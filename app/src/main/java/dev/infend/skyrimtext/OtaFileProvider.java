@@ -14,8 +14,8 @@ import java.io.FileNotFoundException;
 public final class OtaFileProvider extends ContentProvider {
     @Override public boolean onCreate(){return true;}
     private File file(Uri uri)throws FileNotFoundException{
-        if(!"/update.apk".equals(uri.getPath()))throw new FileNotFoundException("Invalid URI");
-        File f=new File(getContext().getCacheDir(),"update.apk");if(!f.isFile())throw new FileNotFoundException();return f;
+        if(!"/apk".equals(uri.getPath()))throw new FileNotFoundException("Invalid URI");
+        File f=UpdateManager.apkFile(getContext());if(!f.isFile())throw new FileNotFoundException();return f;
     }
     @Override public ParcelFileDescriptor openFile(Uri uri,String mode)throws FileNotFoundException{
         if(!"r".equals(mode))throw new FileNotFoundException("Read-only");

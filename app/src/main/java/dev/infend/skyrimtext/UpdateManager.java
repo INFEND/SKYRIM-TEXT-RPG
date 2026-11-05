@@ -1,141 +1,322 @@
 package dev.infend.skyrimtext;
 
-import android.app.AlertDialog;
-import android.content.Intent;
+import android.app.Activity;
+import android.content.*;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.Signature;
 import android.net.Uri;
+import android.net.ConnectivityManager;
+import android.net.Network;
+import android.net.NetworkCapabilities;
+import javax.net.ssl.SSLException;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import android.os.Build;
-import android.os.Handler;
-import android.os.Looper;
 import android.provider.Settings;
-import android.graphics.Color;
-import android.content.res.ColorStateList;
-import android.widget.LinearLayout;
-import android.widget.ProgressBar;
-import android.widget.TextView;
-import android.view.Gravity;
-
-import org.json.JSONArray;
 import org.json.JSONObject;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
+import org.json.JSONArray;
+import java.util.ArrayList;
+import java.util.List;
+import java.io.*;
+import java.net.*;
 import java.security.MessageDigest;
+import java.util.Arrays;
 import java.util.Locale;
+import javax.net.ssl.HttpsURLConnection;
 
-/** Checks public GitHub Releases, verifies SHA-256, installs through Android Package Installer. */
+/** Secure user-initiated update checker for an HTTPS manifest and a single APK. */
 public final class UpdateManager {
-    private static final String MANIFEST_URL="https://github.com/INFEND/SKYRIM-TEXT-RPG/releases/latest/download/update.json";
-    private static final String ALLOWED_APK_PREFIX="https://github.com/INFEND/SKYRIM-TEXT-RPG/releases/download/";
-    private final MainActivity activity;
-    private final Handler ui=new Handler(Looper.getMainLooper());
-    private volatile boolean busy=false;
-    private boolean installPending=false;
-    UpdateManager(MainActivity activity){this.activity=activity;}
-
-    public void check(boolean manual){
-        if(busy){if(manual)activity.toast("Проверка уже выполняется");return;}
-        busy=true;if(manual)activity.toast("Проверка обновлений…");
-        new Thread(()->{
-            try{
-                JSONObject info=new JSONObject(readString(MANIFEST_URL));
-                int code=info.getInt("versionCode");String version=info.getString("versionName");
-                String apk=info.getString("apkUrl");String sha=info.getString("sha256").toLowerCase(Locale.ROOT);
-                if(!apk.startsWith(ALLOWED_APK_PREFIX)||!sha.matches("[0-9a-f]{64}"))throw new Exception("Некорректный манифест обновления");
-                StringBuilder notes=new StringBuilder();JSONArray arr=info.optJSONArray("changelog");
-                if(arr!=null)for(int i=0;i<arr.length();i++)notes.append("• ").append(arr.optString(i)).append("\n");
-                ui.post(()->{
-                    busy=false;
-                    if(code>BuildConfig.VERSION_CODE)offer(version,apk,sha,notes.toString());
-                    else if(manual)activity.toast("Установлена актуальная версия: "+BuildConfig.VERSION_NAME);
-                });
-            }catch(Exception e){ui.post(()->{busy=false;if(manual)activity.toast("Нет доступного релиза или ошибка сети");});}
-        },"skyrim-ota-check").start();
+    private UpdateManager(){}
+    /** This is the only official OTA channel. No editable source or alternate endpoint. */
+    public static final String MANIFEST_URL=OtaUrlPolicy.MANIFEST;
+    public static final String TRUSTED_CERT_SHA256="8A0D221B9C31007B55AC0BAED5597A0B638881F7FEF6650A6E7BD0E2B49793FE";
+    private static final long MAX_APK=512L*1024L*1024L;
+    private static final int MAX_MANIFEST_BYTES=4*1024*1024;
+    // Only the two pinned slugs of this repository are accepted after its rename.
+    public static final String APK_FILE="skyrim_text_rpg_update.apk";
+    public interface Callback {
+        void status(String message);
+        default void progress(long transferred,long total){}
+        void release(Release info, boolean newer);
+        void downloaded(File file);
+        void error(String message);
     }
-    private String readString(String link)throws Exception{
-        HttpURLConnection c=(HttpURLConnection)new URL(link).openConnection();
-        c.setConnectTimeout(12000);c.setReadTimeout(16000);c.setInstanceFollowRedirects(true);
-        c.setRequestProperty("User-Agent","SKYRIM-TEXT-RPG/"+BuildConfig.VERSION_NAME);
-        try{
-            if(c.getResponseCode()!=200)throw new Exception("HTTP "+c.getResponseCode());
-            if(c.getContentLengthLong()>128000)throw new Exception("Manifest too large");
-            try(InputStream in=c.getInputStream()){
-                byte[] bytes=readLimited(in,128000);return new String(bytes,java.nio.charset.StandardCharsets.UTF_8);
+    public static final class Release {
+        public final long versionCode;
+        public final String versionName,apkUrl,sha256,notes,packageName;
+        public final long sizeBytes;
+        private final List<OtaHistory.Entry> history;
+        public String notesFor(long installedVersionCode){
+            return OtaHistory.merge(history,installedVersionCode,versionCode,notes);
+        }
+        Release(JSONObject j)throws Exception {
+            if(j.has("schema") && j.getInt("schema")!=1)throw new IOException("Неподдерживаемый формат OTA");
+            packageName=j.optString("packageName","dev.infend.skyrimtext");
+            if(!"dev.xarkon.link".equals(packageName))throw new IOException("Ошибка идентификатора приложения");
+            versionCode=j.getLong("versionCode");
+            versionName=j.optString("versionName","Новая версия");
+            apkUrl=j.getString("apkUrl");
+            sha256=j.getString("sha256").toLowerCase(Locale.US);
+            notes=j.optString("notes","");
+            sizeBytes=j.optLong("sizeBytes",-1L);
+            if(versionCode<1||!sha256.matches("[0-9a-f]{64}")||
+                !versionName.matches("[A-Za-z0-9._-]{1,40}")||
+                sizeBytes==0||sizeBytes < -1||sizeBytes>MAX_APK||notes.length()>100_000)
+                throw new IOException("Недействительные метаданные OTA");
+            if(!OtaUrlPolicy.trustedApk(apkUrl,versionName))
+                throw new IOException("APK размещён вне официального канала");
+            List<OtaHistory.Entry> entries=new ArrayList<>();
+            JSONArray versions=j.optJSONArray("history");
+            // Do not discard the full missed-release history after 500 entries.
+            // Input bytes are bounded separately when the manifest is downloaded.
+            if(versions!=null){
+                for(int i=0;i<versions.length();i++){
+                    JSONObject item=versions.optJSONObject(i);
+                    if(item==null){entries.clear();break;}
+                    entries.add(new OtaHistory.Entry(item.optLong("versionCode",0),
+                        item.optString("versionName",""),item.optString("notes","")));
+                }
             }
+            history=entries;
+        }
+    }
+    private static void checkHttps(String url)throws IOException{
+        URL u=new URL(url);
+        if(!"https".equalsIgnoreCase(u.getProtocol())||u.getHost()==null||u.getHost().isEmpty())
+            throw new IOException("Нужна прямая HTTPS-ссылка");
+    }
+    public static File apkFile(Context c){return new File(new File(c.getFilesDir(),"ota"),APK_FILE);}
+    private static void internetReady(Context c)throws IOException{
+        ConnectivityManager cm=(ConnectivityManager)c.getSystemService(Context.CONNECTIVITY_SERVICE);
+        Network network=cm==null?null:cm.getActiveNetwork();
+        NetworkCapabilities caps=network==null?null:cm.getNetworkCapabilities(network);
+        if(caps==null||!caps.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET))
+            throw new IOException("Нет подключения к интернету. Включите Wi-Fi или мобильные данные.");
+        try{InetAddress.getAllByName("github.com");}
+        catch(UnknownHostException e){
+            if(!caps.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED))
+                throw new IOException("Сеть подключена, но интернет или DNS недоступны. Проверьте Wi-Fi, мобильные данные и VPN.",e);
+            throw new IOException("Интернет доступен, но сервер обновлений не определяется. Проверьте DNS и VPN.",e);
+        }
+    }
+    private static String friendly(Exception e){
+        if(e instanceof UnknownHostException)return "Не удаётся определить адрес сервера обновлений. Проверьте интернет, DNS и VPN.";
+        if(e instanceof SocketTimeoutException)return "Сервер обновлений не ответил вовремя. Попробуйте ещё раз.";
+        if(e instanceof SSLException)return "Ошибка защищённого соединения. Проверьте дату, время и настройки VPN.";
+        if(e instanceof ConnectException)return "Не удалось подключиться к серверу обновлений.";
+        String s=e.getMessage();
+        return s==null||s.trim().isEmpty()?"Ошибка обновления":s;
+    }
+    private static void requireOk(HttpsURLConnection c,String purpose)throws IOException{
+        int code=c.getResponseCode();
+        if(code==200)return;
+        if(code==404)throw new IOException("Файл обновления не найден на сервере (HTTP 404).");
+        if(code==403||code==429)throw new IOException("Сервер временно ограничил загрузку (HTTP "+code+"). Попробуйте позже.");
+        if(code>=500)throw new IOException("Сервер обновлений временно недоступен (HTTP "+code+").");
+        throw new IOException(purpose+": сервер ответил HTTP "+code);
+    }
+    private static HttpsURLConnection connection(String url)throws IOException{
+        checkHttps(url);
+        URLConnection c=new URL(url).openConnection();
+        if(!(c instanceof HttpsURLConnection))throw new IOException("Не HTTPS");
+        HttpsURLConnection h=(HttpsURLConnection)c;
+        h.setConnectTimeout(12000);h.setReadTimeout(25000);
+        h.setRequestProperty("User-Agent","SKYRIM-TEXT-RPG-Updater/1.0");
+        return h;
+    }
+    /** If an owner rename breaks the legacy APK URL, retry only the pinned same-version asset. */
+    private static HttpsURLConnection openApk(String url,String version)throws IOException{
+        IOException oldFailure;
+        try{
+            HttpsURLConnection original=connection(url);
+            try{requireOk(original,"Загрузка APK");return original;}
+            catch(IOException unavailable){original.disconnect();throw unavailable;}
+        }catch(IOException unavailable){oldFailure=unavailable;}
+        String fallback=OtaUrlPolicy.canonicalApkFallback(url,version);
+        if(fallback==null)throw oldFailure;
+        HttpsURLConnection canonical=connection(fallback);
+        try{requireOk(canonical,"Загрузка APK");return canonical;}
+        catch(IOException unavailable){
+            canonical.disconnect();unavailable.addSuppressed(oldFailure);throw unavailable;
+        }
+    }
+
+    /** The original URL remains primary for installed OTA clients. */
+    public static Release fetchLatest(Context context)throws Exception{
+        internetReady(context);
+        try{return readManifest(MANIFEST_URL);}
+        catch(IOException oldEndpointFailure){
+            // GitHub owner changes can invalidate old release redirects.
+            // Retry only the canonical URL of the same pinned repository.
+            try{return readManifest(OtaUrlPolicy.MANIFEST);}
+            catch(Exception currentFailure){
+                currentFailure.addSuppressed(oldEndpointFailure);
+                throw currentFailure;
+            }
+        }
+    }
+    private static Release readManifest(String url)throws Exception{
+        HttpsURLConnection c=connection(url);
+        try{
+            requireOk(c,"Проверка обновления");
+            ByteArrayOutputStream memory=new ByteArrayOutputStream();
+            try(InputStream in=c.getInputStream()){
+                byte[] b=new byte[8192];int n;
+                while((n=in.read(b))!=-1){
+                    if(memory.size()+n>MAX_MANIFEST_BYTES)throw new IOException("Ответ сервера слишком большой.");
+                    memory.write(b,0,n);
+                }
+            }
+            try{return new Release(new JSONObject(memory.toString("UTF-8")));}
+            catch(org.json.JSONException bad){throw new IOException("Некорректные данные обновления.",bad);}
         }finally{c.disconnect();}
     }
-    private byte[] readLimited(InputStream in,int max)throws Exception{
-        java.io.ByteArrayOutputStream out=new java.io.ByteArrayOutputStream();byte[] buf=new byte[4096];int n;
-        while((n=in.read(buf))!=-1){if(out.size()+n>max)throw new Exception("Too large");out.write(buf,0,n);}return out.toByteArray();
-    }
-    private void offer(String version,String apk,String sha,String notes){
-        String msg="Новая версия: "+version+"\nТекущая: "+BuildConfig.VERSION_NAME+"\n\n"+(notes.isEmpty()?"Исправления и улучшения.":notes);
-        new AlertDialog.Builder(activity).setTitle("Обновление SKYRIM TEXT RPG")
-            .setMessage(msg).setNegativeButton("Позже",null)
-            .setPositiveButton("Скачать и установить",(d,w)->download(apk,sha)).show();
-    }
-    private void download(String url,String expectedHash){
-        if(busy)return;busy=true;
-        LinearLayout panel=new LinearLayout(activity);panel.setOrientation(LinearLayout.VERTICAL);
-        int pad=(int)(24*activity.getResources().getDisplayMetrics().density);panel.setPadding(pad,pad,pad,pad);
-        TextView label=new TextView(activity);label.setText("Загрузка обновления… 0%");label.setTextSize(15);
-        label.setTextColor(Color.WHITE);panel.addView(label);
-        ProgressBar progress=new ProgressBar(activity,null,android.R.attr.progressBarStyleHorizontal);
-        progress.setMax(100);progress.setProgressTintList(ColorStateList.valueOf(activity.currentAccent()));
-        LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(-1,pad/2);lp.topMargin=pad/2;panel.addView(progress,lp);
-        AlertDialog dialog=new AlertDialog.Builder(activity).setTitle("Обновление приложения")
-            .setView(panel).setCancelable(false).create();dialog.show();
+    public static void check(Activity activity,String manifestUrl,Callback cb){
         new Thread(()->{
-            HttpURLConnection c=null;File temp=new File(activity.getCacheDir(),"update.part");
             try{
-                URL source=new URL(url);if(!url.startsWith(ALLOWED_APK_PREFIX))throw new Exception("Invalid update URL");
-                c=(HttpURLConnection)source.openConnection();c.setConnectTimeout(18000);c.setReadTimeout(25000);
-                c.setRequestProperty("User-Agent","SKYRIM-TEXT-RPG/OTA");
-                if(c.getResponseCode()!=200)throw new Exception("HTTP "+c.getResponseCode());
-                long size=c.getContentLengthLong();if(size>200L*1024*1024)throw new Exception("APK too large");
-                MessageDigest hash=MessageDigest.getInstance("SHA-256");
-                try(InputStream in=c.getInputStream();FileOutputStream out=new FileOutputStream(temp)){
-                    byte[] buffer=new byte[16384];int count;long downloaded=0;int last=-1;
-                    while((count=in.read(buffer))!=-1){downloaded+=count;
-                        if(downloaded>200L*1024*1024)throw new Exception("APK size limit");
-                        out.write(buffer,0,count);hash.update(buffer,0,count);
-                        int percent=size>0?(int)Math.min(100,downloaded*100/size):0;
-                        if(percent!=last){last=percent;final int p=percent;
-                            ui.post(()->{progress.setProgress(p);label.setText("Загрузка обновления… "+p+"%");});}
+                if(!MANIFEST_URL.equals(manifestUrl))throw new IOException("Недоверенный источник обновления.");
+                activity.runOnUiThread(()->cb.status("Проверка соединения..."));
+                Release info=fetchLatest(activity.getApplicationContext());
+                long installed=activity.getPackageManager().getPackageInfo(activity.getPackageName(),0).getLongVersionCode();
+                activity.runOnUiThread(()->cb.release(info,info.versionCode>installed));
+            }catch(Exception e){
+                String error=friendly(e);
+                activity.runOnUiThread(()->cb.error(error));
+            }
+        },"skyrim-text-rpg-update-check").start();
+    }
+    public static void download(Activity activity,Release r,Callback cb){
+        new Thread(()->{
+            File folder=new File(activity.getFilesDir(),"ota");
+            File temp=new File(folder,APK_FILE+".part");
+            File apk=new File(folder,APK_FILE);
+            try{
+                internetReady(activity);
+                if(!folder.isDirectory()&&!folder.mkdirs())throw new IOException("Не удалось создать папку обновлений во внутренней памяти.");
+                if(r.sizeBytes>MAX_APK)throw new IOException("Размер обновления превышает 512 МБ.");
+                if(r.sizeBytes>0&&folder.getUsableSpace()<r.sizeBytes+4L*1024*1024)
+                    throw new IOException("Недостаточно свободного места для обновления. Освободите память устройства.");
+                HttpsURLConnection c=openApk(r.apkUrl,r.versionName);
+                long received=0L;
+                long total;
+                MessageDigest digest=MessageDigest.getInstance("SHA-256");
+                try{
+                    long serverLength=c.getContentLengthLong();
+                    if(serverLength>MAX_APK)throw new IOException("Слишком большой APK.");
+                    if(r.sizeBytes>0&&serverLength>0&&serverLength!=r.sizeBytes)
+                        throw new IOException("Сервер вернул файл другого размера.");
+                    total=r.sizeBytes>0?r.sizeBytes:serverLength;
+                    final long visibleTotal=total;
+                    activity.runOnUiThread(()->cb.progress(0L,visibleTotal));
+                    try(InputStream in=new BufferedInputStream(c.getInputStream(),128*1024);
+                        FileOutputStream out=new FileOutputStream(temp,false)){
+                        byte[] buf=new byte[128*1024];
+                        int n;long lastReport=0L;
+                        while((n=in.read(buf))!=-1){
+                            received+=n;
+                            if(received>MAX_APK)throw new IOException("Превышен допустимый размер обновления.");
+                            out.write(buf,0,n);digest.update(buf,0,n);
+                            long now=System.currentTimeMillis();
+                            if(now-lastReport>120L){
+                                lastReport=now;
+                                final long current=received;
+                                activity.runOnUiThread(()->cb.progress(current,visibleTotal));
+                            }
+                        }
+                        out.getFD().sync();
+                    }catch(FileNotFoundException e){
+                        throw new IOException("Не удалось создать файл обновления. Проверьте свободное место.",e);
                     }
-                }
-                byte[] digest=hash.digest();StringBuilder sb=new StringBuilder();for(byte b:digest)sb.append(String.format(Locale.ROOT,"%02x",b&0xff));
-                if(!expectedHash.equals(sb.toString()))throw new Exception("SHA-256 mismatch");
-                File target=new File(activity.getCacheDir(),"update.apk");
-                if(target.exists()&&!target.delete())throw new Exception("Cannot replace old update");
-                if(!temp.renameTo(target))throw new Exception("Cannot move verified APK");
-                ui.post(()->{busy=false;dialog.dismiss();installVerifiedApk();});
-            }catch(Exception error){temp.delete();ui.post(()->{
-                busy=false;dialog.dismiss();new AlertDialog.Builder(activity)
-                    .setTitle("Ошибка обновления").setMessage("APK не установлен: "+error.getMessage())
-                    .setPositiveButton("Закрыть",null).show();});
-            }finally{if(c!=null)c.disconnect();}
-        },"skyrim-ota-download").start();
+                }finally{c.disconnect();}
+                if(r.sizeBytes>0&&received!=r.sizeBytes)
+                    throw new IOException("Файл загрузился не полностью. Повторите загрузку.");
+                final long complete=received;
+                final long full=r.sizeBytes>0?r.sizeBytes:received;
+                activity.runOnUiThread(()->{
+                    cb.progress(complete,full);
+                    cb.status("Проверяем целостность и подпись…");
+                });
+                StringBuilder hash=new StringBuilder(64);
+                for(byte b:digest.digest())hash.append(String.format(Locale.US,"%02x",b&255));
+                if(!hash.toString().equals(r.sha256))throw new IOException("Контрольная сумма SHA-256 не совпала. Файл отклонён.");
+                try{Files.move(temp.toPath(),apk.toPath(),StandardCopyOption.REPLACE_EXISTING);}
+                catch(IOException move){throw new IOException("Не удалось сохранить APK во внутренней памяти. Проверьте свободное место.",move);}
+                try{verifyApk(activity,apk,r.versionCode);}
+                catch(Exception invalid){apk.delete();throw invalid;}
+                activity.runOnUiThread(()->cb.downloaded(apk));
+            }catch(Exception e){
+                temp.delete();
+                final String error=friendly(e);
+                activity.runOnUiThread(()->cb.error(error));
+            }
+        },"skyrim-text-rpg-update-download").start();
     }
-    private void installVerifiedApk(){
-        File apk=new File(activity.getCacheDir(),"update.apk");if(!apk.isFile()){activity.toast("Файл обновления отсутствует");return;}
-        if(Build.VERSION.SDK_INT>=26&&!activity.getPackageManager().canRequestPackageInstalls()){
-            installPending=true;
-            new AlertDialog.Builder(activity).setTitle("Разрешение на установку")
-                .setMessage("Android должен разрешить этому приложению устанавливать загруженные обновления. После разрешения установка продолжится автоматически.")
-                .setNegativeButton("Позже",(d,w)->installPending=false)
-                .setPositiveButton("Разрешить",(d,w)->{
-                    Intent i=new Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES,Uri.parse("package:"+activity.getPackageName()));
-                    try{activity.startActivity(i);}catch(Exception ex){activity.toast("Открой разрешение установки APK в настройках Android");}
-                }).show();return;
+    /** An archive is accepted only if Android will recognize it as THIS installed app. */
+    public static void verifyApk(Context c,File file,long expectedCode)throws Exception{
+        PackageManager pm=c.getPackageManager();
+        PackageInfo archive=pm.getPackageArchiveInfo(file.getAbsolutePath(),PackageManager.GET_SIGNING_CERTIFICATES);
+        if(archive==null)throw new IOException("Не удалось прочитать пакет APK");
+        if(!c.getPackageName().equals(archive.packageName))throw new IOException("APK принадлежит другому приложению");
+        if(archive.getLongVersionCode()!=expectedCode)throw new IOException("Версия APK не соответствует манифесту");
+        long current=pm.getPackageInfo(c.getPackageName(),0).getLongVersionCode();
+        if(archive.getLongVersionCode()<=current)throw new IOException("Версия уже установлена или устарела");
+        PackageInfo installed=pm.getPackageInfo(c.getPackageName(),PackageManager.GET_SIGNING_CERTIFICATES);
+        if(installed.signingInfo==null||archive.signingInfo==null)throw new IOException("Не удалось проверить подпись APK");
+        Signature[] oldSigners=installed.signingInfo.getApkContentsSigners();
+        Signature[] newSigners=archive.signingInfo.getApkContentsSigners();
+        if(oldSigners==null||newSigners==null||oldSigners.length!=1||newSigners.length!=1)
+            throw new IOException("Неподдерживаемое количество сертификатов подписи");
+        if(!TRUSTED_CERT_SHA256.equals(sha256OfSignature(oldSigners[0]))
+            || !TRUSTED_CERT_SHA256.equals(sha256OfSignature(newSigners[0])))
+            throw new IOException("Неверная подпись APK. Установите официальную версию SKYRIM TEXT RPG");
+        if(!Arrays.equals(oldSigners,newSigners))
+            throw new IOException("Подписи установленного приложения и обновления различаются");
+    }
+    private static String sha256OfSignature(Signature signer)throws Exception{
+        byte[] digest=MessageDigest.getInstance("SHA-256").digest(signer.toByteArray());
+        StringBuilder hex=new StringBuilder(64);
+        for(byte b:digest)hex.append(String.format(Locale.US,"%02X",b&255));
+        return hex.toString();
+    }
+    public static void install(Activity a){
+        try{
+            File apk=apkFile(a);
+            if(!apk.isFile())throw new IOException("Сначала загрузите обновление");
+            PackageManager pm=a.getPackageManager();
+            if(Build.VERSION.SDK_INT>=26&&!pm.canRequestPackageInstalls()){
+                Intent settings=new Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES,
+                    Uri.parse("package:"+a.getPackageName()));
+                a.getSharedPreferences("skyrim_text_v1",0).edit().putBoolean("ota_install_pending",true).apply();
+                OtaProgressDialog notice=new OtaProgressDialog(a);
+                notice.show();
+                notice.stage("Разрешение на установку","Разрешите установку обновлений для SKYRIM TEXT RPG в настройках Android.");
+                a.getWindow().getDecorView().postDelayed(()->{
+                    if(a.isFinishing()||a.isDestroyed())return;
+                    try{a.startActivity(settings);notice.dismiss();}
+                    catch(Exception error){notice.fail(friendly(error),null);}
+                },500L);
+                return;
+            }
+            // Both APK identity and signing certificate are checked again before installation.
+            PackageInfo archive=pm.getPackageArchiveInfo(apk.getAbsolutePath(),0);
+            if(archive==null)throw new IOException("Не удалось открыть APK");
+            verifyApk(a,apk,archive.getLongVersionCode());
+            Uri content=Uri.parse("content://"+a.getPackageName()+".updates/apk");
+            // A self-update kills the old SKYRIM TEXT RPG process. Launching the
+            // system installer as a child of our Activity can leave its
+            // post-install "Open" action attached to the dying task.
+            // Start the installer from the application context with NEW_TASK
+            // so Android keeps the installer and SKYRIM TEXT RPG in separate tasks.
+            Intent view=new Intent(Intent.ACTION_VIEW);
+            view.setDataAndType(content,"application/vnd.android.package-archive");
+            view.setClipData(ClipData.newRawUri("SKYRIM TEXT RPG",content));
+            view.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION
+                | Intent.FLAG_ACTIVITY_NEW_TASK);
+            a.getApplicationContext().startActivity(view);
+        }catch(Exception e){
+            OtaProgressDialog screen=new OtaProgressDialog(a);
+            screen.show();screen.fail(friendly(e),null);
         }
-        installPending=false;
-        Uri uri=Uri.parse("content://"+activity.getPackageName()+".ota/update.apk");
-        Intent i=new Intent(Intent.ACTION_VIEW);i.setDataAndType(uri,"application/vnd.android.package-archive");
-        i.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION|Intent.FLAG_ACTIVITY_NEW_TASK);
-        i.setClipData(android.content.ClipData.newUri(activity.getContentResolver(),"SKYRIM Update",uri));
-        try{activity.startActivity(i);}catch(Exception e){activity.toast("Системный установщик Android недоступен");}
     }
-    public void onHostResume(){if(installPending&&activity.getPackageManager().canRequestPackageInstalls())installVerifiedApk();}
 }

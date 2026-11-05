@@ -43,7 +43,7 @@ public final class MainActivity extends Activity {
     private int tab=0, accentIndex=0, fontBonus=0;
     private String draftName="", selectedRace="Норд", selectedClass="Воин";
     private boolean animations=true;
-    private UpdateManager updater;
+    private SkyrimOtaController updater;
 
     @Override public void onCreate(Bundle bundle){
         super.onCreate(bundle);
@@ -52,15 +52,18 @@ public final class MainActivity extends Activity {
         accentIndex=Math.max(0,Math.min(ACCENTS.length-1,prefs.getInt("accent",0)));
         fontBonus=Math.max(-2,Math.min(4,prefs.getInt("font_bonus",0)));
         animations=prefs.getBoolean("animations",true);
-        updater=new UpdateManager(this);
+        updater=new SkyrimOtaController(this);
+        OtaUpdateSchedule.configure(this);
         getWindow().setStatusBarColor(BG);getWindow().setNavigationBarColor(BG);
         getWindow().getDecorView().setSystemUiVisibility(0);
         render();
     }
-    @Override protected void onResume(){super.onResume();if(updater!=null && prefs!=null && game!=null && game.started){
+    @Override protected void onResume(){super.onResume();if(updater!=null && prefs!=null){
         updater.onHostResume();
-        long now=System.currentTimeMillis();long last=prefs.getLong("last_check",0);
-        if(now-last>6L*60*60*1000){prefs.edit().putLong("last_check",now).apply();updater.check(false);}
+        if(prefs.getBoolean(OtaUpdateSchedule.PREF_ON_LAUNCH,true)){
+            long now=System.currentTimeMillis();long last=prefs.getLong("last_check",0);
+            if(now-last>6L*60*60*1000){prefs.edit().putLong("last_check",now).apply();updater.check(false);}
+        }
     }}
     @Override protected void onPause(){save();super.onPause();}
     private void save(){try{prefs.edit().putString("save",game.toJson().toString()).apply();}catch(Exception ignored){}}
@@ -250,7 +253,51 @@ public final class MainActivity extends Activity {
         sw.setOnCheckedChangeListener((b,checked)->{animations=checked;prefs.edit().putBoolean("animations",checked).apply();});
         readability.addView(sw,lp(-1,47));
         space(content,6);addText(content,"ОБНОВЛЕНИЯ",11,accent(),true,11);
-        actionButton("Проверить обновления","Установка APK внутри приложения • без браузера",true,()->updater.check(true));
+        actionButton("Проверить обновления","Проверка подписи, история изменений и установка внутри приложения",true,()->updater.check(true));
+        LinearLayout otaOptions=card();addText(otaOptions,"АВТОМАТИЧЕСКИЕ ПРОВЕРКИ",11,accent(),true,10);
+        Switch onLaunch=new Switch(this);onLaunch.setText("Проверять при запуске");onLaunch.setTextSize(sp(14));
+        onLaunch.setTextColor(TEXT);onLaunch.setChecked(prefs.getBoolean(OtaUpdateSchedule.PREF_ON_LAUNCH,true));
+        onLaunch.setThumbTintList(ColorStateList.valueOf(accent()));
+        onLaunch.setOnCheckedChangeListener((v,on)->prefs.edit().putBoolean(OtaUpdateSchedule.PREF_ON_LAUNCH,on).apply());
+        otaOptions.addView(onLaunch,lp(-1,47));
+        Switch background=new Switch(this);background.setText("Проверять в фоне");background.setTextSize(sp(14));
+        background.setTextColor(TEXT);background.setThumbTintList(ColorStateList.valueOf(accent()));
+        boolean bgEnabled=prefs.getBoolean(OtaUpdateSchedule.PREF_BACKGROUND,false);
+        background.setChecked(bgEnabled);
+        background.setOnCheckedChangeListener((v,on)->{
+            prefs.edit().putBoolean(OtaUpdateSchedule.PREF_BACKGROUND,on).apply();
+            OtaUpdateSchedule.configure(this);
+            if(on&&android.os.Build.VERSION.SDK_INT>=33&&checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS)!=android.content.pm.PackageManager.PERMISSION_GRANTED)
+                requestPermissions(new String[]{android.Manifest.permission.POST_NOTIFICATIONS},917);
+            render();
+        });
+        otaOptions.addView(background,lp(-1,47));
+        if(bgEnabled){
+            long selected=prefs.getLong(OtaUpdateSchedule.PREF_FREQUENCY,24L);
+            int index=4;
+            for(int i=0;i<OtaUpdateSchedule.INTERVAL_HOURS.length;i++)
+                if(OtaUpdateSchedule.INTERVAL_HOURS[i]==selected)index=i;
+            TextView frequency=text("Интервал: "+OtaUpdateSchedule.INTERVAL_NAMES[index],13,MUTED,false);
+            otaOptions.addView(frequency);
+            android.widget.SeekBar seek=new android.widget.SeekBar(this);
+            seek.setMax(OtaUpdateSchedule.INTERVAL_HOURS.length-1);seek.setProgress(index);
+            seek.setProgressTintList(ColorStateList.valueOf(accent()));
+            seek.setThumbTintList(ColorStateList.valueOf(accent()));
+            seek.setOnSeekBarChangeListener(new android.widget.SeekBar.OnSeekBarChangeListener(){
+                public void onStartTrackingTouch(android.widget.SeekBar bar){}
+                public void onProgressChanged(android.widget.SeekBar bar,int p,boolean fromUser){
+                    frequency.setText("Интервал: "+OtaUpdateSchedule.INTERVAL_NAMES[p]);
+                }
+                public void onStopTrackingTouch(android.widget.SeekBar bar){
+                    long hours=OtaUpdateSchedule.INTERVAL_HOURS[bar.getProgress()];
+                    prefs.edit().putLong(OtaUpdateSchedule.PREF_FREQUENCY,hours).apply();
+                    OtaUpdateSchedule.configure(MainActivity.this);
+                }
+            });
+            otaOptions.addView(seek,lp(-1,46));
+            String result=prefs.getString("ota_background_result","");
+            if(!result.isEmpty())addText(otaOptions,result,12,MUTED,false,0);
+        }
         addText(content,"Текущая версия: "+BuildConfig.VERSION_NAME+" ("+BuildConfig.VERSION_CODE+")",12,MUTED,false,20);
         addText(content,"СОХРАНЕНИЯ",11,accent(),true,11);
         actionButton("Сохранить сейчас","Данные хранятся на устройстве",false,()->{save();toast("Прогресс сохранён");});
