@@ -32,9 +32,8 @@ jobs:
         shell: bash
         run: |
           echo "ANDROID_HOME=${ANDROID_HOME:-unset}"
-          command -v sdkmanager
-          sdkmanager --version
-          sdkmanager --install 'platforms;android-35' 'build-tools;35.0.0'
+          "${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager" --version
+          "${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager" --install 'platforms;android-35' 'build-tools;35.0.0'
       - name: Assemble debug APK
         run: gradle --no-daemon --stacktrace :app:assembleDebug
       - name: Prepare debug artifact
