@@ -14,9 +14,10 @@ jobs:
       - name: Extract application sources
         run: |
           unzip -oq source_bundle.zip -d .
+          mv .github/workflows/android-ota.yml ota-workflow.yml.txt
           rm source_bundle.zip
           test -f app/build.gradle
-          test -f .github/workflows/android-ota.yml
+          test -f ota-workflow.yml.txt
       - name: Publish extracted sources to main
         run: |
           git config user.name "github-actions[bot]"
