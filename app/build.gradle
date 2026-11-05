@@ -1,0 +1,46 @@
+plugins { id 'com.android.application' }
+
+def releaseSigning = new Properties()
+def signingFile = rootProject.file('signing.properties')
+if (signingFile.exists()) {
+    signingFile.withInputStream { releaseSigning.load(it) }
+}
+
+android {
+    namespace 'dev.infend.skyrimtext'
+    compileSdk 35
+
+    defaultConfig {
+        applicationId 'dev.infend.skyrimtext'
+        minSdk 26
+        targetSdk 34
+        versionCode 1
+        versionName '1.0.0'
+        resConfigs 'ru'
+    }
+
+    if (signingFile.exists()) {
+        signingConfigs {
+            release {
+                storeFile rootProject.file(releaseSigning.getProperty('storeFile', 'release.jks'))
+                storePassword releaseSigning.getProperty('storePassword')
+                keyAlias releaseSigning.getProperty('keyAlias')
+                keyPassword releaseSigning.getProperty('keyPassword')
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            if (signingFile.exists()) signingConfig signingConfigs.release
+        }
+        debug { applicationIdSuffix '' }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+    buildFeatures { buildConfig true }
+    packaging { resources { excludes += ['/META-INF/{AL2.0,LGPL2.1}'] } }
+}
