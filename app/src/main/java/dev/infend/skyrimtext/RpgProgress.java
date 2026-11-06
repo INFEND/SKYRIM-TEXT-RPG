@@ -21,6 +21,8 @@ public final class RpgProgress {
     public int dragonNextStage=0;
     public String dragonNextRecent="";
     public final HashSet<String> dragonNextUsed=new HashSet<>();
+    // Failed risky attempts remain spent, but are not evidence.
+    public final HashSet<String> dragonNextFailed=new HashSet<>();
     public String dragonRecent="";
     public final HashSet<String> dragonUsed=new HashSet<>();
     public int actionDay=-1;
@@ -226,7 +228,8 @@ public final class RpgProgress {
              .put("dragonStage",dragonStage).put("dragonInsight",dragonInsight)
              .put("dragonRecent",dragonRecent).put("dragonUsed",new JSONArray(dragonUsed))
              .put("dragonNextStage",dragonNextStage).put("dragonNextRecent",dragonNextRecent)
-             .put("dragonNextUsed",new JSONArray(dragonNextUsed));
+             .put("dragonNextUsed",new JSONArray(dragonNextUsed))
+             .put("dragonNextFailed",new JSONArray(dragonNextFailed));
         }catch(Exception ignored){}
         return o;
     }
@@ -245,6 +248,11 @@ public final class RpgProgress {
         if(nextActions!=null)for(int i=0;i<nextActions.length();i++){
             String value=nextActions.optString(i,"");
             if(value.matches("DRAGON_NEXT:[01]:[1-8]"))p.dragonNextUsed.add(value);
+        }
+        JSONArray nextFailed=obj.optJSONArray("dragonNextFailed");
+        if(nextFailed!=null)for(int i=0;i<nextFailed.length();i++){
+            String value=nextFailed.optString(i,"");
+            if(value.matches("DRAGON_NEXT:[01]:[357]")&&p.dragonNextUsed.contains(value))p.dragonNextFailed.add(value);
         }
         JSONArray dragonActions=obj.optJSONArray("dragonUsed");
         if(dragonActions!=null)for(int i=0;i<dragonActions.length();i++){
