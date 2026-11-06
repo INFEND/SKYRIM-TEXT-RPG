@@ -30,6 +30,15 @@ class DragonContinuationContracts(unittest.TestCase):
         self.assertIn("SKILLS[stage][choice-1],8",c)
         self.assertIn("g.progress.completed.add(TITLES[stage]",c)
         self.assertIn("if(g.progress.dragonNextUsed.contains(action))return;",c)
+    def test_quest_objectives_and_branching_conclusions(self):
+        c=source("DragonContinuation.java")
+        self.assertIn("public static String questObjective(GameEngine g)",c)
+        self.assertIn("evidenceCount(g,stage)+\"/3\"",c)
+        self.assertIn("private static String lead(GameEngine g)",c)
+        self.assertIn("if(seal&&dates)",c)
+        self.assertIn("if(courier&&scout)",c)
+        self.assertIn("!g.progress.dragonNextFailed.contains",c)
+        self.assertIn("Следующая экспедиция пока не реализована.",c)
     def test_integration_and_legacy(self):
         arc=source("DragonArc.java")
         game=source("GameEngine.java")
