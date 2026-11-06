@@ -41,6 +41,15 @@ class DragonContinuationContracts(unittest.TestCase):
         self.assertIn("if(courier&&scout)",c)
         self.assertIn("!g.progress.dragonNextFailed.contains",c)
         self.assertIn("Дальнейшая экспедиция пока не реализована.",c)
+    def test_windhelm_actions_reachable_and_saveable(self):
+        c=source("DragonContinuation.java")
+        self.assertIn('action.matches("DRAGON_NEXT:[012]:[0-9]")',c)
+        self.assertNotIn('action.matches("DRAGON_NEXT:[01]:[0-9]")',c)
+        self.assertIn('g.progress.dragonNextStage++',c)
+        self.assertIn('if(stage==2)g.progress.recent=',c)
+        self.assertIn('g.progress.dragonNextUsed.add(action)',c)
+        self.assertIn('g.progress.dragonNextFailed.add(action)',c)
+
     def test_integration_and_legacy(self):
         arc=source("DragonArc.java")
         game=source("GameEngine.java")
