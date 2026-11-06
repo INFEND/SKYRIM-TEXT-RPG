@@ -637,6 +637,19 @@ public final class MainActivity extends Activity {
         actionButton("Продолжить историю","Открыть следующую главу",true,()->{
             game.mode="DRAGON";save();tab=0;render();
         });
+        if(game.progress.dragonStage>=DragonArc.FINAL_STAGE){
+            LinearLayout continuation=card();
+            addText(continuation,"ПРОДОЛЖЕНИЕ ОСНОВНОЙ ИСТОРИИ",11,accent(),true,11);
+            addText(continuation,"Драконий след • расследования",20,TEXT,true,8);
+            addText(continuation,DragonContinuation.status(game),14,accent(),true,8);
+            addText(continuation,DragonContinuation.questObjective(game),15,MUTED,false,10);
+            if(game.progress.dragonNextStage<3){
+                addText(continuation,"Пройдено расследований: "+Math.max(0,game.progress.dragonNextStage)+" / 3",13,MUTED,false,8);
+                actionButton("Продолжить расследование","Открыть активное сюжетное задание",true,()->{
+                    game.mode="DRAGON";save();tab=0;render();
+                });
+            }
+        }
         LinearLayout main=card();addText(main,"ДОПОЛНИТЕЛЬНАЯ ИСТОРИЯ",11,accent(),true,11);
         addText(main,"Пепельные печати",22,TEXT,true,8);
         addText(main,"Статус: "+game.questStatus(),13,accent(),false,13);
@@ -650,6 +663,11 @@ public final class MainActivity extends Activity {
         LinearLayout finishedQuests=card();addText(finishedQuests,"ЗАВЕРШЁННЫЕ ЗАДАНИЯ",11,accent(),true,9);
         if(game.progress.dragonStage==DragonArc.FINAL_STAGE)
             addText(finishedQuests,"✓  Драконий след • первое испытание",14,TEXT,false,8);
+        if(game.progress.dragonStage>=DragonArc.FINAL_STAGE){
+            String[] investigations={"Письмо под пеплом","Совет за закрытыми дверями","След пепельного гонца"};
+            for(int i=0;i<Math.min(3,game.progress.dragonNextStage);i++)
+                addText(finishedQuests,"✓  "+investigations[i],14,TEXT,false,8);
+        }
         if(game.questStage==4)addText(finishedQuests,"✓  Пепельные печати",14,TEXT,false,8);
         if(game.progress.dragonStage<DragonArc.FINAL_STAGE)
             addText(finishedQuests,"Драконий след: ещё не завершён.",13,MUTED,false,8);
