@@ -39,7 +39,7 @@ public final class RpgProgress {
         quantity("Лечебное зелье",Math.max(0,g.potions));
         quantity("Зелье магии",Math.max(0,g.manaPotions));
         if(g.swordUpgraded){quantity("Походный клинок",0);quantity("Стальной меч",1);}
-        if(g.armorUpgraded){quantity("Дорожная одежда",0);quantity("Стальной кираса",1);}
+        if(g.armorUpgraded){quantity("Дорожная одежда",0);quantity("Стальная кираса",1);}
     }
     public void quantity(String id,int n){
         try{inventory.put(id,Math.max(0,n));}catch(Exception ignored){}
@@ -235,6 +235,12 @@ public final class RpgProgress {
         for(int i=0;i<3;i++)if(pts!=null)p.spent[i]=Math.max(0,Math.min(5,pts.optInt(i,0)));
         JSONObject inv=obj.optJSONObject("inventory");
         if(inv!=null){Iterator<String> keys=inv.keys();while(keys.hasNext()){String k=keys.next();p.quantity(k,inv.optInt(k,0));}}
+        // Older saves contained an invalid armor key; convert without duplicating weight.
+        int legacyArmor=p.quantity("Стальной кираса");
+        if(legacyArmor>0){
+            p.quantity("Стальная кираса",Math.max(legacyArmor,p.quantity("Стальная кираса")));
+            p.inventory.remove("Стальной кираса");
+        }
         JSONArray done=obj.optJSONArray("completed"),bad=obj.optJSONArray("failed");
         if(done!=null)for(int i=0;i<done.length();i++)p.completed.add(done.optString(i));
         if(bad!=null)for(int i=0;i<bad.length();i++)p.failed.add(bad.optString(i));

@@ -133,8 +133,13 @@ public final class GameEngine {
     }
 
     private Scene travelScene() {
-        Scene s = new Scene("КАРТА СЕВЕРА", "Куда держать путь?", "Дорога занимает день. Открыты дороги во все доступные регионы. В пути ты восстановишь немного сил.");
-        for(int i=0;i<REGIONS.length;i++) if(i!=region) s.add("REGION:"+i, REGIONS[i], regionHint(i));
+        Scene s = new Scene("ДОРОГИ СЕВЕРА", "Куда держать путь?", "Поездки занимают несколько дней и требуют перехода между дорогами владений. На Солстейм ходит корабль из Виндхельма.");
+        for(int i=0;i<REGIONS.length;i++)if(i!=region){
+            WorldAtlas.Place target=WorldAtlas.find(TravelPlanner.HUBS[i]);
+            TravelPlanner.Route route=TravelPlanner.plan(this,target);
+            s.add("REGION:"+i,REGIONS[i],regionHint(i)+(route.allowed?
+                " • "+route.days+" дн."+(route.fare>0?" • "+route.fare+" септимов":""):" • "+route.problem));
+        }
         return s.add("GO_WORLD","Остаться здесь","Вернуться в город");
     }
     private String regionHint(int i) {
@@ -198,21 +203,28 @@ public final class GameEngine {
     public void choose(String action) {
         if (!started || action==null) return;
         if (action.startsWith("ACT:")){progress.perform(this,action);progress.sync(this);return;}
-        if (action.startsWith("LOC:")){
+        if(action.startsWith("LOC:")){
             WorldAtlas.Place target=WorldAtlas.find(action.substring(4));
             if(target==null)return;
-            if(progress.carryWeight()>50.00001){message="Тяжесть поклажи не позволяет продолжить путь.";mode="RESULT";return;}
-            region=target.region;progress.location=target.name;day++;
-            stamina=Math.max(0,stamina-12);
-            message="Ты добираешься до «"+target.name+"». "+target.description+
-                "\n\nТропа остаётся позади. Небо меняет цвет, а путешествие продолжается.";
+            TravelPlanner.Route route=TravelPlanner.plan(this,target);
+            if(!route.allowed){message=route.problem;mode="RESULT";return;}
+            if(route.days==0){message="Ты уже находишься здесь.";mode="WORLD";return;}
+            gold-=route.fare;
+            day+=route.days;
+            region=target.region;
+            progress.location=target.name;
+            stamina=Math.max(1,stamina-Math.min(Math.max(0,stamina-1),route.days*6));
+            magicka=Math.max(1,magicka-Math.min(Math.max(0,magicka-1),route.days*2));
+            message="Ты преодолеваешь дорогу, постепенно оставляя за спиной стоянки, перевалы и чужие костры. "+
+                route.summary()+"\n\nМесто назначения: "+target.name+". "+target.description;
             mode="RESULT";return;
         }
-        if (action.startsWith("REGION:")) {
-            try { int to=Integer.parseInt(action.substring(7)); if(to>=0 && to<REGIONS.length) {
-                region=to;progress.location=REGIONS[to]; day++; stamina=Math.min(maxStamina,stamina+20); magicka=Math.min(maxMagicka,magicka+10);
-                message="После долгого пути ты входишь в " + REGIONS[to] + "."; mode="WORLD";
-            } } catch(NumberFormatException ignored) {} return;
+        if(action.startsWith("REGION:")){
+            try{
+                int target=Integer.parseInt(action.substring(7));
+                if(target>=0&&target<REGIONS.length)choose("LOC:"+TravelPlanner.HUBS[target]);
+            }catch(NumberFormatException ignored){}
+            return;
         }
         switch(action) {
             case "GO_WORLD": mode="WORLD"; if(message.isEmpty()) message="Ветер зовёт обратно на дорогу."; break;
@@ -249,11 +261,31 @@ public final class GameEngine {
         }
     }
     private void buy(int price,String success,String item) {
-        if((item.equals("SWORD")&&swordUpgraded)||(item.equals("ARMOR")&&armorUpgraded)) {message="Этот предмет у тебя уже есть.";mode="RESULT";return;}
-        if(gold<price){message="Недостаточно септимов. Нужно ещё " + (price-gold) + " септимов.";mode="RESULT";return;}
+        if((item.equals("SWORD")&&swordUpgraded)||(item.equals("ARMOR")&&armorUpgraded)) {
+            message="Этот предмет у тебя уже есть.";mode="RESULT";return;
+        }
+        if(gold<price){message="Недостаточно септимов. Нужно ещё "+(price-gold)+" септимов.";mode="RESULT";return;}
+        progress.sync(this);
+        String target=item.equals("HP")?"Лечебное зелье":item.equals("MP")?"Зелье магии":
+            item.equals("SWORD")?"Стальной меч":"Стальная кираса";
+        String replaced=item.equals("SWORD")?"Походный клинок":item.equals("ARMOR")?"Дорожная одежда":null;
+        ItemCatalog.Item incoming=ItemCatalog.find(target);
+        ItemCatalog.Item previous=replaced==null?null:ItemCatalog.find(replaced);
+        if(incoming==null){message="Предмет не найден в каталоге. Покупка отменена.";mode="RESULT";return;}
+        double projected=progress.carryWeight()+incoming.weight;
+        if(previous!=null&&progress.quantity(replaced)>0)projected-=previous.weight;
+        if(projected>50.00001){
+            message="Нельзя взять предмет: вес превысит 50 кг. Септимы не списаны.";
+            mode="RESULT";return;
+        }
         gold-=price;
-        switch(item){case "HP":potions++;break;case "MP":manaPotions++;break;case "SWORD":swordUpgraded=true;attack+=6;break;case "ARMOR":armorUpgraded=true;armor+=4;break;}
-        message=success;mode="RESULT";
+        switch(item){
+            case "HP":potions++;break;
+            case "MP":manaPotions++;break;
+            case "SWORD":swordUpgraded=true;attack+=6;break;
+            case "ARMOR":armorUpgraded=true;armor+=4;break;
+        }
+        progress.sync(this);message=success;mode="RESULT";
     }
     private void explore() {
         explored++;stamina=Math.max(0,stamina-5);
@@ -272,8 +304,12 @@ public final class GameEngine {
             message=events[random.nextInt(events.length)];mode="EVENT";
         } else {
             int found=15+random.nextInt(41);gold+=found;addXp(12);
-            if(random.nextInt(4)==0) potions++;
-            message="В зарослях найден старый тайник. Внутри " + found + " септимов. +12 опыта.";mode="RESULT";
+            boolean extraPotion=random.nextInt(4)==0;
+            boolean canTake=progress.carryWeight()+0.5<=50.00001;
+            if(extraPotion&&canTake)potions++;
+            message="В зарослях найден старый тайник. Внутри "+found+" септимов. +12 опыта."+
+                (extraPotion?(canTake?" Найдено лечебное зелье.":" Зелье пришлось оставить из-за веса."):"");
+            mode="RESULT";
         }
     }
     private void eventChoice(boolean help) {
@@ -284,7 +320,12 @@ public final class GameEngine {
         if(succeeded){
             if(help){
                 reputation++;int gain=10+random.nextInt(16);addXp(gain);
-                if(random.nextBoolean()){potions++;message="Ты помогаешь незнакомцу и получаешь лечебное зелье. Репутация +1, опыт +"+gain+".";}
+                if(random.nextBoolean()){
+                    boolean canCarry=progress.carryWeight()+0.5<=50.00001;
+                    if(canCarry)potions++;
+                    message=canCarry?"Ты помогаешь незнакомцу и получаешь лечебное зелье. Репутация +1, опыт +"+gain+".":
+                        "Ты помогаешь путнику, но оставляешь зелье из-за тяжёлой поклажи. Репутация +1, опыт +"+gain+".";
+                }
                 else{gold+=25;message="В благодарность тебе вручают 25 септимов. Репутация +1, опыт +"+gain+".";}
             }else{
                 int found=28+random.nextInt(44);gold+=found;addXp(10);

@@ -329,16 +329,20 @@ public final class MainActivity extends Activity {
         addText(content,"Обозначено мест: "+places.size(),12,MUTED,false,8);
         for(WorldAtlas.Place place:places){
             String status=place.name.equals(game.progress.location)?"  •  ВЫ ЗДЕСЬ":"";
-            actionButton(WorldAtlas.icon(place.type)+"  "+place.name+status,place.type+"  •  "+GameEngine.REGIONS[place.region],false,()->locationDialog(place));
+            TravelPlanner.Route route=TravelPlanner.plan(game,place);
+            String detail=place.type+"  •  "+GameEngine.REGIONS[place.region]+
+                (route.allowed?(route.days>0?"  •  "+route.days+" дн.":""):"  •  Недоступно");
+            actionButton(WorldAtlas.icon(place.type)+"  "+place.name+status,detail,false,()->locationDialog(place));
         }
     }
     private void locationDialog(WorldAtlas.Place place){
-        String body=place.description+"\n\nТип: "+place.type+"\nРегион: "+GameEngine.REGIONS[place.region];
+        TravelPlanner.Route route=TravelPlanner.plan(game,place);
+        String body=place.description+"\n\nТип: "+place.type+
+            "\nРегион: "+GameEngine.REGIONS[place.region]+"\n\n"+route.summary();
         AlertDialog.Builder dialog=new AlertDialog.Builder(this).setTitle(place.name).setMessage(body)
             .setNegativeButton("Закрыть",null);
-        if(!place.name.equals(game.progress.location)){
-            dialog.setPositiveButton("Отправиться", (d,w)->{
-                if(game.progress.carryWeight()>50.0){toast("Превышен предел переносимого веса");return;}
+        if(route.allowed&&route.days>0){
+            dialog.setPositiveButton("Начать переход",(d,w)->{
                 game.choose("LOC:"+place.name);game.progress.sync(game);save();tab=0;render();
             });
         }
