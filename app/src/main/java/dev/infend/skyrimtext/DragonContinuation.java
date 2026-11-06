@@ -36,6 +36,26 @@ public final class DragonContinuation {
                 !g.progress.dragonNextFailed.contains("DRAGON_NEXT:"+stage+":"+i))n++;
         return n;
     }
+    /** Quest objective derived from existing schema-1 flags; no migration required. */
+    private static String lead(GameEngine g){
+        boolean courier=g.progress.dragonNextUsed.contains("DRAGON_NEXT:0:4");
+        boolean seal=g.progress.dragonNextUsed.contains("DRAGON_NEXT:0:5")
+            && !g.progress.dragonNextFailed.contains("DRAGON_NEXT:0:5");
+        boolean dates=g.progress.dragonNextUsed.contains("DRAGON_NEXT:1:1");
+        boolean scout=g.progress.dragonNextUsed.contains("DRAGON_NEXT:1:7")
+            && !g.progress.dragonNextFailed.contains("DRAGON_NEXT:1:7");
+        if(seal&&dates)return "Древняя печать и даты налётов указывают на пробуждение курганов.";
+        if(courier&&scout)return "Показания караванщика и слежка раскрыли путь тайного посланника.";
+        if(scout)return "След посланника ведёт к забытым погребениям.";
+        if(dates)return "Даты нападений образуют тревожную последовательность.";
+        return "Свидетельства собраны, но источник угрозы пока не установлен.";
+    }
+    public static String questObjective(GameEngine g){
+        int stage=g.progress.dragonNextStage;
+        if(stage>=2)return "Завершено: новые свидетельства. "+lead(g);
+        return "Активно: "+TITLES[stage]+" • "+PLACES[stage]
+            +" • свидетельства "+evidenceCount(g,stage)+"/3";
+    }
     public static String status(GameEngine g){
         int stage=g.progress.dragonNextStage;
         return stage>=2?"Драконий след • новые свидетельства собраны":
@@ -44,11 +64,11 @@ public final class DragonContinuation {
     public static GameEngine.Scene scene(GameEngine g){
         int stage=g.progress.dragonNextStage;
         if(stage>=2)return new GameEngine.Scene("ДРАКОНИЙ СЛЕД • ПРОДОЛЖЕНИЕ","След ведёт дальше",
-            "Два новых свидетельства изучены. Донесения указывают на древние погребения, но путь к следующей тайне ещё не открыт.")
+            "Расследования в Ривервуде и Вайтране завершены. "+lead(g)+" Следующая экспедиция пока не реализована.")
             .primary("GO_WORLD","Вернуться в мир","Продолжить путешествие");
         boolean here=PLACES[stage].equals(g.progress.location);
         GameEngine.Scene s=new GameEngine.Scene("ДРАКОНИЙ СЛЕД • ГЛАВА "+(stage+7),TITLES[stage],
-            STORIES[stage]+"\n\nМЕСТО: "+PLACES[stage]+(here?" • ты здесь":" • требуется путь")+
+            STORIES[stage]+"\n\nЦЕЛЬ КВЕСТА: "+questObjective(g)+"\n\nМЕСТО: "+PLACES[stage]+(here?" • ты здесь":" • требуется путь")+
             (g.progress.dragonNextRecent.isEmpty()?"":"\n\nПОСЛЕДСТВИЕ\n"+g.progress.dragonNextRecent));
         s.primary("DRAGON_NEXT:"+stage+":0",here?"Завершить расследование":"Проложить путь в "+PLACES[stage],
             here?"Собери три свидетельства ("+evidenceCount(g,stage)+"/3)":"Открыть маршруты");
@@ -80,9 +100,9 @@ public final class DragonContinuation {
             if(evidenceCount(g,stage)<3){g.progress.dragonNextRecent="Нужно три свидетельства: "+evidenceCount(g,stage)+"/3.";return;}
             g.progress.dragonNextStage++;
             g.addXp(30+stage*15);
-            g.progress.dragonNextRecent="Сведения собраны, дальнейший путь открыт.";
+            g.progress.dragonNextRecent=stage==1?"Ривервудские свидетельства переданы советникам Вайтрана.":"Совет завершён. "+lead(g);
             g.progress.completed.add(TITLES[stage]+" • день "+g.day);
-            if(stage==1)g.progress.recent="Квест «Драконий след: новые свидетельства» завершён.";
+            if(stage==1)g.progress.recent="Квест «Драконий след: новые свидетельства» завершён. "+lead(g);
             return;
         }
         if(g.progress.dragonNextUsed.contains(action))return;
