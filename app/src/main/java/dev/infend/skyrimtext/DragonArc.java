@@ -110,14 +110,11 @@ public final class DragonArc {
 
     public static String status(GameEngine g){
         int stage=Math.max(0,Math.min(FINAL_STAGE,g.progress.dragonStage));
-        return stage==FINAL_STAGE?"Завершено: первое испытание":CHAPTERS[stage]+" • "+PROGRESS[stage];
+        return stage==FINAL_STAGE?DragonContinuation.status(g):CHAPTERS[stage]+" • "+PROGRESS[stage];
     }
     public static GameEngine.Scene scene(GameEngine g){
         int stage=Math.max(0,Math.min(FINAL_STAGE,g.progress.dragonStage));
-        if(stage==FINAL_STAGE)
-            return new GameEngine.Scene("ПЕРВАЯ САГА ЗАВЕРШЕНА","Голос среди гор",
-                "Уцелевшие жители долин рассказывают о сражении у сторожевой башни. На вершине ты услышал, что сила без понимания превращается в новую беду. Знание о драконах теперь часть твоего пути.\n\nЭто завершение первой самостоятельной сюжетной арки. Впереди остаётся исследование Скайрима, другие задания и ещё не раскрытые древние тайны.")
-                .primary("GO_WORLD","Вернуться в большой мир","Продолжить приключение и другие задания");
+        if(stage==FINAL_STAGE)return DragonContinuation.scene(g);
         String destination=DESTINATIONS[stage];
         boolean arrived=destination.equals(g.progress.location);
         String suffix=g.progress.dragonRecent.isEmpty()?"":"\n\nПОСЛЕДСТВИЕ ПОСЛЕДНЕГО ВЫБОРА\n"+g.progress.dragonRecent;
