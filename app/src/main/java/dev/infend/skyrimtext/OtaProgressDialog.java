@@ -67,14 +67,14 @@ public final class OtaProgressDialog {
     }
     private int dp(float x){ return (int)(activity.getResources().getDisplayMetrics().density*x+.5f); }
     private GradientDrawable shape(int color,int border,int radius){
-        GradientDrawable d=new GradientDrawable();d.setColor(color);d.setCornerRadius(dp(radius));
-        if(border!=0)d.setStroke(dp(1),border);
+        GradientDrawable d=new GradientDrawable();d.setColor(color);d.setCornerRadius(0);
+        if(border!=0)d.setStroke(dp(2),border);
         return d;
     }
     private TextView text(String s,int size,int color,boolean bold){
         TextView v=new TextView(activity);v.setText(s);v.setTextColor(color);v.setTextSize(size);
         v.setIncludeFontPadding(false);
-        if(bold)v.setTypeface(Typeface.DEFAULT,Typeface.BOLD);
+        v.setTypeface(Typeface.SERIF,bold?Typeface.BOLD:Typeface.NORMAL);
         return v;
     }
     private static String size(long value){
@@ -93,13 +93,13 @@ public final class OtaProgressDialog {
         panel=light?0xffffffff:amoled?0xff0c1014:0xff14212d;
         foreground=light?0xff182837:0xfff1eee5;
         muted=light?0xff617689:0xff97a0a3;
-        int stroke=light?0xffdce4ed:amoled?0xff293136:0xff304252;
+        int stroke=light?0xffdce4ed:amoled?0xff877456:0xff9a8969;
         animate=p.getBoolean("animations",true);
         dialog=new Dialog(a);dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         LinearLayout root=new LinearLayout(a);root.setOrientation(LinearLayout.VERTICAL);
-        root.setPadding(dp(22),dp(22),dp(22),dp(19));root.setBackground(shape(panel,stroke,25));
+        root.setPadding(dp(22),dp(22),dp(22),dp(19));root.setBackground(new RuneFrameDrawable(panel,accent,true));
         LinearLayout top=new LinearLayout(a);top.setOrientation(LinearLayout.HORIZONTAL);top.setGravity(Gravity.CENTER_VERTICAL);
-        FrameLayout symbolBox=new FrameLayout(a);symbolBox.setBackground(shape((accent&0x00ffffff)|0x22000000,0,15));
+        FrameLayout symbolBox=new FrameLayout(a);symbolBox.setBackground(new RuneFrameDrawable(0xff161d21,accent,false));
         LinearLayout.LayoutParams sb=new LinearLayout.LayoutParams(dp(53),dp(53));sb.rightMargin=dp(14);top.addView(symbolBox,sb);
         mark=new CenteredRing(a,accent);
         symbolBox.addView(mark,new FrameLayout.LayoutParams(dp(33),dp(33),Gravity.CENTER));
@@ -115,7 +115,7 @@ public final class OtaProgressDialog {
         notesScroll=new android.widget.ScrollView(a);
         notesScroll.setFillViewport(false);
         notesScroll.setVerticalScrollBarEnabled(false);
-        notesScroll.setBackground(shape(light?0xfff3f6f9:0xff0c0f12,stroke,15));
+        notesScroll.setBackground(new RuneFrameDrawable(light?0xfff3f6f9:0xff0c0f12,stroke,false));
         notesText=text("",13,foreground,false);
         notesText.setPadding(dp(13),dp(12),dp(13),dp(13));
         notesText.setLineSpacing(dp(4),1f);
@@ -139,10 +139,11 @@ public final class OtaProgressDialog {
         LinearLayout.LayoutParams al=new LinearLayout.LayoutParams(-1,-2);al.topMargin=dp(24);root.addView(actions,al);
         secondary=text("СКРЫТЬ",12,muted,true);secondary.setGravity(Gravity.CENTER);
         secondary.setPadding(dp(16),dp(14),dp(16),dp(14));
+        secondary.setBackground(new RuneFrameDrawable(0xff12191d,stroke,false));
         secondary.setOnClickListener(v->dismiss());
         actions.addView(secondary);
-        primary=text("ПОВТОРИТЬ",12,Color.BLACK,true);primary.setGravity(Gravity.CENTER);
-        primary.setBackground(shape(accent,0,13));primary.setPadding(dp(16),dp(13),dp(16),dp(13));
+        primary=text("ПОВТОРИТЬ",12,accent,true);primary.setGravity(Gravity.CENTER);
+        primary.setBackground(new RuneFrameDrawable(0xff27261f,accent,true));primary.setPadding(dp(16),dp(13),dp(16),dp(13));
         LinearLayout.LayoutParams ap=new LinearLayout.LayoutParams(-2,-2);ap.leftMargin=dp(8);
         actions.addView(primary,ap);primary.setVisibility(View.GONE);
         dialog.setContentView(root);dialog.setCancelable(true);
