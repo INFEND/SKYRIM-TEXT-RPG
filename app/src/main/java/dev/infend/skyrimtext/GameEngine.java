@@ -202,6 +202,11 @@ public final class GameEngine {
 
     public void choose(String action) {
         if (!started || action==null) return;
+        // A pending battle cannot be escaped by invoking a world, map or quest action.
+        // This guard also protects saved games restored directly into COMBAT mode.
+        if ("COMBAT".equals(mode) && !("ATTACK".equals(action) || "HEAVY".equals(action)
+                || "MAGIC".equals(action) || "DEFEND".equals(action)
+                || "POTION".equals(action) || "FLEE".equals(action))) return;
         if (action.startsWith("ACT:")){progress.perform(this,action);progress.sync(this);return;}
         if(action.startsWith("LOC:")){
             WorldAtlas.Place target=WorldAtlas.find(action.substring(4));
