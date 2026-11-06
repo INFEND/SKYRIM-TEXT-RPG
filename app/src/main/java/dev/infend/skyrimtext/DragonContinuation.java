@@ -32,7 +32,8 @@ public final class DragonContinuation {
     private DragonContinuation(){}
     private static int evidenceCount(GameEngine g,int stage){
         int n=0;
-        for(int i=1;i<=8;i++)if(g.progress.dragonNextUsed.contains("DRAGON_NEXT:"+stage+":"+i))n++;
+        for(int i=1;i<=8;i++)if(g.progress.dragonNextUsed.contains("DRAGON_NEXT:"+stage+":"+i) &&
+                !g.progress.dragonNextFailed.contains("DRAGON_NEXT:"+stage+":"+i))n++;
         return n;
     }
     public static String status(GameEngine g){
@@ -97,8 +98,9 @@ public final class DragonContinuation {
                 g.progress.skillExperience(g,SKILLS[stage][choice-1],12+stage*4);
                 g.progress.dragonNextRecent="Успех: "+pair[0]+". "+pair[1]+" Получены полезные свидетельства.";
             }else{
+                g.progress.dragonNextFailed.add(action);
                 g.hp=Math.max(1,g.hp-(4+stage*2));
-                g.progress.dragonNextRecent="Неудача: "+pair[0]+". Пришлось отступить с ранами.";
+                g.progress.dragonNextRecent="Неудача: "+pair[0]+". Свидетельство не получено, попытка исчерпана. Пришлось отступить с ранами.";
             }
         }else{
             if(choice==2||choice==6)g.reputation=Math.min(50,g.reputation+2);
