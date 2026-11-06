@@ -41,13 +41,17 @@ public final class MainActivity extends Activity {
     private ScrollView scroll;
     private EditText nameField;
     private int tab=0, accentIndex=0, fontBonus=0;
-    private String draftName="", selectedRace="Норд", selectedClass="Воин";
+    private String draftName="", selectedRace="Норд", selectedClass="Без класса";
+    private int selectedStart=0,selectedMapRegion=-1;
+    private final int[] initialPoints={0,0,0};
+    private String selectedCategory="Все",selectedSort="Название";
     private boolean animations=true;
     private SkyrimOtaController updater;
 
     @Override public void onCreate(Bundle bundle){
         super.onCreate(bundle);
         prefs=getSharedPreferences(PREFS,MODE_PRIVATE);
+        ItemCatalog.initialize(this);
         game=GameEngine.fromJson(prefs.getString("save",null));
         accentIndex=Math.max(0,Math.min(ACCENTS.length-1,prefs.getInt("accent",0)));
         fontBonus=Math.max(-2,Math.min(4,prefs.getInt("font_bonus",0)));
@@ -96,8 +100,10 @@ public final class MainActivity extends Activity {
         content=column();content.setPadding(dp(19),dp(20),dp(19),dp(26));scroll.addView(content);
         if(!game.started)renderNewGame();
         else if(tab==0)renderStory();
-        else if(tab==1)renderHero();
-        else if(tab==2)renderJournal();
+        else if(tab==1)renderMap();
+        else if(tab==2)renderInventory();
+        else if(tab==3)renderHero();
+        else if(tab==4)renderJournal();
         else renderSettings();
         if(game.started)renderNav();
         if(animations){content.setAlpha(0.8f);content.animate().alpha(1f).setDuration(210).setInterpolator(new DecelerateInterpolator()).start();}
@@ -157,21 +163,94 @@ public final class MainActivity extends Activity {
         return chevron;
     }
     private void renderNewGame(){
-        section("СВОБОДНОЕ ПРИКЛЮЧЕНИЕ","Напиши свою легенду","Текстовая RPG на русском. Оригинальные приключения, тактические бои и последствия каждого решения.");
-        LinearLayout c=card();addText(c,"ИМЯ ПЕРСОНАЖА",11,accent(),true,10);
-        nameField=new EditText(this);nameField.setSingleLine(true);nameField.setTextColor(TEXT);
-        nameField.setHintTextColor(MUTED);nameField.setHint("Как зовут героя?");nameField.setTextSize(sp(17));
-        nameField.setFilters(new android.text.InputFilter[]{new android.text.InputFilter.LengthFilter(22)});
-        nameField.setPadding(dp(12),dp(9),dp(12),dp(9));nameField.setBackground(bg(PANEL_2,BORDER,9));
-        nameField.setText(draftName);c.addView(nameField,lp(-1,49));
-        space(content,7);addText(content,"ПРОИСХОЖДЕНИЕ",11,accent(),true,11);
+        section("НОВАЯ ИСТОРИЯ","Твоя легенда начинается","Выбери место старта, расу, путь развития и распределение первых пяти очков. Каждый выбор влияет на историю героя.");
+        LinearLayout details=card();addText(details,"ИМЯ ПЕРСОНАЖА",11,accent(),true,10);
+        LinearLayout nameLine=row();details.addView(nameLine,lp(-1,-2));
+        nameField=new EditText(this);nameField.setSingleLine(true);nameField.setTextColor(TEXT);nameField.setHintTextColor(MUTED);
+        nameField.setHint("Имя героя");nameField.setTextSize(sp(16));
+        nameField.setFilters(new android.text.InputFilter[]{new android.text.InputFilter.LengthFilter(28)});
+        nameField.setPadding(dp(11),dp(8),dp(11),dp(8));nameField.setBackground(bg(PANEL_2,BORDER,9));
+        nameField.setText(draftName);nameLine.addView(nameField,new LinearLayout.LayoutParams(0,dp(48),1));
+        TextView nameDice=text("⟳",26,accent(),true);nameDice.setGravity(Gravity.CENTER);
+        LinearLayout.LayoutParams diceLp=lp(48,48);diceLp.leftMargin=dp(7);nameLine.addView(nameDice,diceLp);
+        nameDice.setBackground(bg(PANEL_2,accent(),10));
+        nameDice.setContentDescription("Сгенерировать случайное имя");
+        nameDice.setOnClickListener(v->{draftName=RpgContent.randomName();nameField.setText(draftName);nameField.setSelection(draftName.length());});
+        addText(details,"Нажми ⟳, чтобы получить случайное имя.",12,MUTED,false,0);
+
+        addText(content,"РАСА",11,accent(),true,9);
         chips(GameEngine.RACES,selectedRace,value->{draftName=nameField.getText().toString();selectedRace=value;render();});
-        space(content,22);addText(content,"ПУТЬ ГЕРОЯ",11,accent(),true,11);
+        int race=RpgContent.raceIndex(selectedRace);
+        LinearLayout racial=card();
+        addText(racial,"ПАССИВНЫЙ ЭФФЕКТ",10,accent(),true,6);
+        addText(racial,RpgContent.PASSIVES[race],14,TEXT,false,11);
+        addText(racial,"РАСОВЫЙ ТАЛАНТ",10,accent(),true,6);
+        addText(racial,RpgContent.POWERS[race],14,MUTED,false,0);
+
+        addText(content,"КЛАСС • НЕОБЯЗАТЕЛЬНО",11,accent(),true,9);
         chips(GameEngine.CLASSES,selectedClass,value->{draftName=nameField.getText().toString();selectedClass=value;render();});
-        space(content,12);
-        actionButton("НАЧАТЬ ПУТЕШЕСТВИЕ","Новая игра • автосохранение",true,()->{
-            game.start(nameField.getText().toString(),selectedRace,selectedClass);tab=0;save();render();});
-        space(content,13);addText(content,"Неофициальный фанатский проект. Оригинальные тексты и игровые события.",12,MUTED,false,0);
+        int cls=0;for(int i=0;i<GameEngine.CLASSES.length;i++)if(GameEngine.CLASSES[i].equals(selectedClass))cls=i;
+        addText(content,RpgContent.CLASS_DETAILS[cls],13,MUTED,false,15);
+
+        LinearLayout stats=card();addText(stats,"СТАРТОВЫЕ ХАРАКТЕРИСТИКИ",11,accent(),true,7);
+        int used=initialPoints[0]+initialPoints[1]+initialPoints[2];
+        addText(stats,"Свободных очков: "+(5-used)+" / 5  •  +10 к выбранному ресурсу за очко",13,MUTED,false,12);
+        for(int i=0;i<3;i++){
+            final int index=i;LinearLayout line=row();stats.addView(line,lp(-1,50));
+            line.addView(text(RpgContent.ATTRIBUTES[i],14,TEXT,false),new LinearLayout.LayoutParams(0,-2,1));
+            TextView minus=text("−",24,accent(),true);minus.setGravity(Gravity.CENTER);minus.setBackground(bg(PANEL_2,BORDER,9));
+            line.addView(minus,lp(38,38));
+            TextView amount=text(" +"+initialPoints[i],16,TEXT,true);amount.setGravity(Gravity.CENTER);
+            line.addView(amount,lp(63,43));
+            TextView plus=text("+",23,accent(),true);plus.setGravity(Gravity.CENTER);plus.setBackground(bg(PANEL_2,BORDER,9));
+            line.addView(plus,lp(38,38));
+            minus.setOnClickListener(v->{if(initialPoints[index]>0){draftName=nameField.getText().toString();initialPoints[index]--;render();}});
+            plus.setOnClickListener(v->{if(initialPoints[0]+initialPoints[1]+initialPoints[2]<5){draftName=nameField.getText().toString();initialPoints[index]++;render();}});
+        }
+
+        LinearLayout origin=card();
+        addText(origin,"АЛЬТЕРНАТИВНОЕ НАЧАЛО",11,accent(),true,10);
+        String[] origins=new String[RpgContent.STARTS.length];
+        for(int i=0;i<origins.length;i++)origins[i]=RpgContent.startParts(i)[0];
+        android.widget.Spinner selector=spinner(origins,selectedStart,i->{selectedStart=i;});
+        origin.addView(selector,lp(-1,51));
+        TextView originText=text(RpgContent.startParts(selectedStart)[3],14,MUTED,false);
+        originText.setLineSpacing(dp(4),1.08f);
+        origin.addView(originText);
+        selector.setOnItemSelectedListener(new android.widget.AdapterView.OnItemSelectedListener(){
+            public void onNothingSelected(android.widget.AdapterView<?> p){}
+            public void onItemSelected(android.widget.AdapterView<?> p,View v,int position,long id){
+                selectedStart=position;originText.setText(RpgContent.startParts(position)[3]);
+            }
+        });
+        space(content,8);
+        actionButton("НАЧАТЬ ПУТЕШЕСТВИЕ","Игра с сохранением, выбором судьбы и последствиями решений",true,()->{
+            int n=initialPoints[0]+initialPoints[1]+initialPoints[2];
+            if(n!=5){toast("Распредели все 5 свободных очков");return;}
+            game.start(nameField.getText().toString(),selectedRace,selectedClass,selectedStart,initialPoints);
+            tab=0;save();render();
+        });
+        addText(content,"Неофициальная самостоятельная история в знакомом северном мире.",12,MUTED,false,0);
+    }
+    private android.widget.Spinner spinner(String[] options,int position,java.util.function.IntConsumer onChange){
+        android.widget.Spinner sp=new android.widget.Spinner(this);
+        android.widget.ArrayAdapter<String> adapter=new android.widget.ArrayAdapter<String>(this,android.R.layout.simple_spinner_item,options){
+            @Override public View getView(int pos,View old,ViewGroup parent){
+                TextView t=(TextView)super.getView(pos,old,parent);t.setTextColor(TEXT);t.setTextSize(15);t.setPadding(dp(12),dp(6),dp(9),dp(6));return t;
+            }
+            @Override public View getDropDownView(int pos,View old,ViewGroup parent){
+                TextView t=(TextView)super.getDropDownView(pos,old,parent);t.setTextColor(TEXT);
+                t.setBackgroundColor(PANEL);t.setPadding(dp(15),dp(15),dp(10),dp(15));return t;
+            }
+        };
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        sp.setAdapter(adapter);sp.setSelection(Math.max(0,Math.min(position,options.length-1)));
+        sp.setBackground(bg(PANEL_2,BORDER,11));
+        sp.setOnItemSelectedListener(new android.widget.AdapterView.OnItemSelectedListener(){
+            public void onNothingSelected(android.widget.AdapterView<?> v){}
+            public void onItemSelected(android.widget.AdapterView<?> v,View view,int pos,long id){onChange.accept(pos);}
+        });
+        return sp;
     }
     private interface Selection{void onSelect(String value);}
     private void chips(String[] options,String selected,Selection handler){
@@ -188,13 +267,185 @@ public final class MainActivity extends Activity {
         GameEngine.Scene s=game.scene();section(s.kicker,s.title,"");
         LinearLayout narrative=card();
         addText(narrative,"◈  ХРОНИКА ПУТИ",10,accent(),true,13);
-        TextView body=text(s.body,16,TEXT,false);body.setLineSpacing(dp(5),1.09f);narrative.addView(body);
+        TextView body=text(s.body,16,TEXT,false);body.setLineSpacing(dp(5),1.09f);makeItemsClickable(body,s.body);narrative.addView(body);
         space(content,8);addText(content,"ВЫБЕРИ ДЕЙСТВИЕ",11,MUTED,true,13);
-        for(GameEngine.Choice c:s.choices){actionButton(c.title,c.detail,c.special,()->{
-            game.choose(c.action);save();tab=0;render();scroll.scrollTo(0,0);
-        });}
+        for(GameEngine.Choice c:s.choices){
+            int chance=game.progress.chance(game,c.action);
+            String caption=c.detail+(chance<0?"":"\n[Шанс успеха: "+chance+"%]");
+            actionButton(c.title,caption,c.special,()->{
+                int old=game.questStage;
+                game.choose(c.action);
+                if(!c.action.startsWith("ACT:"))game.progress.observe(game,c.action,old);
+                game.progress.sync(game);
+                save();tab=0;render();scroll.scrollTo(0,0);
+            });
+        }
         space(content,5);
         addText(content,"Каждое действие сохраняется автоматически",11,MUTED,false,0);
+    }
+    private void makeItemsClickable(TextView view,String source){
+        android.text.SpannableString span=new android.text.SpannableString(source);
+        java.util.ArrayList<ItemCatalog.Item> list=ItemCatalog.all();
+        list.sort((a,b)->Integer.compare(b.name.length(),a.name.length()));
+        boolean[] occupied=new boolean[source.length()];
+        int created=0;
+        for(ItemCatalog.Item item:list){
+            int i=0;
+            while((i=source.indexOf(item.name,i))>=0){
+                final int start=i,end=i+item.name.length();i=end;
+                boolean overlaps=false;
+                for(int j=start;j<end;j++)if(occupied[j]){overlaps=true;break;}
+                if(overlaps)continue;
+                for(int j=start;j<end;j++)occupied[j]=true;
+                span.setSpan(new android.text.style.ClickableSpan(){
+                    @Override public void onClick(View widget){itemDialog(item);}
+                    @Override public void updateDrawState(android.text.TextPaint p){
+                        p.setColor(accent());p.setUnderlineText(true);
+                    }
+                },start,end,android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                if(++created>60)break;
+            }
+            if(created>60)break;
+        }
+        if(created>0){
+            view.setText(span);view.setMovementMethod(android.text.method.LinkMovementMethod.getInstance());
+            view.setHighlightColor(0x2255dfcb);
+        }
+    }
+    private void renderMap(){
+        section("АТЛАС СЕВЕРА","Карта Скайрима","Метка показывает твоё текущее местоположение. Нажми на любую точку или выбери место в списке.");
+        LinearLayout overview=card();
+        addText(overview,"⌖  ВЫ НАХОДИТЕСЬ: "+game.progress.location,15,accent(),true,10);
+        addText(overview,"Регион: "+GameEngine.REGIONS[game.region]+"  •  день "+game.day,13,MUTED,false,9);
+        overview.addView(new WorldAtlas.MapView(this,game,this::locationDialog),lp(-1,-2));
+        addText(content,"МЕСТА И ПЕРЕХОДЫ",11,accent(),true,10);
+        String[] regions=new String[GameEngine.REGIONS.length+1];regions[0]="Все регионы";
+        System.arraycopy(GameEngine.REGIONS,0,regions,1,GameEngine.REGIONS.length);
+        android.widget.Spinner filter=spinner(regions,selectedMapRegion+1,i->{
+            if(selectedMapRegion!=i-1){selectedMapRegion=i-1;render();}
+        });
+        content.addView(filter,lp(-1,49));space(content,12);
+        java.util.ArrayList<WorldAtlas.Place> places=selectedMapRegion<0?WorldAtlas.all():WorldAtlas.byRegion(selectedMapRegion);
+        addText(content,"Обозначено мест: "+places.size(),12,MUTED,false,8);
+        for(WorldAtlas.Place place:places){
+            String status=place.name.equals(game.progress.location)?"  •  ВЫ ЗДЕСЬ":"";
+            actionButton(WorldAtlas.icon(place.type)+"  "+place.name+status,place.type+"  •  "+GameEngine.REGIONS[place.region],false,()->locationDialog(place));
+        }
+    }
+    private void locationDialog(WorldAtlas.Place place){
+        String body=place.description+"\n\nТип: "+place.type+"\nРегион: "+GameEngine.REGIONS[place.region];
+        AlertDialog.Builder dialog=new AlertDialog.Builder(this).setTitle(place.name).setMessage(body)
+            .setNegativeButton("Закрыть",null);
+        if(!place.name.equals(game.progress.location)){
+            dialog.setPositiveButton("Отправиться", (d,w)->{
+                if(game.progress.carryWeight()>50.0){toast("Превышен предел переносимого веса");return;}
+                game.choose("LOC:"+place.name);game.progress.sync(game);save();tab=0;render();
+            });
+        }
+        dialog.show();
+    }
+    private void renderInventory(){
+        game.progress.sync(game);
+        section("СУМКА СТРАННИКА","Инвентарь","Каждый предмет имеет вес, цену и собственное описание. Переносимый вес учитывается при путешествиях.");
+        LinearLayout capacity=card();
+        double used=game.progress.carryWeight();
+        addText(capacity,String.format(java.util.Locale.forLanguageTag("ru"),"ВЕС: %.2f / 50.00 КГ",used),19,used>50?0xffef8585:accent(),true,8);
+        ProgressBar bar=new ProgressBar(this,null,android.R.attr.progressBarStyleHorizontal);
+        bar.setMax(5000);bar.setProgress(Math.min(5000,(int)Math.round(used*100)));
+        bar.setProgressTintList(ColorStateList.valueOf(used>50?0xffef8585:accent()));
+        capacity.addView(bar,lp(-1,8));
+        addText(capacity,"Септимы: "+game.gold+"  •  Каталог: "+ItemCatalog.count()+" предметов",13,MUTED,false,0);
+        java.util.ArrayList<String> categories=ItemCatalog.groups();
+        if(!categories.contains(selectedCategory))selectedCategory="Все";
+        int index=categories.indexOf(selectedCategory);
+        android.widget.Spinner group=spinner(categories.toArray(new String[0]),index,i->{
+            String choice=categories.get(i);if(!choice.equals(selectedCategory)){selectedCategory=choice;render();}
+        });
+        content.addView(group,lp(-1,50));space(content,8);
+        String[] sorts={"Название","Вес","Цена"};
+        int sortIndex=java.util.Arrays.asList(sorts).indexOf(selectedSort);
+        android.widget.Spinner sort=spinner(sorts,Math.max(0,sortIndex),i->{
+            if(!sorts[i].equals(selectedSort)){selectedSort=sorts[i];render();}
+        });
+        content.addView(sort,lp(-1,50));space(content,10);
+        java.util.ArrayList<ItemCatalog.Item> owned=game.progress.owned(selectedCategory,selectedSort);
+        if(owned.isEmpty())addText(content,"В этой категории пока ничего нет.",15,MUTED,false,15);
+        for(ItemCatalog.Item item:owned){
+            int count=game.progress.quantity(item.id);
+            String desc=String.format(java.util.Locale.forLanguageTag("ru"),"%s · %.2f кг × %d · %d септимов",item.category,item.weight,count,item.value);
+            actionButton(item.icon+"  "+item.name+" ×"+count,desc,false,()->itemDialog(item));
+        }
+        actionButton("Полный справочник предметов","Поиск, характеристики, вес и описание каждого предмета",true,this::showItemCatalog);
+        actionButton("Личная библиотека","Материалы, созданные для этой игры, включая способности и существ",false,this::showLibrary);
+    }
+    private void itemDialog(ItemCatalog.Item item){
+        String text=item.icon+"  "+item.name+"\n\nКатегория: "+item.category+
+            String.format(java.util.Locale.forLanguageTag("ru"),"\nВес: %.2f кг\nСтоимость: %d септимов",item.weight,item.value)+
+            "\n\n"+item.description+"\n\nЭффект: "+item.effect;
+        AlertDialog.Builder dialog=new AlertDialog.Builder(this).setTitle("Сведения о предмете")
+            .setMessage(text).setNegativeButton("Закрыть",null);
+        if(game.progress.quantity(item.id)>0){
+            if("Лечебное зелье".equals(item.id)||"Зелье магии".equals(item.id))
+                dialog.setPositiveButton("Использовать",(d,w)->{
+                    boolean result="Лечебное зелье".equals(item.id)?game.drinkHealing():game.drinkMana();
+                    game.progress.sync(game);save();render();
+                    toast(result?"Зелье использовано":"Нет необходимости использовать зелье");
+                });
+        }
+        dialog.show();
+    }
+    private void showItemCatalog(){
+        java.util.ArrayList<ItemCatalog.Item> items=ItemCatalog.all();
+        items.sort((a,b)->a.name.compareToIgnoreCase(b.name));
+        LinearLayout root=column();root.setPadding(dp(12),dp(8),dp(12),dp(12));
+        EditText search=new EditText(this);search.setSingleLine(true);search.setHint("Найти предмет по названию");
+        search.setTextColor(TEXT);search.setHintTextColor(MUTED);root.addView(search,lp(-1,55));
+        android.widget.ListView list=new android.widget.ListView(this);
+        root.addView(list,lp(-1,440));
+        java.util.ArrayList<ItemCatalog.Item> visible=new java.util.ArrayList<>(items);
+        android.widget.ArrayAdapter<String> adapter=new android.widget.ArrayAdapter<>(this,android.R.layout.simple_list_item_1,new java.util.ArrayList<String>());
+        Runnable refresh=()->{
+            String term=search.getText().toString().trim().toLowerCase(java.util.Locale.ROOT);
+            visible.clear();adapter.clear();
+            for(ItemCatalog.Item item:items){
+                if(!term.isEmpty()&&!item.name.toLowerCase(java.util.Locale.ROOT).contains(term))continue;
+                visible.add(item);adapter.add(item.icon+"  "+item.name+" · "+item.weight+" кг");
+            }
+            adapter.notifyDataSetChanged();
+        };
+        list.setAdapter(adapter);refresh.run();
+        search.addTextChangedListener(new android.text.TextWatcher(){
+            public void beforeTextChanged(CharSequence x,int start,int count,int after){}
+            public void onTextChanged(CharSequence x,int a,int b,int c){refresh.run();}
+            public void afterTextChanged(android.text.Editable x){}
+        });
+        AlertDialog dlg=new AlertDialog.Builder(this).setTitle("Каталог предметов").setView(root).setNegativeButton("Закрыть",null).create();
+        list.setOnItemClickListener((parent,v,pos,id)->{if(pos>=0&&pos<visible.size())itemDialog(visible.get(pos));});
+        dlg.show();
+    }
+    private void showLibrary(){
+        java.util.ArrayList<String> docs=ItemCatalog.loreDocuments(this);
+        if(docs.isEmpty()){toast("Библиотека не загружена");return;}
+        new AlertDialog.Builder(this).setTitle("Личная библиотека • "+docs.size()+" документов")
+            .setItems(docs.toArray(new String[0]),(d,position)->showDocument(docs.get(position)))
+            .setNegativeButton("Закрыть",null).show();
+    }
+    private void showDocument(String file){
+        android.widget.ScrollView scroll=new android.widget.ScrollView(this);
+        LinearLayout col=column();col.setPadding(dp(17),dp(15),dp(17),dp(18));scroll.addView(col);
+        String picture=null;
+        if(file.contains("Эликсир Жизни"))picture="Предметы/Эликсир Жизни.webp";
+        android.graphics.Bitmap bmp=picture==null?null:ItemCatalog.picture(this,picture);
+        if(bmp!=null){
+            android.widget.ImageView image=new android.widget.ImageView(this);
+            image.setImageBitmap(bmp);image.setAdjustViewBounds(true);
+            image.setScaleType(android.widget.ImageView.ScaleType.FIT_CENTER);
+            col.addView(image,lp(-1,260));
+        }
+        String data=ItemCatalog.document(this,file);
+        TextView text=text(data,14,TEXT,false);text.setLineSpacing(dp(4),1.04f);col.addView(text);
+        new AlertDialog.Builder(this).setTitle(file.replace(".txt","")).setView(scroll)
+            .setNegativeButton("Закрыть",null).show();
     }
     private void heroEntry(LinearLayout p,String label,String value){
         LinearLayout r=row();p.addView(r,lp(-1,39));
@@ -206,7 +457,7 @@ public final class MainActivity extends Activity {
         LinearLayout c=card();addText(c,"ХАРАКТЕРИСТИКИ",11,accent(),true,9);
         heroEntry(c,"Опыт",game.xp+" / "+(game.level*80));
         heroEntry(c,"Атака",String.valueOf(game.attack));heroEntry(c,"Защита",String.valueOf(game.armor));
-        heroEntry(c,"Золото",game.gold+" монет");heroEntry(c,"Репутация",String.valueOf(game.reputation));
+        heroEntry(c,"Септимы",game.gold+" септимов");heroEntry(c,"Репутация",String.valueOf(game.reputation));
         heroEntry(c,"Победы",String.valueOf(game.victories));heroEntry(c,"Исследований",String.valueOf(game.explored));
         LinearLayout items=card();addText(items,"СНАРЯЖЕНИЕ",11,accent(),true,12);
         addText(items,"Оружие: "+(game.swordUpgraded?"Закалённый клинок":"Походный клинок"),15,TEXT,false,10);
@@ -216,7 +467,48 @@ public final class MainActivity extends Activity {
         actionButton("Выпить лечебное зелье","+45 здоровья • без боя",false,()->{
             toast(game.drinkHealing()?"Здоровье восстановлено":"Зелье не требуется или закончилось");save();render();});
         actionButton("Выпить зелье магии","+35 магии • без боя",false,()->{
-            toast(game.drinkMana()?"Магия восстановлена":"Зелье не требуется или закончилось");save();render();});
+            toast(game.drinkMana()?"Магия восстановлена":"Зелье не требуется или закончилось");game.progress.sync(game);save();render();});
+        LinearLayout race=card();addText(race,"НАСЛЕДИЕ РАСЫ",11,accent(),true,12);
+        addText(race,game.race+" • пассивно",16,TEXT,true,7);
+        addText(race,game.progress.racePassive(game),14,MUTED,false,13);
+        addText(race,"Талант",13,accent(),true,5);
+        addText(race,game.progress.racePower(game),14,TEXT,false,7);
+        actionButton("Применить расовый талант","Доступен один раз в день",false,()->{
+            boolean ok=game.progress.useRacePower(game);
+            if(ok)save();render();toast(ok?"Расовый талант активирован":"Талант уже применён сегодня");
+        });
+        LinearLayout stats=card();addText(stats,"БАЗОВЫЕ АТРИБУТЫ",11,accent(),true,10);
+        heroEntry(stats,"Здоровье",String.valueOf(game.maxHp));
+        heroEntry(stats,"Магия",String.valueOf(game.maxMagicka));
+        heroEntry(stats,"Выносливость",String.valueOf(game.maxStamina));
+        addText(stats,"Стартовые очки: +"+game.progress.spent[0]+" / +"+game.progress.spent[1]+" / +"+game.progress.spent[2],12,MUTED,false,0);
+        addText(content,"НАВЫКИ И ДРЕВА РАЗВИТИЯ",11,accent(),true,12);
+        addText(content,"Свободных очков талантов: "+game.progress.perkPoints,13,MUTED,false,13);
+        for(int i=0;i<RpgContent.SKILLS.length;i++){
+            final int index=i;int lvl=game.progress.skillLevel(i);
+            String details=RpgContent.SKILL_DESCRIPTIONS[i]+" • опыт "+game.progress.skillXp[i]+"/"+game.progress.skillNeed(i);
+            actionButton(RpgContent.SKILLS[i]+" • "+lvl+(lvl==100?" [ЛЕГЕНДАРНЫЙ]":""),details,false,()->showSkill(index));
+        }
+        addText(content,"ШКОЛЫ МАГИИ И КРИКИ",11,accent(),true,12);
+        for(String record:RpgContent.SHOUTS){
+            String[] parts=record.split("\\|",2);
+            actionButton("ᚱ  "+parts[0],parts.length>1?parts[1]:"",false,()->new AlertDialog.Builder(this)
+                .setTitle(parts[0]).setMessage(parts.length>1?parts[1]:"").setPositiveButton("Закрыть",null).show());
+        }
+    }
+    private void showSkill(int index){
+        int lvl=game.progress.skillLevel(index);
+        String details=RpgContent.SKILL_DESCRIPTIONS[index]+"\n\nУровень: "+lvl+
+            "\nОпыт навыка: "+game.progress.skillXp[index]+" / "+game.progress.skillNeed(index)+
+            "\n\nВетка талантов: ученик → адепт → мастер.";
+        AlertDialog.Builder builder=new AlertDialog.Builder(this).setTitle(RpgContent.SKILLS[index])
+            .setMessage(details).setNegativeButton("Закрыть",null);
+        if(game.progress.perkPoints>0&&lvl>=20)
+            builder.setPositiveButton("Развить талант",(d,w)->{
+                game.progress.perkPoints--;game.progress.skillExperience(game,index,70);
+                save();render();toast("Очко таланта применено");
+            });
+        builder.show();
     }
     private void renderJournal(){
         section("ЛЕТОПИСЬ","Задания","Твои решения формируют собственную историю Скайрима.");
@@ -230,6 +522,12 @@ public final class MainActivity extends Activity {
                 game.sideQuest==2?"Предложение доступно. Вернись к доске, чтобы принять его.":
                 "Победы над противниками: "+game.sideKills+"/3"+(game.sideKills>=3?". Награда ждёт у доски.":".");
         addText(side,sideStatus,15,MUTED,false,0);
+        LinearLayout done=card();addText(done,"ВЫПОЛНЕННЫЕ",11,accent(),true,9);
+        if(game.progress.completed.isEmpty())addText(done,"Пока нет завершённых записей.",13,MUTED,false,0);
+        for(String entry:game.progress.completed)addText(done,"✓  "+entry,13,TEXT,false,8);
+        LinearLayout failed=card();addText(failed,"ПРОВАЛЕННЫЕ И НЕУДАЧНЫЕ",11,0xffeb8e8e,true,9);
+        if(game.progress.failed.isEmpty())addText(failed,"Пока нет проваленных действий.",13,MUTED,false,0);
+        for(String entry:game.progress.failed)addText(failed,"✕  "+entry,13,MUTED,false,8);
         actionButton("Вернуться к истории","Открыть текущую сцену",true,()->{tab=0;render();});
     }
     private void renderSettings(){
@@ -323,20 +621,20 @@ public final class MainActivity extends Activity {
         new AlertDialog.Builder(this).setTitle("Начать заново?")
             .setMessage("Текущее сохранение будет заменено. При необходимости сначала скопируй код сохранения.")
             .setNegativeButton("Отмена",null).setPositiveButton("Новая игра",(d,w)->{
-                game=new GameEngine();tab=0;draftName="";save();render();}).show();
+                game=new GameEngine();tab=0;draftName="";selectedStart=0;java.util.Arrays.fill(initialPoints,0);save();render();}).show();
     }
     private void renderNav(){
         View sep=new View(this);sep.setBackgroundColor(BORDER);root.addView(sep,lp(-1,1));
         LinearLayout nav=row();nav.setPadding(dp(6),dp(7),dp(6),dp(7));nav.setBackgroundColor(PANEL);
         root.addView(nav,lp(-1,65));
-        String[] labels={"ИСТОРИЯ","ГЕРОЙ","ЗАДАНИЯ","НАСТРОЙКИ"};
-        String[] signs={"⌘","◇","☷","⚙"};
+        String[] labels={"ИСТОРИЯ","КАРТА","СУМКА","ГЕРОЙ","ЖУРНАЛ","НАСТРОЙКИ"};
+        String[] signs={"⌘","◈","▣","◇","☷","⚙"};
         for(int i=0;i<labels.length;i++){
             final int index=i;
             LinearLayout navitem=column();navitem.setGravity(Gravity.CENTER);
             LinearLayout.LayoutParams size=new LinearLayout.LayoutParams(0,-1,1);nav.addView(navitem,size);
             TextView icon=text(signs[i],23,tab==i?accent():MUTED,true);icon.setGravity(Gravity.CENTER);navitem.addView(icon);
-            TextView t=text(labels[i],9,tab==i?accent():MUTED,tab==i);t.setGravity(Gravity.CENTER);navitem.addView(t);
+            TextView t=text(labels[i],8,tab==i?accent():MUTED,tab==i);t.setGravity(Gravity.CENTER);navitem.addView(t);
             navitem.setOnClickListener(v->{if(tab!=index){tab=index;render();}});
         }
     }

@@ -1,0 +1,229 @@
+package dev.infend.skyrimtext;
+import org.json.JSONArray;
+import org.json.JSONObject;
+import java.util.*;
+
+public final class RpgProgress {
+    public final JSONObject inventory = new JSONObject();
+    public final ArrayList<String> completed = new ArrayList<>();
+    public final ArrayList<String> failed = new ArrayList<>();
+    public final int[] skillLevels = new int[RpgContent.SKILLS.length];
+    public final int[] skillXp = new int[RpgContent.SKILLS.length];
+    public final int[] spent = new int[3];
+    public String startId="Хелген", location="Хелген";
+    public String recent="Новая история начинается.";
+    public int perkPoints=0;
+    public int activePowerDay=-1;
+    public int difficulty=0;
+    public RpgProgress(){Arrays.fill(skillLevels,15);}
+    public static RpgProgress newHero(GameEngine g,int start,int[] points){
+        RpgProgress p=new RpgProgress();
+        String[] data=RpgContent.startParts(start);
+        p.startId=data[0];p.location=data[1];
+        if(points!=null&&points.length>=3){
+            int sum=0;for(int i=0;i<3;i++){p.spent[i]=Math.max(0,Math.min(5,points[i]));sum+=p.spent[i];}
+            if(sum>5){Arrays.fill(p.spent,0);p.spent[0]=5;}
+        }
+        p.quantity("Походный клинок",1);
+        p.quantity("Дорожная одежда",1);
+        p.quantity("Факел",1);
+        p.quantity("Отмычка",5);
+        p.sync(g);
+        p.recent="Предыстория: "+data[0]+". "+data[3];
+        return p;
+    }
+    public void sync(GameEngine g){
+        quantity("Септимы",Math.max(0,g.gold));
+        quantity("Лечебное зелье",Math.max(0,g.potions));
+        quantity("Зелье магии",Math.max(0,g.manaPotions));
+        if(g.swordUpgraded){quantity("Походный клинок",0);quantity("Стальной меч",1);}
+        if(g.armorUpgraded){quantity("Дорожная одежда",0);quantity("Стальной кираса",1);}
+    }
+    public void quantity(String id,int n){
+        try{inventory.put(id,Math.max(0,n));}catch(Exception ignored){}
+    }
+    public int quantity(String id){return inventory.optInt(id,0);}
+    public boolean addItem(String id,int quantity){
+        if(quantity<=0||ItemCatalog.find(id)==null)return false;
+        ItemCatalog.Item item=ItemCatalog.find(id);
+        if(item.weight>0&&carryWeight()+item.weight*quantity>50.00001)return false;
+        quantity(id,quantity(id)+quantity);return true;
+    }
+    public boolean removeItem(String id,int amount){
+        if(amount<1||quantity(id)<amount)return false;
+        quantity(id,quantity(id)-amount);return true;
+    }
+    public double carryWeight(){
+        double sum=0;Iterator<String> names=inventory.keys();
+        while(names.hasNext()){
+            String n=names.next();ItemCatalog.Item item=ItemCatalog.find(n);
+            if(item!=null)sum+=item.weight*inventory.optInt(n,0);
+        }
+        return Math.round(sum*100.0)/100.0;
+    }
+    public ArrayList<ItemCatalog.Item> owned(String group,String sort){
+        ArrayList<ItemCatalog.Item> list=new ArrayList<>();
+        for(ItemCatalog.Item item:ItemCatalog.sorted(group,sort))
+            if(quantity(item.id)>0)list.add(item);
+        return list;
+    }
+    public int skillLevel(int index){return skillLevels[Math.max(0,Math.min(index,skillLevels.length-1))];}
+    public int skillNeed(int index){int lvl=skillLevel(index);return Math.max(100,100*lvl);}
+    public void skillExperience(GameEngine g,int index,int amount){
+        if(index<0||index>=skillLevels.length||amount<=0)return;
+        if(skillLevels[index]<100){
+            skillXp[index]+=amount;
+            while(skillLevels[index]<100&&skillXp[index]>=skillNeed(index)){
+                skillXp[index]-=skillNeed(index);skillLevels[index]++;
+                if(skillLevels[index]==100)skillXp[index]=0;
+            }
+        }
+        g.addXp(amount);
+    }
+    public int chance(GameEngine g,int actionIndex,int skillIndex,int baseDifficulty){
+        int stat=actionIndex%3;
+        int exhaustion=stat==1?(g.maxMagicka-g.magicka):stat==2?(g.maxStamina-g.stamina):Math.max(0,g.maxHp-g.hp);
+        int difficulty=baseDifficulty+Math.max(0,15-g.level)*2;
+        int danger=Math.max(0,g.region/2)+difficulty/10;
+        int skill=skillIndex<0?0:(skillLevel(skillIndex)-15)/2;
+        int context=Math.min(18,g.reputation/3)+skill-((int)carryWeight()>45?8:0);
+        return RpgContent.successChance(g,stat,difficulty,danger,exhaustion,context);
+    }
+    public int chance(GameEngine g,String action){
+        if(action==null)return -1;
+        if(action.startsWith("ACT:")){
+            int which=0;try{which=Integer.parseInt(action.substring(4));}catch(Exception ignored){}
+            return chance(g,which,skillFor(which),12+(which*5)%34);
+        }
+        switch(action){
+            case "ATTACK":return chance(g,0,0,14);
+            case "HEAVY":return chance(g,2,1,30);
+            case "MAGIC":return chance(g,1,13,24);
+            case "FLEE":return chance(g,2,9,38);
+            case "EVENT_HELP":return chance(g,0,14,15);
+            case "EVENT_SEARCH":return chance(g,2,9,25);
+            case "TALK_HELP":return chance(g,1,12,15);
+            case "TALK_GIVE":return -1;
+            case "Q_ALTAR":return chance(g,1,16,22);
+            case "Q_BOSS":return chance(g,0,0,36);
+            case "EXPLORE":return chance(g,2,9,16);
+            default:return -1; // Household actions and navigation are deterministic.
+        }
+    }
+    private int skillFor(int index){int[] map={9,12,0,14,10,15,2,13,3,9};return map[Math.floorMod(index,map.length)];}
+    private static final String[] ACTIONS={
+        "Осмотреть едва заметные следы|Проверить, куда ведут примятые травы и мокрая земля.",
+        "Поговорить с прохожим|Выведать новости и скрытые обстоятельства.",
+        "Принять выгодную позицию|Отыскать укрытие и подготовиться к опасности.",
+        "Почувствовать магическую аномалию|Изучить след магии в камне и воздухе.",
+        "Взломать запертую шкатулку|Рискнуть отмычкой ради возможной добычи.",
+        "Разобрать древнюю надпись|Понять назначение забытых символов.",
+        "Взобраться на возвышение|Осмотреть долину и ближайшие дороги.",
+        "Применить боевое заклинание|Изгнать угрозу магией, если найдётся цель.",
+        "Отразить внезапный выпад|Применить блокирование и осторожность.",
+        "Пробраться незамеченным|Обойти опасный участок в тени."
+    };
+    public void fillChoices(GameEngine g,GameEngine.Scene s){
+        HashSet<String> used=new HashSet<>();
+        for(GameEngine.Choice c:s.choices)used.add(c.action);
+        int i=0;
+        while(s.choices.size()<10&&i<30){
+            int index=(i+Math.max(0,g.region))%10;i++;
+            String[] a=ACTIONS[index].split("\\|",2);
+            String action="ACT:"+index;if(used.contains(action))continue;
+            s.choices.add(new GameEngine.Choice(action,a[0],a[1],false));used.add(action);
+        }
+    }
+    public boolean perform(GameEngine g,String action){
+        if(!action.startsWith("ACT:"))return false;
+        int index=0;try{index=Integer.parseInt(action.substring(4));}catch(Exception ignored){}
+        index=Math.floorMod(index,10);
+        String[] a=ACTIONS[index].split("\\|",2);
+        int skill=skillFor(index);
+        int chance=chance(g,action);
+        boolean success=new Random().nextInt(100)<chance;
+        int fatigue=3+(index%4)*2;
+        g.stamina=Math.max(0,g.stamina-fatigue);
+        if(success){
+            int reward=5+(index%5)*3;
+            g.gold+=reward;
+            skillExperience(g,skill,14+index*2);
+            recent="Успех: "+a[0]+". Навык «"+RpgContent.SKILLS[skill]+"» получает опыт. Найдено "+reward+" септимов.";
+            completed.add(a[0]+" • день "+g.day);
+        }else{
+            int harm=2+(index%4)*3;
+            if(index==2||index==7||index==8){g.hp=Math.max(1,g.hp-harm);}
+            recent="Не удалось: "+a[0]+". "+(index==2||index==7||index==8?
+                "Риск обернулся ударом и потерей "+harm+" здоровья.":"Время упущено, а следы скрылись в сумерках.");
+            failed.add(a[0]+" • день "+g.day);
+        }
+        g.message=recent;
+        g.mode="RESULT";
+        if(completed.size()>80)completed.remove(0);
+        if(failed.size()>80)failed.remove(0);
+        return true;
+    }
+    public void observe(GameEngine g,String action,int oldQuest){
+        if(action==null)return;
+        switch(action){
+            case "Q_ACCEPT":recent="Принято сюжетное поручение: «Пепельные печати».";break;
+            case "Q_ALTAR":
+                if(g.questStage>oldQuest)completed.add("Исследование древнего алтаря • день "+g.day);
+                break;
+            case "Q_FINISH":
+                if(g.questStage>oldQuest)completed.add("Пепельные печати • день "+g.day);
+                break;
+            case "EXPLORE":skillExperience(g,9,6);break;
+            case "TALK_HELP":skillExperience(g,12,6);break;
+            case "ATTACK":skillExperience(g,0,8);break;
+            case "MAGIC":skillExperience(g,13,8);break;
+            case "HEAVY":skillExperience(g,1,8);break;
+            case "DEFEND":skillExperience(g,3,8);break;
+            case "FLEE":skillExperience(g,9,8);break;
+        }
+        sync(g);
+    }
+    public String racePassive(GameEngine g){return RpgContent.PASSIVES[RpgContent.raceIndex(g.race)];}
+    public String racePower(GameEngine g){return RpgContent.POWERS[RpgContent.raceIndex(g.race)];}
+    public boolean useRacePower(GameEngine g){
+        if(activePowerDay==g.day)return false;
+        activePowerDay=g.day;
+        int index=RpgContent.raceIndex(g.race);
+        if(index==1||index==7)g.magicka=Math.min(g.maxMagicka,g.magicka+40);
+        else if(index==6)g.stamina=g.maxStamina;
+        else if(index==9)g.hp=Math.min(g.maxHp,g.hp+50);
+        else if(index==4)g.reputation+=2;
+        else if(index==5)g.attack+=1;
+        recent="Расовый талант применён: "+racePower(g)+" (один раз в игровой день).";
+        return true;
+    }
+    public JSONObject toJson(){
+        JSONObject o=new JSONObject();
+        try{
+            o.put("startId",startId).put("location",location).put("recent",recent)
+             .put("points",new JSONArray(spent)).put("skillLevels",new JSONArray(skillLevels))
+             .put("skillXp",new JSONArray(skillXp)).put("inventory",inventory)
+             .put("completed",new JSONArray(completed)).put("failed",new JSONArray(failed))
+             .put("perks",perkPoints).put("activePowerDay",activePowerDay).put("difficulty",difficulty);
+        }catch(Exception ignored){}
+        return o;
+    }
+    public static RpgProgress fromJson(JSONObject obj){
+        RpgProgress p=new RpgProgress();if(obj==null)return p;
+        p.startId=obj.optString("startId","Хелген");p.location=obj.optString("location","Хелген");
+        p.recent=obj.optString("recent","");p.perkPoints=Math.max(0,obj.optInt("perks",0));
+        p.activePowerDay=obj.optInt("activePowerDay",-1);p.difficulty=obj.optInt("difficulty",0);
+        JSONArray levels=obj.optJSONArray("skillLevels"),xp=obj.optJSONArray("skillXp"),pts=obj.optJSONArray("points");
+        for(int i=0;i<p.skillLevels.length;i++){
+            if(levels!=null)p.skillLevels[i]=Math.max(0,Math.min(100,levels.optInt(i,15)));
+            if(xp!=null)p.skillXp[i]=Math.max(0,xp.optInt(i,0));
+        }
+        for(int i=0;i<3;i++)if(pts!=null)p.spent[i]=Math.max(0,Math.min(5,pts.optInt(i,0)));
+        JSONObject inv=obj.optJSONObject("inventory");
+        if(inv!=null){Iterator<String> keys=inv.keys();while(keys.hasNext()){String k=keys.next();p.quantity(k,inv.optInt(k,0));}}
+        JSONArray done=obj.optJSONArray("completed"),bad=obj.optJSONArray("failed");
+        if(done!=null)for(int i=0;i<done.length();i++)p.completed.add(done.optString(i));
+        if(bad!=null)for(int i=0;i<bad.length();i++)p.failed.add(bad.optString(i));
+        return p;
+    }
+}
