@@ -93,7 +93,7 @@ public final class RpgProgress {
     }
     public int chance(GameEngine g,String action){
         if(action==null)return -1;
-        if(action.startsWith("ACT:")){
+        if(action.matches("ACT:[0-9]")){
             if(!("WORLD".equals(g.mode)||"TALK".equals(g.mode)||"EVENT".equals(g.mode)||"QUEST".equals(g.mode)))return -1;
             int which=0;try{which=Integer.parseInt(action.substring(4));}catch(Exception ignored){}
             return chance(g,which,skillFor(which),12+(which*5)%34);
@@ -138,7 +138,7 @@ public final class RpgProgress {
         }
     }
     public boolean perform(GameEngine g,String action){
-        if(action==null||!action.startsWith("ACT:"))return false;
+        if(action==null||!action.matches("ACT:[0-9]"))return false;
         if(!("WORLD".equals(g.mode)||"TALK".equals(g.mode)||"EVENT".equals(g.mode)||"QUEST".equals(g.mode)))return false;
         if(actionDay!=g.day){attemptedToday.clear();actionDay=g.day;}
         if(attemptedToday.contains(action))return false;
