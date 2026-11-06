@@ -98,7 +98,7 @@ public final class DragonContinuation {
         return g.progress.chance(g,choice%3,new int[]{9,15,12}[choice==3?0:choice==5?1:2],29+stage*5);
     }
     public static void perform(GameEngine g,String action){
-        if(!"DRAGON".equals(g.mode)||action==null||!action.matches("DRAGON_NEXT:[01]:[0-9]"))return;
+        if(!"DRAGON".equals(g.mode)||action==null||!action.matches("DRAGON_NEXT:[012]:[0-9]"))return;
         String[] p=action.split(":");int stage=Integer.parseInt(p[1]),choice=Integer.parseInt(p[2]);
         if(stage!=g.progress.dragonNextStage)return;
         if(choice==9){g.mode="WORLD";return;}
