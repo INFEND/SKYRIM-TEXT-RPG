@@ -18,6 +18,9 @@ public final class RpgProgress {
     // First dragon story arc is kept inside existing schema-1 save data.
     public int dragonStage=0;
     public int dragonInsight=0;
+    public int dragonNextStage=0;
+    public String dragonNextRecent="";
+    public final HashSet<String> dragonNextUsed=new HashSet<>();
     public String dragonRecent="";
     public final HashSet<String> dragonUsed=new HashSet<>();
     public int actionDay=-1;
@@ -98,6 +101,7 @@ public final class RpgProgress {
     }
     public int chance(GameEngine g,String action){
         if(action==null)return -1;
+        if(action.startsWith("DRAGON_NEXT:"))return DragonContinuation.chance(g,action);
         if(action.startsWith("DRAGON:"))return DragonArc.chance(g,action);
         if(action.matches("ACT:[0-9]")){
             if(!("WORLD".equals(g.mode)||"TALK".equals(g.mode)||"EVENT".equals(g.mode)||"QUEST".equals(g.mode)))return -1;
@@ -220,7 +224,9 @@ public final class RpgProgress {
              .put("perks",perkPoints).put("activePowerDay",activePowerDay).put("difficulty",difficulty)
              .put("actionDay",actionDay).put("attemptedToday",new JSONArray(attemptedToday))
              .put("dragonStage",dragonStage).put("dragonInsight",dragonInsight)
-             .put("dragonRecent",dragonRecent).put("dragonUsed",new JSONArray(dragonUsed));
+             .put("dragonRecent",dragonRecent).put("dragonUsed",new JSONArray(dragonUsed))
+             .put("dragonNextStage",dragonNextStage).put("dragonNextRecent",dragonNextRecent)
+             .put("dragonNextUsed",new JSONArray(dragonNextUsed));
         }catch(Exception ignored){}
         return o;
     }
@@ -233,6 +239,13 @@ public final class RpgProgress {
         p.dragonStage=Math.max(0,Math.min(DragonArc.FINAL_STAGE,obj.optInt("dragonStage",0)));
         p.dragonInsight=Math.max(0,Math.min(15,obj.optInt("dragonInsight",0)));
         p.dragonRecent=obj.optString("dragonRecent","");
+        p.dragonNextStage=Math.max(0,Math.min(2,obj.optInt("dragonNextStage",0)));
+        p.dragonNextRecent=obj.optString("dragonNextRecent","");
+        JSONArray nextActions=obj.optJSONArray("dragonNextUsed");
+        if(nextActions!=null)for(int i=0;i<nextActions.length();i++){
+            String value=nextActions.optString(i,"");
+            if(value.matches("DRAGON_NEXT:[01]:[1-8]"))p.dragonNextUsed.add(value);
+        }
         JSONArray dragonActions=obj.optJSONArray("dragonUsed");
         if(dragonActions!=null)for(int i=0;i<dragonActions.length();i++){
             String value=dragonActions.optString(i,"");
