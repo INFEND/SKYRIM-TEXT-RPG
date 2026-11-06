@@ -242,7 +242,7 @@ public final class GameEngine {
             case "REST":
                 if(gold<20) {message="Хозяин трактира просит 20 септимов. Придётся поискать заработок.";mode="RESULT";}
                 else {gold-=20;day++;hp=maxHp;magicka=maxMagicka;stamina=maxStamina;message="После тёплого ужина и долгого сна силы восстановились.";mode="RESULT";} break;
-            case "Q_ACCEPT": questStage=1;gold+=40;message="Ты принимаешь 40 септимов и получаешь первую зацепку: алтарь находится в Фолкрите.";mode="RESULT";break;
+            case "Q_ACCEPT": if(questStage==0) {questStage=1;gold+=40;message="Ты принимаешь 40 септимов и получаешь первую зацепку: алтарь находится в Фолкрите.";mode="RESULT";} break;
             case "Q_ALTAR": if(questStage==1 && region==5) {questStage=2;addXp(35);message="Ты находишь под алтарём серебряную пластину. На ней указан Винтерхолд. +35 опыта.";mode="RESULT";} break;
             case "Q_BOSS": if(questStage==2 && region==6) startBattle("Пепельный страж",90+level*11,12+level*2,"QUEST","Внутри башни оживает существо из пепла и холодного камня."); break;
             case "Q_FINISH": if(questStage==3 && region==3) {questStage=4;gold+=300;reputation+=5;addXp(180);message="Хранители принимают журнал и восстанавливают печать. Скайрим получает ещё один мирный рассвет. Награда: 300 септимов и 180 опыта.";mode="RESULT";} break;
@@ -252,7 +252,7 @@ public final class GameEngine {
             case "BUY_MP": buy(30,"Зелье магии куплено.","MP");break;
             case "BUY_SWORD": buy(180,"Клинок закалён. Атака +6.","SWORD");break;
             case "BUY_ARMOR": buy(160,"Ты облачаешься в стальной нагрудник. Защита +4.","ARMOR");break;
-            case "SIDE_ACCEPT": sideQuest=1;sideKills=0;message="Заказ принят. Победи трёх противников во время исследования мира.";mode="RESULT";break;
+            case "SIDE_ACCEPT": if(sideQuest==2) {sideQuest=1;sideKills=0;message="Заказ принят. Победи трёх противников во время исследования мира.";mode="RESULT";} break;
             case "SIDE_CLAIM": if(sideQuest==1 && sideKills>=3) {sideQuest=0;sideKills=0;gold+=120;addXp(65);message="Заказ выполнен. +120 септимов и +65 опыта.";mode="RESULT";}break;
             case "EVENT_HELP": eventChoice(true);break;
             case "EVENT_SEARCH": eventChoice(false);break;
