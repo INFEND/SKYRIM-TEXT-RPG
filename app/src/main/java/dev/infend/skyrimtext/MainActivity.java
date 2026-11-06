@@ -223,7 +223,7 @@ public final class MainActivity extends Activity {
         nameField=new EditText(this);nameField.setSingleLine(true);nameField.setTextColor(TEXT);nameField.setHintTextColor(MUTED);
         nameField.setHint("Имя героя");nameField.setTextSize(sp(16));
         nameField.setFilters(new android.text.InputFilter[]{new android.text.InputFilter.LengthFilter(28)});
-        nameField.setPadding(dp(11),dp(8),dp(11),dp(8));nameField.setBackground(bg(PANEL_2,BORDER,9));
+        nameField.setPadding(dp(11),dp(8),dp(11),dp(8));nameField.setBackground(new RuneFrameDrawable(PANEL_2,0xff85745f,false));
         nameField.setText(draftName);nameLine.addView(nameField,new LinearLayout.LayoutParams(0,dp(48),1));
         TextView nameDice=text("⟳",26,accent(),true);nameDice.setGravity(Gravity.CENTER);
         LinearLayout.LayoutParams diceLp=lp(48,48);diceLp.leftMargin=dp(7);nameLine.addView(nameDice,diceLp);
@@ -299,7 +299,7 @@ public final class MainActivity extends Activity {
         };
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         sp.setAdapter(adapter);sp.setSelection(Math.max(0,Math.min(position,options.length-1)));
-        sp.setBackground(bg(PANEL_2,BORDER,11));
+        sp.setBackground(new RuneFrameDrawable(PANEL_2,0xff85745f,false));
         sp.setOnItemSelectedListener(new android.widget.AdapterView.OnItemSelectedListener(){
             public void onNothingSelected(android.widget.AdapterView<?> v){}
             public void onItemSelected(android.widget.AdapterView<?> v,View view,int pos,long id){onChange.accept(pos);}
@@ -311,7 +311,7 @@ public final class MainActivity extends Activity {
         HorizontalScrollView hsv=new HorizontalScrollView(this);hsv.setHorizontalScrollBarEnabled(false);
         LinearLayout layout=row();hsv.addView(layout);content.addView(hsv,lp(-1,48));
         for(String o:options){boolean active=o.equals(selected);
-            TextView pill=text(o,14,active?BG:TEXT,active);pill.setGravity(Gravity.CENTER);
+            TextView pill=text(o,14,active?accent():TEXT,active);pill.setGravity(Gravity.CENTER);
             pill.setPadding(dp(18),0,dp(18),0);pill.setBackground(bg(active?0xFF2D2A22:PANEL_2,active?accent():BORDER,2));
             LinearLayout.LayoutParams p=lp(-2,43);p.rightMargin=dp(9);layout.addView(pill,p);
             pill.setOnClickListener(v->handler.onSelect(o));
@@ -407,6 +407,7 @@ public final class MainActivity extends Activity {
     private void renderInventory(){
         game.progress.sync(game);
         section("СУМКА СТРАННИКА","Инвентарь","Каждый предмет имеет вес, цену и собственное описание. Переносимый вес учитывается при путешествиях.");
+        content.addView(new NordicArtView(this,NordicArtView.TITLE),lp(-1,120));space(content,12);
         LinearLayout capacity=card();
         double used=game.progress.carryWeight();
         addText(capacity,String.format(java.util.Locale.forLanguageTag("ru"),"ВЕС: %.2f / 50.00 КГ",used),19,used>50?0xffef8585:accent(),true,8);
@@ -515,6 +516,7 @@ public final class MainActivity extends Activity {
     }
     private void renderHero(){
         section("ЛИЧНОЕ ДЕЛО",""+game.name,game.race+" • "+game.heroClass+" • уровень "+game.level);
+        content.addView(new NordicArtView(this,NordicArtView.STORY),lp(-1,125));space(content,12);
         LinearLayout c=card();addText(c,"ХАРАКТЕРИСТИКИ",11,accent(),true,9);
         heroEntry(c,"Опыт",game.xp+" / "+(game.level*80));
         heroEntry(c,"Атака",String.valueOf(game.attack));heroEntry(c,"Защита",String.valueOf(game.armor));
@@ -627,6 +629,7 @@ public final class MainActivity extends Activity {
     }
     private void renderJournal(){
         section("ЛЕТОПИСЬ","Задания","Твои решения формируют собственную историю Скайрима.");
+        content.addView(new NordicArtView(this,NordicArtView.TITLE),lp(-1,120));space(content,12);
         LinearLayout main=card();addText(main,"ОСНОВНАЯ ИСТОРИЯ",11,accent(),true,11);
         addText(main,"Пепельные печати",22,TEXT,true,8);
         addText(main,"Статус: "+game.questStatus(),13,accent(),false,13);
@@ -653,6 +656,7 @@ public final class MainActivity extends Activity {
     }
     private void renderSettings(){
         section("ПАРАМЕТРЫ","Настройки","Твоя история, твои правила.");
+        content.addView(new NordicArtView(this,NordicArtView.STORY),lp(-1,105));space(content,12);
         LinearLayout palette=card();addText(palette,"ЦВЕТ АКЦЕНТА",11,accent(),true,12);
         for(int i=0;i<ACCENTS.length;i++){
             final int value=i;LinearLayout item=row();LinearLayout.LayoutParams p=lp(-1,42);palette.addView(item,p);
