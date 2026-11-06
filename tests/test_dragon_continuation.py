@@ -23,6 +23,13 @@ class DragonContinuationContracts(unittest.TestCase):
         self.assertIn('if(risky&&g.stamina<7)',c)
         self.assertIn('new Random().nextInt(100)<probability',c)
         self.assertIn('int probability=chance(g,action)',c)
+    def test_evidence_gate_and_skill_rewards(self):
+        c=source("DragonContinuation.java")
+        self.assertIn("evidenceCount(g,stage)<3",c)
+        self.assertIn("SKILLS[stage][choice-1],12+stage*4",c)
+        self.assertIn("SKILLS[stage][choice-1],8",c)
+        self.assertIn("g.progress.completed.add(TITLES[stage]",c)
+        self.assertIn("if(g.progress.dragonNextUsed.contains(action))return;",c)
     def test_integration_and_legacy(self):
         arc=source("DragonArc.java")
         game=source("GameEngine.java")
