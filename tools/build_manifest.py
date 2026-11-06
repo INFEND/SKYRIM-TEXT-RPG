@@ -39,7 +39,12 @@ if current["versionCode"] != code or current["versionName"] != version:
 base = "https://github.com/INFEND/SKYRIM-TEXT-RPG/releases/download/"
 payload = {
     "schema": 1,
-    "packageName": "dev.infend.skyrimtext",
+    # Compatibility with v1.0.1 and v1.0.2, whose embedded metadata validator
+    # mistakenly expected the legacy field. This value is NOT the APK identity.
+    # The actual package and signing certificate are verified from the APK.
+    "packageName": "dev.xarkon.link",
+    "apkPackageName": "dev.infend.skyrimtext",
+    "legacyPackageField": True,
     "versionCode": code,
     "versionName": version,
     "apkUrl": f"{base}v{version}/SKYRIM-TEXT-RPG.apk",

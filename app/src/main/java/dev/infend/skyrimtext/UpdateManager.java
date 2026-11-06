@@ -33,7 +33,7 @@ public final class UpdateManager {
     public static final String TRUSTED_CERT_SHA256="8A0D221B9C31007B55AC0BAED5597A0B638881F7FEF6650A6E7BD0E2B49793FE";
     private static final long MAX_APK=512L*1024L*1024L;
     private static final int MAX_MANIFEST_BYTES=4*1024*1024;
-    // Only the two pinned slugs of this repository are accepted after its rename.
+    // Fixed update identity: downloaded APK must match this app and its pinned certificate.
     public static final String APK_FILE="skyrim_text_rpg_update.apk";
     public interface Callback {
         void status(String message);
@@ -52,8 +52,17 @@ public final class UpdateManager {
         }
         Release(JSONObject j)throws Exception {
             if(j.has("schema") && j.getInt("schema")!=1)throw new IOException("Неподдерживаемый формат OTA");
-            packageName=j.optString("packageName","dev.infend.skyrimtext");
-            if(!"dev.xarkon.link".equals(packageName))throw new IOException("Ошибка идентификатора приложения");
+            // Read the real application identity separately from a legacy metadata alias.
+            // Older installed clients have an incorrect hard-coded value. Preserve compatibility
+            // in update.json without ever accepting an APK with a different package or signer.
+            String metadataId=j.optString("packageName","");
+            packageName=j.optString("apkPackageName",metadataId);
+            if(!BuildConfig.APPLICATION_ID.equals(packageName))
+                throw new IOException("Обновление предназначено для другого приложения");
+            boolean legacyMetadata=j.optBoolean("legacyPackageField",false)
+                && "dev.xarkon.link".equals(metadataId);
+            if(!BuildConfig.APPLICATION_ID.equals(metadataId)&&!legacyMetadata)
+                throw new IOException("Ошибка идентификатора приложения");
             versionCode=j.getLong("versionCode");
             versionName=j.optString("versionName","Новая версия");
             apkUrl=j.getString("apkUrl");

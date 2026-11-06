@@ -92,6 +92,8 @@ jobs:
         run: |
           cp app/build/outputs/apk/release/app-release.apk dist/SKYRIM-TEXT-RPG.apk
           python3 tools/build_manifest.py
+          python3 tools/check_ota_contract.py
+          "${ANDROID_HOME}/build-tools/35.0.0/apksigner" verify --print-certs dist/SKYRIM-TEXT-RPG.apk
       - name: Publish OTA release
         if: steps.signing.outputs.available == 'true' && steps.release_version.outputs.publish == 'true'
         uses: softprops/action-gh-release@v2
