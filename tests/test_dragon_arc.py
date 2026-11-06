@@ -49,7 +49,7 @@ class DragonArcContracts(unittest.TestCase):
         self.assertIn('startBattle("Мирмулнир"',game)
         self.assertIn('if("DRAGON".equals(battleKind)&&progress.dragonStage==3)',game)
         self.assertIn('progress.dragonStage=4;',game)
-        self.assertIn('if("COMBAT".equals(mode)',game)
+        self.assertIn('if ("COMBAT".equals(mode)',game)
         self.assertIn('case "DRAGON": return DragonArc.scene(this);',game)
         self.assertIn('s.primary("DRAGON_OPEN"',game)
         self.assertIn('DragonArc.status(this)',game)
