@@ -522,11 +522,17 @@ public final class MainActivity extends Activity {
                 game.sideQuest==2?"Предложение доступно. Вернись к доске, чтобы принять его.":
                 "Победы над противниками: "+game.sideKills+"/3"+(game.sideKills>=3?". Награда ждёт у доски.":".");
         addText(side,sideStatus,15,MUTED,false,0);
-        LinearLayout done=card();addText(done,"ВЫПОЛНЕННЫЕ",11,accent(),true,9);
-        if(game.progress.completed.isEmpty())addText(done,"Пока нет завершённых записей.",13,MUTED,false,0);
+        LinearLayout finishedQuests=card();addText(finishedQuests,"ЗАВЕРШЁННЫЕ ЗАДАНИЯ",11,accent(),true,9);
+        if(game.questStage==4)addText(finishedQuests,"✓  Пепельные печати",14,TEXT,false,8);
+        if(game.questStage!=4)addText(finishedQuests,"Основная история ещё не завершена.",13,MUTED,false,8);
+        addText(finishedQuests,"Заказы доски после сдачи не сохраняются в отдельном архиве.",12,MUTED,false,0);
+        LinearLayout failedQuests=card();addText(failedQuests,"ПРОВАЛЕННЫЕ ЗАДАНИЯ",11,0xffeb8e8e,true,9);
+        addText(failedQuests,"Пока нет проваленных сюжетных заданий.",13,MUTED,false,0);
+        LinearLayout done=card();addText(done,"ИСТОРИЯ УСПЕШНЫХ ПРОВЕРОК",11,accent(),true,9);
+        if(game.progress.completed.isEmpty())addText(done,"Пока нет успешных проверок.",13,MUTED,false,0);
         for(String entry:game.progress.completed)addText(done,"✓  "+entry,13,TEXT,false,8);
-        LinearLayout failed=card();addText(failed,"ПРОВАЛЕННЫЕ И НЕУДАЧНЫЕ",11,0xffeb8e8e,true,9);
-        if(game.progress.failed.isEmpty())addText(failed,"Пока нет проваленных действий.",13,MUTED,false,0);
+        LinearLayout failed=card();addText(failed,"ИСТОРИЯ НЕУДАЧНЫХ ПРОВЕРОК",11,0xffeb8e8e,true,9);
+        if(game.progress.failed.isEmpty())addText(failed,"Пока нет неудачных проверок.",13,MUTED,false,0);
         for(String entry:game.progress.failed)addText(failed,"✕  "+entry,13,MUTED,false,8);
         actionButton("Вернуться к истории","Открыть текущую сцену",true,()->{tab=0;render();});
     }

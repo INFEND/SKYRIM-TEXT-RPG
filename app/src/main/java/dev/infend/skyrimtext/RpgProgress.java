@@ -199,9 +199,9 @@ public final class RpgProgress {
         if(index==1||index==7)g.magicka=Math.min(g.maxMagicka,g.magicka+40);
         else if(index==6)g.stamina=g.maxStamina;
         else if(index==9)g.hp=Math.min(g.maxHp,g.hp+50);
-        else if(index==4)g.reputation+=2;
-        else if(index==5)g.attack+=1;
-        recent="Расовый талант применён: "+racePower(g)+" (один раз в игровой день).";
+        else if(index==4)g.stamina=Math.min(g.maxStamina,g.stamina+30);
+        else if(index==5)g.hp=Math.min(g.maxHp,g.hp+30);
+        recent="Расовый талант: "+racePower(g)+" • разовое восстановление ресурсов (один раз в игровой день).";
         return true;
     }
     public JSONObject toJson(){

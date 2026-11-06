@@ -59,6 +59,17 @@ class GameContracts(unittest.TestCase):
         self.assertIn("new Random().nextInt(100)<chance",progress)
         self.assertNotIn("random.nextInt(3)==0",engine)
 
+    def test_journal_separates_quests_from_rolls_and_race_power_has_no_permanent_farm(self):
+        ui=text("MainActivity.java")
+        progress=text("RpgProgress.java")
+        self.assertIn('"ЗАВЕРШЁННЫЕ ЗАДАНИЯ"',ui)
+        self.assertIn('"ПРОВАЛЕННЫЕ ЗАДАНИЯ"',ui)
+        self.assertIn('"ИСТОРИЯ УСПЕШНЫХ ПРОВЕРОК"',ui)
+        self.assertIn('"ИСТОРИЯ НЕУДАЧНЫХ ПРОВЕРОК"',ui)
+        self.assertNotIn("g.attack+=1;",progress)
+        self.assertNotIn("g.reputation+=2;",progress)
+        self.assertIn("if(activePowerDay==g.day)return false;",progress)
+
     def test_inventory_atlas_saves(self):
         progress=text("RpgProgress.java")
         atlas=text("WorldAtlas.java")
