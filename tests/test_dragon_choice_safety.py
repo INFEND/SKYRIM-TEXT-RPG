@@ -16,7 +16,12 @@ class DragonChoiceSafety(unittest.TestCase):
         self.assertLess(ARC.index('if((index==3||index==5||index==7)&&g.stamina<7)'), ARC.index('g.progress.dragonUsed.add(action);'))
 
     def test_probability_hidden_when_attempt_is_unavailable(self):
-        self.assertIn('if(!DESTINATIONS[stage].equals(g.progress.location)||g.stamina<7)return -1;', ARC)
+        self.assertIn('if(!DESTINATIONS[stage].equals(g.progress.location))return -1;', ARC)
+        self.assertIn('if(index!=3&&index!=5&&index!=7)return -1;\n        if(g.stamina<7)return -1;', ARC)
+
+    def test_safe_choices_do_not_require_stamina(self):
+        self.assertIn('if((index==3||index==5||index==7)&&g.stamina<7)', ARC)
+        self.assertNotIn('if(!DESTINATIONS[stage].equals(g.progress.location)||g.stamina<7)', ARC)
 
     def test_save_schema_remains_one(self):
         engine = (ROOT / "app/src/main/java/dev/infend/skyrimtext/GameEngine.java").read_text(encoding="utf-8")
