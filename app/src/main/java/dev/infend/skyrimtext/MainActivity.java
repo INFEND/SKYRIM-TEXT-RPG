@@ -45,7 +45,8 @@ public final class MainActivity extends Activity {
     private int selectedStart=0,selectedMapRegion=-1;
     private final int[] initialPoints={0,0,0};
     private String selectedCategory="Все",selectedSort="Название";
-    private boolean animations=true;
+    private boolean animations=true, titleOpen=true;
+    private int codexCategory=0;
     private SkyrimOtaController updater;
 
     @Override public void onCreate(Bundle bundle){
@@ -92,27 +93,30 @@ public final class MainActivity extends Activity {
     private void render(){
         root=column();root.setBackgroundColor(BG);root.setFitsSystemWindows(true);
         setContentView(root);
-        renderHeader();
-        if(game.started)renderBars();
+        if(!titleOpen){renderHeader();if(game.started)renderBars();}
         scroll=new ScrollView(this);scroll.setFillViewport(false);scroll.setClipToPadding(false);
         scroll.setVerticalScrollBarEnabled(false);
         root.addView(scroll,new LinearLayout.LayoutParams(-1,0,1));
         content=column();content.setPadding(dp(21),dp(23),dp(21),dp(30));scroll.addView(content);
-        if(!game.started)renderNewGame();
+        if(titleOpen)renderTitle();
+        else if(!game.started && tab!=5)renderNewGame();
         else if(tab==0)renderStory();
         else if(tab==1)renderMap();
         else if(tab==2)renderInventory();
         else if(tab==3)renderHero();
         else if(tab==4)renderJournal();
+        else if(tab==6)renderCodex();
         else renderSettings();
-        if(game.started)renderNav();
+        if(!titleOpen&&game.started)renderNav();
         if(animations){content.setAlpha(0.8f);content.animate().alpha(1f).setDuration(210).setInterpolator(new DecelerateInterpolator()).start();}
     }
     private void renderHeader(){
         header=row();header.setPadding(dp(19),dp(15),dp(19),dp(13));
         root.addView(header,lp(-1,-2));
         TextView sigil=text("ᛟ",30,accent(),false);sigil.setGravity(Gravity.CENTER);
-        sigil.setBackground(bg(BG,accent(),1));header.addView(sigil,lp(47,47));
+        sigil.setBackground(new RuneFrameDrawable(BG,accent(),true));header.addView(sigil,lp(47,47));
+        sigil.setContentDescription("Открыть главное меню");
+        sigil.setOnClickListener(v->{titleOpen=true;render();});
         LinearLayout copy=column();copy.setPadding(dp(12),0,0,0);
         header.addView(copy,new LinearLayout.LayoutParams(0,-2,1));
         addText(copy,"SKYRIM",23,TEXT,false,1);
@@ -148,12 +152,12 @@ public final class MainActivity extends Activity {
         space(content,19);
     }
     private LinearLayout card(){
-        LinearLayout c=column();c.setPadding(dp(17),dp(17),dp(17),dp(17));c.setBackground(bg(PANEL,BORDER,2));
+        LinearLayout c=column();c.setPadding(dp(17),dp(17),dp(17),dp(17));c.setBackground(new RuneFrameDrawable(PANEL,0xff82745d,false));
         LinearLayout.LayoutParams p=lp(-1,-2);p.bottomMargin=dp(13);content.addView(c,p);return c;
     }
     private TextView actionButton(String title,String detail,boolean primary,Runnable onClick){
         LinearLayout box=row();box.setPadding(dp(17),dp(15),dp(15),dp(15));
-        box.setBackground(bg(primary?0xFF24241F:BG,primary?accent():BORDER,1));
+        box.setBackground(new RuneFrameDrawable(primary?0xff22231e:0xff0e1519,primary?accent():0xff85745f,primary));
         LinearLayout info=column();box.addView(info,new LinearLayout.LayoutParams(0,-2,1));
         addText(info,title,17,primary?accent():TEXT,false,detail.isEmpty()?0:4);
         if(!detail.isEmpty())addText(info,detail,12,MUTED,false,0);
@@ -163,8 +167,57 @@ public final class MainActivity extends Activity {
         box.setClickable(true);box.setFocusable(true);box.setOnClickListener(v->onClick.run());
         return chevron;
     }
+    private void titleButton(String caption,boolean active,Runnable callback){
+        TextView v=text(caption,19,active?accent():TEXT,false);v.setGravity(Gravity.CENTER);
+        v.setBackground(new RuneFrameDrawable(active?0xff27261f:0xff0c1216,active?accent():0xff8c7b62,active));
+        LinearLayout.LayoutParams params=lp(-1,49);params.setMargins(dp(39),0,dp(39),dp(10));
+        content.addView(v,params);v.setClickable(true);v.setFocusable(true);
+        v.setOnClickListener(view->callback.run());
+    }
+    private void titleRule(){
+        TextView t=text("──────────  ◈  ──────────",15,accent(),false);
+        t.setGravity(Gravity.CENTER);content.addView(t,lp(-1,39));
+    }
+    private void renderTitle(){
+        content.setPadding(0,dp(8),0,dp(25));
+        FrameLayout cover=new FrameLayout(this);content.addView(cover,lp(-1,340));
+        cover.addView(new NordicArtView(this,NordicArtView.TITLE),
+            new FrameLayout.LayoutParams(-1,-1));
+        LinearLayout letter=column();letter.setGravity(Gravity.CENTER);
+        FrameLayout.LayoutParams overlay=new FrameLayout.LayoutParams(-1,-1);overlay.setMargins(dp(8),0,dp(8),dp(25));cover.addView(letter,overlay);
+        TextView rune=text("ᚱ   ᛟ   ᚦ",38,accent(),false);rune.setGravity(Gravity.CENTER);letter.addView(rune,lp(-1,75));
+        TextView name=text("СКАЙРИМ",38,TEXT,false);name.setGravity(Gravity.CENTER);name.setLetterSpacing(.14f);
+        letter.addView(name,lp(-1,60));
+        TextView subtitle=text("Т Е К С Т О В А Я   R P G",11,accent(),false);
+        subtitle.setGravity(Gravity.CENTER);letter.addView(subtitle,lp(-1,32));
+        titleRule();
+        titleButton("Новая игра",true,()->{
+            if(game.started){
+                new AlertDialog.Builder(this).setTitle("Новая история")
+                    .setMessage("Существующее сохранение будет заменено. Продолжить?")
+                    .setNegativeButton("Отмена",null)
+                    .setPositiveButton("Новая игра",(d,w)->{
+                        game=new GameEngine();save();titleOpen=false;tab=0;render();
+                    }).show();
+            }else{titleOpen=false;tab=0;render();}
+        });
+        titleButton("Продолжить",false,()->{
+            if(!game.started){toast("Сохранённого героя пока нет");return;}
+            titleOpen=false;tab=0;render();
+        });
+        titleButton("Настройки",false,()->{titleOpen=false;tab=5;render();});
+        titleButton("О игре",false,()->new AlertDialog.Builder(this)
+            .setTitle("СКАЙРИМ · ТЕКСТОВАЯ RPG")
+            .setMessage("Интерактивная история северных земель. Выборы, путешествия, дневник и кодекс. Самостоятельный неофициальный проект.")
+            .setPositiveButton("Закрыть",null).show());
+        titleRule();
+        TextView foot=text("ᛟ  ТВОЯ ИСТОРИЯ НАЧИНАЕТСЯ НА СЕВЕРЕ  ᛟ",10,MUTED,false);
+        foot.setGravity(Gravity.CENTER);content.addView(foot,lp(-1,36));
+    }
     private void renderNewGame(){
         section("НОВАЯ ИСТОРИЯ","Твоя легенда начинается","Выбери место старта, расу, путь развития и распределение первых пяти очков. Каждый выбор влияет на историю героя.");
+        content.addView(new NordicArtView(this,NordicArtView.STORY),lp(-1,165));
+        space(content,15);
         LinearLayout details=card();addText(details,"ИМЯ ПЕРСОНАЖА",11,accent(),true,10);
         LinearLayout nameLine=row();details.addView(nameLine,lp(-1,-2));
         nameField=new EditText(this);nameField.setSingleLine(true);nameField.setTextColor(TEXT);nameField.setHintTextColor(MUTED);
@@ -266,8 +319,10 @@ public final class MainActivity extends Activity {
     }
     private void renderStory(){
         GameEngine.Scene s=game.scene();section(s.kicker,s.title,"");
+        content.addView(new NordicArtView(this,NordicArtView.STORY),lp(-1,188));
+        space(content,16);
         LinearLayout narrative=card();
-        addText(narrative,"ᛟ  ХРОНИКА ПУТИ  ᛟ",11,accent(),false,13);
+        addText(narrative,"ᚱ  ГЛАВА  ·  "+s.kicker.toUpperCase(java.util.Locale.ROOT),11,accent(),false,13);
         TextView body=text(s.body,18,TEXT,false);body.setLineSpacing(dp(6),1.12f);makeItemsClickable(body,s.body);narrative.addView(body);
         space(content,8);addText(content,"ВЫБЕРИ ДЕЙСТВИЕ",11,MUTED,true,13);
         for(GameEngine.Choice c:s.choices){
@@ -381,6 +436,7 @@ public final class MainActivity extends Activity {
             actionButton(item.icon+"  "+item.name+" ×"+count,desc,false,()->itemDialog(item));
         }
         actionButton("Полный справочник предметов","Поиск, характеристики, вес и описание каждого предмета",true,this::showItemCatalog);
+        actionButton("Кодекс и бестиарий","Народы, существа, история и места северных земель",false,()->{tab=6;render();});
         actionButton("Личная библиотека","Материалы, созданные для этой игры, включая способности и существ",false,this::showLibrary);
     }
     private void itemDialog(ItemCatalog.Item item){
@@ -515,6 +571,60 @@ public final class MainActivity extends Activity {
             });
         builder.show();
     }
+
+    private static final String[][] CODEX_CREATURES={
+        {"Дракон","Древнее крылатое существо. Его появление меняет ход истории, а встреча требует подготовки, укрытий и холодной головы."},
+        {"Волк","Стайный хищник лесов и дорог. Голодные стаи особенно опасны для одиноких путников."},
+        {"Великан","Обитатель степей, пасущий мамонтов. Враждует с незваными гостями, но не всегда нападает первым."},
+        {"Морозный тролль","Живёт в заснеженных ущельях. Быстро восстанавливает силы и боится пламени."},
+        {"Драугр","Оживший страж древних нордских гробниц. Оружие и сила зависят от ранга погребённого воина."},
+        {"Двемерский центурион","Механический исполин, охраняющий подземные залы двемеров. Крайне опасен в ближнем бою."},
+        {"Ледяной призрак","Холодное существо на заснеженных перевалах. Трудно заметить во время метели."},
+        {"Фалмер","Скрытный житель глубин и старых двемерских построек. Использует яды, ловушки и боевых существ."}
+    };
+    private void renderCodex(){
+        section("ДРЕВНИЕ ЛЕТОПИСИ","Кодекс","Бестиарий, народы, места и истории, которые открывают мир северных земель.");
+        content.addView(new NordicArtView(this,NordicArtView.CODEX),lp(-1,190));
+        space(content,15);
+        String[] groups={"Бестиарий","Народы","История","Места"};
+        String selected=groups[Math.max(0,Math.min(groups.length-1,codexCategory))];
+        chips(groups,selected,category->{
+            for(int i=0;i<groups.length;i++)if(groups[i].equals(category)){codexCategory=i;break;}
+            render();
+        });
+        space(content,14);
+        if(codexCategory==0){
+            addText(content,"ᛟ  СУЩЕСТВА И ОБИТАТЕЛИ",11,accent(),false,10);
+            for(String[] record:CODEX_CREATURES){
+                actionButton("◇  "+record[0],record[1],false,()->new AlertDialog.Builder(this)
+                    .setTitle(record[0]).setMessage(record[1])
+                    .setPositiveButton("Закрыть",null).show());
+            }
+        }else if(codexCategory==1){
+            addText(content,"ᛟ  ДЕСЯТЬ НАРОДОВ",11,accent(),false,10);
+            for(int i=0;i<GameEngine.RACES.length;i++){
+                final int idx=i;
+                actionButton("ᚱ  "+GameEngine.RACES[i],RpgContent.PASSIVES[i],false,()->new AlertDialog.Builder(this)
+                    .setTitle(GameEngine.RACES[idx]).setMessage("Наследие: "+RpgContent.PASSIVES[idx]+
+                    "\n\nРасовая способность: "+RpgContent.POWERS[idx])
+                    .setPositiveButton("Закрыть",null).show());
+            }
+        }else if(codexCategory==2){
+            java.util.ArrayList<String> docs=ItemCatalog.loreDocuments(this);
+            addText(content,"ᛟ  ХРОНИКИ И РУКОПИСИ",11,accent(),false,10);
+            if(docs.isEmpty())addText(content,"Справочные рукописи пока не загружены.",14,MUTED,false,8);
+            for(String file:docs)actionButton("◇  "+file.replace(".txt",""),"Читать рукопись",false,()->showDocument(file));
+        }else{
+            addText(content,"ᛟ  МЕСТА И ДОРОГИ",11,accent(),false,10);
+            java.util.ArrayList<WorldAtlas.Place> places=WorldAtlas.all();
+            for(WorldAtlas.Place place:places){
+                if(!place.type.contains("Столица")&&!place.type.contains("Поселение")&&
+                   !place.type.contains("Деревня"))continue;
+                actionButton(WorldAtlas.icon(place.type)+"  "+place.name,place.description,false,()->locationDialog(place));
+            }
+            actionButton("Открыть полную карту","Отметки, маршруты и расположение героя",true,()->{tab=1;render();});
+        }
+    }
     private void renderJournal(){
         section("ЛЕТОПИСЬ","Задания","Твои решения формируют собственную историю Скайрима.");
         LinearLayout main=card();addText(main,"ОСНОВНАЯ ИСТОРИЯ",11,accent(),true,11);
@@ -638,20 +748,23 @@ public final class MainActivity extends Activity {
         View sep=new View(this);sep.setBackgroundColor(BORDER);root.addView(sep,lp(-1,1));
         LinearLayout nav=row();nav.setPadding(dp(6),dp(7),dp(6),dp(7));nav.setBackgroundColor(PANEL);
         root.addView(nav,lp(-1,65));
-        String[] labels={"ИСТОРИЯ","КАРТА","СУМКА","ГЕРОЙ","ЖУРНАЛ","НАСТРОЙКИ"};
-        String[] signs={"⌘","◈","▣","◇","☷","⚙"};
+        String[] labels={"ИСТОРИЯ","КАРТА","СУМКА","КОДЕКС","ГЕРОЙ","ЖУРНАЛ","ТЕМА"};
+        String[] signs={"ᚱ","◈","▣","ᛟ","◇","☷","⚙"};
+        int[] tabs={0,1,2,6,3,4,5};
         for(int i=0;i<labels.length;i++){
-            final int index=i;
+            final int index=tabs[i];
             LinearLayout navitem=column();navitem.setGravity(Gravity.CENTER);
             LinearLayout.LayoutParams size=new LinearLayout.LayoutParams(0,-1,1);nav.addView(navitem,size);
-            TextView icon=text(signs[i],23,tab==i?accent():MUTED,true);icon.setGravity(Gravity.CENTER);navitem.addView(icon);
-            TextView t=text(labels[i],8,tab==i?accent():MUTED,tab==i);t.setGravity(Gravity.CENTER);navitem.addView(t);
+            TextView icon=text(signs[i],23,tab==index?accent():MUTED,true);icon.setGravity(Gravity.CENTER);navitem.addView(icon);
+            TextView t=text(labels[i],8,tab==index?accent():MUTED,tab==index);t.setGravity(Gravity.CENTER);navitem.addView(t);
             navitem.setOnClickListener(v->{if(tab!=index){tab=index;render();}});
         }
     }
     public void toast(String message){Toast.makeText(this,message,Toast.LENGTH_SHORT).show();}
     int currentAccent(){return accent();}
-    @Override public void onBackPressed(){if(game.started&&tab!=0){tab=0;render();return;}
+    @Override public void onBackPressed(){if(titleOpen){super.onBackPressed();return;}
+        if(!game.started||tab==5||tab==6){titleOpen=true;render();return;}
+        if(game.started&&tab!=0){tab=0;render();return;}
         if(game.started&&!game.mode.equals("WORLD")&&!game.mode.equals("COMBAT")){game.choose("GO_WORLD");save();render();return;}
         super.onBackPressed();}
 }
