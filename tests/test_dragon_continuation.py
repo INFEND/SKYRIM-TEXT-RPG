@@ -12,6 +12,8 @@ class DragonContinuationContracts(unittest.TestCase):
         c=source("DragonContinuation.java")
         self.assertIn('"Письмо под пеплом"',c)
         self.assertIn('"Совет за закрытыми дверями"',c)
+        self.assertIn('"След пепельного гонца"',c)
+        self.assertIn('"Виндхельм"',c)
         self.assertIn('for(int i=1;i<=8;i++)',c)
         self.assertIn('s.primary("DRAGON_NEXT:"+stage+":0"',c)
         self.assertIn('s.add("DRAGON_NEXT:"+stage+":9"',c)
@@ -38,7 +40,7 @@ class DragonContinuationContracts(unittest.TestCase):
         self.assertIn("if(seal&&dates)",c)
         self.assertIn("if(courier&&scout)",c)
         self.assertIn("!g.progress.dragonNextFailed.contains",c)
-        self.assertIn("Следующая экспедиция пока не реализована.",c)
+        self.assertIn("Дальнейшая экспедиция пока не реализована.",c)
     def test_integration_and_legacy(self):
         arc=source("DragonArc.java")
         game=source("GameEngine.java")
@@ -50,5 +52,8 @@ class DragonContinuationContracts(unittest.TestCase):
         for field in ('dragonNextStage','dragonNextRecent','dragonNextUsed'):
             self.assertIn('.put("'+field+'"',p)
         self.assertIn('obj.optInt("dragonNextStage",0)',p)
+        self.assertIn('Math.min(3,obj.optInt("dragonNextStage",0))',p)
+        self.assertIn('DRAGON_NEXT:[012]:[1-8]',p)
+        self.assertIn('DRAGON_NEXT:[012]:[357]',p)
         self.assertIn('j.put("schema",1)',game)
 if __name__=="__main__": unittest.main()
