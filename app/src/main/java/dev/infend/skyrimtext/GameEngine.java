@@ -212,6 +212,9 @@ public final class GameEngine {
         if("DRAGON_OPEN".equals(action)){
             mode="DRAGON";return;
         }
+        if(action.startsWith("DRAGON_NEXT:")){
+            DragonContinuation.perform(this,action);return;
+        }
         if(action.startsWith("DRAGON:")){
             boolean dragonFight=DragonArc.perform(this,action);
             if(dragonFight){
