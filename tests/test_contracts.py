@@ -115,6 +115,17 @@ class GameContracts(unittest.TestCase):
         self.assertIn('quantity("Стальная кираса",1)',progress)
         self.assertIn('p.inventory.remove("Стальной кираса")',progress)
 
+    def test_combat_cannot_be_bypassed_by_world_actions(self):
+        engine=text("GameEngine.java")
+        choose=engine[engine.index("public void choose(String action)"):engine.index("private void buy(")]
+        guard=choose.index('if ("COMBAT".equals(mode)')
+        self.assertLess(guard,choose.index('if (action.startsWith("ACT:"))'))
+        self.assertLess(guard,choose.index('if(action.startsWith("LOC:"))'))
+        self.assertLess(guard,choose.index('switch(action)'))
+        for action in ("ATTACK","HEAVY","MAGIC","DEFEND","POTION","FLEE"):
+            self.assertIn('"' + action + '".equals(action)',choose[:choose.index('if (action.startsWith("ACT:"))')])
+        self.assertIn('if(!mode.equals("COMBAT"))return;',engine)
+
     def test_embedded_user_materials(self):
         bundle=ROOT/"app/src/main/assets/lore_bundle.zip"
         self.assertTrue(bundle.is_file())
