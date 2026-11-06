@@ -630,7 +630,14 @@ public final class MainActivity extends Activity {
     private void renderJournal(){
         section("ЛЕТОПИСЬ","Задания","Твои решения формируют собственную историю Скайрима.");
         content.addView(new NordicArtView(this,NordicArtView.TITLE),lp(-1,120));space(content,12);
-        LinearLayout main=card();addText(main,"ОСНОВНАЯ ИСТОРИЯ",11,accent(),true,11);
+        LinearLayout dragon=card();addText(dragon,"ОСНОВНАЯ ИСТОРИЯ",11,accent(),true,11);
+        addText(dragon,"Драконий след",22,TEXT,true,8);
+        addText(dragon,"Глава "+Math.min(6,game.progress.dragonStage+1)+" / 6",13,accent(),true,8);
+        addText(dragon,DragonArc.status(game),15,MUTED,false,10);
+        actionButton("Продолжить историю","Открыть следующую главу",true,()->{
+            game.mode="DRAGON";save();tab=0;render();
+        });
+        LinearLayout main=card();addText(main,"ДОПОЛНИТЕЛЬНАЯ ИСТОРИЯ",11,accent(),true,11);
         addText(main,"Пепельные печати",22,TEXT,true,8);
         addText(main,"Статус: "+game.questStatus(),13,accent(),false,13);
         addText(main,game.questDetails(),15,MUTED,false,0);
@@ -641,8 +648,12 @@ public final class MainActivity extends Activity {
                 "Победы над противниками: "+game.sideKills+"/3"+(game.sideKills>=3?". Награда ждёт у доски.":".");
         addText(side,sideStatus,15,MUTED,false,0);
         LinearLayout finishedQuests=card();addText(finishedQuests,"ЗАВЕРШЁННЫЕ ЗАДАНИЯ",11,accent(),true,9);
+        if(game.progress.dragonStage==DragonArc.FINAL_STAGE)
+            addText(finishedQuests,"✓  Драконий след • первое испытание",14,TEXT,false,8);
         if(game.questStage==4)addText(finishedQuests,"✓  Пепельные печати",14,TEXT,false,8);
-        if(game.questStage!=4)addText(finishedQuests,"Основная история ещё не завершена.",13,MUTED,false,8);
+        if(game.progress.dragonStage<DragonArc.FINAL_STAGE)
+            addText(finishedQuests,"Драконий след: ещё не завершён.",13,MUTED,false,8);
+        if(game.questStage!=4)addText(finishedQuests,"История хранителей ещё не завершена.",13,MUTED,false,8);
         addText(finishedQuests,"Заказы доски после сдачи не сохраняются в отдельном архиве.",12,MUTED,false,0);
         LinearLayout failedQuests=card();addText(failedQuests,"ПРОВАЛЕННЫЕ ЗАДАНИЯ",11,0xffeb8e8e,true,9);
         addText(failedQuests,"Пока нет проваленных сюжетных заданий.",13,MUTED,false,0);

@@ -15,6 +15,11 @@ public final class RpgProgress {
     public int perkPoints=0;
     public int activePowerDay=-1;
     public int difficulty=0;
+    // First dragon story arc is kept inside existing schema-1 save data.
+    public int dragonStage=0;
+    public int dragonInsight=0;
+    public String dragonRecent="";
+    public final HashSet<String> dragonUsed=new HashSet<>();
     public int actionDay=-1;
     public final HashSet<String> attemptedToday=new HashSet<>();
     public RpgProgress(){Arrays.fill(skillLevels,15);}
@@ -93,6 +98,7 @@ public final class RpgProgress {
     }
     public int chance(GameEngine g,String action){
         if(action==null)return -1;
+        if(action.startsWith("DRAGON:"))return DragonArc.chance(g,action);
         if(action.matches("ACT:[0-9]")){
             if(!("WORLD".equals(g.mode)||"TALK".equals(g.mode)||"EVENT".equals(g.mode)||"QUEST".equals(g.mode)))return -1;
             int which=0;try{which=Integer.parseInt(action.substring(4));}catch(Exception ignored){}
@@ -212,7 +218,9 @@ public final class RpgProgress {
              .put("skillXp",new JSONArray(skillXp)).put("inventory",inventory)
              .put("completed",new JSONArray(completed)).put("failed",new JSONArray(failed))
              .put("perks",perkPoints).put("activePowerDay",activePowerDay).put("difficulty",difficulty)
-             .put("actionDay",actionDay).put("attemptedToday",new JSONArray(attemptedToday));
+             .put("actionDay",actionDay).put("attemptedToday",new JSONArray(attemptedToday))
+             .put("dragonStage",dragonStage).put("dragonInsight",dragonInsight)
+             .put("dragonRecent",dragonRecent).put("dragonUsed",new JSONArray(dragonUsed));
         }catch(Exception ignored){}
         return o;
     }
@@ -222,6 +230,14 @@ public final class RpgProgress {
         p.recent=obj.optString("recent","");p.perkPoints=Math.max(0,obj.optInt("perks",0));
         p.activePowerDay=obj.optInt("activePowerDay",-1);p.difficulty=obj.optInt("difficulty",0);
         p.actionDay=obj.optInt("actionDay",-1);
+        p.dragonStage=Math.max(0,Math.min(DragonArc.FINAL_STAGE,obj.optInt("dragonStage",0)));
+        p.dragonInsight=Math.max(0,Math.min(15,obj.optInt("dragonInsight",0)));
+        p.dragonRecent=obj.optString("dragonRecent","");
+        JSONArray dragonActions=obj.optJSONArray("dragonUsed");
+        if(dragonActions!=null)for(int i=0;i<dragonActions.length();i++){
+            String value=dragonActions.optString(i,"");
+            if(value.matches("DRAGON:[0-5]:[1-8]"))p.dragonUsed.add(value);
+        }
         JSONArray attempted=obj.optJSONArray("attemptedToday");
         if(attempted!=null)for(int i=0;i<attempted.length();i++){
             String key=attempted.optString(i,"");

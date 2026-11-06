@@ -109,6 +109,7 @@ public final class GameEngine {
                 .primary("GO_WORLD","Сделать первый шаг","Начать историю и выйти на дорогу");
             case "TRAVEL": return travelScene();
             case "QUEST": return questScene();
+            case "DRAGON": return DragonArc.scene(this);
             case "TALK": return talkScene();
             case "SHOP": return shopScene();
             case "EVENT": return eventScene();
@@ -122,8 +123,9 @@ public final class GameEngine {
     private Scene worldScene() {
         Scene s = new Scene("СКАЙРИМ • ДЕНЬ " + day, progress.location + " · " + REGIONS[region], DESCRIPTIONS[region] + "\n\nМестность: "+progress.location+"." +
             (message.isEmpty()?"":"\n\n"+message));
-        s.primary("EXPLORE","Исследовать окрестности","Случайные встречи, тайники и опасности");
-        s.add("QUEST","Главная история","Пепельные печати • " + questStatus());
+        s.primary("DRAGON_OPEN","Главная история • Драконий след",DragonArc.status(this));
+        s.add("EXPLORE","Исследовать окрестности","Случайные встречи, тайники и опасности");
+        s.add("QUEST","История хранителей","Пепельные печати • " + questStatus());
         s.add("TALK","Поговорить с местными","Слухи, события и полезные сведения");
         s.add("TRAVEL","Отправиться в путь","Выбрать другой город");
         s.add("SHOP","Торговая лавка","Зелья, оружие и снаряжение");
@@ -207,6 +209,20 @@ public final class GameEngine {
         if ("COMBAT".equals(mode) && !("ATTACK".equals(action) || "HEAVY".equals(action)
                 || "MAGIC".equals(action) || "DEFEND".equals(action)
                 || "POTION".equals(action) || "FLEE".equals(action))) return;
+        if("DRAGON_OPEN".equals(action)){
+            mode="DRAGON";return;
+        }
+        if(action.startsWith("DRAGON:")){
+            boolean dragonFight=DragonArc.perform(this,action);
+            if(dragonFight){
+                int prepared=progress.dragonInsight;
+                startBattle("Мирмулнир",Math.max(95,170+level*8-prepared*7),
+                    Math.max(9,17+level*2-prepared/2),"DRAGON",
+                    "Дракон резко обрывает круг над дозорной башней. Стража пытается удержать строй. "+
+                    "Укрытия из камня ещё стоят, а замеченные ранее слабости крылатого врага дают шанс выстоять.");
+            }
+            progress.sync(this);return;
+        }
         if (action.startsWith("ACT:")){progress.perform(this,action);progress.sync(this);return;}
         if(action.startsWith("LOC:")){
             WorldAtlas.Place target=WorldAtlas.find(action.substring(4));
@@ -382,9 +398,16 @@ public final class GameEngine {
         int reward=25+random.nextInt(26)+level*4;int gain=30+level*9;
         gold+=reward;victories++;if(sideQuest==1&&sideKills<3)sideKills++;
         if("QUEST".equals(battleKind)) {questStage=3;reward+=50;gold+=50;gain+=65;}
+        if("DRAGON".equals(battleKind)&&progress.dragonStage==3){
+            progress.dragonStage=4;
+            reward+=85;gold+=85;gain+=90;
+            progress.dragonRecent="У сторожевой башни повержен дракон. "+
+                "Над полем прозвучал голос, которому откликнулись горы. Следующая цель: Айварстед.";
+        }
         addXp(gain);mode="RESULT";
         message=lastHit+"\n\nПобеда над «"+enemyName+"»! +"+reward+" септимов, +"+gain+" опыта.";
         if("QUEST".equals(battleKind))message+="\n\nЗа стражем ты находишь журнал хранителя. Следующая цель: Солитьюд.";
+        if("DRAGON".equals(battleKind))message+="\n\n"+progress.dragonRecent;
         if(sideQuest==1)message+="\nЗаказ доски: "+sideKills+"/3.";
     }
     public void addXp(int amount) {
