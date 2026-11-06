@@ -85,6 +85,36 @@ class GameContracts(unittest.TestCase):
         self.assertIn("renderMap()",text("MainActivity.java"))
         self.assertIn("renderInventory()",text("MainActivity.java"))
 
+    def test_route_planning_and_ferry_restrictions(self):
+        route=text("TravelPlanner.java")
+        engine=text("GameEngine.java")
+        ui=text("MainActivity.java")
+        self.assertIn('FERRY_FARE = 250',route)
+        self.assertIn('{2,9}',route)
+        self.assertIn('game.progress.carryWeight()>CARRY_LIMIT_KG',route)
+        self.assertIn('game.gold<fare',route)
+        self.assertIn('target.type.equals("Иной мир")',route)
+        self.assertIn('TravelPlanner.plan(this,target)',engine)
+        self.assertIn('choose("LOC:"+TravelPlanner.HUBS[target])',engine)
+        self.assertIn('gold-=route.fare;',engine)
+        self.assertIn('day+=route.days;',engine)
+        self.assertIn('TravelPlanner.plan(game,place)',ui)
+        self.assertNotIn('region=to;progress.location=REGIONS[to]; day++',engine)
+
+    def test_shop_checks_weight_before_payment_and_migrates_armor(self):
+        engine=text("GameEngine.java")
+        progress=text("RpgProgress.java")
+        catalog=text("ItemCatalog.java")
+        shop=engine[engine.index('private void buy('):engine.index('private void explore()')]
+        self.assertIn('double projected=progress.carryWeight()+incoming.weight',shop)
+        self.assertIn('if(projected>50.00001)',shop)
+        self.assertLess(shop.index('if(projected>50.00001)'),shop.index('gold-=price;'))
+        self.assertIn('progress.carryWeight()+0.5<=50.00001',engine)
+        self.assertIn('put(feminine[i]+" кираса"',catalog)
+        self.assertIn('put(plural[i]+" перчатки"',catalog)
+        self.assertIn('quantity("Стальная кираса",1)',progress)
+        self.assertIn('p.inventory.remove("Стальной кираса")',progress)
+
     def test_embedded_user_materials(self):
         bundle=ROOT/"app/src/main/assets/lore_bundle.zip"
         self.assertTrue(bundle.is_file())
