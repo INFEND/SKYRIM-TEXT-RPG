@@ -193,7 +193,7 @@ public final class MainActivity extends Activity {
         titleRule();
         titleButton("Новая игра",true,()->{
             if(game.started){
-                new AlertDialog.Builder(this).setTitle("Новая история")
+                new RuneDialogBuilder(this,accent()).setTitle("Новая история")
                     .setMessage("Существующее сохранение будет заменено. Продолжить?")
                     .setNegativeButton("Отмена",null)
                     .setPositiveButton("Новая игра",(d,w)->{
@@ -206,7 +206,7 @@ public final class MainActivity extends Activity {
             titleOpen=false;tab=0;render();
         });
         titleButton("Настройки",false,()->{titleOpen=false;tab=5;render();});
-        titleButton("О игре",false,()->new AlertDialog.Builder(this)
+        titleButton("О игре",false,()->new RuneDialogBuilder(this,accent())
             .setTitle("СКАЙРИМ · ТЕКСТОВАЯ RPG")
             .setMessage("Интерактивная история северных земель. Выборы, путешествия, дневник и кодекс. Самостоятельный неофициальный проект.")
             .setPositiveButton("Закрыть",null).show());
@@ -395,7 +395,7 @@ public final class MainActivity extends Activity {
         TravelPlanner.Route route=TravelPlanner.plan(game,place);
         String body=place.description+"\n\nТип: "+place.type+
             "\nРегион: "+GameEngine.REGIONS[place.region]+"\n\n"+route.summary();
-        AlertDialog.Builder dialog=new AlertDialog.Builder(this).setTitle(place.name).setMessage(body)
+        AlertDialog.Builder dialog=new RuneDialogBuilder(this,accent()).setTitle(place.name).setMessage(body)
             .setNegativeButton("Закрыть",null);
         if(route.allowed&&route.days>0){
             dialog.setPositiveButton("Начать переход",(d,w)->{
@@ -444,7 +444,7 @@ public final class MainActivity extends Activity {
         String text=item.icon+"  "+item.name+"\n\nКатегория: "+item.category+
             String.format(java.util.Locale.forLanguageTag("ru"),"\nВес: %.2f кг\nСтоимость: %d септимов",item.weight,item.value)+
             "\n\n"+item.description+"\n\nЭффект: "+item.effect;
-        AlertDialog.Builder dialog=new AlertDialog.Builder(this).setTitle("Сведения о предмете")
+        AlertDialog.Builder dialog=new RuneDialogBuilder(this,accent()).setTitle("Сведения о предмете")
             .setMessage(text).setNegativeButton("Закрыть",null);
         if(game.progress.quantity(item.id)>0){
             if("Лечебное зелье".equals(item.id)||"Зелье магии".equals(item.id))
@@ -481,14 +481,14 @@ public final class MainActivity extends Activity {
             public void onTextChanged(CharSequence x,int a,int b,int c){refresh.run();}
             public void afterTextChanged(android.text.Editable x){}
         });
-        AlertDialog dlg=new AlertDialog.Builder(this).setTitle("Каталог предметов").setView(root).setNegativeButton("Закрыть",null).create();
+        AlertDialog dlg=new RuneDialogBuilder(this,accent()).setTitle("Каталог предметов").setView(root).setNegativeButton("Закрыть",null).create();
         list.setOnItemClickListener((parent,v,pos,id)->{if(pos>=0&&pos<visible.size())itemDialog(visible.get(pos));});
         dlg.show();
     }
     private void showLibrary(){
         java.util.ArrayList<String> docs=ItemCatalog.loreDocuments(this);
         if(docs.isEmpty()){toast("Библиотека не загружена");return;}
-        new AlertDialog.Builder(this).setTitle("Личная библиотека • "+docs.size()+" документов")
+        new RuneDialogBuilder(this,accent()).setTitle("Личная библиотека • "+docs.size()+" документов")
             .setItems(docs.toArray(new String[0]),(d,position)->showDocument(docs.get(position)))
             .setNegativeButton("Закрыть",null).show();
     }
@@ -506,7 +506,7 @@ public final class MainActivity extends Activity {
         }
         String data=ItemCatalog.document(this,file);
         TextView text=text(data,14,TEXT,false);text.setLineSpacing(dp(4),1.04f);col.addView(text);
-        new AlertDialog.Builder(this).setTitle(file.replace(".txt","")).setView(scroll)
+        new RuneDialogBuilder(this,accent()).setTitle(file.replace(".txt","")).setView(scroll)
             .setNegativeButton("Закрыть",null).show();
     }
     private void heroEntry(LinearLayout p,String label,String value){
@@ -555,7 +555,7 @@ public final class MainActivity extends Activity {
         addText(content,"ШКОЛЫ МАГИИ И КРИКИ",11,accent(),true,12);
         for(String record:RpgContent.SHOUTS){
             String[] parts=record.split("\\|",2);
-            actionButton("ᚱ  "+parts[0],parts.length>1?parts[1]:"",false,()->new AlertDialog.Builder(this)
+            actionButton("ᚱ  "+parts[0],parts.length>1?parts[1]:"",false,()->new RuneDialogBuilder(this,accent())
                 .setTitle(parts[0]).setMessage(parts.length>1?parts[1]:"").setPositiveButton("Закрыть",null).show());
         }
     }
@@ -564,7 +564,7 @@ public final class MainActivity extends Activity {
         String details=RpgContent.SKILL_DESCRIPTIONS[index]+"\n\nУровень: "+lvl+
             "\nОпыт навыка: "+game.progress.skillXp[index]+" / "+game.progress.skillNeed(index)+
             "\n\nВетка талантов: ученик → адепт → мастер.";
-        AlertDialog.Builder builder=new AlertDialog.Builder(this).setTitle(RpgContent.SKILLS[index])
+        AlertDialog.Builder builder=new RuneDialogBuilder(this,accent()).setTitle(RpgContent.SKILLS[index])
             .setMessage(details).setNegativeButton("Закрыть",null);
         if(game.progress.perkPoints>0&&lvl>=20)
             builder.setPositiveButton("Развить талант",(d,w)->{
@@ -598,7 +598,7 @@ public final class MainActivity extends Activity {
         if(codexCategory==0){
             addText(content,"ᛟ  СУЩЕСТВА И ОБИТАТЕЛИ",11,accent(),false,10);
             for(String[] record:CODEX_CREATURES){
-                actionButton("◇  "+record[0],record[1],false,()->new AlertDialog.Builder(this)
+                actionButton("◇  "+record[0],record[1],false,()->new RuneDialogBuilder(this,accent())
                     .setTitle(record[0]).setMessage(record[1])
                     .setPositiveButton("Закрыть",null).show());
             }
@@ -606,7 +606,7 @@ public final class MainActivity extends Activity {
             addText(content,"ᛟ  ДЕСЯТЬ НАРОДОВ",11,accent(),false,10);
             for(int i=0;i<GameEngine.RACES.length;i++){
                 final int idx=i;
-                actionButton("ᚱ  "+GameEngine.RACES[i],RpgContent.PASSIVES[i],false,()->new AlertDialog.Builder(this)
+                actionButton("ᚱ  "+GameEngine.RACES[i],RpgContent.PASSIVES[i],false,()->new RuneDialogBuilder(this,accent())
                     .setTitle(GameEngine.RACES[idx]).setMessage("Наследие: "+RpgContent.PASSIVES[idx]+
                     "\n\nРасовая способность: "+RpgContent.POWERS[idx])
                     .setPositiveButton("Закрыть",null).show());
@@ -735,7 +735,7 @@ public final class MainActivity extends Activity {
     }
     private void restoreDialog(){
         EditText e=new EditText(this);e.setTextColor(TEXT);e.setHint("Вставь JSON-код сохранения");e.setHintTextColor(MUTED);e.setMinLines(3);
-        new AlertDialog.Builder(this).setTitle("Восстановление").setView(e).setNegativeButton("Отмена",null)
+        new RuneDialogBuilder(this,accent()).setTitle("Восстановление").setView(e).setNegativeButton("Отмена",null)
             .setPositiveButton("Загрузить",(d,w)->{
                 try{JSONObject json=new JSONObject(e.getText().toString());if(json.optInt("schema")!=1 || !json.optBoolean("started"))throw new Exception();
                     game=GameEngine.fromJson(json.toString());tab=0;save();render();toast("Сохранение восстановлено");
@@ -743,7 +743,7 @@ public final class MainActivity extends Activity {
             }).show();
     }
     private void resetDialog(){
-        new AlertDialog.Builder(this).setTitle("Начать заново?")
+        new RuneDialogBuilder(this,accent()).setTitle("Начать заново?")
             .setMessage("Текущее сохранение будет заменено. При необходимости сначала скопируй код сохранения.")
             .setNegativeButton("Отмена",null).setPositiveButton("Новая игра",(d,w)->{
                 game=new GameEngine();tab=0;draftName="";selectedStart=0;java.util.Arrays.fill(initialPoints,0);save();render();}).show();
