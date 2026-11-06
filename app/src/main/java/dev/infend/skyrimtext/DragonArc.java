@@ -130,7 +130,7 @@ public final class DragonArc {
             String[] split=OPTIONS[stage][i-1].split("\\|",2);
             boolean attempted=g.progress.dragonUsed.contains("DRAGON:"+stage+":"+i);
             s.add("DRAGON:"+stage+":"+i,(attempted?"✓ ":"")+split[0],
-                attempted?"Уже выполнено в этой главе":split[1]);
+                attempted?"Уже выполнено в этой главе":!arrived?"Сначала доберись до места главы":split[1]);
         }
         s.add("DRAGON:"+stage+":9","Вернуться к исследованию мира","Сохранить текущую главу и продолжить путь позднее");
         return s;
@@ -142,6 +142,7 @@ public final class DragonArc {
         String[] tokens=action.split(":");
         int stage=Integer.parseInt(tokens[1]),index=Integer.parseInt(tokens[2]);
         if(stage!=g.progress.dragonStage||g.progress.dragonUsed.contains(action))return -1;
+        if(!DESTINATIONS[stage].equals(g.progress.location)||g.stamina<7)return -1;
         if(index!=3&&index!=5&&index!=7)return -1;
         int skill=SKILLS[index-1];
         return g.progress.chance(g,index%3,skill,DIFFICULTY[index-1]+stage*3);
@@ -174,6 +175,14 @@ public final class DragonArc {
         }
         if(g.progress.dragonUsed.contains(action)){
             g.progress.dragonRecent="Этот путь уже пройден. Повторное действие не даёт новых наград.";
+            return false;
+        }
+        if(!DESTINATIONS[stage].equals(g.progress.location)){
+            g.progress.dragonRecent="Сначала доберись до места главы: "+DESTINATIONS[stage]+". Удалённые действия недоступны.";
+            return false;
+        }
+        if((index==3||index==5||index==7)&&g.stamina<7){
+            g.progress.dragonRecent="Ты слишком истощён для опасной попытки. Отдохни перед испытанием.";
             return false;
         }
         int check=chance(g,action);
