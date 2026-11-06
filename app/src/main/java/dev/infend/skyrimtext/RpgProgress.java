@@ -15,6 +15,8 @@ public final class RpgProgress {
     public int perkPoints=0;
     public int activePowerDay=-1;
     public int difficulty=0;
+    public int actionDay=-1;
+    public final HashSet<String> attemptedToday=new HashSet<>();
     public RpgProgress(){Arrays.fill(skillLevels,15);}
     public static RpgProgress newHero(GameEngine g,int start,int[] points){
         RpgProgress p=new RpgProgress();
@@ -92,21 +94,18 @@ public final class RpgProgress {
     public int chance(GameEngine g,String action){
         if(action==null)return -1;
         if(action.startsWith("ACT:")){
+            if(!("WORLD".equals(g.mode)||"TALK".equals(g.mode)||"EVENT".equals(g.mode)||"QUEST".equals(g.mode)))return -1;
             int which=0;try{which=Integer.parseInt(action.substring(4));}catch(Exception ignored){}
             return chance(g,which,skillFor(which),12+(which*5)%34);
         }
         switch(action){
-            case "ATTACK":return chance(g,0,0,14);
-            case "HEAVY":return chance(g,2,1,30);
-            case "MAGIC":return chance(g,1,13,24);
-            case "FLEE":return chance(g,2,9,38);
+            case "HEAVY":return g.stamina>=10?chance(g,2,1,30):-1;
+            case "FLEE":return "WILD".equals(g.battleKind)?chance(g,2,9,38):-1;
             case "EVENT_HELP":return chance(g,0,14,15);
             case "EVENT_SEARCH":return chance(g,2,9,25);
-            case "TALK_HELP":return chance(g,1,12,15);
-            case "TALK_GIVE":return -1;
-            case "Q_ALTAR":return chance(g,1,16,22);
-            case "Q_BOSS":return chance(g,0,0,36);
-            case "EXPLORE":return chance(g,2,9,16);
+            // These actions do not make an independent success roll. Do not advertise a fictitious percentage.
+            case "ATTACK":case "MAGIC":case "TALK_HELP":case "TALK_GIVE":
+            case "Q_ALTAR":case "Q_BOSS":case "EXPLORE":return -1;
             default:return -1; // Household actions and navigation are deterministic.
         }
     }
@@ -124,23 +123,31 @@ public final class RpgProgress {
         "Пробраться незамеченным|Обойти опасный участок в тени."
     };
     public void fillChoices(GameEngine g,GameEngine.Scene s){
+        // Context-specific choices only. A generic loot action must never appear in combat,
+        // shops, introductions, defeat, or after-event results.
+        if(!("WORLD".equals(g.mode)||"TALK".equals(g.mode)||"EVENT".equals(g.mode)||"QUEST".equals(g.mode)))return;
+        if(actionDay!=g.day){attemptedToday.clear();actionDay=g.day;}
         HashSet<String> used=new HashSet<>();
         for(GameEngine.Choice c:s.choices)used.add(c.action);
         int i=0;
         while(s.choices.size()<10&&i<30){
             int index=(i+Math.max(0,g.region))%10;i++;
             String[] a=ACTIONS[index].split("\\|",2);
-            String action="ACT:"+index;if(used.contains(action))continue;
+            String action="ACT:"+index;if(used.contains(action)||attemptedToday.contains(action))continue;
             s.choices.add(new GameEngine.Choice(action,a[0],a[1],false));used.add(action);
         }
     }
     public boolean perform(GameEngine g,String action){
-        if(!action.startsWith("ACT:"))return false;
+        if(action==null||!action.startsWith("ACT:"))return false;
+        if(!("WORLD".equals(g.mode)||"TALK".equals(g.mode)||"EVENT".equals(g.mode)||"QUEST".equals(g.mode)))return false;
+        if(actionDay!=g.day){attemptedToday.clear();actionDay=g.day;}
+        if(attemptedToday.contains(action))return false;
         int index=0;try{index=Integer.parseInt(action.substring(4));}catch(Exception ignored){}
         index=Math.floorMod(index,10);
         String[] a=ACTIONS[index].split("\\|",2);
         int skill=skillFor(index);
         int chance=chance(g,action);
+        attemptedToday.add(action);
         boolean success=new Random().nextInt(100)<chance;
         int fatigue=3+(index%4)*2;
         g.stamina=Math.max(0,g.stamina-fatigue);
@@ -204,7 +211,8 @@ public final class RpgProgress {
              .put("points",new JSONArray(spent)).put("skillLevels",new JSONArray(skillLevels))
              .put("skillXp",new JSONArray(skillXp)).put("inventory",inventory)
              .put("completed",new JSONArray(completed)).put("failed",new JSONArray(failed))
-             .put("perks",perkPoints).put("activePowerDay",activePowerDay).put("difficulty",difficulty);
+             .put("perks",perkPoints).put("activePowerDay",activePowerDay).put("difficulty",difficulty)
+             .put("actionDay",actionDay).put("attemptedToday",new JSONArray(attemptedToday));
         }catch(Exception ignored){}
         return o;
     }
@@ -213,6 +221,12 @@ public final class RpgProgress {
         p.startId=obj.optString("startId","Хелген");p.location=obj.optString("location","Хелген");
         p.recent=obj.optString("recent","");p.perkPoints=Math.max(0,obj.optInt("perks",0));
         p.activePowerDay=obj.optInt("activePowerDay",-1);p.difficulty=obj.optInt("difficulty",0);
+        p.actionDay=obj.optInt("actionDay",-1);
+        JSONArray attempted=obj.optJSONArray("attemptedToday");
+        if(attempted!=null)for(int i=0;i<attempted.length();i++){
+            String key=attempted.optString(i,"");
+            if(key.matches("ACT:[0-9]"))p.attemptedToday.add(key);
+        }
         JSONArray levels=obj.optJSONArray("skillLevels"),xp=obj.optJSONArray("skillXp"),pts=obj.optJSONArray("points");
         for(int i=0;i<p.skillLevels.length;i++){
             if(levels!=null)p.skillLevels[i]=Math.max(0,Math.min(100,levels.optInt(i,15)));

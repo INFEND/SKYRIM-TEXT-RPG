@@ -133,7 +133,7 @@ public final class GameEngine {
     }
 
     private Scene travelScene() {
-        Scene s = new Scene("КАРТА СЕВЕРА", "Куда держать путь?", "Дорога занимает день. Открыты все восемь городов. В пути ты восстановишь немного сил.");
+        Scene s = new Scene("КАРТА СЕВЕРА", "Куда держать путь?", "Дорога занимает день. Открыты дороги во все доступные регионы. В пути ты восстановишь немного сил.");
         for(int i=0;i<REGIONS.length;i++) if(i!=region) s.add("REGION:"+i, REGIONS[i], regionHint(i));
         return s.add("GO_WORLD","Остаться здесь","Вернуться в город");
     }
@@ -273,12 +273,29 @@ public final class GameEngine {
         } else {
             int found=15+random.nextInt(41);gold+=found;addXp(12);
             if(random.nextInt(4)==0) potions++;
-            message="В зарослях найден старый тайник. Внутри " + found + " золотых септимов. +12 опыта.";mode="RESULT";
+            message="В зарослях найден старый тайник. Внутри " + found + " септимов. +12 опыта.";mode="RESULT";
         }
     }
     private void eventChoice(boolean help) {
-        if(help){reputation++;int gain=10+random.nextInt(16);addXp(gain);if(random.nextBoolean()){potions++;message="Ты помогаешь незнакомцу и получаешь лечебное зелье. Репутация +1, опыт +"+gain+".";}else{gold+=25;message="В благодарность тебе вручают 25 золотых. Репутация +1, опыт +"+gain+".";}}
-        else {if(random.nextInt(3)==0){hp=Math.max(1,hp-17);message="Сработала старая ловушка! −17 здоровья.";}else{int found=28+random.nextInt(44);gold+=found;message="Под камнем найдено " + found + " септимов.";}addXp(10);}
+        // The exact percentage shown in the scene is the same value used in this roll.
+        String action=help?"EVENT_HELP":"EVENT_SEARCH";
+        int successChance=progress.chance(this,action);
+        boolean succeeded=random.nextInt(100)<successChance;
+        if(succeeded){
+            if(help){
+                reputation++;int gain=10+random.nextInt(16);addXp(gain);
+                if(random.nextBoolean()){potions++;message="Ты помогаешь незнакомцу и получаешь лечебное зелье. Репутация +1, опыт +"+gain+".";}
+                else{gold+=25;message="В благодарность тебе вручают 25 септимов. Репутация +1, опыт +"+gain+".";}
+            }else{
+                int found=28+random.nextInt(44);gold+=found;addXp(10);
+                message="Под камнем найдено "+found+" септимов. Получено 10 опыта.";
+            }
+            progress.completed.add((help?"Помощь путнику":"Исследование находки")+" • день "+day);
+        }else{
+            if(help){reputation=Math.max(-50,reputation-1);message="Незнакомец принимает жест за угрозу и уходит. Репутация −1.";}
+            else{hp=Math.max(1,hp-17);message="Сработала старая ловушка! −17 здоровья.";}
+            progress.failed.add((help?"Помощь путнику":"Исследование находки")+" • день "+day);
+        }
         mode="RESULT";
     }
     private void board() {
@@ -296,8 +313,9 @@ public final class GameEngine {
         int damage=0;boolean defending=false;String actionText="";
         switch(action){
             case "ATTACK": damage=Math.max(1,attack+random.nextInt(9)-3);actionText="Ты наносишь удар: −"+damage+" здоровья врагу.";break;
-            case "HEAVY":if(stamina<10){battleLog="Недостаточно выносливости для сильного удара.";return;}stamina-=10;
-                if(random.nextInt(100)<progress.chance(this,"HEAVY")){damage=Math.max(1,attack*2+random.nextInt(9));actionText="Сильный удар! −"+damage+" здоровья врагу.";}else actionText="Сильный удар проходит мимо.";break;
+            case "HEAVY":if(stamina<10){battleLog="Недостаточно выносливости для сильного удара.";return;}
+                int hitChance=progress.chance(this,"HEAVY");stamina-=10;
+                if(random.nextInt(100)<hitChance){damage=Math.max(1,attack*2+random.nextInt(9));actionText="Сильный удар! −"+damage+" здоровья врагу.";}else actionText="Сильный удар проходит мимо.";break;
             case "MAGIC":if(magicka<12){battleLog="Недостаточно магии. Нужны 12 единиц.";return;}magicka-=12;damage=18+level*4+random.nextInt(8);actionText="Магическая вспышка обжигает врага: −"+damage+".";break;
             case "DEFEND": defending=true;stamina=Math.min(maxStamina,stamina+12);magicka=Math.min(maxMagicka,magicka+5);actionText="Ты встаёшь в оборону, восстанавливая силы.";break;
             case "POTION":if(potions==0){battleLog="Лечебных зелий больше нет.";return;}potions--;int restored=Math.min(45,maxHp-hp);hp+=restored;actionText="Ты восстанавливаешь "+restored+" здоровья.";break;
