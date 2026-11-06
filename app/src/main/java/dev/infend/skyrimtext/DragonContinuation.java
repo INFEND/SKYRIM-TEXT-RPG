@@ -28,7 +28,13 @@ public final class DragonContinuation {
          "Проследить за тайным посланником|Попытаться выяснить источник утечки.",
          "Выбрать маршрут разведки|Составить план следующего похода."}
     };
+    private static final int[][] SKILLS={{12,12,9,12,15,2,9,9},{15,12,9,13,12,14,9,9}};
     private DragonContinuation(){}
+    private static int evidenceCount(GameEngine g,int stage){
+        int n=0;
+        for(int i=1;i<=8;i++)if(g.progress.dragonNextUsed.contains("DRAGON_NEXT:"+stage+":"+i))n++;
+        return n;
+    }
     public static String status(GameEngine g){
         int stage=g.progress.dragonNextStage;
         return stage>=2?"Драконий след • новые свидетельства собраны":
@@ -44,7 +50,7 @@ public final class DragonContinuation {
             STORIES[stage]+"\n\nМЕСТО: "+PLACES[stage]+(here?" • ты здесь":" • требуется путь")+
             (g.progress.dragonNextRecent.isEmpty()?"":"\n\nПОСЛЕДСТВИЕ\n"+g.progress.dragonNextRecent));
         s.primary("DRAGON_NEXT:"+stage+":0",here?"Завершить расследование":"Проложить путь в "+PLACES[stage],
-            here?"Сохранить собранные сведения и продолжить историю":"Открыть маршруты");
+            here?"Собери три свидетельства ("+evidenceCount(g,stage)+"/3)":"Открыть маршруты");
         for(int i=1;i<=8;i++){
             String action="DRAGON_NEXT:"+stage+":"+i;
             String[] pair=OPTIONS[stage][i-1].split("\\|",2);
@@ -70,10 +76,12 @@ public final class DragonContinuation {
             g.mode="TRAVEL";g.message="Доберись до "+PLACES[stage]+", чтобы продолжить расследование.";return;
         }
         if(choice==0){
+            if(evidenceCount(g,stage)<3){g.progress.dragonNextRecent="Нужно три свидетельства: "+evidenceCount(g,stage)+"/3.";return;}
             g.progress.dragonNextStage++;
             g.addXp(30+stage*15);
             g.progress.dragonNextRecent="Сведения собраны, дальнейший путь открыт.";
-            if(stage==1)g.progress.completed.add("Драконий след • новые свидетельства • день "+g.day);
+            g.progress.completed.add(TITLES[stage]+" • день "+g.day);
+            if(stage==1)g.progress.recent="Квест «Драконий след: новые свидетельства» завершён.";
             return;
         }
         if(g.progress.dragonNextUsed.contains(action))return;
@@ -86,14 +94,15 @@ public final class DragonContinuation {
             g.stamina=Math.max(0,g.stamina-7);
             if(new Random().nextInt(100)<probability){
                 g.progress.dragonInsight=Math.min(15,g.progress.dragonInsight+2);
-                g.progress.skillExperience(g,9,12+stage*4);
+                g.progress.skillExperience(g,SKILLS[stage][choice-1],12+stage*4);
                 g.progress.dragonNextRecent="Успех: "+pair[0]+". "+pair[1]+" Получены полезные свидетельства.";
             }else{
                 g.hp=Math.max(1,g.hp-(4+stage*2));
                 g.progress.dragonNextRecent="Неудача: "+pair[0]+". Пришлось отступить с ранами.";
             }
         }else{
-            if(choice==2||choice==6)g.reputation=Math.min(50,g.reputation+1);
+            if(choice==2||choice==6)g.reputation=Math.min(50,g.reputation+2);
+            else if(choice==4||choice==8)g.progress.skillExperience(g,SKILLS[stage][choice-1],8);
             else g.progress.dragonInsight=Math.min(15,g.progress.dragonInsight+1);
             g.progress.dragonNextRecent=pair[0]+". "+pair[1]+" Выбор записан и не может быть повторён.";
         }
