@@ -101,6 +101,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.release_version.outputs.tag }}
+          target_commitish: ${{ github.sha }}
           name: SKYRIM TEXT RPG ${{ steps.release_version.outputs.tag }}
           body_path: dist/release_notes.md
           files: |
