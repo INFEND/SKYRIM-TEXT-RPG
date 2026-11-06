@@ -142,8 +142,9 @@ public final class DragonArc {
         String[] tokens=action.split(":");
         int stage=Integer.parseInt(tokens[1]),index=Integer.parseInt(tokens[2]);
         if(stage!=g.progress.dragonStage||g.progress.dragonUsed.contains(action))return -1;
-        if(!DESTINATIONS[stage].equals(g.progress.location)||g.stamina<7)return -1;
+        if(!DESTINATIONS[stage].equals(g.progress.location))return -1;
         if(index!=3&&index!=5&&index!=7)return -1;
+        if(g.stamina<7)return -1;
         int skill=SKILLS[index-1];
         return g.progress.chance(g,index%3,skill,DIFFICULTY[index-1]+stage*3);
     }
