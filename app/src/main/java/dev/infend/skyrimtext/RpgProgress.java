@@ -242,17 +242,17 @@ public final class RpgProgress {
         p.dragonStage=Math.max(0,Math.min(DragonArc.FINAL_STAGE,obj.optInt("dragonStage",0)));
         p.dragonInsight=Math.max(0,Math.min(15,obj.optInt("dragonInsight",0)));
         p.dragonRecent=obj.optString("dragonRecent","");
-        p.dragonNextStage=Math.max(0,Math.min(2,obj.optInt("dragonNextStage",0)));
+        p.dragonNextStage=Math.max(0,Math.min(3,obj.optInt("dragonNextStage",0)));
         p.dragonNextRecent=obj.optString("dragonNextRecent","");
         JSONArray nextActions=obj.optJSONArray("dragonNextUsed");
         if(nextActions!=null)for(int i=0;i<nextActions.length();i++){
             String value=nextActions.optString(i,"");
-            if(value.matches("DRAGON_NEXT:[01]:[1-8]"))p.dragonNextUsed.add(value);
+            if(value.matches("DRAGON_NEXT:[012]:[1-8]"))p.dragonNextUsed.add(value);
         }
         JSONArray nextFailed=obj.optJSONArray("dragonNextFailed");
         if(nextFailed!=null)for(int i=0;i<nextFailed.length();i++){
             String value=nextFailed.optString(i,"");
-            if(value.matches("DRAGON_NEXT:[01]:[357]")&&p.dragonNextUsed.contains(value))p.dragonNextFailed.add(value);
+            if(value.matches("DRAGON_NEXT:[012]:[357]")&&p.dragonNextUsed.contains(value))p.dragonNextFailed.add(value);
         }
         JSONArray dragonActions=obj.optJSONArray("dragonUsed");
         if(dragonActions!=null)for(int i=0;i<dragonActions.length();i++){
