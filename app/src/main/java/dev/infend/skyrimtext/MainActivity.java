@@ -30,9 +30,9 @@ import android.widget.Toast;
 import org.json.JSONObject;
 
 public final class MainActivity extends Activity {
-    private static final int BG=Color.rgb(5,7,9), PANEL=Color.rgb(12,16,20), PANEL_2=Color.rgb(17,23,28);
-    private static final int TEXT=Color.rgb(241,238,229), MUTED=Color.rgb(151,160,163), BORDER=Color.rgb(41,49,54);
-    private static final int[] ACCENTS={0xFFC8A86B,0xFF69CDA8,0xFF7FB5FF,0xFFAE8EF1,0xFFF18D86,0xFFE8E5DB};
+    private static final int BG=Color.rgb(7,11,15), PANEL=Color.rgb(12,17,21), PANEL_2=Color.rgb(16,22,27);
+    private static final int TEXT=Color.rgb(237,231,218), MUTED=Color.rgb(169,170,165), BORDER=Color.rgb(85,79,68);
+    private static final int[] ACCENTS={0xFFE1C58F,0xFF69CDA8,0xFF7FB5FF,0xFFAE8EF1,0xFFF18D86,0xFFE8E5DB};
     private static final String[] ACCENT_NAMES={"Золото", "Север", "Лёд", "Аметист", "Рубин", "Серебро"};
     private static final String PREFS="skyrim_text_v1";
     private GameEngine game;
@@ -75,7 +75,7 @@ public final class MainActivity extends Activity {
     private int sp(int size){return Math.max(10,size+fontBonus);}
     private int accent(){return ACCENTS[accentIndex];}
     private GradientDrawable bg(int fill,int border,int radius){
-        GradientDrawable gd=new GradientDrawable();gd.setColor(fill);gd.setCornerRadius(dp(radius));
+        GradientDrawable gd=new GradientDrawable();gd.setColor(fill);gd.setCornerRadius(dp(Math.min(radius,3)));
         if(border!=Color.TRANSPARENT)gd.setStroke(dp(1),border);return gd;
     }
     private LinearLayout column(){LinearLayout l=new LinearLayout(this);l.setOrientation(LinearLayout.VERTICAL);return l;}
@@ -83,7 +83,7 @@ public final class MainActivity extends Activity {
     private TextView text(String str,int size,int color,boolean bold){
         TextView t=new TextView(this);t.setText(str);t.setTextSize(sp(size));t.setTextColor(color);
         t.setFontFeatureSettings("kern");t.setIncludeFontPadding(true);
-        if(bold)t.setTypeface(Typeface.create("sans-serif-medium",Typeface.NORMAL));
+        t.setTypeface(Typeface.create(bold?"serif":"serif",bold?Typeface.BOLD:Typeface.NORMAL));
         return t;
     }
     private LinearLayout.LayoutParams lp(int w,int h){return new LinearLayout.LayoutParams(w<0?w:dp(w),h<0?h:dp(h));}
@@ -97,7 +97,7 @@ public final class MainActivity extends Activity {
         scroll=new ScrollView(this);scroll.setFillViewport(false);scroll.setClipToPadding(false);
         scroll.setVerticalScrollBarEnabled(false);
         root.addView(scroll,new LinearLayout.LayoutParams(-1,0,1));
-        content=column();content.setPadding(dp(19),dp(20),dp(19),dp(26));scroll.addView(content);
+        content=column();content.setPadding(dp(21),dp(23),dp(21),dp(30));scroll.addView(content);
         if(!game.started)renderNewGame();
         else if(tab==0)renderStory();
         else if(tab==1)renderMap();
@@ -111,12 +111,12 @@ public final class MainActivity extends Activity {
     private void renderHeader(){
         header=row();header.setPadding(dp(19),dp(15),dp(19),dp(13));
         root.addView(header,lp(-1,-2));
-        TextView sigil=text("ᛟ",29,accent(),true);sigil.setGravity(Gravity.CENTER);
-        sigil.setBackground(bg(PANEL_2,accent(),13));header.addView(sigil,lp(47,47));
+        TextView sigil=text("ᛟ",30,accent(),false);sigil.setGravity(Gravity.CENTER);
+        sigil.setBackground(bg(BG,accent(),1));header.addView(sigil,lp(47,47));
         LinearLayout copy=column();copy.setPadding(dp(12),0,0,0);
         header.addView(copy,new LinearLayout.LayoutParams(0,-2,1));
-        addText(copy,"SKYRIM",18,TEXT,true,1);
-        addText(copy,"TEXT ROLE-PLAYING GAME",9,accent(),true,0);
+        addText(copy,"SKYRIM",23,TEXT,false,1);
+        addText(copy,"ᛟ  ТЕКСТОВАЯ RPG  ᛟ",10,accent(),false,0);
         if(game.started){LinearLayout meta=column();meta.setGravity(Gravity.END);
             addText(meta,"ДЕНЬ "+game.day,11,TEXT,true,1);
             addText(meta,"УР. "+game.level,10,MUTED,false,0);
@@ -141,22 +141,23 @@ public final class MainActivity extends Activity {
         LinearLayout.LayoutParams b=lp(-1,3);b.topMargin=dp(6);col.addView(bar,b);
     }
     private void section(String eyebrow,String heading,String subtitle){
-        addText(content,eyebrow.toUpperCase(),10,accent(),true,7);
-        addText(content,heading,29,TEXT,true,9);
+        addText(content,"ᛟ  "+eyebrow.toUpperCase()+"  ᛟ",11,accent(),false,10);
+        addText(content,heading,30,TEXT,false,9);
+        TextView runeRule=text("────────  ◈  ────────",14,accent(),false);runeRule.setGravity(Gravity.CENTER);content.addView(runeRule,lp(-1,32));
         if(subtitle!=null&&!subtitle.isEmpty()){TextView t=text(subtitle,15,MUTED,false);t.setLineSpacing(dp(3),1f);content.addView(t);}
-        space(content,21);
+        space(content,19);
     }
     private LinearLayout card(){
-        LinearLayout c=column();c.setPadding(dp(17),dp(17),dp(17),dp(17));c.setBackground(bg(PANEL,BORDER,17));
+        LinearLayout c=column();c.setPadding(dp(17),dp(17),dp(17),dp(17));c.setBackground(bg(PANEL,BORDER,2));
         LinearLayout.LayoutParams p=lp(-1,-2);p.bottomMargin=dp(13);content.addView(c,p);return c;
     }
     private TextView actionButton(String title,String detail,boolean primary,Runnable onClick){
         LinearLayout box=row();box.setPadding(dp(17),dp(15),dp(15),dp(15));
-        box.setBackground(bg(primary?0xFF22251E:PANEL_2,primary?accent():BORDER,14));
+        box.setBackground(bg(primary?0xFF24241F:BG,primary?accent():BORDER,1));
         LinearLayout info=column();box.addView(info,new LinearLayout.LayoutParams(0,-2,1));
-        addText(info,title,16,primary?accent():TEXT,true,detail.isEmpty()?0:4);
+        addText(info,title,17,primary?accent():TEXT,false,detail.isEmpty()?0:4);
         if(!detail.isEmpty())addText(info,detail,12,MUTED,false,0);
-        TextView chevron=text("›",27,primary?accent():MUTED,false);chevron.setGravity(Gravity.CENTER);
+        TextView chevron=text("ᛟ",19,primary?accent():MUTED,false);chevron.setGravity(Gravity.CENTER);
         box.addView(chevron,lp(24,35));
         LinearLayout.LayoutParams p=lp(-1,-2);p.bottomMargin=dp(10);content.addView(box,p);
         box.setClickable(true);box.setFocusable(true);box.setOnClickListener(v->onClick.run());
@@ -258,7 +259,7 @@ public final class MainActivity extends Activity {
         LinearLayout layout=row();hsv.addView(layout);content.addView(hsv,lp(-1,48));
         for(String o:options){boolean active=o.equals(selected);
             TextView pill=text(o,14,active?BG:TEXT,active);pill.setGravity(Gravity.CENTER);
-            pill.setPadding(dp(18),0,dp(18),0);pill.setBackground(bg(active?accent():PANEL_2,active?accent():BORDER,12));
+            pill.setPadding(dp(18),0,dp(18),0);pill.setBackground(bg(active?0xFF2D2A22:PANEL_2,active?accent():BORDER,2));
             LinearLayout.LayoutParams p=lp(-2,43);p.rightMargin=dp(9);layout.addView(pill,p);
             pill.setOnClickListener(v->handler.onSelect(o));
         }
@@ -266,8 +267,8 @@ public final class MainActivity extends Activity {
     private void renderStory(){
         GameEngine.Scene s=game.scene();section(s.kicker,s.title,"");
         LinearLayout narrative=card();
-        addText(narrative,"◈  ХРОНИКА ПУТИ",10,accent(),true,13);
-        TextView body=text(s.body,16,TEXT,false);body.setLineSpacing(dp(5),1.09f);makeItemsClickable(body,s.body);narrative.addView(body);
+        addText(narrative,"ᛟ  ХРОНИКА ПУТИ  ᛟ",11,accent(),false,13);
+        TextView body=text(s.body,18,TEXT,false);body.setLineSpacing(dp(6),1.12f);makeItemsClickable(body,s.body);narrative.addView(body);
         space(content,8);addText(content,"ВЫБЕРИ ДЕЙСТВИЕ",11,MUTED,true,13);
         for(GameEngine.Choice c:s.choices){
             int chance=game.progress.chance(game,c.action);
