@@ -60,6 +60,16 @@ class DragonContinuationContracts(unittest.TestCase):
         self.assertIn('lead(g)+" "+windhelmVerdict(g)',c)
         self.assertIn('g.progress.recent="Квест «Драконий след: пепельный гонец» завершён. "+lead(g)+" "+windhelmVerdict(g)',c)
 
+    def test_failed_attempts_and_actual_skill_chance(self):
+        c=source("DragonContinuation.java")
+        self.assertIn("SKILLS[stage][choice-1],29+stage*5",c)
+        self.assertIn("private static int failedCount(GameEngine g,int stage)",c)
+        self.assertIn("неудачные вылазки",c)
+        self.assertIn("Попытка провалена, свидетельство не получено",c)
+        self.assertIn("Свидетельство получено, действие завершено",c)
+        self.assertIn("boolean failed=g.progress.dragonNextFailed.contains(action)",c)
+        self.assertNotIn("new int[]{9,15,12}[choice==3?0:choice==5?1:2]",c)
+
     def test_integration_and_legacy(self):
         arc=source("DragonArc.java")
         game=source("GameEngine.java")
