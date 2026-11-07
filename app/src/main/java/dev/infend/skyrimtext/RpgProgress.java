@@ -296,11 +296,6 @@ public final class RpgProgress {
         if(outcomes!=null){Iterator<String> keys=outcomes.keys();while(keys.hasNext()){
             String id=keys.next();p.setQuestOutcome(id,outcomes.optString(id,""));
         }}
-        // Migrate pre-quest-ledger saves without changing schema 1.
-        // The main quest stage is authoritative for legacy characters.
-        if(!p.questOutcomes.containsKey("ash_seals")){
-            // Legacy quest stage is reconciled by GameEngine after loading.
-        }
         return p;
     }
 }
