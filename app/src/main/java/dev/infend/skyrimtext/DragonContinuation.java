@@ -94,21 +94,39 @@ public final class DragonContinuation {
         String key="DRAGON_NEXT:"+stage+":"+choice;
         return g.progress.dragonNextUsed.contains(key)&&!g.progress.dragonNextFailed.contains(key);
     }
+    /** Report terminal failures without claiming that every chapter was successful. */
+    private static int failedChapters(GameEngine g){
+        int count=0;
+        for(int i=0;i<TITLES.length;i++)
+            if("FAILED".equals(g.progress.questOutcomes.get(questId(i))))count++;
+        return count;
+    }
+    private static String questSummary(GameEngine g){
+        StringBuilder summary=new StringBuilder();
+        for(int i=0;i<TITLES.length;i++){
+            if(i>0)summary.append("; ");
+            String outcome=g.progress.questOutcomes.get(questId(i));
+            summary.append(TITLES[i]).append(": ")
+                .append("FAILED".equals(outcome)?"провалено":
+                    "COMPLETED".equals(outcome)?"выполнено":"без окончательного результата");
+        }
+        return summary.append(".").toString();
+    }
     public static String questObjective(GameEngine g){
         int stage=g.progress.dragonNextStage;
-        if(stage>=3)return "Завершено: расследование пепельного следа. "+lead(g)+" "+windhelmVerdict(g);
+        if(stage>=3)return "Итог пепельного следа: "+questSummary(g)+" "+lead(g)+" "+windhelmVerdict(g);
         return "Активно: "+TITLES[stage]+" • "+PLACES[stage]
             +" • свидетельства "+evidenceCount(g,stage)+"/3 • неудачные вылазки "+failedCount(g,stage);
     }
     public static String status(GameEngine g){
         int stage=g.progress.dragonNextStage;
-        return stage>=3?"Драконий след • пепельный след раскрыт":
+        return stage>=3?"Драконий след • расследования завершены ("+failedChapters(g)+" провалено)":
             TITLES[Math.max(0,stage)]+" • "+PLACES[Math.max(0,stage)];
     }
     public static GameEngine.Scene scene(GameEngine g){
         int stage=g.progress.dragonNextStage;
         if(stage>=3)return new GameEngine.Scene("ДРАКОНИЙ СЛЕД • ПРОДОЛЖЕНИЕ","Пепельный след",
-            "Расследования в Ривервуде, Вайтране и Виндхельме завершены. "+lead(g)+" "+windhelmVerdict(g)+" Дальнейшая экспедиция пока не реализована.")
+            "Расследования в Ривервуде, Вайтране и Виндхельме завершены. "+questSummary(g)+" "+lead(g)+" "+windhelmVerdict(g)+" Дальнейшая экспедиция пока не реализована.")
             .primary("GO_WORLD","Вернуться в мир","Продолжить путешествие");
         boolean here=PLACES[stage].equals(g.progress.location);
         GameEngine.Scene s=new GameEngine.Scene("ДРАКОНИЙ СЛЕД • ГЛАВА "+(stage+7),TITLES[stage],
