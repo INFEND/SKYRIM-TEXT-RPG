@@ -17,11 +17,11 @@ class ContinuationChoicesTest(unittest.TestCase):
         self.assertIn('i<=OPTIONS[stage].length', CONT)
 
     def test_new_actions_are_persisted_and_one_time(self):
-        self.assertIn('(?:[1-8]|10|11)', PROGRESS)
+        self.assertIn('(?:[1-9]|10)', PROGRESS)
         self.assertIn('dragonNextUsed.contains(action)', CONT)
         self.assertIn('dragonNextUsed.add(action)', CONT)
         self.assertIn('dragonNextUsed",new JSONArray(dragonNextUsed)', PROGRESS)
-        self.assertIn('choice==10||choice==11', CONT)
+        self.assertIn('choice==10', CONT)
 
 if __name__ == "__main__":
     unittest.main()
