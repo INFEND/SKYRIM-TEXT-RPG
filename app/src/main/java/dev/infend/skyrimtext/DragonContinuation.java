@@ -60,11 +60,15 @@ public final class DragonContinuation {
         for(int i=3;i<=7;i+=2)if(g.progress.dragonNextFailed.contains("DRAGON_NEXT:"+stage+":"+i))n++;
         return n;
     }
+    /** At least one dangerous lead must be proven, not merely attempted. */
+    private static boolean hasRiskProof(GameEngine g,int stage){
+        return proved(g,stage,3)||proved(g,stage,5)||proved(g,stage,7);
+    }
     /** A chapter can fail only when all ten unique leads are exhausted. */
     private static boolean exhausted(GameEngine g,int stage){
         for(int i=1;i<=OPTIONS[stage].length;i++)
             if(!g.progress.dragonNextUsed.contains("DRAGON_NEXT:"+stage+":"+i))return false;
-        return evidenceCount(g,stage)<3;
+        return evidenceCount(g,stage)<3 || !hasRiskProof(g,stage);
     }
     /** Quest objective derived from existing schema-1 flags; no migration required. */
     private static String lead(GameEngine g){
@@ -116,7 +120,7 @@ public final class DragonContinuation {
         int stage=g.progress.dragonNextStage;
         if(stage>=3)return "Итог пепельного следа: "+questSummary(g)+" "+lead(g)+" "+windhelmVerdict(g);
         return "Активно: "+TITLES[stage]+" • "+PLACES[stage]
-            +" • свидетельства "+evidenceCount(g,stage)+"/3 • неудачные вылазки "+failedCount(g,stage);
+            +" • свидетельства "+evidenceCount(g,stage)+"/3 • опасная зацепка "+(hasRiskProof(g,stage)?"доказана":"не доказана")+" • неудачные вылазки "+failedCount(g,stage);
     }
     public static String status(GameEngine g){
         int stage=g.progress.dragonNextStage;
@@ -133,7 +137,7 @@ public final class DragonContinuation {
             STORIES[stage]+"\n\nЦЕЛЬ КВЕСТА: "+questObjective(g)+"\n\nМЕСТО: "+PLACES[stage]+(here?" • ты здесь":" • требуется путь")+
             (g.progress.dragonNextRecent.isEmpty()?"":"\n\nПОСЛЕДСТВИЕ\n"+g.progress.dragonNextRecent));
         s.primary("DRAGON_NEXT:"+stage+":0",here?"Завершить расследование":"Проложить путь в "+PLACES[stage],
-            here?(exhausted(g,stage)?"Все зацепки исчерпаны: зафиксировать провал": "Собери три свидетельства ("+evidenceCount(g,stage)+"/3)"):"Открыть маршруты");
+            here?(exhausted(g,stage)?"Все зацепки исчерпаны: зафиксировать провал": "Собери три свидетельства ("+evidenceCount(g,stage)+"/3) и докажи одну опасную зацепку"):"Открыть маршруты");
         for(int i=1;i<=OPTIONS[stage].length;i++){
             String action="DRAGON_NEXT:"+stage+":"+i;
             String[] pair=OPTIONS[stage][i-1].split("\\|",2);
@@ -161,14 +165,14 @@ public final class DragonContinuation {
             g.mode="TRAVEL";g.message="Доберись до "+PLACES[stage]+", чтобы продолжить расследование.";return;
         }
         if(choice==0){
-            if(evidenceCount(g,stage)<3){
-                if(!exhausted(g,stage)){g.progress.dragonNextRecent="Нужно три свидетельства: "+evidenceCount(g,stage)+"/3.";return;}
+            if(evidenceCount(g,stage)<3 || !hasRiskProof(g,stage)){
+                if(!exhausted(g,stage)){g.progress.dragonNextRecent="Нужно три свидетельства ("+evidenceCount(g,stage)+"/3) и хотя бы одна успешно проверенная опасная зацепка.";return;}
                 // Terminal failure is recorded once; advancing prevents a soft lock.
                 g.progress.setQuestOutcome(questId(stage),"FAILED");
                 g.progress.dragonNextStage++;
                 activateQuest(g,g.progress.dragonNextStage);
                 g.reputation=Math.max(-50,g.reputation-3);
-                g.progress.dragonNextRecent="Расследование «"+TITLES[stage]+"» провалено: все десять зацепок исчерпаны, трёх свидетельств нет. Доверие жителей упало (-3 репутации).";
+                g.progress.dragonNextRecent="Расследование «"+TITLES[stage]+"» провалено: все десять зацепок исчерпаны, не удалось подтвердить обязательную опасную зацепку или собрать три свидетельства. Доверие жителей упало (-3 репутации).";
                 g.progress.recent=g.progress.dragonNextRecent;
                 return;
             }
