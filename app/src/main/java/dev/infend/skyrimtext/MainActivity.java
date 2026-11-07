@@ -672,7 +672,7 @@ public final class MainActivity extends Activity {
         if(game.progress.dragonStage<DragonArc.FINAL_STAGE)
             addText(finishedQuests,"Драконий след: ещё не завершён.",13,MUTED,false,8);
         if(game.questStage!=4)addText(finishedQuests,"История хранителей ещё не завершена.",13,MUTED,false,8);
-        addText(finishedQuests,"Заказы доски после сдачи не сохраняются в отдельном архиве.",12,MUTED,false,0);
+        if(game.boardCompleted>0)addText(finishedQuests,"✓  Опасные дороги • выполнено заказов: "+game.boardCompleted,14,TEXT,false,8);
         LinearLayout failedQuests=card();addText(failedQuests,"ПРОВАЛЕННЫЕ ЗАДАНИЯ",11,0xffeb8e8e,true,9);
         addText(failedQuests,"Пока нет проваленных сюжетных заданий.",13,MUTED,false,0);
         LinearLayout done=card();addText(done,"ИСТОРИЯ УСПЕШНЫХ ПРОВЕРОК",11,accent(),true,9);
