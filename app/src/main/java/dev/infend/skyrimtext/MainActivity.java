@@ -674,7 +674,14 @@ public final class MainActivity extends Activity {
         if(game.questStage!=4)addText(finishedQuests,"История хранителей ещё не завершена.",13,MUTED,false,8);
         if(game.boardCompleted>0)addText(finishedQuests,"✓  Опасные дороги • выполнено заказов: "+game.boardCompleted,14,TEXT,false,8);
         LinearLayout failedQuests=card();addText(failedQuests,"ПРОВАЛЕННЫЕ ЗАДАНИЯ",11,0xffeb8e8e,true,9);
-        addText(failedQuests,"Пока нет проваленных сюжетных заданий.",13,MUTED,false,0);
+        boolean hasFailedQuest=false;
+        for(java.util.Map.Entry<String,String> entry:game.progress.questOutcomes.entrySet()){
+            if(!"FAILED".equals(entry.getValue()))continue;
+            hasFailedQuest=true;
+            String title="ash_seals".equals(entry.getKey())?"Пепельные печати":entry.getKey();
+            addText(failedQuests,"✕  "+title,14,MUTED,false,8);
+        }
+        if(!hasFailedQuest)addText(failedQuests,"Пока нет проваленных сюжетных заданий.",13,MUTED,false,0);
         LinearLayout done=card();addText(done,"ИСТОРИЯ УСПЕШНЫХ ПРОВЕРОК",11,accent(),true,9);
         if(game.progress.completed.isEmpty())addText(done,"Пока нет успешных проверок.",13,MUTED,false,0);
         for(String entry:game.progress.completed)addText(done,"✓  "+entry,13,TEXT,false,8);
