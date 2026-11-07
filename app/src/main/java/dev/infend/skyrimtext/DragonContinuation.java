@@ -45,6 +45,11 @@ public final class DragonContinuation {
                 !g.progress.dragonNextFailed.contains("DRAGON_NEXT:"+stage+":"+i))n++;
         return n;
     }
+    private static int failedCount(GameEngine g,int stage){
+        int n=0;
+        for(int i=3;i<=7;i+=2)if(g.progress.dragonNextFailed.contains("DRAGON_NEXT:"+stage+":"+i))n++;
+        return n;
+    }
     /** Quest objective derived from existing schema-1 flags; no migration required. */
     private static String lead(GameEngine g){
         boolean courier=g.progress.dragonNextUsed.contains("DRAGON_NEXT:0:4");
@@ -77,7 +82,7 @@ public final class DragonContinuation {
         int stage=g.progress.dragonNextStage;
         if(stage>=3)return "Завершено: расследование пепельного следа. "+lead(g)+" "+windhelmVerdict(g);
         return "Активно: "+TITLES[stage]+" • "+PLACES[stage]
-            +" • свидетельства "+evidenceCount(g,stage)+"/3";
+            +" • свидетельства "+evidenceCount(g,stage)+"/3 • неудачные вылазки "+failedCount(g,stage);
     }
     public static String status(GameEngine g){
         int stage=g.progress.dragonNextStage;
@@ -99,7 +104,8 @@ public final class DragonContinuation {
             String action="DRAGON_NEXT:"+stage+":"+i;
             String[] pair=OPTIONS[stage][i-1].split("\\|",2);
             boolean used=g.progress.dragonNextUsed.contains(action);
-            s.add(action,(used?"✓ ":"")+pair[0],used?"Уже выполнено":here?pair[1]:"Сначала доберись до места");
+            boolean failed=g.progress.dragonNextFailed.contains(action);
+            s.add(action,(failed?"✕ ":used?"✓ ":"")+pair[0],failed?"Попытка провалена, свидетельство не получено":used?"Свидетельство получено, действие завершено":here?pair[1]:"Сначала доберись до места");
         }
         return s.add("DRAGON_NEXT:"+stage+":9","Вернуться в мир","Продолжить расследование позже");
     }
@@ -109,7 +115,7 @@ public final class DragonContinuation {
         if(stage!=g.progress.dragonNextStage||g.progress.dragonNextUsed.contains(action))return -1;
         if(!PLACES[stage].equals(g.progress.location)||(choice==3||choice==5||choice==7)&&g.stamina<7)return -1;
         if(choice!=3&&choice!=5&&choice!=7)return -1;
-        return g.progress.chance(g,choice%3,new int[]{9,15,12}[choice==3?0:choice==5?1:2],29+stage*5);
+        return g.progress.chance(g,choice%3,SKILLS[stage][choice-1],29+stage*5);
     }
     public static void perform(GameEngine g,String action){
         if(!"DRAGON".equals(g.mode)||action==null||!action.matches("DRAGON_NEXT:[012]:[0-9]"))return;
