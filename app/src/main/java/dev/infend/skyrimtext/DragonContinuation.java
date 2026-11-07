@@ -144,7 +144,24 @@ public final class DragonContinuation {
             g.addXp(30+stage*15);
             g.progress.dragonNextRecent=stage==0?"Ривервудские свидетельства переданы советникам Вайтрана.":stage==1?"Совет завершён. Следующая цель: Виндхельм. "+lead(g):"Стража Виндхельма получила досье. "+lead(g)+" "+windhelmVerdict(g);
             g.progress.completed.add(TITLES[stage]+" • день "+g.day);
-            if(stage==2)g.progress.recent="Квест «Драконий след: пепельный гонец» завершён. "+lead(g)+" "+windhelmVerdict(g);
+            if(stage==2){
+                // Apply the proven Windhelm outcome once, at quest completion only.
+                // These consequences use existing schema-1 flags and attributes.
+                if(proved(g,2,1)&&proved(g,2,4)&&proved(g,2,7)){
+                    g.reputation=Math.min(50,g.reputation+5);
+                    g.progress.dragonNextRecent+=" Перехват перевозчиков укрепил доверие городской стражи (+5 репутации).";
+                }else if(proved(g,2,2)&&proved(g,2,6)){
+                    g.reputation=Math.min(50,g.reputation+4);
+                    g.progress.dragonNextRecent+=" Защищённые свидетели благодарят тебя (+4 репутации).";
+                }else if(proved(g,2,5)&&proved(g,2,4)){
+                    g.progress.dragonInsight=Math.min(15,g.progress.dragonInsight+3);
+                    g.progress.dragonNextRecent+=" Исследование реликвий углубило понимание драконьих знаков (+3 прозрения).";
+                }else{
+                    g.reputation=Math.min(50,g.reputation+1);
+                    g.progress.dragonNextRecent+=" Следствие осталось неполным, но город оценил помощь (+1 репутации).";
+                }
+                g.progress.recent="Квест «Драконий след: пепельный гонец» завершён. "+g.progress.dragonNextRecent;
+            }
             return;
         }
         if(g.progress.dragonNextUsed.contains(action))return;
