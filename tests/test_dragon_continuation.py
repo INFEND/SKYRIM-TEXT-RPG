@@ -76,6 +76,15 @@ class DragonContinuationContracts(unittest.TestCase):
         self.assertIn("boolean failed=g.progress.dragonNextFailed.contains(action)",c)
         self.assertNotIn("new int[]{9,15,12}[choice==3?0:choice==5?1:2]",c)
 
+    def test_legacy_continuation_quest_reconciliation(self):
+        game=source("GameEngine.java")
+        self.assertIn("if(g.progress.dragonStage>=6)",game)
+        self.assertIn("chapter<g.progress.dragonNextStage",game)
+        self.assertIn('g.progress.setQuestOutcome(questId,"COMPLETED")',game)
+        self.assertIn('g.progress.setQuestOutcome(questId,"ACTIVE")',game)
+        progress=source("RpgProgress.java")
+        self.assertIn('if("COMPLETED".equals(old)||"FAILED".equals(old))return;',progress)
+
     def test_integration_and_legacy(self):
         arc=source("DragonArc.java")
         game=source("GameEngine.java")
