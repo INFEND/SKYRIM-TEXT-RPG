@@ -319,7 +319,12 @@ public final class MainActivity extends Activity {
     }
     private void renderStory(){
         GameEngine.Scene s=game.scene();section(s.kicker,s.title,"");
-        content.addView(new NordicArtView(this,NordicArtView.STORY),lp(-1,188));
+        if(LocationGalleryView.hasGallery(game.progress.location)){
+            addText(content,"ᛟ  ВИДЫ ЛОКАЦИИ",11,accent(),true,9);
+            content.addView(new LocationGalleryView(this,game.progress.location,accent(),false),lp(-1,-2));
+        }else{
+            content.addView(new NordicArtView(this,NordicArtView.STORY),lp(-1,188));
+        }
         space(content,16);
         LinearLayout narrative=card();
         addText(narrative,"ᚱ  ГЛАВА  ·  "+s.kicker.toUpperCase(java.util.Locale.ROOT),11,accent(),false,13);
@@ -374,6 +379,10 @@ public final class MainActivity extends Activity {
         addText(overview,"⌖  ВЫ НАХОДИТЕСЬ: "+game.progress.location,15,accent(),true,10);
         addText(overview,"Регион: "+GameEngine.REGIONS[game.region]+"  •  день "+game.day,13,MUTED,false,9);
         overview.addView(new WorldAtlas.MapView(this,game,this::locationDialog),lp(-1,-2));
+        if(LocationGalleryView.hasGallery(game.progress.location)){
+            addText(overview,"ᛟ  ГАЛЕРЕЯ ТЕКУЩЕГО МЕСТА",11,accent(),true,12);
+            overview.addView(new LocationGalleryView(this,game.progress.location,accent(),false),lp(-1,-2));
+        }
         addText(content,"МЕСТА И ПЕРЕХОДЫ",11,accent(),true,10);
         String[] regions=new String[GameEngine.REGIONS.length+1];regions[0]="Все регионы";
         System.arraycopy(GameEngine.REGIONS,0,regions,1,GameEngine.REGIONS.length);
@@ -395,8 +404,23 @@ public final class MainActivity extends Activity {
         TravelPlanner.Route route=TravelPlanner.plan(game,place);
         String body=place.description+"\n\nТип: "+place.type+
             "\nРегион: "+GameEngine.REGIONS[place.region]+"\n\n"+route.summary();
-        AlertDialog.Builder dialog=new RuneDialogBuilder(this,accent()).setTitle(place.name).setMessage(body)
+        AlertDialog.Builder dialog=new RuneDialogBuilder(this,accent()).setTitle(place.name)
             .setNegativeButton("Закрыть",null);
+        if(LocationGalleryView.hasGallery(place.name)){
+            android.widget.ScrollView scroller=new android.widget.ScrollView(this);
+            scroller.setFillViewport(false);
+            LinearLayout wrapper=column();
+            wrapper.setPadding(dp(9),dp(9),dp(9),dp(12));
+            scroller.addView(wrapper);
+            wrapper.addView(new LocationGalleryView(this,place.name,accent(),false),lp(-1,-2));
+            TextView description=text(body,14,TEXT,false);
+            description.setLineSpacing(dp(4),1.05f);
+            description.setPadding(dp(8),dp(13),dp(8),dp(5));
+            wrapper.addView(description,lp(-1,-2));
+            dialog.setView(scroller);
+        }else{
+            dialog.setMessage(body);
+        }
         if(route.allowed&&route.days>0){
             dialog.setPositiveButton("Начать переход",(d,w)->{
                 game.choose("LOC:"+place.name);game.progress.sync(game);save();tab=0;render();
