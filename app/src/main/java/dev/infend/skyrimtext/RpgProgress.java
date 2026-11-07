@@ -7,6 +7,17 @@ public final class RpgProgress {
     public final JSONObject inventory = new JSONObject();
     public final ArrayList<String> completed = new ArrayList<>();
     public final ArrayList<String> failed = new ArrayList<>();
+    // Quest outcomes are separate from repeatable skill-check history.
+    public final LinkedHashMap<String,String> questOutcomes = new LinkedHashMap<>();
+    public void setQuestOutcome(String id,String state){
+        if(id==null||!id.matches("[a-z0-9_]{1,48}"))return;
+        if(!("ACTIVE".equals(state)||"COMPLETED".equals(state)||"FAILED".equals(state)))return;
+        String old=questOutcomes.get(id);
+        if("COMPLETED".equals(old)||"FAILED".equals(old))return; // terminal outcomes cannot be farmed
+        questOutcomes.put(id,state);
+    }
+    public String questOutcome(String id){return questOutcomes.get(id);}
+
     public final int[] skillLevels = new int[RpgContent.SKILLS.length];
     public final int[] skillXp = new int[RpgContent.SKILLS.length];
     public final int[] spent = new int[3];
@@ -184,12 +195,12 @@ public final class RpgProgress {
     public void observe(GameEngine g,String action,int oldQuest){
         if(action==null)return;
         switch(action){
-            case "Q_ACCEPT":recent="Принято сюжетное поручение: «Пепельные печати».";break;
+            case "Q_ACCEPT":setQuestOutcome("ash_seals","ACTIVE");recent="Принято сюжетное поручение: «Пепельные печати».";break;
             case "Q_ALTAR":
                 if(g.questStage>oldQuest)completed.add("Исследование древнего алтаря • день "+g.day);
                 break;
             case "Q_FINISH":
-                if(g.questStage>oldQuest)completed.add("Пепельные печати • день "+g.day);
+                if(g.questStage>oldQuest){setQuestOutcome("ash_seals","COMPLETED");completed.add("Пепельные печати • день "+g.day);}
                 break;
             case "EXPLORE":skillExperience(g,9,6);break;
             case "TALK_HELP":skillExperience(g,12,6);break;
@@ -222,6 +233,7 @@ public final class RpgProgress {
              .put("points",new JSONArray(spent)).put("skillLevels",new JSONArray(skillLevels))
              .put("skillXp",new JSONArray(skillXp)).put("inventory",inventory)
              .put("completed",new JSONArray(completed)).put("failed",new JSONArray(failed))
+             .put("questOutcomes",new JSONObject(questOutcomes))
              .put("perks",perkPoints).put("activePowerDay",activePowerDay).put("difficulty",difficulty)
              .put("actionDay",actionDay).put("attemptedToday",new JSONArray(attemptedToday))
              .put("dragonStage",dragonStage).put("dragonInsight",dragonInsight)
@@ -280,6 +292,15 @@ public final class RpgProgress {
         JSONArray done=obj.optJSONArray("completed"),bad=obj.optJSONArray("failed");
         if(done!=null)for(int i=0;i<done.length();i++)p.completed.add(done.optString(i));
         if(bad!=null)for(int i=0;i<bad.length();i++)p.failed.add(bad.optString(i));
+        JSONObject outcomes=obj.optJSONObject("questOutcomes");
+        if(outcomes!=null){Iterator<String> keys=outcomes.keys();while(keys.hasNext()){
+            String id=keys.next();p.setQuestOutcome(id,outcomes.optString(id,""));
+        }}
+        // Migrate pre-quest-ledger saves without changing schema 1.
+        // The main quest stage is authoritative for legacy characters.
+        if(!p.questOutcomes.containsKey("ash_seals")){
+            // Legacy quest stage is reconciled by GameEngine after loading.
+        }
         return p;
     }
 }
