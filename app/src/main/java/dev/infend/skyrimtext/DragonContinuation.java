@@ -44,7 +44,7 @@ public final class DragonContinuation {
          "Передать предупреждение капитанам|Помочь судам избежать подозрительного ночного маршрута."}
     };
     private static final int[][] SKILLS={{12,12,9,12,15,2,9,9,14,12},{15,12,9,13,12,14,9,9,12,14},{15,12,9,13,15,14,9,12,12,14}};
-    private DragonContinuation(){}
+    private DragonContinuation(){}\n    private static String questId(int stage){return "dragon_ash_"+stage;}\n    private static void activateQuest(GameEngine g,int stage){\n        if(stage>=0&&stage<TITLES.length)g.progress.setQuestOutcome(questId(stage),"ACTIVE");\n    }
     private static int evidenceCount(GameEngine g,int stage){
         int n=0;
         for(int i=1;i<=OPTIONS[stage].length;i++)if(g.progress.dragonNextUsed.contains("DRAGON_NEXT:"+stage+":"+i) &&
@@ -127,13 +127,13 @@ public final class DragonContinuation {
         if(!"DRAGON".equals(g.mode)||action==null||!action.matches("DRAGON_NEXT:[012]:(?:[0-9]|10|99)"))return;
         String[] p=action.split(":");int stage=Integer.parseInt(p[1]),choice=Integer.parseInt(p[2]);
         if(stage!=g.progress.dragonNextStage)return;
-        if(choice==99){g.mode="WORLD";return;}
+        if(choice==99){g.mode="WORLD";return;}\n        activateQuest(g,stage);
         if(!PLACES[stage].equals(g.progress.location)){
             g.mode="TRAVEL";g.message="Доберись до "+PLACES[stage]+", чтобы продолжить расследование.";return;
         }
         if(choice==0){
             if(evidenceCount(g,stage)<3){g.progress.dragonNextRecent="Нужно три свидетельства: "+evidenceCount(g,stage)+"/3.";return;}
-            g.progress.dragonNextStage++;
+            g.progress.setQuestOutcome(questId(stage),"COMPLETED");\n            g.progress.dragonNextStage++;\n            activateQuest(g,g.progress.dragonNextStage);
             g.addXp(30+stage*15);
             g.progress.dragonNextRecent=stage==0?"Ривервудские свидетельства переданы советникам Вайтрана.":stage==1?"Совет завершён. Следующая цель: Виндхельм. "+lead(g):"Стража Виндхельма получила досье. "+lead(g)+" "+windhelmVerdict(g);
             g.progress.completed.add(TITLES[stage]+" • день "+g.day);
