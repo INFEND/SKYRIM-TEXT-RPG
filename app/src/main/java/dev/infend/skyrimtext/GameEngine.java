@@ -462,6 +462,17 @@ public final class GameEngine {
             // Reconcile legacy schema-1 saves with the authoritative quest stage.
             if(g.questStage>=4)g.progress.setQuestOutcome("ash_seals","COMPLETED");
             else if(g.questStage>0)g.progress.setQuestOutcome("ash_seals","ACTIVE");
+            // Rebuild missing continuation ledger entries from authoritative schema-1 stage.
+            // Never overwrite terminal outcomes already stored in newer saves.
+            if(g.progress.dragonStage>=6){
+                for(int chapter=0;chapter<3;chapter++){
+                    String questId="dragon_ash_"+chapter;
+                    if(chapter<g.progress.dragonNextStage)
+                        g.progress.setQuestOutcome(questId,"COMPLETED");
+                    else if(chapter==g.progress.dragonNextStage)
+                        g.progress.setQuestOutcome(questId,"ACTIVE");
+                }
+            }
             if(j.optJSONObject("progress")==null)g.progress.location=REGIONS[g.region];
             g.progress.sync(g);
             if(g.mode.equals("COMBAT")&&g.enemyHp<=0)g.mode="WORLD";
