@@ -59,9 +59,23 @@ public final class DragonContinuation {
         if(dates)return "Даты нападений образуют тревожную последовательность.";
         return "Свидетельства собраны, но источник угрозы пока не установлен.";
     }
+    /** Windhelm verdict depends on proven, not merely attempted, evidence. */
+    private static String windhelmVerdict(GameEngine g){
+        boolean ledger=proved(g,2,1),workers=proved(g,2,2);
+        boolean seals=proved(g,2,4),chest=proved(g,2,5);
+        boolean family=proved(g,2,6),caravan=proved(g,2,7);
+        if(ledger&&seals&&caravan)return "Поддельные разрешения и след каравана раскрыли сеть перевозчиков реликвий. Стража получила маршрут для перехвата.";
+        if(workers&&family)return "Показания докеров и семьи моряка помогли защитить свидетелей. Следствие продолжится без массовых арестов.";
+        if(chest&&seals)return "Сундук и торговые печати связали груз с древним культом. Реликвии переданы под охрану.";
+        return "Досье передано страже, однако часть участников и маршрутов осталась неизвестной.";
+    }
+    private static boolean proved(GameEngine g,int stage,int choice){
+        String key="DRAGON_NEXT:"+stage+":"+choice;
+        return g.progress.dragonNextUsed.contains(key)&&!g.progress.dragonNextFailed.contains(key);
+    }
     public static String questObjective(GameEngine g){
         int stage=g.progress.dragonNextStage;
-        if(stage>=3)return "Завершено: расследование пепельного следа. "+lead(g);
+        if(stage>=3)return "Завершено: расследование пепельного следа. "+lead(g)+" "+windhelmVerdict(g);
         return "Активно: "+TITLES[stage]+" • "+PLACES[stage]
             +" • свидетельства "+evidenceCount(g,stage)+"/3";
     }
@@ -73,7 +87,7 @@ public final class DragonContinuation {
     public static GameEngine.Scene scene(GameEngine g){
         int stage=g.progress.dragonNextStage;
         if(stage>=3)return new GameEngine.Scene("ДРАКОНИЙ СЛЕД • ПРОДОЛЖЕНИЕ","Пепельный след",
-            "Расследования в Ривервуде, Вайтране и Виндхельме завершены. "+lead(g)+" Доказательства переданы стражникам. Дальнейшая экспедиция пока не реализована.")
+            "Расследования в Ривервуде, Вайтране и Виндхельме завершены. "+lead(g)+" "+windhelmVerdict(g)+" Дальнейшая экспедиция пока не реализована.")
             .primary("GO_WORLD","Вернуться в мир","Продолжить путешествие");
         boolean here=PLACES[stage].equals(g.progress.location);
         GameEngine.Scene s=new GameEngine.Scene("ДРАКОНИЙ СЛЕД • ГЛАВА "+(stage+7),TITLES[stage],
@@ -109,9 +123,9 @@ public final class DragonContinuation {
             if(evidenceCount(g,stage)<3){g.progress.dragonNextRecent="Нужно три свидетельства: "+evidenceCount(g,stage)+"/3.";return;}
             g.progress.dragonNextStage++;
             g.addXp(30+stage*15);
-            g.progress.dragonNextRecent=stage==0?"Ривервудские свидетельства переданы советникам Вайтрана.":stage==1?"Совет завершён. Следующая цель: Виндхельм. "+lead(g):"Стража Виндхельма получила досье. "+lead(g);
+            g.progress.dragonNextRecent=stage==0?"Ривервудские свидетельства переданы советникам Вайтрана.":stage==1?"Совет завершён. Следующая цель: Виндхельм. "+lead(g):"Стража Виндхельма получила досье. "+lead(g)+" "+windhelmVerdict(g);
             g.progress.completed.add(TITLES[stage]+" • день "+g.day);
-            if(stage==2)g.progress.recent="Квест «Драконий след: пепельный гонец» завершён. "+lead(g);
+            if(stage==2)g.progress.recent="Квест «Драконий след: пепельный гонец» завершён. "+lead(g)+" "+windhelmVerdict(g);
             return;
         }
         if(g.progress.dragonNextUsed.contains(action))return;
