@@ -246,7 +246,7 @@ public final class RpgProgress {
         JSONArray nextActions=obj.optJSONArray("dragonNextUsed");
         if(nextActions!=null)for(int i=0;i<nextActions.length();i++){
             String value=nextActions.optString(i,"");
-            if(value.matches("DRAGON_NEXT:[012]:[1-8]"))p.dragonNextUsed.add(value);
+            if(value.matches("DRAGON_NEXT:[012]:(?:[1-8]|10|11)"))p.dragonNextUsed.add(value);
         }
         JSONArray nextFailed=obj.optJSONArray("dragonNextFailed");
         if(nextFailed!=null)for(int i=0;i<nextFailed.length();i++){
