@@ -164,17 +164,16 @@ public final class RpgProgress {
         int fatigue=3+(index%4)*2;
         g.stamina=Math.max(0,g.stamina-fatigue);
         if(success){
-            int reward=5+(index%5)*3;
-            g.gold+=reward;
+            // Ordinary repeatable checks are not quests or sources of infinite septims.
+            // Their reward is practice, not fabricated loot or a completed quest entry.
             skillExperience(g,skill,14+index*2);
-            recent="Успех: "+a[0]+". Навык «"+RpgContent.SKILLS[skill]+"» получает опыт. Найдено "+reward+" септимов.";
-            completed.add(a[0]+" • день "+g.day);
+            recent="Успех: "+a[0]+". Навык «"+RpgContent.SKILLS[skill]+"» получает опыт.";
         }else{
             int harm=2+(index%4)*3;
             if(index==2||index==7||index==8){g.hp=Math.max(1,g.hp-harm);}
             recent="Не удалось: "+a[0]+". "+(index==2||index==7||index==8?
                 "Риск обернулся ударом и потерей "+harm+" здоровья.":"Время упущено, а следы скрылись в сумерках.");
-            failed.add(a[0]+" • день "+g.day);
+            // Failed checks belong to the event history, not the failed-quests journal.
         }
         g.message=recent;
         g.mode="RESULT";
