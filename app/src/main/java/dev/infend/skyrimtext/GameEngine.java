@@ -46,7 +46,7 @@ public final class GameEngine {
     public int region = 0, day = 1, level = 1, xp = 0, maxHp = 100, hp = 100;
     public int maxStamina = 65, stamina = 65, maxMagicka = 40, magicka = 40;
     public int gold = 85, potions = 3, manaPotions = 1, attack = 12, armor = 2;
-    public int questStage = 0, sideQuest = 0, sideKills = 0, explored = 0, victories = 0, reputation = 0;
+    public int questStage = 0, sideQuest = 0, sideKills = 0, boardCompleted = 0, explored = 0, victories = 0, reputation = 0;
     public boolean swordUpgraded = false, armorUpgraded = false;
     public String mode = "WORLD", message = "Новый день открывает новые дороги.";
     public String enemyName = "", battleLog = "", battleKind = "", enemyIntro = "";
@@ -63,7 +63,7 @@ public final class GameEngine {
         race=contains(RACES,desiredRace)?desiredRace:"Норд";
         heroClass=contains(CLASSES,desiredClass)?desiredClass:"Без класса";
         started=true;day=1;level=1;xp=0;gold=85;potions=3;manaPotions=1;
-        questStage=0;sideQuest=0;sideKills=0;explored=0;victories=0;reputation=0;
+        questStage=0;sideQuest=0;sideKills=0;boardCompleted=0;explored=0;victories=0;reputation=0;
         swordUpgraded=false;armorUpgraded=false;
         maxHp=100;maxStamina=100;maxMagicka=100;attack=12;armor=2;
         switch(heroClass){
@@ -272,7 +272,7 @@ public final class GameEngine {
             case "BUY_SWORD": buy(180,"Клинок закалён. Атака +6.","SWORD");break;
             case "BUY_ARMOR": buy(160,"Ты облачаешься в стальной нагрудник. Защита +4.","ARMOR");break;
             case "SIDE_ACCEPT": if(sideQuest==2) {sideQuest=1;sideKills=0;message="Заказ принят. Победи трёх противников во время исследования мира.";mode="RESULT";} break;
-            case "SIDE_CLAIM": if(sideQuest==1 && sideKills>=3) {sideQuest=0;sideKills=0;gold+=120;addXp(65);message="Заказ выполнен. +120 септимов и +65 опыта.";mode="RESULT";}break;
+            case "SIDE_CLAIM": if(sideQuest==1 && sideKills>=3) {sideQuest=0;sideKills=0;boardCompleted++;gold+=120;addXp(65);message="Заказ выполнен. +120 септимов и +65 опыта.";mode="RESULT";}break;
             case "EVENT_HELP": eventChoice(true);break;
             case "EVENT_SEARCH": eventChoice(false);break;
             case "EVENT_LEAVE": mode="WORLD";message="Ты оставляешь встречу позади и возвращаешься на дорогу.";break;
@@ -428,7 +428,7 @@ public final class GameEngine {
          .put("region",region).put("day",day).put("level",level).put("xp",xp).put("maxHp",maxHp).put("hp",hp)
          .put("maxStamina",maxStamina).put("stamina",stamina).put("maxMagicka",maxMagicka).put("magicka",magicka)
          .put("gold",gold).put("potions",potions).put("manaPotions",manaPotions).put("attack",attack).put("armor",armor)
-         .put("questStage",questStage).put("sideQuest",sideQuest).put("sideKills",sideKills).put("explored",explored)
+         .put("questStage",questStage).put("sideQuest",sideQuest).put("sideKills",sideKills).put("boardCompleted",boardCompleted).put("explored",explored)
          .put("victories",victories).put("reputation",reputation).put("swordUpgraded",swordUpgraded)
          .put("armorUpgraded",armorUpgraded).put("mode",mode).put("message",message).put("enemyName",enemyName)
          .put("battleLog",battleLog).put("battleKind",battleKind).put("enemyIntro",enemyIntro)
@@ -451,7 +451,7 @@ public final class GameEngine {
             g.gold=Math.max(0,j.optInt("gold",85));g.potions=Math.max(0,j.optInt("potions",3));g.manaPotions=Math.max(0,j.optInt("manaPotions",1));
             g.attack=Math.max(1,j.optInt("attack",12));g.armor=Math.max(0,j.optInt("armor",2));
             g.questStage=Math.max(0,Math.min(4,j.optInt("questStage",0)));g.sideQuest=j.optInt("sideQuest",0);
-            g.sideKills=Math.max(0,j.optInt("sideKills",0));g.explored=Math.max(0,j.optInt("explored",0));
+            g.sideKills=Math.max(0,j.optInt("sideKills",0));g.boardCompleted=Math.max(0,j.optInt("boardCompleted",0));g.explored=Math.max(0,j.optInt("explored",0));
             g.victories=Math.max(0,j.optInt("victories",0));g.reputation=j.optInt("reputation",0);
             g.swordUpgraded=j.optBoolean("swordUpgraded",false);g.armorUpgraded=j.optBoolean("armorUpgraded",false);
             g.mode=j.optString("mode","WORLD");g.message=j.optString("message","");
