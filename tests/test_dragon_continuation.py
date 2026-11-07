@@ -14,11 +14,17 @@ class DragonContinuationContracts(unittest.TestCase):
         self.assertIn('"Совет за закрытыми дверями"',c)
         self.assertIn('"След пепельного гонца"',c)
         self.assertIn('"Виндхельм"',c)
-        self.assertIn('for(int i=1;i<=8;i++)',c)
+        self.assertIn('for(int i=1;i<=OPTIONS[stage].length;i++)',c)
         self.assertIn('s.primary("DRAGON_NEXT:"+stage+":0"',c)
-        self.assertIn('s.add("DRAGON_NEXT:"+stage+":9"',c)
+        self.assertIn('s.add("DRAGON_NEXT:"+stage+":99"',c)
         self.assertIn('if(g.progress.dragonNextUsed.contains(action))return;',c)
         self.assertIn('g.progress.dragonNextUsed.add(action)',c)
+    def test_chapter_quest_ledger_transitions(self):
+        c=source("DragonContinuation.java")
+        self.assertIn('g.progress.setQuestOutcome(questId(stage),"ACTIVE")',c)
+        self.assertIn('g.progress.setQuestOutcome(questId(stage),"COMPLETED")',c)
+        self.assertIn("activateQuest(g,g.progress.dragonNextStage)",c)
+
     def test_risk_and_location(self):
         c=source("DragonContinuation.java")
         self.assertIn('if(!PLACES[stage].equals(g.progress.location))',c)
@@ -43,7 +49,7 @@ class DragonContinuationContracts(unittest.TestCase):
         self.assertIn("Дальнейшая экспедиция пока не реализована.",c)
     def test_windhelm_actions_reachable_and_saveable(self):
         c=source("DragonContinuation.java")
-        self.assertIn('action.matches("DRAGON_NEXT:[012]:[0-9]")',c)
+        self.assertIn('action.matches("DRAGON_NEXT:[012]:(?:[0-9]|10|99)")',c)
         self.assertNotIn('action.matches("DRAGON_NEXT:[01]:[0-9]")',c)
         self.assertIn('g.progress.dragonNextStage++',c)
         self.assertIn('if(stage==2)g.progress.recent=',c)
@@ -82,7 +88,7 @@ class DragonContinuationContracts(unittest.TestCase):
             self.assertIn('.put("'+field+'"',p)
         self.assertIn('obj.optInt("dragonNextStage",0)',p)
         self.assertIn('Math.min(3,obj.optInt("dragonNextStage",0))',p)
-        self.assertIn('DRAGON_NEXT:[012]:[1-8]',p)
+        self.assertIn('DRAGON_NEXT:[012]:(?:[1-9]|10)',p)
         self.assertIn('DRAGON_NEXT:[012]:[357]',p)
         self.assertIn('j.put("schema",1)',game)
 if __name__=="__main__": unittest.main()
