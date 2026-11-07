@@ -459,6 +459,9 @@ public final class GameEngine {
             g.battleKind=j.optString("battleKind","");g.enemyIntro=j.optString("enemyIntro","");
             g.enemyHp=Math.max(0,j.optInt("enemyHp",0));g.enemyMaxHp=Math.max(0,j.optInt("enemyMaxHp",0));g.enemyDamage=Math.max(0,j.optInt("enemyDamage",0));
             g.progress=RpgProgress.fromJson(j.optJSONObject("progress"));
+            // Reconcile legacy schema-1 saves with the authoritative quest stage.
+            if(g.questStage>=4)g.progress.setQuestOutcome("ash_seals","COMPLETED");
+            else if(g.questStage>0)g.progress.setQuestOutcome("ash_seals","ACTIVE");
             if(j.optJSONObject("progress")==null)g.progress.location=REGIONS[g.region];
             g.progress.sync(g);
             if(g.mode.equals("COMBAT")&&g.enemyHp<=0)g.mode="WORLD";
