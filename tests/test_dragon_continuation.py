@@ -52,7 +52,8 @@ class DragonContinuationContracts(unittest.TestCase):
         self.assertIn('action.matches("DRAGON_NEXT:[012]:(?:[0-9]|10|99)")',c)
         self.assertNotIn('action.matches("DRAGON_NEXT:[01]:[0-9]")',c)
         self.assertIn('g.progress.dragonNextStage++',c)
-        self.assertIn('if(stage==2)g.progress.recent=',c)
+        self.assertIn('if(stage==2){',c)
+        self.assertIn('g.progress.recent="Квест «Драконий след: пепельный гонец» завершён. "',c)
         self.assertIn('g.progress.dragonNextUsed.add(action)',c)
         self.assertIn('g.progress.dragonNextFailed.add(action)',c)
 
@@ -64,7 +65,7 @@ class DragonContinuationContracts(unittest.TestCase):
         self.assertIn("chest&&seals",c)
         self.assertIn("!g.progress.dragonNextFailed.contains(key)",c)
         self.assertIn('lead(g)+" "+windhelmVerdict(g)',c)
-        self.assertIn('g.progress.recent="Квест «Драконий след: пепельный гонец» завершён. "+lead(g)+" "+windhelmVerdict(g)',c)
+        self.assertIn('g.progress.recent="Квест «Драконий след: пепельный гонец» завершён. "+g.progress.dragonNextRecent',c)
 
     def test_failed_attempts_and_actual_skill_chance(self):
         c=source("DragonContinuation.java")
