@@ -25,3 +25,11 @@ class ContinuationChoicesTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+def test_ninth_choice_is_not_exit():
+    assert '"DRAGON_NEXT:"+stage+":99","Вернуться в мир"' in CONT
+    assert 'if(choice==99){g.mode="WORLD";return;}' in CONT
+    assert 'if(choice==9){g.mode="WORLD";return;}' not in CONT
+    assert CONT.count('(?:[0-9]|10|99)') == 2
+    assert 'DRAGON_NEXT:[012]:(?:[1-9]|10)' in PROGRESS
