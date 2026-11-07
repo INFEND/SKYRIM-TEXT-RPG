@@ -113,10 +113,10 @@ public final class DragonContinuation {
             boolean failed=g.progress.dragonNextFailed.contains(action);
             s.add(action,(failed?"✕ ":used?"✓ ":"")+pair[0],failed?"Попытка провалена, свидетельство не получено":used?"Свидетельство получено, действие завершено":here?pair[1]:"Сначала доберись до места");
         }
-        return s.add("DRAGON_NEXT:"+stage+":9","Вернуться в мир","Продолжить расследование позже");
+        return s.add("DRAGON_NEXT:"+stage+":99","Вернуться в мир","Продолжить расследование позже");
     }
     public static int chance(GameEngine g,String action){
-        if(!"DRAGON".equals(g.mode)||action==null||!action.matches("DRAGON_NEXT:[012]:(?:[0-9]|10|11)"))return -1;
+        if(!"DRAGON".equals(g.mode)||action==null||!action.matches("DRAGON_NEXT:[012]:(?:[0-9]|10|99)"))return -1;
         String[] p=action.split(":");int stage=Integer.parseInt(p[1]),choice=Integer.parseInt(p[2]);
         if(stage!=g.progress.dragonNextStage||g.progress.dragonNextUsed.contains(action))return -1;
         if(!PLACES[stage].equals(g.progress.location)||(choice==3||choice==5||choice==7)&&g.stamina<7)return -1;
@@ -124,10 +124,10 @@ public final class DragonContinuation {
         return g.progress.chance(g,choice%3,SKILLS[stage][choice-1],29+stage*5);
     }
     public static void perform(GameEngine g,String action){
-        if(!"DRAGON".equals(g.mode)||action==null||!action.matches("DRAGON_NEXT:[012]:(?:[0-9]|10|11)"))return;
+        if(!"DRAGON".equals(g.mode)||action==null||!action.matches("DRAGON_NEXT:[012]:(?:[0-9]|10|99)"))return;
         String[] p=action.split(":");int stage=Integer.parseInt(p[1]),choice=Integer.parseInt(p[2]);
         if(stage!=g.progress.dragonNextStage)return;
-        if(choice==9){g.mode="WORLD";return;}
+        if(choice==99){g.mode="WORLD";return;}
         if(!PLACES[stage].equals(g.progress.location)){
             g.mode="TRAVEL";g.message="Доберись до "+PLACES[stage]+", чтобы продолжить расследование.";return;
         }
