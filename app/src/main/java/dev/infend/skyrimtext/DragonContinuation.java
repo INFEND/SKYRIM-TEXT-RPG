@@ -19,7 +19,9 @@ public final class DragonContinuation {
          "Расшифровать восковую печать|Попытаться прочесть скрытый знак.",
          "Укрепить переправу|Помочь жителям сохранить путь для эвакуации.",
          "Проверить ночной дозор|Выйти к опасному наблюдательному посту.",
-         "Составить карту свидетельств|Свести имена и даты в одну запись."},
+         "Составить карту свидетельств|Свести имена и даты в одну запись.",
+         "Составить список укрытий|Подготовить безопасные места для семей, которым угрожает погоня.",
+         "Проверить запасы переправы|Оценить припасы для эвакуации и предупредить о нехватке."},
         {"Сопоставить даты налётов|Найти повторяющийся порядок в донесениях.",
          "Выслушать купцов|Узнать, какие дороги ещё открыты.",
          "Осмотреть сгоревший обоз|Проверить опасные следы на окраине.",
@@ -27,7 +29,9 @@ public final class DragonContinuation {
          "Проверить подлинность приказа|Рискнуть обвинением в подлоге.",
          "Организовать помощь беженцам|Подготовить припасы для пострадавших.",
          "Проследить за тайным посланником|Попытаться выяснить источник утечки.",
-         "Выбрать маршрут разведки|Составить план следующего похода."},
+         "Выбрать маршрут разведки|Составить план следующего похода.",
+         "Согласовать охрану обозов|Убедить стражу выделить сопровождение на опасном тракте.",
+         "Отметить безопасные ночлеги|Подготовить маршрут для людей, покидающих опасные деревни."},
         {"Изучить портовый журнал|Проверить пропавшие записи о судне.",
          "Выслушать докеров|Собрать показания рабочих пристани.",
          "Проникнуть в заброшенный склад|Проверить опасное убежище контрабандистов.",
@@ -35,13 +39,15 @@ public final class DragonContinuation {
          "Вскрыть древний сундук|Рискнуть столкнуться с защитными чарами.",
          "Помочь семье пропавшего моряка|Найти свидетелей без угроз.",
          "Проследить за ночным караваном|Выяснить, куда увозят найденные реликвии.",
-         "Составить досье для стражи|Подготовить доказательства к разбирательству."}
+         "Составить досье для стражи|Подготовить доказательства к разбирательству.",
+         "Устроить встречу свидетелей|Свести показания моряков и торговцев без публичных обвинений.",
+         "Передать предупреждение капитанам|Помочь судам избежать подозрительного ночного маршрута."}
     };
-    private static final int[][] SKILLS={{12,12,9,12,15,2,9,9},{15,12,9,13,12,14,9,9},{15,12,9,13,15,14,9,12}};
+    private static final int[][] SKILLS={{12,12,9,12,15,2,9,9,14,12},{15,12,9,13,12,14,9,9,12,14},{15,12,9,13,15,14,9,12,12,14}};
     private DragonContinuation(){}
     private static int evidenceCount(GameEngine g,int stage){
         int n=0;
-        for(int i=1;i<=8;i++)if(g.progress.dragonNextUsed.contains("DRAGON_NEXT:"+stage+":"+i) &&
+        for(int i=1;i<=OPTIONS[stage].length;i++)if(g.progress.dragonNextUsed.contains("DRAGON_NEXT:"+stage+":"+i) &&
                 !g.progress.dragonNextFailed.contains("DRAGON_NEXT:"+stage+":"+i))n++;
         return n;
     }
@@ -100,7 +106,7 @@ public final class DragonContinuation {
             (g.progress.dragonNextRecent.isEmpty()?"":"\n\nПОСЛЕДСТВИЕ\n"+g.progress.dragonNextRecent));
         s.primary("DRAGON_NEXT:"+stage+":0",here?"Завершить расследование":"Проложить путь в "+PLACES[stage],
             here?"Собери три свидетельства ("+evidenceCount(g,stage)+"/3)":"Открыть маршруты");
-        for(int i=1;i<=8;i++){
+        for(int i=1;i<=OPTIONS[stage].length;i++){
             String action="DRAGON_NEXT:"+stage+":"+i;
             String[] pair=OPTIONS[stage][i-1].split("\\|",2);
             boolean used=g.progress.dragonNextUsed.contains(action);
@@ -110,7 +116,7 @@ public final class DragonContinuation {
         return s.add("DRAGON_NEXT:"+stage+":9","Вернуться в мир","Продолжить расследование позже");
     }
     public static int chance(GameEngine g,String action){
-        if(!"DRAGON".equals(g.mode)||action==null||!action.matches("DRAGON_NEXT:[012]:[0-9]"))return -1;
+        if(!"DRAGON".equals(g.mode)||action==null||!action.matches("DRAGON_NEXT:[012]:(?:[0-9]|10|11)"))return -1;
         String[] p=action.split(":");int stage=Integer.parseInt(p[1]),choice=Integer.parseInt(p[2]);
         if(stage!=g.progress.dragonNextStage||g.progress.dragonNextUsed.contains(action))return -1;
         if(!PLACES[stage].equals(g.progress.location)||(choice==3||choice==5||choice==7)&&g.stamina<7)return -1;
@@ -118,7 +124,7 @@ public final class DragonContinuation {
         return g.progress.chance(g,choice%3,SKILLS[stage][choice-1],29+stage*5);
     }
     public static void perform(GameEngine g,String action){
-        if(!"DRAGON".equals(g.mode)||action==null||!action.matches("DRAGON_NEXT:[012]:[0-9]"))return;
+        if(!"DRAGON".equals(g.mode)||action==null||!action.matches("DRAGON_NEXT:[012]:(?:[0-9]|10|11)"))return;
         String[] p=action.split(":");int stage=Integer.parseInt(p[1]),choice=Integer.parseInt(p[2]);
         if(stage!=g.progress.dragonNextStage)return;
         if(choice==9){g.mode="WORLD";return;}
@@ -152,7 +158,7 @@ public final class DragonContinuation {
                 g.progress.dragonNextRecent="Неудача: "+pair[0]+". Свидетельство не получено, попытка исчерпана. Пришлось отступить с ранами.";
             }
         }else{
-            if(choice==2||choice==6)g.reputation=Math.min(50,g.reputation+2);
+            if(choice==2||choice==6||choice==10||choice==11)g.reputation=Math.min(50,g.reputation+2);
             else if(choice==4||choice==8)g.progress.skillExperience(g,SKILLS[stage][choice-1],8);
             else g.progress.dragonInsight=Math.min(15,g.progress.dragonInsight+1);
             g.progress.dragonNextRecent=pair[0]+". "+pair[1]+" Выбор записан и не может быть повторён.";
