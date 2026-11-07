@@ -50,6 +50,16 @@ class DragonContinuationContracts(unittest.TestCase):
         self.assertIn('g.progress.dragonNextUsed.add(action)',c)
         self.assertIn('g.progress.dragonNextFailed.add(action)',c)
 
+    def test_windhelm_verdicts_require_proven_evidence(self):
+        c=source("DragonContinuation.java")
+        self.assertIn("private static String windhelmVerdict(GameEngine g)",c)
+        self.assertIn("ledger&&seals&&caravan",c)
+        self.assertIn("workers&&family",c)
+        self.assertIn("chest&&seals",c)
+        self.assertIn("!g.progress.dragonNextFailed.contains(key)",c)
+        self.assertIn('lead(g)+" "+windhelmVerdict(g)',c)
+        self.assertIn('g.progress.recent="Квест «Драконий след: пепельный гонец» завершён. "+lead(g)+" "+windhelmVerdict(g)',c)
+
     def test_integration_and_legacy(self):
         arc=source("DragonArc.java")
         game=source("GameEngine.java")
