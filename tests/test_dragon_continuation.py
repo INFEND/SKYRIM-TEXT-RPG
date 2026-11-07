@@ -89,13 +89,16 @@ class DragonContinuationContracts(unittest.TestCase):
     def test_exhausted_investigation_terminal_failure(self):
         c=source("DragonContinuation.java")
         self.assertIn("private static boolean exhausted(GameEngine g,int stage)",c)
-        self.assertIn("return evidenceCount(g,stage)<3;",c)
+        self.assertIn("return evidenceCount(g,stage)<3 || !hasRiskProof(g,stage);",c)
         self.assertIn('g.progress.setQuestOutcome(questId(stage),"FAILED")',c)
         self.assertIn('g.reputation=Math.max(-50,g.reputation-3)',c)
         self.assertIn("activateQuest(g,g.progress.dragonNextStage)",c)
         self.assertIn("if(!exhausted(g,stage))",c)
         self.assertIn('g.progress.recent=g.progress.dragonNextRecent',c)
-        self.assertIn('if(evidenceCount(g,stage)<3)',c)
+        self.assertIn('if(evidenceCount(g,stage)<3 || !hasRiskProof(g,stage))',c)
+        self.assertIn('return proved(g,stage,3)||proved(g,stage,5)||proved(g,stage,7);',c)
+        self.assertIn('опасная зацепка',c)
+        self.assertIn('if(!exhausted(g,stage))',c)
 
     def test_integration_and_legacy(self):
         arc=source("DragonArc.java")
