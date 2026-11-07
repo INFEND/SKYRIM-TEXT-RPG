@@ -13,8 +13,16 @@ def test_failure_record_survives_schema_one_save():
     assert '.put("dragonNextFailed",new JSONArray(dragonNextFailed))' in progress
     assert 'obj.optJSONArray("dragonNextFailed")' in progress
     assert 'p.dragonNextUsed.contains(value)' in progress
-    assert 'DRAGON_NEXT:[01]:[357]' in progress
+    assert 'DRAGON_NEXT:[012]:[357]' in progress
 
 def test_old_saves_have_no_mandatory_new_field():
     assert 'if(nextFailed!=null)' in progress
     assert 'public final HashSet<String> dragonNextFailed=new HashSet<>()' in progress
+
+def test_terminal_failures_are_visible_in_final_story_and_journal():
+    assert 'private static int failedChapters(GameEngine g)' in story
+    assert 'private static String questSummary(GameEngine g)' in story
+    assert '"FAILED".equals(g.progress.questOutcomes.get(questId(i)))' in story
+    assert '"FAILED".equals(outcome)?"провалено"' in story
+    assert '"Итог пепельного следа: "+questSummary(g)' in story
+    assert '"Расследования в Ривервуде, Вайтране и Виндхельме завершены. "+questSummary(g)' in story
