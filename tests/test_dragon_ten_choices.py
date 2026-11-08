@@ -13,7 +13,7 @@ class ContinuationChoicesTest(unittest.TestCase):
                       "Согласовать охрану обозов", "Отметить безопасные ночлеги",
                       "Устроить встречу свидетелей", "Передать предупреждение капитанам"):
             self.assertIn(label, block)
-        self.assertEqual(30, len(re.findall(r'^\s*\{?\s*"[^"\n]+\|[^"\n]+"', block, re.MULTILINE)))
+        self.assertEqual(10 * 4, len(re.findall(r'^\s*\{?\s*"[^"\n]+\|[^"\n]+"', block, re.MULTILINE)))
         self.assertIn('i<=OPTIONS[stage].length', CONT)
 
     def test_new_actions_are_persisted_and_one_time(self):
