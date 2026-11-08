@@ -30,10 +30,11 @@ import android.widget.Toast;
 import org.json.JSONObject;
 
 public final class MainActivity extends Activity {
-    private static final int BG=Color.rgb(7,11,15), PANEL=Color.rgb(12,17,21), PANEL_2=Color.rgb(16,22,27);
-    private static final int TEXT=Color.rgb(237,231,218), MUTED=Color.rgb(169,170,165), BORDER=Color.rgb(85,79,68);
-    private static final int[] ACCENTS={0xFFE1C58F,0xFF69CDA8,0xFF7FB5FF,0xFFAE8EF1,0xFFF18D86,0xFFE8E5DB};
-    private static final String[] ACCENT_NAMES={"Золото", "Север", "Лёд", "Аметист", "Рубин", "Серебро"};
+    // Monochrome translucent menus, following the six provided Skyrim references.
+    private static final int BG=0xff06090a, PANEL=0xe806090b, PANEL_2=0xf30b0e10;
+    private static final int TEXT=0xfff0f1ef, MUTED=0xffaab0b3, BORDER=0xff666d72;
+    private static final int[] ACCENTS={0xffe1e3e3,0xffa4b9bf,0xffb9c9dc,0xffceb48c,0xffc79a97,0xffeeece8};
+    private static final String[] ACCENT_NAMES={"Серебро", "Север", "Лёд", "Древнее золото", "Рубин", "Снег"};
     private static final String PREFS="skyrim_text_v1";
     private GameEngine game;
     private SharedPreferences prefs;
@@ -45,6 +46,7 @@ public final class MainActivity extends Activity {
     private int selectedStart=0,selectedMapRegion=-1;
     private final int[] initialPoints={0,0,0};
     private String selectedCategory="Все",selectedSort="Название";
+    private String focusedInventoryId="";
     private boolean animations=true, titleOpen=true;
     private int codexCategory=0;
     private SkyrimOtaController updater;
@@ -124,13 +126,13 @@ public final class MainActivity extends Activity {
     private void space(LinearLayout parent,int h){View v=new View(this);parent.addView(v,lp(1,h));}
     private void addText(LinearLayout parent,String str,int size,int color,boolean bold,int bottom){TextView t=text(str,size,color,bold);parent.addView(t);if(bottom>0)space(parent,bottom);}
     private void render(){
-        root=column();root.setBackgroundColor(BG);root.setFitsSystemWindows(true);
+        root=column();root.setBackground(new SkyrimBackdropDrawable());root.setFitsSystemWindows(true);
         setContentView(root);
         if(!titleOpen){renderHeader();if(game.started && !(tab==0&&prefs.getBoolean("ai_enabled",false)))renderBars();}
         scroll=new ScrollView(this);scroll.setFillViewport(false);scroll.setClipToPadding(false);
         scroll.setVerticalScrollBarEnabled(false);
         root.addView(scroll,new LinearLayout.LayoutParams(-1,0,1));
-        content=column();content.setPadding(dp(21),dp(23),dp(21),dp(30));scroll.addView(content);
+        content=column();content.setPadding(dp(13),dp(17),dp(13),dp(28));scroll.addView(content);
         if(titleOpen)renderTitle();
         else if(!game.started && tab!=5)renderNewGame();
         else if(tab==0)renderStory();
@@ -144,21 +146,24 @@ public final class MainActivity extends Activity {
         if(animations){content.setAlpha(0.8f);content.animate().alpha(1f).setDuration(210).setInterpolator(new DecelerateInterpolator()).start();}
     }
     private void renderHeader(){
-        header=row();header.setPadding(dp(19),dp(15),dp(19),dp(13));
+        header=row();header.setPadding(dp(13),dp(9),dp(13),dp(9));
+        header.setBackground(new RuneFrameDrawable(PANEL,BORDER,false));
         root.addView(header,lp(-1,-2));
-        TextView sigil=text("ᛟ",30,accent(),false);sigil.setGravity(Gravity.CENTER);
-        sigil.setBackground(new RuneFrameDrawable(BG,accent(),true));header.addView(sigil,lp(47,47));
-        sigil.setContentDescription("Открыть главное меню");
-        sigil.setOnClickListener(v->{titleOpen=true;render();});
-        LinearLayout copy=column();copy.setPadding(dp(12),0,0,0);
-        header.addView(copy,new LinearLayout.LayoutParams(0,-2,1));
-        addText(copy,"SKYRIM",23,TEXT,false,1);
-        addText(copy,"ᛟ  ТЕКСТОВАЯ RPG  ᛟ",10,accent(),false,0);
-        if(game.started){LinearLayout meta=column();meta.setGravity(Gravity.END);
-            addText(meta,"ДЕНЬ "+game.day,11,TEXT,true,1);
-            addText(meta,"УР. "+game.level,10,MUTED,false,0);
-            header.addView(meta,lp(-2,-2));}
-        View line=new View(this);line.setBackgroundColor(BORDER);root.addView(line,lp(-1,1));
+        SkyrimIconView crest=new SkyrimIconView(this,"dragon",accent());
+        header.addView(crest,lp(42,42));
+        crest.setOnClickListener(v->{titleOpen=true;render();});
+        crest.setContentDescription("Открыть главное меню");
+        LinearLayout label=column();label.setPadding(dp(12),0,0,0);
+        header.addView(label,new LinearLayout.LayoutParams(0,-2,1));
+        TextView word=text("S K Y R I M",20,TEXT,true);word.setLetterSpacing(.08f);label.addView(word);
+        addText(label,"ᛟ  ТЕКСТОВАЯ RPG",10,MUTED,false,0);
+        if(game.started){
+            LinearLayout state=column();state.setGravity(Gravity.END);
+            addText(state,"ДЕНЬ "+game.day,11,TEXT,true,2);
+            addText(state,"УРОВЕНЬ "+game.level,10,MUTED,false,0);
+            header.addView(state,lp(-2,-2));
+        }
+        root.addView(new SkyrimRuleView(this,accent()),lp(-1,15));
     }
     private void renderBars(){
         LinearLayout stats=row();stats.setPadding(dp(19),dp(11),dp(19),dp(11));
@@ -178,38 +183,75 @@ public final class MainActivity extends Activity {
         LinearLayout.LayoutParams b=lp(-1,3);b.topMargin=dp(6);col.addView(bar,b);
     }
     private void section(String eyebrow,String heading,String subtitle){
-        addText(content,"ᛟ  "+eyebrow.toUpperCase()+"  ᛟ",11,accent(),false,10);
-        addText(content,heading,30,TEXT,false,9);
-        TextView runeRule=text("────────  ◈  ────────",14,accent(),false);runeRule.setGravity(Gravity.CENTER);content.addView(runeRule,lp(-1,32));
-        if(subtitle!=null&&!subtitle.isEmpty()){TextView t=text(subtitle,15,MUTED,false);t.setLineSpacing(dp(3),1f);content.addView(t);}
-        space(content,19);
+        TextView over=text(eyebrow.toUpperCase(java.util.Locale.ROOT),10,MUTED,true);
+        over.setGravity(Gravity.CENTER);over.setLetterSpacing(.16f);
+        content.addView(over,lp(-1,24));
+        TextView title=text(heading.toUpperCase(java.util.Locale.ROOT),27,TEXT,true);
+        title.setGravity(Gravity.CENTER);title.setLetterSpacing(.04f);content.addView(title,lp(-1,-2));
+        content.addView(new SkyrimRuleView(this,accent()),lp(-1,19));
+        if(subtitle!=null&&!subtitle.isEmpty()){
+            TextView line=text(subtitle,14,MUTED,false);
+            line.setGravity(Gravity.CENTER);line.setLineSpacing(dp(3),1.08f);
+            content.addView(line,lp(-1,-2));
+        }
+        space(content,12);
     }
     private LinearLayout card(){
-        LinearLayout c=column();c.setPadding(dp(17),dp(17),dp(17),dp(17));c.setBackground(new RuneFrameDrawable(PANEL,0xff82745d,false));
-        LinearLayout.LayoutParams p=lp(-1,-2);p.bottomMargin=dp(13);content.addView(c,p);return c;
+        LinearLayout c=column();c.setPadding(dp(16),dp(18),dp(16),dp(18));
+        c.setBackground(new RuneFrameDrawable(PANEL,0xff929a9e,false));
+        LinearLayout.LayoutParams p=lp(-1,-2);p.bottomMargin=dp(11);content.addView(c,p);return c;
+    }
+    private static String iconOf(String title){
+        String t=title.toLowerCase(java.util.Locale.ROOT);
+        if(t.contains("карта")||t.contains("мест")||t.contains("локац")||t.contains("путь"))return "map";
+        if(t.contains("оруж")||t.contains("меч")||t.contains("боев"))return "weapon";
+        if(t.contains("доспех")||t.contains("брон")||t.contains("щит"))return "armor";
+        if(t.contains("зель")||t.contains("лекар")||t.contains("алхим"))return "potion";
+        if(t.contains("герой")||t.contains("характерист")||t.contains("навык"))return "hero";
+        if(t.contains("квест")||t.contains("задан")||t.contains("журнал"))return "journal";
+        if(t.contains("настр")||t.contains("тема")||t.contains("ии-")||t.contains("модель"))return "settings";
+        if(t.contains("инвентар")||t.contains("сумк")||t.contains("предмет"))return "bag";
+        if(t.contains("библиотек")||t.contains("кодекс")||t.contains("книга"))return "codex";
+        if(t.contains("дракон")||t.contains("скайрим"))return "dragon";
+        return "star";
     }
     private TextView actionButton(String title,String detail,boolean primary,Runnable onClick){
-        LinearLayout box=row();box.setPadding(dp(17),dp(15),dp(15),dp(15));
-        box.setBackground(new RuneFrameDrawable(primary?0xff22231e:0xff0e1519,primary?accent():0xff85745f,primary));
-        LinearLayout info=column();box.addView(info,new LinearLayout.LayoutParams(0,-2,1));
-        addText(info,title,17,primary?accent():TEXT,false,detail.isEmpty()?0:4);
+        LinearLayout row=row();row.setPadding(dp(12),dp(11),dp(10),dp(11));
+        row.setBackground(new RuneFrameDrawable(primary?0xf0181a1c:PANEL,primary?accent():BORDER,primary));
+        row.addView(new SkyrimIconView(this,iconOf(title),primary?accent():0xffbfc7cb),lp(28,29));
+        LinearLayout info=column();LinearLayout.LayoutParams ip=new LinearLayout.LayoutParams(0,-2,1);
+        ip.leftMargin=dp(11);row.addView(info,ip);
+        addText(info,title,16,primary?accent():TEXT,true,detail.isEmpty()?0:4);
         if(!detail.isEmpty())addText(info,detail,12,MUTED,false,0);
-        TextView chevron=text("ᛟ",19,primary?accent():MUTED,false);chevron.setGravity(Gravity.CENTER);
-        box.addView(chevron,lp(24,35));
-        LinearLayout.LayoutParams p=lp(-1,-2);p.bottomMargin=dp(10);content.addView(box,p);
-        box.setClickable(true);box.setFocusable(true);box.setOnClickListener(v->onClick.run());
-        return chevron;
+        TextView mark=text("◇",19,primary?accent():MUTED,false);
+        mark.setGravity(Gravity.CENTER);row.addView(mark,lp(24,28));
+        LinearLayout.LayoutParams p=lp(-1,-2);p.bottomMargin=dp(7);content.addView(row,p);
+        row.setClickable(true);row.setFocusable(true);row.setContentDescription(title+". "+detail);
+        row.setOnClickListener(v->onClick.run());return mark;
     }
     private void titleButton(String caption,boolean active,Runnable callback){
-        TextView v=text(caption,19,active?accent():TEXT,false);v.setGravity(Gravity.CENTER);
-        v.setBackground(new RuneFrameDrawable(active?0xff27261f:0xff0c1216,active?accent():0xff8c7b62,active));
-        LinearLayout.LayoutParams params=lp(-1,49);params.setMargins(dp(39),0,dp(39),dp(10));
-        content.addView(v,params);v.setClickable(true);v.setFocusable(true);
-        v.setOnClickListener(view->callback.run());
+        TextView item=text(caption.toUpperCase(java.util.Locale.ROOT),19,active?accent():TEXT,true);
+        item.setGravity(Gravity.CENTER);item.setLetterSpacing(.12f);
+        item.setBackground(new RuneFrameDrawable(active?0xf0121516:PANEL,active?accent():BORDER,active));
+        LinearLayout.LayoutParams p=lp(-1,50);p.setMargins(dp(28),0,dp(28),dp(9));
+        content.addView(item,p);item.setClickable(true);item.setFocusable(true);
+        item.setOnClickListener(v->callback.run());
     }
-    private void titleRule(){
-        TextView t=text("──────────  ◈  ──────────",15,accent(),false);
-        t.setGravity(Gravity.CENTER);content.addView(t,lp(-1,39));
+    private void titleRule(){content.addView(new SkyrimRuleView(this,accent()),lp(-1,29));}
+    private void skyrimTopTabs(int current){
+        final int[] screens={4,3,5};
+        final String[] names={"ЗАДАНИЯ","СТАТИСТИКА","СИСТЕМА"};
+        LinearLayout bar=row();bar.setPadding(dp(3),dp(5),dp(3),dp(5));
+        bar.setBackground(new RuneFrameDrawable(PANEL,BORDER,false));
+        content.addView(bar,lp(-1,-2));
+        for(int i=0;i<screens.length;i++){
+            final int index=screens[i];
+            TextView title=text(names[i],12,current==index?accent():MUTED,current==index);
+            title.setGravity(Gravity.CENTER);
+            bar.addView(title,new LinearLayout.LayoutParams(0,dp(38),1));
+            title.setOnClickListener(v->{tab=index;render();});
+        }
+        content.addView(new SkyrimRuleView(this,accent()),lp(-1,14));
     }
     private void renderTitle(){
         content.setPadding(0,dp(8),0,dp(25));
@@ -218,7 +260,9 @@ public final class MainActivity extends Activity {
             new FrameLayout.LayoutParams(-1,-1));
         LinearLayout letter=column();letter.setGravity(Gravity.CENTER);
         FrameLayout.LayoutParams overlay=new FrameLayout.LayoutParams(-1,-1);overlay.setMargins(dp(8),0,dp(8),dp(25));cover.addView(letter,overlay);
-        TextView rune=text("ᚱ   ᛟ   ᚦ",38,accent(),false);rune.setGravity(Gravity.CENTER);letter.addView(rune,lp(-1,75));
+        SkyrimIconView rune=new SkyrimIconView(this,"dragon",accent());
+        LinearLayout.LayoutParams logo=lp(82,82);logo.gravity=Gravity.CENTER;
+        letter.addView(rune,logo);
         TextView name=text("СКАЙРИМ",38,TEXT,false);name.setGravity(Gravity.CENTER);name.setLetterSpacing(.14f);
         letter.addView(name,lp(-1,60));
         TextView subtitle=text("Т Е К С Т О В А Я   R P G",11,accent(),false);
@@ -1099,6 +1143,7 @@ public final class MainActivity extends Activity {
         r.addView(text(value,15,TEXT,true));
     }
     private void renderHero(){
+        skyrimTopTabs(3);
         section("ЛИЧНОЕ ДЕЛО",""+game.name,game.race+" • "+game.heroClass+" • уровень "+game.level);
         content.addView(new NordicArtView(this,NordicArtView.STORY),lp(-1,125));space(content,12);
         LinearLayout c=card();addText(c,"ХАРАКТЕРИСТИКИ",11,accent(),true,9);
@@ -1212,6 +1257,7 @@ public final class MainActivity extends Activity {
         }
     }
     private void renderJournal(){
+        skyrimTopTabs(4);
         section("ЛЕТОПИСЬ","Задания","Твои решения формируют собственную историю Скайрима.");
         content.addView(new NordicArtView(this,NordicArtView.TITLE),lp(-1,120));space(content,12);
         if(!game.aiJournal.isEmpty()){
@@ -1280,6 +1326,7 @@ public final class MainActivity extends Activity {
         actionButton("Вернуться к истории","Открыть текущую сцену",true,()->{tab=0;render();});
     }
     private void renderSettings(){
+        skyrimTopTabs(5);
         section("ПАРАМЕТРЫ","Настройки","Твоя история, твои правила.");
         content.addView(new NordicArtView(this,NordicArtView.STORY),lp(-1,105));space(content,12);
         LinearLayout palette=card();addText(palette,"ЦВЕТ АКЦЕНТА",11,accent(),true,12);
@@ -1419,19 +1466,21 @@ public final class MainActivity extends Activity {
                 newAiSession();game=new GameEngine();tab=0;draftName="";selectedStart=0;java.util.Arrays.fill(initialPoints,0);save();render();}).show();
     }
     private void renderNav(){
-        View sep=new View(this);sep.setBackgroundColor(BORDER);root.addView(sep,lp(-1,1));
-        LinearLayout nav=row();nav.setPadding(dp(6),dp(7),dp(6),dp(7));nav.setBackgroundColor(PANEL);
-        root.addView(nav,lp(-1,65));
+        root.addView(new SkyrimRuleView(this,0xff929b9d),lp(-1,12));
+        LinearLayout nav=row();nav.setPadding(dp(2),dp(7),dp(2),dp(8));
+        nav.setBackgroundColor(0xf8050809);root.addView(nav,lp(-1,66));
         String[] labels={"ИСТОРИЯ","КАРТА","СУМКА","КОДЕКС","ГЕРОЙ","ЖУРНАЛ","ТЕМА"};
-        String[] signs={"ᚱ","◈","▣","ᛟ","◇","☷","⚙"};
-        int[] tabs={0,1,2,6,3,4,5};
+        String[] glyphs={"story","map","bag","codex","hero","journal","settings"};
+        int[] screens={0,1,2,6,3,4,5};
         for(int i=0;i<labels.length;i++){
-            final int index=tabs[i];
-            LinearLayout navitem=column();navitem.setGravity(Gravity.CENTER);
-            LinearLayout.LayoutParams size=new LinearLayout.LayoutParams(0,-1,1);nav.addView(navitem,size);
-            TextView icon=text(signs[i],23,tab==index?accent():MUTED,true);icon.setGravity(Gravity.CENTER);navitem.addView(icon);
-            TextView t=text(labels[i],8,tab==index?accent():MUTED,tab==index);t.setGravity(Gravity.CENTER);navitem.addView(t);
-            navitem.setOnClickListener(v->{if(tab!=index){tab=index;render();}});
+            final int id=screens[i];
+            LinearLayout area=column();area.setGravity(Gravity.CENTER);
+            nav.addView(area,new LinearLayout.LayoutParams(0,-1,1));
+            area.addView(new SkyrimIconView(this,glyphs[i],tab==id?accent():0xff969da0),lp(28,31));
+            TextView label=text(labels[i],8,tab==id?accent():MUTED,tab==id);
+            label.setGravity(Gravity.CENTER);area.addView(label);
+            area.setContentDescription(labels[i]);
+            area.setOnClickListener(v->{if(tab!=id){tab=id;render();}});
         }
     }
     public void toast(String message){Toast.makeText(this,message,Toast.LENGTH_SHORT).show();}
