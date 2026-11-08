@@ -339,18 +339,7 @@ public final class MainActivity extends Activity {
         LinearLayout.LayoutParams p=lp(-1,-2);p.bottomMargin=dp(11);content.addView(c,p);return c;
     }
     private static String iconOf(String title){
-        String t=title.toLowerCase(java.util.Locale.ROOT);
-        if(t.contains("карта")||t.contains("мест")||t.contains("локац")||t.contains("путь"))return "map";
-        if(t.contains("оруж")||t.contains("меч")||t.contains("боев"))return "weapon";
-        if(t.contains("доспех")||t.contains("брон")||t.contains("щит"))return "armor";
-        if(t.contains("зель")||t.contains("лекар")||t.contains("алхим"))return "potion";
-        if(t.contains("герой")||t.contains("характерист")||t.contains("навык"))return "hero";
-        if(t.contains("квест")||t.contains("задан")||t.contains("журнал"))return "journal";
-        if(t.contains("настр")||t.contains("тема")||t.contains("ии-")||t.contains("модель"))return "settings";
-        if(t.contains("инвентар")||t.contains("сумк")||t.contains("предмет"))return "bag";
-        if(t.contains("библиотек")||t.contains("кодекс")||t.contains("книга"))return "codex";
-        if(t.contains("дракон")||t.contains("скайрим"))return "dragon";
-        return "star";
+        return SkyrimIconView.iconForLabel(title);
     }
     private TextView actionButton(String title,String detail,boolean primary,Runnable onClick){
         LinearLayout row=row();row.setPadding(dp(12),dp(11),dp(10),dp(11));
@@ -1193,12 +1182,7 @@ public final class MainActivity extends Activity {
         content.addView(categoryScroll,lp(-1,-2));
         for(String group:groups){
             boolean active=selectedCategory.equals(group);
-            String image=iconOf(group);
-            if(group.equals("Оружие"))image="weapon";
-            else if(group.equals("Броня")||group.equals("Одежда"))image="armor";
-            else if(group.equals("Зелья"))image="potion";
-            else if(group.equals("Все"))image="bag";
-            else if(group.equals("Книги"))image="book";
+            String image=group.equals("Все")?"bag":iconOf(group);
             LinearLayout tile=column();tile.setGravity(Gravity.CENTER);
             tile.setPadding(dp(7),dp(3),dp(7),dp(3));
             categoryStrip.addView(tile,lp(65,67));
@@ -1230,7 +1214,7 @@ public final class MainActivity extends Activity {
         if(focused!=null){
             LinearLayout selected=card();
             LinearLayout top=row();selected.addView(top,lp(-1,-2));
-            SkyrimIconView image=new SkyrimIconView(this,iconOf(focused.category),accent());
+            SkyrimIconView image=new SkyrimIconView(this,SkyrimIconView.iconForItem(focused.name,focused.category),accent());
             top.addView(image,lp(70,78));
             LinearLayout details=column();details.setPadding(dp(9),0,0,0);
             top.addView(details,new LinearLayout.LayoutParams(0,-2,1));
@@ -1258,7 +1242,7 @@ public final class MainActivity extends Activity {
             final boolean active=item.id.equals(focusedInventoryId);
             LinearLayout itemRow=row();itemRow.setPadding(dp(7),dp(10),dp(8),dp(10));
             itemRow.setBackgroundColor(active?0xa02a2e30:0x98050607);
-            itemRow.addView(new SkyrimIconView(this,iconOf(item.category),active?accent():MUTED),lp(22,23));
+            itemRow.addView(new SkyrimIconView(this,SkyrimIconView.iconForItem(item.name,item.category),active?accent():MUTED),lp(22,23));
             TextView name=text(item.name+" ×"+game.progress.quantity(item.id),14,active?accent():TEXT,active);
             name.setMaxLines(2);LinearLayout.LayoutParams np=new LinearLayout.LayoutParams(0,-2,1);
             np.leftMargin=dp(8);itemRow.addView(name,np);
