@@ -4,6 +4,9 @@ import android.os.Handler;
 import android.os.Looper;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.json.JSONArray;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -46,7 +49,7 @@ final class AiStoryClient {
     boolean isRunning() { return running; }
 
     /** Must be called on UI thread; takes an immutable snapshot before networking. */
-    boolean generate(String token, String model, GameEngine game, String history, String playerText, Listener listener) {
+    boolean generate(String token, String model, boolean chatGptPlan, GameEngine game, String history, String playerText, Listener listener) {
         if (running || token == null || token.isEmpty() || model == null || !model.matches("[a-zA-Z0-9._-]{2,100}")) return false;
         final String input = context(game, history, playerText);
         final int id = ++sequence;
@@ -60,10 +63,14 @@ final class AiStoryClient {
                 JSONObject payload = new JSONObject();
                 payload.put("model", model);
                 payload.put("instructions", RULES);
-                payload.put("input", input);
+                // ChatGPT plan usage requires a role-labeled array and forbids
+                // max_output_tokens. API-key billing may still set the output cap.
+                JSONArray inputMessages=new JSONArray();
+                inputMessages.put(new JSONObject().put("role","user").put("content",input));
+                payload.put("input", inputMessages);
                 payload.put("stream", true);
                 payload.put("store", false);
-                payload.put("max_output_tokens", 2200);
+                if(!chatGptPlan)payload.put("max_output_tokens",2200);
                 HttpURLConnection conn = (HttpURLConnection) new URL(ENDPOINT).openConnection();
                 connection = conn;
                 conn.setRequestMethod("POST");
@@ -77,11 +84,8 @@ final class AiStoryClient {
                     output.write(payload.toString().getBytes(StandardCharsets.UTF_8));
                 }
                 int status = conn.getResponseCode();
-                if (status < 200 || status > 299) {
-                    throw new IllegalStateException(status == 401 ? "Авторизация ИИ не удалась (401)" :
-                            status == 429 ? "Лимит или баланс OpenAI API (429)" :
-                            "Облачный ИИ недоступен (HTTP " + status + ")");
-                }
+                if (status < 200 || status > 299)
+                    throw new IllegalStateException(formatHttpFailure(conn,status,chatGptPlan));
                 try (BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream(), StandardCharsets.UTF_8))) {
                     String line;
                     while (!cancelled && (line = reader.readLine()) != null) {
@@ -136,6 +140,60 @@ final class AiStoryClient {
             }
         });
         return true;
+    }
+
+
+    /**
+     * Reads only a small bounded error response, never the Authorization header
+     * or OAuth tokens. ChatGPT plan requests can be rejected before SSE starts.
+     */
+    private static String formatHttpFailure(HttpURLConnection conn,int status,boolean chatGptPlan) {
+        String code="", param="", message="", detail="";
+        try {
+            String raw=readError(conn.getErrorStream(),8192);
+            JSONObject json=new JSONObject(raw);
+            JSONObject error=json.optJSONObject("error");
+            if(error!=null){
+                code=error.optString("code","");
+                param=error.optString("param","");
+                message=error.optString("message","");
+            }
+            if(json.opt("detail") instanceof String)detail=json.optString("detail","");
+        }catch(Exception ignored){}
+        String diagnostic=!code.isEmpty()?code:"";
+        if(!param.isEmpty())diagnostic+=(diagnostic.isEmpty()?"":" · ")+"параметр: "+param;
+        if(diagnostic.isEmpty())diagnostic=!message.isEmpty()?message:detail;
+        diagnostic=safeServerText(diagnostic);
+        String header=chatGptPlan?"ChatGPT":"OpenAI API";
+        String prefix=status==400?"отклонил параметры запроса":
+                status==401?"не принял авторизацию":
+                status==403?"запретил доступ":
+                status==429?(chatGptPlan?"достигнут лимит подписки":"достигнут лимит API"):
+                "недоступен";
+        String result=header+" "+prefix+" (HTTP "+status+")";
+        if(!diagnostic.isEmpty())result+=": "+diagnostic;
+        String requestId=conn.getHeaderField("x-request-id");
+        if(requestId!=null && requestId.matches("[a-zA-Z0-9_-]{3,100}"))
+            result+=" · Request ID: "+requestId;
+        return result;
+    }
+
+    private static String readError(InputStream input,int maxBytes) throws IOException {
+        if(input==null)return "";
+        try(InputStream stream=input;ByteArrayOutputStream data=new ByteArrayOutputStream()){
+            byte[] buf=new byte[1024];int n;
+            while((n=stream.read(buf,0,Math.min(buf.length,maxBytes-data.size())))>0)
+                data.write(buf,0,n);
+            return new String(data.toByteArray(),StandardCharsets.UTF_8);
+        }
+    }
+
+    private static String safeServerText(String raw){
+        if(raw==null)return "";
+        String sanitized=raw.replaceAll("(?i)sk-[a-z0-9_-]{8,}","[секрет скрыт]")
+                .replaceAll("(?i)bearer\\\\s+[a-z0-9._-]{8,}","Bearer [секрет скрыт]")
+                .replaceAll("[\\\\x00-\\\\x1f]+"," ").trim();
+        return sanitized.substring(0,Math.min(180,sanitized.length()));
     }
 
     private static String context(GameEngine g, String history, String input) {

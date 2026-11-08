@@ -586,7 +586,7 @@ public final class MainActivity extends Activity {
                     send.setText("СОЗДАТЬ ПРОДОЛЖЕНИЕ");
                 }
                 @Override public void onError(String error){
-                    status.setText(error+". Игровой прогресс не изменён.");
+                    status.setText(error+"\nИгровой прогресс не изменён.");
                     send.setText("ПОВТОРИТЬ");
                 }
             };
@@ -597,7 +597,7 @@ public final class MainActivity extends Activity {
                     awaitingAiToken=false;
                     if(error!=null){status.setText(error);send.setText("ПОВТОРИТЬ");return;}
                     status.setText("ChatGPT создаёт сцену…");
-                    boolean started=aiClient.generate(token,selectedModel,game,history,request,responseListener);
+                    boolean started=aiClient.generate(token,selectedModel,true,game,history,request,responseListener);
                     if(!started){status.setText("Предыдущий запрос ещё завершается");send.setText("СОЗДАТЬ ПРОДОЛЖЕНИЕ");}
                 });
             }else{
@@ -605,7 +605,7 @@ public final class MainActivity extends Activity {
                 try{key=AiKeyVault.read(this);}
                 catch(Exception ex){status.setText("Не удалось прочитать ключ API");send.setText("ПОВТОРИТЬ");return;}
                 if(key.isEmpty()){status.setText("API-ключ не настроен");send.setText("ПОВТОРИТЬ");return;}
-                boolean started=aiClient.generate(key,selectedModel,game,history,request,responseListener);
+                boolean started=aiClient.generate(key,selectedModel,false,game,history,request,responseListener);
                 if(!started){status.setText("Предыдущий запрос ещё завершается");send.setText("СОЗДАТЬ ПРОДОЛЖЕНИЕ");}
             }
         });
