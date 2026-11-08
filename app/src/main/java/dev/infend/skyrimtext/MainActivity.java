@@ -514,10 +514,12 @@ public final class MainActivity extends Activity {
             String value=own.getText().toString().trim();
             if(value.isEmpty()){toast("Напиши свой ответ");return;}
             if(value.length()>1500){toast("Не более 1500 символов");return;}
-            int roll=AiGameTurn.roll();
-            requestAiTurn("СВОБОДНОЕ ДЕЙСТВИЕ ИГРОКА: "+value+
-                "\nБросок для этого действия (1–100): "+roll+
-                ". Сам определи customChance, сравни с этим броском и опиши успех/неудачу. Верни реальные effects.",true);
+            // The model must commit to a probability BEFORE Android draws a die.
+            requestAiTurn("ОЦЕНКА СВОБОДНОГО ДЕЙСТВИЯ (ЭТАП 1): "+value+
+                "\nОцени customChance по состоянию героя и сложности, без броска. "+
+                "Не исполняй действие и не меняй состояние: effects={}. "+
+                "Верни корректный игровой JSON с десятью вариантами, но он служит "+
+                "только предварительной оценкой и не будет показан игроку.",false,true,-2,value);
         });
     }
 
@@ -553,6 +555,13 @@ public final class MainActivity extends Activity {
      * On interruption the previous scene, dice and inventory remain unchanged.
      */
     private void requestAiTurn(String instruction,boolean actionResolved){
+        requestAiTurn(instruction,actionResolved,false,-2,null);
+    }
+
+    /** Two-stage custom action: proposal is never persisted, and the die is hidden
+     * until the model has committed to a probability. -2 means no fixed chance. */
+    private void requestAiTurn(String instruction,boolean actionResolved,
+                               boolean proposalOnly,int expectedChance,String customAction){
         if(aiTurnBusy||aiClient.isRunning()||!game.started)return;
         final boolean chat=usingChatGpt();
         final String model=prefs.getString(chat?"ai_chatgpt_model":"ai_api_model",
@@ -568,6 +577,7 @@ public final class MainActivity extends Activity {
         final AiStoryClient.Listener listener=new AiStoryClient.Listener(){
             @Override public void onText(String accumulated){
                 if(!aiTurnBusy)return;
+                if(proposalOnly)return;
                 String visible=AiGameTurn.previewScene(accumulated);
                 if(visible.isEmpty()||visible.equals(aiTurnPreview))return;
                 aiTurnPreview=visible;
@@ -582,6 +592,25 @@ public final class MainActivity extends Activity {
                     if(!game.toJson().toString().equals(saved))
                         throw new IllegalStateException("Состояние героя изменилось во время генерации");
                     AiGameTurn completed=AiGameTurn.parse(answer);
+                    if(proposalOnly){
+                        // No effects, scene, journal or memory are applied at this stage.
+                        final int fixedChance=completed.customChance;
+                        final int die=fixedChance<0?-1:AiGameTurn.roll();
+                        final boolean passed=AiGameTurn.success(fixedChance,die);
+                        aiTurnBusy=false;aiTurnPreview="";
+                        String verdict=fixedChance<0
+                            ?"Проверка навыка не требуется. Действие гарантировано."
+                            :"Зафиксированный шанс: "+fixedChance+"%. Бросок Android: "+
+                              die+". Исход: "+(passed?"УСПЕХ":"НЕУДАЧА")+".";
+                        requestAiTurn("СВОБОДНОЕ ДЕЙСТВИЕ ИГРОКА (ЭТАП 2): "+customAction+
+                            "\\n"+verdict+" Не пересчитывай шанс и не меняй исход. "+
+                            "Верни customChance точно "+(fixedChance<0?"null":fixedChance)+
+                            ", подробно опиши установленный результат и только теперь "+
+                            "предложи effects и десять новых вариантов.",true,false,fixedChance,null);
+                        return;
+                    }
+                    if(expectedChance!=-2&&completed.customChance!=expectedChance)
+                        throw new IllegalStateException("ИИ изменил шанс после броска");
                     GameEngine next=GameEngine.fromJson(saved);
                     completed.apply(next,actionResolved);
                     next.aiTurn=completed;
