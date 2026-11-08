@@ -40,6 +40,12 @@ public final class MainActivity extends Activity {
     private SharedPreferences prefs;
     private LinearLayout root, content, header;
     private ScrollView scroll;
+    private String renderedPage="";
+    private static final class PageScroll {
+        final int y; final java.util.ArrayList<Integer> horizontal;
+        PageScroll(int y,java.util.ArrayList<Integer> horizontal){this.y=y;this.horizontal=horizontal;}
+    }
+    private final java.util.Map<String,PageScroll> scrollCache=new java.util.HashMap<>();
     private EditText nameField;
     private int tab=0, accentIndex=0, fontBonus=0;
     private String draftName="", selectedRace="Норд", selectedClass="Без класса";
@@ -79,6 +85,7 @@ public final class MainActivity extends Activity {
         aiClient=new AiStoryClient();
         chatGptOAuth=new ChatGptOAuth(this);
         ItemCatalog.initialize(this);
+        SovngardeTypeface.preload(this);
         game=GameEngine.fromJson(prefs.getString("save",null));
         accentIndex=Math.max(0,Math.min(ACCENTS.length-1,prefs.getInt("accent",0)));
         fontBonus=Math.max(-2,Math.min(4,prefs.getInt("font_bonus",0)));
@@ -121,13 +128,53 @@ public final class MainActivity extends Activity {
     private TextView text(String str,int size,int color,boolean bold){
         TextView t=new TextView(this);t.setText(str);t.setTextSize(sp(size));t.setTextColor(color);
         t.setFontFeatureSettings("kern");t.setIncludeFontPadding(true);
-        t.setTypeface(Typeface.create(bold?"serif":"serif",bold?Typeface.BOLD:Typeface.NORMAL));
+        t.setTypeface(SovngardeTypeface.face(this,bold));
         return t;
     }
     private LinearLayout.LayoutParams lp(int w,int h){return new LinearLayout.LayoutParams(w<0?w:dp(w),h<0?h:dp(h));}
     private void space(LinearLayout parent,int h){View v=new View(this);parent.addView(v,lp(1,h));}
     private void addText(LinearLayout parent,String str,int size,int color,boolean bold,int bottom){TextView t=text(str,size,color,bold);parent.addView(t);if(bottom>0)space(parent,bottom);}
+    private String viewportKey(){
+        if(titleOpen)return "title";
+        return (!game.started?"new-":"tab-")+tab;
+    }
+    private void findHorizontal(View node,java.util.List<HorizontalScrollView> found){
+        if(node instanceof HorizontalScrollView)found.add((HorizontalScrollView)node);
+        if(node instanceof ViewGroup){
+            ViewGroup parent=(ViewGroup)node;
+            for(int i=0;i<parent.getChildCount();i++)
+                findHorizontal(parent.getChildAt(i),found);
+        }
+    }
+    private void rememberViewport(){
+        if(scroll==null||renderedPage.isEmpty())return;
+        java.util.ArrayList<HorizontalScrollView> found=new java.util.ArrayList<>();
+        findHorizontal(scroll,found);
+        java.util.ArrayList<Integer> positions=new java.util.ArrayList<>();
+        for(HorizontalScrollView h:found)positions.add(h.getScrollX());
+        scrollCache.put(renderedPage,new PageScroll(scroll.getScrollY(),positions));
+    }
+    private void resumeViewport(PageScroll previous,ScrollView target,String key){
+        if(previous==null)return;
+        target.post(()->{
+            if(scroll!=target||!viewportKey().equals(key))return;
+            java.util.ArrayList<HorizontalScrollView> found=new java.util.ArrayList<>();
+            findHorizontal(target,found);
+            for(int i=0;i<Math.min(found.size(),previous.horizontal.size());i++){
+                HorizontalScrollView h=found.get(i);
+                View child=h.getChildAt(0);
+                int limit=child==null?0:Math.max(0,child.getWidth()-h.getWidth());
+                h.scrollTo(Math.min(Math.max(0,previous.horizontal.get(i)),limit),0);
+            }
+            View inner=target.getChildAt(0);
+            int limit=inner==null?0:Math.max(0,inner.getHeight()-target.getHeight());
+            target.scrollTo(0,Math.min(Math.max(0,previous.y),limit));
+        });
+    }
     private void render(){
+        rememberViewport();
+        String thisPage=viewportKey();
+        PageScroll oldScroll=scrollCache.get(thisPage);
         root=column();root.setBackground(new SkyrimBackdropDrawable());root.setFitsSystemWindows(true);
         setContentView(root);
         if(!titleOpen){
@@ -149,6 +196,9 @@ public final class MainActivity extends Activity {
         else if(tab==6)renderCodex();
         else renderSettings();
         if(!titleOpen&&game.started)renderNav();
+        SovngardeTypeface.applyTree(root);
+        renderedPage=thisPage;
+        resumeViewport(oldScroll,scroll,thisPage);
         if(animations){content.setAlpha(0.8f);content.animate().alpha(1f).setDuration(210).setInterpolator(new DecelerateInterpolator()).start();}
     }
     private void renderHeader(){
@@ -444,11 +494,11 @@ public final class MainActivity extends Activity {
         android.widget.Spinner sp=new android.widget.Spinner(this);
         android.widget.ArrayAdapter<String> adapter=new android.widget.ArrayAdapter<String>(this,android.R.layout.simple_spinner_item,options){
             @Override public View getView(int pos,View old,ViewGroup parent){
-                TextView t=(TextView)super.getView(pos,old,parent);t.setTextColor(TEXT);t.setTextSize(15);t.setPadding(dp(12),dp(6),dp(9),dp(6));return t;
+                TextView t=(TextView)super.getView(pos,old,parent);t.setTextColor(TEXT);t.setTextSize(15);t.setTypeface(SovngardeTypeface.face(MainActivity.this,false));t.setPadding(dp(12),dp(6),dp(9),dp(6));return t;
             }
             @Override public View getDropDownView(int pos,View old,ViewGroup parent){
                 TextView t=(TextView)super.getDropDownView(pos,old,parent);t.setTextColor(TEXT);
-                t.setBackgroundColor(PANEL);t.setPadding(dp(15),dp(15),dp(10),dp(15));return t;
+                t.setTypeface(SovngardeTypeface.face(MainActivity.this,false));t.setBackgroundColor(PANEL);t.setPadding(dp(15),dp(15),dp(10),dp(15));return t;
             }
         };
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -485,7 +535,7 @@ public final class MainActivity extends Activity {
         LinearLayout narrative=card();
         addText(narrative,"ᚱ  ГЛАВА  ·  "+s.kicker.toUpperCase(java.util.Locale.ROOT),11,accent(),false,13);
         TextView body=text("",18,TEXT,false);
-        body.setTypeface(Typeface.create("sans-serif",Typeface.NORMAL));
+        body.setTypeface(SovngardeTypeface.face(this,false));
         body.setText(SceneTypography.render(s.body,accent()));
         body.setLineSpacing(dp(7),1.16f);
         makeItemsClickable(body,body.getText().toString());
@@ -505,7 +555,7 @@ public final class MainActivity extends Activity {
                 game.progress.sync(game);
                 if(prefs.getBoolean("ai_enabled",false))
                     aiMemory.add(aiSession,"event","Игровое действие: "+c.title+". Текущее сообщение движка: "+game.message);
-                save();tab=0;render();scroll.scrollTo(0,0);
+                save();tab=0;render();
             });
         }
         space(content,5);
@@ -548,7 +598,7 @@ public final class MainActivity extends Activity {
         LinearLayout.LayoutParams size=new LinearLayout.LayoutParams(0,-2,1);
         size.leftMargin=dp(5);box.addView(prose,size);
         TextView name=text(c.title,17,TEXT,true);
-        name.setTypeface(Typeface.create("serif",Typeface.BOLD));
+        name.setTypeface(SovngardeTypeface.face(this,true));
         name.setLineSpacing(dp(3),1.1f);prose.addView(name);
         if(c.detail!=null&&!c.detail.isEmpty()){
             space(prose,5);
@@ -611,7 +661,7 @@ public final class MainActivity extends Activity {
             if(!aiTurnStatus.isEmpty())addText(content,aiTurnStatus,12,MUTED,false,12);
             LinearLayout frame=card();
             aiTurnText=text("",17,TEXT,false);
-            aiTurnText.setTypeface(Typeface.create("sans-serif",Typeface.NORMAL));
+            aiTurnText.setTypeface(SovngardeTypeface.face(this,false));
             aiTurnText.setLineSpacing(dp(7),1.15f);
             aiTurnText.setText(SceneTypography.render(aiTurnPreview.isEmpty()?
                     "…":aiTurnPreview,accent()));
@@ -633,7 +683,7 @@ public final class MainActivity extends Activity {
         }
         LinearLayout narrative=card();
         aiTurnText=text("",18,TEXT,false);
-        aiTurnText.setTypeface(Typeface.create("sans-serif",Typeface.NORMAL));
+        aiTurnText.setTypeface(SovngardeTypeface.face(this,false));
         aiTurnText.setLineSpacing(dp(7),1.16f);
         aiTurnText.setText(SceneTypography.render(game.aiTurn.scene,accent()));
         makeItemsClickable(aiTurnText,aiTurnText.getText().toString());
@@ -687,7 +737,7 @@ public final class MainActivity extends Activity {
         LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(0,-2,1);
         p.leftMargin=dp(4);row.addView(detail,p);
         TextView title=text(option.title,17,TEXT,true);
-        title.setTypeface(Typeface.create("serif",Typeface.BOLD));
+        title.setTypeface(SovngardeTypeface.face(this,true));
         detail.addView(title);space(detail,6);
         addText(detail,option.detail,14,MUTED,false,7);
         if(option.chance>=0){

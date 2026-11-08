@@ -4,11 +4,16 @@ import android.graphics.Typeface;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
-import android.text.style.QuoteSpan;
-import android.text.style.StyleSpan;
 import android.text.style.RelativeSizeSpan;
+import android.text.style.StyleSpan;
 
-/** Renders **bold**, *italic* and > dialogue with a visible side rule. */
+/**
+ * A dialogue is always two independent lines:
+ * **Персонаж:**
+ * **— Реплика**
+ * The quote decoration is NEVER drawn; all other narration is italic.
+ * Supports historic >**— ...** output for old saved AI stories.
+ */
 public final class SceneTypography {
     private SceneTypography(){}
 
@@ -17,8 +22,9 @@ public final class SceneTypography {
         for(int i=0;i<source.length();){
             if(source.startsWith("**",i)){
                 if(bold<0)bold=out.length();
-                else {
-                    if(out.length()>bold)out.setSpan(new StyleSpan(Typeface.BOLD),bold,out.length(),Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                else{
+                    if(out.length()>bold)
+                        out.setSpan(new StyleSpan(Typeface.BOLD),bold,out.length(),Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
                     bold=-1;
                 }
                 i+=2;continue;
@@ -26,52 +32,62 @@ public final class SceneTypography {
             if(source.charAt(i)=='*'){
                 if(italic<0)italic=out.length();
                 else{
-                    if(out.length()>italic)out.setSpan(new StyleSpan(Typeface.ITALIC),italic,out.length(),Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    if(out.length()>italic)
+                        out.setSpan(new StyleSpan(Typeface.ITALIC),italic,out.length(),Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
                     italic=-1;
                 }
                 i++;continue;
             }
             out.append(source.charAt(i++));
         }
-        if(bold>=0&&out.length()>bold)out.setSpan(new StyleSpan(Typeface.BOLD),bold,out.length(),Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-        if(italic>=0&&out.length()>italic)out.setSpan(new StyleSpan(Typeface.ITALIC),italic,out.length(),Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        if(bold>=0&&out.length()>bold)
+            out.setSpan(new StyleSpan(Typeface.BOLD),bold,out.length(),Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        if(italic>=0&&out.length()>italic)
+            out.setSpan(new StyleSpan(Typeface.ITALIC),italic,out.length(),Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+    }
+
+    private static String normalize(String raw){
+        String text=raw.replace("\r\n","\n").replace('\r','\n');
+        // The provider sometimes produces "смотришь. Стражник:" in a prose line.
+        // Move a marked (or a clearly unmarked) speaker to its own paragraph.
+        text=text.replaceAll("([.!?…])\\h+(\\*\\*[А-ЯЁ][^:\\n]{1,55}:\\*\\*)","$1\n\n$2");
+        text=text.replaceAll("([.!?…])\\h+([А-ЯЁ][а-яА-ЯЁё \\-]{1,48}:)(?=\\h*(?:\\n|\\*\\*|[—-]))","$1\n\n$2");
+        // Keep the speaker and the dash even when the AI streams both on one line.
+        text=text.replaceAll("(\\*\\*[^\\n:]{1,55}:\\*\\*)\\h*(?=(?:\\*\\*)?[—-])","$1\n");
+        text=text.replaceAll("(:)\\h+(?=(?:\\*\\*)?[—-]\\h)","$1\n");
+        return text;
     }
 
     public static SpannableStringBuilder render(String raw,int accent){
         SpannableStringBuilder result=new SpannableStringBuilder();
         if(raw==null||raw.isEmpty())return result;
-        String[] lines=raw.split("\n",-1);
-        java.util.ArrayList<int[]> quoteRanges=new java.util.ArrayList<>();
+        String[] lines=normalize(raw).split("\n",-1);
         for(int i=0;i<lines.length;i++){
-            String line=lines[i];
-            boolean spoken=line.startsWith(">");
-            if(spoken)line=line.substring(1).trim();
-            String visibleForSpeaker=line.replace("**","").trim();
-            boolean speaker=!spoken&&visibleForSpeaker.endsWith(":")
-                &&visibleForSpeaker.length()>1&&visibleForSpeaker.length()<64
-                &&visibleForSpeaker.indexOf('.')<0;
+            String line=lines[i].trim();
+            boolean quoted=line.startsWith(">");
+            if(quoted)line=line.substring(1).trim(); // Old saves, no QuoteSpan.
+            String plain=line.replace("**","").trim();
+            boolean spoken=quoted||plain.startsWith("— ")||plain.startsWith("- ");
+            boolean speaker=!spoken&&plain.endsWith(":")&&plain.length()>1
+                &&plain.length()<62&&plain.indexOf('.')<0;
             int start=result.length();
             appendRich(result,line);
             int end=result.length();
             if(i<lines.length-1)result.append("\n");
-            if(spoken&&end>start){
-                // QuoteSpan is a PARAGRAPH span: its end is inclusive while it is
-                // at the SpannableStringBuilder's current end. Register it only
-                // once all later prose has been appended, or the gold stripe
-                // incorrectly expands through subsequent ordinary paragraphs.
-                quoteRanges.add(new int[]{start,result.length()});
-                result.setSpan(new ForegroundColorSpan(0xffeeeae5),start,end,Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-            }else if(speaker&&end>start){
+            if(end<=start)continue;
+            if(spoken){
                 result.setSpan(new StyleSpan(Typeface.BOLD),start,end,Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-                result.setSpan(new ForegroundColorSpan(0xffeeeae5),start,end,Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-                result.setSpan(new RelativeSizeSpan(0.96f),start,end,Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                result.setSpan(new ForegroundColorSpan(0xfff0f0ef),start,end,Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            }else if(speaker){
+                result.setSpan(new StyleSpan(Typeface.BOLD),start,end,Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                result.setSpan(new ForegroundColorSpan(accent),start,end,Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                result.setSpan(new RelativeSizeSpan(1.03f),start,end,Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            }else{
+                // The authorial narrative always has italic styling, even if
+                // AI omitted Markdown or this is a previously saved story.
+                result.setSpan(new StyleSpan(Typeface.ITALIC),start,end,Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
             }
         }
-        // The completed text already contains the exact line boundaries.
-        // SPAN_PARAGRAPH now applies only to the spoken line, even with
-        // multiline narration following it, including AI streaming fragments.
-        for(int[] range:quoteRanges)
-            result.setSpan(new QuoteSpan(accent),range[0],range[1],Spanned.SPAN_PARAGRAPH);
         return result;
     }
 }

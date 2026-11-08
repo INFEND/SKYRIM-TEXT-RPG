@@ -69,6 +69,7 @@ public final class LocationGalleryView extends LinearLayout {
         t.setText(value);t.setTextColor(color);
         t.setTextSize(TypedValue.COMPLEX_UNIT_SP,sp);
         t.setGravity(Gravity.CENTER_VERTICAL);t.setIncludeFontPadding(false);
+        t.setTypeface(SovngardeTypeface.face(getContext(),false));
         return t;
     }
     private GradientDrawable panel(int color,float corners,int outline){
@@ -105,7 +106,7 @@ public final class LocationGalleryView extends LinearLayout {
         header.setPadding(dp(5),dp(2),dp(5),dp(10));
         addView(header,new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,dp(31)));
         TextView heading=text("ᛟ  "+location.toUpperCase(new Locale("ru")),12,accent);
-        heading.setTypeface(android.graphics.Typeface.create("serif",android.graphics.Typeface.BOLD));
+        heading.setTypeface(SovngardeTypeface.face(context,true));
         header.addView(heading,new LayoutParams(0,ViewGroup.LayoutParams.WRAP_CONTENT,1));
         page=text("",12,0xffddd4c4);
         header.addView(page,new LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,dp(24)));

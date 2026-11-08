@@ -45,7 +45,7 @@ public final class RuneDialogBuilder extends AlertDialog.Builder {
                 View titleView=dialog.findViewById(titleId);
                 if(titleView instanceof TextView){
                     TextView title=(TextView)titleView;
-                    title.setTypeface(Typeface.SERIF,Typeface.NORMAL);
+                    title.setTypeface(SovngardeTypeface.face(context,true));
                     title.setTextColor(0xfff1f2f0);
                     title.setTextSize(22);
                     title.setLineSpacing(dp(2),1.04f);
@@ -53,7 +53,7 @@ public final class RuneDialogBuilder extends AlertDialog.Builder {
             }
             TextView message=dialog.findViewById(android.R.id.message);
             if(message!=null){
-                message.setTypeface(Typeface.SERIF,Typeface.NORMAL);
+                message.setTypeface(SovngardeTypeface.face(context,false));
                 message.setTextColor(0xffbec5c7);
                 message.setTextSize(16);
                 message.setLineSpacing(dp(4),1.08f);
@@ -61,6 +61,7 @@ public final class RuneDialogBuilder extends AlertDialog.Builder {
             styleButton(dialog.getButton(DialogInterface.BUTTON_POSITIVE),true);
             styleButton(dialog.getButton(DialogInterface.BUTTON_NEGATIVE),false);
             styleButton(dialog.getButton(DialogInterface.BUTTON_NEUTRAL),false);
+            if(window!=null)SovngardeTypeface.applyTree(window.getDecorView());
         });
         return dialog;
     }
@@ -68,7 +69,7 @@ public final class RuneDialogBuilder extends AlertDialog.Builder {
     private void styleButton(Button button,boolean primary){
         if(button==null)return;
         button.setAllCaps(false);
-        button.setTypeface(Typeface.SERIF,Typeface.NORMAL);
+        button.setTypeface(SovngardeTypeface.face(context,false));
         button.setTextSize(15);
         button.setTextColor(primary?accent:0xffc4cbcd);
         button.setBackground(new RuneFrameDrawable(primary?0xff202426:0xff0b0f11,
