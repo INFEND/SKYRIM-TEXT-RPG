@@ -43,7 +43,7 @@ public final class GameEngine {
 
     public boolean started;
     public String name = "Странник", race = "Норд", heroClass = "Воин";
-    public int region = 0, day = 1, level = 1, xp = 0, maxHp = 100, hp = 100;
+    public int region = 0, day = 1, hour = 8, level = 1, xp = 0, maxHp = 100, hp = 100;
     public int maxStamina = 65, stamina = 65, maxMagicka = 40, magicka = 40;
     public int gold = 85, potions = 3, manaPotions = 1, attack = 12, armor = 2;
     public int questStage = 0, sideQuest = 0, sideKills = 0, boardCompleted = 0, explored = 0, victories = 0, reputation = 0;
@@ -64,7 +64,7 @@ public final class GameEngine {
         if(name.length()>28)name=name.substring(0,28);
         race=contains(RACES,desiredRace)?desiredRace:"Норд";
         heroClass=contains(CLASSES,desiredClass)?desiredClass:"Без класса";
-        started=true;aiTurn=null;aiJournal="";day=1;level=1;xp=0;gold=85;potions=3;manaPotions=1;
+        started=true;aiTurn=null;aiJournal="";day=1;hour=8;level=1;xp=0;gold=85;potions=3;manaPotions=1;
         questStage=0;sideQuest=0;sideKills=0;boardCompleted=0;explored=0;victories=0;reputation=0;
         swordUpgraded=false;armorUpgraded=false;
         maxHp=100;maxStamina=100;maxMagicka=100;attack=12;armor=2;
@@ -421,6 +421,20 @@ public final class GameEngine {
         xp+=amount;
         while(xp>=level*80 && level<100){xp-=level*80;level++;maxHp+=10;maxStamina+=10;maxMagicka+=10;progress.perkPoints++;hp=maxHp;stamina=maxStamina;magicka=maxMagicka;}
     }
+    /** Time-limited rest available outside combat, tracked in the old save schema. */
+    public boolean waitHours(int hours){
+        if(!started||"COMBAT".equals(mode)||hours<1||hours>24)return false;
+        int total=hour+hours;
+        day+=total/24;hour=total%24;
+        hp=Math.min(maxHp,hp+hours*3);
+        stamina=Math.min(maxStamina,stamina+hours*7);
+        magicka=Math.min(maxMagicka,magicka+hours*6);
+        message="Отдых длился "+hours+" ч. Наступил день "+day+", "+
+            String.format(java.util.Locale.ROOT,"%02d:00",hour)+".";
+        progress.recent=message;
+        progress.sync(this);
+        return true;
+    }
     public boolean drinkHealing() {if(!started||potions<=0||hp>=maxHp)return false;potions--;hp=Math.min(maxHp,hp+45);return true;}
     public boolean drinkMana() {if(!started||manaPotions<=0||magicka>=maxMagicka)return false;manaPotions--;magicka=Math.min(maxMagicka,magicka+35);return true;}
     public String questStatus() {switch(questStage){case 0:return "не начато";case 1:return "Фолкрит";case 2:return "Винтерхолд";case 3:return "Солитьюд";default:return "завершено";}}
@@ -429,7 +443,7 @@ public final class GameEngine {
     public JSONObject toJson() throws JSONException {
         JSONObject j=new JSONObject();
         j.put("schema",1).put("started",started).put("name",name).put("race",race).put("heroClass",heroClass)
-         .put("region",region).put("day",day).put("level",level).put("xp",xp).put("maxHp",maxHp).put("hp",hp)
+         .put("region",region).put("day",day).put("hour",hour).put("level",level).put("xp",xp).put("maxHp",maxHp).put("hp",hp)
          .put("maxStamina",maxStamina).put("stamina",stamina).put("maxMagicka",maxMagicka).put("magicka",magicka)
          .put("gold",gold).put("potions",potions).put("manaPotions",manaPotions).put("attack",attack).put("armor",armor)
          .put("questStage",questStage).put("sideQuest",sideQuest).put("sideKills",sideKills).put("boardCompleted",boardCompleted).put("explored",explored)
@@ -449,7 +463,7 @@ public final class GameEngine {
             g.started=j.optBoolean("started",false);g.name=j.optString("name",g.name);
             g.race=j.optString("race",g.race);g.heroClass=j.optString("heroClass",g.heroClass);
             g.region=Math.max(0,Math.min(REGIONS.length-1,j.optInt("region",0)));
-            g.day=Math.max(1,j.optInt("day",1));g.level=Math.max(1,j.optInt("level",1));g.xp=Math.max(0,j.optInt("xp",0));
+            g.day=Math.max(1,j.optInt("day",1));g.hour=Math.max(0,Math.min(23,j.optInt("hour",8)));g.level=Math.max(1,j.optInt("level",1));g.xp=Math.max(0,j.optInt("xp",0));
             g.maxHp=Math.max(1,j.optInt("maxHp",100));g.hp=Math.max(0,Math.min(g.maxHp,j.optInt("hp",100)));
             g.maxStamina=Math.max(1,j.optInt("maxStamina",65));g.stamina=Math.max(0,Math.min(g.maxStamina,j.optInt("stamina",65)));
             g.maxMagicka=Math.max(1,j.optInt("maxMagicka",40));g.magicka=Math.max(0,Math.min(g.maxMagicka,j.optInt("magicka",40)));

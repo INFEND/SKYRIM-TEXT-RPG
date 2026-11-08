@@ -149,7 +149,10 @@ public final class AiGameTurn {
         int st=cap((long)g.stamina+change(e,"staminaDelta",500),0,maxSt);
         int mg=cap((long)g.magicka+change(e,"magickaDelta",500),0,maxMg);
         int gold=cap((long)g.gold+change(e,"goldDelta",5000),0,10000000);
-        int day=cap((long)g.day+change(e,"dayDelta",30),1,1000000);
+        int addHours=change(e,"hourDelta",24);
+        int totalHours=g.hour+addHours;
+        int nextHour=Math.floorMod(totalHours,24);
+        int day=cap((long)g.day+change(e,"dayDelta",30)+Math.floorDiv(totalHours,24),1,1000000);
         int rep=cap((long)g.reputation+change(e,"reputationDelta",30),-100,100);
         int attack=cap((long)g.attack+change(e,"attackDelta",15),1,5000);
         int armor=cap((long)g.armor+change(e,"armorDelta",15),0,5000);
@@ -216,7 +219,7 @@ public final class AiGameTurn {
             g.battleKind=health>0?"AI":"";
         }
         g.maxHp=maxHp;g.hp=hp;g.maxStamina=maxSt;g.stamina=st;g.maxMagicka=maxMg;g.magicka=mg;
-        g.gold=gold;g.day=day;g.reputation=rep;g.attack=attack;g.armor=armor;g.potions=pots;g.manaPotions=manaPots;
+        g.gold=gold;g.day=day;g.hour=nextHour;g.reputation=rep;g.attack=attack;g.armor=armor;g.potions=pots;g.manaPotions=manaPots;
         if(place!=null){g.region=place.region;g.progress.location=place.name;}
         if(xp>0)g.addXp(xp);
         g.questStage=Math.min(4,g.questStage+q);

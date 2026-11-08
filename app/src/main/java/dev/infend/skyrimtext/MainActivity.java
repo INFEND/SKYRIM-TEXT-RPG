@@ -159,9 +159,13 @@ public final class MainActivity extends Activity {
         addText(label,"ᛟ  ТЕКСТОВАЯ RPG",10,MUTED,false,0);
         if(game.started){
             LinearLayout state=column();state.setGravity(Gravity.END);
-            addText(state,"ДЕНЬ "+game.day,11,TEXT,true,2);
+            addText(state,"ДЕНЬ "+game.day+"  ·  "+String.format(java.util.Locale.ROOT,"%02d:00",game.hour),11,TEXT,true,2);
             addText(state,"УРОВЕНЬ "+game.level,10,MUTED,false,0);
             header.addView(state,lp(-2,-2));
+            if(!prefs.getBoolean("ai_enabled",false)){
+                state.setContentDescription("Ожидать и изменить игровое время");
+                state.setOnClickListener(v->showWaitDialog());
+            }
         }
         root.addView(new SkyrimRuleView(this,accent()),lp(-1,15));
     }
@@ -1214,6 +1218,44 @@ public final class MainActivity extends Activity {
         new RuneDialogBuilder(this,accent()).setTitle(file.replace(".txt","")).setView(scroll)
             .setNegativeButton("Закрыть",null).show();
     }
+    private void showWaitDialog(){
+        if(!game.started||prefs.getBoolean("ai_enabled",false)){
+            toast("В режиме ИИ временем управляет ИИ-мастер");return;
+        }
+        if("COMBAT".equals(game.mode)){toast("Во время боя ожидать нельзя");return;}
+        LinearLayout panel=column();panel.setPadding(dp(16),dp(10),dp(16),dp(8));
+        TextView header=text("ОЖИДАТЬ СКОЛЬКО ЧАСОВ?",20,TEXT,true);
+        header.setGravity(Gravity.CENTER);panel.addView(header,lp(-1,-2));
+        panel.addView(new SkyrimRuleView(this,accent()),lp(-1,27));
+        TextView amount=text("1",34,accent(),true);
+        amount.setGravity(Gravity.CENTER);panel.addView(amount,lp(-1,54));
+        android.widget.SeekBar slider=new android.widget.SeekBar(this);
+        slider.setMax(23);slider.setProgress(0);
+        slider.setProgressTintList(ColorStateList.valueOf(accent()));
+        slider.setThumbTintList(ColorStateList.valueOf(accent()));
+        panel.addView(slider,lp(-1,58));
+        TextView clock=text("",14,MUTED,false);clock.setGravity(Gravity.CENTER);
+        panel.addView(clock,lp(-1,54));
+        java.util.function.IntConsumer update=h->{
+            int total=game.hour+h;
+            amount.setText(h+" Ч");
+            clock.setText("ДЕНЬ "+(game.day+total/24)+"   ·   "+
+                String.format(java.util.Locale.ROOT,"%02d:00",total%24));
+        };
+        update.accept(1);
+        slider.setOnSeekBarChangeListener(new android.widget.SeekBar.OnSeekBarChangeListener(){
+            @Override public void onProgressChanged(android.widget.SeekBar b,int progress,boolean user){
+                update.accept(progress+1);
+            }
+            @Override public void onStartTrackingTouch(android.widget.SeekBar b){}
+            @Override public void onStopTrackingTouch(android.widget.SeekBar b){}
+        });
+        new RuneDialogBuilder(this,accent()).setTitle("ОЖИДАНИЕ")
+            .setView(panel).setNegativeButton("Отмена",null)
+            .setPositiveButton("Ждать",(dialog,which)->{
+                if(game.waitHours(slider.getProgress()+1)){save();render();}
+            }).show();
+    }
     private void heroEntry(LinearLayout p,String label,String value){
         LinearLayout r=row();p.addView(r,lp(-1,39));
         r.addView(text(label,14,MUTED,false),new LinearLayout.LayoutParams(0,-2,1));
@@ -1223,6 +1265,8 @@ public final class MainActivity extends Activity {
         skyrimTopTabs(3);
         section("ЛИЧНОЕ ДЕЛО",""+game.name,game.race+" • "+game.heroClass+" • уровень "+game.level);
         content.addView(new NordicArtView(this,NordicArtView.STORY),lp(-1,125));space(content,12);
+        if(!prefs.getBoolean("ai_enabled",false))
+            actionButton("Ожидать","Выбрать от 1 до 24 часов отдыха",false,this::showWaitDialog);
         LinearLayout c=card();addText(c,"ХАРАКТЕРИСТИКИ",11,accent(),true,9);
         heroEntry(c,"Опыт",game.xp+" / "+(game.level*80));
         heroEntry(c,"Атака",String.valueOf(game.attack));heroEntry(c,"Защита",String.valueOf(game.armor));

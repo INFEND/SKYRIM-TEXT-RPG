@@ -55,7 +55,7 @@ final class AiStoryClient {
             "Для безопасных гарантированных действий chance=null и skill=''. Для рискованных честно оцени 0..100%. "+
             "Не дублируй список вариантов в сцене: игра покажет их отдельными десятью кнопками, а затем поле своего ответа игрока. "+
             "customChance: только для предыдущего свободного ответа игрока, целое 0..100 либо null (если не было проверки). "+
-            "effects: JSON-объект только с изменениями ПОСЛЕ предыдущего выбора: hpDelta,maxHpDelta,staminaDelta,maxStaminaDelta,magickaDelta,maxMagickaDelta,goldDelta,xpDelta,dayDelta,reputationDelta,attackDelta,armorDelta,potionsDelta,manaPotionsDelta,questStageDelta,dragonStageDelta. "+
+            "effects: JSON-объект только с изменениями ПОСЛЕ предыдущего выбора: hourDelta, hpDelta,maxHpDelta,staminaDelta,maxStaminaDelta,magickaDelta,maxMagickaDelta,goldDelta,xpDelta,dayDelta,reputationDelta,attackDelta,armorDelta,potionsDelta,manaPotionsDelta,questStageDelta,dragonStageDelta. "+
             "Поля inventory:[{name,delta}] только с точными названиями существующих предметов. location только точное имя из предоставленного атласа. "+
             "enemy:{name,hp,maxHp,damage}, если в сцене появился или исчез противник; hp=0 для исчезновения. "+
             "skills:[{index,xp}], quest:string, questStatus:ACTIVE|COMPLETED|FAILED. journal: краткая запись нового события. "+
@@ -321,7 +321,8 @@ final class AiStoryClient {
         out.append("Герой: ").append(game.name).append("; ").append(game.race).append("; класс ")
                 .append(game.heroClass).append("; уровень ").append(game.level).append("; опыт ").append(game.xp).append('\n');
         out.append("Локация: ").append(game.progress.location).append("; регион ").append(GameEngine.REGIONS[game.region])
-                .append("; день ").append(game.day).append('\n');
+                .append("; день ").append(game.day).append("; время ")
+                .append(String.format(java.util.Locale.ROOT,"%02d:00",game.hour)).append('\n');
         out.append("Здоровье ").append(game.hp).append('/').append(game.maxHp)
                 .append(", выносливость ").append(game.stamina).append('/').append(game.maxStamina)
                 .append(", магия ").append(game.magicka).append('/').append(game.maxMagicka)
