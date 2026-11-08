@@ -465,6 +465,23 @@ public final class MainActivity extends Activity {
                 dialog.dismiss();render();
             }).setNegativeButton("Закрыть",null).show();
     }
+    private String selectedReasoningEffort(){
+        return AiReasoningEffort.normalize(prefs.getString("ai_reasoning_effort",AiReasoningEffort.DEFAULT));
+    }
+    private void aiReasoningEffortDialog(){
+        String[] choices=AiReasoningEffort.LABELS;
+        int selected=AiReasoningEffort.position(selectedReasoningEffort());
+        new RuneDialogBuilder(this,accent()).setTitle("Уровень размышления ИИ")
+            .setSingleChoiceItems(choices,selected,(dialog,which)->{
+                String effort=AiReasoningEffort.VALUES[which];
+                prefs.edit().putString("ai_reasoning_effort",effort).apply();
+                if(aiClient!=null)aiClient.cancel();
+                awaitingAiToken=false;
+                dialog.dismiss();
+                render();
+            })
+            .setNegativeButton("Закрыть",null).show();
+    }
     private void apiModelDialog(){
         int current=AiModelCatalog.position(prefs.getString("ai_api_model",AiModelCatalog.DEFAULT_API));
         new RuneDialogBuilder(this,accent()).setTitle("Модель OpenAI API")
@@ -547,8 +564,9 @@ public final class MainActivity extends Activity {
         panel.addView(prompt,lp(-1,-2));
         space(panel,9);
         String selectedModel=prefs.getString(chatgpt?"ai_chatgpt_model":"ai_api_model",chatgpt?"":AiModelCatalog.DEFAULT_API);
-        TextView status=text(chatgpt?"ChatGPT · "+(selectedModel.isEmpty()?"выбери модель в настройках":selectedModel):
-                "OpenAI API · "+AiModelCatalog.label(selectedModel)+" · отдельная оплата",11,MUTED,false);
+        TextView status=text((chatgpt?"ChatGPT · "+(selectedModel.isEmpty()?"выбери модель в настройках":selectedModel):
+                "OpenAI API · "+AiModelCatalog.label(selectedModel)+" · отдельная оплата")
+                +"\nРазмышление: "+AiReasoningEffort.label(selectedReasoningEffort()),11,MUTED,false);
         panel.addView(status);
         space(panel,8);
         TextView send=text("СОЗДАТЬ ПРОДОЛЖЕНИЕ",14,accent(),true);
@@ -568,6 +586,7 @@ public final class MainActivity extends Activity {
             if(request.isEmpty()){toast("Напиши действие или реплику");return;}
             if(request.length()>800){toast("Максимум 800 символов");return;}
             String history=aiMemory.context(aiSession);
+            String reasoningEffort=selectedReasoningEffort();
             if(chatgpt&&selectedModel.isEmpty()){
                 status.setText("Сначала выбери модель ChatGPT в настройках.");return;
             }
@@ -597,7 +616,7 @@ public final class MainActivity extends Activity {
                     awaitingAiToken=false;
                     if(error!=null){status.setText(error);send.setText("ПОВТОРИТЬ");return;}
                     status.setText("ChatGPT создаёт сцену…");
-                    boolean started=aiClient.generate(token,selectedModel,true,game,history,request,responseListener);
+                    boolean started=aiClient.generate(token,selectedModel,true,reasoningEffort,game,history,request,responseListener);
                     if(!started){status.setText("Предыдущий запрос ещё завершается");send.setText("СОЗДАТЬ ПРОДОЛЖЕНИЕ");}
                 });
             }else{
@@ -605,7 +624,7 @@ public final class MainActivity extends Activity {
                 try{key=AiKeyVault.read(this);}
                 catch(Exception ex){status.setText("Не удалось прочитать ключ API");send.setText("ПОВТОРИТЬ");return;}
                 if(key.isEmpty()){status.setText("API-ключ не настроен");send.setText("ПОВТОРИТЬ");return;}
-                boolean started=aiClient.generate(key,selectedModel,false,game,history,request,responseListener);
+                boolean started=aiClient.generate(key,selectedModel,false,reasoningEffort,game,history,request,responseListener);
                 if(!started){status.setText("Предыдущий запрос ещё завершается");send.setText("СОЗДАТЬ ПРОДОЛЖЕНИЕ");}
             }
         });
@@ -1054,6 +1073,9 @@ public final class MainActivity extends Activity {
         }
         actionButton("Модель OpenAI API",AiModelCatalog.label(prefs.getString("ai_api_model",AiModelCatalog.DEFAULT_API)),
             false,this::apiModelDialog);
+        actionButton("Уровень размышления",AiReasoningEffort.label(selectedReasoningEffort())+
+            " · используется для ChatGPT и API",false,this::aiReasoningEffortDialog);
+        addText(content,"Чем глубже размышление, тем дольше может формироваться ответ. При использовании API возможно увеличение расходов. Поддержка уровня зависит от модели.",12,MUTED,false,11);
         actionButton("Ввести / заменить OpenAI API-ключ",AiKeyVault.configured(this)?"Ключ уже сохранён (зашифрован)":"Ключ не настроен",false,this::aiKeyDialog);
         if(AiKeyVault.configured(this))actionButton("Удалить сохранённый API-ключ","Не затрагивает игру и историю",false,()->{
             new RuneDialogBuilder(this,accent()).setTitle("Удалить ключ API?")

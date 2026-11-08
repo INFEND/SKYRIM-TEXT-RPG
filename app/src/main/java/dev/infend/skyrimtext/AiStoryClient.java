@@ -48,9 +48,10 @@ final class AiStoryClient {
     boolean isRunning() { return running; }
 
     /** Must be called on UI thread; takes an immutable snapshot before networking. */
-    boolean generate(String token, String model, boolean chatGptPlan, GameEngine game, String history, String playerText, Listener listener) {
+    boolean generate(String token, String model, boolean chatGptPlan, String effort, GameEngine game, String history, String playerText, Listener listener) {
         if (running || token == null || token.isEmpty() || model == null || !model.matches("[a-zA-Z0-9._-]{2,100}")) return false;
         final String input = context(game, history, playerText);
+        final String selectedEffort = AiReasoningEffort.normalize(effort);
         final int id = ++sequence;
         cancelled = false;
         running = true;
@@ -69,12 +70,17 @@ final class AiStoryClient {
                 payload.put("input", inputMessages);
                 payload.put("stream", true);
                 payload.put("store", false);
-                if(!chatGptPlan)payload.put("max_output_tokens",2200);
+                // In auto mode use the model's default. Explicit effort changes
+                // the model's reasoning budget, not just an instruction in prose.
+                if(!AiReasoningEffort.isAutomatic(selectedEffort))
+                    payload.put("reasoning",new JSONObject().put("effort",selectedEffort));
+                if(!chatGptPlan)
+                    payload.put("max_output_tokens",AiReasoningEffort.apiOutputLimit(selectedEffort));
                 HttpURLConnection conn = (HttpURLConnection) new URL(ENDPOINT).openConnection();
                 connection = conn;
                 conn.setRequestMethod("POST");
                 conn.setConnectTimeout(16000);
-                conn.setReadTimeout(90000);
+                conn.setReadTimeout(AiReasoningEffort.networkReadTimeoutMs(selectedEffort));
                 conn.setRequestProperty("Authorization", "Bearer " + token);
                 conn.setRequestProperty("Content-Type", "application/json; charset=utf-8");
                 conn.setRequestProperty("Accept", "text/event-stream");
