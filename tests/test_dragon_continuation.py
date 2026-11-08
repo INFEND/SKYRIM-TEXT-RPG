@@ -37,6 +37,18 @@ class DragonContinuationContracts(unittest.TestCase):
         self.assertIn('DRAGON_NEXT:[0123]:[357]',progress)
         self.assertIn('DRAGON_NEXT:[0123]:(?:[1-9]|10)',progress)
 
+    def test_epilogue_reflects_saved_outcomes_without_fake_weather(self):
+        c=source("DragonContinuation.java")
+        self.assertIn("private static String epilogue(GameEngine g)",c)
+        self.assertIn("boolean route=proved(g,3,1)&&proved(g,3,3)",c)
+        self.assertIn("boolean runes=proved(g,3,5)&&proved(g,3,7)",c)
+        self.assertIn("boolean sheltered=proved(g,3,2)&&proved(g,3,6)&&proved(g,3,10)",c)
+        self.assertIn("if(failedChapters(g)>0)",c)
+        self.assertIn("return text.toString();",c)
+        self.assertIn("epilogue(g)",c)
+        self.assertIn("Продолжение похода внутрь курганов пока недоступно",c)
+        self.assertNotIn("Расследования в Ривервуде, Вайтране и Виндхельме завершены. \"+questSummary",c)
+
     def test_chapter_quest_ledger_transitions(self):
         c=source("DragonContinuation.java")
         self.assertIn('g.progress.setQuestOutcome(questId(stage),"ACTIVE")',c)
