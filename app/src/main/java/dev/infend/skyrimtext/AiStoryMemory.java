@@ -27,36 +27,48 @@ final class AiStoryMemory extends SQLiteOpenHelper {
         // Future schema migrations must be non-destructive.
     }
 
+    // Preserve complete long-form AI scenes rather than cutting them at 6000 characters.
+    private static final int STORED_TURN_LIMIT=32000;
     synchronized void add(String session, String role, String body) {
         if (session == null || session.isEmpty() || body == null || body.trim().isEmpty()) return;
         if (!("user".equals(role) || "master".equals(role) || "event".equals(role))) return;
         ContentValues values = new ContentValues();
         values.put("session", session);
         values.put("role", role);
-        values.put("body", body.substring(0, Math.min(6000, body.length())));
+        values.put("body", body.substring(0, Math.min(STORED_TURN_LIMIT, body.length())));
         values.put("created", System.currentTimeMillis());
         getWritableDatabase().insertOrThrow("turns", null, values);
     }
 
-    /** All turns remain in SQLite; only a bounded context is sent to the provider. */
+    /** Latest events have priority. Earlier long passages cannot evict the newest turn. */
     synchronized String context(String session) {
-        List<String> entries = new ArrayList<>();
-        try (Cursor c = getReadableDatabase().query("turns", new String[]{"role","body"},
-                "session=?", new String[]{session}, null, null, "id DESC", "22")) {
-            while (c.moveToNext()) {
-                String role = c.getString(0);
-                String text = c.getString(1);
-                if (text.length() > 1100) text = text.substring(0, 1100);
-                entries.add(("user".equals(role) ? "Игрок: " :
-                        "event".equals(role) ? "Факт движка: " : "Рассказчик: ") + text);
+        List<String> newest=new ArrayList<>();
+        final int limit=18000;
+        int used=0;
+        try (Cursor c=getReadableDatabase().query("turns",new String[]{"role","body"},
+                "session=?",new String[]{session},null,null,"id DESC","26")) {
+            while(c.moveToNext()) {
+                String role=c.getString(0);
+                String body=c.getString(1);
+                if(body==null)continue;
+                int max="master".equals(role)?3200:900;
+                if(body.length()>max){
+                    // Keep the scene's opening and its latest dramatic outcome.
+                    int prefix="master".equals(role)?500:0;
+                    body=prefix>0?body.substring(0,prefix)+"\n…\n"+
+                            body.substring(body.length()-(max-prefix-3)):
+                            body.substring(body.length()-max);
+                }
+                String line=("user".equals(role)?"Игрок: ":
+                        "event".equals(role)?"Факт движка: ":"Рассказчик: ")+body;
+                if(used+line.length()+1>limit)break;
+                newest.add(line);
+                used+=line.length()+1;
             }
         }
-        Collections.reverse(entries);
-        StringBuilder output = new StringBuilder();
-        for (String line : entries) {
-            if (output.length() + line.length() > 11500) break;
-            output.append(line).append('\n');
-        }
+        Collections.reverse(newest);
+        StringBuilder output=new StringBuilder();
+        for(String line:newest)output.append(line).append('\n');
         return output.toString();
     }
 
@@ -101,7 +113,7 @@ final class AiStoryMemory extends SQLiteOpenHelper {
                 v.put("session", session);
                 v.put("role", role);
                 String body = row.optString("body", "");
-                v.put("body", body.substring(0, Math.min(body.length(), 6000)));
+                v.put("body", body.substring(0, Math.min(body.length(), STORED_TURN_LIMIT)));
                 v.put("created", System.currentTimeMillis());
                 db.insert("turns", null, v);
             }

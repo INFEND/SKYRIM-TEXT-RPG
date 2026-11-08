@@ -548,8 +548,8 @@ public final class MainActivity extends Activity {
             return;
         }
         String previous=aiMemory.latestAnswer(aiSession);
-        TextView reply=text(previous.isEmpty()?"ИИ помнит историю беседы. Опиши действие или заговори с персонажем.":previous,15,TEXT,false);
-        reply.setLineSpacing(dp(4),1.10f);
+        TextView reply=text(previous.isEmpty()?"ИИ помнит историю беседы. Опиши действие или заговори с персонажем.":previous,17,TEXT,false);
+        reply.setLineSpacing(dp(6),1.16f);
         reply.setText(SceneTypography.render(previous.isEmpty()?
             "ИИ помнит историю беседы. Опиши действие или заговори с персонажем.":previous,accent()));
         panel.addView(reply);
