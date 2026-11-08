@@ -41,6 +41,7 @@ public final class SceneTypography {
         SpannableStringBuilder result=new SpannableStringBuilder();
         if(raw==null||raw.isEmpty())return result;
         String[] lines=raw.split("\n",-1);
+        java.util.ArrayList<int[]> quoteRanges=new java.util.ArrayList<>();
         for(int i=0;i<lines.length;i++){
             String line=lines[i];
             boolean spoken=line.startsWith(">");
@@ -54,7 +55,11 @@ public final class SceneTypography {
             int end=result.length();
             if(i<lines.length-1)result.append("\n");
             if(spoken&&end>start){
-                result.setSpan(new QuoteSpan(accent),start,result.length(),Spanned.SPAN_PARAGRAPH);
+                // QuoteSpan is a PARAGRAPH span: its end is inclusive while it is
+                // at the SpannableStringBuilder's current end. Register it only
+                // once all later prose has been appended, or the gold stripe
+                // incorrectly expands through subsequent ordinary paragraphs.
+                quoteRanges.add(new int[]{start,result.length()});
                 result.setSpan(new ForegroundColorSpan(0xffeeeae5),start,end,Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
             }else if(speaker&&end>start){
                 result.setSpan(new StyleSpan(Typeface.BOLD),start,end,Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
@@ -62,6 +67,11 @@ public final class SceneTypography {
                 result.setSpan(new RelativeSizeSpan(0.96f),start,end,Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
             }
         }
+        // The completed text already contains the exact line boundaries.
+        // SPAN_PARAGRAPH now applies only to the spoken line, even with
+        // multiline narration following it, including AI streaming fragments.
+        for(int[] range:quoteRanges)
+            result.setSpan(new QuoteSpan(accent),range[0],range[1],Spanned.SPAN_PARAGRAPH);
         return result;
     }
 }
