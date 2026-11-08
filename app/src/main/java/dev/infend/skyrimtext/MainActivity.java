@@ -53,6 +53,9 @@ public final class MainActivity extends Activity {
     private AiStoryMemory aiMemory;
     private AiStoryClient aiClient;
     private String aiSession;
+    private boolean aiTurnBusy;
+    private String aiTurnPreview="",aiTurnStatus="";
+    private TextView aiTurnText;
 
 
     @Override public void onCreate(Bundle bundle){
@@ -118,7 +121,7 @@ public final class MainActivity extends Activity {
     private void render(){
         root=column();root.setBackgroundColor(BG);root.setFitsSystemWindows(true);
         setContentView(root);
-        if(!titleOpen){renderHeader();if(game.started)renderBars();}
+        if(!titleOpen){renderHeader();if(game.started && !(tab==0&&prefs.getBoolean("ai_enabled",false)))renderBars();}
         scroll=new ScrollView(this);scroll.setFillViewport(false);scroll.setClipToPadding(false);
         scroll.setVerticalScrollBarEnabled(false);
         root.addView(scroll,new LinearLayout.LayoutParams(-1,0,1));
@@ -343,6 +346,7 @@ public final class MainActivity extends Activity {
         }
     }
     private void renderStory(){
+        if(prefs.getBoolean("ai_enabled",false)){renderAiGame();return;}
         GameEngine.Scene s=game.scene();section(s.kicker,s.title,"");
         renderStorySnapshot();
         if(LocationGalleryView.hasGallery(game.progress.location)){
@@ -442,6 +446,183 @@ public final class MainActivity extends Activity {
         LinearLayout.LayoutParams dividerParams=lp(-1,1);
         dividerParams.topMargin=dp(3);dividerParams.bottomMargin=dp(5);
         content.addView(divider,dividerParams);
+    }
+
+
+    /** AI mode replaces the entire offline story, not just its dialogue panel. */
+    private void renderAiGame(){
+        boolean chat=usingChatGpt();
+        boolean ready=chat?chatGptOAuth.hasAuthorizedPlan():AiKeyVault.configured(this);
+        aiTurnText=null;
+        if(!ready){
+            LinearLayout card=card();
+            addText(card,"ИИ-ИГРА НЕ ПОДКЛЮЧЕНА",14,accent(),true,11);
+            addText(card,"Подключи выбранный источник в настройках. Обычный текст игры скрыт, поскольку выбран режим ИИ.",14,TEXT,false,13);
+            actionButton("НАСТРОИТЬ ИИ","Вход ChatGPT или ключ OpenAI API",true,()->{tab=5;render();});
+            return;
+        }
+        if(aiTurnBusy) {
+            addText(content,"ᛟ  ИИ СОЗДАЁТ ПРОДОЛЖЕНИЕ",12,accent(),true,10);
+            if(!aiTurnStatus.isEmpty())addText(content,aiTurnStatus,12,MUTED,false,12);
+            LinearLayout frame=card();
+            aiTurnText=text("",17,TEXT,false);
+            aiTurnText.setTypeface(Typeface.create("sans-serif",Typeface.NORMAL));
+            aiTurnText.setLineSpacing(dp(7),1.15f);
+            aiTurnText.setText(SceneTypography.render(aiTurnPreview.isEmpty()?
+                    "…":aiTurnPreview,accent()));
+            frame.addView(aiTurnText,lp(-1,-2));
+            actionButton("ОСТАНОВИТЬ ГЕНЕРАЦИЮ","Текущая сцена и характеристики останутся прежними",false,()->{
+                if(aiClient!=null)aiClient.cancel();
+                awaitingAiToken=false;aiTurnBusy=false;aiTurnPreview="";
+                aiTurnStatus="Генерация остановлена, изменения не сохранены";
+                render();
+            });
+            return;
+        }
+        if(!aiTurnStatus.isEmpty())addText(content,aiTurnStatus,12,MUTED,false,11);
+        if(game.aiTurn==null){
+            addText(content,"ИИ-Мастер создаст первую сцену из истории твоего героя. Затем появятся десять вариантов действий и поле собственного ответа.",15,TEXT,false,15);
+            actionButton("НАЧАТЬ ИИ-ПРИКЛЮЧЕНИЕ","Сгенерировать первую сцену и десять решений",true,()->
+                requestAiTurn("Начни историю моего героя в текущем месте. Это первый ход: не меняй параметры, предоставь ten choices.",false));
+            return;
+        }
+        LinearLayout narrative=card();
+        aiTurnText=text("",18,TEXT,false);
+        aiTurnText.setTypeface(Typeface.create("sans-serif",Typeface.NORMAL));
+        aiTurnText.setLineSpacing(dp(7),1.16f);
+        aiTurnText.setText(SceneTypography.render(game.aiTurn.scene,accent()));
+        makeItemsClickable(aiTurnText,aiTurnText.getText().toString());
+        narrative.addView(aiTurnText,lp(-1,-2));
+        space(content,16);
+        for(int i=0;i<game.aiTurn.choices.size();i++){
+            final AiGameTurn.Option option=game.aiTurn.choices.get(i);
+            renderAiChoice(i+1,option);
+        }
+        // The user's own response is always below choice number 10.
+        space(content,12);
+        addText(content,"СВОЙ ВАРИАНТ ОТВЕТА",12,accent(),true,11);
+        EditText own=new EditText(this);
+        own.setTextColor(TEXT);own.setHintTextColor(MUTED);own.setTextSize(sp(16));
+        own.setHint("Опиши, что говоришь или делаешь...");
+        own.setInputType(InputType.TYPE_CLASS_TEXT|InputType.TYPE_TEXT_FLAG_MULTI_LINE|InputType.TYPE_TEXT_FLAG_CAP_SENTENCES);
+        own.setMinLines(3);own.setMaxLines(7);
+        own.setPadding(dp(13),dp(11),dp(13),dp(11));
+        own.setBackground(new RuneFrameDrawable(PANEL_2,BORDER,false));
+        content.addView(own,lp(-1,-2));
+        space(content,10);
+        actionButton("ОТПРАВИТЬ СВОЙ ОТВЕТ","ИИ определит вероятность и последствия этого действия",true,()->{
+            String value=own.getText().toString().trim();
+            if(value.isEmpty()){toast("Напиши свой ответ");return;}
+            if(value.length()>1500){toast("Не более 1500 символов");return;}
+            int roll=AiGameTurn.roll();
+            requestAiTurn("СВОБОДНОЕ ДЕЙСТВИЕ ИГРОКА: "+value+
+                "\nБросок для этого действия (1–100): "+roll+
+                ". Сам определи customChance, сравни с этим броском и опиши успех/неудачу. Верни реальные effects.",true);
+        });
+    }
+
+    private void renderAiChoice(int number,AiGameTurn.Option option){
+        LinearLayout row=column();
+        row.setPadding(dp(15),dp(13),dp(15),dp(13));
+        row.setBackground(new RuneFrameDrawable(PANEL,number==1?accent():BORDER,false));
+        addText(row,number+".  "+option.title,17,TEXT,true,7);
+        addText(row,option.detail,14,TEXT,false,7);
+        if(option.chance>=0){
+            if(!option.skill.isEmpty())addText(row,"Навык: "+option.skill,12,MUTED,false,4);
+            addText(row,"Шанс успеха: "+option.chance+"%",14,SceneChoiceMeta.chanceColor(option.chance),true,0);
+        }else{
+            addText(row,"Без проверки вероятности",12,MUTED,false,0);
+        }
+        row.setClickable(true);row.setFocusable(true);
+        row.setOnClickListener(v->{
+            int die=AiGameTurn.roll();
+            boolean success=AiGameTurn.success(option.chance,die);
+            String result=option.chance<0?"Действие без проверки навыка.":
+                "Вероятность, заданная ИИ: "+option.chance+"%. Реальный бросок: "+die+
+                ". Результат: "+(success?"УСПЕХ":"НЕУДАЧА")+".";
+            requestAiTurn("Игрок нажал вариант "+number+": "+option.title+
+                ". Описание: "+option.detail+". "+result+
+                " Продолжи именно этот исход и верни effects за совершённое действие.",true);
+        });
+        content.addView(row,lp(-1,-2));
+        space(content,7);
+    }
+
+    /**
+     * All effects are committed only after a completed and parsed model response.
+     * On interruption the previous scene, dice and inventory remain unchanged.
+     */
+    private void requestAiTurn(String instruction,boolean actionResolved){
+        if(aiTurnBusy||aiClient.isRunning()||!game.started)return;
+        final boolean chat=usingChatGpt();
+        final String model=prefs.getString(chat?"ai_chatgpt_model":"ai_api_model",
+                chat?"":AiModelCatalog.DEFAULT_API);
+        if(model.isEmpty()){aiTurnStatus="Сначала выбери модель в настройках";render();return;}
+        final String effort=selectedReasoningEffort(),history=aiMemory.context(aiSession);
+        final String saved;
+        try{saved=game.toJson().toString();}
+        catch(Exception ex){aiTurnStatus="Не удалось прочитать состояние героя";render();return;}
+        aiTurnBusy=true;aiTurnPreview="";
+        aiTurnStatus=chat?"Подключение к ChatGPT…":"Создание игровой сцены…";
+        render();
+        final AiStoryClient.Listener listener=new AiStoryClient.Listener(){
+            @Override public void onText(String accumulated){
+                if(!aiTurnBusy)return;
+                String visible=AiGameTurn.previewScene(accumulated);
+                if(visible.isEmpty()||visible.equals(aiTurnPreview))return;
+                aiTurnPreview=visible;
+                if(tab==0&&aiTurnText!=null&&prefs.getBoolean("ai_enabled",false)){
+                    aiTurnText.setText(SceneTypography.render(visible,accent()));
+                }
+            }
+            @Override public void onComplete(String answer){
+                if(!aiTurnBusy)return;
+                try{
+                    // Never overwrite a save changed during the network request.
+                    if(!game.toJson().toString().equals(saved))
+                        throw new IllegalStateException("Состояние героя изменилось во время генерации");
+                    AiGameTurn completed=AiGameTurn.parse(answer);
+                    GameEngine next=GameEngine.fromJson(saved);
+                    completed.apply(next,actionResolved);
+                    next.aiTurn=completed;
+                    game=next;
+                    save();
+                    aiMemory.add(aiSession,"user",instruction);
+                    aiMemory.add(aiSession,"master",completed.scene);
+                    if(!completed.journal.isEmpty())aiMemory.add(aiSession,"event",completed.journal);
+                    aiTurnStatus="";
+                }catch(Exception ex){
+                    aiTurnStatus="ИИ-сцена не принята: "+ex.getMessage()+". Повтори выбор, сохранение не изменилось.";
+                }
+                aiTurnBusy=false;aiTurnPreview="";
+                if(tab==0)render();
+            }
+            @Override public void onError(String error){
+                if(!aiTurnBusy)return;
+                aiTurnBusy=false;aiTurnPreview="";
+                aiTurnStatus="Ошибка генерации: "+error+". Сохранение не изменено.";
+                if(tab==0)render();
+            }
+        };
+        if(chat){
+            awaitingAiToken=true;
+            chatGptOAuth.getToken((token,error)->{
+                if(!awaitingAiToken||!aiTurnBusy)return;
+                awaitingAiToken=false;
+                if(error!=null){aiTurnBusy=false;aiTurnStatus=error;render();return;}
+                if(!aiClient.generateTurn(token,model,true,effort,game,history,instruction,listener)){
+                    aiTurnBusy=false;aiTurnStatus="Предыдущая генерация ещё завершается";render();
+                }
+            });
+        }else{
+            final String key;
+            try{key=AiKeyVault.read(this);}
+            catch(Exception e){aiTurnBusy=false;aiTurnStatus="API-ключ недоступен";render();return;}
+            if(key==null||key.isEmpty()){aiTurnBusy=false;aiTurnStatus="Не настроен API-ключ";render();return;}
+            if(!aiClient.generateTurn(key,model,false,effort,game,history,instruction,listener)){
+                aiTurnBusy=false;aiTurnStatus="Предыдущая генерация ещё завершается";render();
+            }
+        }
     }
 
     /** Story-only AI assistant: real game rules and quest transitions stay in GameEngine. */
@@ -1048,13 +1229,13 @@ public final class MainActivity extends Activity {
         addText(aiCard,"ИСТОЧНИК МОДЕЛИ И РАЗМЫШЛЕНИЯ",11,accent(),true,8);
         addText(aiCard,"Подключение ChatGPT расходует доступные лимиты «Работа / Codex», НЕ лимиты обычного «Чата». Список моделей запрашивается из твоего аккаунта, но модель и уровень размышления задаются отдельно в этой игре. Через API действует своя оплата. Локальная модель пока не подключена.",12,MUTED,false,10);
         Switch aiToggle=new Switch(this);
-        aiToggle.setText("Разрешить ИИ-повествование");
+        aiToggle.setText("ИИ управляет всей игрой, сценами и вариантами");
         aiToggle.setTextSize(sp(14));aiToggle.setTextColor(TEXT);
         aiToggle.setThumbTintList(ColorStateList.valueOf(accent()));
         aiToggle.setChecked(prefs.getBoolean("ai_enabled",false));
         aiToggle.setOnCheckedChangeListener((v,on)->{
             prefs.edit().putBoolean("ai_enabled",on).apply();
-            if(!on && aiClient!=null)aiClient.cancel();
+            if(!on && aiClient!=null){aiClient.cancel();aiTurnBusy=false;awaitingAiToken=false;}
         });
         aiCard.addView(aiToggle,lp(-1,48));
         addText(aiCard,"В «Авто» приоритет у разрешённой подписки ChatGPT (Работа/Codex), затем у настроенного API. При исчерпании лимита ChatGPT скрытого перехода на платный API нет. Обычный «Чат» и его личные настройки не считываются.",12,MUTED,false,0);
