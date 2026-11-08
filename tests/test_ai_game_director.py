@@ -67,6 +67,14 @@ class AiGameDirectorContracts(unittest.TestCase):
         self.assertIn("g.progress.skillExperience(g,",bridge)
         self.assertIn("g.aiJournal=quest+",bridge)
 
+    def test_json_recovery_is_string_aware_and_never_splices_objects(self):
+        bridge=code("AiGameTurn.java")
+        self.assertIn("extractObject(response)",bridge)
+        self.assertIn("boolean quoted=false,escaped=false",bridge)
+        self.assertIn('candidate.has("scene")&&candidate.has("choices")',bridge)
+        self.assertIn("response.substring(start,i+1)",bridge)
+        self.assertNotIn("response.substring(start,end+1)",bridge)
+
     def test_story_stream_is_not_a_json_dump(self):
         client=code("AiStoryClient.java")
         ui=code("MainActivity.java")
