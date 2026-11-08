@@ -138,6 +138,18 @@ public final class AiGameTurn {
         if(v!=Math.rint(v)||Math.abs(v)>limit)throw new JSONException("Недопустимое изменение "+name);
         return (int)v;
     }
+    private static int requiredEnemyInt(JSONObject enemy,String key,int min,int max)throws JSONException{
+        if(!enemy.has(key)) {
+            if("hp".equals(key))throw new JSONException("Не указано здоровье противника");
+            return "damage".equals(key)?1:min;
+        }
+        Object raw=enemy.opt(key);
+        if(!(raw instanceof Number))throw new JSONException("Неверный параметр противника: "+key);
+        double value=((Number)raw).doubleValue();
+        if(!Double.isFinite(value)||value!=Math.rint(value)||value<min||value>max)
+            throw new JSONException("Параметр противника вне диапазона: "+key);
+        return (int)value;
+    }
     private static int cap(long x,int min,int max){return (int)Math.max(min,Math.min(max,x));}
     public void apply(GameEngine g,boolean acted)throws JSONException{
         if(!acted||effects==null)return;
@@ -164,6 +176,8 @@ public final class AiGameTurn {
         WorldAtlas.Place place=loc.isEmpty()?null:WorldAtlas.find(loc);
         if(!loc.isEmpty()&&place==null)throw new JSONException("Неизвестная локация: "+loc);
         java.util.LinkedHashMap<String,Integer> inventoryChanges=new java.util.LinkedHashMap<>();
+        if(e.has("inventory") && !e.isNull("inventory") && !(e.opt("inventory") instanceof JSONArray))
+            throw new JSONException("Инвентарь должен быть массивом");
         JSONArray inv=e.optJSONArray("inventory");
         if(inv!=null){
             if(inv.length()>16)throw new JSONException("Слишком много предметов");
@@ -183,11 +197,13 @@ public final class AiGameTurn {
                 if(amount<0||amount>9999)throw new JSONException("Неверное количество "+name);
                 weight+=changes.get(name)*ItemCatalog.find(name).weight;
             }
-            if(weight>50.0001)throw new JSONException("Рюкзак превышает 50 кг");
+            if(weight>50.0001 || weight < -0.0001)throw new JSONException("Недопустимый вес рюкзака");
             inventoryChanges.putAll(changes);
         }
         int q=change(e,"questStageDelta",1),d=change(e,"dragonStageDelta",1);
         if(q<0||d<0)throw new JSONException("Сюжетный этап нельзя откатывать");
+        if(e.has("skills") && !e.isNull("skills") && !(e.opt("skills") instanceof JSONArray))
+            throw new JSONException("Навыки должны быть массивом");
         JSONArray skills=e.optJSONArray("skills");
         if(skills!=null){
             if(skills.length()>18)throw new JSONException("Слишком много изменений навыков");
@@ -202,11 +218,17 @@ public final class AiGameTurn {
         String questStatus=e.optString("questStatus","ACTIVE");
         if(!quest.isEmpty()&&!("ACTIVE".equals(questStatus)||"COMPLETED".equals(questStatus)||"FAILED".equals(questStatus)))
             throw new JSONException("Неизвестный статус квеста");
+        if(e.has("enemy") && !e.isNull("enemy") && !(e.opt("enemy") instanceof JSONObject))
+            throw new JSONException("Противник должен быть объектом");
         JSONObject enemy=e.optJSONObject("enemy");
         if(enemy!=null){
             String name=limited(enemy.optString("name",""),70);
-            int health=cap(enemy.optInt("hp",0),0,50000);
+            int health=requiredEnemyInt(enemy,"hp",0,50000);
             if(health>0&&name.isEmpty())throw new JSONException("Противник без имени");
+            if(health>0){
+                requiredEnemyInt(enemy,"maxHp",health,50000);
+                requiredEnemyInt(enemy,"damage",0,1000);
+            }
         }
         // Commit only after all model-controlled fields have passed validation.
         for(String name:inventoryChanges.keySet())
@@ -214,8 +236,8 @@ public final class AiGameTurn {
         if(enemy!=null){
             int health=cap(enemy.optInt("hp",0),0,50000);
             g.enemyName=health>0?limited(enemy.optString("name",""),70):"";g.enemyHp=health;
-            g.enemyMaxHp=health>0?cap(enemy.optInt("maxHp",health),health,50000):0;
-            g.enemyDamage=health>0?cap(enemy.optInt("damage",1),0,1000):0;
+            g.enemyMaxHp=health>0?requiredEnemyInt(enemy,"maxHp",health,50000):0;
+            g.enemyDamage=health>0?requiredEnemyInt(enemy,"damage",0,1000):0;
             g.battleKind=health>0?"AI":"";
         }
         g.maxHp=maxHp;g.hp=hp;g.maxStamina=maxSt;g.stamina=st;g.maxMagicka=maxMg;g.magicka=mg;
