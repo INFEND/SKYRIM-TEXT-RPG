@@ -45,6 +45,17 @@ class NarrativeContracts(unittest.TestCase):
         self.assertNotIn("В лунном свете чернила",prose)
         self.assertNotIn("мокрый снег, а вокруг",prose)
 
+    def test_dragon_arc_has_six_independent_contextual_scenes(self):
+        prose=read("SceneNarrative.java")
+        self.assertIn("DRAGON_SCENES",prose)
+        self.assertIn("g.progress.dragonStage",prose)
+        self.assertIn("dialogue(part[2],part[3])",prose)
+        self.assertIn('+"\\n\\n"+s.body+',prose)
+        for landmark in ("Хелгена", "Ривервуду", "Драконьем Пределе",
+                         "западной башни", "Айварстеде", "Высокого Хротгара"):
+            self.assertIn(landmark,prose)
+        self.assertNotIn('dialogue("Пожилой путник"',prose)
+
     def test_ai_adopts_same_longform_format_without_changing_game_rules(self):
         client=read("AiStoryClient.java")
         ui=read("MainActivity.java")
