@@ -48,10 +48,21 @@ public final class MainActivity extends Activity {
     private boolean animations=true, titleOpen=true;
     private int codexCategory=0;
     private SkyrimOtaController updater;
+    private AiStoryMemory aiMemory;
+    private AiStoryClient aiClient;
+    private String aiSession;
+
 
     @Override public void onCreate(Bundle bundle){
         super.onCreate(bundle);
         prefs=getSharedPreferences(PREFS,MODE_PRIVATE);
+        aiSession=prefs.getString("ai_session","");
+        if(aiSession.isEmpty()){
+            aiSession=java.util.UUID.randomUUID().toString();
+            prefs.edit().putString("ai_session",aiSession).apply();
+        }
+        aiMemory=new AiStoryMemory(this);
+        aiClient=new AiStoryClient();
         ItemCatalog.initialize(this);
         game=GameEngine.fromJson(prefs.getString("save",null));
         accentIndex=Math.max(0,Math.min(ACCENTS.length-1,prefs.getInt("accent",0)));
@@ -71,6 +82,16 @@ public final class MainActivity extends Activity {
         }
     }}
     @Override protected void onPause(){save();super.onPause();}
+    @Override protected void onDestroy(){
+        if(aiClient!=null)aiClient.shutdown();
+        if(aiMemory!=null)aiMemory.close();
+        super.onDestroy();
+    }
+    private void newAiSession(){
+        if(aiClient!=null)aiClient.cancel();
+        aiSession=java.util.UUID.randomUUID().toString();
+        prefs.edit().putString("ai_session",aiSession).apply();
+    }
     private void save(){try{prefs.edit().putString("save",game.toJson().toString()).apply();}catch(Exception ignored){}}
     private int dp(float dp){return (int)(dp*getResources().getDisplayMetrics().density+0.5f);}
     private int sp(int size){return Math.max(10,size+fontBonus);}
@@ -281,7 +302,7 @@ public final class MainActivity extends Activity {
         actionButton("НАЧАТЬ ПУТЕШЕСТВИЕ","Игра с сохранением, выбором судьбы и последствиями решений",true,()->{
             int n=initialPoints[0]+initialPoints[1]+initialPoints[2];
             if(n!=5){toast("Распредели все 5 свободных очков");return;}
-            game.start(nameField.getText().toString(),selectedRace,selectedClass,selectedStart,initialPoints);
+            newAiSession();game.start(nameField.getText().toString(),selectedRace,selectedClass,selectedStart,initialPoints);
             tab=0;save();render();
         });
         addText(content,"Неофициальная самостоятельная история в знакомом северном мире.",12,MUTED,false,0);
@@ -329,21 +350,116 @@ public final class MainActivity extends Activity {
         LinearLayout narrative=card();
         addText(narrative,"ᚱ  ГЛАВА  ·  "+s.kicker.toUpperCase(java.util.Locale.ROOT),11,accent(),false,13);
         TextView body=text(s.body,18,TEXT,false);body.setLineSpacing(dp(6),1.12f);makeItemsClickable(body,s.body);narrative.addView(body);
+        if(prefs.getBoolean("ai_enabled",false)) renderAiStoryPanel();
         space(content,8);addText(content,"ВЫБЕРИ ДЕЙСТВИЕ",11,MUTED,true,13);
         for(GameEngine.Choice c:s.choices){
             int chance=game.progress.chance(game,c.action);
             String caption=c.detail+(chance<0?"":"\n[Шанс успеха: "+chance+"%]");
             actionButton(c.title,caption,c.special,()->{
+                if(aiClient!=null)aiClient.cancel();
                 int old=game.questStage;
                 game.choose(c.action);
                 if(!c.action.startsWith("ACT:"))game.progress.observe(game,c.action,old);
                 game.progress.sync(game);
+                if(prefs.getBoolean("ai_enabled",false))
+                    aiMemory.add(aiSession,"event","Игровое действие: "+c.title+". Текущее сообщение движка: "+game.message);
                 save();tab=0;render();scroll.scrollTo(0,0);
             });
         }
         space(content,5);
         addText(content,"Каждое действие сохраняется автоматически",11,MUTED,false,0);
     }
+
+    /** Story-only AI assistant: real game rules and quest transitions stay in GameEngine. */
+    private void renderAiStoryPanel(){
+        LinearLayout panel=card();
+        addText(panel,"ᚱ  ИИ-МАСТЕР · АВТО",11,accent(),true,8);
+        addText(panel,"Свободный диалог и повествование. Инвентарь, бой, награды и перемещения изменяются только игровыми действиями.",12,MUTED,false,12);
+        if(!AiKeyVault.configured(this)){
+            addText(panel,"Для облачного ИИ добавь собственный OpenAI API-ключ в настройках. Без ключа работает обычная офлайн-RPG.",13,TEXT,false,8);
+            TextView setup=text("НАСТРОИТЬ ИИ",14,accent(),true);
+            setup.setPadding(dp(10),dp(12),dp(10),dp(12));
+            setup.setBackground(new RuneFrameDrawable(PANEL_2,accent(),false));
+            panel.addView(setup);setup.setOnClickListener(v->{tab=5;render();});
+            return;
+        }
+        String previous=aiMemory.latestAnswer(aiSession);
+        TextView reply=text(previous.isEmpty()?"ИИ помнит историю беседы. Опиши действие или заговори с персонажем.":previous,15,TEXT,false);
+        reply.setLineSpacing(dp(4),1.10f);
+        panel.addView(reply);
+        space(panel,9);
+        EditText prompt=new EditText(this);
+        prompt.setTextColor(TEXT);prompt.setHintTextColor(MUTED);
+        prompt.setHint("Что ты хочешь сказать или сделать?");
+        prompt.setTextSize(sp(14));
+        prompt.setMinLines(2);prompt.setMaxLines(4);
+        prompt.setInputType(InputType.TYPE_CLASS_TEXT|InputType.TYPE_TEXT_FLAG_MULTI_LINE|InputType.TYPE_TEXT_FLAG_CAP_SENTENCES);
+        prompt.setBackground(new RuneFrameDrawable(PANEL_2,BORDER,false));
+        prompt.setPadding(dp(12),dp(10),dp(12),dp(10));
+        panel.addView(prompt,lp(-1,-2));
+        space(panel,9);
+        TextView status=text("Облачный ИИ · GPT-6.1 Terra · запросы могут тарифицироваться",11,MUTED,false);
+        panel.addView(status);
+        space(panel,8);
+        TextView send=text("СОЗДАТЬ ПРОДОЛЖЕНИЕ",14,accent(),true);
+        send.setGravity(Gravity.CENTER);
+        send.setPadding(dp(8),dp(13),dp(8),dp(13));
+        send.setBackground(new RuneFrameDrawable(PANEL_2,accent(),false));
+        panel.addView(send);
+        send.setOnClickListener(v->{
+            if(aiClient.isRunning()){
+                aiClient.cancel();
+                status.setText("Генерация остановлена. Игровой прогресс не изменён.");
+                send.setText("СОЗДАТЬ ПРОДОЛЖЕНИЕ");
+                return;
+            }
+            final String request=prompt.getText().toString().trim();
+            if(request.isEmpty()){toast("Напиши действие или реплику");return;}
+            if(request.length()>800){toast("Максимум 800 символов");return;}
+            final String key;
+            try{key=AiKeyVault.read(this);}
+            catch(Exception ex){status.setText("Не удалось прочитать ключ. Введи его снова в настройках.");return;}
+            if(key.isEmpty()){status.setText("API-ключ не настроен");return;}
+            String history=aiMemory.context(aiSession);
+            status.setText("ИИ создаёт сцену…");
+            reply.setText("");
+            send.setText("ОСТАНОВИТЬ");
+            boolean started=aiClient.generate(key,game,history,request,new AiStoryClient.Listener(){
+                @Override public void onText(String accumulated){reply.setText(accumulated);}
+                @Override public void onComplete(String answer){
+                    aiMemory.add(aiSession,"user",request);
+                    aiMemory.add(aiSession,"master",answer);
+                    status.setText("Ответ сохранён в памяти приключения");
+                    prompt.setText("");
+                    send.setText("СОЗДАТЬ ПРОДОЛЖЕНИЕ");
+                }
+                @Override public void onError(String error){
+                    status.setText(error+". Игровой прогресс не изменён.");
+                    send.setText("ПОВТОРИТЬ");
+                }
+            });
+            if(!started){send.setText("СОЗДАТЬ ПРОДОЛЖЕНИЕ");status.setText("Предыдущий запрос ещё завершается");}
+        });
+    }
+
+    private void aiKeyDialog(){
+        EditText value=new EditText(this);
+        value.setSingleLine(true);
+        value.setTextColor(TEXT);value.setHintTextColor(MUTED);
+        value.setHint("sk-...");
+        value.setInputType(InputType.TYPE_CLASS_TEXT|InputType.TYPE_TEXT_VARIATION_PASSWORD);
+        new RuneDialogBuilder(this,accent()).setTitle("OpenAI API-ключ")
+            .setMessage("Нужен отдельный API-ключ с доступным балансом. Подписка ChatGPT не заменяет API. Ключ шифруется в Android Keystore. Для публичных приложений безопаснее собственный сервер.")
+            .setView(value).setNegativeButton("Отмена",null)
+            .setPositiveButton("Сохранить",(d,w)->{
+                try{
+                    AiKeyVault.save(this,value.getText().toString());
+                    toast("Ключ сохранён в защищённом хранилище");
+                    render();
+                }catch(Exception e){toast("Не удалось сохранить ключ");}
+            }).show();
+    }
+
     private void makeItemsClickable(TextView view,String source){
         android.text.SpannableString span=new android.text.SpannableString(source);
         java.util.ArrayList<ItemCatalog.Item> list=ItemCatalog.all();
@@ -735,6 +851,29 @@ public final class MainActivity extends Activity {
         sw.setChecked(animations);sw.setThumbTintList(ColorStateList.valueOf(accent()));
         sw.setOnCheckedChangeListener((b,checked)->{animations=checked;prefs.edit().putBoolean("animations",checked).apply();});
         readability.addView(sw,lp(-1,47));
+        space(content,6);addText(content,"ИИ-ПРИКЛЮЧЕНИЕ",11,accent(),true,11);
+        LinearLayout aiCard=card();
+        addText(aiCard,"АВТОМАТИЧЕСКИЙ РЕЖИМ",11,accent(),true,8);
+        addText(aiCard,"При наличии собственного API-ключа доступен облачный ИИ-мастер. Без ключа остаётся стандартная офлайн-игра. Локальная нейросеть и вход через ChatGPT пока не реализованы.",12,MUTED,false,10);
+        Switch aiToggle=new Switch(this);
+        aiToggle.setText("Разрешить ИИ-повествование");
+        aiToggle.setTextSize(sp(14));aiToggle.setTextColor(TEXT);
+        aiToggle.setThumbTintList(ColorStateList.valueOf(accent()));
+        aiToggle.setChecked(prefs.getBoolean("ai_enabled",false));
+        aiToggle.setOnCheckedChangeListener((v,on)->{
+            prefs.edit().putBoolean("ai_enabled",on).apply();
+            if(!on && aiClient!=null)aiClient.cancel();
+        });
+        aiCard.addView(aiToggle,lp(-1,48));
+        addText(aiCard,"История переписки сохраняется в SQLite отдельно для каждого нового персонажа. Облачные запросы могут оплачиваться отдельно.",12,MUTED,false,0);
+        actionButton("Ввести / заменить OpenAI API-ключ",AiKeyVault.configured(this)?"Ключ уже сохранён (зашифрован)":"Ключ не настроен",false,this::aiKeyDialog);
+        if(AiKeyVault.configured(this))actionButton("Удалить сохранённый API-ключ","Не затрагивает игру и историю",false,()->{
+            new RuneDialogBuilder(this,accent()).setTitle("Удалить ключ API?")
+                .setNegativeButton("Отмена",null).setPositiveButton("Удалить",(d,w)->{
+                    if(aiClient!=null)aiClient.cancel();
+                    AiKeyVault.clear(this);render();
+                }).show();
+        });
         space(content,6);addText(content,"ОБНОВЛЕНИЯ",11,accent(),true,11);
         actionButton("Проверить обновления","Проверка подписи, история изменений и установка внутри приложения",true,()->updater.check(true));
         LinearLayout otaOptions=card();addText(otaOptions,"АВТОМАТИЧЕСКИЕ ПРОВЕРКИ",11,accent(),true,10);
@@ -785,7 +924,7 @@ public final class MainActivity extends Activity {
         addText(content,"СОХРАНЕНИЯ",11,accent(),true,11);
         actionButton("Сохранить сейчас","Данные хранятся на устройстве",false,()->{save();toast("Прогресс сохранён");});
         actionButton("Копировать сохранение","Резервная копия в буфер обмена",false,()->{
-            try{String s=game.toJson().toString();ClipboardManager cb=(ClipboardManager)getSystemService(Context.CLIPBOARD_SERVICE);
+            try{JSONObject j=game.toJson();j.put("ai_history",aiMemory.exportSession(aiSession));String s=j.toString();ClipboardManager cb=(ClipboardManager)getSystemService(Context.CLIPBOARD_SERVICE);
                 cb.setPrimaryClip(ClipData.newPlainText("SKYRIM SAVE",s));toast("Код сохранения скопирован");}catch(Exception e){toast("Не удалось экспортировать");}
         });
         actionButton("Восстановить сохранение","Вставить код из резервной копии",false,this::restoreDialog);
@@ -798,7 +937,7 @@ public final class MainActivity extends Activity {
         new RuneDialogBuilder(this,accent()).setTitle("Восстановление").setView(e).setNegativeButton("Отмена",null)
             .setPositiveButton("Загрузить",(d,w)->{
                 try{JSONObject json=new JSONObject(e.getText().toString());if(json.optInt("schema")!=1 || !json.optBoolean("started"))throw new Exception();
-                    game=GameEngine.fromJson(json.toString());tab=0;save();render();toast("Сохранение восстановлено");
+                    game=GameEngine.fromJson(json.toString());newAiSession();aiMemory.importSession(aiSession,json.optJSONArray("ai_history"));tab=0;save();render();toast("Сохранение восстановлено");
                 }catch(Exception ex){toast("Неверный код сохранения");}
             }).show();
     }
@@ -806,7 +945,7 @@ public final class MainActivity extends Activity {
         new RuneDialogBuilder(this,accent()).setTitle("Начать заново?")
             .setMessage("Текущее сохранение будет заменено. При необходимости сначала скопируй код сохранения.")
             .setNegativeButton("Отмена",null).setPositiveButton("Новая игра",(d,w)->{
-                game=new GameEngine();tab=0;draftName="";selectedStart=0;java.util.Arrays.fill(initialPoints,0);save();render();}).show();
+                newAiSession();game=new GameEngine();tab=0;draftName="";selectedStart=0;java.util.Arrays.fill(initialPoints,0);save();render();}).show();
     }
     private void renderNav(){
         View sep=new View(this);sep.setBackgroundColor(BORDER);root.addView(sep,lp(-1,1));
