@@ -7,12 +7,16 @@ import android.net.Uri;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Base64;
+import android.util.JsonReader;
+import android.util.JsonToken;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.FilterInputStream;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.math.BigInteger;
 import java.net.HttpURLConnection;
@@ -254,17 +258,9 @@ final class ChatGptOAuth {
                     conn.setConnectTimeout(12000);conn.setReadTimeout(18000);
                     try{
                         if(conn.getResponseCode()!=200)throw new IllegalStateException("Модели ChatGPT недоступны (HTTP "+conn.getResponseCode()+")");
-                        JSONObject obj=new JSONObject(read(conn.getInputStream()));
-                        JSONArray models=obj.optJSONArray("models");
-                        if(models==null)throw new IllegalStateException("Сервер не вернул каталог моделей ChatGPT");
-                        List<ModelOption> options=new ArrayList<>();
-                        for(int i=0;i<models.length() && options.size()<100;i++){
-                            JSONObject m=models.optJSONObject(i);
-                            if(m==null || !"list".equals(m.optString("visibility","")))continue;
-                            String slug=m.optString("slug","");
-                            if(!slug.matches("[a-zA-Z0-9._-]{2,100}"))continue;
-                            options.add(new ModelOption(slug,m.optString("display_name",slug)));
-                        }
+                        // The account-specific /models catalog can exceed 500 KB.
+                        // Parse it incrementally instead of materializing the whole JSON.
+                        List<ModelOption> options=readModelCatalog(conn.getInputStream());
                         ui.post(()->listener.models(options,null));
                     }finally{conn.disconnect();}
                 }catch(Exception ex){String err=safeError(ex);ui.post(()->listener.models(Collections.emptyList(),err));}
@@ -354,6 +350,85 @@ final class ChatGptOAuth {
         for(String part:list.split("\\s+"))if(scope.equals(part))return true;
         return false;
     }
+    /** Keeps memory bounded when the account-specific models catalog is large. */
+    private static List<ModelOption> readModelCatalog(InputStream input) throws Exception {
+        List<ModelOption> result=new ArrayList<>();
+        boolean modelsPresent=false;
+        try (JsonReader reader=new JsonReader(new InputStreamReader(
+                new LimitedInputStream(input,64L*1024*1024),StandardCharsets.UTF_8))) {
+            reader.beginObject();
+            while(reader.hasNext()){
+                String field=reader.nextName();
+                if(!"models".equals(field)){
+                    reader.skipValue();
+                    continue;
+                }
+                if(reader.peek()!=JsonToken.BEGIN_ARRAY){
+                    reader.skipValue();
+                    continue;
+                }
+                modelsPresent=true;
+                reader.beginArray();
+                while(reader.hasNext()){
+                    // The screen displays at most 100 authorized models.
+                    // Stop downloading the rest once we have enough valid entries.
+                    if(result.size()>=100)return result;
+                    if(reader.peek()!=JsonToken.BEGIN_OBJECT){
+                        reader.skipValue();
+                        continue;
+                    }
+                    reader.beginObject();
+                    String slug="", display="", visibility="";
+                    while(reader.hasNext()){
+                        String name=reader.nextName();
+                        if("slug".equals(name)){
+                            if(reader.peek()==JsonToken.STRING)slug=reader.nextString();
+                            else reader.skipValue();
+                        }else if("display_name".equals(name)){
+                            if(reader.peek()==JsonToken.STRING)display=reader.nextString();
+                            else reader.skipValue();
+                        }else if("visibility".equals(name)){
+                            if(reader.peek()==JsonToken.STRING)visibility=reader.nextString();
+                            else reader.skipValue();
+                        }else reader.skipValue();
+                    }
+                    reader.endObject();
+                    if(!"list".equals(visibility)||!slug.matches("[a-zA-Z0-9._-]{2,100}"))
+                        continue;
+                    if(display.isEmpty()||display.length()>150)display=slug;
+                    result.add(new ModelOption(slug,display));
+                }
+                reader.endArray();
+            }
+            reader.endObject();
+        }
+        if(!modelsPresent)throw new IOException("Сервер не вернул каталог моделей ChatGPT");
+        return result;
+    }
+
+    /** Hard network safety limit, separate from the OAuth metadata limit of 500 KB. */
+    private static final class LimitedInputStream extends FilterInputStream {
+        private final long limit;
+        private long consumed;
+        LimitedInputStream(InputStream input,long limit){super(input);this.limit=limit;}
+        @Override public int read() throws IOException {
+            int value=in.read();
+            if(value!=-1&&++consumed>limit)throw new IOException("Каталог моделей превысил 64 МБ");
+            return value;
+        }
+        @Override public int read(byte[] data,int offset,int length) throws IOException {
+            if(consumed>=limit){
+                int probe=in.read();
+                if(probe==-1)return -1;
+                throw new IOException("Каталог моделей превысил 64 МБ");
+            }
+            int allowed=(int)Math.min((long)length,limit-consumed);
+            int count=in.read(data,offset,allowed);
+            if(count>0)consumed+=count;
+            return count;
+        }
+    }
+
     private static String read(InputStream stream)throws Exception{
         if(stream==null)throw new IllegalStateException("Пустой ответ сервера");
         try(InputStream in=stream; ByteArrayOutputStream out=new ByteArrayOutputStream()){
