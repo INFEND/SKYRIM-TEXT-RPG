@@ -1,27 +1,30 @@
-"""Regression protection: spoken dialogue's side stripe must not spill into narration."""
+"""No side bars; speaker and dialogue must remain on their own lines."""
 import pathlib
 import unittest
 
 ROOT=pathlib.Path(__file__).resolve().parents[1]
-SOURCE=(ROOT/"app/src/main/java/dev/infend/skyrimtext/SceneTypography.java")
+SOURCE=ROOT/"app/src/main/java/dev/infend/skyrimtext/SceneTypography.java"
+PROSE=ROOT/"app/src/main/java/dev/infend/skyrimtext/SceneNarrative.java"
 
 class DialogueQuoteRangeTests(unittest.TestCase):
-    def test_quotation_spans_are_registered_after_text_is_complete(self):
-        content=SOURCE.read_text(encoding="utf-8")
-        method=content[content.index("public static SpannableStringBuilder render("):]
-        self.assertIn("quoteRanges.add(new int[]{start,result.length()});",method)
-        self.assertIn("for(int[] range:quoteRanges)",method)
-        self.assertIn("new QuoteSpan(accent)",method)
-        self.assertLess(method.index('if(i<lines.length-1)result.append'),method.index("for(int[] range:quoteRanges)"))
-        self.assertNotIn("result.setSpan(new QuoteSpan(accent),start,result.length()",method)
+    def test_no_quote_lines_or_paragraph_spans(self):
+        source=SOURCE.read_text(encoding="utf-8")
+        self.assertNotIn("QuoteSpan",source.split("public final class SceneTypography")[0])
+        self.assertNotIn("new QuoteSpan(",source)
+        self.assertNotIn("Spanned.SPAN_PARAGRAPH",source)
+        self.assertIn('if(quoted)line=line.substring(1).trim();',source)
+        self.assertIn('plain.startsWith("— ")',source)
+        self.assertIn("boolean speaker=!spoken",source)
 
-    def test_spoken_markup_is_only_on_quote_paragraph(self):
-        content=SOURCE.read_text(encoding="utf-8")
-        self.assertIn('boolean spoken=line.startsWith(">")',content)
-        self.assertIn('if(spoken)line=line.substring(1).trim();',content)
-        self.assertIn('Spanned.SPAN_PARAGRAPH',content)
-        self.assertIn('Spanned.SPAN_EXCLUSIVE_EXCLUSIVE',content)
-        self.assertIn('Typeface.ITALIC',content)
+    def test_dialogue_linebreak_and_italic_narration(self):
+        source=SOURCE.read_text(encoding="utf-8")
+        self.assertIn("String[] lines=normalize(raw).split",source)
+        self.assertIn('text.replaceAll("([.!?…])',source)
+        self.assertIn("new StyleSpan(Typeface.ITALIC)",source)
+        self.assertIn("new StyleSpan(Typeface.BOLD)",source)
+        self.assertIn("return result;",source)
+        prose=PROSE.read_text(encoding="utf-8")
+        self.assertIn('return "**"+person+":**\\n**— "+statement+"**";',prose)
+        self.assertNotIn('":**\\n>**— "',prose)
 
-if __name__=="__main__":
-    unittest.main()
+if __name__=="__main__":unittest.main()

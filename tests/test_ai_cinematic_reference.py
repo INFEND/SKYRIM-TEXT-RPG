@@ -12,7 +12,7 @@ class ScreenshotNarrativeContract(unittest.TestCase):
         code=java("AiStoryClient.java")
         for key in ("от второго лица","6000–14000 знаков",
                     "Меняй ритм длинных и коротких абзацев",
-                    "**Персонаж:**",">**— Его реплика**",
+                    "**Персонаж:**","**— Его реплика**",
                     "только игровым движком",
                     "пронумерованные действия игрока"):
             self.assertIn(key,code)
