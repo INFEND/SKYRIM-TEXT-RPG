@@ -36,7 +36,7 @@ class DragonArcContracts(unittest.TestCase):
         self.assertIn('new Random().nextInt(100)<check',arc)
         self.assertIn('if(action.startsWith("DRAGON:"))return DragonArc.chance(g,action);',progress)
         self.assertIn('game.progress.chance(game,c.action)',ui)
-        self.assertIn('"Шанс успеха: "+chance+"%"',ui)
+        self.assertIn('"ШАНС УСПЕХА  "+chance+"%"',ui)
         self.assertIn('SceneChoiceMeta.chanceColor(chance)',ui)
         self.assertIn('g.progress.dragonUsed.add(action);',arc)
         self.assertIn('if(g.progress.dragonUsed.contains(action))',arc)
