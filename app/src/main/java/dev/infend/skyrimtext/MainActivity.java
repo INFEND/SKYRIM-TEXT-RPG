@@ -1406,7 +1406,7 @@ public final class MainActivity extends Activity {
             actionButton("Продолжить ИИ-приключение","Вернуться к сцене ИИ",true,()->{tab=0;render();});
         }
         LinearLayout completed=card();
-        addText(completed,"ПРОЙДЕННЫЕ ИСТОРИИ",12,accent(),true,9);
+        addText(completed,"ЗАВЕРШЁННЫЕ ЗАДАНИЯ",12,accent(),true,9);
         if(game.progress.dragonStage>=DragonArc.FINAL_STAGE)
             addText(completed,"◇ Драконий след · первое испытание",14,TEXT,false,7);
         if(game.progress.dragonStage>=DragonArc.FINAL_STAGE){
@@ -1416,22 +1416,29 @@ public final class MainActivity extends Activity {
         }
         if(game.questStage==4)addText(completed,"◇ Пепельные печати",14,TEXT,false,6);
         if(game.boardCompleted>0)addText(completed,"◇ Опасные дороги · заказов: "+game.boardCompleted,14,TEXT,false,6);
-        for(String entry:game.progress.completed)
-            addText(completed,"◇ "+entry,13,MUTED,false,6);
         if(game.progress.completed.isEmpty()&&game.questStage!=4
                 &&game.progress.dragonStage<DragonArc.FINAL_STAGE&&game.boardCompleted==0)
             addText(completed,"Завершённых поручений пока нет.",14,MUTED,false,0);
         LinearLayout failures=card();
-        addText(failures,"НЕУДАЧИ И ПРОВАЛЕННЫЕ ЗАДАНИЯ",12,accent(),true,9);
+        addText(failures,"ПРОВАЛЕННЫЕ ЗАДАНИЯ",12,accent(),true,9);
         boolean any=false;
         for(java.util.Map.Entry<String,String> q:game.progress.questOutcomes.entrySet())
             if("FAILED".equals(q.getValue())){
                 addText(failures,"✕ "+q.getKey(),13,MUTED,false,6);any=true;
             }
-        for(String entry:game.progress.failed){
-            addText(failures,"✕ "+entry,13,MUTED,false,6);any=true;
-        }
-        if(!any)addText(failures,"Проваленных заданий и проверок нет.",14,MUTED,false,0);
+        if(!any)addText(failures,"Проваленных заданий нет.",14,MUTED,false,0);
+        LinearLayout successRolls=card();
+        addText(successRolls,"ИСТОРИЯ УСПЕШНЫХ ПРОВЕРОК",12,accent(),true,9);
+        if(game.progress.completed.isEmpty())
+            addText(successRolls,"Успешных проверок пока нет.",14,MUTED,false,0);
+        for(String check:game.progress.completed)
+            addText(successRolls,"◇ "+check,13,TEXT,false,6);
+        LinearLayout failedRolls=card();
+        addText(failedRolls,"ИСТОРИЯ НЕУДАЧНЫХ ПРОВЕРОК",12,accent(),true,9);
+        if(game.progress.failed.isEmpty())
+            addText(failedRolls,"Неудачных проверок пока нет.",14,MUTED,false,0);
+        for(String check:game.progress.failed)
+            addText(failedRolls,"✕ "+check,13,MUTED,false,6);
         actionButton("Вернуться к приключению","Продолжить текущую сцену",true,()->{tab=0;render();});
     }
     private void renderSettings(){
