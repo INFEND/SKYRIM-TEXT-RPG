@@ -12,15 +12,16 @@ class ChatGptRequestContract(unittest.TestCase):
         self.assertIn('payload.put("input", inputMessages)',source)
         self.assertIn('payload.put("stream", true)',source)
         self.assertIn('payload.put("store", false)',source)
-        self.assertIn('if(!chatGptPlan)payload.put("max_output_tokens",2200)',source)
+        self.assertIn('if(!chatGptPlan)',source)
+        self.assertIn('payload.put("max_output_tokens",AiReasoningEffort.apiOutputLimit(selectedEffort))',source)
         self.assertNotIn('payload.put("input", input)',source)
         self.assertIn('payload.put("instructions", RULES)',source)
         self.assertIn('formatHttpFailure(conn,status,chatGptPlan)',source)
 
     def test_right_auth_mode_and_no_invisible_payment_fallback(self):
         source=(SRC/"MainActivity.java").read_text(encoding="utf-8")
-        self.assertIn('aiClient.generate(token,selectedModel,true,game,history,request,responseListener)',source)
-        self.assertIn('aiClient.generate(key,selectedModel,false,game,history,request,responseListener)',source)
+        self.assertIn('aiClient.generate(token,selectedModel,true,reasoningEffort,game,history,request,responseListener)',source)
+        self.assertIn('aiClient.generate(key,selectedModel,false,reasoningEffort,game,history,request,responseListener)',source)
         self.assertIn('if(chatgpt)',source)
         self.assertIn('game.choose(c.action)',source)
 
