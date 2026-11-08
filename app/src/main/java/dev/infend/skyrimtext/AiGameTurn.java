@@ -44,7 +44,7 @@ public final class AiGameTurn {
                 char c=response.charAt(i);
                 if(quoted){
                     if(escaped)escaped=false;
-                    else if(c=='\\\\')escaped=true;
+                    else if(c=='\\')escaped=true;
                     else if(c=='"')quoted=false;
                 }else if(c=='"')quoted=true;
                 else if(c=='{')depth++;
