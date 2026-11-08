@@ -26,7 +26,7 @@ class AiGameDirectorContracts(unittest.TestCase):
         sub=ui[begin:ui.index("private void renderAiChoice(",begin)]
         self.assertLess(sub.index("renderAiChoice(i+1,option)"),sub.index('СВОЙ ВАРИАНТ ОТВЕТА'))
         self.assertIn('own.setHint("Опиши, что говоришь или делаешь...")',sub)
-        self.assertIn('requestAiTurn("СВОБОДНОЕ ДЕЙСТВИЕ ИГРОКА:',sub)
+        self.assertIn('requestAiTurn("ОЦЕНКА СВОБОДНОГО ДЕЙСТВИЯ (ЭТАП 1):',sub)
 
     def test_model_picks_chances_but_engine_rolls_and_commits(self):
         bridge=code("AiGameTurn.java")
@@ -84,6 +84,22 @@ class AiGameDirectorContracts(unittest.TestCase):
         self.assertLess(commit,enemy)
         self.assertIn('inventoryChanges.putAll(changes)',bridge)
         self.assertNotIn('for(String name:changes.keySet())g.progress.quantity',bridge)
+
+    def test_custom_action_is_two_phase_and_probability_is_locked(self):
+        ui=code("MainActivity.java")
+        first=ui.index('requestAiTurn("ОЦЕНКА СВОБОДНОГО ДЕЙСТВИЯ (ЭТАП 1):')
+        handler=ui.index('if(proposalOnly){',first)
+        roll=ui.index('AiGameTurn.roll()',handler)
+        second=ui.index('requestAiTurn("СВОБОДНОЕ ДЕЙСТВИЕ ИГРОКА (ЭТАП 2):',roll)
+        commit=ui.index('completed.apply(next,actionResolved)',second)
+        self.assertLess(first,handler)
+        self.assertLess(handler,roll)
+        self.assertLess(roll,second)
+        self.assertLess(second,commit)
+        self.assertIn('if(proposalOnly)return;',ui)
+        self.assertIn('completed.customChance!=expectedChance',ui)
+        self.assertIn('if(!game.toJson().toString().equals(saved))',ui)
+        self.assertIn('aiTurnBusy=false;aiTurnPreview="";',ui[handler:second])
 
     def test_story_stream_is_not_a_json_dump(self):
         client=code("AiStoryClient.java")
