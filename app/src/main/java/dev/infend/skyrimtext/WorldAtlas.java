@@ -175,7 +175,19 @@ public final class WorldAtlas {
                 boolean city=p.type.contains("Столица")||p.name.equals("Воронья Скала");
                 boolean isPlayer=p.name.equals(game.progress.location);
                 paint.setStyle(Paint.Style.FILL);paint.setColor(isPlayer?0xffecf0f1:city?GOLD:0xff9da8ac);
-                c.drawCircle(x,y,isPlayer?13:city?8:4,paint);
+                String landmark=isPlayer?"маркер игрока":
+                    city?"столицы владений":
+                    p.type.contains("Пещера")?"пещеры":
+                    p.type.contains("Руины")?"нордские руины":
+                    p.type.contains("Крепость")?"крепости":
+                    p.type.contains("Деревня")?"деревни":
+                    p.type.contains("Башня")?"башни":
+                    p.type.contains("Святилище")?"даэдрические святилища":
+                    p.type.contains("Лагерь")?"лагеря":"обнаруженные места";
+                if(!SkyrimIconAtlas.drawMarker(getContext(),c,landmark,
+                    isPlayer?0xffecf0f1:GOLD,x,y,isPlayer?31:city?22:14)){
+                    c.drawCircle(x,y,isPlayer?13:city?8:4,paint);
+                }
                 if(city||isPlayer){
                     paint.setTypeface(android.graphics.Typeface.DEFAULT_BOLD);
                     paint.setTextSize(isPlayer?24:20);
@@ -185,7 +197,8 @@ public final class WorldAtlas {
                 if(isPlayer){
                     color(0xffccd6da,2.5f);c.drawCircle(x,y,24,paint);
                     paint.setStyle(Paint.Style.FILL);paint.setTextSize(24);paint.setColor(0xffecf1f1);
-                    c.drawText("⌖",x-10,y+7,paint);
+                    SkyrimIconAtlas.drawMarker(getContext(),c,"маркер игрока",
+                        0xffecf1f1,x,y,26);
                 }
             }
             paint.setStyle(Paint.Style.FILL);paint.setColor(INK);paint.setTextSize(26);

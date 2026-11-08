@@ -94,6 +94,9 @@ public final class SkyrimIconView extends View {
     }
     @Override protected void onDraw(Canvas canvas){
         super.onDraw(canvas);
+        // New 358-label atlas, indexed by the source's real icon bounds.
+        if(SkyrimIconAtlas.draw(getContext(),canvas,glyph,tint,getWidth(),getHeight()))return;
+        // Legacy 48-icon atlas remains as a safe fallback for old/unknown keys.
         Bitmap b=load(getContext());
         if(b==null||getWidth()==0||getHeight()==0)return;
         Rect crop=bounds(b,assetIndex(glyph));

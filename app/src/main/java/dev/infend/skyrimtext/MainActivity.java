@@ -338,8 +338,9 @@ public final class MainActivity extends Activity {
         c.setBackground(new RuneFrameDrawable(PANEL,0xff929a9e,false));
         LinearLayout.LayoutParams p=lp(-1,-2);p.bottomMargin=dp(11);content.addView(c,p);return c;
     }
-    private static String iconOf(String title){
-        return SkyrimIconView.iconForLabel(title);
+    private String iconOf(String title){
+        String exact=SkyrimIconAtlas.exactLabel(this,title);
+        return exact!=null?exact:SkyrimIconView.iconForLabel(title);
     }
     private TextView actionButton(String title,String detail,boolean primary,Runnable onClick){
         LinearLayout row=row();row.setPadding(dp(12),dp(11),dp(10),dp(11));
@@ -602,6 +603,8 @@ public final class MainActivity extends Activity {
         TextView ordinal=text("◇ "+position,18,c.special?accent():MUTED,true);
         ordinal.setGravity(Gravity.TOP|Gravity.CENTER_HORIZONTAL);
         box.addView(ordinal,lp(47,-2));
+        box.addView(new SkyrimIconView(this,
+            chance>=0?SceneChoiceMeta.skill(c.action):"способности",accent()),lp(24,26));
         LinearLayout prose=column();
         LinearLayout.LayoutParams size=new LinearLayout.LayoutParams(0,-2,1);
         size.leftMargin=dp(5);box.addView(prose,size);
@@ -741,6 +744,8 @@ public final class MainActivity extends Activity {
         TextView ordinal=text("◇ "+number,17,number==1?accent():MUTED,true);
         ordinal.setGravity(Gravity.TOP|Gravity.CENTER_HORIZONTAL);
         row.addView(ordinal,lp(48,-2));
+        row.addView(new SkyrimIconView(this,
+            option.skill.isEmpty()?"способности":option.skill,accent()),lp(24,26));
         LinearLayout detail=column();
         LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(0,-2,1);
         p.leftMargin=dp(4);row.addView(detail,p);
@@ -1426,7 +1431,7 @@ public final class MainActivity extends Activity {
             final int index=i;int lvl=game.progress.skillLevel(i);
             LinearLayout skill=row();skill.setPadding(dp(12),dp(10),dp(12),dp(10));
             skill.setBackground(new RuneFrameDrawable(PANEL,BORDER,false));
-            skill.addView(new SkyrimIconView(this,"armor",accent()),lp(34,37));
+            skill.addView(new SkyrimIconView(this,RpgContent.SKILLS[i],accent()),lp(34,37));
             LinearLayout body=column();LinearLayout.LayoutParams bp=new LinearLayout.LayoutParams(0,-2,1);
             bp.leftMargin=dp(11);skill.addView(body,bp);
             addText(body,RpgContent.SKILLS[i].toUpperCase(java.util.Locale.ROOT),13,TEXT,true,4);
