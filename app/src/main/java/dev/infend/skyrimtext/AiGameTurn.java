@@ -31,11 +31,38 @@ public final class AiGameTurn {
         if(n<0||n>100||n!=Math.rint(n))throw new JSONException("Неверный шанс действия");
         return (int)n;
     }
+    /**
+     * Recover a complete JSON object from fenced or interrupted model output.
+     * Braces inside quoted narrative text do not terminate the object.
+     * Never combine two unrelated objects into one candidate.
+     */
+    private static JSONObject extractObject(String response)throws JSONException{
+        JSONException last=null;
+        for(int start=response.indexOf('{');start>=0;start=response.indexOf('{',start+1)){
+            int depth=0;boolean quoted=false,escaped=false;
+            for(int i=start;i<response.length();i++){
+                char c=response.charAt(i);
+                if(quoted){
+                    if(escaped)escaped=false;
+                    else if(c=='\\\\')escaped=true;
+                    else if(c=='"')quoted=false;
+                }else if(c=='"')quoted=true;
+                else if(c=='{')depth++;
+                else if(c=='}'&&--depth==0){
+                    try{
+                        JSONObject candidate=new JSONObject(response.substring(start,i+1));
+                        if(candidate.has("scene")&&candidate.has("choices"))return candidate;
+                    }catch(JSONException ex){last=ex;}
+                    break;
+                }
+            }
+        }
+        if(last!=null)throw last;
+        throw new JSONException("ИИ не вернул полный игровой JSON");
+    }
     public static AiGameTurn parse(String response)throws JSONException{
         if(response==null)throw new JSONException("Пустой ответ ИИ");
-        int start=response.indexOf('{'),end=response.lastIndexOf('}');
-        if(start<0||end<=start)throw new JSONException("ИИ не вернул игровой JSON");
-        JSONObject json=new JSONObject(response.substring(start,end+1));
+        JSONObject json=extractObject(response);
         String scene=limited(json.optString("scene",""),30000);
         JSONArray array=json.optJSONArray("choices");
         if(scene.length()<200)throw new JSONException("ИИ вернул слишком короткую сцену");
