@@ -78,7 +78,7 @@ class DragonContinuationContracts(unittest.TestCase):
         self.assertIn("if(seal&&dates)",c)
         self.assertIn("if(courier&&scout)",c)
         self.assertIn("!g.progress.dragonNextFailed.contains",c)
-        self.assertIn("Следующий поход к курганам пока не реализован.",c)
+        self.assertIn("Продолжение похода внутрь курганов пока недоступно.",c)
     def test_windhelm_actions_reachable_and_saveable(self):
         c=source("DragonContinuation.java")
         self.assertIn('action.matches("DRAGON_NEXT:[0123]:(?:[0-9]|10|99)")',c)
