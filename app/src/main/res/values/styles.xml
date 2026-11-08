@@ -1,22 +1,22 @@
 <resources>
     <style name="AppTheme" parent="android:style/Theme.Material.NoActionBar">
         <item name="android:fontFamily">serif</item>
-        <item name="android:colorAccent">#E1C58F</item>
+        <item name="android:colorAccent">#E1E3E3</item>
         <item name="android:alertDialogTheme">@style/RunicDialogTheme</item>
         <item name="android:windowLightStatusBar">false</item>
-        <item name="android:statusBarColor">#070B0F</item>
-        <item name="android:navigationBarColor">#070B0F</item>
+        <item name="android:statusBarColor">#06090A</item>
+        <item name="android:navigationBarColor">#06090A</item>
         <item name="android:windowLightNavigationBar">false</item>
         <item name="android:windowActionModeOverlay">true</item>
-        <item name="android:windowBackground">#070B0F</item>
+        <item name="android:windowBackground">#06090A</item>
     </style>
     <style name="RunicDialogTheme" parent="android:style/Theme.Material.Dialog.Alert">
         <item name="android:windowBackground">@drawable/dialog_panel</item>
-        <item name="android:colorAccent">#E1C58F</item>
+        <item name="android:colorAccent">#D8E0E2</item>
         <item name="android:fontFamily">serif</item>
-        <item name="android:textColorPrimary">#EDE7DA</item>
-        <item name="android:textColorSecondary">#A9AAA5</item>
-        <item name="android:colorControlActivated">#E1C58F</item>
+        <item name="android:textColorPrimary">#F0F1EF</item>
+        <item name="android:textColorSecondary">#AAB0B3</item>
+        <item name="android:colorControlActivated">#D8E0E2</item>
         <item name="android:windowLightStatusBar">false</item>
         <item name="android:backgroundDimEnabled">true</item>
     </style>

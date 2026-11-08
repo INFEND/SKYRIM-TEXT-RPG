@@ -17,17 +17,19 @@ class RunicDialogContract(unittest.TestCase):
 
     def test_rectangle_not_hexagonal_notch(self):
         frame=(SRC/"RuneFrameDrawable.java").read_text(encoding="utf-8")
-        self.assertIn("canvas.drawRect(left,top,right,bottom,paint)",frame)
+        self.assertIn("c.drawRect(r,p)",frame)
+        self.assertIn("corner(c,x,y,1,1,corner)",frame)
+        self.assertIn("corner(c,right,bottom,-1,-1,corner)",frame)
         self.assertNotIn("notch=",frame)
-        self.assertIn("1.55f",frame)
-        self.assertIn("1.95f",frame)
+        self.assertIn("Paint.Style.STROKE",frame)
+        self.assertIn("0xffced7dc",frame)
 
     def test_system_alert_theme_is_dark_and_legible(self):
         styles=(RES/"values/styles.xml").read_text(encoding="utf-8")
         drawable=(RES/"drawable/dialog_panel.xml").read_text(encoding="utf-8")
         self.assertIn('@style/RunicDialogTheme',styles)
         self.assertIn('@drawable/dialog_panel',styles)
-        self.assertIn('#EDE7DA',styles)
+        self.assertIn('#F0F1EF',styles)
         self.assertIn('android:shape="rectangle"',drawable)
         self.assertIn('android:width="2dp"',drawable)
 

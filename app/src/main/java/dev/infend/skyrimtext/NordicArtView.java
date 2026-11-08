@@ -14,13 +14,13 @@ public final class NordicArtView extends View {
     public static final int TITLE=0, STORY=1, CODEX=2;
     private final Paint p=new Paint(Paint.ANTI_ALIAS_FLAG);
     private final int mode;
-    private static final int GOLD=0xffd5bd89, INK=0xff090e12;
+    private static final int GOLD=0xffc4c9ca, INK=0xff050809;
     public NordicArtView(Context context,int scene){super(context);mode=scene;setLayerType(View.LAYER_TYPE_SOFTWARE,null);}
     @Override protected void onDraw(Canvas actual){
         super.onDraw(actual);
         int w=getWidth(),h=getHeight();if(w==0||h==0)return;
         Canvas c=actual;c.save();c.scale(w/1000f,h/550f);
-        p.setShader(new LinearGradient(0,0,0,550,new int[]{0xff070b0e,0xff1a252d,0xff121b22,INK},null,Shader.TileMode.CLAMP));
+        p.setShader(new LinearGradient(0,0,0,550,new int[]{0xff07090b,0xff192023,0xff0e1315,INK},null,Shader.TileMode.CLAMP));
         p.setStyle(Paint.Style.FILL);c.drawRect(0,0,1000,550,p);p.setShader(null);
         Random random=new Random(71+mode*41);
         for(int i=0;i<48;i++){
@@ -28,16 +28,16 @@ public final class NordicArtView extends View {
             p.setColor(i%4==0?0x557e8a91:0x2fbdc4c5);c.drawCircle(x,y,random.nextFloat()*1.7f+.5f,p);
         }
         p.setColor(0x3accd6d5);c.drawCircle(mode==TITLE?745:180,mode==TITLE?112:93,mode==TITLE?36:29,p);
-        ridge(c,random,0xff34434d,239,95,9);
-        ridge(c,random,0xff24333e,307,111,13);
-        ridge(c,random,0xff17232c,387,82,18);
+        ridge(c,random,0xff303637,239,95,9);
+        ridge(c,random,0xff232a2c,307,111,13);
+        ridge(c,random,0xff141b1d,387,82,18);
         mist(c,0x152c414c,302,87);
         if(mode==CODEX){dragon(c);castle(c,760,330,.65f);}else if(mode==STORY){
             castle(c,738,342,.98f);oldArch(c,136,406,0.65f);
         }else{oldArch(c,170,447,1.45f);castle(c,777,398,.69f);}
-        trees(c,random,0xff0b161b,400,20,6);
-        trees(c,random,0xff081014,475,33,9);
-        p.setShader(new LinearGradient(0,310,0,550,new int[]{0x00080d10,0x76070b0e,0xff070b0e},null,Shader.TileMode.CLAMP));
+        trees(c,random,0xff0a1011,400,20,6);
+        trees(c,random,0xff070b0b,475,33,9);
+        p.setShader(new LinearGradient(0,310,0,550,new int[]{0x00080d10,0x76070b0e,0xff07090b},null,Shader.TileMode.CLAMP));
         c.drawRect(0,310,1000,550,p);p.setShader(null);
         p.setColor(0x4e8c8780);p.setStyle(Paint.Style.STROKE);p.setStrokeWidth(1.7f);
         c.drawLine(28,548,972,548,p);p.setStyle(Paint.Style.FILL);
@@ -104,7 +104,7 @@ public final class NordicArtView extends View {
     }
     private void dragon(Canvas c){
         c.save();c.translate(520,278);c.scale(1.22f,1.22f);
-        p.setColor(0xff9ba7ab);p.setStyle(Paint.Style.STROKE);p.setStrokeWidth(5);
+        p.setColor(0xffc4cccc);p.setStyle(Paint.Style.STROKE);p.setStrokeWidth(5);
         Path head=new Path();head.moveTo(-145,4);head.lineTo(-94,-35);head.lineTo(-42,-45);
         head.lineTo(6,-31);head.lineTo(40,-63);head.lineTo(57,-51);head.lineTo(34,-19);
         head.lineTo(80,8);head.lineTo(23,30);head.lineTo(-7,58);head.lineTo(-40,38);

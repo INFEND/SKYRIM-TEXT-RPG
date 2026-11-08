@@ -127,7 +127,7 @@ public final class WorldAtlas {
         private final GameEngine game;
         private final Paint paint=new Paint(3);
         private OnPlace tap;
-        private static final int INK=0xffeae3d6,GOLD=0xffe1c58f,WATER=0xff576571;
+        private static final int INK=0xffeaeded,GOLD=0xffc7d0d4,WATER=0xff3b464b;
         public interface OnPlace{void selected(Place p);}
         public MapView(Context c,GameEngine g,OnPlace listener){super(c);game=g;tap=listener;setMinimumHeight(900);}
         @Override protected void onMeasure(int w,int h){
@@ -140,18 +140,18 @@ public final class WorldAtlas {
         }
         @Override protected void onDraw(Canvas original){
             super.onDraw(original);
-            original.drawColor(0xff090f13);
+            original.drawColor(0xff07090a);
             Canvas c=original;
             c.save();c.scale(getWidth()/1120f,getHeight()/1160f);
-            paint.setStyle(Paint.Style.FILL);paint.setColor(0xff111a20);
+            paint.setStyle(Paint.Style.FILL);paint.setColor(0xff0e1214);
             c.drawRoundRect(12,12,1108,1148,3,3,paint);
-            paint.setColor(0xff192229);
+            paint.setColor(0xff171d1f);
             for(int i=0;i<13;i++){float y=i*95; c.drawRoundRect(25,y,1090,y+37,18,18,paint);}
-            paint.setColor(0xff263139);
+            paint.setColor(0xff2f3536);
             Path land=new Path();land.moveTo(125,210);land.lineTo(242,160);land.lineTo(388,220);land.lineTo(540,130);
             land.lineTo(812,171);land.lineTo(910,259);land.lineTo(931,615);land.lineTo(865,1050);
             land.lineTo(640,1090);land.lineTo(400,1052);land.lineTo(145,852);land.lineTo(62,580);land.close();c.drawPath(land,paint);
-            paint.setColor(0xff495158);
+            paint.setColor(0xff51595b);
             for(int i=0;i<90;i++){
                 float x=86+(i*79)%775,y=239+(i*173)%762;
                 Path mountain=new Path();mountain.moveTo(x-19,y+17);mountain.lineTo(x,y-23);mountain.lineTo(x+20,y+17);mountain.close();
@@ -161,36 +161,36 @@ public final class WorldAtlas {
             Path river=new Path();river.moveTo(792,400);river.cubicTo(695,540,570,591,595,782);river.cubicTo(575,864,470,897,390,1030);
             c.drawPath(river,paint);
             Path lake=new Path();lake.addOval(378,830,548,885,Path.Direction.CW);
-            paint.setStyle(Paint.Style.FILL);paint.setColor(0xff46535b);c.drawPath(lake,paint);
-            color(0xffb29a74,4);
+            paint.setStyle(Paint.Style.FILL);paint.setColor(0xff353d41);c.drawPath(lake,paint);
+            color(0xff9aa4a7,4);
             int[][] edges={{0,3},{0,1},{0,2},{0,5},{0,4},{0,8},{7,6},{7,8},{6,2},{2,1},{4,5},{3,8}};
             String[] capitals={"Вайтран","Рифтен","Виндхельм","Солитьюд","Маркарт","Фолкрит","Винтерхолд","Данстар","Морфал"};
             for(int[] e:edges){Place a=find(capitals[e[0]]),b=find(capitals[e[1]]);
                 if(a!=null&&b!=null)line(c,a.x,a.y,b.x,b.y);}
-            paint.setStyle(Paint.Style.FILL);paint.setColor(0xff273039);c.drawOval(919,219,1107,524,paint);
-            paint.setStyle(Paint.Style.STROKE);paint.setStrokeWidth(2);paint.setColor(0xff8c7c62);c.drawOval(919,219,1107,524,paint);
+            paint.setStyle(Paint.Style.FILL);paint.setColor(0xff151a1b);c.drawOval(919,219,1107,524,paint);
+            paint.setStyle(Paint.Style.STROKE);paint.setStrokeWidth(2);paint.setColor(0xff747e81);c.drawOval(919,219,1107,524,paint);
             Place player=find(game.progress.location);
             for(Place p:places){
                 float x=p.x,y=p.y;
                 boolean city=p.type.contains("Столица")||p.name.equals("Воронья Скала");
                 boolean isPlayer=p.name.equals(game.progress.location);
-                paint.setStyle(Paint.Style.FILL);paint.setColor(isPlayer?0xfff1e0b3:city?GOLD:0xff8c999f);
+                paint.setStyle(Paint.Style.FILL);paint.setColor(isPlayer?0xffecf0f1:city?GOLD:0xff9da8ac);
                 c.drawCircle(x,y,isPlayer?13:city?8:4,paint);
                 if(city||isPlayer){
                     paint.setTypeface(android.graphics.Typeface.DEFAULT_BOLD);
                     paint.setTextSize(isPlayer?24:20);
-                    paint.setColor(isPlayer?0xfff1db9f:INK);
+                    paint.setColor(isPlayer?0xfff0f3f3:INK);
                     c.drawText(p.name,Math.max(15,Math.min(960,x-35)),y-15,paint);
                 }
                 if(isPlayer){
-                    color(0xffe1c58f,2.5f);c.drawCircle(x,y,24,paint);
-                    paint.setStyle(Paint.Style.FILL);paint.setTextSize(24);paint.setColor(0xffead69e);
+                    color(0xffccd6da,2.5f);c.drawCircle(x,y,24,paint);
+                    paint.setStyle(Paint.Style.FILL);paint.setTextSize(24);paint.setColor(0xffecf1f1);
                     c.drawText("⌖",x-10,y+7,paint);
                 }
             }
             paint.setStyle(Paint.Style.FILL);paint.setColor(INK);paint.setTextSize(26);
             c.drawText("ᛟ   С К А Й Р И М   ᛟ",52,70,paint);
-            paint.setTextSize(16);paint.setColor(0xffb2aca2);
+            paint.setTextSize(16);paint.setColor(0xffb8c0c3);
             c.drawText("УСЛОВНАЯ ИГРОВАЯ СХЕМА • НАЖМИ НА МЕТКУ",52,98,paint);
             // Compass rose and engraved rim; the atlas remains an explicitly schematic map.
             color(GOLD,2);
@@ -198,7 +198,7 @@ public final class WorldAtlas {
             line(c,1023,39,1023,127);line(c,980,83,1066,83);
             paint.setStyle(Paint.Style.FILL);paint.setTextSize(20);paint.setColor(GOLD);
             c.drawText("N",1017,32,paint);
-            color(0xff9f8b6c,2);c.drawRect(21,21,1099,1137,paint);
+            color(0xff829095,2);c.drawRect(21,21,1099,1137,paint);
             c.drawText("● игрок   ● столица   · другие места",52,1115,paint);
             c.restore();
         }

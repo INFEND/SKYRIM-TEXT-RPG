@@ -34,7 +34,7 @@ public final class RuneDialogBuilder extends AlertDialog.Builder {
         dialog.setOnShowListener(ignored->{
             Window window=dialog.getWindow();
             if(window!=null){
-                window.setBackgroundDrawable(new RuneFrameDrawable(0xff0e1519,accent,true));
+                window.setBackgroundDrawable(new RuneFrameDrawable(0xf0060809,accent,true));
                 window.addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
                 WindowManager.LayoutParams attributes=window.getAttributes();
                 attributes.dimAmount=.72f;
@@ -46,7 +46,7 @@ public final class RuneDialogBuilder extends AlertDialog.Builder {
                 if(titleView instanceof TextView){
                     TextView title=(TextView)titleView;
                     title.setTypeface(Typeface.SERIF,Typeface.NORMAL);
-                    title.setTextColor(0xffede7da);
+                    title.setTextColor(0xfff1f2f0);
                     title.setTextSize(22);
                     title.setLineSpacing(dp(2),1.04f);
                 }
@@ -54,7 +54,7 @@ public final class RuneDialogBuilder extends AlertDialog.Builder {
             TextView message=dialog.findViewById(android.R.id.message);
             if(message!=null){
                 message.setTypeface(Typeface.SERIF,Typeface.NORMAL);
-                message.setTextColor(0xffd3cfc5);
+                message.setTextColor(0xffbec5c7);
                 message.setTextSize(16);
                 message.setLineSpacing(dp(4),1.08f);
             }
@@ -70,9 +70,9 @@ public final class RuneDialogBuilder extends AlertDialog.Builder {
         button.setAllCaps(false);
         button.setTypeface(Typeface.SERIF,Typeface.NORMAL);
         button.setTextSize(15);
-        button.setTextColor(primary?accent:0xffd4c9b3);
-        button.setBackground(new RuneFrameDrawable(primary?0xff27261f:0xff11191e,
-            primary?accent:0xff766952,primary));
+        button.setTextColor(primary?accent:0xffc4cbcd);
+        button.setBackground(new RuneFrameDrawable(primary?0xff202426:0xff0b0f11,
+            primary?accent:0xff70797d,primary));
         button.setMinHeight(dp(44));
         button.setPadding(dp(12),dp(6),dp(12),dp(6));
     }
