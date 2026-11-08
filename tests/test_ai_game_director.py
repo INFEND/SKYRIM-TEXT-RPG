@@ -110,6 +110,20 @@ class AiGameDirectorContracts(unittest.TestCase):
         self.assertIn('parseChance(String response)',bridge)
         self.assertIn('aiTurnBusy=false;aiTurnPreview="";',ui[handler:second])
 
+    def test_ai_patch_rejects_malformed_enemy_and_collection_shapes(self):
+        bridge=code("AiGameTurn.java")
+        self.assertIn('requiredEnemyInt(enemy,"hp",0,50000)',bridge)
+        self.assertIn('requiredEnemyInt(enemy,"maxHp",health,50000)',bridge)
+        self.assertIn('requiredEnemyInt(enemy,"damage",0,1000)',bridge)
+        self.assertIn('Double.isFinite(value)',bridge)
+        self.assertIn('!(e.opt("inventory") instanceof JSONArray)',bridge)
+        self.assertIn('!(e.opt("skills") instanceof JSONArray)',bridge)
+        self.assertIn('!(e.opt("enemy") instanceof JSONObject)',bridge)
+        self.assertIn('weight>50.0001 || weight < -0.0001',bridge)
+        validate=bridge.index('int health=requiredEnemyInt(enemy,"hp",0,50000)')
+        commit=bridge.index('for(String name:inventoryChanges.keySet())')
+        self.assertLess(validate,commit)
+
     def test_story_stream_is_not_a_json_dump(self):
         client=code("AiStoryClient.java")
         ui=code("MainActivity.java")
