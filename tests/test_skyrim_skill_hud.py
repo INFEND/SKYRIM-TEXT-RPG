@@ -15,7 +15,7 @@ class SkillLevelHudContracts(unittest.TestCase):
     def test_icon_has_real_alpha_and_progress_uses_real_skill_xp(self):
         ui=(SRC/"MainActivity.java").read_text(encoding="utf-8")
         icons=(SRC/"SkyrimIconView.java").read_text(encoding="utf-8")
-        self.assertIn('new SkyrimIconView(this,"shield",accent())',ui)
+        self.assertIn('new SkyrimIconView(this,"armor",accent())',ui)
         self.assertIn("Color.TRANSPARENT",icons)
         self.assertIn("game.progress.skillXp[i]",ui)
         self.assertIn("game.progress.skillNeed(i)",ui)

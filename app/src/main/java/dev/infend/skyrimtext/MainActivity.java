@@ -211,7 +211,7 @@ public final class MainActivity extends Activity {
         area.setMargins(dp(10),dp(2),dp(10),dp(6));
         root.addView(panel,area);
         LinearLayout top=row();panel.addView(top,lp(-1,-2));
-        top.addView(new SkyrimIconView(this,"shield",accent()),lp(37,40));
+        top.addView(new SkyrimIconView(this,"armor",accent()),lp(37,40));
         LinearLayout words=column();
         LinearLayout.LayoutParams wp=new LinearLayout.LayoutParams(0,-2,1);
         wp.leftMargin=dp(12);top.addView(words,wp);
