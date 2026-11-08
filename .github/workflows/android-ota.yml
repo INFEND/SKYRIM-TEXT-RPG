@@ -110,6 +110,13 @@ jobs:
       - name: Assemble signed release APK
         if: steps.signing.outputs.available == 'true' && steps.release_version.outputs.publish == 'true'
         run: gradle --no-daemon --stacktrace :app:assembleRelease
+      - name: Verify Sovngarde fonts inside signed APK
+        if: steps.signing.outputs.available == 'true' && steps.release_version.outputs.publish == 'true'
+        shell: bash
+        run: |
+          unzip -l app/build/outputs/apk/release/app-release.apk | grep -F "assets/fonts/Sovngarde Light.ttf"
+          unzip -l app/build/outputs/apk/release/app-release.apk | grep -F "assets/fonts/Sovngarde Bold.ttf"
+          unzip -l app/build/outputs/apk/release/app-release.apk | grep -F "assets/fonts/OFL.txt"
       - name: Create update manifest and release notes
         if: steps.signing.outputs.available == 'true' && steps.release_version.outputs.publish == 'true'
         run: |

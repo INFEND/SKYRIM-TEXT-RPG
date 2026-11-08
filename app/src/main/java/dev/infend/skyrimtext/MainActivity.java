@@ -156,19 +156,25 @@ public final class MainActivity extends Activity {
     }
     private void resumeViewport(PageScroll previous,ScrollView target,String key){
         if(previous==null)return;
-        target.post(()->{
-            if(scroll!=target||!viewportKey().equals(key))return;
-            java.util.ArrayList<HorizontalScrollView> found=new java.util.ArrayList<>();
-            findHorizontal(target,found);
-            for(int i=0;i<Math.min(found.size(),previous.horizontal.size());i++){
-                HorizontalScrollView h=found.get(i);
-                View child=h.getChildAt(0);
-                int limit=child==null?0:Math.max(0,child.getWidth()-h.getWidth());
-                h.scrollTo(Math.min(Math.max(0,previous.horizontal.get(i)),limit),0);
+        // Apply the restored offsets once layout has its final measured widths.
+        // The user never sees the new screen at scroll=0 before restoration.
+        target.getViewTreeObserver().addOnPreDrawListener(new android.view.ViewTreeObserver.OnPreDrawListener(){
+            @Override public boolean onPreDraw(){
+                target.getViewTreeObserver().removeOnPreDrawListener(this);
+                if(scroll!=target||!viewportKey().equals(key))return true;
+                java.util.ArrayList<HorizontalScrollView> found=new java.util.ArrayList<>();
+                findHorizontal(target,found);
+                for(int i=0;i<Math.min(found.size(),previous.horizontal.size());i++){
+                    HorizontalScrollView h=found.get(i);
+                    View child=h.getChildAt(0);
+                    int limit=child==null?0:Math.max(0,child.getWidth()-h.getWidth());
+                    h.scrollTo(Math.min(Math.max(0,previous.horizontal.get(i)),limit),0);
+                }
+                View inner=target.getChildAt(0);
+                int limit=inner==null?0:Math.max(0,inner.getHeight()-target.getHeight());
+                target.scrollTo(0,Math.min(Math.max(0,previous.y),limit));
+                return true;
             }
-            View inner=target.getChildAt(0);
-            int limit=inner==null?0:Math.max(0,inner.getHeight()-target.getHeight());
-            target.scrollTo(0,Math.min(Math.max(0,previous.y),limit));
         });
     }
     private void render(){
@@ -184,6 +190,10 @@ public final class MainActivity extends Activity {
         }
         scroll=new ScrollView(this);scroll.setFillViewport(false);scroll.setClipToPadding(false);
         scroll.setVerticalScrollBarEnabled(false);
+        // Avoid automatic descendant focus scrolling to an arbitrary new child.
+        scroll.setDescendantFocusability(ViewGroup.FOCUS_BEFORE_DESCENDANTS);
+        scroll.setFocusableInTouchMode(true);
+        scroll.requestFocus();
         root.addView(scroll,new LinearLayout.LayoutParams(-1,0,1));
         content=column();content.setPadding(dp(13),dp(17),dp(13),dp(28));scroll.addView(content);
         if(titleOpen)renderTitle();
@@ -502,11 +512,20 @@ public final class MainActivity extends Activity {
             }
         };
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        sp.setAdapter(adapter);sp.setSelection(Math.max(0,Math.min(position,options.length-1)));
+        sp.setAdapter(adapter);
+        final int initial=Math.max(0,Math.min(position,options.length-1));
+        sp.setSelection(initial);
         sp.setBackground(new RuneFrameDrawable(PANEL_2,0xff85745f,false));
+        final int[] previous={initial};
         sp.setOnItemSelectedListener(new android.widget.AdapterView.OnItemSelectedListener(){
             public void onNothingSelected(android.widget.AdapterView<?> v){}
-            public void onItemSelected(android.widget.AdapterView<?> v,View view,int pos,long id){onChange.accept(pos);}
+            public void onItemSelected(android.widget.AdapterView<?> v,View view,int pos,long id){
+                // Android calls onItemSelected once during initial layout.
+                // That is not a user choice and must not rebuild the whole page.
+                if(pos==previous[0])return;
+                previous[0]=pos;
+                onChange.accept(pos);
+            }
         });
         return sp;
     }
