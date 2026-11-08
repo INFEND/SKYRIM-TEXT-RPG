@@ -455,7 +455,8 @@ public final class MainActivity extends Activity {
         return "chatgpt".equals(mode)||("auto".equals(mode)&&chatGptOAuth.hasAuthorizedPlan());
     }
     private void aiProviderDialog(){
-        String[] labels={"Автоматически · ChatGPT → API → обычная RPG","Аккаунт ChatGPT","OpenAI API"};
+        String[] labels={"Автоматически · Работа/Codex → API → офлайн",
+                "ChatGPT · расход лимитов Работа/Codex","OpenAI API · отдельная оплата"};
         String mode=aiProviderMode();
         int selected="chatgpt".equals(mode)?1:"api".equals(mode)?2:0;
         new RuneDialogBuilder(this,accent()).setTitle("Источник ИИ")
@@ -471,7 +472,7 @@ public final class MainActivity extends Activity {
     private void aiReasoningEffortDialog(){
         String[] choices=AiReasoningEffort.LABELS;
         int selected=AiReasoningEffort.position(selectedReasoningEffort());
-        new RuneDialogBuilder(this,accent()).setTitle("Уровень размышления ИИ")
+        new RuneDialogBuilder(this,accent()).setTitle("Уровень размышления · настройка игры")
             .setSingleChoiceItems(choices,selected,(dialog,which)->{
                 String effort=AiReasoningEffort.VALUES[which];
                 prefs.edit().putString("ai_reasoning_effort",effort).apply();
@@ -492,7 +493,7 @@ public final class MainActivity extends Activity {
             }).setNegativeButton("Закрыть",null).show();
     }
     private void loginChatGpt(){
-        toast("Открывается безопасная авторизация ChatGPT в браузере");
+        toast("Вход ChatGPT: для игры используются лимиты Работа/Codex");
         chatGptOAuth.signIn(this,(success,message)->{
             toast(message);
             if(tab==5)render();
@@ -511,7 +512,7 @@ public final class MainActivity extends Activity {
         });
     }
     private void chatGptModelDialog(){
-        toast("Загружаю модели аккаунта ChatGPT…");
+        toast("Получаю доступные модели ChatGPT для Работы/Codex…");
         chatGptOAuth.loadModels((models,error)->{
             if(error!=null){toast(error);return;}
             if(models.isEmpty()){toast("Нет доступных моделей ChatGPT");return;}
@@ -522,7 +523,7 @@ public final class MainActivity extends Activity {
                 if(chosen.equals(models.get(i).slug))selected=i;
             }
             if(isFinishing()||isDestroyed())return;
-            new RuneDialogBuilder(this,accent()).setTitle("Модели ChatGPT")
+            new RuneDialogBuilder(this,accent()).setTitle("Модели · Работа/Codex")
                 .setSingleChoiceItems(labels,selected,(dialog,which)->{
                     prefs.edit().putString("ai_chatgpt_model",models.get(which).slug).apply();
                     if(aiClient!=null)aiClient.cancel();
@@ -533,7 +534,7 @@ public final class MainActivity extends Activity {
 
     private void renderAiStoryPanel(){
         LinearLayout panel=card();
-        addText(panel,"ᚱ  ИИ-МАСТЕР · "+(usingChatGpt()?"ChatGPT":"OpenAI API"),11,accent(),true,8);
+        addText(panel,"ᚱ  ИИ-МАСТЕР · "+(usingChatGpt()?"РАБОТА / CODEX":"OPENAI API"),11,accent(),true,8);
         addText(panel,"Свободный диалог и повествование. Инвентарь, бой, награды и перемещения изменяются только игровыми действиями.",12,MUTED,false,12);
         boolean chatgpt=usingChatGpt();
         boolean ready=chatgpt?chatGptOAuth.hasAuthorizedPlan():AiKeyVault.configured(this);
@@ -564,9 +565,11 @@ public final class MainActivity extends Activity {
         panel.addView(prompt,lp(-1,-2));
         space(panel,9);
         String selectedModel=prefs.getString(chatgpt?"ai_chatgpt_model":"ai_api_model",chatgpt?"":AiModelCatalog.DEFAULT_API);
-        TextView status=text((chatgpt?"ChatGPT · "+(selectedModel.isEmpty()?"выбери модель в настройках":selectedModel):
-                "OpenAI API · "+AiModelCatalog.label(selectedModel)+" · отдельная оплата")
-                +"\nРазмышление: "+AiReasoningEffort.label(selectedReasoningEffort()),11,MUTED,false);
+        String modelLabel=selectedModel.isEmpty()?"не выбрана":chatgpt?selectedModel:AiModelCatalog.label(selectedModel);
+        String providerLabel=chatgpt?"Источник: ChatGPT · лимиты Работа/Codex":
+                "Источник: OpenAI API · отдельная оплата";
+        TextView status=text(providerLabel+"\nМодель (выбрана в игре): "+modelLabel+
+                "\nРазмышление (настройка игры): "+AiReasoningEffort.label(selectedReasoningEffort()),11,MUTED,false);
         panel.addView(status);
         space(panel,8);
         TextView send=text("СОЗДАТЬ ПРОДОЛЖЕНИЕ",14,accent(),true);
@@ -1042,8 +1045,8 @@ public final class MainActivity extends Activity {
         readability.addView(sw,lp(-1,47));
         space(content,6);addText(content,"ИИ-ПРИКЛЮЧЕНИЕ",11,accent(),true,11);
         LinearLayout aiCard=card();
-        addText(aiCard,"АВТОМАТИЧЕСКИЙ РЕЖИМ",11,accent(),true,8);
-        addText(aiCard,"Вход через ChatGPT с отдельным разрешением использовать подписку либо собственный OpenAI API. Платный API не используется автоматически при ошибке или исчерпании лимита ChatGPT. Локальная модель пока не подключена.",12,MUTED,false,10);
+        addText(aiCard,"ИСТОЧНИК МОДЕЛИ И РАЗМЫШЛЕНИЯ",11,accent(),true,8);
+        addText(aiCard,"Подключение ChatGPT расходует доступные лимиты «Работа / Codex», НЕ лимиты обычного «Чата». Список моделей запрашивается из твоего аккаунта, но модель и уровень размышления задаются отдельно в этой игре. Через API действует своя оплата. Локальная модель пока не подключена.",12,MUTED,false,10);
         Switch aiToggle=new Switch(this);
         aiToggle.setText("Разрешить ИИ-повествование");
         aiToggle.setTextSize(sp(14));aiToggle.setTextColor(TEXT);
@@ -1054,15 +1057,16 @@ public final class MainActivity extends Activity {
             if(!on && aiClient!=null)aiClient.cancel();
         });
         aiCard.addView(aiToggle,lp(-1,48));
-        addText(aiCard,"Диалоги сохраняются в SQLite. Расход ChatGPT идёт в пределах разрешённого плана; API оплачивается отдельно.",12,MUTED,false,0);
+        addText(aiCard,"В «Авто» приоритет у разрешённой подписки ChatGPT (Работа/Codex), затем у настроенного API. При исчерпании лимита ChatGPT скрытого перехода на платный API нет. Обычный «Чат» и его личные настройки не считываются.",12,MUTED,false,0);
         String provider=aiProviderMode();
-        actionButton("Источник ИИ","chatgpt".equals(provider)?"Аккаунт ChatGPT":
-            "api".equals(provider)?"OpenAI API":"Автоматически · ChatGPT → API",true,this::aiProviderDialog);
-        actionButton("Продолжить с ChatGPT",chatGptOAuth.accountLabel()+
-            " · вход в системном браузере",false,this::loginChatGpt);
+        actionButton("Источник ИИ","chatgpt".equals(provider)?"ChatGPT · Работа/Codex":
+            "api".equals(provider)?"OpenAI API · отдельная оплата":
+                "Автоматически · Работа/Codex → API",true,this::aiProviderDialog);
+        actionButton("Вход ChatGPT · Работа/Codex",chatGptOAuth.accountLabel()+
+            " · авторизация в системном браузере",false,this::loginChatGpt);
         if(chatGptOAuth.hasAuthorizedPlan()){
-            actionButton("Модель ChatGPT",prefs.getString("ai_chatgpt_model","Не выбрана")+
-                " · список твоего аккаунта",false,this::chatGptModelDialog);
+            actionButton("Модель · Работа/Codex",prefs.getString("ai_chatgpt_model","Не выбрана")+
+                " · доступна по аккаунту, выбрана внутри игры",false,this::chatGptModelDialog);
             actionButton("Выйти из ChatGPT","Завершить авторизованную сессию",false,()->{
                 new RuneDialogBuilder(this,accent()).setTitle("Выйти из ChatGPT?")
                     .setNegativeButton("Отмена",null).setPositiveButton("Выйти",(d,w)->{
@@ -1071,11 +1075,11 @@ public final class MainActivity extends Activity {
                     }).show();
             });
         }
-        actionButton("Модель OpenAI API",AiModelCatalog.label(prefs.getString("ai_api_model",AiModelCatalog.DEFAULT_API)),
-            false,this::apiModelDialog);
-        actionButton("Уровень размышления",AiReasoningEffort.label(selectedReasoningEffort())+
-            " · используется для ChatGPT и API",false,this::aiReasoningEffortDialog);
-        addText(content,"Чем глубже размышление, тем дольше может формироваться ответ. При использовании API возможно увеличение расходов. Поддержка уровня зависит от модели.",12,MUTED,false,11);
+        actionButton("Модель · OpenAI API",AiModelCatalog.label(prefs.getString("ai_api_model",AiModelCatalog.DEFAULT_API))+
+                " · отдельный API-ключ",false,this::apiModelDialog);
+        actionButton("Уровень размышления · в игре",AiReasoningEffort.label(selectedReasoningEffort())+
+            " · отправляется выбранной модели, не копируется из Чата/Работы",false,this::aiReasoningEffortDialog);
+        addText(content,"«Автоматически» означает уровень по умолчанию у выбранной модели. Это не синхронизация ползунка из ChatGPT. Уровни доступны не для всех моделей; высокие значения могут отвечать медленнее и увеличивать расходы API.",12,MUTED,false,11);
         actionButton("Ввести / заменить OpenAI API-ключ",AiKeyVault.configured(this)?"Ключ уже сохранён (зашифрован)":"Ключ не настроен",false,this::aiKeyDialog);
         if(AiKeyVault.configured(this))actionButton("Удалить сохранённый API-ключ","Не затрагивает игру и историю",false,()->{
             new RuneDialogBuilder(this,accent()).setTitle("Удалить ключ API?")
