@@ -1143,6 +1143,11 @@ public final class MainActivity extends Activity {
     private void renderJournal(){
         section("ЛЕТОПИСЬ","Задания","Твои решения формируют собственную историю Скайрима.");
         content.addView(new NordicArtView(this,NordicArtView.TITLE),lp(-1,120));space(content,12);
+        if(!game.aiJournal.isEmpty()){
+            LinearLayout aiQuest=card();
+            addText(aiQuest,"ᚱ  ЗАДАНИЕ ИИ-МАСТЕРА",11,accent(),true,8);
+            addText(aiQuest,game.aiJournal,15,TEXT,false,0);
+        }
         LinearLayout dragon=card();addText(dragon,"ОСНОВНАЯ ИСТОРИЯ",11,accent(),true,11);
         addText(dragon,"Драконий след",22,TEXT,true,8);
         addText(dragon,"Глава "+Math.min(6,game.progress.dragonStage+1)+" / 6",13,accent(),true,8);
