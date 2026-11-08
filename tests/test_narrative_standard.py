@@ -37,6 +37,14 @@ class NarrativeContracts(unittest.TestCase):
         self.assertIn('new android.text.SpannableStringBuilder(view.getText())',view)
         self.assertIn('makeItemsClickable(body,body.getText().toString())',view)
 
+    def test_offline_narrative_does_not_invent_clock_or_weather(self):
+        prose=read("SceneNarrative.java")
+        self.assertNotIn("g.day%3==0",prose)
+        self.assertNotIn("К вечеру воздух темнеет",prose)
+        self.assertNotIn("дневной свет находит каждый след",prose)
+        self.assertNotIn("В лунном свете чернила",prose)
+        self.assertNotIn("мокрый снег, а вокруг",prose)
+
     def test_ai_adopts_same_longform_format_without_changing_game_rules(self):
         client=read("AiStoryClient.java")
         ui=read("MainActivity.java")
