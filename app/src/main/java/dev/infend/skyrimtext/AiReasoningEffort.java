@@ -34,16 +34,16 @@ final class AiReasoningEffort {
 
     /** Reasoning tokens are part of the API output budget; reserve enough for narration. */
     static int apiOutputLimit(String value) {
+        // Reasoning tokens consume part of the total. Leave room for long prose.
         switch(normalize(value)) {
-            case "low":return 3200;
-            case "high":return 9000;
-            case "xhigh":return 14000;
-            case "max":return 20000;
-            case "medium":return 5500;
-            default:return 5500;
+            case "low":return 8000;
+            case "high":return 18000;
+            case "xhigh":return 24000;
+            case "max":return 32000;
+            case "medium":return 12000;
+            default:return 12000;
         }
     }
-
     /** Deep reasoning can take longer before the first streamed text token appears. */
     static int networkReadTimeoutMs(String value){
         switch(normalize(value)){
