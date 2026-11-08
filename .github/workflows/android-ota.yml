@@ -36,8 +36,29 @@ jobs:
           "${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager" --install 'platforms;android-35' 'build-tools;35.0.0'
       - name: Gate signed releases on all Python regression checks
         run: python3 -m unittest discover -s tests -p 'test_*.py' -v
+      - name: Bundle exact user-supplied Sovngarde fonts
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p app/src/main/assets/fonts
+          MIRROR="https://raw.githubusercontent.com/B4lex/PlayerHub/e9fa97b3c312eb948f3808f5c2d1f053555d1a48/assets/fonts"
+          curl --fail --location --retry 4 --retry-delay 2 --silent --show-error "$MIRROR/Sovngarde%20Light.ttf" -o "app/src/main/assets/fonts/Sovngarde Light.ttf"
+          curl --fail --location --retry 4 --retry-delay 2 --silent --show-error "$MIRROR/Sovngarde%20Bold.ttf" -o "app/src/main/assets/fonts/Sovngarde Bold.ttf"
+          curl --fail --location --retry 4 --retry-delay 2 --silent --show-error "$MIRROR/Sovngarde%20OFL%20License.txt" -o "app/src/main/assets/fonts/OFL.txt"
+          printf '%s\n' \
+            "8a080bba62534ca37bdd3137e933f9215dbf18e8a070495e4ae782ea7c3b9851  app/src/main/assets/fonts/Sovngarde Light.ttf" \
+            "a4abb4f2cf49f7e52d87f45d59b1fe2592d464c94f049094f66520072317c2ef  app/src/main/assets/fonts/Sovngarde Bold.ttf" \
+            "beb729413bd1bb04bfecbfd530eb0b899777fdd57472c8496a26e2cd53ef8bd5  app/src/main/assets/fonts/OFL.txt" \
+            | sha256sum --check --strict
+          echo "Exact font files verified against uploaded ZIP; fonts included in APK."
       - name: Assemble debug APK
         run: gradle --no-daemon --stacktrace :app:assembleDebug
+      - name: Verify Sovngarde TTF and license inside debug APK
+        shell: bash
+        run: |
+          unzip -l app/build/outputs/apk/debug/app-debug.apk | grep -F "assets/fonts/Sovngarde Light.ttf"
+          unzip -l app/build/outputs/apk/debug/app-debug.apk | grep -F "assets/fonts/Sovngarde Bold.ttf"
+          unzip -l app/build/outputs/apk/debug/app-debug.apk | grep -F "assets/fonts/OFL.txt"
       - name: Prepare debug artifact
         run: |
           mkdir -p dist

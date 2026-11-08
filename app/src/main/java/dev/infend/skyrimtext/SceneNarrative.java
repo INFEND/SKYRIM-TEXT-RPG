@@ -47,7 +47,7 @@ public final class SceneNarrative {
         "Бывшие участники экспедиции уже разошлись по своим дорогам. Печати снова целы, но на картах осталось несколько зачёркнутых мест, о которых никто не захотел говорить вслух. Победа не убрала из мира все опасности; она только дала людям время."
     };
     private static String dialogue(String person,String statement){
-        return "**"+person+":**\n>**— "+statement+"**";
+        return "**"+person+":**\n**— "+statement+"**";
     }
     private static int region(GameEngine g){
         return Math.max(0,Math.min(LANDSCAPES.length-1,g.region));
