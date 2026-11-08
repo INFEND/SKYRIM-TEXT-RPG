@@ -52,6 +52,8 @@ public final class GameEngine {
     public String enemyName = "", battleLog = "", battleKind = "", enemyIntro = "";
     public int enemyHp = 0, enemyMaxHp = 0, enemyDamage = 0;
     public RpgProgress progress = new RpgProgress();
+    public AiGameTurn aiTurn;
+    public String aiJournal = "";
     private final Random random = new Random();
 
     public void start(String desiredName, String desiredRace, String desiredClass) {
@@ -62,7 +64,7 @@ public final class GameEngine {
         if(name.length()>28)name=name.substring(0,28);
         race=contains(RACES,desiredRace)?desiredRace:"Норд";
         heroClass=contains(CLASSES,desiredClass)?desiredClass:"Без класса";
-        started=true;day=1;level=1;xp=0;gold=85;potions=3;manaPotions=1;
+        started=true;aiTurn=null;aiJournal="";day=1;level=1;xp=0;gold=85;potions=3;manaPotions=1;
         questStage=0;sideQuest=0;sideKills=0;boardCompleted=0;explored=0;victories=0;reputation=0;
         swordUpgraded=false;armorUpgraded=false;
         maxHp=100;maxStamina=100;maxMagicka=100;attack=12;armor=2;
@@ -434,7 +436,8 @@ public final class GameEngine {
          .put("victories",victories).put("reputation",reputation).put("swordUpgraded",swordUpgraded)
          .put("armorUpgraded",armorUpgraded).put("mode",mode).put("message",message).put("enemyName",enemyName)
          .put("battleLog",battleLog).put("battleKind",battleKind).put("enemyIntro",enemyIntro)
-         .put("enemyHp",enemyHp).put("enemyMaxHp",enemyMaxHp).put("enemyDamage",enemyDamage).put("progress",progress.toJson());
+         .put("enemyHp",enemyHp).put("enemyMaxHp",enemyMaxHp).put("enemyDamage",enemyDamage).put("progress",progress.toJson())
+         .put("aiJournal",aiJournal).put("aiTurn",aiTurn==null?JSONObject.NULL:aiTurn.save());
         return j;
     }
     public static GameEngine fromJson(String json) {
@@ -461,6 +464,8 @@ public final class GameEngine {
             g.battleKind=j.optString("battleKind","");g.enemyIntro=j.optString("enemyIntro","");
             g.enemyHp=Math.max(0,j.optInt("enemyHp",0));g.enemyMaxHp=Math.max(0,j.optInt("enemyMaxHp",0));g.enemyDamage=Math.max(0,j.optInt("enemyDamage",0));
             g.progress=RpgProgress.fromJson(j.optJSONObject("progress"));
+            g.aiJournal=j.optString("aiJournal","");
+            g.aiTurn=AiGameTurn.restore(j.optJSONObject("aiTurn"));
             // Reconcile legacy schema-1 saves with the authoritative quest stage.
             if(g.questStage>=4)g.progress.setQuestOutcome("ash_seals","COMPLETED");
             else if(g.questStage>0)g.progress.setQuestOutcome("ash_seals","ACTIVE");
