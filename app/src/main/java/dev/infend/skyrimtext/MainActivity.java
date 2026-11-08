@@ -47,6 +47,8 @@ public final class MainActivity extends Activity {
     private final int[] initialPoints={0,0,0};
     private String selectedCategory="Все",selectedSort="Название";
     private String focusedInventoryId="";
+    private static final String SKILL_HUD_OWNER="skill_hud_owner";
+    private static final String SKILL_HUD_SNAPSHOT="skill_hud_snapshot";
     private boolean animations=true, titleOpen=true;
     private int codexCategory=0;
     private SkyrimOtaController updater;
@@ -128,7 +130,11 @@ public final class MainActivity extends Activity {
     private void render(){
         root=column();root.setBackground(new SkyrimBackdropDrawable());root.setFitsSystemWindows(true);
         setContentView(root);
-        if(!titleOpen){renderHeader();if(game.started && !(tab==0&&prefs.getBoolean("ai_enabled",false)))renderBars();}
+        if(!titleOpen){
+            renderHeader();
+            if(game.started)renderSkillLevelNotice();
+            if(game.started && !(tab==0&&prefs.getBoolean("ai_enabled",false)))renderBars();
+        }
         scroll=new ScrollView(this);scroll.setFillViewport(false);scroll.setClipToPadding(false);
         scroll.setVerticalScrollBarEnabled(false);
         root.addView(scroll,new LinearLayout.LayoutParams(-1,0,1));
@@ -169,6 +175,73 @@ public final class MainActivity extends Activity {
         }
         root.addView(new SkyrimRuleView(this,accent()),lp(-1,15));
     }
+    /**
+     * Compact level-up HUD taken from the Skyrim skill-notification reference.
+     * Only genuine skill-level increases trigger a notice. Previously loaded
+     * saves establish their first snapshot silently, without fake level-ups.
+     */
+    private void renderSkillLevelNotice(){
+        String owner=game.name+"|"+game.race+"|"+game.heroClass;
+        StringBuilder saved=new StringBuilder();
+        for(int i=0;i<RpgContent.SKILLS.length;i++){
+            if(i>0)saved.append(',');
+            saved.append(game.progress.skillLevel(i));
+        }
+        String snapshot=saved.toString();
+        String prior=prefs.getString(SKILL_HUD_SNAPSHOT,"");
+        String previousOwner=prefs.getString(SKILL_HUD_OWNER,"");
+        prefs.edit().putString(SKILL_HUD_OWNER,owner)
+            .putString(SKILL_HUD_SNAPSHOT,snapshot).apply();
+        if(prior.isEmpty()||!owner.equals(previousOwner))return;
+        String[] previous=prior.split(",",-1);
+        if(previous.length!=RpgContent.SKILLS.length)return;
+        int raised=-1;
+        for(int i=0;i<previous.length;i++){
+            int oldLevel;
+            try{oldLevel=Integer.parseInt(previous[i]);}
+            catch(NumberFormatException ex){return;}
+            if(oldLevel>0&&game.progress.skillLevel(i)>oldLevel&&raised<0)raised=i;
+        }
+        if(raised<0)return;
+        int i=raised;
+        LinearLayout panel=column();
+        panel.setPadding(dp(13),dp(11),dp(13),dp(11));
+        panel.setBackground(new RuneFrameDrawable(0xf0090c0d,0xffbac5c9,true));
+        LinearLayout.LayoutParams area=lp(-1,-2);
+        area.setMargins(dp(10),dp(2),dp(10),dp(6));
+        root.addView(panel,area);
+        LinearLayout top=row();panel.addView(top,lp(-1,-2));
+        top.addView(new SkyrimIconView(this,"shield",accent()),lp(37,40));
+        LinearLayout words=column();
+        LinearLayout.LayoutParams wp=new LinearLayout.LayoutParams(0,-2,1);
+        wp.leftMargin=dp(12);top.addView(words,wp);
+        TextView label=text(RpgContent.SKILLS[i].toUpperCase(java.util.Locale.ROOT),14,TEXT,true);
+        label.setLetterSpacing(.11f);words.addView(label);
+        addText(words,"НАВЫК ПОВЫШЕН ДО "+game.progress.skillLevel(i),11,MUTED,false,0);
+        TextView seal=text(String.valueOf(game.progress.skillLevel(i)),21,accent(),true);
+        seal.setGravity(Gravity.CENTER);
+        seal.setBackground(new RuneFrameDrawable(0x33000000,accent(),true));
+        top.addView(seal,lp(39,39));
+        ProgressBar line=new ProgressBar(this,null,android.R.attr.progressBarStyleHorizontal);
+        line.setMax(Math.max(1,game.progress.skillNeed(i)));
+        line.setProgress(Math.max(0,game.progress.skillXp[i]));
+        line.setProgressTintList(ColorStateList.valueOf(accent()));
+        line.setProgressBackgroundTintList(ColorStateList.valueOf(0xff30383c));
+        LinearLayout.LayoutParams lineParams=lp(-1,3);
+        lineParams.topMargin=dp(9);panel.addView(line,lineParams);
+        panel.setContentDescription(RpgContent.SKILLS[i]+" повышен до уровня "+game.progress.skillLevel(i));
+        if(animations){
+            panel.setAlpha(0f);
+            panel.animate().alpha(1f).setDuration(250).start();
+        }
+        panel.postDelayed(()->{
+            panel.animate().alpha(0f).setDuration(420).withEndAction(()->{
+                if(panel.getParent() instanceof android.view.ViewGroup)
+                    ((android.view.ViewGroup)panel.getParent()).removeView(panel);
+            }).start();
+        },3400);
+    }
+
     private void renderBars(){
         LinearLayout stats=row();stats.setPadding(dp(19),dp(11),dp(19),dp(11));
         stats.setBackgroundColor(PANEL);root.addView(stats,lp(-1,-2));
