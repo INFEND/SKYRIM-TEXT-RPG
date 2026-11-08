@@ -27,10 +27,13 @@ class SkyrimReferenceRedesign(unittest.TestCase):
         app=(RES/"drawable/ic_app.xml").read_text(encoding="utf-8")
         ui=code("MainActivity.java")
         self.assertIn("Color.TRANSPARENT",icon)
-        self.assertIn("paint.setStyle(Paint.Style.STROKE)",icon)
-        self.assertIn("case \"map\":compass(c)",icon)
-        self.assertIn("case \"bag\":satchel(c)",icon)
-        self.assertIn("case \"journal\":scroll(c)",icon)
+        # The player's signed 48-image archive now supersedes the placeholder
+        # programmatic line icons; their transparent WebP pixels must remain.
+        self.assertIn('ASSET="icons/skyrim_icons_48.webp"',icon)
+        self.assertIn('TOTAL=48',icon)
+        self.assertIn("canvas.drawBitmap(b,crop,dest,paint)",icon)
+        self.assertIn("BitmapFactory.decodeStream(input)",icon)
+        self.assertIn('INDEX.put("shield",20)',icon)
         self.assertIn('String[] glyphs={"story","map","bag","codex","hero","journal","settings"}',ui)
         self.assertIn('No background path',app)
         self.assertNotIn('M0,0h108v108',app)
