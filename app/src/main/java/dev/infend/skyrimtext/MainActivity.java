@@ -465,42 +465,33 @@ public final class MainActivity extends Activity {
 
     private void storyChoice(int position,GameEngine.Choice c,Runnable onClick){
         int chance=game.progress.chance(game,c.action);
-        LinearLayout line=row();line.setGravity(Gravity.TOP);
-        line.setPadding(dp(7),dp(15),dp(7),dp(19));
-        TextView badge=text(String.valueOf(position),18,c.special?accent():TEXT,true);
-        badge.setTypeface(Typeface.create("sans-serif",Typeface.BOLD));
-        badge.setGravity(Gravity.CENTER);
-        badge.setBackground(bg(PANEL_2,c.special?accent():BORDER,3));
-        line.addView(badge,lp(42,46));
-        LinearLayout detail=column();
-        LinearLayout.LayoutParams layout=new LinearLayout.LayoutParams(0,-2,1);
-        layout.leftMargin=dp(14);line.addView(detail,layout);
-        TextView title=text(c.title,17,TEXT,true);
-        title.setTypeface(Typeface.create("sans-serif",Typeface.BOLD));
-        title.setLineSpacing(dp(3),1.12f);detail.addView(title);
+        LinearLayout box=row();box.setGravity(Gravity.TOP);
+        box.setPadding(dp(12),dp(13),dp(12),dp(14));
+        box.setBackground(new RuneFrameDrawable(PANEL,c.special?accent():BORDER,c.special));
+        TextView ordinal=text("◇ "+position,18,c.special?accent():MUTED,true);
+        ordinal.setGravity(Gravity.TOP|Gravity.CENTER_HORIZONTAL);
+        box.addView(ordinal,lp(47,-2));
+        LinearLayout prose=column();
+        LinearLayout.LayoutParams size=new LinearLayout.LayoutParams(0,-2,1);
+        size.leftMargin=dp(5);box.addView(prose,size);
+        TextView name=text(c.title,17,TEXT,true);
+        name.setTypeface(Typeface.create("serif",Typeface.BOLD));
+        name.setLineSpacing(dp(3),1.1f);prose.addView(name);
         if(c.detail!=null&&!c.detail.isEmpty()){
-            space(detail,6);
-            TextView explanation=text(c.detail,15,TEXT,false);
-            explanation.setTypeface(Typeface.create("sans-serif",Typeface.NORMAL));
-            explanation.setLineSpacing(dp(4),1.11f);detail.addView(explanation);
+            space(prose,5);
+            TextView desc=text(c.detail,14,MUTED,false);
+            desc.setLineSpacing(dp(3),1.12f);prose.addView(desc);
         }
-        space(detail,7);
+        space(prose,6);
         if(chance>=0){
-            addText(detail,SceneChoiceMeta.skill(c.action),12,MUTED,false,5);
-            addText(detail,"Шанс успеха: "+chance+"%",13,SceneChoiceMeta.chanceColor(chance),true,0);
-        }else{
-            addText(detail,"Проверка навыка не требуется",12,MUTED,false,0);
-        }
-        line.setBackground(new RuneFrameDrawable(PANEL,c.special?accent():BORDER,false));
-        line.setClickable(true);line.setFocusable(true);
-        line.setOnClickListener(v->onClick.run());
-        content.addView(line,lp(-1,-2));
-        View divider=new View(this);divider.setBackgroundColor(0xff30302d);
-        LinearLayout.LayoutParams dividerParams=lp(-1,1);
-        dividerParams.topMargin=dp(3);dividerParams.bottomMargin=dp(5);
-        content.addView(divider,dividerParams);
+            addText(prose,SceneChoiceMeta.skill(c.action),12,MUTED,false,4);
+            addText(prose,"ШАНС УСПЕХА  "+chance+"%",13,SceneChoiceMeta.chanceColor(chance),true,0);
+        }else addText(prose,"БЕЗ ПРОВЕРКИ",11,0xffb8c1c4,false,0);
+        LinearLayout.LayoutParams layout=lp(-1,-2);layout.bottomMargin=dp(5);
+        content.addView(box,layout);
+        box.setClickable(true);box.setFocusable(true);
+        box.setOnClickListener(view->onClick.run());
     }
-
 
     /** A failed network continuation must not reroll an already evaluated action. */
     private String pendingAiAction(){
@@ -613,17 +604,25 @@ public final class MainActivity extends Activity {
     }
 
     private void renderAiChoice(int number,AiGameTurn.Option option){
-        LinearLayout row=column();
-        row.setPadding(dp(15),dp(13),dp(15),dp(13));
-        row.setBackground(new RuneFrameDrawable(PANEL,number==1?accent():BORDER,false));
-        addText(row,number+".  "+option.title,17,TEXT,true,7);
-        addText(row,option.detail,14,TEXT,false,7);
+        LinearLayout row=row();row.setGravity(Gravity.TOP);
+        row.setPadding(dp(12),dp(13),dp(12),dp(13));
+        row.setBackground(new RuneFrameDrawable(PANEL,number==1?accent():BORDER,number==1));
+        TextView ordinal=text("◇ "+number,17,number==1?accent():MUTED,true);
+        ordinal.setGravity(Gravity.TOP|Gravity.CENTER_HORIZONTAL);
+        row.addView(ordinal,lp(48,-2));
+        LinearLayout detail=column();
+        LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(0,-2,1);
+        p.leftMargin=dp(4);row.addView(detail,p);
+        TextView title=text(option.title,17,TEXT,true);
+        title.setTypeface(Typeface.create("serif",Typeface.BOLD));
+        detail.addView(title);space(detail,6);
+        addText(detail,option.detail,14,MUTED,false,7);
         if(option.chance>=0){
-            if(!option.skill.isEmpty())addText(row,"Навык: "+option.skill,12,MUTED,false,4);
-            addText(row,"Шанс успеха: "+option.chance+"%",14,SceneChoiceMeta.chanceColor(option.chance),true,0);
-        }else{
-            addText(row,"Без проверки вероятности",12,MUTED,false,0);
-        }
+            if(!option.skill.isEmpty())
+                addText(detail,"НАВЫК  "+option.skill,12,MUTED,false,3);
+            addText(detail,"ШАНС УСПЕХА  "+option.chance+"%",13,
+                SceneChoiceMeta.chanceColor(option.chance),true,0);
+        }else addText(detail,"БЕЗ ПРОВЕРКИ",12,MUTED,false,0);
         row.setClickable(true);row.setFocusable(true);
         row.setOnClickListener(v->{
             clearAiPending();
@@ -636,8 +635,8 @@ public final class MainActivity extends Activity {
                 ". Описание: "+option.detail+". "+result+
                 " Продолжи именно этот исход и верни effects за совершённое действие.",true);
         });
-        content.addView(row,lp(-1,-2));
-        space(content,7);
+        LinearLayout.LayoutParams wrap=lp(-1,-2);wrap.bottomMargin=dp(6);
+        content.addView(row,wrap);
     }
 
     /**
