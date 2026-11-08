@@ -340,6 +340,7 @@ public final class MainActivity extends Activity {
     }
     private void renderStory(){
         GameEngine.Scene s=game.scene();section(s.kicker,s.title,"");
+        renderStorySnapshot();
         if(LocationGalleryView.hasGallery(game.progress.location)){
             addText(content,"ᛟ  ВИДЫ ЛОКАЦИИ",11,accent(),true,9);
             content.addView(new LocationGalleryView(this,game.progress.location,accent(),false),lp(-1,-2));
@@ -350,16 +351,19 @@ public final class MainActivity extends Activity {
         LinearLayout narrative=card();
         addText(narrative,"ᚱ  ГЛАВА  ·  "+s.kicker.toUpperCase(java.util.Locale.ROOT),11,accent(),false,13);
         TextView body=text("",18,TEXT,false);
+        body.setTypeface(Typeface.create("sans-serif",Typeface.NORMAL));
         body.setText(SceneTypography.render(s.body,accent()));
-        body.setLineSpacing(dp(6),1.12f);
+        body.setLineSpacing(dp(7),1.16f);
         makeItemsClickable(body,body.getText().toString());
         narrative.addView(body);
+        renderStoryJournal();
         if(prefs.getBoolean("ai_enabled",false)) renderAiStoryPanel();
-        space(content,8);addText(content,"ВЫБЕРИ ДЕЙСТВИЕ",11,MUTED,true,13);
+        space(content,12);
+        addText(content,"Что ты предпримешь?",22,TEXT,true,7);
+        addText(content,s.choices.size()+" доступных вариантов. Вероятность показана только для настоящих проверок.",12,MUTED,false,15);
+        int number=0;
         for(GameEngine.Choice c:s.choices){
-            int chance=game.progress.chance(game,c.action);
-            String caption=c.detail+(chance<0?"":"\n[Шанс успеха: "+chance+"%]");
-            actionButton(c.title,caption,c.special,()->{
+            storyChoice(++number,c,()->{
                 if(aiClient!=null)aiClient.cancel();
                 int old=game.questStage;
                 game.choose(c.action);
@@ -372,6 +376,68 @@ public final class MainActivity extends Activity {
         }
         space(content,5);
         addText(content,"Каждое действие сохраняется автоматически",11,MUTED,false,0);
+    }
+
+    private void renderStorySnapshot(){
+        addText(content,game.name+" · "+game.race+" · Уровень "+game.level,17,TEXT,true,7);
+        addText(content,"⌖ "+game.progress.location+"  ·  День "+game.day+"  ·  Опыт "+game.xp,13,MUTED,false,7);
+        addText(content,"Вес: "+
+            String.format(java.util.Locale.forLanguageTag("ru"),"%.1f",game.progress.carryWeight())+
+            "/50 кг  ·  "+game.gold+" септимов",13,accent(),false,12);
+    }
+
+    private void renderStoryJournal(){
+        if(!game.started)return;
+        if(!"QUEST".equals(game.mode)&&!"DRAGON".equals(game.mode)
+            &&!"EVENT".equals(game.mode)&&!"RESULT".equals(game.mode))return;
+        LinearLayout journal=card();
+        addText(journal,"ᚱ  ЖУРНАЛ ПРИКЛЮЧЕНИЙ",11,accent(),true,10);
+        if(game.questStage>0&&game.questStage<4)
+            addText(journal,"◉  Пепельные печати · "+game.questStatus(),13,TEXT,false,7);
+        if(game.progress.dragonStage>=0&&game.progress.dragonStage<DragonArc.FINAL_STAGE)
+            addText(journal,"◉  Драконий след · "+DragonArc.status(game),13,TEXT,false,7);
+        if(game.sideQuest==1)
+            addText(journal,"◉  Опасные дороги · "+game.sideKills+"/3",13,MUTED,false,7);
+        if("EVENT".equals(game.mode))
+            addText(journal,"!  Случайная встреча · исход ещё неизвестен",13,0xfff18e60,true,1);
+    }
+
+    private void storyChoice(int position,GameEngine.Choice c,Runnable onClick){
+        int chance=game.progress.chance(game,c.action);
+        LinearLayout line=row();line.setGravity(Gravity.TOP);
+        line.setPadding(dp(7),dp(15),dp(7),dp(19));
+        TextView badge=text(String.valueOf(position),18,c.special?accent():TEXT,true);
+        badge.setTypeface(Typeface.create("sans-serif",Typeface.BOLD));
+        badge.setGravity(Gravity.CENTER);
+        badge.setBackground(bg(PANEL_2,c.special?accent():BORDER,3));
+        line.addView(badge,lp(42,46));
+        LinearLayout detail=column();
+        LinearLayout.LayoutParams layout=new LinearLayout.LayoutParams(0,-2,1);
+        layout.leftMargin=dp(14);line.addView(detail,layout);
+        TextView title=text(c.title,17,TEXT,true);
+        title.setTypeface(Typeface.create("sans-serif",Typeface.BOLD));
+        title.setLineSpacing(dp(3),1.12f);detail.addView(title);
+        if(c.detail!=null&&!c.detail.isEmpty()){
+            space(detail,6);
+            TextView explanation=text(c.detail,15,TEXT,false);
+            explanation.setTypeface(Typeface.create("sans-serif",Typeface.NORMAL));
+            explanation.setLineSpacing(dp(4),1.11f);detail.addView(explanation);
+        }
+        space(detail,7);
+        if(chance>=0){
+            addText(detail,SceneChoiceMeta.skill(c.action),12,MUTED,false,5);
+            addText(detail,"Шанс успеха: "+chance+"%",13,SceneChoiceMeta.chanceColor(chance),true,0);
+        }else{
+            addText(detail,"Проверка навыка не требуется",12,MUTED,false,0);
+        }
+        line.setBackground(new RuneFrameDrawable(PANEL,c.special?accent():BORDER,false));
+        line.setClickable(true);line.setFocusable(true);
+        line.setOnClickListener(v->onClick.run());
+        content.addView(line,lp(-1,-2));
+        View divider=new View(this);divider.setBackgroundColor(0xff30302d);
+        LinearLayout.LayoutParams dividerParams=lp(-1,1);
+        dividerParams.topMargin=dp(3);dividerParams.bottomMargin=dp(5);
+        content.addView(divider,dividerParams);
     }
 
     /** Story-only AI assistant: real game rules and quest transitions stay in GameEngine. */

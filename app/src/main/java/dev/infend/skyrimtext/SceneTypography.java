@@ -4,13 +4,38 @@ import android.graphics.Typeface;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
-import android.text.style.LeadingMarginSpan;
+import android.text.style.QuoteSpan;
 import android.text.style.StyleSpan;
 import android.text.style.RelativeSizeSpan;
 
-/** Renders authored scene dialogue without exposing Markdown markers to players. */
+/** Renders **bold**, *italic* and > dialogue with a visible side rule. */
 public final class SceneTypography {
     private SceneTypography(){}
+
+    private static void appendRich(SpannableStringBuilder out,String source){
+        int bold=-1,italic=-1;
+        for(int i=0;i<source.length();){
+            if(source.startsWith("**",i)){
+                if(bold<0)bold=out.length();
+                else {
+                    if(out.length()>bold)out.setSpan(new StyleSpan(Typeface.BOLD),bold,out.length(),Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    bold=-1;
+                }
+                i+=2;continue;
+            }
+            if(source.charAt(i)=='*'){
+                if(italic<0)italic=out.length();
+                else{
+                    if(out.length()>italic)out.setSpan(new StyleSpan(Typeface.ITALIC),italic,out.length(),Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    italic=-1;
+                }
+                i++;continue;
+            }
+            out.append(source.charAt(i++));
+        }
+        if(bold>=0&&out.length()>bold)out.setSpan(new StyleSpan(Typeface.BOLD),bold,out.length(),Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        if(italic>=0&&out.length()>italic)out.setSpan(new StyleSpan(Typeface.ITALIC),italic,out.length(),Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+    }
 
     public static SpannableStringBuilder render(String raw,int accent){
         SpannableStringBuilder result=new SpannableStringBuilder();
@@ -20,20 +45,22 @@ public final class SceneTypography {
             String line=lines[i];
             boolean spoken=line.startsWith(">");
             if(spoken)line=line.substring(1).trim();
-            line=line.replace("**","");
+            String visibleForSpeaker=line.replace("**","").trim();
+            boolean speaker=!spoken&&visibleForSpeaker.endsWith(":")
+                &&visibleForSpeaker.length()>1&&visibleForSpeaker.length()<64
+                &&visibleForSpeaker.indexOf('.')<0;
             int start=result.length();
-            result.append(line);
+            appendRich(result,line);
             int end=result.length();
-            if(spoken && end>start){
-                result.setSpan(new StyleSpan(Typeface.BOLD),start,end,Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-                result.setSpan(new ForegroundColorSpan(0xffe7dbc6),start,end,Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-                result.setSpan(new LeadingMarginSpan.Standard(20),start,end,Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-            }else if(line.endsWith(":") && line.length()>1 && line.length()<64 && line.indexOf('.')<0){
-                result.setSpan(new StyleSpan(Typeface.BOLD),start,end,Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-                result.setSpan(new ForegroundColorSpan(accent),start,end,Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-                result.setSpan(new RelativeSizeSpan(0.92f),start,end,Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-            }
             if(i<lines.length-1)result.append("\n");
+            if(spoken&&end>start){
+                result.setSpan(new QuoteSpan(accent),start,result.length(),Spanned.SPAN_PARAGRAPH);
+                result.setSpan(new ForegroundColorSpan(0xffeeeae5),start,end,Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            }else if(speaker&&end>start){
+                result.setSpan(new StyleSpan(Typeface.BOLD),start,end,Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                result.setSpan(new ForegroundColorSpan(0xffeeeae5),start,end,Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                result.setSpan(new RelativeSizeSpan(0.96f),start,end,Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            }
         }
         return result;
     }
