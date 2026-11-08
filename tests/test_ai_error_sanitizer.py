@@ -11,6 +11,7 @@ class ServerErrorSanitization(unittest.TestCase):
         self.assertIn('return sanitized.substring',block)
     def test_supported_chatgpt_payload_preserved(self):
         s=SRC.read_text()
-        self.assertIn('if(!chatGptPlan)payload.put("max_output_tokens",2200)',s)
+        self.assertIn('if(!chatGptPlan)',s)
+        self.assertIn('payload.put("max_output_tokens",AiReasoningEffort.apiOutputLimit(selectedEffort))',s)
         self.assertIn('payload.put("input", inputMessages)',s)
 if __name__=='__main__':unittest.main()
