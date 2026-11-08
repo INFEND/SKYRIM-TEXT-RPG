@@ -349,7 +349,11 @@ public final class MainActivity extends Activity {
         space(content,16);
         LinearLayout narrative=card();
         addText(narrative,"ᚱ  ГЛАВА  ·  "+s.kicker.toUpperCase(java.util.Locale.ROOT),11,accent(),false,13);
-        TextView body=text(s.body,18,TEXT,false);body.setLineSpacing(dp(6),1.12f);makeItemsClickable(body,s.body);narrative.addView(body);
+        TextView body=text("",18,TEXT,false);
+        body.setText(SceneTypography.render(s.body,accent()));
+        body.setLineSpacing(dp(6),1.12f);
+        makeItemsClickable(body,body.getText().toString());
+        narrative.addView(body);
         if(prefs.getBoolean("ai_enabled",false)) renderAiStoryPanel();
         space(content,8);addText(content,"ВЫБЕРИ ДЕЙСТВИЕ",11,MUTED,true,13);
         for(GameEngine.Choice c:s.choices){
@@ -386,6 +390,8 @@ public final class MainActivity extends Activity {
         String previous=aiMemory.latestAnswer(aiSession);
         TextView reply=text(previous.isEmpty()?"ИИ помнит историю беседы. Опиши действие или заговори с персонажем.":previous,15,TEXT,false);
         reply.setLineSpacing(dp(4),1.10f);
+        reply.setText(SceneTypography.render(previous.isEmpty()?
+            "ИИ помнит историю беседы. Опиши действие или заговори с персонажем.":previous,accent()));
         panel.addView(reply);
         space(panel,9);
         EditText prompt=new EditText(this);
@@ -425,7 +431,9 @@ public final class MainActivity extends Activity {
             reply.setText("");
             send.setText("ОСТАНОВИТЬ");
             boolean started=aiClient.generate(key,game,history,request,new AiStoryClient.Listener(){
-                @Override public void onText(String accumulated){reply.setText(accumulated);}
+                @Override public void onText(String accumulated){
+                    reply.setText(SceneTypography.render(accumulated,accent()));
+                }
                 @Override public void onComplete(String answer){
                     aiMemory.add(aiSession,"user",request);
                     aiMemory.add(aiSession,"master",answer);
@@ -461,7 +469,8 @@ public final class MainActivity extends Activity {
     }
 
     private void makeItemsClickable(TextView view,String source){
-        android.text.SpannableString span=new android.text.SpannableString(source);
+        // Retain speaker/dialogue formatting when adding clickable item spans.
+        android.text.SpannableStringBuilder span=new android.text.SpannableStringBuilder(view.getText());
         java.util.ArrayList<ItemCatalog.Item> list=ItemCatalog.all();
         list.sort((a,b)->Integer.compare(b.name.length(),a.name.length()));
         boolean[] occupied=new boolean[source.length()];

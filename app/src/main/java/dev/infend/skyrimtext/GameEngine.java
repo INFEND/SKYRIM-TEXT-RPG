@@ -98,7 +98,9 @@ public final class GameEngine {
     public Scene scene() {
         Scene s=baseScene();
         if(started)progress.fillChoices(this,s);
-        return s;
+        // Every offline scene follows the same long-form literary presentation.
+        // SceneNarrative is text-only: action IDs, story flags and saves are unchanged.
+        return SceneNarrative.expand(this,s);
     }
     private Scene baseScene(){
         if (!started) return new Scene("НОВАЯ ИСТОРИЯ", "Твоя сага начинается", "Создай героя, чтобы отправиться в суровые северные земли. Каждое решение меняет путь, а прогресс сохраняется автоматически.");
