@@ -467,7 +467,7 @@ public final class GameEngine {
             // Rebuild missing continuation ledger entries from authoritative schema-1 stage.
             // Never overwrite terminal outcomes already stored in newer saves.
             if(g.progress.dragonStage>=6){
-                for(int chapter=0;chapter<3;chapter++){
+                for(int chapter=0;chapter<4;chapter++){
                     String questId="dragon_ash_"+chapter;
                     if(chapter<g.progress.dragonNextStage)
                         g.progress.setQuestOutcome(questId,"COMPLETED");
