@@ -1142,7 +1142,7 @@ public final class MainActivity extends Activity {
                 selectedSort.equals(field)?accent():MUTED,selectedSort.equals(field));
             t.setGravity(Gravity.CENTER);
             sortBar.addView(t,new LinearLayout.LayoutParams(0,-1,1));
-            t.setOnClickListener(v->{selectedSort=field;render();});
+            t.setOnClickListener(clicked->{selectedSort=field;render();});
         }
         content.addView(new SkyrimRuleView(this,0xff92999b),lp(-1,18));
         actionButton("Полный справочник предметов","Каталог, поиск и характеристики всех вещей",false,this::showItemCatalog);
