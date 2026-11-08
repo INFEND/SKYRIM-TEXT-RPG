@@ -48,6 +48,8 @@ public final class MainActivity extends Activity {
     private boolean animations=true, titleOpen=true;
     private int codexCategory=0;
     private SkyrimOtaController updater;
+    private ChatGptOAuth chatGptOAuth;
+    private boolean awaitingAiToken;
     private AiStoryMemory aiMemory;
     private AiStoryClient aiClient;
     private String aiSession;
@@ -63,6 +65,7 @@ public final class MainActivity extends Activity {
         }
         aiMemory=new AiStoryMemory(this);
         aiClient=new AiStoryClient();
+        chatGptOAuth=new ChatGptOAuth(this);
         ItemCatalog.initialize(this);
         game=GameEngine.fromJson(prefs.getString("save",null));
         accentIndex=Math.max(0,Math.min(ACCENTS.length-1,prefs.getInt("accent",0)));
@@ -84,6 +87,7 @@ public final class MainActivity extends Activity {
     @Override protected void onPause(){save();super.onPause();}
     @Override protected void onDestroy(){
         if(aiClient!=null)aiClient.shutdown();
+        if(chatGptOAuth!=null)chatGptOAuth.shutdown();
         if(aiMemory!=null)aiMemory.close();
         super.onDestroy();
     }
@@ -441,12 +445,84 @@ public final class MainActivity extends Activity {
     }
 
     /** Story-only AI assistant: real game rules and quest transitions stay in GameEngine. */
+
+    private String aiProviderMode(){
+        String mode=prefs.getString("ai_provider","auto");
+        return ("chatgpt".equals(mode)||"api".equals(mode))?mode:"auto";
+    }
+    private boolean usingChatGpt(){
+        String mode=aiProviderMode();
+        return "chatgpt".equals(mode)||("auto".equals(mode)&&chatGptOAuth.hasAuthorizedPlan());
+    }
+    private void aiProviderDialog(){
+        String[] labels={"Автоматически · ChatGPT → API → обычная RPG","Аккаунт ChatGPT","OpenAI API"};
+        String mode=aiProviderMode();
+        int selected="chatgpt".equals(mode)?1:"api".equals(mode)?2:0;
+        new RuneDialogBuilder(this,accent()).setTitle("Источник ИИ")
+            .setSingleChoiceItems(labels,selected,(dialog,which)->{
+                prefs.edit().putString("ai_provider",which==1?"chatgpt":which==2?"api":"auto").apply();
+                if(aiClient!=null)aiClient.cancel();
+                dialog.dismiss();render();
+            }).setNegativeButton("Закрыть",null).show();
+    }
+    private void apiModelDialog(){
+        int current=AiModelCatalog.position(prefs.getString("ai_api_model",AiModelCatalog.DEFAULT_API));
+        new RuneDialogBuilder(this,accent()).setTitle("Модель OpenAI API")
+            .setSingleChoiceItems(AiModelCatalog.LABELS,current,(dialog,which)->{
+                prefs.edit().putString("ai_api_model",AiModelCatalog.IDS[which]).apply();
+                if(aiClient!=null)aiClient.cancel();
+                dialog.dismiss();render();
+            }).setNegativeButton("Закрыть",null).show();
+    }
+    private void loginChatGpt(){
+        toast("Открывается безопасная авторизация ChatGPT в браузере");
+        chatGptOAuth.signIn(this,(success,message)->{
+            toast(message);
+            if(tab==5)render();
+            if(success)chatGptOAuth.loadModels((models,error)->{
+                if(error!=null||models.isEmpty()){toast(error==null?"Нет доступных моделей ChatGPT":error);return;}
+                String current=prefs.getString("ai_chatgpt_model","");
+                boolean exists=false;
+                for(ChatGptOAuth.ModelOption m:models)if(current.equals(m.slug))exists=true;
+                if(!exists){
+                    String best=models.get(0).slug;
+                    for(ChatGptOAuth.ModelOption m:models)if("gpt-6.1-sol".equals(m.slug))best=m.slug;
+                    prefs.edit().putString("ai_chatgpt_model",best).apply();
+                }
+                if(tab==5)render();
+            });
+        });
+    }
+    private void chatGptModelDialog(){
+        toast("Загружаю модели аккаунта ChatGPT…");
+        chatGptOAuth.loadModels((models,error)->{
+            if(error!=null){toast(error);return;}
+            if(models.isEmpty()){toast("Нет доступных моделей ChatGPT");return;}
+            String[] labels=new String[models.size()];
+            int selected=0;String chosen=prefs.getString("ai_chatgpt_model","");
+            for(int i=0;i<models.size();i++){
+                labels[i]=models.get(i).title+" ("+models.get(i).slug+")";
+                if(chosen.equals(models.get(i).slug))selected=i;
+            }
+            if(isFinishing()||isDestroyed())return;
+            new RuneDialogBuilder(this,accent()).setTitle("Модели ChatGPT")
+                .setSingleChoiceItems(labels,selected,(dialog,which)->{
+                    prefs.edit().putString("ai_chatgpt_model",models.get(which).slug).apply();
+                    if(aiClient!=null)aiClient.cancel();
+                    dialog.dismiss();render();
+                }).setNegativeButton("Закрыть",null).show();
+        });
+    }
+
     private void renderAiStoryPanel(){
         LinearLayout panel=card();
-        addText(panel,"ᚱ  ИИ-МАСТЕР · АВТО",11,accent(),true,8);
+        addText(panel,"ᚱ  ИИ-МАСТЕР · "+(usingChatGpt()?"ChatGPT":"OpenAI API"),11,accent(),true,8);
         addText(panel,"Свободный диалог и повествование. Инвентарь, бой, награды и перемещения изменяются только игровыми действиями.",12,MUTED,false,12);
-        if(!AiKeyVault.configured(this)){
-            addText(panel,"Для облачного ИИ добавь собственный OpenAI API-ключ в настройках. Без ключа работает обычная офлайн-RPG.",13,TEXT,false,8);
+        boolean chatgpt=usingChatGpt();
+        boolean ready=chatgpt?chatGptOAuth.hasAuthorizedPlan():AiKeyVault.configured(this);
+        if(!ready){
+            addText(panel,chatgpt?"Войди через ChatGPT и разреши использование лимитов в настройках.":
+                "Подключи ChatGPT или добавь OpenAI API-ключ в настройках. Обычная RPG работает офлайн.",13,TEXT,false,8);
             TextView setup=text("НАСТРОИТЬ ИИ",14,accent(),true);
             setup.setPadding(dp(10),dp(12),dp(10),dp(12));
             setup.setBackground(new RuneFrameDrawable(PANEL_2,accent(),false));
@@ -470,7 +546,9 @@ public final class MainActivity extends Activity {
         prompt.setPadding(dp(12),dp(10),dp(12),dp(10));
         panel.addView(prompt,lp(-1,-2));
         space(panel,9);
-        TextView status=text("Облачный ИИ · GPT-6.1 Terra · запросы могут тарифицироваться",11,MUTED,false);
+        String selectedModel=prefs.getString(chatgpt?"ai_chatgpt_model":"ai_api_model",chatgpt?"":AiModelCatalog.DEFAULT_API);
+        TextView status=text(chatgpt?"ChatGPT · "+(selectedModel.isEmpty()?"выбери модель в настройках":selectedModel):
+                "OpenAI API · "+AiModelCatalog.label(selectedModel)+" · отдельная оплата",11,MUTED,false);
         panel.addView(status);
         space(panel,8);
         TextView send=text("СОЗДАТЬ ПРОДОЛЖЕНИЕ",14,accent(),true);
@@ -479,7 +557,8 @@ public final class MainActivity extends Activity {
         send.setBackground(new RuneFrameDrawable(PANEL_2,accent(),false));
         panel.addView(send);
         send.setOnClickListener(v->{
-            if(aiClient.isRunning()){
+            if(aiClient.isRunning()||awaitingAiToken){
+                awaitingAiToken=false;
                 aiClient.cancel();
                 status.setText("Генерация остановлена. Игровой прогресс не изменён.");
                 send.setText("СОЗДАТЬ ПРОДОЛЖЕНИЕ");
@@ -488,15 +567,14 @@ public final class MainActivity extends Activity {
             final String request=prompt.getText().toString().trim();
             if(request.isEmpty()){toast("Напиши действие или реплику");return;}
             if(request.length()>800){toast("Максимум 800 символов");return;}
-            final String key;
-            try{key=AiKeyVault.read(this);}
-            catch(Exception ex){status.setText("Не удалось прочитать ключ. Введи его снова в настройках.");return;}
-            if(key.isEmpty()){status.setText("API-ключ не настроен");return;}
             String history=aiMemory.context(aiSession);
-            status.setText("ИИ создаёт сцену…");
+            if(chatgpt&&selectedModel.isEmpty()){
+                status.setText("Сначала выбери модель ChatGPT в настройках.");return;
+            }
+            status.setText(chatgpt?"Проверка сессии ChatGPT…":"ИИ создаёт сцену…");
             reply.setText("");
             send.setText("ОСТАНОВИТЬ");
-            boolean started=aiClient.generate(key,game,history,request,new AiStoryClient.Listener(){
+            AiStoryClient.Listener responseListener=new AiStoryClient.Listener(){
                 @Override public void onText(String accumulated){
                     reply.setText(SceneTypography.render(accumulated,accent()));
                 }
@@ -511,8 +589,25 @@ public final class MainActivity extends Activity {
                     status.setText(error+". Игровой прогресс не изменён.");
                     send.setText("ПОВТОРИТЬ");
                 }
-            });
-            if(!started){send.setText("СОЗДАТЬ ПРОДОЛЖЕНИЕ");status.setText("Предыдущий запрос ещё завершается");}
+            };
+            if(chatgpt){
+                awaitingAiToken=true;
+                chatGptOAuth.getToken((token,error)->{
+                    if(!awaitingAiToken)return;
+                    awaitingAiToken=false;
+                    if(error!=null){status.setText(error);send.setText("ПОВТОРИТЬ");return;}
+                    status.setText("ChatGPT создаёт сцену…");
+                    boolean started=aiClient.generate(token,selectedModel,game,history,request,responseListener);
+                    if(!started){status.setText("Предыдущий запрос ещё завершается");send.setText("СОЗДАТЬ ПРОДОЛЖЕНИЕ");}
+                });
+            }else{
+                final String key;
+                try{key=AiKeyVault.read(this);}
+                catch(Exception ex){status.setText("Не удалось прочитать ключ API");send.setText("ПОВТОРИТЬ");return;}
+                if(key.isEmpty()){status.setText("API-ключ не настроен");send.setText("ПОВТОРИТЬ");return;}
+                boolean started=aiClient.generate(key,selectedModel,game,history,request,responseListener);
+                if(!started){status.setText("Предыдущий запрос ещё завершается");send.setText("СОЗДАТЬ ПРОДОЛЖЕНИЕ");}
+            }
         });
     }
 
@@ -523,7 +618,7 @@ public final class MainActivity extends Activity {
         value.setHint("sk-...");
         value.setInputType(InputType.TYPE_CLASS_TEXT|InputType.TYPE_TEXT_VARIATION_PASSWORD);
         new RuneDialogBuilder(this,accent()).setTitle("OpenAI API-ключ")
-            .setMessage("Нужен отдельный API-ключ с доступным балансом. Подписка ChatGPT не заменяет API. Ключ шифруется в Android Keystore. Для публичных приложений безопаснее собственный сервер.")
+            .setMessage("API оплачивается отдельно. Вход через ChatGPT доступен выше без API-ключа после разрешения использования подписки. Ключ шифруется в Android Keystore; публичным приложениям безопаснее использовать сервер.")
             .setView(value).setNegativeButton("Отмена",null)
             .setPositiveButton("Сохранить",(d,w)->{
                 try{
@@ -929,7 +1024,7 @@ public final class MainActivity extends Activity {
         space(content,6);addText(content,"ИИ-ПРИКЛЮЧЕНИЕ",11,accent(),true,11);
         LinearLayout aiCard=card();
         addText(aiCard,"АВТОМАТИЧЕСКИЙ РЕЖИМ",11,accent(),true,8);
-        addText(aiCard,"При наличии собственного API-ключа доступен облачный ИИ-мастер. Без ключа остаётся стандартная офлайн-игра. Локальная нейросеть и вход через ChatGPT пока не реализованы.",12,MUTED,false,10);
+        addText(aiCard,"Вход через ChatGPT с отдельным разрешением использовать подписку либо собственный OpenAI API. Платный API не используется автоматически при ошибке или исчерпании лимита ChatGPT. Локальная модель пока не подключена.",12,MUTED,false,10);
         Switch aiToggle=new Switch(this);
         aiToggle.setText("Разрешить ИИ-повествование");
         aiToggle.setTextSize(sp(14));aiToggle.setTextColor(TEXT);
@@ -940,7 +1035,25 @@ public final class MainActivity extends Activity {
             if(!on && aiClient!=null)aiClient.cancel();
         });
         aiCard.addView(aiToggle,lp(-1,48));
-        addText(aiCard,"История переписки сохраняется в SQLite отдельно для каждого нового персонажа. Облачные запросы могут оплачиваться отдельно.",12,MUTED,false,0);
+        addText(aiCard,"Диалоги сохраняются в SQLite. Расход ChatGPT идёт в пределах разрешённого плана; API оплачивается отдельно.",12,MUTED,false,0);
+        String provider=aiProviderMode();
+        actionButton("Источник ИИ","chatgpt".equals(provider)?"Аккаунт ChatGPT":
+            "api".equals(provider)?"OpenAI API":"Автоматически · ChatGPT → API",true,this::aiProviderDialog);
+        actionButton("Продолжить с ChatGPT",chatGptOAuth.accountLabel()+
+            " · вход в системном браузере",false,this::loginChatGpt);
+        if(chatGptOAuth.hasAuthorizedPlan()){
+            actionButton("Модель ChatGPT",prefs.getString("ai_chatgpt_model","Не выбрана")+
+                " · список твоего аккаунта",false,this::chatGptModelDialog);
+            actionButton("Выйти из ChatGPT","Завершить авторизованную сессию",false,()->{
+                new RuneDialogBuilder(this,accent()).setTitle("Выйти из ChatGPT?")
+                    .setNegativeButton("Отмена",null).setPositiveButton("Выйти",(d,w)->{
+                        if(aiClient!=null)aiClient.cancel();
+                        chatGptOAuth.signOut((success,message)->{toast(message);render();});
+                    }).show();
+            });
+        }
+        actionButton("Модель OpenAI API",AiModelCatalog.label(prefs.getString("ai_api_model",AiModelCatalog.DEFAULT_API)),
+            false,this::apiModelDialog);
         actionButton("Ввести / заменить OpenAI API-ключ",AiKeyVault.configured(this)?"Ключ уже сохранён (зашифрован)":"Ключ не настроен",false,this::aiKeyDialog);
         if(AiKeyVault.configured(this))actionButton("Удалить сохранённый API-ключ","Не затрагивает игру и историю",false,()->{
             new RuneDialogBuilder(this,accent()).setTitle("Удалить ключ API?")

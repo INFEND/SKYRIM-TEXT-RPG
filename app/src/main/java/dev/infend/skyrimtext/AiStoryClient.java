@@ -23,7 +23,6 @@ final class AiStoryClient {
     }
 
     private static final String ENDPOINT = "https://api.openai.com/v1/responses";
-    private static final String MODEL = "gpt-6.1-terra";
     private static final String RULES = "Ты мастер текстовой RPG во вселенной Skyrim. Пиши только по-русски, канонично, как целую литературную сцену, а не короткий пересказ. Меняй ритм длинных и коротких абзацев. " +
             "Описывай обстановку, запахи, звук, мокрую одежду, усталость, мысли героя, поведение спутников, нарастающую угрозу и последствия каждого выбора. Уместный объём 2500-5000 знаков, без пустых повторений и выдуманных наград. " +
             "Оформляй диалоги строго так: **Персонаж:** затем отдельная строка >**— Его реплика**. Мысли героя оформляй *курсивом*. Не выдавай неподтверждённые события за изменения игрового журнала. " +
@@ -47,23 +46,24 @@ final class AiStoryClient {
     boolean isRunning() { return running; }
 
     /** Must be called on UI thread; takes an immutable snapshot before networking. */
-    boolean generate(String token, GameEngine game, String history, String playerText, Listener listener) {
-        if (running || token == null || token.isEmpty()) return false;
+    boolean generate(String token, String model, GameEngine game, String history, String playerText, Listener listener) {
+        if (running || token == null || token.isEmpty() || model == null || !model.matches("[a-zA-Z0-9._-]{2,100}")) return false;
         final String input = context(game, history, playerText);
         final int id = ++sequence;
         cancelled = false;
         running = true;
         executor.execute(() -> {
             StringBuilder answer = new StringBuilder();
+            boolean completed = false;
             long lastDraw = 0;
             try {
                 JSONObject payload = new JSONObject();
-                payload.put("model", MODEL);
+                payload.put("model", model);
                 payload.put("instructions", RULES);
                 payload.put("input", input);
                 payload.put("stream", true);
                 payload.put("store", false);
-                payload.put("max_output_tokens", 800);
+                payload.put("max_output_tokens", 2200);
                 HttpURLConnection conn = (HttpURLConnection) new URL(ENDPOINT).openConnection();
                 connection = conn;
                 conn.setRequestMethod("POST");
@@ -78,7 +78,7 @@ final class AiStoryClient {
                 }
                 int status = conn.getResponseCode();
                 if (status < 200 || status > 299) {
-                    throw new IllegalStateException(status == 401 ? "Неверный ключ OpenAI API (401)" :
+                    throw new IllegalStateException(status == 401 ? "Авторизация ИИ не удалась (401)" :
                             status == 429 ? "Лимит или баланс OpenAI API (429)" :
                             "Облачный ИИ недоступен (HTTP " + status + ")");
                 }
@@ -92,8 +92,15 @@ final class AiStoryClient {
                         JSONObject event;
                         try { event = new JSONObject(data); } catch (Exception ignored) { continue; }
                         String type = event.optString("type", "");
-                        if ("response.failed".equals(type) || "error".equals(type))
-                            throw new IllegalStateException("Ошибка генерации на сервере");
+                        if ("response.failed".equals(type) || "error".equals(type)) {
+                            JSONObject response=event.optJSONObject("response");
+                            JSONObject err=response==null?event.optJSONObject("error"):response.optJSONObject("error");
+                            String code=err==null?"":err.optString("code","");
+                            throw new IllegalStateException(code.isEmpty()?"Ошибка генерации на сервере":"Ошибка ИИ: "+code);
+                        }
+                        if ("response.incomplete".equals(type))
+                            throw new IllegalStateException("ИИ не завершил ответ");
+                        if ("response.completed".equals(type))completed=true;
                         if ("response.output_text.delta".equals(type)) {
                             answer.append(event.optString("delta", ""));
                             long now = System.currentTimeMillis();
@@ -106,6 +113,7 @@ final class AiStoryClient {
                     }
                 }
                 if (!cancelled && sequence == id) {
+                    if (!completed) throw new IllegalStateException("Поток прервался до завершения ответа");
                     if (answer.length() == 0) throw new IllegalStateException("ИИ вернул пустой ответ");
                     String complete = answer.toString();
                     main.post(() -> {
