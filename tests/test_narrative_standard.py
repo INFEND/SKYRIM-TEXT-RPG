@@ -29,7 +29,7 @@ class NarrativeContracts(unittest.TestCase):
         self.assertNotIn('new QuoteSpan(',formatter)
         self.assertIn('Typeface.ITALIC',formatter)
         self.assertIn('new ForegroundColorSpan(0xfff0f0ef)',formatter)
-        self.assertIn('new QuoteSpan(accent)',formatter)
+        self.assertNotIn('new QuoteSpan(',formatter)
         self.assertIn('body.setText(SceneTypography.render(s.body,accent()));',view)
         self.assertIn('storyChoice(++number,c,()->',view)
         self.assertIn('SceneChoiceMeta.chanceColor(chance)',view)
