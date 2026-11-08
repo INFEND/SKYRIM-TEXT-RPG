@@ -11,8 +11,8 @@ class ContinuationConsequencesTest(unittest.TestCase):
     def test_thirty_distinct_results(self):
         section = SOURCE.split("private static final String[][] CONSEQUENCES=", 1)[1].split("private static final int[][] SKILLS=", 1)[0]
         results = re.findall(r'^\s*"([^"]+)"[,}]?\s*$', section, re.MULTILINE)
-        self.assertEqual(len(results), 30)
-        self.assertEqual(len(set(results)), 30)
+        self.assertEqual(len(results), 10 * 4)
+        self.assertEqual(len(set(results)), 10 * 4)
         for result in results:
             self.assertGreater(len(result), 90)
         self.assertIn("CONSEQUENCES[stage][choice-1]", SOURCE)
