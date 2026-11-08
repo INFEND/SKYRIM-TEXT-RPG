@@ -82,6 +82,16 @@ public final class AiGameTurn {
         }
         return turn;
     }
+    /** Short, isolated AI request. The returned chance is locked before a roll. */
+    public static int parseChance(String response)throws JSONException{
+        if(response==null||response.length()>3000)throw new JSONException("Нет оценки шанса ИИ");
+        String s=response.trim();
+        int begin=s.indexOf('{'),end=s.lastIndexOf('}');
+        if(begin<0||end<=begin)throw new JSONException("ИИ не прислал шанс JSON");
+        JSONObject obj=new JSONObject(s.substring(begin,end+1));
+        if(!obj.has("customChance"))throw new JSONException("В ответе нет customChance");
+        return probability(obj,"customChance");
+    }
     public static int roll(){return DICE.nextInt(100)+1;}
     public static boolean success(int chance,int roll){return chance<0||roll<=chance;}
     public JSONObject save()throws JSONException{

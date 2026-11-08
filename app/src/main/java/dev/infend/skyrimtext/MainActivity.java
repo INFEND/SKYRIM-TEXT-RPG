@@ -53,6 +53,11 @@ public final class MainActivity extends Activity {
     private AiStoryMemory aiMemory;
     private AiStoryClient aiClient;
     private String aiSession;
+    private static final String AI_PENDING_ACTION="ai_pending_action";
+    private static final String AI_PENDING_CHANCE="ai_pending_chance";
+    private static final String AI_PENDING_DIE="ai_pending_die";
+    private static final String AI_PENDING_SCENE="ai_pending_scene_hash";
+    private static final String AI_PENDING_SESSION="ai_pending_session";
     private boolean aiTurnBusy;
     private String aiTurnPreview="",aiTurnStatus="";
     private TextView aiTurnText;
@@ -449,6 +454,34 @@ public final class MainActivity extends Activity {
     }
 
 
+    /** A failed network continuation must not reroll an already evaluated action. */
+    private String pendingAiAction(){
+        if(game.aiTurn==null)return "";
+        if(prefs.getInt(AI_PENDING_SCENE,0)!=game.aiTurn.scene.hashCode())return "";
+        if(!aiSession.equals(prefs.getString(AI_PENDING_SESSION,"")))return "";
+        return prefs.getString(AI_PENDING_ACTION,"");
+    }
+    private void clearAiPending(){
+        prefs.edit().remove(AI_PENDING_ACTION).remove(AI_PENDING_CHANCE)
+            .remove(AI_PENDING_DIE).remove(AI_PENDING_SCENE)
+            .remove(AI_PENDING_SESSION).apply();
+    }
+    private void storeAiPending(String action,int chance,int die){
+        prefs.edit().putString(AI_PENDING_ACTION,action)
+            .putInt(AI_PENDING_CHANCE,chance).putInt(AI_PENDING_DIE,die)
+            .putInt(AI_PENDING_SCENE,game.aiTurn==null?0:game.aiTurn.scene.hashCode())
+            .putString(AI_PENDING_SESSION,aiSession).apply();
+    }
+    private String lockedFreeInstruction(String action,int chance,int die){
+        String verdict=chance<0?"Проверка не требуется, действие гарантировано.":
+            "ИИ ранее зафиксировал шанс "+chance+"%, Android уже бросил "+die+
+            " из 100. Результат "+(AiGameTurn.success(chance,die)?"УСПЕХ":"НЕУДАЧА")+".";
+        return "СВОБОДНОЕ ДЕЙСТВИЕ ИГРОКА: "+action+"\n"+verdict+
+            " НЕ пересчитывай вероятность и НЕ меняй исход. Верни customChance ровно "+
+            (chance<0?"null":String.valueOf(chance))+
+            ", опиши только этот установленный результат, effects и 10 новых вариантов.";
+    }
+
     /** AI mode replaces the entire offline story, not just its dialogue panel. */
     private void renderAiGame(){
         boolean chat=usingChatGpt();
@@ -504,6 +537,8 @@ public final class MainActivity extends Activity {
         EditText own=new EditText(this);
         own.setTextColor(TEXT);own.setHintTextColor(MUTED);own.setTextSize(sp(16));
         own.setHint("Опиши, что говоришь или делаешь...");
+        String existingPending=pendingAiAction();
+        if(!existingPending.isEmpty())own.setText(existingPending);
         own.setInputType(InputType.TYPE_CLASS_TEXT|InputType.TYPE_TEXT_FLAG_MULTI_LINE|InputType.TYPE_TEXT_FLAG_CAP_SENTENCES);
         own.setMinLines(3);own.setMaxLines(7);
         own.setPadding(dp(13),dp(11),dp(13),dp(11));
@@ -514,12 +549,18 @@ public final class MainActivity extends Activity {
             String value=own.getText().toString().trim();
             if(value.isEmpty()){toast("Напиши свой ответ");return;}
             if(value.length()>1500){toast("Не более 1500 символов");return;}
-            // The model must commit to a probability BEFORE Android draws a die.
-            requestAiTurn("ОЦЕНКА СВОБОДНОГО ДЕЙСТВИЯ (ЭТАП 1): "+value+
-                "\nОцени customChance по состоянию героя и сложности, без броска. "+
-                "Не исполняй действие и не меняй состояние: effects={}. "+
-                "Верни корректный игровой JSON с десятью вариантами, но он служит "+
-                "только предварительной оценкой и не будет показан игроку.",false,true,-2,value);
+            if(value.equals(pendingAiAction())){
+                // Retry the same recorded outcome after an API/validation error.
+                int lockedChance=prefs.getInt(AI_PENDING_CHANCE,-1);
+                int lockedDie=prefs.getInt(AI_PENDING_DIE,-1);
+                requestAiTurn(lockedFreeInstruction(value,lockedChance,lockedDie),
+                    true,false,lockedChance,null);
+                return;
+            }
+            clearAiPending();
+            requestAiTurn("ОЦЕНКА СВОБОДНОГО ДЕЙСТВИЯ: "+value+
+                "\nНазови ТОЛЬКО customChance по состоянию персонажа и риску. "+
+                "ЗАПРЕЩЕНО выполнять действие или выдавать эффект до броска.",false,true,-2,value);
         });
     }
 
@@ -537,6 +578,7 @@ public final class MainActivity extends Activity {
         }
         row.setClickable(true);row.setFocusable(true);
         row.setOnClickListener(v->{
+            clearAiPending();
             int die=AiGameTurn.roll();
             boolean success=AiGameTurn.success(option.chance,die);
             String result=option.chance<0?"Действие без проверки навыка.":
@@ -591,24 +633,17 @@ public final class MainActivity extends Activity {
                     // Never overwrite a save changed during the network request.
                     if(!game.toJson().toString().equals(saved))
                         throw new IllegalStateException("Состояние героя изменилось во время генерации");
-                    AiGameTurn completed=AiGameTurn.parse(answer);
                     if(proposalOnly){
-                        // No effects, scene, journal or memory are applied at this stage.
-                        final int fixedChance=completed.customChance;
-                        final int die=fixedChance<0?-1:AiGameTurn.roll();
-                        final boolean passed=AiGameTurn.success(fixedChance,die);
+                        // The short chance-only response is never written to RPG memory.
+                        int fixedChance=AiGameTurn.parseChance(answer);
+                        int die=fixedChance<0?-1:AiGameTurn.roll();
+                        storeAiPending(customAction,fixedChance,die);
                         aiTurnBusy=false;aiTurnPreview="";
-                        String verdict=fixedChance<0
-                            ?"Проверка навыка не требуется. Действие гарантировано."
-                            :"Зафиксированный шанс: "+fixedChance+"%. Бросок Android: "+
-                              die+". Исход: "+(passed?"УСПЕХ":"НЕУДАЧА")+".";
-                        requestAiTurn("СВОБОДНОЕ ДЕЙСТВИЕ ИГРОКА (ЭТАП 2): "+customAction+
-                            "\\n"+verdict+" Не пересчитывай шанс и не меняй исход. "+
-                            "Верни customChance точно "+(fixedChance<0?"null":fixedChance)+
-                            ", подробно опиши установленный результат и только теперь "+
-                            "предложи effects и десять новых вариантов.",true,false,fixedChance,null);
+                        requestAiTurn(lockedFreeInstruction(customAction,fixedChance,die),
+                            true,false,fixedChance,null);
                         return;
                     }
+                    AiGameTurn completed=AiGameTurn.parse(answer);
                     if(expectedChance!=-2&&completed.customChance!=expectedChance)
                         throw new IllegalStateException("ИИ изменил шанс после броска");
                     GameEngine next=GameEngine.fromJson(saved);
@@ -616,6 +651,7 @@ public final class MainActivity extends Activity {
                     next.aiTurn=completed;
                     game=next;
                     save();
+                    clearAiPending();
                     aiMemory.add(aiSession,"user",instruction);
                     aiMemory.add(aiSession,"master",completed.scene);
                     if(!completed.journal.isEmpty())aiMemory.add(aiSession,"event",completed.journal);
@@ -639,7 +675,10 @@ public final class MainActivity extends Activity {
                 if(!awaitingAiToken||!aiTurnBusy)return;
                 awaitingAiToken=false;
                 if(error!=null){aiTurnBusy=false;aiTurnStatus=error;render();return;}
-                if(!aiClient.generateTurn(token,model,true,effort,game,history,instruction,listener)){
+                boolean started=proposalOnly?
+                    aiClient.generateChance(token,model,true,effort,game,history,instruction,listener):
+                    aiClient.generateTurn(token,model,true,effort,game,history,instruction,listener);
+                if(!started){
                     aiTurnBusy=false;aiTurnStatus="Предыдущая генерация ещё завершается";render();
                 }
             });
@@ -648,7 +687,10 @@ public final class MainActivity extends Activity {
             try{key=AiKeyVault.read(this);}
             catch(Exception e){aiTurnBusy=false;aiTurnStatus="API-ключ недоступен";render();return;}
             if(key==null||key.isEmpty()){aiTurnBusy=false;aiTurnStatus="Не настроен API-ключ";render();return;}
-            if(!aiClient.generateTurn(key,model,false,effort,game,history,instruction,listener)){
+            boolean started=proposalOnly?
+                aiClient.generateChance(key,model,false,effort,game,history,instruction,listener):
+                aiClient.generateTurn(key,model,false,effort,game,history,instruction,listener);
+            if(!started){
                 aiTurnBusy=false;aiTurnStatus="Предыдущая генерация ещё завершается";render();
             }
         }
