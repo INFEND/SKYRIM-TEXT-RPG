@@ -4,7 +4,6 @@ import android.os.Handler;
 import android.os.Looper;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.json.JSONArray;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.BufferedReader;
@@ -190,9 +189,10 @@ final class AiStoryClient {
 
     private static String safeServerText(String raw){
         if(raw==null)return "";
+        // Preserve error codes exactly. Redact access keys and inline bearer tokens.
         String sanitized=raw.replaceAll("(?i)sk-[a-z0-9_-]{8,}","[секрет скрыт]")
-                .replaceAll("(?i)bearer\\\\s+[a-z0-9._-]{8,}","Bearer [секрет скрыт]")
-                .replaceAll("[\\\\x00-\\\\x1f]+"," ").trim();
+                .replaceAll("(?i)bearer\\s+[a-z0-9._-]{8,}","Bearer [секрет скрыт]")
+                .replace('\n',' ').replace('\r',' ').trim();
         return sanitized.substring(0,Math.min(180,sanitized.length()));
     }
 
