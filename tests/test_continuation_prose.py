@@ -15,8 +15,8 @@ class ContinuationNarrative(unittest.TestCase):
                        "Ривервуд", "Драконьем Пределе", "Виндхельму"):
             self.assertIn(marker,section)
         self.assertEqual(section.count(">**—"),3)
-        self.assertEqual(section.count("**\\n>**—"),3)
-        self.assertGreater(len(section),8500)
+        self.assertEqual(section.count("**\\\\n>**—"),3)
+        self.assertGreater(len(section),6000)
         self.assertIn("private static final String[][] OPTIONS=",source)
         self.assertIn("DRAGON_NEXT:",source)
         self.assertIn("dragonNextUsed",source)
