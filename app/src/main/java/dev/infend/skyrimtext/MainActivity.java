@@ -1034,39 +1034,116 @@ public final class MainActivity extends Activity {
     }
     private void renderInventory(){
         game.progress.sync(game);
-        section("СУМКА СТРАННИКА","Инвентарь","Каждый предмет имеет вес, цену и собственное описание. Переносимый вес учитывается при путешествиях.");
-        content.addView(new NordicArtView(this,NordicArtView.TITLE),lp(-1,120));space(content,12);
-        LinearLayout capacity=card();
-        double used=game.progress.carryWeight();
-        addText(capacity,String.format(java.util.Locale.forLanguageTag("ru"),"ВЕС: %.2f / 50.00 КГ",used),19,used>50?0xffef8585:accent(),true,8);
-        ProgressBar bar=new ProgressBar(this,null,android.R.attr.progressBarStyleHorizontal);
-        bar.setMax(5000);bar.setProgress(Math.min(5000,(int)Math.round(used*100)));
-        bar.setProgressTintList(ColorStateList.valueOf(used>50?0xffef8585:accent()));
-        capacity.addView(bar,lp(-1,8));
-        addText(capacity,"Септимы: "+game.gold+"  •  Каталог: "+ItemCatalog.count()+" предметов",13,MUTED,false,0);
-        java.util.ArrayList<String> categories=ItemCatalog.groups();
-        if(!categories.contains(selectedCategory))selectedCategory="Все";
-        int index=categories.indexOf(selectedCategory);
-        android.widget.Spinner group=spinner(categories.toArray(new String[0]),index,i->{
-            String choice=categories.get(i);if(!choice.equals(selectedCategory)){selectedCategory=choice;render();}
-        });
-        content.addView(group,lp(-1,50));space(content,8);
-        String[] sorts={"Название","Вес","Цена"};
-        int sortIndex=java.util.Arrays.asList(sorts).indexOf(selectedSort);
-        android.widget.Spinner sort=spinner(sorts,Math.max(0,sortIndex),i->{
-            if(!sorts[i].equals(selectedSort)){selectedSort=sorts[i];render();}
-        });
-        content.addView(sort,lp(-1,50));space(content,10);
-        java.util.ArrayList<ItemCatalog.Item> owned=game.progress.owned(selectedCategory,selectedSort);
-        if(owned.isEmpty())addText(content,"В этой категории пока ничего нет.",15,MUTED,false,15);
-        for(ItemCatalog.Item item:owned){
-            int count=game.progress.quantity(item.id);
-            String desc=String.format(java.util.Locale.forLanguageTag("ru"),"%s · %.2f кг × %d · %d септимов",item.category,item.weight,count,item.value);
-            actionButton(item.icon+"  "+item.name+" ×"+count,desc,false,()->itemDialog(item));
+        section("ПРЕДМЕТЫ И СНАРЯЖЕНИЕ","Инвентарь","Оружие, доспехи, книги и другие находки.");
+        java.util.ArrayList<String> groups=ItemCatalog.groups();
+        if(!groups.contains(selectedCategory))selectedCategory="Все";
+        // Category icon ribbon, horizontally scrollable and fully transparent.
+        HorizontalScrollView categoryScroll=new HorizontalScrollView(this);
+        categoryScroll.setHorizontalScrollBarEnabled(false);
+        categoryScroll.setFillViewport(false);
+        LinearLayout categoryStrip=row();
+        categoryStrip.setPadding(dp(4),dp(7),dp(4),dp(9));
+        categoryStrip.setBackground(new RuneFrameDrawable(PANEL,BORDER,false));
+        categoryScroll.addView(categoryStrip);
+        content.addView(categoryScroll,lp(-1,-2));
+        for(String group:groups){
+            boolean active=selectedCategory.equals(group);
+            String image=iconOf(group);
+            if(group.equals("Оружие"))image="weapon";
+            else if(group.equals("Броня")||group.equals("Одежда"))image="armor";
+            else if(group.equals("Зелья"))image="potion";
+            else if(group.equals("Все"))image="bag";
+            else if(group.equals("Книги"))image="book";
+            LinearLayout tile=column();tile.setGravity(Gravity.CENTER);
+            tile.setPadding(dp(7),dp(3),dp(7),dp(3));
+            categoryStrip.addView(tile,lp(65,67));
+            tile.addView(new SkyrimIconView(this,image,active?accent():MUTED),lp(28,30));
+            TextView caption=text(group.toUpperCase(java.util.Locale.ROOT),9,active?TEXT:MUTED,active);
+            caption.setGravity(Gravity.CENTER);caption.setMaxLines(2);
+            tile.addView(caption,lp(-1,-2));
+            tile.setOnClickListener(v->{selectedCategory=group;focusedInventoryId="";render();});
         }
-        actionButton("Полный справочник предметов","Поиск, характеристики, вес и описание каждого предмета",true,this::showItemCatalog);
-        actionButton("Кодекс и бестиарий","Народы, существа, история и места северных земель",false,()->{tab=6;render();});
-        actionButton("Личная библиотека","Материалы, созданные для этой игры, включая способности и существ",false,this::showLibrary);
+        content.addView(new SkyrimRuleView(this,accent()),lp(-1,22));
+        double carried=game.progress.carryWeight();
+        LinearLayout summary=card();
+        TextView weight=text(String.format(java.util.Locale.forLanguageTag("ru"),
+                "ВЕС  %.2f / 50 кг     ◈  СЕПТИМЫ  %d",carried,game.gold),
+                15,carried>50?0xffd9a5a5:TEXT,true);
+        weight.setGravity(Gravity.CENTER);summary.addView(weight);
+        space(summary,6);
+        ProgressBar load=new ProgressBar(this,null,android.R.attr.progressBarStyleHorizontal);
+        load.setMax(5000);load.setProgress((int)Math.min(5000,Math.round(carried*100)));
+        load.setProgressTintList(ColorStateList.valueOf(0xffc4c9c9));
+        load.setProgressBackgroundTintList(ColorStateList.valueOf(0xff303839));
+        summary.addView(load,lp(-1,3));
+        java.util.ArrayList<ItemCatalog.Item> owned=game.progress.owned(selectedCategory,selectedSort);
+        if(owned.isEmpty())focusedInventoryId="";
+        else if(focusedInventoryId.isEmpty()||game.progress.quantity(focusedInventoryId)==0
+                ||owned.stream().noneMatch(item->item.id.equals(focusedInventoryId)))
+            focusedInventoryId=owned.get(0).id;
+        ItemCatalog.Item focused=focusedInventoryId.isEmpty()?null:ItemCatalog.find(focusedInventoryId);
+        if(focused!=null){
+            LinearLayout selected=card();
+            LinearLayout top=row();selected.addView(top,lp(-1,-2));
+            SkyrimIconView image=new SkyrimIconView(this,iconOf(focused.category),accent());
+            top.addView(image,lp(70,78));
+            LinearLayout details=column();details.setPadding(dp(9),0,0,0);
+            top.addView(details,new LinearLayout.LayoutParams(0,-2,1));
+            addText(details,focused.name.toUpperCase(java.util.Locale.ROOT),18,TEXT,true,7);
+            addText(details,focused.effect,12,MUTED,false,8);
+            addText(details,"ВЕС "+String.format(java.util.Locale.forLanguageTag("ru"),"%.2f",focused.weight)
+                    +"     СТОИМОСТЬ "+focused.value,12,accent(),true,0);
+            selected.addView(new SkyrimRuleView(this,accent()),lp(-1,17));
+            addText(selected,focused.description,14,TEXT,false,9);
+            TextView detail=text("◇  ПОДРОБНЕЕ / ИСПОЛЬЗОВАТЬ",12,accent(),true);
+            detail.setGravity(Gravity.END);selected.addView(detail,lp(-1,30));
+            detail.setOnClickListener(v->itemDialog(focused));
+        }
+        // Skyrim's familiar name / weight / value table, without bulky cards.
+        LinearLayout tableHead=row();tableHead.setPadding(dp(8),dp(7),dp(8),dp(8));
+        tableHead.setBackgroundColor(0xb5000000);
+        TextView title=text("НАЗВАНИЕ",12,MUTED,true);
+        tableHead.addView(title,new LinearLayout.LayoutParams(0,-2,1));
+        TextView w=text("ВЕС",11,MUTED,true);w.setGravity(Gravity.END);tableHead.addView(w,lp(63,-2));
+        TextView v=text("ЦЕНА",11,MUTED,true);v.setGravity(Gravity.END);tableHead.addView(v,lp(58,-2));
+        content.addView(tableHead,lp(-1,-2));
+        content.addView(new SkyrimRuleView(this,0xff707577),lp(-1,10));
+        if(owned.isEmpty())addText(content,"В выбранной категории нет предметов.",15,MUTED,false,14);
+        for(ItemCatalog.Item item:owned){
+            final boolean active=item.id.equals(focusedInventoryId);
+            LinearLayout itemRow=row();itemRow.setPadding(dp(7),dp(10),dp(8),dp(10));
+            itemRow.setBackgroundColor(active?0xa02a2e30:0x98050607);
+            itemRow.addView(new SkyrimIconView(this,iconOf(item.category),active?accent():MUTED),lp(22,23));
+            TextView name=text(item.name+" ×"+game.progress.quantity(item.id),14,active?accent():TEXT,active);
+            name.setMaxLines(2);LinearLayout.LayoutParams np=new LinearLayout.LayoutParams(0,-2,1);
+            np.leftMargin=dp(8);itemRow.addView(name,np);
+            TextView measure=text(String.format(java.util.Locale.forLanguageTag("ru"),"%.1f",item.weight),
+                12,active?TEXT:MUTED,false);measure.setGravity(Gravity.END);
+            itemRow.addView(measure,lp(63,-2));
+            TextView price=text(String.valueOf(item.value),12,active?TEXT:MUTED,false);
+            price.setGravity(Gravity.END);itemRow.addView(price,lp(58,-2));
+            content.addView(itemRow,lp(-1,-2));
+            View separator=new View(this);separator.setBackgroundColor(0xff262b2d);
+            content.addView(separator,lp(-1,1));
+            itemRow.setOnClickListener(view->{focusedInventoryId=item.id;render();});
+            itemRow.setOnLongClickListener(view->{itemDialog(item);return true;});
+        }
+        space(content,9);
+        LinearLayout sortBar=row();
+        sortBar.setGravity(Gravity.CENTER);
+        content.addView(sortBar,lp(-1,41));
+        String[] sorts={"Название","Вес","Цена"};
+        for(String field:sorts){
+            TextView t=text(field.toUpperCase(java.util.Locale.ROOT),12,
+                selectedSort.equals(field)?accent():MUTED,selectedSort.equals(field));
+            t.setGravity(Gravity.CENTER);
+            sortBar.addView(t,new LinearLayout.LayoutParams(0,-1,1));
+            t.setOnClickListener(v->{selectedSort=field;render();});
+        }
+        content.addView(new SkyrimRuleView(this,0xff92999b),lp(-1,18));
+        actionButton("Полный справочник предметов","Каталог, поиск и характеристики всех вещей",false,this::showItemCatalog);
+        actionButton("Кодекс и бестиарий","Народы, существа, история и древние места",false,()->{tab=6;render();});
+        actionButton("Личная библиотека","Твои документы, легенды и записи",false,this::showLibrary);
     }
     private void itemDialog(ItemCatalog.Item item){
         String text=item.icon+"  "+item.name+"\n\nКатегория: "+item.category+
@@ -1178,8 +1255,22 @@ public final class MainActivity extends Activity {
         addText(content,"Свободных очков талантов: "+game.progress.perkPoints,13,MUTED,false,13);
         for(int i=0;i<RpgContent.SKILLS.length;i++){
             final int index=i;int lvl=game.progress.skillLevel(i);
-            String details=RpgContent.SKILL_DESCRIPTIONS[i]+" • опыт "+game.progress.skillXp[i]+"/"+game.progress.skillNeed(i);
-            actionButton(RpgContent.SKILLS[i]+" • "+lvl+(lvl==100?" [ЛЕГЕНДАРНЫЙ]":""),details,false,()->showSkill(index));
+            LinearLayout skill=row();skill.setPadding(dp(12),dp(10),dp(12),dp(10));
+            skill.setBackground(new RuneFrameDrawable(PANEL,BORDER,false));
+            skill.addView(new SkyrimIconView(this,"armor",accent()),lp(34,37));
+            LinearLayout body=column();LinearLayout.LayoutParams bp=new LinearLayout.LayoutParams(0,-2,1);
+            bp.leftMargin=dp(11);skill.addView(body,bp);
+            addText(body,RpgContent.SKILLS[i].toUpperCase(java.util.Locale.ROOT),13,TEXT,true,4);
+            ProgressBar progress=new ProgressBar(this,null,android.R.attr.progressBarStyleHorizontal);
+            progress.setMax(Math.max(1,game.progress.skillNeed(i)));
+            progress.setProgress(Math.max(0,game.progress.skillXp[i]));
+            progress.setProgressTintList(ColorStateList.valueOf(accent()));
+            progress.setProgressBackgroundTintList(ColorStateList.valueOf(0xff353b3e));
+            body.addView(progress,lp(-1,3));
+            TextView value=text(String.valueOf(lvl),22,accent(),true);value.setGravity(Gravity.CENTER);
+            skill.addView(value,lp(43,-2));
+            content.addView(skill,lp(-1,-2));space(content,5);
+            skill.setOnClickListener(v->showSkill(index));
         }
         addText(content,"ШКОЛЫ МАГИИ И КРИКИ",11,accent(),true,12);
         for(String record:RpgContent.SHOUTS){
@@ -1256,74 +1347,92 @@ public final class MainActivity extends Activity {
             actionButton("Открыть полную карту","Отметки, маршруты и расположение героя",true,()->{tab=1;render();});
         }
     }
+    private String selectedJournalEntry="Драконий след";
     private void renderJournal(){
         skyrimTopTabs(4);
-        section("ЛЕТОПИСЬ","Задания","Твои решения формируют собственную историю Скайрима.");
-        content.addView(new NordicArtView(this,NordicArtView.TITLE),lp(-1,120));space(content,12);
-        if(!game.aiJournal.isEmpty()){
-            LinearLayout aiQuest=card();
-            addText(aiQuest,"ᚱ  ЗАДАНИЕ ИИ-МАСТЕРА",11,accent(),true,8);
-            addText(aiQuest,game.aiJournal,15,TEXT,false,0);
+        section("ЛЕТОПИСЬ СЕВЕРА","Журнал","Выбирай задание, чтобы увидеть описание и текущую цель.");
+        String[] entries=game.aiJournal.isEmpty()?
+            new String[]{"Драконий след","Пепельные печати","Опасные дороги"}:
+            new String[]{"Драконий след","Пепельные печати","Опасные дороги","Задание ИИ"};
+        boolean present=false;for(String e:entries)if(e.equals(selectedJournalEntry))present=true;
+        if(!present)selectedJournalEntry=entries[0];
+        LinearLayout list=card();
+        addText(list,"ЗАДАНИЯ",12,accent(),true,9);
+        for(String entry:entries){
+            boolean chosen=entry.equals(selectedJournalEntry);
+            LinearLayout slot=row();slot.setPadding(dp(9),dp(11),dp(7),dp(11));
+            slot.setBackgroundColor(chosen?0x99363b3d:0x22000000);
+            TextView pointer=text(chosen?"◇":"◦",20,chosen?accent():MUTED,true);
+            slot.addView(pointer,lp(27,26));
+            TextView name=text(entry,17,chosen?TEXT:MUTED,chosen);
+            slot.addView(name,new LinearLayout.LayoutParams(0,-2,1));
+            list.addView(slot,lp(-1,-2));
+            slot.setOnClickListener(v->{selectedJournalEntry=entry;render();});
         }
-        LinearLayout dragon=card();addText(dragon,"ОСНОВНАЯ ИСТОРИЯ",11,accent(),true,11);
-        addText(dragon,"Драконий след",22,TEXT,true,8);
-        addText(dragon,"Глава "+Math.min(6,game.progress.dragonStage+1)+" / 6",13,accent(),true,8);
-        addText(dragon,DragonArc.status(game),15,MUTED,false,10);
-        actionButton("Продолжить историю","Открыть следующую главу",true,()->{
-            game.mode="DRAGON";save();tab=0;render();
-        });
-        if(game.progress.dragonStage>=DragonArc.FINAL_STAGE){
-            LinearLayout continuation=card();
-            addText(continuation,"ПРОДОЛЖЕНИЕ ОСНОВНОЙ ИСТОРИИ",11,accent(),true,11);
-            addText(continuation,"Драконий след • расследования",20,TEXT,true,8);
-            addText(continuation,DragonContinuation.status(game),14,accent(),true,8);
-            addText(continuation,DragonContinuation.questObjective(game),15,MUTED,false,10);
-            if(game.progress.dragonNextStage<3){
-                addText(continuation,"Пройдено расследований: "+Math.max(0,game.progress.dragonNextStage)+" / 3",13,MUTED,false,8);
-                actionButton("Продолжить расследование","Открыть активное сюжетное задание",true,()->{
-                    game.mode="DRAGON";save();tab=0;render();
-                });
-            }
+        LinearLayout focus=card();
+        String objective="",description="",title=selectedJournalEntry;
+        if("Драконий след".equals(title)){
+            description="Свидетельства о возвращении драконов ведут тебя от южных поселений к северным горам. Каждая глава открывает новые тайны.";
+            objective=DragonArc.status(game);
+            if(game.progress.dragonStage>=DragonArc.FINAL_STAGE)
+                objective+="\n"+DragonContinuation.questObjective(game);
+        }else if("Пепельные печати".equals(title)){
+            description="История древних печатей и хранителей, которые пытаются не допустить возвращения давно забытой угрозы.";
+            objective=game.questDetails();
+        }else if("Опасные дороги".equals(title)){
+            description="Заказ у доски объявлений. Северные тракты полны разбойников и опасных существ.";
+            objective=game.sideQuest==0?"Поручение пока не принято.":"Победы над противниками: "+game.sideKills+"/3";
+        }else{description="Приключение, созданное игровым ИИ-мастером.";objective=game.aiJournal;}
+        TextView questTitle=text(title.toUpperCase(java.util.Locale.ROOT),22,TEXT,true);
+        questTitle.setGravity(Gravity.CENTER);focus.addView(questTitle);
+        focus.addView(new SkyrimRuleView(this,accent()),lp(-1,23));
+        addText(focus,description,15,TEXT,false,13);
+        TextView target=text("ЦЕЛИ",15,accent(),true);
+        target.setGravity(Gravity.CENTER);focus.addView(target,lp(-1,35));
+        addText(focus,"◇  "+objective,15,TEXT,false,11);
+        if("Драконий след".equals(title)){
+            actionButton("Продолжить историю","Следующее доступное сюжетное решение",true,()->{
+                game.mode="DRAGON";save();tab=0;render();
+            });
+        }else if("Пепельные печати".equals(title)){
+            actionButton("Открыть историю хранителей","Посмотреть текущую главу",true,()->{
+                game.mode="QUEST";save();tab=0;render();
+            });
+        }else if("Опасные дороги".equals(title)){
+            actionButton("Вернуться к объявлениям","Разговоры и заказы доступны в поселениях",false,()->{
+                game.mode="WORLD";save();tab=0;render();
+            });
+        }else{
+            actionButton("Продолжить ИИ-приключение","Вернуться к сцене ИИ",true,()->{tab=0;render();});
         }
-        LinearLayout main=card();addText(main,"ДОПОЛНИТЕЛЬНАЯ ИСТОРИЯ",11,accent(),true,11);
-        addText(main,"Пепельные печати",22,TEXT,true,8);
-        addText(main,"Статус: "+game.questStatus(),13,accent(),false,13);
-        addText(main,game.questDetails(),15,MUTED,false,0);
-        LinearLayout side=card();addText(side,"ДОПОЛНИТЕЛЬНЫЕ ЗАДАНИЯ",11,accent(),true,11);
-        addText(side,"Опасные дороги",20,TEXT,true,8);
-        String sideStatus=game.sideQuest==0?"Нет активного заказа. Возьми его у доски объявлений в любом городе.":
-                game.sideQuest==2?"Предложение доступно. Вернись к доске, чтобы принять его.":
-                "Победы над противниками: "+game.sideKills+"/3"+(game.sideKills>=3?". Награда ждёт у доски.":".");
-        addText(side,sideStatus,15,MUTED,false,0);
-        LinearLayout finishedQuests=card();addText(finishedQuests,"ЗАВЕРШЁННЫЕ ЗАДАНИЯ",11,accent(),true,9);
-        if(game.progress.dragonStage==DragonArc.FINAL_STAGE)
-            addText(finishedQuests,"✓  Драконий след • первое испытание",14,TEXT,false,8);
+        LinearLayout completed=card();
+        addText(completed,"ПРОЙДЕННЫЕ ИСТОРИИ",12,accent(),true,9);
+        if(game.progress.dragonStage>=DragonArc.FINAL_STAGE)
+            addText(completed,"◇ Драконий след · первое испытание",14,TEXT,false,7);
         if(game.progress.dragonStage>=DragonArc.FINAL_STAGE){
             String[] investigations={"Письмо под пеплом","Совет за закрытыми дверями","След пепельного гонца"};
             for(int i=0;i<Math.min(3,game.progress.dragonNextStage);i++)
-                addText(finishedQuests,"✓  "+investigations[i],14,TEXT,false,8);
+                addText(completed,"◇ "+investigations[i],14,TEXT,false,6);
         }
-        if(game.questStage==4)addText(finishedQuests,"✓  Пепельные печати",14,TEXT,false,8);
-        if(game.progress.dragonStage<DragonArc.FINAL_STAGE)
-            addText(finishedQuests,"Драконий след: ещё не завершён.",13,MUTED,false,8);
-        if(game.questStage!=4)addText(finishedQuests,"История хранителей ещё не завершена.",13,MUTED,false,8);
-        if(game.boardCompleted>0)addText(finishedQuests,"✓  Опасные дороги • выполнено заказов: "+game.boardCompleted,14,TEXT,false,8);
-        LinearLayout failedQuests=card();addText(failedQuests,"ПРОВАЛЕННЫЕ ЗАДАНИЯ",11,0xffeb8e8e,true,9);
-        boolean hasFailedQuest=false;
-        for(java.util.Map.Entry<String,String> entry:game.progress.questOutcomes.entrySet()){
-            if(!"FAILED".equals(entry.getValue()))continue;
-            hasFailedQuest=true;
-            String title="ash_seals".equals(entry.getKey())?"Пепельные печати":entry.getKey();
-            addText(failedQuests,"✕  "+title,14,MUTED,false,8);
+        if(game.questStage==4)addText(completed,"◇ Пепельные печати",14,TEXT,false,6);
+        if(game.boardCompleted>0)addText(completed,"◇ Опасные дороги · заказов: "+game.boardCompleted,14,TEXT,false,6);
+        for(String entry:game.progress.completed)
+            addText(completed,"◇ "+entry,13,MUTED,false,6);
+        if(game.progress.completed.isEmpty()&&game.questStage!=4
+                &&game.progress.dragonStage<DragonArc.FINAL_STAGE&&game.boardCompleted==0)
+            addText(completed,"Завершённых поручений пока нет.",14,MUTED,false,0);
+        LinearLayout failures=card();
+        addText(failures,"НЕУДАЧИ И ПРОВАЛЕННЫЕ ЗАДАНИЯ",12,accent(),true,9);
+        boolean any=false;
+        for(java.util.Map.Entry<String,String> q:game.progress.questOutcomes.entrySet())
+            if("FAILED".equals(q.getValue())){
+                addText(failures,"✕ "+q.getKey(),13,MUTED,false,6);any=true;
+            }
+        for(String entry:game.progress.failed){
+            addText(failures,"✕ "+entry,13,MUTED,false,6);any=true;
         }
-        if(!hasFailedQuest)addText(failedQuests,"Пока нет проваленных сюжетных заданий.",13,MUTED,false,0);
-        LinearLayout done=card();addText(done,"ИСТОРИЯ УСПЕШНЫХ ПРОВЕРОК",11,accent(),true,9);
-        if(game.progress.completed.isEmpty())addText(done,"Пока нет успешных проверок.",13,MUTED,false,0);
-        for(String entry:game.progress.completed)addText(done,"✓  "+entry,13,TEXT,false,8);
-        LinearLayout failed=card();addText(failed,"ИСТОРИЯ НЕУДАЧНЫХ ПРОВЕРОК",11,0xffeb8e8e,true,9);
-        if(game.progress.failed.isEmpty())addText(failed,"Пока нет неудачных проверок.",13,MUTED,false,0);
-        for(String entry:game.progress.failed)addText(failed,"✕  "+entry,13,MUTED,false,8);
-        actionButton("Вернуться к истории","Открыть текущую сцену",true,()->{tab=0;render();});
+        if(!any)addText(failures,"Проваленных заданий и проверок нет.",14,MUTED,false,0);
+        actionButton("Вернуться к приключению","Продолжить текущую сцену",true,()->{tab=0;render();});
     }
     private void renderSettings(){
         skyrimTopTabs(5);
