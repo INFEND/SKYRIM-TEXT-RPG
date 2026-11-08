@@ -150,6 +150,7 @@ public final class AiGameTurn {
         String loc=limited(e.optString("location",""),80);
         WorldAtlas.Place place=loc.isEmpty()?null:WorldAtlas.find(loc);
         if(!loc.isEmpty()&&place==null)throw new JSONException("Неизвестная локация: "+loc);
+        java.util.LinkedHashMap<String,Integer> inventoryChanges=new java.util.LinkedHashMap<>();
         JSONArray inv=e.optJSONArray("inventory");
         if(inv!=null){
             if(inv.length()>16)throw new JSONException("Слишком много предметов");
@@ -170,7 +171,7 @@ public final class AiGameTurn {
                 weight+=changes.get(name)*ItemCatalog.find(name).weight;
             }
             if(weight>50.0001)throw new JSONException("Рюкзак превышает 50 кг");
-            for(String name:changes.keySet())g.progress.quantity(name,g.progress.quantity(name)+changes.get(name));
+            inventoryChanges.putAll(changes);
         }
         int q=change(e,"questStageDelta",1),d=change(e,"dragonStageDelta",1);
         if(q<0||d<0)throw new JSONException("Сюжетный этап нельзя откатывать");
@@ -184,12 +185,22 @@ public final class AiGameTurn {
                     throw new JSONException("Неверный навык или опыт");
             }
         }
+        String quest=limited(e.optString("quest",""),180);
+        String questStatus=e.optString("questStatus","ACTIVE");
+        if(!quest.isEmpty()&&!("ACTIVE".equals(questStatus)||"COMPLETED".equals(questStatus)||"FAILED".equals(questStatus)))
+            throw new JSONException("Неизвестный статус квеста");
         JSONObject enemy=e.optJSONObject("enemy");
         if(enemy!=null){
             String name=limited(enemy.optString("name",""),70);
             int health=cap(enemy.optInt("hp",0),0,50000);
             if(health>0&&name.isEmpty())throw new JSONException("Противник без имени");
-            g.enemyName=health>0?name:"";g.enemyHp=health;
+        }
+        // Commit only after all model-controlled fields have passed validation.
+        for(String name:inventoryChanges.keySet())
+            g.progress.quantity(name,g.progress.quantity(name)+inventoryChanges.get(name));
+        if(enemy!=null){
+            int health=cap(enemy.optInt("hp",0),0,50000);
+            g.enemyName=health>0?limited(enemy.optString("name",""),70):"";g.enemyHp=health;
             g.enemyMaxHp=health>0?cap(enemy.optInt("maxHp",health),health,50000):0;
             g.enemyDamage=health>0?cap(enemy.optInt("damage",1),0,1000):0;
             g.battleKind=health>0?"AI":"";
@@ -204,11 +215,8 @@ public final class AiGameTurn {
             JSONObject sk=skills.optJSONObject(i);
             g.progress.skillExperience(g,sk.optInt("index"),change(sk,"xp",250));
         }
-        String quest=limited(e.optString("quest",""),180);
         if(!quest.isEmpty()){
-            String state=e.optString("questStatus","ACTIVE");
-            if(!("ACTIVE".equals(state)||"COMPLETED".equals(state)||"FAILED".equals(state)))
-                throw new JSONException("Неизвестный статус квеста");
+            String state=questStatus;
             g.aiJournal=quest+" · "+state;
             if("COMPLETED".equals(state)&&!g.progress.completed.contains(quest))g.progress.completed.add(quest);
             if("FAILED".equals(state)&&!g.progress.failed.contains(quest))g.progress.failed.add(quest);
