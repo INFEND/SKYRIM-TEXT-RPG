@@ -75,6 +75,16 @@ class AiGameDirectorContracts(unittest.TestCase):
         self.assertIn("response.substring(start,i+1)",bridge)
         self.assertNotIn("response.substring(start,end+1)",bridge)
 
+    def test_invalid_late_quest_cannot_partially_apply_inventory(self):
+        bridge=code("AiGameTurn.java")
+        validation=bridge.index('String questStatus=e.optString("questStatus","ACTIVE")')
+        commit=bridge.index('for(String name:inventoryChanges.keySet())')
+        enemy=bridge.index('if(enemy!=null){',commit)
+        self.assertLess(validation,commit)
+        self.assertLess(commit,enemy)
+        self.assertIn('inventoryChanges.putAll(changes)',bridge)
+        self.assertNotIn('for(String name:changes.keySet())g.progress.quantity',bridge)
+
     def test_story_stream_is_not_a_json_dump(self):
         client=code("AiStoryClient.java")
         ui=code("MainActivity.java")
