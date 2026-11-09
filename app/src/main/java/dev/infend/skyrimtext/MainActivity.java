@@ -1377,7 +1377,7 @@ public final class MainActivity extends Activity {
         addText(content,"МЕСТА И ПЕРЕХОДЫ",11,accent(),true,10);
         actionButton("ПОИСК ПО ВСЕМ ТОЧКАМ АТЛАСА",
             "Игровые переходы и "+SkyrimMapCatalog.size()+" справочных мест",false,
-            this::searchSkyrimAtlas);
+            ()->searchSkyrimAtlas(terrainMap));
         String[] regions=new String[GameEngine.REGIONS.length+1];regions[0]="Все регионы";
         System.arraycopy(GameEngine.REGIONS,0,regions,1,GameEngine.REGIONS.length);
         android.widget.Spinner filter=spinner(regions,selectedMapRegion+1,i->{
@@ -1388,7 +1388,7 @@ public final class MainActivity extends Activity {
         java.util.ArrayList<WorldAtlas.Place> places=selectedMapRegion<0?WorldAtlas.all():WorldAtlas.byRegion(selectedMapRegion);
         places.removeIf(place->hiddenMapTypes.contains(place.type));
         addText(content,"Игровых мест: "+places.size()+
-            "  ·  Дополнительных меток: "+SkyrimMapCatalog.size(),
+            "  ·  Дополнительных мест: "+SkyrimMapCatalog.visibleCount(hiddenMapTypes),
             12,MUTED,false,8);
         for(WorldAtlas.Place place:places){
             String status=place.name.equals(game.progress.location)?"  •  ВЫ ЗДЕСЬ":"";
@@ -1433,6 +1433,7 @@ public final class MainActivity extends Activity {
         mapControl(toolbar,"+",()->map.zoomBy(1.5f));
         mapControl(toolbar,"Вся карта",map::showWholeProvince);
         mapControl(toolbar,"К герою",map::centerOnPlayer);
+        mapControl(toolbar,"Поиск",()->searchSkyrimAtlas(map));
         TextView close=text("×",33,TEXT,true);
         close.setGravity(Gravity.CENTER);
         close.setBackgroundColor(0xc506090b);
@@ -1474,6 +1475,10 @@ public final class MainActivity extends Activity {
             .setMessage(details).setNegativeButton("Закрыть",null).show();
     }
     private void searchSkyrimAtlas(){
+        searchSkyrimAtlas(null);
+    }
+    /** Search results focus the map camera, not merely display a detached card. */
+    private void searchSkyrimAtlas(SkyrimTerrainMapView activeMap){
         LinearLayout wrapper=column();
         wrapper.setPadding(dp(14),dp(6),dp(14),dp(7));
         EditText query=new EditText(this);
@@ -1491,6 +1496,7 @@ public final class MainActivity extends Activity {
         scroller.addView(matches);
         wrapper.addView(scroller,lp(-1,420));
         final Runnable[] refresh={null};
+        final AlertDialog[] searchWindow={null};
         refresh[0]=()->{
             String needle=query.getText().toString().trim().toLowerCase(java.util.Locale.ROOT);
             matches.removeAllViews();
@@ -1504,7 +1510,11 @@ public final class MainActivity extends Activity {
                 TextView result=text(place.name+"  ·  "+place.type,15,TEXT,false);
                 result.setPadding(dp(7),dp(10),dp(7),dp(10));
                 matches.addView(result,lp(-1,-2));
-                result.setOnClickListener(v->locationDialog(place));
+                result.setOnClickListener(v->{
+                    if(activeMap!=null)activeMap.centerOn(place);
+                    if(searchWindow[0]!=null)searchWindow[0].dismiss();
+                    locationDialog(place);
+                });
             }
             for(SkyrimMapCatalog.Site site:SkyrimMapCatalog.all()){
                 if(hiddenMapTypes.contains(site.type))continue;
@@ -1515,7 +1525,11 @@ public final class MainActivity extends Activity {
                 TextView result=text(site.name+"  ·  "+site.type,15,TEXT,false);
                 result.setPadding(dp(7),dp(10),dp(7),dp(10));
                 matches.addView(result,lp(-1,-2));
-                result.setOnClickListener(v->atlasSiteDialog(site));
+                result.setOnClickListener(v->{
+                    if(activeMap!=null)activeMap.centerOn(site);
+                    if(searchWindow[0]!=null)searchWindow[0].dismiss();
+                    atlasSiteDialog(site);
+                });
             }
             count.setText("Найдено: "+total+(total>55?
                 "  ·  Показаны первые 55":""));
@@ -1526,7 +1540,8 @@ public final class MainActivity extends Activity {
             public void onTextChanged(CharSequence s,int start,int before,int count){refresh[0].run();}
             public void afterTextChanged(android.text.Editable e){}
         });
-        new RuneDialogBuilder(this,accent()).setTitle("Поиск по карте Скайрима")
+        searchWindow[0]=new RuneDialogBuilder(this,accent())
+            .setTitle("Поиск по карте Скайрима")
             .setView(wrapper).setNegativeButton("Закрыть",null).show();
     }
     /** Full atlas type filter; reflects both the map markers and location list. */
