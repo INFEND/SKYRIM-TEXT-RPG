@@ -21,6 +21,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <service android:name=".LocalAiInferenceService" android:exported="false" android:process=":llm" />
         <service android:name=".BackgroundUpdateJob" android:exported="true" android:permission="android.permission.BIND_JOB_SERVICE" />
         <receiver android:name=".OtaBootReceiver" android:exported="false">
             <intent-filter>
