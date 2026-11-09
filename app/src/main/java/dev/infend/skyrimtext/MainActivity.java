@@ -1188,7 +1188,7 @@ public final class MainActivity extends Activity {
         LinearLayout overview=card();
         addText(overview,"⌖  ВЫ НАХОДИТЕСЬ: "+game.progress.location,15,accent(),true,10);
         addText(overview,"Регион: "+GameEngine.REGIONS[game.region]+"  •  день "+game.day,13,MUTED,false,9);
-        overview.addView(new WorldAtlas.MapView(this,game,this::locationDialog),lp(-1,-2));
+        overview.addView(new WorldAtlas.MapView(this,game,this::locationDialog,hiddenMapTypes),lp(-1,-2));
         if(LocationGalleryView.hasGallery(game.progress.location)){
             addText(overview,"ᛟ  ГАЛЕРЕЯ ТЕКУЩЕГО МЕСТА",11,accent(),true,12);
             overview.addView(new LocationGalleryView(this,game.progress.location,accent(),false),lp(-1,-2));
@@ -1200,7 +1200,9 @@ public final class MainActivity extends Activity {
             if(selectedMapRegion!=i-1){selectedMapRegion=i-1;render();}
         });
         content.addView(filter,lp(-1,49));space(content,12);
+        renderMapTypeFilters();
         java.util.ArrayList<WorldAtlas.Place> places=selectedMapRegion<0?WorldAtlas.all():WorldAtlas.byRegion(selectedMapRegion);
+        places.removeIf(place->hiddenMapTypes.contains(place.type));
         addText(content,"Обозначено мест: "+places.size(),12,MUTED,false,8);
         for(WorldAtlas.Place place:places){
             String status=place.name.equals(game.progress.location)?"  •  ВЫ ЗДЕСЬ":"";
@@ -1210,6 +1212,52 @@ public final class MainActivity extends Activity {
             actionButton(WorldAtlas.icon(place.type)+"  "+place.name+status,detail,false,()->locationDialog(place));
         }
     }
+    /** Full atlas type filter; reflects both the map markers and location list. */
+    private void renderMapTypeFilters(){
+        LinearLayout panel=card();
+        boolean expanded=prefs.getBoolean("map_types_expanded",false);
+        TextView toggle=text((expanded?"⌃":"⌄")+"  ТИПЫ ЛОКАЦИЙ",14,accent(),true);
+        toggle.setPadding(dp(7),dp(10),dp(7),dp(10));
+        panel.addView(toggle,lp(-1,-2));
+        addText(panel,"✓  отображается     ✕  скрыто",12,MUTED,false,7);
+        toggle.setOnClickListener(v->{
+            prefs.edit().putBoolean("map_types_expanded",!expanded).apply();render();
+        });
+        if(!expanded)return;
+        java.util.LinkedHashSet<String> types=new java.util.LinkedHashSet<>();
+        types.add("Столица");types.add("Деревня");
+        for(WorldAtlas.Place place:WorldAtlas.all())types.add(place.type);
+        LinearLayout commands=row();panel.addView(commands,lp(-1,47));
+        TextView all=text("✓  Включить все",13,accent(),true);
+        TextView none=text("✕  Скрыть все",13,MUTED,true);
+        commands.addView(all,new LinearLayout.LayoutParams(0,-2,1));
+        commands.addView(none,new LinearLayout.LayoutParams(0,-2,1));
+        all.setOnClickListener(v->{hiddenMapTypes.clear();persistMapFilters();render();});
+        none.setOnClickListener(v->{hiddenMapTypes.clear();hiddenMapTypes.addAll(types);persistMapFilters();render();});
+        LinearLayout options=column();panel.addView(options,lp(-1,-2));
+        LinearLayout current=null;int index=0;
+        for(String type:types){
+            if(index++%2==0){current=row();options.addView(current,lp(-1,-2));}
+            final String category=type;
+            boolean enabled=!hiddenMapTypes.contains(type);
+            String label=type.equals("Столица")?"Города":type.equals("Деревня")?"Деревни":type;
+            TextView button=text((enabled?"✓ ":"✕ ")+label,12,enabled?accent():MUTED,enabled);
+            button.setPadding(dp(7),dp(11),dp(5),dp(11));
+            button.setBackground(new RuneFrameDrawable(PANEL_2,enabled?BORDER:0xff3a3e40,false));
+            LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(0,-2,1);
+            p.setMargins(dp(2),dp(2),dp(2),dp(2));
+            current.addView(button,p);
+            button.setOnClickListener(v->{
+                if(!hiddenMapTypes.add(category))hiddenMapTypes.remove(category);
+                persistMapFilters();render();
+            });
+        }
+        if(types.size()%2==1)current.addView(new View(this),new LinearLayout.LayoutParams(0,1,1));
+    }
+    private void persistMapFilters(){
+        prefs.edit().putStringSet("map_hidden_types",new java.util.HashSet<>(hiddenMapTypes)).apply();
+    }
+
     private void locationDialog(WorldAtlas.Place place){
         TravelPlanner.Route route=TravelPlanner.plan(game,place);
         String body=place.description+"\n\nТип: "+place.type+
@@ -1682,10 +1730,47 @@ public final class MainActivity extends Activity {
             addText(failedRolls,"✕ "+check,13,MUTED,false,6);
         actionButton("Вернуться к приключению","Продолжить текущую сцену",true,()->{tab=0;render();});
     }
+    private void foldSettingsSection(String key,String name,int from){
+        LinearLayout body=column();
+        while(content.getChildCount()>from){
+            View child=content.getChildAt(from);
+            ViewGroup.LayoutParams params=child.getLayoutParams();
+            content.removeViewAt(from);
+            body.addView(child,params);
+        }
+        LinearLayout panel=column();
+        panel.setBackground(new RuneFrameDrawable(PANEL,BORDER,false));
+        LinearLayout heading=row();
+        heading.setPadding(dp(12),dp(12),dp(12),dp(12));
+        boolean open=prefs.getBoolean("settings_group_"+key,"ai".equals(key));
+        TextView title=text(name,15,accent(),true);
+        heading.addView(title,new LinearLayout.LayoutParams(0,-2,1));
+        TextView arrow=text(open?"⌃":"⌄",23,accent(),true);
+        heading.addView(arrow,lp(30,30));
+        panel.addView(heading,lp(-1,-2));
+        body.setPadding(dp(6),dp(4),dp(6),dp(10));
+        body.setVisibility(open?View.VISIBLE:View.GONE);
+        panel.addView(body,lp(-1,-2));
+        heading.setClickable(true);
+        heading.setContentDescription(name+", "+(open?"раскрыто":"свёрнуто"));
+        heading.setOnClickListener(v->{
+            boolean expanded=body.getVisibility()!=View.VISIBLE;
+            if(animations)android.transition.TransitionManager.beginDelayedTransition(
+                panel,new android.transition.AutoTransition().setDuration(230));
+            body.setVisibility(expanded?View.VISIBLE:View.GONE);
+            arrow.setText(expanded?"⌃":"⌄");
+            heading.setContentDescription(name+", "+(expanded?"раскрыто":"свёрнуто"));
+            prefs.edit().putBoolean("settings_group_"+key,expanded).apply();
+        });
+        LinearLayout.LayoutParams p=lp(-1,-2);p.bottomMargin=dp(9);
+        content.addView(panel,from,p);
+    }
+
     private void renderSettings(){
         skyrimTopTabs(5);
         section("ПАРАМЕТРЫ","Настройки","Твоя история, твои правила.");
         content.addView(new NordicArtView(this,NordicArtView.STORY),lp(-1,105));space(content,12);
+        int appearanceStart=content.getChildCount();
         LinearLayout palette=card();addText(palette,"ЦВЕТ АКЦЕНТА",11,accent(),true,12);
         for(int i=0;i<ACCENTS.length;i++){
             final int value=i;LinearLayout item=row();LinearLayout.LayoutParams p=lp(-1,42);palette.addView(item,p);
@@ -1704,6 +1789,8 @@ public final class MainActivity extends Activity {
         sw.setChecked(animations);sw.setThumbTintList(ColorStateList.valueOf(accent()));
         sw.setOnCheckedChangeListener((b,checked)->{animations=checked;prefs.edit().putBoolean("animations",checked).apply();});
         readability.addView(sw,lp(-1,47));
+        foldSettingsSection("appearance","ОФОРМЛЕНИЕ И ЧИТАЕМОСТЬ",appearanceStart);
+        int aiStart=content.getChildCount();
         space(content,6);addText(content,"ИИ-ПРИКЛЮЧЕНИЕ",11,accent(),true,11);
         LinearLayout aiCard=card();
         addText(aiCard,"ИСТОЧНИК МОДЕЛИ И РАЗМЫШЛЕНИЯ",11,accent(),true,8);
@@ -1749,6 +1836,8 @@ public final class MainActivity extends Activity {
                     AiKeyVault.clear(this);render();
                 }).show();
         });
+        foldSettingsSection("ai","ИИ-ПРИКЛЮЧЕНИЕ И МОДЕЛИ",aiStart);
+        int updatesStart=content.getChildCount();
         space(content,6);addText(content,"ОБНОВЛЕНИЯ",11,accent(),true,11);
         actionButton("Проверить обновления","Проверка подписи, история изменений и установка внутри приложения",true,()->updater.check(true));
         LinearLayout otaOptions=card();addText(otaOptions,"АВТОМАТИЧЕСКИЕ ПРОВЕРКИ",11,accent(),true,10);
@@ -1796,6 +1885,8 @@ public final class MainActivity extends Activity {
             if(!result.isEmpty())addText(otaOptions,result,12,MUTED,false,0);
         }
         addText(content,"Текущая версия: "+BuildConfig.VERSION_NAME+" ("+BuildConfig.VERSION_CODE+")",12,MUTED,false,20);
+        foldSettingsSection("updates","ОБНОВЛЕНИЯ",updatesStart);
+        int savesStart=content.getChildCount();
         addText(content,"СОХРАНЕНИЯ",11,accent(),true,11);
         actionButton("Сохранить сейчас","Данные хранятся на устройстве",false,()->{save();toast("Прогресс сохранён");});
         actionButton("Копировать сохранение","Резервная копия в буфер обмена",false,()->{
@@ -1804,6 +1895,7 @@ public final class MainActivity extends Activity {
         });
         actionButton("Восстановить сохранение","Вставить код из резервной копии",false,this::restoreDialog);
         actionButton("Начать новую игру","Старое сохранение будет заменено",false,this::resetDialog);
+        foldSettingsSection("saves","СОХРАНЕНИЯ И НОВАЯ ИГРА",savesStart);
         space(content,10);addText(content,"НЕОФИЦИАЛЬНЫЙ ФАНАТСКИЙ ПРОЕКТ",11,accent(),true,8);
         addText(content,"Оригинальные тексты и игровые механики. Не связан с Bethesda Softworks. Не содержит ресурсов официальной игры.",12,MUTED,false,0);
     }
