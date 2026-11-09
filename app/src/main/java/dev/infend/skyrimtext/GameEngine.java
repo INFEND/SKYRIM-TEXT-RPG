@@ -242,6 +242,14 @@ public final class GameEngine {
             day+=route.days;
             region=target.region;
             progress.location=target.name;
+            // Register only locations reached through the validated atlas route.
+            // A stable key keeps repeat visits idempotent across save/load.
+            try {
+                sceneState.confirm("sublocation", "atlas_" + Integer.toHexString(target.name.hashCode()),
+                        target.name, "VISITED");
+            } catch (JSONException ignored) {
+                // Optional scene metadata cannot invalidate a completed journey.
+            }
             stamina=Math.max(1,stamina-Math.min(Math.max(0,stamina-1),route.days*6));
             magicka=Math.max(1,magicka-Math.min(Math.max(0,magicka-1),route.days*2));
             message="Ты преодолеваешь дорогу, постепенно оставляя за спиной стоянки, перевалы и чужие костры. "+
