@@ -228,7 +228,9 @@ public final class SkyrimTerrainMapView extends View {
         }
         return pins;
     }
-    private String symbol(SkyrimMapCatalog.Site site){
+    /** Shared source of location-type icons for both the map and the location list.
+     * A single mapping prevents glyph mismatches between views. */
+    public static String iconForSite(SkyrimMapCatalog.Site site){
         String t=site.type;
         if(site.capital())return "столицы владений";
         if(t.contains("Двемер"))return "двемерские руины";
@@ -261,7 +263,7 @@ public final class SkyrimTerrainMapView extends View {
             ink.setStyle(Paint.Style.FILL);ink.setColor(0xe0091216);
             canvas.drawCircle(pin.x,pin.y,radius+1.1f*density,ink);
             if(!SkyrimIconAtlas.drawMarker(getContext(),canvas,
-                pin.player?"маркер игрока":symbol(site),color,pin.x,pin.y,diameter)){
+                pin.player?"маркер игрока":iconForSite(site),color,pin.x,pin.y,diameter)){
                 ink.setColor(color);
                 canvas.drawCircle(pin.x,pin.y,Math.max(2f*density,diameter*.24f),ink);
             }
