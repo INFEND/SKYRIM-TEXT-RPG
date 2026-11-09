@@ -44,7 +44,7 @@ class LocalAiClient {
                     loadedPath=""
                     loadedModel=Llama.loadModel(modelPath,LlamaConfig(
                         contextSize=8192,threads=4,gpuLayers=0,
-                        temperature=if(chanceOnly)0.15f else 0.7f,topP=0.9f
+                        temperature=0.7f,topP=0.9f
                     ))
                     loadedPath=modelPath
                 }
