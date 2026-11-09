@@ -1,4 +1,4 @@
-plugins { id 'com.android.application' }
+plugins { id 'com.android.application'; id 'org.jetbrains.kotlin.android' }
 
 def releaseSigning = new Properties()
 def signingFile = rootProject.file('signing.properties')
@@ -17,6 +17,7 @@ android {
         versionCode 42
         versionName '1.0.41'
         resConfigs 'ru'
+        ndk { abiFilters 'arm64-v8a' }
     }
 
     if (signingFile.exists()) {
@@ -42,6 +43,12 @@ android {
         targetCompatibility JavaVersion.VERSION_17
     }
     buildFeatures { buildConfig true }
+    kotlinOptions { jvmTarget = '17' }
     packaging { resources { excludes += ['/META-INF/{AL2.0,LGPL2.1}'] } }
 }
 
+
+dependencies {
+    implementation 'dev.ffmpegkit-maintained:llama-android:0.1.1'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.9.0'
+}
