@@ -28,8 +28,15 @@ class LocalAiClient(private val context: Context) {
     private var activeListener: AiStoryClient.Listener?=null
     private var messenger: Messenger?=null
     private var binding: ServiceConnection?=null
+    private var watchdog: Runnable?=null
     private val incoming=Messenger(Handler(Looper.getMainLooper()) { reply ->
-        if(reply.what==LocalAiInferenceService.MSG_RESULT) {
+        if(reply.what==LocalAiInferenceService.MSG_STATUS) {
+            val id=reply.data.getLong("id",-1L)
+            val listener=synchronized(guard) {
+                if(!closed&&busy&&id==generation)activeListener else null
+            }
+            listener?.onLocalStatus(reply.data.getString("status").orEmpty())
+        }else if(reply.what==LocalAiInferenceService.MSG_RESULT) {
             val id=reply.data.getLong("id",-1L)
             val listener: AiStoryClient.Listener?
             synchronized(guard) {
@@ -38,11 +45,15 @@ class LocalAiClient(private val context: Context) {
                 activeListener=null
                 busy=false
             }
+            watchdog?.let{ui.removeCallbacks(it)}
+            watchdog=null
             val error=reply.data.getString("error")
             val answer=reply.data.getString("answer")
             if(!error.isNullOrBlank())listener?.onError(error)
             else if(answer.isNullOrBlank())listener?.onError("Локальная модель не вернула текст")
             else {
+                listener?.onLocalMetrics(reply.data.getInt("tokens",0),
+                    reply.data.getFloat("speed",0f),reply.data.getLong("elapsedMs",0))
                 listener?.onText(answer)
                 listener?.onComplete(answer)
             }
@@ -54,10 +65,23 @@ class LocalAiClient(private val context: Context) {
 
     fun generate(modelPath:String,game:GameEngine,history:String,command:String,
                  controlled:Boolean,chanceOnly:Boolean,listener:AiStoryClient.Listener):Boolean {
-        val model=File(modelPath)
-        if(!model.isFile||model.length()<64L*1024L*1024L)return false
         val system=AiStoryClient.localSystemPrompt(controlled,chanceOnly)
         val prompt=AiStoryClient.localUserPrompt(game,history,command,controlled)
+        // Full scenes require a structured JSON with ten choices. CPU-only 9B
+        // inference is slow: keep the budget finite rather than waiting on 2048 tokens.
+        val maxTokens=if(chanceOnly)80 else if(controlled)1024 else 448
+        return start(modelPath,system,prompt,maxTokens,listener)
+    }
+
+    /** A tiny smoke-test with no RPG state changes, available in AI settings. */
+    fun testModel(modelPath:String,listener:AiStoryClient.Listener):Boolean =
+        start(modelPath,"Отвечай коротко и точно, без рассуждений.",
+            "Напиши только слово: ГОТОВО",24,listener)
+
+    private fun start(modelPath:String,system:String,prompt:String,maxTokens:Int,
+                      listener:AiStoryClient.Listener):Boolean {
+        val model=File(modelPath)
+        if(!model.isFile||model.length()<64L*1024L*1024L)return false
         var fail:String?=null
         try {
             val manager=context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
@@ -85,10 +109,22 @@ class LocalAiClient(private val context: Context) {
         data.putString("path",modelPath)
         data.putString("system",system)
         data.putString("prompt",prompt)
-        data.putInt("maxTokens",if(chanceOnly)192 else if(controlled)2048 else 1536)
+        data.putInt("maxTokens",maxTokens)
         request.data=data
         request.replyTo=incoming
         pending=request
+        listener.onLocalStatus("Подключение к отдельному процессу модели…")
+        // Native completion does not stream; never leave the game waiting forever.
+        val expiry=Runnable {
+            val timedOut=synchronized(guard){busy&&generation==id&&!closed}
+            if(timedOut){
+                failGeneration(id,"Локальная модель слишком долго не отвечает. Это может быть медленный CPU-инференс или зависание GGUF. Проверь коротким тестом в настройках.")
+                try{messenger?.send(Message.obtain(null,LocalAiInferenceService.MSG_CANCEL))}catch(_:Exception){}
+                releaseBinding()
+            }
+        }
+        watchdog=expiry
+        ui.postDelayed(expiry,12L*60L*1000L)
         val current=messenger
         if(current!=null) {
             send(current,request,id)
@@ -147,10 +183,14 @@ class LocalAiClient(private val context: Context) {
             activeListener=null
             busy=false
         }
+        watchdog?.let {ui.removeCallbacks(it)}
+        watchdog=null
         ui.post { listener?.onError(error) }
     }
 
     fun cancel() {
+        watchdog?.let{ui.removeCallbacks(it)}
+        watchdog=null
         synchronized(guard) {
             generation++
             activeListener=null
