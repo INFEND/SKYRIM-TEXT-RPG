@@ -12,7 +12,7 @@ import kotlinx.coroutines.launch
 import java.io.File
 
 /** Local llama.cpp session. Cancellation invalidates results while native inference finishes. */
-internal class LocalAiClient {
+class LocalAiClient {
     private val main=Handler(Looper.getMainLooper())
     private val scope=CoroutineScope(SupervisorJob()+Dispatchers.IO)
     private val lock=Any()
