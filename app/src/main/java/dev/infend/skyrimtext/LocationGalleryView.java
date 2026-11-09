@@ -1,6 +1,8 @@
 package dev.infend.skyrimtext;
 
-import android.app.AlertDialog;
+import android.app.Dialog;
+import android.view.Window;
+import android.view.WindowManager;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -22,8 +24,10 @@ import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.zip.ZipEntry;
@@ -40,7 +44,21 @@ public final class LocationGalleryView extends LinearLayout {
         "morthal","riverwood","riften","solitude","falkreath"
     };
     private static final Map<String,String> ID_BY_CITY=new HashMap<>();
+    /** Labels follow location/sub-location names, not gallery image numbers. */
+    private static final String[][] PHOTO_LABELS={
+        {"Панорама Вайтрана","Главные ворота","Рынок","Ветреный район","Йоррваскр","Драконий Предел"},
+        {"Главные ворота","Серый квартал","Рынок","Каменный квартал","Дворец королей","Набережная"},
+        {"Подход к Винтерхолду","Заснеженная улица","Главная площадь","Врата Коллегии","Двор Коллегии","Зимний двор"},
+        {"Подход к Данстару","Порт","Главная улица","Таверна","У причала","Заснеженная бухта"},
+        {"Городские ворота","Каменные улицы","Рынок","Храм Дибеллы","Подкаменная крепость","Террасы Маркарта"},
+        {"Подход к Морфалу","Деревянный мост","Главная улица","Таверна","Болотные окраины","Деревня у болота"},
+        {"Подход к Ривервуду","Главная улица","Кузница Алвора","Лесопилка","Река у деревни"},
+        {"Городские ворота","Рынок","Городские каналы","Порт","Крепость Миствейл","Нижние улицы"},
+        {"Главные ворота","Рынок","Синий дворец","Главная площадь","Городская арка","Набережная"},
+        {"Подход к Фолкриту","Главная улица","Рынок","Зал мёртвых","Кладбище","Лесная окраина"}
+    };
     private static final ExecutorService IO=Executors.newFixedThreadPool(2);
+    private static final Set<String> PREFETCHING=java.util.Collections.synchronizedSet(new HashSet<>());
     // Keep at most around three full-resolution 16:9 views decoded at once.
     private static final LruCache<String,Bitmap> CACHE=new LruCache<String,Bitmap>(24*1024*1024){
         @Override protected int sizeOf(String key,Bitmap bitmap){return bitmap.getByteCount();}
@@ -59,8 +77,7 @@ public final class LocationGalleryView extends LinearLayout {
     private final int accent;
     private final boolean fullscreen;
     private final ImageView photo;
-    private final TextView page,caption,loading;
-    private final TextView leftArrow,rightArrow;
+    private final TextView page;
     private int current=0,requested=0;
 
     private int dp(float value){return Math.round(value*getResources().getDisplayMetrics().density);}
@@ -82,15 +99,27 @@ public final class LocationGalleryView extends LinearLayout {
         return slug+".zip";
     }
     private static String captionFor(String location,int index){
-        if("Винтерхолд".equals(location)){
-            String[] titles={
-                "Заснеженный посёлок и крепость","Улица к крепости",
-                "Внутренняя площадь","Главные врата академии",
-                "Магический двор","Статуя и источник"
-            };
-            return titles[index];
-        }
-        return index==0?"Главный вид · "+location:location+" · ракурс "+(index+1);
+        for(int i=0;i<CITIES.length;i++)if(CITIES[i].equals(location))
+            return PHOTO_LABELS[i][Math.max(0,Math.min(index,PHOTO_LABELS[i].length-1))];
+        return location;
+    }
+    private static String cacheKey(String slug,int number,boolean full){
+        return slug+"/"+number+"/"+(full?"full":"small");
+    }
+    /** Decode the city's compact previews once, ahead of swipes. No loading overlay. */
+    private void prefetch(){
+        if(!PREFETCHING.add(slug))return;
+        Context context=getContext().getApplicationContext();
+        IO.execute(()->{
+            try{
+                for(int n=1;n<=imageCount(location);n++){
+                    String key=cacheKey(slug,n,false);
+                    if(CACHE.get(key)!=null)continue;
+                    Bitmap result=decode(context,slug,n,false);
+                    if(result!=null)CACHE.put(key,result);
+                }
+            }finally{PREFETCHING.remove(slug);}
+        });
     }
     public LocationGalleryView(Context context,String location,int accent,boolean fullscreen){
         super(context);
@@ -122,18 +151,6 @@ public final class LocationGalleryView extends LinearLayout {
         photo.setContentDescription("Изображение локации "+location);
         photo.setFocusable(true);
         viewport.addView(photo,new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.MATCH_PARENT));
-        loading=text("Загрузка изображения…",13,0xffb6ada0);
-        loading.setGravity(Gravity.CENTER);
-        viewport.addView(loading,new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.MATCH_PARENT));
-
-        leftArrow=arrow(context,"❮",true);
-        rightArrow=arrow(context,"❯",false);
-        FrameLayout.LayoutParams lpLeft=new FrameLayout.LayoutParams(dp(42),dp(52),Gravity.START|Gravity.CENTER_VERTICAL);
-        FrameLayout.LayoutParams lpRight=new FrameLayout.LayoutParams(dp(42),dp(52),Gravity.END|Gravity.CENTER_VERTICAL);
-        lpLeft.leftMargin=dp(6);lpRight.rightMargin=dp(6);
-        viewport.addView(leftArrow,lpLeft);viewport.addView(rightArrow,lpRight);
-        leftArrow.setOnClickListener(v->move(-1));
-        rightArrow.setOnClickListener(v->move(1));
         final GestureDetector detector=new GestureDetector(context,new GestureDetector.SimpleOnGestureListener(){
             @Override public boolean onDown(MotionEvent e){return true;}
             @Override public boolean onFling(MotionEvent e1,MotionEvent e2,float vx,float vy){
@@ -155,22 +172,9 @@ public final class LocationGalleryView extends LinearLayout {
         });
         photo.setOnClickListener(v->{if(!fullscreen)openFullscreen();});
 
-        caption=text("",13,0xffddd4c4);
-        caption.setGravity(Gravity.CENTER);
-        caption.setPadding(dp(5),dp(12),dp(5),dp(3));
-        addView(caption,new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,dp(42)));
-        TextView hint=text(fullscreen?"Листай изображения влево или вправо":"Проведи вбок или нажми на фото для увеличения",11,0xffa79c8c);
-        hint.setGravity(Gravity.CENTER);
-        addView(hint,new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,dp(24)));
+        // No redundant instructions, page counter or arrow overlays.
         show(0);
-    }
-    private TextView arrow(Context c,String text,boolean left){
-        TextView v=text(text,26,accent);
-        v.setGravity(Gravity.CENTER);
-        v.setBackground(panel(0xdf0b1116,8,0xff635139));
-        v.setContentDescription(left?"Предыдущее изображение":"Следующее изображение");
-        v.setFocusable(true);
-        return v;
+        prefetch();
     }
     private void move(int delta){
         int count=imageCount(location);
@@ -179,12 +183,11 @@ public final class LocationGalleryView extends LinearLayout {
     private void show(int index){
         current=index;
         final int target=++requested;
-        page.setText((index+1)+" / "+imageCount(location));
-        caption.setText(captionFor(location,index));
+        page.setText(captionFor(location,index));
         photo.animate().cancel();
-        photo.setAlpha(0.45f);
-        loading.setVisibility(View.VISIBLE);
-        final String key=slug+"/"+(index+1)+"/"+(fullscreen?"full":"small");
+        // Keep the previous picture visible while the next cached preview resolves.
+        // Never show a "loading" banner during manual swiping.
+        final String key=cacheKey(slug,index+1,fullscreen);
         Bitmap cached=CACHE.get(key);
         if(cached!=null&&!cached.isRecycled()){
             present(target,cached);
@@ -196,15 +199,13 @@ public final class LocationGalleryView extends LinearLayout {
             post(()->{
                 if(target!=requested)return;
                 if(bitmap!=null)present(target,bitmap);
-                else{loading.setText("Изображение временно недоступно");photo.setAlpha(1f);}
             });
         });
     }
     private void present(int target,Bitmap image){
         if(target!=requested||image==null)return;
         photo.setImageBitmap(image);
-        loading.setVisibility(View.GONE);
-        photo.animate().alpha(1f).setDuration(180).start();
+        photo.setAlpha(1f);
     }
     @Override protected void onDetachedFromWindow(){
         requested++;
@@ -232,17 +233,84 @@ public final class LocationGalleryView extends LinearLayout {
         }catch(Exception ignored){}
         return null;
     }
+    /** A borderless photo lightbox: only an X button; no gallery chrome. */
     private void openFullscreen(){
-        LinearLayout root=new LinearLayout(getContext());
-        root.setOrientation(VERTICAL);
-        root.setPadding(dp(8),dp(8),dp(8),dp(8));
-        LocationGalleryView large=new LocationGalleryView(getContext(),location,accent,true);
-        large.show(current);
-        root.addView(large,new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.WRAP_CONTENT));
-        new RuneDialogBuilder(getContext(),accent)
-            .setTitle("Галерея · "+location)
-            .setView(root)
-            .setNegativeButton("Закрыть",null)
-            .show();
+        Dialog viewer=new Dialog(getContext());
+        viewer.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        FrameLayout backdrop=new FrameLayout(getContext());
+        backdrop.setBackgroundColor(0xf206090b);
+        ImageView image=new ImageView(getContext());
+        image.setScaleType(ImageView.ScaleType.FIT_CENTER);
+        image.setContentDescription("Полноэкранное фото локации "+location);
+        backdrop.addView(image,new FrameLayout.LayoutParams(-1,-1));
+
+        final int[] selected={current};
+        final int[] generation={0};
+        final Runnable[] render={null};
+        final Context context=getContext().getApplicationContext();
+        render[0]=()->{
+            int number=selected[0]+1;
+            int ticket=++generation[0];
+            String fullKey=cacheKey(slug,number,true);
+            Bitmap full=CACHE.get(fullKey);
+            if(full!=null&&!full.isRecycled()){
+                image.setImageBitmap(full);
+                return;
+            }
+            // Preview is already in memory, so there is never an empty loading view.
+            Bitmap preview=CACHE.get(cacheKey(slug,number,false));
+            if(preview!=null&&!preview.isRecycled())image.setImageBitmap(preview);
+            IO.execute(()->{
+                Bitmap bitmap=decode(context,slug,number,true);
+                if(bitmap!=null)CACHE.put(fullKey,bitmap);
+                image.post(()->{
+                    if(ticket==generation[0]&&viewer.isShowing()&&bitmap!=null)
+                        image.setImageBitmap(bitmap);
+                });
+            });
+        };
+        final GestureDetector detector=new GestureDetector(getContext(),
+            new GestureDetector.SimpleOnGestureListener(){
+                @Override public boolean onDown(MotionEvent event){return true;}
+                @Override public boolean onFling(MotionEvent start,MotionEvent end,float vx,float vy){
+                    if(start==null||end==null)return false;
+                    float dx=end.getX()-start.getX(),dy=end.getY()-start.getY();
+                    if(Math.abs(dx)<=dp(45)||Math.abs(dx)<=Math.abs(dy)*1.1f)return false;
+                    int count=imageCount(location);
+                    selected[0]=(selected[0]+(dx<0?1:-1)+count)%count;
+                    render[0].run();
+                    return true;
+                }
+            });
+        image.setOnTouchListener((view,event)->{
+            detector.onTouchEvent(event);
+            return true;
+        });
+
+        TextView close=text("×",33,Color.WHITE);
+        close.setTypeface(android.graphics.Typeface.DEFAULT_BOLD);
+        close.setGravity(Gravity.CENTER);
+        close.setContentDescription("Закрыть полноэкранное фото");
+        close.setOnClickListener(v->viewer.dismiss());
+        FrameLayout.LayoutParams closeParams=new FrameLayout.LayoutParams(dp(54),dp(54),
+            Gravity.TOP|Gravity.END);
+        closeParams.topMargin=dp(19);
+        closeParams.rightMargin=dp(14);
+        backdrop.addView(close,closeParams);
+        viewer.setContentView(backdrop);
+        viewer.setOnDismissListener(d->generation[0]++);
+        viewer.show();
+        Window window=viewer.getWindow();
+        if(window!=null){
+            window.setBackgroundDrawableResource(android.R.color.transparent);
+            window.addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+            WindowManager.LayoutParams params=window.getAttributes();
+            params.dimAmount=.82f;
+            params.gravity=Gravity.CENTER;
+            params.width=WindowManager.LayoutParams.MATCH_PARENT;
+            params.height=WindowManager.LayoutParams.MATCH_PARENT;
+            window.setAttributes(params);
+        }
+        render[0].run();
     }
 }
