@@ -602,6 +602,21 @@ public final class MainActivity extends Activity {
             addText(journal,"!  Случайная встреча · исход ещё неизвестен",13,0xfff18e60,true,1);
     }
 
+    /** Only the value is bold; the attribute label remains regular. */
+    private void addChoiceStat(LinearLayout target,String label,String value,int valueColor,int bottom){
+        String display=label+": "+value;
+        TextView line=text(display,13,MUTED,false);
+        android.text.SpannableString styled=new android.text.SpannableString(display);
+        int start=display.length()-value.length();
+        styled.setSpan(new android.text.style.StyleSpan(Typeface.BOLD),start,display.length(),
+            android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        styled.setSpan(new android.text.style.ForegroundColorSpan(valueColor),start,display.length(),
+            android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        line.setText(styled);
+        target.addView(line,lp(-1,-2));
+        if(bottom>0)space(target,bottom);
+    }
+
     private void storyChoice(int position,GameEngine.Choice c,Runnable onClick){
         int chance=game.progress.chance(game,c.action);
         LinearLayout box=row();box.setGravity(Gravity.TOP);
@@ -625,8 +640,8 @@ public final class MainActivity extends Activity {
         }
         space(prose,6);
         if(chance>=0){
-            addText(prose,SceneChoiceMeta.skill(c.action),12,MUTED,false,4);
-            addText(prose,"ШАНС УСПЕХА  "+chance+"%",13,SceneChoiceMeta.chanceColor(chance),true,0);
+            addChoiceStat(prose,"НАВЫК",SceneChoiceMeta.skillName(c.action),accent(),4);
+            addChoiceStat(prose,"ШАНС УСПЕХА",chance+"%",SceneChoiceMeta.chanceColor(chance),0);
         }else addText(prose,"БЕЗ ПРОВЕРКИ",11,0xffb8c1c4,false,0);
         LinearLayout.LayoutParams layout=lp(-1,-2);layout.bottomMargin=dp(5);
         content.addView(box,layout);
@@ -858,10 +873,9 @@ public final class MainActivity extends Activity {
         detail.addView(title);space(detail,6);
         addText(detail,option.detail,14,MUTED,false,7);
         if(option.chance>=0){
-            if(!option.skill.isEmpty())
-                addText(detail,"НАВЫК  "+option.skill,12,MUTED,false,3);
-            addText(detail,"ШАНС УСПЕХА  "+option.chance+"%",13,
-                SceneChoiceMeta.chanceColor(option.chance),true,0);
+            addChoiceStat(detail,"НАВЫК",option.skill.isEmpty()?"Способности":option.skill,accent(),3);
+            addChoiceStat(detail,"ШАНС УСПЕХА",option.chance+"%",
+                SceneChoiceMeta.chanceColor(option.chance),0);
         }else addText(detail,"БЕЗ ПРОВЕРКИ",12,MUTED,false,0);
         row.setClickable(true);row.setFocusable(true);
         row.setContentDescription("Вариант "+number+". "+option.title+". "+(selected?"Выбран":"Не выбран"));
@@ -1334,7 +1348,7 @@ public final class MainActivity extends Activity {
     }
     private void renderInventory(){
         game.progress.sync(game);
-        section("ПРЕДМЕТЫ И СНАРЯЖЕНИЕ","Инвентарь","Оружие, доспехи, книги и другие находки.");
+        section("СУМКА ПУТНИКА","Инвентарь","Предметы и снаряжение");
         java.util.ArrayList<String> groups=ItemCatalog.groups();
         if(!groups.contains(selectedCategory))selectedCategory="Все";
         // Category icon ribbon, horizontally scrollable and fully transparent.
@@ -1348,7 +1362,7 @@ public final class MainActivity extends Activity {
         content.addView(categoryScroll,lp(-1,-2));
         for(String group:groups){
             boolean active=selectedCategory.equals(group);
-            String image=group.equals("Все")?"bag":iconOf(group);
+            String image=SkyrimIconView.iconForCategory(group);
             LinearLayout tile=column();tile.setGravity(Gravity.CENTER);
             tile.setPadding(dp(7),dp(3),dp(7),dp(3));
             categoryStrip.addView(tile,lp(65,67));
@@ -1441,11 +1455,28 @@ public final class MainActivity extends Activity {
         actionButton("Личная библиотека","Твои документы, легенды и записи",false,this::showLibrary);
     }
     private void itemDialog(ItemCatalog.Item item){
-        String text=item.icon+"  "+item.name+"\n\nКатегория: "+item.category+
-            String.format(java.util.Locale.forLanguageTag("ru"),"\nВес: %.2f кг\nСтоимость: %d септимов",item.weight,item.value)+
-            "\n\n"+item.description+"\n\nЭффект: "+item.effect;
+        LinearLayout view=column();
+        view.setPadding(dp(14),dp(10),dp(14),dp(8));
+        LinearLayout heading=row();
+        view.addView(heading,lp(-1,-2));
+        // Use the actual atlas sprite rather than Item.icon's old Unicode glyph.
+        heading.addView(new SkyrimIconView(this,
+            SkyrimIconView.iconForItem(item.name,item.category),accent()),lp(44,44));
+        LinearLayout words=column();
+        LinearLayout.LayoutParams wordsParams=new LinearLayout.LayoutParams(0,-2,1);
+        wordsParams.leftMargin=dp(12);
+        heading.addView(words,wordsParams);
+        addText(words,item.name,17,TEXT,true,4);
+        addText(words,item.category,12,MUTED,false,0);
+        view.addView(new SkyrimRuleView(this,accent()),lp(-1,22));
+        addText(view,String.format(java.util.Locale.forLanguageTag("ru"),
+            "Вес: %.2f кг     Стоимость: %d септимов",item.weight,item.value),
+            13,accent(),false,12);
+        addText(view,item.description,14,TEXT,false,12);
+        addText(view,"ЭФФЕКТ",11,accent(),true,5);
+        addText(view,item.effect,13,MUTED,false,3);
         AlertDialog.Builder dialog=new RuneDialogBuilder(this,accent()).setTitle("Сведения о предмете")
-            .setMessage(text).setNegativeButton("Закрыть",null);
+            .setView(view).setNegativeButton("Закрыть",null);
         if(game.progress.quantity(item.id)>0){
             if("Лечебное зелье".equals(item.id)||"Зелье магии".equals(item.id))
                 dialog.setPositiveButton("Использовать",(d,w)->{
@@ -1456,34 +1487,124 @@ public final class MainActivity extends Activity {
         }
         dialog.show();
     }
+
+    /** Compact expandable catalog, with dedicated atlas icons and no list weights. */
     private void showItemCatalog(){
-        java.util.ArrayList<ItemCatalog.Item> items=ItemCatalog.all();
-        items.sort((a,b)->a.name.compareToIgnoreCase(b.name));
-        LinearLayout root=column();root.setPadding(dp(12),dp(8),dp(12),dp(12));
-        EditText search=new EditText(this);search.setSingleLine(true);search.setHint("Найти предмет по названию");
-        search.setTextColor(TEXT);search.setHintTextColor(MUTED);root.addView(search,lp(-1,55));
-        android.widget.ListView list=new android.widget.ListView(this);
-        root.addView(list,lp(-1,440));
-        java.util.ArrayList<ItemCatalog.Item> visible=new java.util.ArrayList<>(items);
-        android.widget.ArrayAdapter<String> adapter=new android.widget.ArrayAdapter<>(this,android.R.layout.simple_list_item_1,new java.util.ArrayList<String>());
-        Runnable refresh=()->{
-            String term=search.getText().toString().trim().toLowerCase(java.util.Locale.ROOT);
-            visible.clear();adapter.clear();
-            for(ItemCatalog.Item item:items){
-                if(!term.isEmpty()&&!item.name.toLowerCase(java.util.Locale.ROOT).contains(term))continue;
-                visible.add(item);adapter.add(item.icon+"  "+item.name+" · "+item.weight+" кг");
+        java.util.ArrayList<ItemCatalog.Item> allItems=ItemCatalog.all();
+        allItems.sort((a,b)->a.name.compareToIgnoreCase(b.name));
+        LinearLayout panel=column();
+        panel.setPadding(dp(12),dp(5),dp(12),dp(8));
+        EditText search=new EditText(this);
+        search.setSingleLine(true);
+        search.setTextColor(TEXT);search.setHintTextColor(MUTED);
+        search.setTextSize(sp(14));
+        search.setHint("Поиск предметов");
+        panel.addView(search,lp(-1,48));
+        TextView resultCount=text("",12,MUTED,false);
+        panel.addView(resultCount,lp(-1,28));
+        ScrollView scrollCatalog=new ScrollView(this);
+        scrollCatalog.setVerticalScrollBarEnabled(false);
+        scrollCatalog.setFillViewport(false);
+        LinearLayout sections=column();
+        scrollCatalog.addView(sections);
+        int maxHeight=Math.min(dp(530),
+            (int)(getResources().getDisplayMetrics().heightPixels*.58f));
+        panel.addView(scrollCatalog,new LinearLayout.LayoutParams(-1,maxHeight));
+        java.util.HashSet<String> opened=new java.util.HashSet<>();
+        java.util.HashSet<String> manuallyClosed=new java.util.HashSet<>();
+        final Runnable[] refresh=new Runnable[1];
+        refresh[0]=()->{
+            String query=search.getText().toString().trim().toLowerCase(java.util.Locale.ROOT);
+            boolean searching=!query.isEmpty();
+            java.util.LinkedHashMap<String,java.util.ArrayList<ItemCatalog.Item>> groups=
+                new java.util.LinkedHashMap<>();
+            int matches=0;
+            for(ItemCatalog.Item item:allItems){
+                if(searching&&!item.name.toLowerCase(java.util.Locale.ROOT).contains(query)
+                    &&!item.category.toLowerCase(java.util.Locale.ROOT).contains(query))continue;
+                java.util.ArrayList<ItemCatalog.Item> group=groups.get(item.category);
+                if(group==null){group=new java.util.ArrayList<>();groups.put(item.category,group);}
+                group.add(item);matches++;
             }
-            adapter.notifyDataSetChanged();
+            resultCount.setText("НАЙДЕНО: "+matches+" / "+allItems.size()+
+                "     КАТЕГОРИЙ: "+groups.size());
+            sections.removeAllViews();
+            if(matches==0){
+                TextView empty=text("Совпадений нет",14,MUTED,false);
+                empty.setGravity(Gravity.CENTER);
+                sections.addView(empty,lp(-1,90));
+                return;
+            }
+            for(java.util.Map.Entry<String,java.util.ArrayList<ItemCatalog.Item>> entry:groups.entrySet()){
+                String category=entry.getKey();
+                java.util.ArrayList<ItemCatalog.Item> categoryItems=entry.getValue();
+                boolean expanded=opened.contains(category)||(searching&&!manuallyClosed.contains(category));
+                LinearLayout header=row();
+                header.setMinimumHeight(dp(49));
+                header.setPadding(dp(8),dp(7),dp(10),dp(7));
+                header.setBackground(new RuneFrameDrawable(PANEL,BORDER,false));
+                header.addView(new SkyrimIconView(this,
+                    SkyrimIconView.iconForCategory(category),accent()),lp(28,29));
+                TextView title=text(category.toUpperCase(java.util.Locale.ROOT)+
+                    "  ("+categoryItems.size()+")",13,TEXT,true);
+                title.setSingleLine(true);title.setEllipsize(android.text.TextUtils.TruncateAt.END);
+                LinearLayout.LayoutParams nameParams=new LinearLayout.LayoutParams(0,-2,1);
+                nameParams.leftMargin=dp(10);header.addView(title,nameParams);
+                TextView arrow=text(expanded?"⌃":"⌄",21,accent(),true);
+                arrow.setGravity(Gravity.CENTER);header.addView(arrow,lp(28,28));
+                LinearLayout.LayoutParams hp=lp(-1,-2);
+                hp.bottomMargin=dp(3);
+                sections.addView(header,hp);
+                LinearLayout entries=column();
+                entries.setVisibility(expanded?View.VISIBLE:View.GONE);
+                sections.addView(entries,lp(-1,-2));
+                header.setContentDescription(category+", "+(expanded?"развёрнуто":"свёрнуто"));
+                header.setOnClickListener(v->{
+                    boolean next=entries.getVisibility()!=View.VISIBLE;
+                    if(animations)android.transition.TransitionManager.beginDelayedTransition(
+                        sections,new android.transition.AutoTransition().setDuration(200));
+                    entries.setVisibility(next?View.VISIBLE:View.GONE);
+                    arrow.setText(next?"⌃":"⌄");
+                    if(next){opened.add(category);manuallyClosed.remove(category);}
+                    else{opened.remove(category);manuallyClosed.add(category);}
+                    header.setContentDescription(category+", "+(next?"развёрнуто":"свёрнуто"));
+                });
+                if(!expanded)continue;
+                for(ItemCatalog.Item item:categoryItems){
+                    LinearLayout itemRow=row();
+                    itemRow.setMinimumHeight(dp(46));
+                    itemRow.setPadding(dp(9),dp(7),dp(8),dp(7));
+                    itemRow.setBackgroundColor(0xb2090d0f);
+                    itemRow.addView(new SkyrimIconView(this,
+                        SkyrimIconView.iconForItem(item.name,item.category),accent()),lp(25,25));
+                    TextView itemName=text(item.name,14,TEXT,false);
+                    itemName.setMaxLines(2);
+                    itemName.setEllipsize(android.text.TextUtils.TruncateAt.END);
+                    LinearLayout.LayoutParams np=new LinearLayout.LayoutParams(0,-2,1);
+                    np.leftMargin=dp(9);
+                    itemRow.addView(itemName,np);
+                    TextView price=text(item.value+" ◈",11,MUTED,false);
+                    price.setGravity(Gravity.END|Gravity.CENTER_VERTICAL);
+                    LinearLayout.LayoutParams priceP=lp(75,-2);
+                    priceP.leftMargin=dp(6);
+                    itemRow.addView(price,priceP);
+                    entries.addView(itemRow,lp(-1,-2));
+                    View sep=new View(this);sep.setBackgroundColor(0xff252b2e);
+                    entries.addView(sep,lp(-1,1));
+                    itemRow.setOnClickListener(v->itemDialog(item));
+                }
+                space(sections,5);
+            }
         };
-        list.setAdapter(adapter);refresh.run();
+        // Start compact; typing a query reveals matching categories automatically.
+        refresh[0].run();
         search.addTextChangedListener(new android.text.TextWatcher(){
             public void beforeTextChanged(CharSequence x,int start,int count,int after){}
-            public void onTextChanged(CharSequence x,int a,int b,int c){refresh.run();}
+            public void onTextChanged(CharSequence x,int a,int b,int c){refresh[0].run();}
             public void afterTextChanged(android.text.Editable x){}
         });
-        AlertDialog dlg=new RuneDialogBuilder(this,accent()).setTitle("Каталог предметов").setView(root).setNegativeButton("Закрыть",null).create();
-        list.setOnItemClickListener((parent,v,pos,id)->{if(pos>=0&&pos<visible.size())itemDialog(visible.get(pos));});
-        dlg.show();
+        new RuneDialogBuilder(this,accent()).setTitle("Каталог предметов")
+            .setView(panel).setNegativeButton("Закрыть",null).show();
     }
     private void showLibrary(){
         java.util.ArrayList<String> docs=ItemCatalog.loreDocuments(this);
