@@ -38,7 +38,10 @@ public final class MainActivity extends Activity {
     private static final String PREFS="skyrim_text_v1";
     private GameEngine game;
     private SharedPreferences prefs;
-    private LinearLayout root, content, header;
+    private LinearLayout root, content, header, topChrome;
+    private boolean chromeHidden;
+    private int chromeScrollTravel;
+    private long chromeIgnoreScrollUntil;
     private ScrollView scroll;
     private String renderedPage="";
     private static final class PageScroll {
@@ -190,10 +193,15 @@ public final class MainActivity extends Activity {
         PageScroll oldScroll=scrollCache.get(thisPage);
         root=column();root.setBackground(new SkyrimBackdropDrawable());root.setFitsSystemWindows(true);
         setContentView(root);
+        // One shared collapsible top region. Never suppress HP, stamina and magicka
+        // just because the AI storyteller is active.
+        topChrome=column();
+        root.addView(topChrome,lp(-1,-2));
+        chromeHidden=false;chromeScrollTravel=0;chromeIgnoreScrollUntil=0L;
         if(!titleOpen){
             renderHeader();
             if(game.started)renderSkillLevelNotice();
-            if(game.started && !(tab==0&&prefs.getBoolean("ai_enabled",false)))renderBars();
+            if(game.started)renderBars();
         }
         scroll=new ScrollView(this);scroll.setFillViewport(false);scroll.setClipToPadding(false);
         scroll.setVerticalScrollBarEnabled(false);
@@ -202,6 +210,8 @@ public final class MainActivity extends Activity {
         scroll.setFocusableInTouchMode(true);
         scroll.requestFocus();
         root.addView(scroll,new LinearLayout.LayoutParams(-1,0,1));
+        scroll.setOnScrollChangeListener((View view,int x,int y,int oldX,int oldY)->
+            handleVerticalScroll(y,oldY));
         content=column();content.setPadding(dp(13),dp(17),dp(13),dp(28));scroll.addView(content);
         if(titleOpen)renderTitle();
         else if(!game.started && tab!=5)renderNewGame();
@@ -218,10 +228,45 @@ public final class MainActivity extends Activity {
         resumeViewport(oldScroll,scroll,thisPage);
         if(animations){content.setAlpha(0.8f);content.animate().alpha(1f).setDuration(210).setInterpolator(new DecelerateInterpolator()).start();}
     }
+    /** Hide top status bars when reading downward; restore on any upward swipe. */
+    private void handleVerticalScroll(int y,int previousY){
+        if(titleOpen||!game.started||topChrome==null)return;
+        int delta=y-previousY;
+        if(y<=dp(8)){setChromeVisible(true);chromeScrollTravel=0;return;}
+        if(android.os.SystemClock.uptimeMillis()<chromeIgnoreScrollUntil||Math.abs(delta)<dp(2))
+            return;
+        if((delta>0)==(chromeScrollTravel>0))chromeScrollTravel+=delta;
+        else chromeScrollTravel=delta;
+        if(!chromeHidden&&chromeScrollTravel>dp(19)){
+            setChromeVisible(false);chromeScrollTravel=0;
+        }else if(chromeHidden&&chromeScrollTravel<-dp(11)){
+            setChromeVisible(true);chromeScrollTravel=0;
+        }
+    }
+    private void setChromeVisible(boolean visible){
+        if(topChrome==null||chromeHidden==!visible)return;
+        chromeHidden=!visible;
+        chromeIgnoreScrollUntil=android.os.SystemClock.uptimeMillis()+240L;
+        topChrome.animate().cancel();
+        if(visible){
+            topChrome.setVisibility(View.VISIBLE);
+            if(animations){
+                topChrome.setAlpha(0f);
+                topChrome.animate().alpha(1f).setDuration(160L).start();
+            }else topChrome.setAlpha(1f);
+        }else if(animations){
+            final LinearLayout target=topChrome;
+            target.animate().alpha(0f).setDuration(140L).withEndAction(()->{
+                if(target==topChrome&&chromeHidden)target.setVisibility(View.GONE);
+            }).start();
+        }else{
+            topChrome.setVisibility(View.GONE);
+        }
+    }
     private void renderHeader(){
         header=row();header.setPadding(dp(13),dp(9),dp(13),dp(9));
         header.setBackground(new RuneFrameDrawable(PANEL,BORDER,false));
-        root.addView(header,lp(-1,-2));
+        topChrome.addView(header,lp(-1,-2));
         SkyrimIconView crest=new SkyrimIconView(this,"dragon",accent());
         header.addView(crest,lp(42,42));
         crest.setOnClickListener(v->{titleOpen=true;render();});
@@ -240,7 +285,7 @@ public final class MainActivity extends Activity {
                 state.setOnClickListener(v->showWaitDialog());
             }
         }
-        root.addView(new SkyrimRuleView(this,accent()),lp(-1,15));
+        topChrome.addView(new SkyrimRuleView(this,accent()),lp(-1,15));
     }
     /**
      * Compact level-up HUD taken from the Skyrim skill-notification reference.
@@ -311,11 +356,11 @@ public final class MainActivity extends Activity {
 
     private void renderBars(){
         LinearLayout stats=row();stats.setPadding(dp(19),dp(11),dp(19),dp(11));
-        stats.setBackgroundColor(PANEL);root.addView(stats,lp(-1,-2));
+        stats.setBackgroundColor(PANEL);topChrome.addView(stats,lp(-1,-2));
         stat(stats,"ЗДОРОВЬЕ",game.hp,game.maxHp,0xFFE47B7B);
         stat(stats,"ЗАПАС СИЛ",game.stamina,game.maxStamina,0xFF79CC9C);
         stat(stats,"МАГИЯ",game.magicka,game.maxMagicka,0xFF7DABF4);
-        View line=new View(this);line.setBackgroundColor(BORDER);root.addView(line,lp(-1,1));
+        View line=new View(this);line.setBackgroundColor(BORDER);topChrome.addView(line,lp(-1,1));
     }
     private void stat(LinearLayout host,String name,int value,int max,int color){
         LinearLayout col=column();LinearLayout.LayoutParams ww=new LinearLayout.LayoutParams(0,-2,1);ww.setMargins(dp(3),0,dp(6),0);host.addView(col,ww);
