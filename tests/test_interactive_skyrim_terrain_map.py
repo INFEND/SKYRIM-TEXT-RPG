@@ -8,7 +8,7 @@ UI=(JAVA/"MainActivity.java").read_text()
 
 class InteractiveTerrainMap(unittest.TestCase):
     def test_both_terrain_sheets_are_offline_and_bounded(self):
-        for name,maximum in (("skyrim_geographic.webp",4_000_000),("solstheim_geographic.webp",500_000)):
+        for name,maximum in (("skyrim_geographic.webp",4_000_000),("solstheim_terrain.webp",800_000)):
             data=(ROOT/"app/src/main/assets/maps"/name).read_bytes()
             self.assertGreater(len(data),100_000)
             self.assertLess(len(data),maximum)
@@ -28,7 +28,7 @@ class InteractiveTerrainMap(unittest.TestCase):
             self.assertIn(token,MAP)
 
     def test_geographic_selection_uses_validated_travel(self):
-        self.assertIn("WorldAtlas.find(site.name)",MAP)
+        self.assertIn("WorldAtlas.find(SkyrimMapCatalog.travelDestination(site))",MAP)
         self.assertIn("callback.selected(place)",MAP)
         self.assertIn("MapPinLayout.hit(renderedPins()",MAP)
         self.assertIn("TravelPlanner.plan(game,place)",UI)

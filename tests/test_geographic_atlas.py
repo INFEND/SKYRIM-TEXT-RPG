@@ -3,6 +3,7 @@ import hashlib
 import json
 from pathlib import Path
 import re
+import math
 import shutil
 import subprocess
 import tempfile
@@ -30,9 +31,25 @@ class GeographicSource(unittest.TestCase):
 
     def test_terrain_files_match_reviewed_inputs(self):
         expected={"skyrim_geographic.webp":"d32690ec652fe6917a7e0a102e024a06c3386ba33593332d00cb2fadbfecf5c8",
-                  "solstheim_geographic.webp":"611813d698838df4d85adec49880afe05ba70298eb6c4107ff49d24006fe26d4"}
+                  "solstheim_terrain.webp":"712a0a78afd7de78690ad1c99f25a7d6086b354bf398ab15abc0b3fd9902404d"}
         for filename,digest in expected.items():
             self.assertEqual(hashlib.sha256((ROOT/"app/src/main/assets/maps"/filename).read_bytes()).hexdigest(),digest)
+
+    def test_island_registration_preserves_published_anchors_and_flags_estimates(self):
+        points=json.loads((ROOT/"tools/map_source/compiled.json").read_text())
+        reference={p["name"]:p for p in json.loads((ROOT/"tools/map_source/solstheim_projection.json").read_text())}
+        island=[p for p in points if p["sheet"]==1]
+        self.assertEqual(sum(p["pinSource"]=="anchor" for p in island),46)
+        self.assertEqual(sum(p["pinSource"]=="interpolated" for p in island),11)
+        for point in island:
+            self.assertTrue(0<=point["displayX"]<=2048 and 0<=point["displayY"]<=2048)
+            if point["pinSource"]!="anchor":continue
+            lon,lat=reference[point["name"]]["coordinates"][:2]
+            self.assertAlmostEqual(point["displayX"],(lon+180)/360*2048,places=6)
+            self.assertAlmostEqual(point["displayY"],(1-math.asinh(math.tan(math.radians(lat)))/math.pi)/2*2048,places=6)
+        ui=(JAVA/"MainActivity.java").read_text()
+        self.assertIn("!geographic.registered",ui)
+        self.assertIn("Положение метки на рельефе ориентировочное",ui)
 
     def test_generation_is_reproducible(self):
         paths=[JAVA/"SkyrimMapPoints.java",ROOT/"tools/map_source/compiled.json"]
@@ -66,7 +83,7 @@ public class Probe {
   check(all.size()==512,"catalog size");
   for(SkyrimMapCatalog.Site site:all){
    check(Float.isFinite(site.x)&&Float.isFinite(site.y),"finite coordinate");
-   check(site.x>=0&&site.y>=0&&site.x<=(site.sheet==0?4096:726)&&site.y<=(site.sheet==0?4096:835),"sheet bounds: "+site.name);
+   check(site.x>=0&&site.y>=0&&site.x<=(site.sheet==0?4096:2048)&&site.y<=(site.sheet==0?4096:2048),"sheet bounds: "+site.name);
    WorldAtlas.Place place=WorldAtlas.find(site.name);
    check(place!=null&&place.region==site.region,"playable place: "+site.name);
   }
@@ -74,6 +91,8 @@ public class Probe {
   check(SkyrimMapCatalog.find("ЧЁРНЫЙ БРОД")==SkyrimMapCatalog.find("Черный Брод"),"yo normalization");
   check(WorldAtlas.find("Камень Шора")==WorldAtlas.find("Шорский Камень"),"old save alias");
   check(WorldAtlas.find("Колбьорн")!=null,"island legacy key");
+  check(SkyrimMapCatalog.travelDestination(SkyrimMapCatalog.find("To Solstheim (DB)")).equals("Воронья Скала"),"boarding point goes to island");
+  check(SkyrimMapCatalog.travelDestination(SkyrimMapCatalog.find("To Skyrim")).equals("Виндхельм"),"return boarding point goes to Windhelm");
   check(WorldAtlas.find("Хелген").region==5,"Helgen travel district");
   check(WorldAtlas.find("Ларгашбур").region==1,"Largashbur corrected geography");
   check(WorldAtlas.find("Лабиринтиан").region==8,"Labyrinthian corrected geography");

@@ -1370,7 +1370,7 @@ public final class MainActivity extends Activity {
         fullMap.setBackground(new RuneFrameDrawable(PANEL_2,BORDER,false));overview.addView(fullMap,lp(-1,-2));
         fullMap.setOnClickListener(v->openFullscreenWorldMap());
         addText(overview,"Масштаб — двумя пальцами или кнопками. Группы меток раскрываются при увеличении. Поиск работает по русским и оригинальным названиям.",12,MUTED,false,6);
-        addText(overview,"Материк: полный игровой рельеф. Солстейм: рисованный атлас с привязкой к ориентирам.",11,MUTED,false,7);
+        addText(overview,"Два полных листа рельефа работают без интернета. Масштаб и положение каждого листа сохраняются отдельно.",11,MUTED,false,7);
         if(LocationGalleryView.hasGallery(game.progress.location)){
             addText(overview,"ᛟ  ГАЛЕРЕЯ ТЕКУЩЕГО МЕСТА",11,accent(),true,12);
             overview.addView(new LocationGalleryView(this,game.progress.location,accent(),false),lp(-1,-2));
@@ -1406,11 +1406,11 @@ public final class MainActivity extends Activity {
         addText(content,"Координаты: UESP.net / Itemaps. Источники рельефа и лицензии — в сведениях о карте.",11,MUTED,false,8);
         actionButton("СВЕДЕНИЯ О КАРТЕ","Покрытие, источники и оформление",false,()->new RuneDialogBuilder(this,accent())
             .setTitle("Атлас Севера").setMessage(SkyrimMapCatalog.size()+" локаций. Координаты материка основаны на игровых данных. "+
-            "Солстейм использует рисованную карту: точность визуальной привязки ниже, чем у рельефа материка. "+
+            "Рельеф Солстейма привязан к опубликованным ориентирам; отдельные метки имеют приблизительную привязку. "+
             "Подземные миры и отдельные внутренние помещения не являются географической поверхностью этой карты.\n\n"+
             "Координаты: Unofficial Elder Scrolls Pages (UESP.net), опубликованный каталог Itemaps. "+
             "Полный рельеф материка: игровые LOD-текстуры, сборка S1lveric. "+
-            "Рисованный Солстейм: Bethesda / SunflashRune, MIT (пакет трекера). "+
+            "Рельеф Солстейма и его ориентиры: Tamriel Maps (tamrielma.ps). "+
             "The Elder Scrolls V: Skyrim — Bethesda Softworks. Неофициальный атлас.")
             .setNegativeButton("Закрыть",null).show());
     }
@@ -1492,13 +1492,7 @@ public final class MainActivity extends Activity {
     }
     private void atlasSiteDialog(SkyrimMapCatalog.Site site){
         if(site==null)return;
-        if(site.english.equals("To Solstheim (DB)")){
-            locationDialog(WorldAtlas.find("Воронья Скала"));return;
-        }
-        if(site.english.equals("To Skyrim")){
-            locationDialog(WorldAtlas.find("Виндхельм"));return;
-        }
-        WorldAtlas.Place place=WorldAtlas.find(site.name);
+        WorldAtlas.Place place=WorldAtlas.find(SkyrimMapCatalog.travelDestination(site));
         if(place!=null){locationDialog(place);return;}
         new RuneDialogBuilder(this,accent()).setTitle(site.name)
             .setMessage(site.type+" · "+site.grid).setNegativeButton("Закрыть",null).show();
@@ -1625,6 +1619,8 @@ public final class MainActivity extends Activity {
         TravelPlanner.Route route=TravelPlanner.plan(game,place);
         String body=place.description+"\n\nТип: "+place.type+
             "\nРегион: "+GameEngine.REGIONS[place.region]+"\n\n"+route.summary();
+        SkyrimMapCatalog.Site geographic=SkyrimMapCatalog.find(place.name);
+        if(geographic!=null&&!geographic.registered)body+="\n\nПоложение метки на рельефе ориентировочное.";
         AlertDialog.Builder dialog=new RuneDialogBuilder(this,accent()).setTitle(place.name)
             .setNegativeButton("Закрыть",null);
         if(LocationGalleryView.hasGallery(place.name)){

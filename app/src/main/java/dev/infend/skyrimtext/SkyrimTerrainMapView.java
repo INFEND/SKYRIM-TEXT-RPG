@@ -24,8 +24,8 @@ public final class SkyrimTerrainMapView extends View {
     public interface OnCatalog {void selected(ArrayList<SkyrimMapCatalog.Site> locations);}
     public static final String TERRAIN="maps/skyrim_geographic.webp";
     public static final int MAP_W=4096,MAP_H=4096;
-    private static final String[] TEXTURES={TERRAIN,"maps/solstheim_geographic.webp"};
-    private static final int[] WIDTH={MAP_W,726},HEIGHT={MAP_H,835};
+    private static final String[] TEXTURES={TERRAIN,"maps/solstheim_terrain.webp"};
+    private static final int[] WIDTH={MAP_W,2048},HEIGHT={MAP_H,2048};
     private static final Bitmap[] IMAGES=new Bitmap[2];
     private static final java.util.concurrent.ExecutorService LOADER=Executors.newSingleThreadExecutor();
 
@@ -283,7 +283,7 @@ public final class SkyrimTerrainMapView extends View {
         ink.setStyle(Paint.Style.FILL);ink.setColor(0xe6081115);
         canvas.drawRect(0,getHeight()-27*density,getWidth(),getHeight(),ink);
         ink.setColor(0xffe1e7e7);
-        String status=(sheet==0?"СКАЙРИМ":"СОЛСТЕЙМ · РИСОВАННЫЙ АТЛАС")+
+        String status=(sheet==0?"СКАЙРИМ":"СОЛСТЕЙМ")+
             String.format(java.util.Locale.ROOT,"  ×%.1f",scale/Math.max(.0001f,minScale));
         if(loading)status+=" · Загрузка рельефа…";
         else if(failed)status+=" · Рельеф недоступен";
@@ -305,7 +305,7 @@ public final class SkyrimTerrainMapView extends View {
             }else if(catalogCallback!=null)catalogCallback.selected(new ArrayList<>(pin.sites));
         }else{
             SkyrimMapCatalog.Site site=pin.sites.get(0);focusId=site.id;changed();
-            WorldAtlas.Place place=WorldAtlas.find(site.name);
+            WorldAtlas.Place place=WorldAtlas.find(SkyrimMapCatalog.travelDestination(site));
             if(catalogCallback!=null)catalogCallback.selected(new ArrayList<>(pin.sites));
             else if(place!=null&&callback!=null)callback.selected(place);
         }

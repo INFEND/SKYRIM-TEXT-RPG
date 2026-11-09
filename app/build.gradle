@@ -14,8 +14,8 @@ android {
         applicationId 'dev.infend.skyrimtext'
         minSdk 26
         targetSdk 34
-        versionCode 38
-        versionName '1.0.37'
+        versionCode 39
+        versionName '1.0.38'
         resConfigs 'ru'
     }
 
@@ -44,3 +44,4 @@ android {
     buildFeatures { buildConfig true }
     packaging { resources { excludes += ['/META-INF/{AL2.0,LGPL2.1}'] } }
 }
+

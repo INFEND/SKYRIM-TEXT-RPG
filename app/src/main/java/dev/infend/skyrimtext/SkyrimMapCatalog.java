@@ -12,6 +12,7 @@ public final class SkyrimMapCatalog {
         public final String id,name,english,type,grid;
         public final int sheet,region;
         public final float worldX,worldY,x,y;
+        public final boolean registered;
         private final String search;
         Site(String row){
             String[] v=row.split("\\|",-1);
@@ -20,10 +21,9 @@ public final class SkyrimMapCatalog {
             worldY=Float.parseFloat(v[6]);region=Integer.parseInt(v[7]);
             grid=sheet==0?"Скайрим":"Солстейм";
             // 32-cell LOD textures, 4096 game units per cell, 4096px sheet.
-            x=sheet==0?2048f+worldX/128f:
-                12.7508995f+worldX*.00641931642f+worldY*.000202240987f;
-            y=sheet==0?2048f-worldY/128f:
-                764.925809f-worldX*.000812372097f-worldY*.00597255664f;
+            x=v.length>9?Float.parseFloat(v[8]):2048f+worldX/128f;
+            y=v.length>9?Float.parseFloat(v[9]):2048f-worldY/128f;
+            registered=v.length<=10||!v[10].equals("interpolated");
             search=normalize(name+" "+english+" "+type);
         }
         public boolean matches(String query){return search.contains(normalize(query));}
@@ -68,5 +68,11 @@ public final class SkyrimMapCatalog {
         return count;
     }
     public static Site find(String name){return INDEX.get(normalize(name));}
+    public static String travelDestination(Site site){
+        if(site==null)return "";
+        if(site.english.equals("To Solstheim (DB)"))return "Воронья Скала";
+        if(site.english.equals("To Skyrim"))return "Виндхельм";
+        return site.name;
+    }
 }
 
