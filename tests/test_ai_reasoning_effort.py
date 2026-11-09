@@ -15,7 +15,8 @@ class AiReasoningEffortTests(unittest.TestCase):
 
     def test_payload_has_actual_reasoning_not_prompt_injection(self):
         src=(SRC/"AiStoryClient.java").read_text(encoding="utf-8")
-        self.assertIn('new JSONObject().put("effort",selectedEffort)',src)
+        self.assertIn('reasoning.put("effort",selectedEffort)',src)
+        self.assertIn('reasoning.put("summary","auto")',src)
         self.assertIn('payload.put("reasoning",',src)
         self.assertIn('if(!AiReasoningEffort.isAutomatic(selectedEffort))',src)
         self.assertIn('AiReasoningEffort.apiOutputLimit(selectedEffort)',src)
