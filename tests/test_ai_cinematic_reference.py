@@ -42,7 +42,7 @@ class ScreenshotNarrativeContract(unittest.TestCase):
         ui=java("MainActivity.java")
         effort=java("AiReasoningEffort.java")
         self.assertIn("response.output_text.delta",client)
-        self.assertIn("SceneTypography.render(accumulated,accent())",ui)
+        self.assertIn("SceneTypography.render(accumulated,accent(),game.name,heroColor())",ui)
         self.assertIn("storyChoice(++number,c,()->",ui)
         self.assertIn("game.choose(c.action)",ui)
         self.assertIn('case "medium":return 12000',effort)
