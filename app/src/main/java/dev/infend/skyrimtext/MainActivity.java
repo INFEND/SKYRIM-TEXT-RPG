@@ -91,6 +91,7 @@ public final class MainActivity extends Activity {
         ItemCatalog.initialize(this);
         SovngardeTypeface.preload(this);
         game=GameEngine.fromJson(prefs.getString("save",null));
+        restoreAiDraft();
         accentIndex=Math.max(0,Math.min(ACCENTS.length-1,prefs.getInt("accent",0)));
         fontBonus=Math.max(-2,Math.min(4,prefs.getInt("font_bonus",0)));
         animations=prefs.getBoolean("animations",true);
@@ -116,7 +117,7 @@ public final class MainActivity extends Activity {
         super.onDestroy();
     }
     private void newAiSession(){
-        selectedAiChoices.clear();aiOwnDraft="";
+        selectedAiChoices.clear();aiOwnDraft="";clearAiDraft();
         if(aiClient!=null)aiClient.cancel();
         aiSession=java.util.UUID.randomUUID().toString();
         prefs.edit().putString("ai_session",aiSession).apply();
@@ -634,6 +635,33 @@ public final class MainActivity extends Activity {
     }
 
     /** A failed network continuation must not reroll an already evaluated action. */
+    private void persistAiDraft(){
+        if(prefs==null||game==null||game.aiTurn==null)return;
+        StringBuilder ids=new StringBuilder();
+        for(Integer i:selectedAiChoices){
+            if(ids.length()>0)ids.append(',');
+            ids.append(i);
+        }
+        prefs.edit().putInt("ai_draft_scene",game.aiTurn.scene.hashCode())
+            .putString("ai_draft_selected",ids.toString())
+            .putString("ai_draft_text",aiOwnDraft).apply();
+    }
+    private void restoreAiDraft(){
+        if(game==null||game.aiTurn==null
+                ||prefs.getInt("ai_draft_scene",0)!=game.aiTurn.scene.hashCode())return;
+        aiOwnDraft=prefs.getString("ai_draft_text","");
+        for(String piece:prefs.getString("ai_draft_selected","").split(",")){
+            try{
+                int i=Integer.parseInt(piece.trim());
+                if(i>=1&&i<=game.aiTurn.choices.size())selectedAiChoices.add(i);
+            }catch(NumberFormatException ignored){}
+        }
+    }
+    private void clearAiDraft(){
+        prefs.edit().remove("ai_draft_scene").remove("ai_draft_selected")
+            .remove("ai_draft_text").apply();
+    }
+
     private String pendingAiAction(){
         if(game.aiTurn==null)return "";
         if(prefs.getInt(AI_PENDING_SCENE,0)!=game.aiTurn.scene.hashCode())return "";
@@ -743,11 +771,15 @@ public final class MainActivity extends Activity {
         if(!aiOwnDraft.isEmpty())own.setText(aiOwnDraft);
         else if(selectedAiChoices.isEmpty()){
             String existingPending=pendingAiAction();
-            if(!existingPending.isEmpty())own.setText(existingPending);
+            if(!existingPending.isEmpty()&&!existingPending.startsWith("ВЫБРАННЫЕ ВАРИАНТЫ")
+                    &&!existingPending.startsWith("СОБСТВЕННЫЙ ТЕКСТ"))
+                own.setText(existingPending);
         }
         own.addTextChangedListener(new android.text.TextWatcher(){
             public void beforeTextChanged(CharSequence s,int start,int count,int after){}
-            public void onTextChanged(CharSequence s,int start,int before,int count){aiOwnDraft=s.toString();}
+            public void onTextChanged(CharSequence s,int start,int before,int count){
+                aiOwnDraft=s.toString();persistAiDraft();
+            }
             public void afterTextChanged(android.text.Editable e){}
         });
         own.setInputType(InputType.TYPE_CLASS_TEXT|InputType.TYPE_TEXT_FLAG_MULTI_LINE|InputType.TYPE_TEXT_FLAG_CAP_SENTENCES);
@@ -775,6 +807,7 @@ public final class MainActivity extends Activity {
             if(!value.isEmpty())combined.append("СОБСТВЕННЫЙ ТЕКСТ ИГРОКА:\n")
                 .append(value).append("\n");
             String compound=combined.toString();
+            persistAiDraft();
             if(!value.isEmpty()){
                 if(compound.equals(pendingAiAction())){
                     int chance=prefs.getInt(AI_PENDING_CHANCE,-1);
@@ -834,6 +867,7 @@ public final class MainActivity extends Activity {
         row.setContentDescription("Вариант "+number+". "+option.title+". "+(selected?"Выбран":"Не выбран"));
         row.setOnClickListener(v->{
             if(!selectedAiChoices.add(number))selectedAiChoices.remove(number);
+            persistAiDraft();
             boolean active=selectedAiChoices.contains(number);
             row.setBackground(new RuneFrameDrawable(PANEL,active?accent():BORDER,active));
             ordinal.setText((active?"✓ ":"◇ ")+number);
@@ -911,7 +945,7 @@ public final class MainActivity extends Activity {
                     completed.apply(next,actionResolved);
                     next.aiTurn=completed;
                     game=next;
-                    selectedAiChoices.clear();aiOwnDraft="";
+                    selectedAiChoices.clear();aiOwnDraft="";clearAiDraft();
                     save();
                     clearAiPending();
                     aiMemory.add(aiSession,"user",instruction);
