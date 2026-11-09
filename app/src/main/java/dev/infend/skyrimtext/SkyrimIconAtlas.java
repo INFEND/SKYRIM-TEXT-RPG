@@ -20,14 +20,14 @@ import java.util.Locale;
 import java.util.Map;
 
 /**
- * Offline atlas built from the player's submitted 358-entry icon reference.
- * 336 independently visible glyphs; 22 nearest-symbol reuse entries are
- * explicitly documented in JSON rather than mislabeling adjacent artwork.
- * The atlas is indexed by tight transparent bounds, not guessed grid cells.
+ * Exact offline atlas rebuilt from the player's 358 individually named PNGs.
+ * All 358 glyphs are independent: no adjacent/reused graphics or guessed cells.
+ * Duplicate source captions "замки" are disambiguated into door locks (164)
+ * and castle buildings (175). The index stores verified sprite bounds.
  */
 public final class SkyrimIconAtlas {
-    public static final String IMAGE="icons/skyrim_icons_358.png";
-    public static final String INDEX="icons/skyrim_icons_358.json";
+    public static final String IMAGE="icons/skyrim_icons_358_exact.webp";
+    public static final String INDEX="icons/skyrim_icons_358_exact.json";
     private static final Map<String,Rect> glyphs=new HashMap<>();
     private static final Map<String,String> aliases=new HashMap<>();
     private static Bitmap atlas;
@@ -109,14 +109,16 @@ public final class SkyrimIconAtlas {
             BitmapFactory.Options config=new BitmapFactory.Options();
             config.inScaled=false;
             Bitmap loaded=BitmapFactory.decodeStream(image,null,config);
-            if(loaded==null||loaded.getWidth()!=1024||loaded.getHeight()!=683)
-                throw new IllegalStateException("Размер иконографического атласа");
+            if(loaded==null||loaded.getWidth()!=1728||loaded.getHeight()!=1920)
+                throw new IllegalStateException("Размер именного атласа 358");
             ByteArrayOutputStream text=new ByteArrayOutputStream(30000);
             byte[] chunk=new byte[4096];int n;
             while((n=data.read(chunk))!=-1)text.write(chunk,0,n);
             JSONObject json=new JSONObject(new String(text.toByteArray(),StandardCharsets.UTF_8));
-            if(json.optInt("total")!=358||json.optInt("unique")!=336)
-                throw new IllegalStateException("Контракт соответствия иконок");
+            if(json.optInt("total")!=358||json.optInt("unique")!=358
+                    ||json.optInt("width")!=loaded.getWidth()
+                    ||json.optInt("height")!=loaded.getHeight())
+                throw new IllegalStateException("Контракт 358 уникальных иконок");
             JSONObject locations=json.getJSONObject("icons");
             java.util.Iterator<String> keys=locations.keys();
             while(keys.hasNext()){
@@ -125,11 +127,12 @@ public final class SkyrimIconAtlas {
                 if(values.length()!=4)continue;
                 Rect box=new Rect(values.getInt(0),values.getInt(1),
                     values.getInt(2),values.getInt(3));
-                if(box.left<0||box.top<0||box.right>1024||box.bottom>683
+                if(box.left<0||box.top<0||box.right>loaded.getWidth()
+                    ||box.bottom>loaded.getHeight()
                     ||box.width()<=0||box.height()<=0)continue;
                 glyphs.put(normalized(name),box);
             }
-            if(glyphs.size()<350)throw new IllegalStateException("Неполный каталог иконок");
+            if(glyphs.size()!=358)throw new IllegalStateException("Неполный именной каталог иконок");
             atlas=loaded;
         }catch(Exception ex){
             glyphs.clear();
@@ -148,7 +151,9 @@ public final class SkyrimIconAtlas {
         ensure(ctx);
         String key=normalized(name);
         if(aliases.containsKey(key))key=normalized(aliases.get(key));
-        if("замок".equals(key))key=normalized("замки (сооружения)");
+        // Lock means the actual door lock; castle is a separate named sprite.
+        if("замок".equals(key)||"замок двери".equals(key))key=normalized("замки");
+        if("крепостной замок".equals(key))key=normalized("замки (сооружения)");
         return glyphs.get(key);
     }
     public static boolean draw(Context context,Canvas canvas,String key,
