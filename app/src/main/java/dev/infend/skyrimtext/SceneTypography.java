@@ -40,8 +40,8 @@ public final class SceneTypography {
             }
             out.append(source.charAt(i++));
         }
-        if(bold>=0&&out.length()>bold)
-            out.setSpan(new StyleSpan(Typeface.BOLD),bold,out.length(),Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        // Unclosed markup is not a license to bold the rest of the narration.
+        // Style only matched ** pairs; malformed tokens are harmless.
         if(italic>=0&&out.length()>italic)
             out.setSpan(new StyleSpan(Typeface.ITALIC),italic,out.length(),Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
     }
@@ -55,6 +55,9 @@ public final class SceneTypography {
         // Keep the speaker and the dash even when the AI streams both on one line.
         text=text.replaceAll("(\\*\\*[^\\n:]{1,55}:\\*\\*)\\h*(?=(?:\\*\\*)?[—-])","$1\n");
         text=text.replaceAll("(:)\\h+(?=(?:\\*\\*)?[—-]\\h)","$1\n");
+        // Models sometimes put narration directly after the closing ** of a
+        // spoken sentence. It is a NEW paragraph, never part of the dialogue.
+        text=text.replaceAll("(?m)^(\\h*>?\\h*\\*\\*[—-][^\\n]*?\\*\\*)\\h+([^\\n]+)$","$1\\n\\n$2");
         return text;
     }
 
@@ -73,7 +76,12 @@ public final class SceneTypography {
             int start=result.length();
             appendRich(result,line);
             int end=result.length();
-            if(i<lines.length-1)result.append("\n");
+            if(i<lines.length-1){
+                result.append("\n");
+                // Always leave an additional breath after a spoken line,
+                // unless the following line is already blank.
+                if(spoken&&!lines[i+1].trim().isEmpty())result.append("\n");
+            }
             if(end<=start)continue;
             if(spoken){
                 result.setSpan(new StyleSpan(Typeface.BOLD),start,end,Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
