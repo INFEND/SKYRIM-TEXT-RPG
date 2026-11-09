@@ -132,7 +132,7 @@ class AiGameDirectorContracts(unittest.TestCase):
         bridge=code("AiGameTurn.java")
         self.assertIn("AiGameTurn.previewScene(accumulated)",ui)
         self.assertIn('partial.indexOf("\\"scene\\"")',bridge)
-        self.assertIn("aiTurnText.setText(SceneTypography.render(visible,accent()))",ui)
+        self.assertIn("aiTurnText.setText(SceneTypography.render(visible,accent(),game.name,heroColor()))",ui)
         self.assertIn("boolean generateTurn(",client)
 
 if __name__=="__main__":
