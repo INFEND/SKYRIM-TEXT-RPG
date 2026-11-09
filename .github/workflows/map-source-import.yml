@@ -10,17 +10,41 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Read published Solstheim projection configuration
+      - run: python3 -m pip install pillow
+      - name: Build complete Solstheim terrain from published tiles
         shell: python
         run: |
-          import pathlib,urllib.request
-          with urllib.request.urlopen("https://tamrielma.ps/js/dragonborn-min.js",timeout=60) as r: body=r.read()
-          pathlib.Path("docs/map-source/dragonborn-map.js").write_bytes(body)
-          print("Projection script",len(body))
-      - name: Save projection metadata
+          import pathlib,urllib.request,json,gzip,io,concurrent.futures
+          from PIL import Image
+          out=pathlib.Path("docs/map-source")
+          with urllib.request.urlopen("https://geo.tamrielma.ps/dragonborn.geojson.gz",timeout=60) as r: raw=r.read()
+          if raw.startswith(b"\x1f\x8b"):raw=gzip.decompress(raw)
+          data=json.loads(raw)
+          features=[dict(name=f["properties"]["name"],coordinates=f["geometry"]["coordinates"]) for f in data["features"] if f.get("geometry",{}).get("type")=="Point"]
+          (out/"solstheim-projection.json").write_text(json.dumps(features,ensure_ascii=False,indent=2))
+          print("GEOMETRY",len(features),features[:4])
+          def tile(pair):
+              x,y=pair
+              url=f"https://map.tamrielma.ps/tm-restyle/dragonborn/3/{x}/{y}.jpg"
+              with urllib.request.urlopen(url,timeout=60) as r: img=Image.open(io.BytesIO(r.read())).convert("RGB")
+              if img.size!=(256,256):raise ValueError((url,img.size))
+              return x,y,img
+          result=Image.new("RGB",(2048,2048))
+          with concurrent.futures.ThreadPoolExecutor(max_workers=4) as pool:
+              for x,y,img in pool.map(tile,[(x,y) for y in range(8) for x in range(8)]):
+                  result.paste(img,(x*256,y*256))
+          result.save(out/"solstheim_terrain.webp","WEBP",quality=88,method=6)
+          print("SOLSTHEIM",result.size,(out/"solstheim_terrain.webp").stat().st_size)
+      - name: Save verified terrain and projection
         run: |
           git config user.name INFEND
           git config user.email 342005527+INFEND@users.noreply.github.com
-          git add docs/map-source/dragonborn-map.js
-          git diff --cached --quiet || git commit -m "Read Solstheim terrain tile projection"
+          git add docs/map-source/solstheim-projection.json docs/map-source/solstheim_terrain.webp
+          git diff --cached --quiet || git commit -m "Compile full Solstheim terrain and calibration anchors"
           git push origin HEAD:map-source-import
+      - uses: actions/upload-artifact@v4
+        with:
+          name: solstheim-terrain-source
+          path: |
+            docs/map-source/solstheim-projection.json
+            docs/map-source/solstheim_terrain.webp
