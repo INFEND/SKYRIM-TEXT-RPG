@@ -38,9 +38,11 @@ class InteractiveTerrainMap(unittest.TestCase):
     def test_sheets_search_and_list_have_consistent_catalog(self):
         for token in ('terrainMap.setSheet(0)','terrainMap.setSheet(1)',
                       "SkyrimMapCatalog.size()","site.matches(needle)",
-                      "site==player", "site.grid", "mapListLimit",
+                      "mapLocationRow(content,site", "mapListLimit",
                       "ПОКАЗАТЬ ЕЩЁ 60"):
             self.assertIn(token,UI)
+        self.assertIn("SkyrimTerrainMapView.iconForSite(site)",UI)
+        self.assertIn('pin.player?"маркер игрока":iconForSite(site)',MAP)
         self.assertNotIn("Положение ориентировочное, по справочной сетке",UI)
         self.assertNotIn("GRID_X",(JAVA/"SkyrimMapCatalog.java").read_text())
 
