@@ -15,15 +15,11 @@ public final class BackgroundUpdateJob extends JobService {
         SharedPreferences prefs=getSharedPreferences("skyrim_text_v1",0);
         if(!prefs.getBoolean(OtaUpdateSchedule.PREF_BACKGROUND,false))return false;
         worker=new Thread(()->{
-            prefs.edit().putLong("ota_last_background_attempt",System.currentTimeMillis())
-                .putString("ota_background_result","Проверка соединения...").apply();
+            prefs.edit().putLong("ota_last_background_attempt",System.currentTimeMillis()).apply();
             try{
                 UpdateManager.Release release=UpdateManager.fetchLatest(getApplicationContext());
                 long installed=getPackageManager().getPackageInfo(getPackageName(),0).getLongVersionCode();
-                prefs.edit().putLong("ota_last_background_check",System.currentTimeMillis())
-                    .putString("ota_background_result",release.versionCode>installed
-                        ?"Доступна версия "+release.versionName:"Установлена актуальная версия")
-                    .apply();
+                prefs.edit().putLong("ota_last_background_check",System.currentTimeMillis()).apply();
                 if(release.versionCode>installed){
                     prefs.edit().putLong(OtaUpdateSchedule.PREF_AVAILABLE_CODE,release.versionCode)
                         .putString(OtaUpdateSchedule.PREF_AVAILABLE_NAME,release.versionName)
@@ -33,13 +29,14 @@ public final class BackgroundUpdateJob extends JobService {
                     if(release.versionCode>previous){
                         if(notifyUpdate(release.versionName))
                             prefs.edit().putLong("ota_last_notified_code",release.versionCode).apply();
-                        else prefs.edit().putString("ota_background_result",
-                            "Обновление найдено, но уведомления отключены").apply();
+                        // Do not persist a text status if Android notifications
+                        // are disabled: updates remain available in the OTA dialog.
                     }
                 }
             }catch(Exception error){
-                String message=error.getMessage()==null?"Ошибка проверки обновлений":error.getMessage();
-                prefs.edit().putString("ota_background_result",message).apply();
+                // Background network failures are intentionally silent. The
+                // user's manual update dialog owns error and retry messages.
+                android.util.Log.w("SkyrimOta","Background update check failed",error);
             }finally{jobFinished(params,false);}
         },"skyrim-text-rpg-background-ota");
         worker.start();
