@@ -4,7 +4,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import java.util.LinkedHashMap;
-import java.util.Map;
 
 /**
  * Authoritative, saveable ledger of confirmed AI-scene facts.
@@ -76,20 +75,25 @@ public final class SceneState {
     public static SceneState fromJson(JSONObject data) {
         SceneState state=new SceneState();
         if(data==null)return state;
-        try {
-            for(String kind:new String[]{"npc","clue","sublocation"}){
-                JSONArray arr=data.optJSONArray(kind);
-                if(arr==null)continue;
-                if(arr.length()>MAX_ENTRIES)throw new JSONException("Слишком много фактов сцены");
-                for(int i=0;i<arr.length();i++){
-                    JSONObject entry=arr.getJSONObject(i);
-                    state.confirm(kind,entry.getString("id"),entry.getString("title"),entry.getString("status"));
+        // Corruption in one optional record must not erase valid NPCs, clues or places.
+        // Never trust more than MAX_ENTRIES entries per category from a saved game.
+        for(String kind:new String[]{"npc","clue","sublocation"}){
+            JSONArray arr=data.optJSONArray(kind);
+            if(arr==null)continue;
+            int limit=Math.min(arr.length(),MAX_ENTRIES);
+            for(int i=0;i<limit;i++){
+                JSONObject entry=arr.optJSONObject(i);
+                if(entry==null)continue;
+                try {
+                    String key=entry.getString("id");
+                    // Duplicate IDs in corrupted saves cannot overwrite the first valid fact.
+                    if(state.contains(kind,key))continue;
+                    state.confirm(kind,key,entry.getString("title"),entry.getString("status"));
+                }catch(JSONException invalid){
+                    // Skip only this invalid optional record; preserve the character.
                 }
             }
-            return state;
-        }catch(JSONException invalid){
-            // Malformed optional scene metadata cannot invalidate an older character.
-            return new SceneState();
         }
+        return state;
     }
 }
