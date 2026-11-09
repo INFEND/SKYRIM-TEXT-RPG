@@ -25,8 +25,9 @@ class OverlayScrollContracts(unittest.TestCase):
         self.assertIn("chromeForRender.getMeasuredHeight()",setup)
         self.assertIn("spacerForRender.requestLayout()",setup)
         self.assertIn("return false;",setup)
-        chrome=UI.split("private void setChromeVisible(boolean visible)",1)[1].split("private void renderHeader()",1)[0]
-        self.assertIn("topChrome.setVisibility(View.GONE)",chrome)
+        chrome=UI.split("private void handleVerticalScroll(int y,int previousY)",1)[1].split("private void renderHeader()",1)[0]
+        self.assertIn("topChrome.setTranslationY(-hidden)",chrome)
+        self.assertIn("scroll.setClipBounds(new android.graphics.Rect(",chrome)
         self.assertNotIn("chromeScrollSpacer",chrome)
         self.assertNotIn("scroll.scrollTo(",chrome)
         self.assertNotIn("scroll.requestLayout(",chrome)
@@ -36,8 +37,8 @@ class OverlayScrollContracts(unittest.TestCase):
         self.assertIn("topChrome.addView(panel,area)",level)
         self.assertNotIn("root.addView(panel,area)",level)
         self.assertIn("if(game.started)renderBars();",UI)
-        self.assertIn("setChromeVisible(true)",UI)
-        self.assertIn("setChromeVisible(false)",UI)
+        self.assertIn("chromeScrollTravel=0",UI)
+        self.assertIn("updateChromeScrollClip()",UI)
         self.assertIn("resumeViewport(oldScroll,scroll,thisPage)",UI)
 
     def test_vertical_swipe_on_gallery_is_passed_to_page_scroller(self):
