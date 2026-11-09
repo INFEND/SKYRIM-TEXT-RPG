@@ -176,10 +176,67 @@ public final class SkyrimIconView extends View {
         return "artifacts";
     }
 
-    /** A specific item name takes precedence over its broad inventory group. */
+    /**
+     * Always resolve inventory categories to the exact icon supplied for them.
+     * Broad text heuristics can accidentally match a word inside another label.
+     */
+    public static String iconForCategory(String category){
+        if(category==null)return "bag";
+        String key=category.trim().toLowerCase(Locale.ROOT).replace('ё','е');
+        switch(key){
+            case "все":return "bag";
+            case "валюта":case "деньги":case "септимы":return "septims";
+            case "еда":case "пища":return "food";
+            case "напитки":return "drinks";
+            case "зелья":return "potion";
+            case "инструменты":return "tools";
+            case "оружие":return "weapon";
+            case "броня":return "armor";
+            case "одежда":return "clothing";
+            case "украшения":return "jewelry";
+            case "материалы":return "materials";
+            case "ингредиенты":return "ingredients";
+            case "драгоценности":return "valuables";
+            case "артефакты":return "artifacts";
+            case "пользовательское оружие":return "customweapon";
+            case "пользовательские предметы":return "customitems";
+            case "книги":return "book";
+            case "свитки":return "scrolls";
+            default:return iconForLabel(category);
+        }
+    }
+
+    /** Correct physical item glyph takes precedence over category decoration. */
     public static String iconForItem(String name,String category){
+        String t=name==null?"":name.toLowerCase(Locale.ROOT).replace('ё','е');
+        if(has(t,"септим","монет"))return "septims";
+        if(has(t,"отмыч"))return "lockpicks";
+        if(has(t,"факел"))return "torches";
+        if(has(t,"амулет","оберег"))return "amulets";
+        if(has(t,"зель","эликсир"))return "potion";
+        if(has(t,"медовух","вино","пиво","напит","сок","квас"))return "drinks";
+        if(has(t,"хлеб","сыр","мясо","рыба","яблок","еда","пища","похлебк","суп"))return "food";
+        if(has(t,"кольц"))return "rings";
+        if(has(t,"ожерел"))return "necklaces";
+        if(has(t,"диадем"))return "circlets";
+        if(has(t,"драконь")&&has(t,"кост"))return "dragonbones";
+        if(has(t,"драконь")&&has(t,"чешу"))return "dragonscales";
+        if(has(t,"кинжал","бритва"))return "daggers";
+        if(has(t,"боевой молот"))return "warhammers";
+        if(has(t,"арбалет"))return "crossbows";
+        if(has(t,"топор","секир"))return "axes";
+        if(has(t,"щит"))return "shields";
+        if(has(t,"шлем","капюшон","маска"))return "helmets";
+        if(has(t,"кирас"))return "cuirasses";
+        if(has(t,"перчатк","рукавиц"))return "gloves";
+        if(has(t,"сапог","ботин"))return "boots";
+        if(has(t,"слиток"))return "ingots";
+        if(has(t,"кожаные полос"))return "leather";
+        if(has(t,"меч","клинок"))return "swords";
+        if(has(t,"лук"))return "bows";
+        if(has(t,"свиток"))return "scrolls";
         String id=iconForLabel(name);
         if(!"artifacts".equals(id))return id;
-        return iconForLabel(category);
+        return iconForCategory(category);
     }
 }
