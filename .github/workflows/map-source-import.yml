@@ -10,32 +10,28 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Read public UESP map data
+      - name: Read published UESP-derived offline atlas
         shell: python
         run: |
-          import json, pathlib, urllib.request, urllib.parse
+          import json,pathlib,urllib.request
           out=pathlib.Path("docs/map-source");out.mkdir(parents=True,exist_ok=True)
           def get(url):
-              req=urllib.request.Request(url, headers={"User-Agent":"INFEND-SkyrimTextRPG-map-import/1.0 (offline fan atlas)"})
-              with urllib.request.urlopen(req,timeout=60) as r: return r.read().decode("utf-8")
-          for slug in ("skyrim","skyrim/solstheim"):
-              url=f"https://itemaps.com/maps/{slug}"
-              try:
-                  import re
-                  raw=get(url)
-                  label=slug.replace("/","-")
-                  (out/f"{label}-page.html").write_text(raw)
-                  scripts=re.findall(r"<script[^>]*>([\\s\\S]*?)</script>",raw)
-                  for i,script in enumerate(scripts):
-                      (out/f"{label}-script-{i}.txt").write_text(script)
-                  print(label,len(raw),[(i,len(s),s[:400]) for i,s in enumerate(scripts)])
-                  print("IMAGES",re.findall(r'(?:src|href)=["\\\x27]([^"\\\x27]+(?:webp|png|jpg|json)[^"\\\x27]*)',raw)[:20])
-              except Exception as error: print("SOURCE ERROR",url,repr(error))
-          if not list(out.glob("*-page.html")): raise RuntimeError("No source metadata retrieved")
+              with urllib.request.urlopen(url,timeout=90) as r: return r.read()
+          data=json.loads(get("https://itemaps.com/media/maps/skyrim/markers.json"))
+          print("ROOT",type(data),list(data)[:30])
+          metadata={}
+          for key,val in data.items():
+              print(key,type(val),len(val) if hasattr(val,"__len__") else val,str(val)[:1500])
+              if isinstance(val,list) and len(val)>100:
+                  for i in range(0,len(val),100):
+                      (out/f"atlas-{key}-{i//100:03}.json").write_text(json.dumps(val[i:i+100],ensure_ascii=False))
+              else: metadata[key]=val
+          (out/"atlas-metadata.json").write_text(json.dumps(metadata,ensure_ascii=False,indent=2))
+          (out/"client.js").write_bytes(get("https://itemaps.com/maps/client.js?v=20261024-icons"))
       - name: Save source snapshot on import branch
         run: |
           git config user.name INFEND
           git config user.email 342005527+INFEND@users.noreply.github.com
           git add docs/map-source
-          git diff --cached --quiet || git commit -m "Record authoritative UESP map metadata for offline atlas"
+          git diff --cached --quiet || git commit -m "Record UESP-derived Skyrim and Solstheim geographic source"
           git push origin HEAD:map-source-import
