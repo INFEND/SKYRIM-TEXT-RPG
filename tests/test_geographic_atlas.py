@@ -101,7 +101,7 @@ public class Probe {
   pair.add(new SkyrimMapCatalog.Site("b|Б|B|Пещера|0|8192|0|0"));
   Set<String> hidden=new HashSet<>();
   ArrayList<MapPinLayout.Pin> low=MapPinLayout.build(pair,0,-1,hidden,"","",.1f,0,0,500,500,1);
-  check(low.size()==1&&low.get(0).sites.size()==2,"nearby pins cluster");
+  check(low.size()==1&&low.get(0).sites.size()==1,"nearby pins are decluttered without clustering");
   check(MapPinLayout.hit(low,low.get(0).x,low.get(0).y,25)==low.get(0),"drawn cluster is tap target");
   ArrayList<MapPinLayout.Pin> high=MapPinLayout.build(pair,0,-1,hidden,"","",1,-1900,-1900,500,500,1);
   check(high.size()==2,"zoom splits cluster into real positions");
