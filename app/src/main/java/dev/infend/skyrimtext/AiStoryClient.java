@@ -79,6 +79,20 @@ final class AiStoryClient {
     private volatile HttpURLConnection connection;
     private volatile int sequence;
 
+    /** Compose existing canonical game rules for the on-device llama.cpp engine. */
+    static String localSystemPrompt(boolean aiControlled,boolean chanceOnly){
+        String base=chanceOnly?AI_CHANCE_RULES:aiControlled?AI_GAME_RULES:RULES;
+        return base+"\nЛОКАЛЬНЫЙ РЕЖИМ: никакого доступа в сеть. Не выводи внутренние рассуждения, "
+            +"теги <think> и вступления. Если требуется игровой JSON, начинай прямо с { и "
+            +"оставляй место для всех десяти вариантов: сцена 1800–4000 знаков, "
+            +"каждый detail 1–2 предложения, effects только подтверждённые последствия. "
+            +"Держи формат ответа строго валидным.";
+    }
+    static String localUserPrompt(GameEngine game,String history,String command,boolean aiControlled){
+        // Bounded conversation context leaves enough tokens for ten decisions and effects.
+        String conciseHistory=crop(history,4600);
+        return aiControlled?contextAi(game,conciseHistory,command):context(game,conciseHistory,command);
+    }
     boolean isRunning() { return running; }
 
     /** Must be called on UI thread; takes an immutable snapshot before networking. */
