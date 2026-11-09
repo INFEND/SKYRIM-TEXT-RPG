@@ -62,6 +62,10 @@ public final class SceneTypography {
     }
 
     public static SpannableStringBuilder render(String raw,int accent){
+        return render(raw,accent,null,accent);
+    }
+    /** Use the actual saved character name for first-person dialogue. */
+    public static SpannableStringBuilder render(String raw,int accent,String heroName,int heroColor){
         SpannableStringBuilder result=new SpannableStringBuilder();
         if(raw==null||raw.isEmpty())return result;
         String[] lines=normalize(raw).split("\n",-1);
@@ -73,6 +77,14 @@ public final class SceneTypography {
             boolean spoken=quoted||plain.startsWith("— ")||plain.startsWith("- ");
             boolean speaker=!spoken&&plain.endsWith(":")&&plain.length()>1
                 &&plain.length()<62&&plain.indexOf('.')<0;
+            boolean heroSpeaker=speaker&&plain.matches("(?iu)ты\\s*:")
+                &&heroName!=null&&!heroName.trim().isEmpty();
+            if(heroSpeaker){
+                String safe=heroName.replace("*","").replace("\\n"," ")
+                    .replace("\\r"," ").trim();
+                if(safe.length()>48)safe=safe.substring(0,48);
+                line=line.startsWith("**")?"**"+safe+":**":safe+":";
+            }
             int start=result.length();
             appendRich(result,line);
             int end=result.length();
@@ -88,7 +100,8 @@ public final class SceneTypography {
                 result.setSpan(new ForegroundColorSpan(0xfff0f0ef),start,end,Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
             }else if(speaker){
                 result.setSpan(new StyleSpan(Typeface.BOLD),start,end,Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-                result.setSpan(new ForegroundColorSpan(accent),start,end,Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                result.setSpan(new ForegroundColorSpan(heroSpeaker?heroColor:accent),
+                    start,end,Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
                 result.setSpan(new RelativeSizeSpan(1.03f),start,end,Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
             }else{
                 // The authorial narrative always has italic styling, even if
