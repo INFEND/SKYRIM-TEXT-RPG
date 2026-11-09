@@ -1569,7 +1569,8 @@ public final class MainActivity extends Activity {
                     else{opened.remove(category);manuallyClosed.add(category);}
                     header.setContentDescription(category+", "+(next?"развёрнуто":"свёрнуто"));
                 });
-                if(!expanded)continue;
+                // Build rows for collapsed categories too: the first tap must
+                // reveal items immediately, without resetting search or scroll.
                 for(ItemCatalog.Item item:categoryItems){
                     LinearLayout itemRow=row();
                     itemRow.setMinimumHeight(dp(46));
