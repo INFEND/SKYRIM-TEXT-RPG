@@ -138,6 +138,28 @@ jobs:
           fail_on_unmatched_files: true
           draft: false
           prerelease: false
+      - name: Publish trusted manifest mirror
+        if: steps.signing.outputs.available == 'true' && steps.release_version.outputs.publish == 'true'
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          # Keep the failover on a separate branch: publishing it does not
+          # trigger the main branch Android build or rewrite release tags.
+          if ! gh api "repos/${GITHUB_REPOSITORY}/git/ref/heads/ota-manifest" >/dev/null 2>&1; then
+            gh api --method POST "repos/${GITHUB_REPOSITORY}/git/refs" \
+              -f ref="refs/heads/ota-manifest" -f sha="${GITHUB_SHA}" >/dev/null
+          fi
+          previous=$(gh api "repos/${GITHUB_REPOSITORY}/contents/update.json?ref=ota-manifest" \
+              --jq .sha 2>/dev/null || true)
+          encoded=$(base64 -w0 dist/update.json)
+          args=(--method PUT "repos/${GITHUB_REPOSITORY}/contents/update.json"
+                -f message="Mirror signed SKYRIM ${{ steps.release_version.outputs.tag }} OTA manifest"
+                -f branch="ota-manifest" -f content="$encoded")
+          if [[ -n "$previous" ]]; then args+=(-f sha="$previous"); fi
+          gh api "${args[@]}" >/dev/null
+          echo "Trusted raw OTA manifest mirror published after official release." >> "$GITHUB_STEP_SUMMARY"
       - name: Upload signed APK artifact
         if: steps.signing.outputs.available == 'true' && steps.release_version.outputs.publish == 'true'
         uses: actions/upload-artifact@v4
