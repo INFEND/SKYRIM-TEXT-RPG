@@ -79,19 +79,66 @@ public final class AiStoryClient {
     private volatile HttpURLConnection connection;
     private volatile int sequence;
 
-    /** Compose existing canonical game rules for the on-device llama.cpp engine. */
+    /**
+     * Small, independent offline prompt. The bundled native AAR submits the
+     * entire prompt in one llama_decode batch, so full online instructions and
+     * the entire Skyrim atlas can exceed n_batch and abort the worker process.
+     */
     static String localSystemPrompt(boolean aiControlled,boolean chanceOnly){
-        String base=chanceOnly?AI_CHANCE_RULES:aiControlled?AI_GAME_RULES:RULES;
-        return base+"\nЛОКАЛЬНЫЙ РЕЖИМ: никакого доступа в сеть. Не выводи внутренние рассуждения, "
-            +"теги <think> и вступления. Если требуется игровой JSON, начинай прямо с { и "
-            +"оставляй место для всех десяти вариантов: сцена 1800–4000 знаков, "
-            +"каждый detail 1–2 предложения, effects только подтверждённые последствия. "
-            +"Держи формат ответа строго валидным.";
+        if(chanceOnly)
+            return "Ты мастер Skyrim. Верни только JSON: {\"customChance\":число_от_0_до_100_или_null}. "
+                +"Это оценка сложности свободного действия на основе навыка героя и ситуации, "
+                +"без броска, без эффектов, без дополнительного текста.";
+        if(aiControlled)
+            return "Ты каноничный мастер текстовой RPG Skyrim. Пиши от второго лица по-русски, "
+                +"атмосферно и без управления героем вместо игрока. Реплики: **Персонаж:** затем "
+                +"**— Реплика**. Сохраняй последствия предыдущих действий. "
+                +"Верни строго один валидный JSON без Markdown и тегов размышления: "
+                +"{\"scene\":\"сцена не короче 250 символов\","
+                +"\"choices\":[10 объектов {\"title\":\"действие\",\"detail\":\"пояснение\","
+                +"\"skill\":\"навык или пусто\",\"chance\":null или целое 0..100}],"
+                +"\"effects\":{},\"journal\":\"новое событие\",\"customChance\":null}. "
+                +"Ровно десять разных действий, без дублирования в сцене. "
+                +"В effects разрешены лишь последствия подтверждённого предыдущего действия "
+                +"(hpDelta,goldDelta,xpDelta,staminaDelta,magickaDelta,location,inventory). "
+                +"Вероятности и бросок из данных игры нельзя менять. На первом ходе effects={}. "
+                +"Не выдумывай предметы, локации, победы или награды.";
+        return "Ты каноничный рассказчик Skyrim. Пиши по-русски, атмосферно и от второго лица. "
+            +"Учитывай героя, факты состояния и память. Диалог: **Персонаж:**, "
+            +"следом **— Реплика**. Не изменяй самостоятельно здоровье, квесты, "
+            +"инвентарь или локацию. Не управляй героем. Верни только сюжетный текст.";
     }
     static String localUserPrompt(GameEngine game,String history,String command,boolean aiControlled){
-        // Bounded conversation context leaves enough tokens for ten decisions and effects.
-        String conciseHistory=crop(history,4600);
-        return aiControlled?contextAi(game,conciseHistory,command):context(game,conciseHistory,command);
+        StringBuilder b=new StringBuilder();
+        b.append("ГЕРОЙ: ").append(crop(game.name,55)).append("; раса ").append(game.race)
+            .append("; класс ").append(game.heroClass).append("; уровень ").append(game.level)
+            .append("; локация ").append(game.progress.location).append("; день ").append(game.day)
+            .append("; час ").append(game.hour).append(".\n");
+        b.append("HP ").append(game.hp).append('/').append(game.maxHp)
+            .append("; выносливость ").append(game.stamina).append('/').append(game.maxStamina)
+            .append("; магия ").append(game.magicka).append('/').append(game.maxMagicka)
+            .append("; золото ").append(game.gold).append(". ");
+        if(game.enemyHp>0)b.append("ВРАГ ").append(crop(game.enemyName,60))
+            .append(" HP ").append(game.enemyHp).append('/').append(game.enemyMaxHp).append(". ");
+        b.append("\nИНВЕНТАРЬ: ");
+        java.util.Iterator<String> inv=game.progress.inventory.keys();
+        int count=0;
+        while(inv.hasNext()&&count<8){
+            String name=inv.next();
+            int quantity=game.progress.quantity(name);
+            if(quantity<=0||"Септимы".equals(name))continue;
+            if(count++>0)b.append(", ");
+            b.append(crop(name,35)).append('×').append(quantity);
+        }
+        b.append("\nСЮЖЕТ: ").append(crop(game.questStatus(),90))
+            .append("; ").append(crop(game.questDetails(),170)).append(".\n");
+        if(game.aiTurn!=null)b.append("ПРЕДЫДУЩАЯ СЦЕНА (фрагмент): ")
+            .append(crop(game.aiTurn.scene,200)).append('\n');
+        b.append("ПАМЯТЬ: ").append(crop(history,350)).append('\n');
+        if(aiControlled)b.append("Разрешённые пункты effects.location: ")
+            .append(crop(game.progress.location,65)).append(" или только достоверный пункт карты.\n");
+        b.append("ТЕКУЩЕЕ ДЕЙСТВИЕ: ").append(crop(command,490));
+        return crop(b.toString(),1300);
     }
     boolean isRunning() { return running; }
 
