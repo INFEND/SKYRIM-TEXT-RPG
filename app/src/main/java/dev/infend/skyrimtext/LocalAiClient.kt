@@ -96,6 +96,7 @@ class LocalAiClient(private val context: Context) {
             try {
                 val connection=object:ServiceConnection{
                     override fun onServiceConnected(name:ComponentName?,binder:IBinder?) {
+                        if(binding!==this)return
                         if(binder==null){failGeneration(id,"Локальный движок не запустился");return}
                         val server=Messenger(binder)
                         messenger=server
@@ -106,14 +107,14 @@ class LocalAiClient(private val context: Context) {
                     }
                     override fun onServiceDisconnected(name:ComponentName?) {
                         messenger=null
-                        failGeneration(id,"Процесс локальной модели завершился. Возможно, не хватило памяти или GGUF несовместим с движком.")
+                        failGeneration(synchronized(guard){generation},"Процесс локальной модели завершился. Возможно, не хватило памяти или GGUF несовместим с движком.")
                     }
                     override fun onBindingDied(name:ComponentName?) {
                         messenger=null
-                        failGeneration(id,"Служба локальной модели аварийно завершилась. Попробуй уменьшить модель или освободить память.")
+                        failGeneration(synchronized(guard){generation},"Служба локальной модели аварийно завершилась. Попробуй уменьшить модель или освободить память.")
                     }
                     override fun onNullBinding(name:ComponentName?) {
-                        failGeneration(id,"Не удалось связаться с локальным движком.")
+                        failGeneration(synchronized(guard){generation},"Не удалось связаться с локальным движком.")
                     }
                 }
                 binding=connection
