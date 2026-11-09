@@ -166,9 +166,30 @@ public final class LocationGalleryView extends LinearLayout {
                 return true;
             }
         });
-        photo.setOnTouchListener((v,event)->{
-            detector.onTouchEvent(event);
-            return true;
+        // A vertical gesture must be handled by the parent page ScrollView.
+        // Only horizontal swipes belong to this picture carousel.
+        photo.setOnTouchListener(new OnTouchListener(){
+            private float downX,downY;
+            private boolean vertical;
+            @Override public boolean onTouch(View view,MotionEvent event){
+                int action=event.getActionMasked();
+                if(action==MotionEvent.ACTION_DOWN){
+                    downX=event.getX();downY=event.getY();vertical=false;
+                    view.getParent().requestDisallowInterceptTouchEvent(true);
+                }else if(action==MotionEvent.ACTION_MOVE&&!vertical){
+                    float dx=Math.abs(event.getX()-downX);
+                    float dy=Math.abs(event.getY()-downY);
+                    if(dy>dp(12)&&dy>dx*1.15f){
+                        vertical=true;
+                        view.getParent().requestDisallowInterceptTouchEvent(false);
+                    }
+                }else if(action==MotionEvent.ACTION_UP||action==MotionEvent.ACTION_CANCEL){
+                    view.getParent().requestDisallowInterceptTouchEvent(false);
+                }
+                if(vertical)return false;
+                detector.onTouchEvent(event);
+                return true;
+            }
         });
         photo.setOnClickListener(v->{if(!fullscreen)openFullscreen();});
 
