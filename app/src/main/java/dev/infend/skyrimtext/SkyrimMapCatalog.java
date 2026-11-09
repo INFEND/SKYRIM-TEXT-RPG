@@ -397,6 +397,12 @@ public final class SkyrimMapCatalog {
     }
     public static ArrayList<Site> all(){return new ArrayList<>(SITES);}
     public static int size(){return SITES.size();}
+    public static int visibleCount(java.util.Set<String> hiddenTypes){
+        int count=0;
+        for(Site site:SITES)
+            if(hiddenTypes==null||!hiddenTypes.contains(site.type))count++;
+        return count;
+    }
     public static Site find(String name){
         for(Site p:SITES)if(p.name.equalsIgnoreCase(name))return p;
         return null;
