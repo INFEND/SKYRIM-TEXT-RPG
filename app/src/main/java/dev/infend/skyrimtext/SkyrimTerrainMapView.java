@@ -62,7 +62,12 @@ public final class SkyrimTerrainMapView extends View {
         gesture=new GestureDetector(context,new GestureDetector.SimpleOnGestureListener(){
             @Override public boolean onDown(MotionEvent e){inertia.forceFinished(true);return true;}
             @Override public boolean onScroll(MotionEvent a,MotionEvent b,float dx,float dy){
-                if(!scaler.isInProgress()){dragged=true;left-=dx;top-=dy;constrain();changed();}
+                if(!scaler.isInProgress()){
+                    dragged=true;
+                    float previousX=left,previousY=top;
+                    left-=dx;top-=dy;constrain();
+                    moved(left-previousX,top-previousY);
+                }
                 return true;
             }
             @Override public boolean onFling(MotionEvent a,MotionEvent b,float vx,float vy){
@@ -161,6 +166,12 @@ public final class SkyrimTerrainMapView extends View {
         left=w*.5f-cx*scale;top=h*.5f-cy*scale;constrain();changed();
     }
     private void changed(){pins=null;invalidate();}
+    /** During drags/flings, icon visibility does not change. Move the
+     * already chosen world-anchored pins by the same camera translation. */
+    private void moved(float dx,float dy){
+        MapPinLayout.translate(pins,dx,dy);
+        postInvalidateOnAnimation();
+    }
     private void constrain(){
         if(getWidth()<=0||getHeight()<=0)return;
         float width=WIDTH[sheet]*scale,height=HEIGHT[sheet]*scale;
@@ -212,7 +223,8 @@ public final class SkyrimTerrainMapView extends View {
         if(pins==null){
             SkyrimMapCatalog.Site player=SkyrimMapCatalog.find(game.progress.location);
             pins=MapPinLayout.build(sites,sheet,region,hiddenTypes,player==null?"":player.id,
-                focusId,scale,left,top,getWidth(),getHeight(),density);
+                focusId,scale,left,top,getWidth(),getHeight(),density,
+                scale/Math.max(.0001f,minScale));
         }
         return pins;
     }
@@ -235,32 +247,37 @@ public final class SkyrimTerrainMapView extends View {
         Bitmap image;synchronized(IMAGES){image=IMAGES[sheet];}
         if(image!=null)canvas.drawBitmap(image,null,new RectF(left,top,left+WIDTH[sheet]*scale,top+HEIGHT[sheet]*scale),imagePaint);
         ArrayList<MapPinLayout.Pin> shown=renderedPins();labels.clear();
+        // Markers never collapse into moving numeric clusters: each icon has
+        // one immutable location ID and world coordinate. Size changes only
+        // as a continuous function of zoom, and is capped in dp.
         for(MapPinLayout.Pin pin:shown){
+            float diameter=pin.sizeDp*density;
+            float margin=diameter*.65f;
+            if(pin.x < -margin||pin.y < -margin||
+                pin.x>getWidth()+margin||pin.y>getHeight()+margin)continue;
             SkyrimMapCatalog.Site site=pin.sites.get(0);
             int color=pin.player?0xfff2dc98:pin.focus?0xffffffff:0xffd5dfe1;
+            float radius=diameter*.47f;
             ink.setStyle(Paint.Style.FILL);ink.setColor(0xe0091216);
-            float r=(pin.player?16:pin.sites.size()>1?14:11)*density;
-            canvas.drawCircle(pin.x,pin.y,r,ink);
-            if(pin.sites.size()>1){
-                ink.setColor(color);ink.setStyle(Paint.Style.STROKE);ink.setStrokeWidth(density);
-                canvas.drawCircle(pin.x,pin.y,r,ink);ink.setStyle(Paint.Style.FILL);
-                ink.setTextSize(11*density);ink.setTypeface(android.graphics.Typeface.DEFAULT_BOLD);
-                String count=String.valueOf(pin.sites.size());
-                canvas.drawText(count,pin.x-ink.measureText(count)/2,pin.y+4*density,ink);
-            }else if(!SkyrimIconAtlas.drawMarker(getContext(),canvas,
-                pin.player?"маркер игрока":symbol(site),color,pin.x,pin.y,(pin.player?30:23)*density)){
-                ink.setColor(color);canvas.drawCircle(pin.x,pin.y,5*density,ink);
+            canvas.drawCircle(pin.x,pin.y,radius+1.1f*density,ink);
+            if(!SkyrimIconAtlas.drawMarker(getContext(),canvas,
+                pin.player?"маркер игрока":symbol(site),color,pin.x,pin.y,diameter)){
+                ink.setColor(color);
+                canvas.drawCircle(pin.x,pin.y,Math.max(2f*density,diameter*.24f),ink);
             }
             if(pin.player||pin.focus){
-                ink.setColor(color);ink.setStyle(Paint.Style.STROKE);ink.setStrokeWidth(1.5f*density);
-                canvas.drawCircle(pin.x,pin.y,r+4*density,ink);ink.setStyle(Paint.Style.FILL);
+                ink.setStyle(Paint.Style.STROKE);
+                ink.setStrokeWidth(1.3f*density);
+                ink.setColor(color);
+                canvas.drawCircle(pin.x,pin.y,radius+3f*density,ink);
+                ink.setStyle(Paint.Style.FILL);
             }
         }
         // Reserve text rectangles in priority order, so labels never cover each other.
         for(int pass=0;pass<3;pass++)for(MapPinLayout.Pin pin:shown){
             SkyrimMapCatalog.Site site=pin.sites.get(0);
             int priority=pin.player||pin.focus?0:site.capital()?1:2;
-            if(priority!=pass||pin.sites.size()!=1)continue;
+            if(priority!=pass)continue;
             if(pass==2&&scale/minScale<4.2f)continue;
             ink.setTypeface(SovngardeTypeface.face(getContext(),pass<2));
             ink.setTextSize((pass==0?16:pass==1?14:12)*density);
@@ -269,8 +286,12 @@ public final class SkyrimTerrainMapView extends View {
             while(title.length()>8&&ink.measureText(title)>maxWidth)title=title.substring(0,title.length()-2);
             if(!title.equals(site.name))title+="…";
             float tw=ink.measureText(title);
-            float tx=Math.max(7*density,Math.min(getWidth()-tw-7*density,pin.x+16*density));
-            float ty=Math.max(19*density,Math.min(getHeight()-30*density,pin.y-6*density));
+            // Do not clamp label X to a screen edge. A clamped label slides
+            // relative to its pin during panning and looks like map jitter.
+            float tx=pin.x+pin.sizeDp*density*.58f+4*density;
+            float ty=pin.y-5*density;
+            if(tx<5*density||tx+tw>getWidth()-5*density||
+               ty<20*density||ty>getHeight()-31*density)continue;
             RectF rect=new RectF(tx-3*density,ty-17*density,tx+tw+3*density,ty+4*density);
             boolean overlap=false;for(RectF old:labels)if(RectF.intersects(old,rect)){overlap=true;break;}
             if(overlap)continue;labels.add(rect);
@@ -293,27 +314,21 @@ public final class SkyrimTerrainMapView extends View {
     private void select(float x,float y){
         MapPinLayout.Pin pin=MapPinLayout.hit(renderedPins(),x,y,28*density);
         if(pin==null){performClick();return;}
-        if(pin.sites.size()>1){
-            float minX=Float.MAX_VALUE,minY=Float.MAX_VALUE,maxX=-Float.MAX_VALUE,maxY=-Float.MAX_VALUE;
-            for(SkyrimMapCatalog.Site site:pin.sites){
-                minX=Math.min(minX,site.x);maxX=Math.max(maxX,site.x);
-                minY=Math.min(minY,site.y);maxY=Math.max(maxY,site.y);
-            }
-            float spread=Math.max(maxX-minX,maxY-minY)*scale;
-            if(scale<maxScale*.9f&&spread>8*density){
-                zoomAt(1.8f,pin.x,pin.y);persist();
-            }else if(catalogCallback!=null)catalogCallback.selected(new ArrayList<>(pin.sites));
-        }else{
-            SkyrimMapCatalog.Site site=pin.sites.get(0);focusId=site.id;changed();
-            WorldAtlas.Place place=WorldAtlas.find(SkyrimMapCatalog.travelDestination(site));
-            if(catalogCallback!=null)catalogCallback.selected(new ArrayList<>(pin.sites));
-            else if(place!=null&&callback!=null)callback.selected(place);
-        }
+        SkyrimMapCatalog.Site site=pin.sites.get(0);
+        focusId=site.id;changed();
+        WorldAtlas.Place place=WorldAtlas.find(SkyrimMapCatalog.travelDestination(site));
+        if(catalogCallback!=null){
+            ArrayList<SkyrimMapCatalog.Site> selected=new ArrayList<>(1);
+            selected.add(site);
+            catalogCallback.selected(selected);
+        }else if(place!=null&&callback!=null)callback.selected(place);
         performClick();
     }
     @Override public void computeScroll(){
         if(inertia.computeScrollOffset()){
-            left=inertia.getCurrX();top=inertia.getCurrY();constrain();pins=null;postInvalidateOnAnimation();
+            float previousX=left,previousY=top;
+            left=inertia.getCurrX();top=inertia.getCurrY();constrain();
+            moved(left-previousX,top-previousY);
             if(inertia.isFinished())persist();
         }
     }
