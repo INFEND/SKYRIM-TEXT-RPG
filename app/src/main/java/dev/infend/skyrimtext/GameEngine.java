@@ -207,6 +207,20 @@ public final class GameEngine {
             .add("FLEE","Отступить","Шанс выйти из боя без награды");
     }
 
+    /** Record only facts produced by successful, engine-authorized actions. */
+    private void confirmSceneFact(String kind, String key, String title, String status) {
+        try { sceneState.confirm(kind, key, title, status); }
+        catch (JSONException ignored) {
+            // Optional scene memory must never cancel an already committed game action.
+        }
+    }
+    private void confirmCurrentConversation() {
+        String[] names = {"Седой караульный", "Торговка пряностями", "Усталый путешественник"};
+        int index = Math.floorMod(region + day, names.length);
+        confirmSceneFact("npc", "local_" + index + "_region_" + region,
+                names[index], "MET");
+    }
+
     public void choose(String action) {
         if (!started || action==null) return;
         // A pending battle cannot be escaped by invoking a world, map or quest action.
@@ -268,17 +282,17 @@ public final class GameEngine {
             case "TRAVEL": mode="TRAVEL"; break;
             case "SHOP": mode="SHOP"; break;
             case "QUEST": mode="QUEST"; break;
-            case "TALK": mode="TALK"; break;
+            case "TALK": confirmCurrentConversation(); mode="TALK"; break;
             case "EXPLORE": explore(); break;
             case "BOARD": board(); break;
             case "REST":
                 if(gold<20) {message="Хозяин трактира просит 20 септимов. Придётся поискать заработок.";mode="RESULT";}
                 else {gold-=20;day++;hp=maxHp;magicka=maxMagicka;stamina=maxStamina;message="После тёплого ужина и долгого сна силы восстановились.";mode="RESULT";} break;
             case "Q_ACCEPT": if(questStage==0) {questStage=1;gold+=40;message="Ты принимаешь 40 септимов и получаешь первую зацепку: алтарь находится в Фолкрите.";mode="RESULT";} break;
-            case "Q_ALTAR": if(questStage==1 && region==5) {questStage=2;addXp(35);message="Ты находишь под алтарём серебряную пластину. На ней указан Винтерхолд. +35 опыта.";mode="RESULT";} break;
+            case "Q_ALTAR": if(questStage==1 && region==5) {questStage=2;confirmSceneFact("clue", "quest_silver_plate", "Серебряная пластина под алтарём Фолкрита", "FOUND");addXp(35);message="Ты находишь под алтарём серебряную пластину. На ней указан Винтерхолд. +35 опыта.";mode="RESULT";} break;
             case "Q_BOSS": if(questStage==2 && region==6) startBattle("Пепельный страж",90+level*11,12+level*2,"QUEST","Внутри башни оживает существо из пепла и холодного камня."); break;
-            case "Q_FINISH": if(questStage==3 && region==3) {questStage=4;gold+=300;reputation+=5;addXp(180);message="Хранители принимают журнал и восстанавливают печать. Скайрим получает ещё один мирный рассвет. Награда: 300 септимов и 180 опыта.";mode="RESULT";} break;
-            case "TALK_HELP": message=questStage==1?"Слух подтверждается: ищи старые плиты в Фолкрите.":questStage==2?"О башне в Винтерхолде говорят вполголоса. Возьми зелья.":"Поговаривают, что на дороге появилось больше разбойников.";mode="RESULT";break;
+            case "Q_FINISH": if(questStage==3 && region==3) {questStage=4;confirmSceneFact("clue", "quest_seal", "Печать хранителей восстановлена", "RESOLVED");gold+=300;reputation+=5;addXp(180);message="Хранители принимают журнал и восстанавливают печать. Скайрим получает ещё один мирный рассвет. Награда: 300 септимов и 180 опыта.";mode="RESULT";} break;
+            case "TALK_HELP": confirmCurrentConversation(); message=questStage==1?"Слух подтверждается: ищи старые плиты в Фолкрите.":questStage==2?"О башне в Винтерхолде говорят вполголоса. Возьми зелья.":"Поговаривают, что на дороге появилось больше разбойников.";mode="RESULT";break;
             case "TALK_GIVE": if(gold>=10){gold-=10;reputation++;addXp(8);message="Собеседник благодарит тебя. Репутация +1, опыт +8.";}else message="В кошельке нет десяти септимов.";mode="RESULT";break;
             case "BUY_HP": buy(35,"Лечебное зелье куплено.","HP");break;
             case "BUY_MP": buy(30,"Зелье магии куплено.","MP");break;
