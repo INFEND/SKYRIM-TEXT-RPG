@@ -30,7 +30,7 @@ class NarrativeContracts(unittest.TestCase):
         self.assertIn('Typeface.ITALIC',formatter)
         self.assertIn('new ForegroundColorSpan(0xfff0f0ef)',formatter)
         self.assertNotIn('new QuoteSpan(',formatter)
-        self.assertIn('body.setText(SceneTypography.render(s.body,accent()));',view)
+        self.assertIn('body.setText(SceneTypography.render(s.body,accent(),game.name,heroColor()));',view)
         self.assertIn('storyChoice(++number,c,()->',view)
         self.assertIn('SceneChoiceMeta.chanceColor(chance)',view)
         self.assertIn('renderStoryJournal();',view)
@@ -64,7 +64,7 @@ class NarrativeContracts(unittest.TestCase):
         self.assertIn('**— Его реплика**',client)
         self.assertIn('Все абзацы повествования выделяй *курсивом*',client)
         self.assertIn('только игровым движком',client)
-        self.assertIn('SceneTypography.render(accumulated,accent())',ui)
+        self.assertIn('SceneTypography.render(accumulated,accent(),game.name,heroColor())',ui)
 
 if __name__=="__main__":
     unittest.main()
