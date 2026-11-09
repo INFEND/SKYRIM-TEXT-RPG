@@ -57,7 +57,7 @@ public final class SceneTypography {
         text=text.replaceAll("(:)\\h+(?=(?:\\*\\*)?[—-]\\h)","$1\n");
         // Models sometimes put narration directly after the closing ** of a
         // spoken sentence. It is a NEW paragraph, never part of the dialogue.
-        text=text.replaceAll("(?m)^(\\h*>?\\h*\\*\\*[—-][^\\n]*?\\*\\*)\\h+([^\\n]+)$","$1\\n\\n$2");
+        text=text.replaceAll("(?m)^(\\h*>?\\h*\\*\\*[—-][^\\n]*?\\*\\*)\\h+([^\\n]+)$","$1\n\n$2");
         return text;
     }
 
