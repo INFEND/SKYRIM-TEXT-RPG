@@ -232,7 +232,8 @@ public final class GameEngine {
         }
     }
     private boolean hasNpcStatus(String suffix) {
-        try { return sceneState.contains("npc", currentConversationId() + suffix); }
+        try { return "HELPED".equals(sceneState.status("npc", currentConversationId()))
+                || sceneState.contains("npc", currentConversationId() + suffix); }
         catch (JSONException ignored) { return false; }
     }
 
@@ -318,11 +319,15 @@ public final class GameEngine {
                 if(hasNpcStatus("_helped")) {
                     message="Ты уже помог этому собеседнику. Повторная награда не положена.";
                 } else if(gold>=10) {
-                    gold-=10;reputation++;addXp(8);
-                    confirmSceneFact("npc", currentConversationId(), currentConversationName(), "HELPED");
-                    // A separate persistent marker prevents farming even if TALK_HELP is used later.
-                    confirmSceneFact("npc", currentConversationId()+"_helped", currentConversationName(), "REWARDED");
-                    message="Собеседник благодарит тебя. Репутация +1, опыт +8.";
+                    // Commit the one-time achievement BEFORE paying or awarding anything.
+                    // A full optional ledger must never turn charity into an XP farm.
+                    try {
+                        sceneState.confirm("npc", currentConversationId(), currentConversationName(), "HELPED");
+                        gold-=10;reputation++;addXp(8);
+                        message="Собеседник благодарит тебя. Репутация +1, опыт +8.";
+                    } catch(JSONException ledgerFull) {
+                        message="Журнал знакомств заполнен. Награда и септимы не изменились.";
+                    }
                 } else message="В кошельке нет десяти септимов.";
                 mode="RESULT";break;
             case "BUY_HP": buy(35,"Лечебное зелье куплено.","HP");break;
