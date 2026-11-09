@@ -19,6 +19,11 @@ public final class SceneChoiceMeta {
             default:return "Проверка навыка";
         }
     }
+    public static String skillName(String action){
+        String name=skill(action);
+        int suffix=name.indexOf(" · ");
+        return suffix<0?name:name.substring(0,suffix);
+    }
     public static int chanceColor(int chance){
         if(chance>=75)return 0xff55c982;
         if(chance>=45)return 0xffff9a57;
