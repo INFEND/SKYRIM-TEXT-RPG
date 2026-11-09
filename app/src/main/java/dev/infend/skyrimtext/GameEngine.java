@@ -214,11 +214,26 @@ public final class GameEngine {
             // Optional scene memory must never cancel an already committed game action.
         }
     }
-    private void confirmCurrentConversation() {
+    private String currentConversationId() {
         String[] names = {"Седой караульный", "Торговка пряностями", "Усталый путешественник"};
-        int index = Math.floorMod(region + day, names.length);
-        confirmSceneFact("npc", "local_" + index + "_region_" + region,
-                names[index], "MET");
+        return "local_" + Math.floorMod(region + day, names.length) + "_region_" + region;
+    }
+    private String currentConversationName() {
+        String[] names = {"Седой караульный", "Торговка пряностями", "Усталый путешественник"};
+        return names[Math.floorMod(region + day, names.length)];
+    }
+    private void confirmCurrentConversation() {
+        try {
+            // Reopening a conversation must not erase an already earned NPC status.
+            if (!sceneState.contains("npc", currentConversationId()))
+                sceneState.confirm("npc", currentConversationId(), currentConversationName(), "MET");
+        } catch (JSONException ignored) {
+            // Scene memory is optional and cannot block dialogue.
+        }
+    }
+    private boolean hasNpcStatus(String suffix) {
+        try { return sceneState.contains("npc", currentConversationId() + suffix); }
+        catch (JSONException ignored) { return false; }
     }
 
     public void choose(String action) {
@@ -292,8 +307,23 @@ public final class GameEngine {
             case "Q_ALTAR": if(questStage==1 && region==5) {questStage=2;confirmSceneFact("clue", "quest_silver_plate", "Серебряная пластина под алтарём Фолкрита", "FOUND");addXp(35);message="Ты находишь под алтарём серебряную пластину. На ней указан Винтерхолд. +35 опыта.";mode="RESULT";} break;
             case "Q_BOSS": if(questStage==2 && region==6) startBattle("Пепельный страж",90+level*11,12+level*2,"QUEST","Внутри башни оживает существо из пепла и холодного камня."); break;
             case "Q_FINISH": if(questStage==3 && region==3) {questStage=4;confirmSceneFact("clue", "quest_seal", "Печать хранителей восстановлена", "RESOLVED");gold+=300;reputation+=5;addXp(180);message="Хранители принимают журнал и восстанавливают печать. Скайрим получает ещё один мирный рассвет. Награда: 300 септимов и 180 опыта.";mode="RESULT";} break;
-            case "TALK_HELP": confirmCurrentConversation(); message=questStage==1?"Слух подтверждается: ищи старые плиты в Фолкрите.":questStage==2?"О башне в Винтерхолде говорят вполголоса. Возьми зелья.":"Поговаривают, что на дороге появилось больше разбойников.";mode="RESULT";break;
-            case "TALK_GIVE": if(gold>=10){gold-=10;reputation++;addXp(8);message="Собеседник благодарит тебя. Репутация +1, опыт +8.";}else message="В кошельке нет десяти септимов.";mode="RESULT";break;
+            case "TALK_HELP":
+                confirmCurrentConversation();
+                confirmSceneFact("npc", currentConversationId(), currentConversationName(), "INFORMED");
+                message=questStage==1?"Слух подтверждается: ищи старые плиты в Фолкрите.":questStage==2?"О башне в Винтерхолде говорят вполголоса. Возьми зелья.":"Поговаривают, что на дороге появилось больше разбойников.";
+                mode="RESULT";break;
+            case "TALK_GIVE":
+                confirmCurrentConversation();
+                if(hasNpcStatus("_helped")) {
+                    message="Ты уже помог этому собеседнику. Повторная награда не положена.";
+                } else if(gold>=10) {
+                    gold-=10;reputation++;addXp(8);
+                    confirmSceneFact("npc", currentConversationId(), currentConversationName(), "HELPED");
+                    // A separate persistent marker prevents farming even if TALK_HELP is used later.
+                    confirmSceneFact("npc", currentConversationId()+"_helped", currentConversationName(), "REWARDED");
+                    message="Собеседник благодарит тебя. Репутация +1, опыт +8.";
+                } else message="В кошельке нет десяти септимов.";
+                mode="RESULT";break;
             case "BUY_HP": buy(35,"Лечебное зелье куплено.","HP");break;
             case "BUY_MP": buy(30,"Зелье магии куплено.","MP");break;
             case "BUY_SWORD": buy(180,"Клинок закалён. Атака +6.","SWORD");break;
