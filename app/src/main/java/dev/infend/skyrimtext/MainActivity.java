@@ -105,7 +105,7 @@ public final class MainActivity extends Activity {
         }
         aiMemory=new AiStoryMemory(this);
         aiClient=new AiStoryClient();
-        localAiClient=new LocalAiClient();
+        localAiClient=new LocalAiClient(this);
         chatGptOAuth=new ChatGptOAuth(this);
         ItemCatalog.initialize(this);
         SovngardeTypeface.preload(this);
