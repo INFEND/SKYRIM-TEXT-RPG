@@ -15,6 +15,9 @@ import android.view.View;
 import android.view.ViewParent;
 
 import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -30,6 +33,9 @@ import java.util.Set;
  */
 public final class SkyrimTerrainMapView extends View {
     public interface OnPlace { void selected(WorldAtlas.Place location); }
+    public interface OnCatalog {
+        void selected(ArrayList<SkyrimMapCatalog.Site> locations);
+    }
 
     public static final String TERRAIN="maps/skyrim_user_mosaic.webp";
     public static final int MAP_W=3500;
@@ -60,6 +66,7 @@ public final class SkyrimTerrainMapView extends View {
 
     private final GameEngine game;
     private final OnPlace callback;
+    private OnCatalog catalogCallback;
     private final Set<String> hiddenTypes;
     private final SharedPreferences prefs;
     private final Paint terrainPaint=new Paint(Paint.FILTER_BITMAP_FLAG|Paint.ANTI_ALIAS_FLAG);
@@ -112,6 +119,23 @@ public final class SkyrimTerrainMapView extends View {
                     return true;
                 }
             });
+    }
+
+    public void setOnCatalog(OnCatalog listener){catalogCallback=listener;}
+
+    /** One aggregated marker per coarse reference grid cell. */
+    private LinkedHashMap<String,ArrayList<SkyrimMapCatalog.Site>> catalogClusters(){
+        LinkedHashMap<String,ArrayList<SkyrimMapCatalog.Site>> grouped=new LinkedHashMap<>();
+        for(SkyrimMapCatalog.Site place:SkyrimMapCatalog.all()){
+            if(hiddenTypes.contains(place.type))continue;
+            ArrayList<SkyrimMapCatalog.Site> list=grouped.get(place.grid);
+            if(list==null){
+                list=new ArrayList<>();
+                grouped.put(place.grid,list);
+            }
+            list.add(place);
+        }
+        return grouped;
     }
 
     /** Screenshots were georegistered by their visible city markers. */
@@ -226,6 +250,35 @@ public final class SkyrimTerrainMapView extends View {
         float density=getResources().getDisplayMetrics().density;
         float zoom=scale/Math.max(.0001f,minScale);
         float radius=12f*density;
+        if(zoom>=1.6f){
+            // Multiple real places fall in the same coarse map square. Show
+            // a cluster count instead of claiming fabricated exact coordinates.
+            for(Map.Entry<String,ArrayList<SkyrimMapCatalog.Site>> pair:catalogClusters().entrySet()){
+                ArrayList<SkyrimMapCatalog.Site> list=pair.getValue();
+                if(list.isEmpty())continue;
+                SkyrimMapCatalog.Site site=list.get(0);
+                float x=left+site.x*scale,y=top+site.y*scale;
+                if(x<-60||y<-40||x>getWidth()+60||y>getHeight()+40)continue;
+                float r=(zoom>4f?15f:12f)*density;
+                pinPaint.setStyle(Paint.Style.FILL);
+                pinPaint.setColor(0xe60d1519);
+                canvas.drawCircle(x,y,r+2*density,pinPaint);
+                pinPaint.setColor(0xffc9ced1);
+                canvas.drawCircle(x,y,r,pinPaint);
+                pinPaint.setColor(0xff182124);
+                pinPaint.setTypeface(android.graphics.Typeface.DEFAULT_BOLD);
+                pinPaint.setTextSize(10*density);
+                String count=String.valueOf(list.size());
+                float width=pinPaint.measureText(count);
+                canvas.drawText(count,x-width/2f,y+3*density,pinPaint);
+                if(zoom>=5.6f){
+                    pinPaint.setTypeface(SovngardeTypeface.face(getContext(),false));
+                    pinPaint.setTextSize(12*density);
+                    pinPaint.setColor(0xffdfe5e6);
+                    canvas.drawText(site.grid+" · "+count+" мест",x+r+5*density,y,pinPaint);
+                }
+            }
+        }
         for(WorldAtlas.Place p:WorldAtlas.all()){
             if(!visible(p))continue;
             boolean selected=player(p),capital=major(p);
@@ -282,7 +335,22 @@ public final class SkyrimTerrainMapView extends View {
             float distance=dx*dx+dy*dy;
             if(distance<bestDistance){bestDistance=distance;best=p;}
         }
-        if(best!=null&&bestDistance<radius*radius&&callback!=null)callback.selected(best);
+        ArrayList<SkyrimMapCatalog.Site> catalogBest=null;
+        float catalogDistance=Float.MAX_VALUE;
+        if(scale/Math.max(.0001f,minScale)>=1.6f){
+            for(ArrayList<SkyrimMapCatalog.Site> list:catalogClusters().values()){
+                if(list.isEmpty())continue;
+                SkyrimMapCatalog.Site p=list.get(0);
+                float sx=left+p.x*scale,sy=top+p.y*scale;
+                float dx=x-sx,dy=y-sy,distance=dx*dx+dy*dy;
+                if(distance<catalogDistance){catalogDistance=distance;catalogBest=list;}
+            }
+        }
+        if(catalogBest!=null&&catalogDistance<radius*radius
+                &&(best==null||catalogDistance<bestDistance)&&catalogCallback!=null)
+            catalogCallback.selected(catalogBest);
+        else if(best!=null&&bestDistance<radius*radius&&callback!=null)
+            callback.selected(best);
         performClick();
     }
     @Override public boolean onTouchEvent(MotionEvent event){
