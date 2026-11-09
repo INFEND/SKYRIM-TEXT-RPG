@@ -22,6 +22,8 @@ public final class AiStoryClient {
         void onText(String accumulated);
         // Only server-provided reasoning summaries, never raw private reasoning.
         default void onReasoningSummary(String summary){}
+        default void onLocalStatus(String status){}
+        default void onLocalMetrics(int tokens,float tokensPerSecond,long elapsedMs){}
         void onComplete(String answer);
         void onError(String message);
     }
