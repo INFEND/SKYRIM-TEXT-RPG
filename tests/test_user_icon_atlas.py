@@ -38,7 +38,7 @@ class UserIconAtlasContracts(unittest.TestCase):
         self.assertIn("SkyrimIconView.iconForLabel(title)",activity)
         self.assertIn("SkyrimIconView.iconForItem(item.name,item.category)",activity)
         self.assertIn("SkyrimIconView.iconForItem(focused.name,focused.category)",activity)
-        self.assertIn('group.equals("Все")?"bag":iconOf(group)',activity)
+        self.assertIn('SkyrimIconView.iconForCategory(group)',activity)
         for name in ('"story"','"map"','"bag"','"codex"','"hero"','"journal"','"settings"'):
             self.assertIn(name,activity)
 
