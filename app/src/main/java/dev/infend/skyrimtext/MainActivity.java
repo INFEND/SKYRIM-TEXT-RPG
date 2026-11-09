@@ -952,7 +952,7 @@ public final class MainActivity extends Activity {
                     if("local".equals(resolvedAiProvider())&&aiLocalStartedAt>0){
                         long elapsed=(android.os.SystemClock.elapsedRealtime()-aiLocalStartedAt)/1000L;
                         aiProgressInfo.setText(label+"\nПрошло "+elapsed+" с"+frames[phase++%frames.length]);
-                    }else aiProgressInfo.setText(label+frames[phase++%frames.length]);
+                    }else aiProgressInfo.setText("Генерация ответа"+frames[phase++%frames.length]);
                     aiProgressInfo.postDelayed(this,430L);
                 }
             };
