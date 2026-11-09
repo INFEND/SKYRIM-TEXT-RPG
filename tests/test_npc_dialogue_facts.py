@@ -15,8 +15,8 @@ class NpcDialogueFactsTest(unittest.TestCase):
     def test_help_and_charity_have_distinct_persistent_outcomes(self):
         self.assertIn('currentConversationName(), "INFORMED"', ENGINE)
         self.assertIn('currentConversationName(), "HELPED"', ENGINE)
-        self.assertIn('currentConversationId()+"_helped"', ENGINE)
-        self.assertIn('currentConversationName(), "REWARDED"', ENGINE)
+        self.assertIn('"HELPED".equals(sceneState.status("npc", currentConversationId()))', ENGINE)
+        self.assertIn('sceneState.contains("npc", currentConversationId() + suffix)', ENGINE)
 
     def test_repeat_charity_cannot_grant_xp(self):
         start = ENGINE.index('case "TALK_GIVE":')
@@ -24,6 +24,13 @@ class NpcDialogueFactsTest(unittest.TestCase):
         block = ENGINE[start:end]
         self.assertLess(block.index('if(hasNpcStatus("_helped"))'), block.index('gold-=10;reputation++;addXp(8);'))
         self.assertIn('Повторная награда не положена', block)
+
+    def test_full_ledger_cannot_grant_untracked_rewards(self):
+        block = ENGINE.split('case "TALK_GIVE":', 1)[1].split('case "BUY_HP":', 1)[0]
+        self.assertLess(block.index('sceneState.confirm("npc", currentConversationId()', block.index("gold-=10;reputation++;addXp(8);"))
+        self.assertIn("catch(JSONException ledgerFull)", block)
+        self.assertIn("Награда и септимы не изменились", block)
+        self.assertIn("public String status(String kind,String key)", SCENE)
 
     def test_scene_facts_survive_schema_one_save(self):
         self.assertIn('.put("sceneState",sceneState.toJson())', ENGINE)
