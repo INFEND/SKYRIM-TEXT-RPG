@@ -18,8 +18,16 @@ class SceneStateRecoveryTest(unittest.TestCase):
 
     def test_restore_is_bounded_and_duplicate_safe(self):
         self.assertIn("MAX_ENTRIES = 32", SOURCE)
-        self.assertIn("Math.min(arr.length(),MAX_ENTRIES)", SOURCE)
+        self.assertIn("Math.min(arr.length(),4096)", SOURCE)
+        self.assertIn("collectionSize(state,kind)<MAX_ENTRIES", SOURCE)
+        self.assertIn("private static int collectionSize", SOURCE)
         self.assertIn("if(state.contains(kind,key))continue", SOURCE)
+
+    def test_malformed_first_32_slots_do_not_discard_later_valid_facts(self):
+        self.assertIn("i<limit && collectionSize(state,kind)<MAX_ENTRIES", SOURCE)
+        self.assertIn("if(entry==null)continue", SOURCE)
+        self.assertIn("if(state.contains(kind,key))continue", SOURCE)
+        self.assertIn("state.confirm(kind,key", SOURCE)
 
     def test_only_validated_engine_facts_enter_context(self):
         self.assertIn("state.confirm(kind,key,entry.getString", SOURCE)
