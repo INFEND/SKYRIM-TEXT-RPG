@@ -33,7 +33,9 @@ class SceneLedgerContextTests(unittest.TestCase):
 
     def test_ledger_is_bounded(self):
         self.assertIn('MAX_ENTRIES = 32', self.scene)
-        self.assertIn('int limit=Math.min(arr.length(),MAX_ENTRIES)', self.scene)
+        self.assertIn('int limit=Math.min(arr.length(),4096)', self.scene)
+        self.assertIn('collectionSize(state,kind)<MAX_ENTRIES', self.scene)
+        self.assertIn('if(state.contains(kind,key))continue;', self.scene)
         self.assertIn('if(!entries.containsKey(safeId) && entries.size()>=MAX_ENTRIES)', self.scene)
 
 if __name__ == "__main__":
