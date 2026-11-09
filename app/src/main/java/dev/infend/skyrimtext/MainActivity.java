@@ -39,6 +39,8 @@ public final class MainActivity extends Activity {
     private GameEngine game;
     private SharedPreferences prefs;
     private LinearLayout root, content, header, topChrome;
+    private FrameLayout scrollStage;
+    private View chromeScrollSpacer;
     private boolean chromeHidden;
     private int chromeScrollTravel;
     private long chromeIgnoreScrollUntil;
@@ -193,26 +195,37 @@ public final class MainActivity extends Activity {
         PageScroll oldScroll=scrollCache.get(thisPage);
         root=column();root.setBackground(new SkyrimBackdropDrawable());root.setFitsSystemWindows(true);
         setContentView(root);
-        // One shared collapsible top region. Never suppress HP, stamina and magicka
-        // just because the AI storyteller is active.
+        // The game header must float OVER the scrolling content. Removing a
+        // vertical LinearLayout child on scroll causes relayout, snap-back and
+        // an infinite show/hide oscillation when the user reverses direction.
+        scrollStage=new FrameLayout(this);
+        root.addView(scrollStage,new LinearLayout.LayoutParams(-1,0,1));
+        scroll=new ScrollView(this);scroll.setFillViewport(false);scroll.setClipToPadding(false);
+        scroll.setVerticalScrollBarEnabled(false);
+        scroll.setDescendantFocusability(ViewGroup.FOCUS_BEFORE_DESCENDANTS);
+        scroll.setFocusableInTouchMode(true);
+        scroll.requestFocus();
+        scrollStage.addView(scroll,new FrameLayout.LayoutParams(-1,-1));
+
         topChrome=column();
-        root.addView(topChrome,lp(-1,-2));
-        chromeHidden=false;chromeScrollTravel=0;chromeIgnoreScrollUntil=0L;
+        scrollStage.addView(topChrome,new FrameLayout.LayoutParams(-1,-2,Gravity.TOP));
+        chromeHidden=false;chromeScrollTravel=0;
+        // Restored scroll offsets are not user flings. Never toggle the header
+        // in response to our own render() / first-layout scroll events.
+        chromeIgnoreScrollUntil=android.os.SystemClock.uptimeMillis()+350L;
         if(!titleOpen){
             renderHeader();
             if(game.started)renderSkillLevelNotice();
             if(game.started)renderBars();
         }
-        scroll=new ScrollView(this);scroll.setFillViewport(false);scroll.setClipToPadding(false);
-        scroll.setVerticalScrollBarEnabled(false);
-        // Avoid automatic descendant focus scrolling to an arbitrary new child.
-        scroll.setDescendantFocusability(ViewGroup.FOCUS_BEFORE_DESCENDANTS);
-        scroll.setFocusableInTouchMode(true);
-        scroll.requestFocus();
-        root.addView(scroll,new LinearLayout.LayoutParams(-1,0,1));
+
         scroll.setOnScrollChangeListener((View view,int x,int y,int oldX,int oldY)->
             handleVerticalScroll(y,oldY));
         content=column();content.setPadding(dp(13),dp(17),dp(13),dp(28));scroll.addView(content);
+        // Reserve the same header height inside the scroller only at its top.
+        // Sliding/hiding the floating header never changes scroll viewport size.
+        chromeScrollSpacer=new View(this);
+        content.addView(chromeScrollSpacer,new LinearLayout.LayoutParams(-1,0));
         if(titleOpen)renderTitle();
         else if(!game.started && tab!=5)renderNewGame();
         else if(tab==0)renderStory();
@@ -224,11 +237,30 @@ public final class MainActivity extends Activity {
         else renderSettings();
         if(!titleOpen&&game.started)renderNav();
         SovngardeTypeface.applyTree(root);
+        // Compute the true font-scaled height before the first displayed frame,
+        // including any genuine skill-level notice (no guessed dp constants).
+        final FrameLayout stageForRender=scrollStage;
+        final LinearLayout chromeForRender=topChrome;
+        final View spacerForRender=chromeScrollSpacer;
+        stageForRender.getViewTreeObserver().addOnPreDrawListener(
+            new android.view.ViewTreeObserver.OnPreDrawListener(){
+                @Override public boolean onPreDraw(){
+                    if(stageForRender!=scrollStage)return true;
+                    int required=chromeForRender.getMeasuredHeight();
+                    if(spacerForRender.getLayoutParams().height!=required){
+                        spacerForRender.getLayoutParams().height=required;
+                        spacerForRender.requestLayout();
+                        return false;
+                    }
+                    stageForRender.getViewTreeObserver().removeOnPreDrawListener(this);
+                    return true;
+                }
+            });
         renderedPage=thisPage;
         resumeViewport(oldScroll,scroll,thisPage);
         if(animations){content.setAlpha(0.8f);content.animate().alpha(1f).setDuration(210).setInterpolator(new DecelerateInterpolator()).start();}
     }
-    /** Hide top status bars when reading downward; restore on any upward swipe. */
+    /** Overlay is scroll-independent: no relayout, changing content offset or jump. */
     private void handleVerticalScroll(int y,int previousY){
         if(titleOpen||!game.started||topChrome==null)return;
         int delta=y-previousY;
@@ -246,7 +278,7 @@ public final class MainActivity extends Activity {
     private void setChromeVisible(boolean visible){
         if(topChrome==null||chromeHidden==!visible)return;
         chromeHidden=!visible;
-        chromeIgnoreScrollUntil=android.os.SystemClock.uptimeMillis()+240L;
+        chromeIgnoreScrollUntil=android.os.SystemClock.uptimeMillis()+120L;
         topChrome.animate().cancel();
         if(visible){
             topChrome.setVisibility(View.VISIBLE);
@@ -321,7 +353,7 @@ public final class MainActivity extends Activity {
         panel.setBackground(new RuneFrameDrawable(0xf0090c0d,0xffbac5c9,true));
         LinearLayout.LayoutParams area=lp(-1,-2);
         area.setMargins(dp(10),dp(2),dp(10),dp(6));
-        root.addView(panel,area);
+        topChrome.addView(panel,area);
         LinearLayout top=row();panel.addView(top,lp(-1,-2));
         top.addView(new SkyrimIconView(this,"armor",accent()),lp(37,40));
         LinearLayout words=column();
