@@ -10,57 +10,28 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: python3 -m pip install pillow
-      - name: Compile public geographic facts and terrain
+      - name: Read published Solstheim terrain metadata
         shell: python
         run: |
-          import json,pathlib,urllib.request,re,html,io
-          from PIL import Image
-          Image.MAX_IMAGE_PIXELS=300_000_000
+          import pathlib,urllib.request,re,urllib.parse
           out=pathlib.Path("docs/map-source")
-          for label in ("skyrim","skyrim-solstheim"):
-              raw=(out/f"{label}-page.html").read_text()
-              rows=re.findall(r'<li class="map-index-row"([\s\S]*?)</li>',raw)
-              places=[]
-              for row in rows:
-                  attrs=dict(re.findall(r'(data-[\w-]+)="([^"]*)"',row))
-                  name=re.search(r'data-index-go="[^"]*">([\s\S]*?)</button>',row)
-                  coord=re.search(r'class="map-index-meta">([^<]*)',row)
-                  if not name or not coord: continue
-                  numbers=re.search(r'([\-\d.]+),\s*([\-\d.]+)',coord[1])
-                  if not numbers: continue
-                  places.append(dict(id=attrs["data-id"],category=attrs["data-cat"],name=html.unescape(name[1]),x=float(numbers[1]),y=float(numbers[2])))
-              (out/f"{label}-coordinates.json").write_text(json.dumps(places,ensure_ascii=False,indent=2))
-              print(label,len(places),places[:2])
-          for key,url in (
-              ("markers","https://itemaps.com/assets/maps/skyrim/markers.json"),
-              ("client","https://itemaps.com/maps/client.js?v=20261024-icons")):
+          for name,url in (("solstheim-terrain","https://skyrimmap.com/solstheim"),("dragonborn-terrain","https://tamrielma.ps/dragonborn/")):
               try:
-                  with urllib.request.urlopen(url,timeout=60) as r: body=r.read()
-                  (out/f"{key}.txt").write_bytes(body)
-                  print("FETCH",key,len(body),body[:120])
-              except Exception as error: print("optional",key,repr(error))
-          url="https://raw.githubusercontent.com/S1lveric/skyrim-live-tracker/main/public/skyrim_map.jpg"
-          with urllib.request.urlopen(url,timeout=120) as r: im=Image.open(io.BytesIO(r.read())); im.draft("RGB",(4096,4096)); im=im.convert("RGB")
-          print("TERRAIN",im.size)
-          im.thumbnail((4096,4096),Image.Resampling.LANCZOS)
-          im.save(out/"skyrim_geographic.webp","WEBP",quality=87,method=6)
-          url="https://raw.githubusercontent.com/SunflashRune/Skyrim-Special-Edition-Manual-AP-PopTracker-Pack/main/images/maps/Solstheim.png"
-          with urllib.request.urlopen(url,timeout=90) as r: island=Image.open(io.BytesIO(r.read())).convert("RGB")
-          print("ISLAND",island.size)
-          island.save(out/"solstheim_geographic.webp","WEBP",quality=90,method=6)
-      - name: Save source snapshot on import branch
+                  with urllib.request.urlopen(url,timeout=60) as r: raw=r.read().decode()
+                  (out/f"{name}.html").write_text(raw)
+                  scripts=re.findall(r'<script[^>]+src=["\x27]([^"\x27]+)',raw)
+                  print(name,len(raw),"SCRIPTS",scripts,"IMAGES",re.findall(r'[^"\'\s<>]+\.(?:jpg|webp|png)[^"\'\s<>]*',raw)[:25])
+                  for i,script in enumerate(scripts[:3]):
+                      link=urllib.parse.urljoin(url,script)
+                      try:
+                          with urllib.request.urlopen(link,timeout=60) as r: body=r.read()
+                          if len(body)<1_000_000:(out/f"{name}-{i}.js").write_bytes(body)
+                      except Exception as error:print("script",link,repr(error))
+              except Exception as error: print(url,repr(error))
+      - name: Save projection metadata on import branch
         run: |
           git config user.name INFEND
           git config user.email 342005527+INFEND@users.noreply.github.com
           git add docs/map-source
-          git diff --cached --quiet || git commit -m "Compile georeferenced Skyrim and Solstheim markers and terrain"
+          git diff --cached --quiet || git commit -m "Read public terrain metadata for Solstheim calibration"
           git push origin HEAD:map-source-import
-      - uses: actions/upload-artifact@v4
-        with:
-          name: skyrim-geographic-source
-          path: |
-            docs/map-source/*coordinates.json
-            docs/map-source/*geographic.webp
-            docs/map-source/client.txt
-            docs/map-source/markers.txt
