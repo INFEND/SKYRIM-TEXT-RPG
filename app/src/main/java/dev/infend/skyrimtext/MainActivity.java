@@ -87,6 +87,8 @@ public final class MainActivity extends Activity {
     private static final String AI_PENDING_SESSION="ai_pending_session";
     private boolean aiTurnBusy;
     private String aiTurnPreview="",aiTurnStatus="";
+    private String aiLocalPhase="Локальная генерация…";
+    private long aiLocalStartedAt=0L;
     private TextView aiTurnText,aiProgressInfo,aiReasoningText;
     private Runnable aiDotsTicker;
     private String aiReasoningPreview="";
@@ -154,6 +156,48 @@ public final class MainActivity extends Activity {
         picker.setType("*/*");
         try{startActivityForResult(picker,REQUEST_LOCAL_GGUF);}
         catch(Exception ex){toast("Не удалось открыть выбор файлов");}
+    }
+    private void testLocalModel(){
+        if(!localModelReady()){toast("Сначала импортируй файл GGUF");return;}
+        if(localAiClient.isRunning()){toast("Модель уже выполняет запрос");return;}
+        final TextView result=text("Проверка запуска GGUF…",14,TEXT,false);
+        result.setPadding(dp(16),dp(16),dp(16),dp(16));
+        AlertDialog dialog=new RuneDialogBuilder(this,accent())
+            .setTitle("ТЕСТ ЛОКАЛЬНОЙ МОДЕЛИ")
+            .setView(result)
+            .setNegativeButton("Остановить",(d,w)->localAiClient.cancel()).create();
+        dialog.setCancelable(false);
+        dialog.show();
+        final long start=android.os.SystemClock.elapsedRealtime();
+        final float[] speed={0f};
+        final int[] tokens={0};
+        boolean started=localAiClient.testModel(LocalAiModelStore.path(prefs),
+            new AiStoryClient.Listener(){
+                @Override public void onLocalStatus(String state){
+                    if(dialog.isShowing())result.setText(state+
+                        "\nМодель работает отдельно от процесса игры. Первый запуск может быть медленным.");
+                }
+                @Override public void onLocalMetrics(int count,float tps,long elapsed){
+                    tokens[0]=count;speed[0]=tps;
+                    prefs.edit().putFloat("ai_local_last_tps",tps)
+                        .putInt("ai_local_last_tokens",count).apply();
+                }
+                @Override public void onText(String value){}
+                @Override public void onComplete(String answer){
+                    if(!dialog.isShowing())return;
+                    long elapsed=(android.os.SystemClock.elapsedRealtime()-start)/1000L;
+                    result.setText("ТЕСТ УСПЕШЕН\n\nОтвет: "+answer.trim()+
+                        "\nОбщее время: "+elapsed+" с"+
+                        "\nСгенерировано: "+tokens[0]+" токенов"+
+                        "\nСкорость: "+String.format(java.util.Locale.ROOT,"%.2f",speed[0])+" ток/с"+
+                        "\n\nДля длинных сцен Skyrim потребуется значительно больше времени.");
+                }
+                @Override public void onError(String message){
+                    if(dialog.isShowing())result.setText("ТЕСТ НЕ ПРОЙДЕН\n\n"+message+
+                        "\n\nИгровые сохранения не изменены.");
+                }
+            });
+        if(!started)result.setText("Модель занята либо импортированный GGUF не найден.");
     }
     private void importLocalModel(Uri uri){
         java.util.concurrent.atomic.AtomicBoolean cancelled=new java.util.concurrent.atomic.AtomicBoolean();
@@ -904,7 +948,11 @@ public final class MainActivity extends Activity {
                 private final String[] frames={"",".","..","..."};
                 @Override public void run(){
                     if(!aiTurnBusy||tab!=0||aiProgressInfo!=progressLabel)return;
-                    aiProgressInfo.setText("Генерация ответа"+frames[phase++%frames.length]);
+                    String label="local".equals(resolvedAiProvider())?aiLocalPhase:"Генерация ответа";
+                    if("local".equals(resolvedAiProvider())&&aiLocalStartedAt>0){
+                        long elapsed=(android.os.SystemClock.elapsedRealtime()-aiLocalStartedAt)/1000L;
+                        aiProgressInfo.setText(label+"\nПрошло "+elapsed+" с"+frames[phase++%frames.length]);
+                    }else aiProgressInfo.setText(label+frames[phase++%frames.length]);
                     aiProgressInfo.postDelayed(this,430L);
                 }
             };
@@ -1080,10 +1128,22 @@ public final class MainActivity extends Activity {
         try{saved=game.toJson().toString();}
         catch(Exception ex){aiTurnStatus="Не удалось прочитать состояние героя";render();return;}
         aiTurnBusy=true;aiTurnPreview="";aiReasoningPreview="";
+        if(local){
+            aiLocalStartedAt=android.os.SystemClock.elapsedRealtime();
+            aiLocalPhase="Запуск модели…";
+        }
         aiTurnStatus=proposalOnly?"Определение вероятности действия…":
             local?"Локальная генерация без интернета…":chat?"Подключение к ChatGPT…":"Создание игровой сцены…";
         render();
         final AiStoryClient.Listener listener=new AiStoryClient.Listener(){
+            @Override public void onLocalStatus(String status){
+                if(!aiTurnBusy)return;
+                aiLocalPhase=status;
+                if(aiProgressInfo!=null)aiProgressInfo.setText(status);
+            }
+            @Override public void onLocalMetrics(int tokens,float speed,long elapsed){
+                prefs.edit().putFloat("ai_local_last_tps",speed).putInt("ai_local_last_tokens",tokens).apply();
+            }
             @Override public void onText(String accumulated){
                 if(!aiTurnBusy)return;
                 if(proposalOnly)return;
@@ -1337,6 +1397,12 @@ public final class MainActivity extends Activity {
             reply.setText("");
             send.setText("ОСТАНОВИТЬ");
             AiStoryClient.Listener responseListener=new AiStoryClient.Listener(){
+                @Override public void onLocalStatus(String message){
+                    status.setText(message);
+                }
+                @Override public void onLocalMetrics(int tokens,float speed,long elapsed){
+                    prefs.edit().putFloat("ai_local_last_tps",speed).putInt("ai_local_last_tokens",tokens).apply();
+                }
                 @Override public void onText(String accumulated){
                     reply.setText(SceneTypography.render(accumulated,accent(),game.name,heroColor()));
                 }
@@ -2409,7 +2475,14 @@ public final class MainActivity extends Activity {
         actionButton("Локальная модель · GGUF",
             localModelReady()?"Готово · "+new java.io.File(LocalAiModelStore.path(prefs)).getName()+
                 " · без интернета":"Не выбрана · импорт из Download",true,this::selectLocalModel);
-        addText(aiCard,"GGUF копируется в папку игры: требуется ещё около 5,7 ГБ свободного места для Qwen3.5-9B. После импорта приложение работает независимо от PocketPal. Ускорение GPU и потоковая выдача локальных токенов пока не поддерживаются.",12,MUTED,false,10);
+        actionButton("ПРОВЕРИТЬ ЛОКАЛЬНУЮ МОДЕЛЬ",
+            localModelReady()?"Короткий тест запуска и скорости · не меняет сохранение":"Сначала импортируй GGUF",
+            false,this::testLocalModel);
+        float lastTps=prefs.getFloat("ai_local_last_tps",0f);
+        if(lastTps>0f)addText(aiCard,"Последний замер: "+
+            String.format(java.util.Locale.ROOT,"%.2f ток/с",lastTps)+
+            " (скорость генерации, не загрузки модели).",12,MUTED,false,7);
+        addText(aiCard,"GGUF копируется в папку игры: требуется ещё около 5,7 ГБ свободного места для Qwen3.5-9B. После импорта приложение работает независимо от PocketPal. Ускорение GPU и потоковая выдача локальных токенов пока не поддерживаются. Во время CPU-генерации отображается стадия и время; большая модель может отвечать несколько минут.",12,MUTED,false,10);
         actionButton("Вход ChatGPT · Работа/Codex",chatGptOAuth.accountLabel()+
             " · авторизация в системном браузере",false,this::loginChatGpt);
         if(chatGptOAuth.hasAuthorizedPlan()){
