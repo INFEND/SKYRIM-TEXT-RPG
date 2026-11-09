@@ -102,6 +102,24 @@ public class Probe {
   Set<String> hidden=new HashSet<>();
   ArrayList<MapPinLayout.Pin> low=MapPinLayout.build(pair,0,-1,hidden,"","",.1f,0,0,500,500,1);
   check(low.size()==1&&low.get(0).sites.size()==1,"nearby pins are decluttered without clustering");
+  ArrayList<MapPinLayout.Pin> shifted=MapPinLayout.build(pair,0,-1,hidden,"","",
+      .1f,115,-72,500,500,1);
+  check(shifted.size()==low.size(),"camera panning cannot change pin visibility");
+  check(shifted.get(0).sites.get(0).id.equals(low.get(0).sites.get(0).id),
+      "camera panning cannot reassign a stable map icon");
+  check(Math.abs((shifted.get(0).x-low.get(0).x)-115f)<.01f,
+      "pin X stays attached to world during camera translation");
+  check(Math.abs((shifted.get(0).y-low.get(0).y)+72f)<.01f,
+      "pin Y stays attached to world during camera translation");
+  MapPinLayout.translate(low,115,-72);
+  check(Math.abs(low.get(0).x-shifted.get(0).x)<.01f,
+      "translated cache equals independently rebuilt map");
+  check(Math.abs(MapPinLayout.sizeDp(1f,400)-10f)<.01f,
+      "distant individual marker remains compact");
+  check(MapPinLayout.sizeDp(14f,400)<=26.01f,
+      "nearby individual marker stops growing at a legible size");
+  check(MapPinLayout.sizeDp(4f,400)>MapPinLayout.sizeDp(2f,400),
+      "marker size grows smoothly with map zoom");
   check(MapPinLayout.hit(low,low.get(0).x,low.get(0).y,25)==low.get(0),"drawn cluster is tap target");
   ArrayList<MapPinLayout.Pin> high=MapPinLayout.build(pair,0,-1,hidden,"","",1,-1900,-1900,500,500,1);
   check(high.size()==2,"zoom splits cluster into real positions");
