@@ -48,6 +48,22 @@ public final class SceneState {
     public boolean contains(String kind,String key) throws JSONException {
         return collection(this,kind).containsKey(id(key));
     }
+    /** Bounded, read-only context of facts confirmed by the engine. */
+    public String confirmedContext() {
+        StringBuilder out = new StringBuilder();
+        for(String kind : new String[]{"npc","clue","sublocation"}) {
+            LinkedHashMap<String,JSONObject> entries;
+            try { entries = collection(this,kind); }
+            catch(JSONException impossible) { continue; }
+            for(JSONObject entry : entries.values()) {
+                if(out.length()>0)out.append('\n');
+                out.append(kind).append(" [").append(entry.optString("id")).append("]: ")
+                   .append(entry.optString("title")).append(" (")
+                   .append(entry.optString("status")).append(')');
+            }
+        }
+        return out.toString();
+    }
     public JSONObject toJson() throws JSONException {
         JSONObject out=new JSONObject();
         for(String kind:new String[]{"npc","clue","sublocation"}){
