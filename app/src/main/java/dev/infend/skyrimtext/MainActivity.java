@@ -1391,14 +1391,9 @@ public final class MainActivity extends Activity {
         int shown=0;
         for(SkyrimMapCatalog.Site site:locations){
             if(shown++>=mapListLimit)break;
-            WorldAtlas.Place place=WorldAtlas.find(site.name);if(place==null)continue;
-            SkyrimMapCatalog.Site player=SkyrimMapCatalog.find(game.progress.location);
-            String status=site==player?"  •  ВЫ ЗДЕСЬ":"";
-            TravelPlanner.Route route=TravelPlanner.plan(game,place);
-            String detail=site.type+"  •  "+site.grid+
-                (route.allowed?(route.days>0?"  •  "+route.days+" дн.":""):"  •  Особый переход");
-            actionButton(WorldAtlas.icon(site.type)+"  "+site.name+status,detail,false,()->{
-                terrainMap.centerOn(site);atlasSiteDialog(site);
+            mapLocationRow(content,site,()->{
+                terrainMap.centerOn(site);
+                atlasSiteDialog(site);
             });
         }
         if(locations.size()>mapListLimit)actionButton("ПОКАЗАТЬ ЕЩЁ 60","Осталось "+(locations.size()-mapListLimit),false,()->{mapListLimit+=60;render();});
@@ -1413,6 +1408,34 @@ public final class MainActivity extends Activity {
             "Рельеф Солстейма и его ориентиры: Tamriel Maps (tamrielma.ps). "+
             "The Elder Scrolls V: Skyrim — Bethesda Softworks. Неофициальный атлас.")
             .setNegativeButton("Закрыть",null).show());
+    }
+    /**
+     * One location = one precise map icon + name. Do not reuse actionButton:
+     * its generic left icon, diamond at the right and detail caption are
+     * deliberately absent from the location list.
+     */
+    private void mapLocationRow(LinearLayout host,SkyrimMapCatalog.Site site,Runnable onClick){
+        LinearLayout tile=row();
+        tile.setGravity(Gravity.CENTER_VERTICAL);
+        tile.setMinimumHeight(dp(55));
+        tile.setPadding(dp(13),dp(9),dp(13),dp(9));
+        tile.setBackground(new RuneFrameDrawable(PANEL,BORDER,false));
+        String glyph=SkyrimTerrainMapView.iconForSite(site);
+        tile.addView(new SkyrimIconView(this,glyph,0xffd5dfe1),lp(32,32));
+        TextView name=text(site.name,16,TEXT,true);
+        name.setGravity(Gravity.CENTER_VERTICAL);
+        name.setSingleLine(true);
+        name.setEllipsize(android.text.TextUtils.TruncateAt.END);
+        LinearLayout.LayoutParams nameParams=new LinearLayout.LayoutParams(0,-2,1);
+        nameParams.leftMargin=dp(13);
+        tile.addView(name,nameParams);
+        LinearLayout.LayoutParams params=lp(-1,-2);
+        params.bottomMargin=dp(7);
+        host.addView(tile,params);
+        tile.setClickable(true);
+        tile.setFocusable(true);
+        tile.setContentDescription(site.name);
+        tile.setOnClickListener(v->onClick.run());
     }
     private void mapControl(LinearLayout host,String label,Runnable command){
         TextView button=text(label,13,TEXT,true);
@@ -1537,10 +1560,7 @@ public final class MainActivity extends Activity {
             int shown=0;
             for(SkyrimMapCatalog.Site site:found){
                 if(shown++>=limit[0])break;
-                TextView result=text(site.name+"\n"+site.type+" · "+site.grid,15,TEXT,false);
-                result.setPadding(dp(7),dp(10),dp(7),dp(10));
-                matches.addView(result,lp(-1,-2));
-                result.setOnClickListener(v->{
+                mapLocationRow(matches,site,()->{
                     if(activeMap!=null)activeMap.centerOn(site);
                     if(searchWindow[0]!=null)searchWindow[0].dismiss();
                     atlasSiteDialog(site);
