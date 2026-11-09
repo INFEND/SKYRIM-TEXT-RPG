@@ -33,6 +33,14 @@ public final class UpdateManager {
     public static final String TRUSTED_CERT_SHA256="8A0D221B9C31007B55AC0BAED5597A0B638881F7FEF6650A6E7BD0E2B49793FE";
     private static final long MAX_APK=512L*1024L*1024L;
     private static final int MAX_MANIFEST_BYTES=4*1024*1024;
+    private static final int MANIFEST_ATTEMPTS=3;
+    private static final int APK_ATTEMPTS=3;
+    public interface StatusReporter {void status(String text);}
+    /** HTTP status remains machine-readable; do not decide retries by Russian text. */
+    static final class HttpStatusException extends IOException {
+        final int status;
+        HttpStatusException(int code,String message){super(message);status=code;}
+    }
     // Fixed update identity: downloaded APK must match this app and its pinned certificate.
     public static final String APK_FILE="skyrim_text_rpg_update.apk";
     public interface Callback {
@@ -120,10 +128,10 @@ public final class UpdateManager {
     private static void requireOk(HttpsURLConnection c,String purpose)throws IOException{
         int code=c.getResponseCode();
         if(code==200)return;
-        if(code==404)throw new IOException("Файл обновления не найден на сервере (HTTP 404).");
-        if(code==403||code==429)throw new IOException("Сервер временно ограничил загрузку (HTTP "+code+"). Попробуйте позже.");
-        if(code>=500)throw new IOException("Сервер обновлений временно недоступен (HTTP "+code+").");
-        throw new IOException(purpose+": сервер ответил HTTP "+code);
+        if(code==404)throw new HttpStatusException(code,"Файл обновления не найден на сервере (HTTP 404).");
+        if(code==403||code==429)throw new HttpStatusException(code,"Сервер временно ограничил загрузку (HTTP "+code+"). Попробуйте позже.");
+        if(code>=500)throw new HttpStatusException(code,"Сервер обновлений временно недоступен (HTTP "+code+").");
+        throw new HttpStatusException(code,purpose+": сервер ответил HTTP "+code);
     }
     private static HttpsURLConnection connection(String url)throws IOException{
         checkHttps(url);
@@ -134,51 +142,141 @@ public final class UpdateManager {
         h.setRequestProperty("User-Agent","SKYRIM-TEXT-RPG-Updater/1.0");
         return h;
     }
-    /** If an owner rename breaks the legacy APK URL, retry only the pinned same-version asset. */
-    private static HttpsURLConnection openApk(String url,String version)throws IOException{
-        IOException oldFailure;
-        try{
-            HttpsURLConnection original=connection(url);
-            try{requireOk(original,"Загрузка APK");return original;}
-            catch(IOException unavailable){original.disconnect();throw unavailable;}
-        }catch(IOException unavailable){oldFailure=unavailable;}
-        String fallback=OtaUrlPolicy.canonicalApkFallback(url,version);
-        if(fallback==null)throw oldFailure;
-        HttpsURLConnection canonical=connection(fallback);
-        try{requireOk(canonical,"Загрузка APK");return canonical;}
-        catch(IOException unavailable){
-            canonical.disconnect();unavailable.addSuppressed(oldFailure);throw unavailable;
+    /** Retry only transient failures; never retry invalid metadata, signatures or TLS errors. */
+    private static boolean transientNetworkFailure(Exception e){
+        if(e instanceof HttpStatusException){
+            int status=((HttpStatusException)e).status;
+            return status==408||status==429||status>=500;
+        }
+        return e instanceof SocketTimeoutException||e instanceof ConnectException
+            ||e instanceof java.net.SocketException||e instanceof UnknownHostException;
+    }
+    private static void retryPause(int attempt)throws IOException{
+        try{Thread.sleep(350L*attempt);}
+        catch(InterruptedException interrupted){
+            Thread.currentThread().interrupt();
+            throw new IOException("Проверка обновлений прервана.",interrupted);
         }
     }
-
-    /** The original URL remains primary for installed OTA clients. */
-    public static Release fetchLatest(Context context)throws Exception{
-        internetReady(context);
-        try{return readManifest(MANIFEST_URL);}
-        catch(IOException oldEndpointFailure){
-            // GitHub owner changes can invalidate old release redirects.
-            // Retry only the canonical URL of the same pinned repository.
-            try{return readManifest(OtaUrlPolicy.MANIFEST);}
-            catch(Exception currentFailure){
-                currentFailure.addSuppressed(oldEndpointFailure);
-                throw currentFailure;
+    private static void report(StatusReporter reporter,String message){
+        if(reporter!=null)reporter.status(message);
+    }
+    private static HttpsURLConnection openApk(String url,String version)throws IOException{
+        IOException last=null;
+        for(int attempt=1;attempt<=APK_ATTEMPTS;attempt++){
+            HttpsURLConnection connection=null;
+            try{
+                connection=connection(url);
+                requireOk(connection,"Загрузка APK");
+                return connection;
+            }catch(IOException unavailable){
+                if(connection!=null)connection.disconnect();
+                last=unavailable;
+                if(!transientNetworkFailure(unavailable)||attempt>=APK_ATTEMPTS)break;
+                retryPause(attempt);
             }
         }
+        throw last==null?new IOException("Не удалось подключиться к серверу APK."):last;
+    }
+
+    /**
+     * Official latest redirect first, then pinned release URL via GitHub API,
+     * then a verified raw mirror containing the SAME published update.json.
+     * Only fixed repository endpoints are allowed; Release still pins package,
+     * APK URL, expected APK SHA-256 and installed signing certificate.
+     */
+    public static Release fetchLatest(Context context)throws Exception{
+        return fetchLatest(context,null);
+    }
+    public static Release fetchLatest(Context context,StatusReporter reporter)throws Exception{
+        internetReady(context);
+        Exception primaryFailure;
+        try{return readManifestRetried(MANIFEST_URL,reporter);}
+        catch(Exception e){
+            if(!transientNetworkFailure(e)&&!(e instanceof HttpStatusException))throw e;
+            primaryFailure=e;
+        }
+
+        String expectedTag=null;
+        Exception pinnedFailure=null;
+        try{
+            report(reporter,"Основной сервер недоступен. Проверяем опубликованную версию...");
+            expectedTag=readLatestPublishedTag();
+            String pinned=OtaUrlPolicy.manifestForTag(expectedTag);
+            if(pinned==null)throw new IOException("Некорректный номер официального выпуска.");
+            report(reporter,"Переключение на прямую ссылку версии "+expectedTag.substring(1)+"...");
+            Release fromTag=readManifestRetried(pinned,reporter);
+            if(!expectedTag.equals("v"+fromTag.versionName))
+                throw new IOException("Версия официального манифеста не совпадает с опубликованной.");
+            return fromTag;
+        }catch(Exception e){pinnedFailure=e;}
+        try{
+            report(reporter,"Проверяем резервный канал обновлений...");
+            Release mirror=readManifestRetried(OtaUrlPolicy.MANIFEST_MIRROR,reporter);
+            if(expectedTag!=null&&!expectedTag.equals("v"+mirror.versionName))
+                throw new IOException("Резервный канал ещё не получил последнюю версию "+expectedTag.substring(1)+".");
+            return mirror;
+        }catch(Exception backupError){
+            backupError.addSuppressed(primaryFailure);
+            if(pinnedFailure!=null)backupError.addSuppressed(pinnedFailure);
+            throw backupError;
+        }
+    }
+    private static Release readManifestRetried(String url,StatusReporter reporter)throws Exception{
+        for(int attempt=1;attempt<=MANIFEST_ATTEMPTS;attempt++){
+            try{return readManifest(url);}
+            catch(IOException problem){
+                if(!transientNetworkFailure(problem)||attempt==MANIFEST_ATTEMPTS)throw problem;
+                report(reporter,"Повтор подключения к серверу: "+(attempt+1)+"/"+MANIFEST_ATTEMPTS);
+                retryPause(attempt);
+            }
+        }
+        throw new IOException("Сервер обновлений не ответил.");
+    }
+    private static String readLatestPublishedTag()throws Exception{
+        HttpsURLConnection connection=connection(OtaUrlPolicy.RELEASE_API);
+        connection.setRequestProperty("Accept","application/vnd.github+json");
+        try{
+            requireOk(connection,"Сведения о выпуске");
+            JSONObject latest=new JSONObject(readBounded(connection,MAX_MANIFEST_BYTES));
+            if(latest.optBoolean("draft",true)||latest.optBoolean("prerelease",true))
+                throw new IOException("Версия ещё не опубликована.");
+            String tag=latest.optString("tag_name","");
+            String pinned=OtaUrlPolicy.manifestForTag(tag);
+            if(pinned==null)throw new IOException("Неподдерживаемое имя версии.");
+            JSONArray assets=latest.optJSONArray("assets");
+            boolean exists=false;
+            if(assets!=null)for(int i=0;i<assets.length();i++){
+                JSONObject a=assets.optJSONObject(i);
+                if(a!=null&&"update.json".equals(a.optString("name"))
+                    &&pinned.equals(a.optString("browser_download_url")))exists=true;
+            }
+            if(!exists)throw new IOException("Выпуск ещё не содержит OTA-манифест.");
+            return tag;
+        }catch(org.json.JSONException invalid){
+            throw new IOException("Некорректные сведения о выпуске.",invalid);
+        }finally{connection.disconnect();}
+    }
+    private static String readBounded(HttpsURLConnection connection,int limit)throws IOException{
+        ByteArrayOutputStream memory=new ByteArrayOutputStream();
+        try(InputStream in=connection.getInputStream()){
+            byte[] data=new byte[8192];int count;
+            while((count=in.read(data))!=-1){
+                if(memory.size()+count>limit)
+                    throw new IOException("Ответ сервера обновлений слишком большой.");
+                memory.write(data,0,count);
+            }
+        }
+        return memory.toString("UTF-8");
     }
     private static Release readManifest(String url)throws Exception{
         HttpsURLConnection c=connection(url);
         try{
             requireOk(c,"Проверка обновления");
-            ByteArrayOutputStream memory=new ByteArrayOutputStream();
-            try(InputStream in=c.getInputStream()){
-                byte[] b=new byte[8192];int n;
-                while((n=in.read(b))!=-1){
-                    if(memory.size()+n>MAX_MANIFEST_BYTES)throw new IOException("Ответ сервера слишком большой.");
-                    memory.write(b,0,n);
-                }
+            try{return new Release(new JSONObject(readBounded(c,MAX_MANIFEST_BYTES)));}
+            catch(org.json.JSONException bad){
+                throw new IOException("Некорректные данные обновления.",bad);
             }
-            try{return new Release(new JSONObject(memory.toString("UTF-8")));}
-            catch(org.json.JSONException bad){throw new IOException("Некорректные данные обновления.",bad);}
         }finally{c.disconnect();}
     }
     public static void check(Activity activity,String manifestUrl,Callback cb){
@@ -186,7 +284,8 @@ public final class UpdateManager {
             try{
                 if(!MANIFEST_URL.equals(manifestUrl))throw new IOException("Недоверенный источник обновления.");
                 activity.runOnUiThread(()->cb.status("Проверка соединения..."));
-                Release info=fetchLatest(activity.getApplicationContext());
+                Release info=fetchLatest(activity.getApplicationContext(),
+                    message->activity.runOnUiThread(()->cb.status(message)));
                 long installed=activity.getPackageManager().getPackageInfo(activity.getPackageName(),0).getLongVersionCode();
                 activity.runOnUiThread(()->cb.release(info,info.versionCode>installed));
             }catch(Exception e){
