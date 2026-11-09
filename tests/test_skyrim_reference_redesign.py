@@ -69,7 +69,9 @@ class SkyrimReferenceRedesign(unittest.TestCase):
         self.assertIn("game.progress.chance(game,c.action)",ui)
         self.assertIn('СВОЙ ВАРИАНТ ОТВЕТА',ui)
         self.assertIn('new RuneFrameDrawable(PANEL,c.special?accent():BORDER,c.special)',ui)
-        self.assertIn('new RuneFrameDrawable(PANEL,number==1?accent():BORDER,number==1)',ui)
+        self.assertIn('new RuneFrameDrawable(PANEL,selected?accent():BORDER,selected)',ui)
+        self.assertIn('selectedAiChoices.contains(number)',ui)
+        self.assertNotIn('number==1?accent():BORDER',ui)
 
 if __name__=="__main__":
     unittest.main()
