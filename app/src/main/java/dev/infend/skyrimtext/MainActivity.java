@@ -35,6 +35,12 @@ public final class MainActivity extends Activity {
     private static final int TEXT=0xfff0f1ef, MUTED=0xffaab0b3, BORDER=0xff666d72;
     private static final int[] ACCENTS={0xffe1e3e3,0xffa4b9bf,0xffb9c9dc,0xffceb48c,0xffc79a97,0xffeeece8};
     private static final String[] ACCENT_NAMES={"Серебро", "Север", "Лёд", "Древнее золото", "Рубин", "Снег"};
+    private static final int[] HERO_NAME_COLORS={
+        0xffdeb66d,0xfff1f2ef,0xffa8c8e5,0xffde8789,0xff8ccdab,0xffc5a8e2
+    };
+    private static final String[] HERO_NAME_COLOR_NAMES={
+        "Золото","Серебро","Лёд","Рубин","Изумруд","Аметист"
+    };
     private static final String PREFS="skyrim_text_v1";
     private GameEngine game;
     private SharedPreferences prefs;
@@ -131,6 +137,17 @@ public final class MainActivity extends Activity {
     private int dp(float dp){return (int)(dp*getResources().getDisplayMetrics().density+0.5f);}
     private int sp(int size){return Math.max(10,size+fontBonus);}
     private int accent(){return ACCENTS[accentIndex];}
+    private int heroColor(){
+        int index=Math.max(0,Math.min(HERO_NAME_COLORS.length-1,prefs.getInt("hero_name_color",0)));
+        return HERO_NAME_COLORS[index];
+    }
+    private boolean showChoiceNumbers(){return prefs.getBoolean("show_choice_numbers",true);}
+    private String skillGlyph(String skill){
+        if(skill==null||skill.trim().isEmpty())return "skills";
+        String clean=skill.split(" · ",2)[0].trim();
+        String exact=SkyrimIconAtlas.exactLabel(this,clean);
+        return exact==null?"skills":exact;
+    }
     private GradientDrawable bg(int fill,int border,int radius){
         GradientDrawable gd=new GradientDrawable();gd.setColor(fill);gd.setCornerRadius(dp(Math.min(radius,3)));
         if(border!=Color.TRANSPARENT)gd.setStroke(dp(1),border);return gd;
@@ -624,7 +641,7 @@ public final class MainActivity extends Activity {
         addText(narrative,"ᚱ  ГЛАВА  ·  "+s.kicker.toUpperCase(java.util.Locale.ROOT),11,accent(),false,13);
         TextView body=text("",18,TEXT,false);
         body.setTypeface(SovngardeTypeface.face(this,false));
-        body.setText(SceneTypography.render(s.body,accent()));
+        body.setText(SceneTypography.render(s.body,accent(),game.name,heroColor()));
         body.setLineSpacing(dp(7),1.16f);
         makeItemsClickable(body,body.getText().toString());
         narrative.addView(body);
@@ -691,17 +708,22 @@ public final class MainActivity extends Activity {
 
     private void storyChoice(int position,GameEngine.Choice c,Runnable onClick){
         int chance=game.progress.chance(game,c.action);
-        LinearLayout box=row();box.setGravity(Gravity.TOP);
-        box.setPadding(dp(12),dp(13),dp(12),dp(14));
+        LinearLayout box=row();box.setGravity(Gravity.CENTER_VERTICAL);
+        box.setPadding(dp(14),dp(14),dp(14),dp(14));
         box.setBackground(new RuneFrameDrawable(PANEL,c.special?accent():BORDER,c.special));
-        TextView ordinal=text("◇ "+position,18,c.special?accent():MUTED,true);
-        ordinal.setGravity(Gravity.TOP|Gravity.CENTER_HORIZONTAL);
-        box.addView(ordinal,lp(47,-2));
-        box.addView(new SkyrimIconView(this,
-            chance>=0?SceneChoiceMeta.skill(c.action):"способности",accent()),lp(24,26));
+        if(showChoiceNumbers()){
+            TextView ordinal=text(String.valueOf(position),17,c.special?accent():MUTED,true);
+            ordinal.setGravity(Gravity.CENTER);
+            LinearLayout.LayoutParams ordinalSize=lp(32,36);
+            ordinalSize.rightMargin=dp(8);
+            box.addView(ordinal,ordinalSize);
+        }
+        SkyrimIconView glyph=new SkyrimIconView(this,
+            chance>=0?skillGlyph(SceneChoiceMeta.skillName(c.action)):"skills",accent());
+        box.addView(glyph,lp(31,34));
         LinearLayout prose=column();
         LinearLayout.LayoutParams size=new LinearLayout.LayoutParams(0,-2,1);
-        size.leftMargin=dp(5);box.addView(prose,size);
+        size.leftMargin=dp(13);box.addView(prose,size);
         TextView name=text(c.title,17,TEXT,true);
         name.setTypeface(SovngardeTypeface.face(this,true));
         name.setLineSpacing(dp(3),1.1f);prose.addView(name);
@@ -840,7 +862,7 @@ public final class MainActivity extends Activity {
         aiTurnText=text("",18,TEXT,false);
         aiTurnText.setTypeface(SovngardeTypeface.face(this,false));
         aiTurnText.setLineSpacing(dp(7),1.16f);
-        aiTurnText.setText(SceneTypography.render(game.aiTurn.scene,accent()));
+        aiTurnText.setText(SceneTypography.render(game.aiTurn.scene,accent(),game.name,heroColor()));
         makeItemsClickable(aiTurnText,aiTurnText.getText().toString());
         narrative.addView(aiTurnText,lp(-1,-2));
         space(content,16);
@@ -928,18 +950,23 @@ public final class MainActivity extends Activity {
     }
 
     private void renderAiChoice(int number,AiGameTurn.Option option){
-        LinearLayout row=row();row.setGravity(Gravity.TOP);
-        row.setPadding(dp(12),dp(13),dp(12),dp(13));
+        LinearLayout row=row();row.setGravity(Gravity.CENTER_VERTICAL);
+        row.setPadding(dp(14),dp(14),dp(14),dp(14));
         boolean selected=selectedAiChoices.contains(number);
         row.setBackground(new RuneFrameDrawable(PANEL,selected?accent():BORDER,selected));
-        TextView ordinal=text((selected?"✓ ":"◇ ")+number,17,selected?accent():MUTED,true);
-        ordinal.setGravity(Gravity.TOP|Gravity.CENTER_HORIZONTAL);
-        row.addView(ordinal,lp(48,-2));
-        row.addView(new SkyrimIconView(this,
-            option.skill.isEmpty()?"способности":option.skill,accent()),lp(24,26));
+        TextView ordinal=showChoiceNumbers()?text(String.valueOf(number),17,
+            selected?accent():MUTED,true):null;
+        if(ordinal!=null){
+            ordinal.setGravity(Gravity.CENTER);
+            LinearLayout.LayoutParams ordinalSize=lp(32,36);
+            ordinalSize.rightMargin=dp(8);
+            row.addView(ordinal,ordinalSize);
+        }
+        SkyrimIconView glyph=new SkyrimIconView(this,skillGlyph(option.skill),accent());
+        row.addView(glyph,lp(31,34));
         LinearLayout detail=column();
         LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(0,-2,1);
-        p.leftMargin=dp(4);row.addView(detail,p);
+        p.leftMargin=dp(13);row.addView(detail,p);
         TextView title=text(option.title,17,TEXT,true);
         title.setTypeface(SovngardeTypeface.face(this,true));
         detail.addView(title);space(detail,6);
@@ -956,8 +983,7 @@ public final class MainActivity extends Activity {
             persistAiDraft();
             boolean active=selectedAiChoices.contains(number);
             row.setBackground(new RuneFrameDrawable(PANEL,active?accent():BORDER,active));
-            ordinal.setText((active?"✓ ":"◇ ")+number);
-            ordinal.setTextColor(active?accent():MUTED);
+            if(ordinal!=null)ordinal.setTextColor(active?accent():MUTED);
             row.setContentDescription("Вариант "+number+". "+option.title+". "+(active?"Выбран":"Не выбран"));
         });
         LinearLayout.LayoutParams wrap=lp(-1,-2);wrap.bottomMargin=dp(6);
@@ -999,7 +1025,7 @@ public final class MainActivity extends Activity {
                 if(aiProgressInfo!=null)
                     aiProgressInfo.setText("Пишет сцену · "+visible.length()+" символов");
                 if(tab==0&&aiTurnText!=null&&prefs.getBoolean("ai_enabled",false)){
-                    aiTurnText.setText(SceneTypography.render(visible,accent()));
+                    aiTurnText.setText(SceneTypography.render(visible,accent(),game.name,heroColor()));
                 }
             }
             @Override public void onReasoningSummary(String summary){
@@ -1232,7 +1258,7 @@ public final class MainActivity extends Activity {
             send.setText("ОСТАНОВИТЬ");
             AiStoryClient.Listener responseListener=new AiStoryClient.Listener(){
                 @Override public void onText(String accumulated){
-                    reply.setText(SceneTypography.render(accumulated,accent()));
+                    reply.setText(SceneTypography.render(accumulated,accent(),game.name,heroColor()));
                 }
                 @Override public void onComplete(String answer){
                     aiMemory.add(aiSession,"user",request);
@@ -2029,6 +2055,35 @@ public final class MainActivity extends Activity {
         sw.setChecked(animations);sw.setThumbTintList(ColorStateList.valueOf(accent()));
         sw.setOnCheckedChangeListener((b,checked)->{animations=checked;prefs.edit().putBoolean("animations",checked).apply();});
         readability.addView(sw,lp(-1,47));
+        Switch numberToggle=new Switch(this);
+        numberToggle.setText("Показывать номера вариантов ответа");
+        numberToggle.setTextColor(TEXT);
+        numberToggle.setTextSize(sp(14));
+        numberToggle.setThumbTintList(ColorStateList.valueOf(accent()));
+        numberToggle.setChecked(showChoiceNumbers());
+        numberToggle.setOnCheckedChangeListener((v,on)->{
+            prefs.edit().putBoolean("show_choice_numbers",on).apply();
+            render();
+        });
+        readability.addView(numberToggle,lp(-1,47));
+        LinearLayout nameColors=card();
+        addText(nameColors,"ЦВЕТ ИМЕНИ ГЕРОЯ В ДИАЛОГАХ",11,accent(),true,10);
+        int currentHeroColor=Math.max(0,Math.min(HERO_NAME_COLORS.length-1,
+            prefs.getInt("hero_name_color",0)));
+        for(int i=0;i<HERO_NAME_COLORS.length;i++){
+            final int selectedColor=i;
+            LinearLayout line=row();
+            line.setMinimumHeight(dp(42));
+            TextView marker=text(currentHeroColor==i?"●":"○",23,HERO_NAME_COLORS[i],true);
+            marker.setGravity(Gravity.CENTER);
+            line.addView(marker,lp(38,38));
+            line.addView(text(HERO_NAME_COLOR_NAMES[i],15,TEXT,currentHeroColor==i));
+            line.setOnClickListener(v->{
+                prefs.edit().putInt("hero_name_color",selectedColor).apply();
+                render();
+            });
+            nameColors.addView(line,lp(-1,44));
+        }
         foldSettingsSection("appearance","ОФОРМЛЕНИЕ И ЧИТАЕМОСТЬ",appearanceStart);
         int aiStart=content.getChildCount();
         space(content,6);addText(content,"ИИ-ПРИКЛЮЧЕНИЕ",11,accent(),true,11);
