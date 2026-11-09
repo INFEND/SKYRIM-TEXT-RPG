@@ -48,9 +48,8 @@ public final class OtaUpdateSchedule {
                 .setOverrideDeadline(4L*60L*1000L)
                 .build();
             scheduler.schedule(once);
-        }else{
-            p.edit().putString("ota_background_result",
-                "Не удалось запланировать фоновую проверку").apply();
         }
+        // Scheduling failures are deliberately not shown as extra text.
+        // The dedicated OTA dialog is the only surface for update messages.
     }
 }
