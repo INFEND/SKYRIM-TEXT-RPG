@@ -17,8 +17,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /** Streaming Responses API adapter. Narration cannot change GameEngine state. */
-final class AiStoryClient {
-    interface Listener {
+public final class AiStoryClient {
+    public interface Listener {
         void onText(String accumulated);
         // Only server-provided reasoning summaries, never raw private reasoning.
         default void onReasoningSummary(String summary){}
