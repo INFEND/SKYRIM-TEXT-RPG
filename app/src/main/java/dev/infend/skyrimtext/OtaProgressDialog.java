@@ -74,7 +74,8 @@ public final class OtaProgressDialog {
     private TextView text(String s,int size,int color,boolean bold){
         TextView v=new TextView(activity);v.setText(s);v.setTextColor(color);v.setTextSize(size);
         v.setIncludeFontPadding(false);
-        v.setTypeface(Typeface.SERIF,bold?Typeface.BOLD:Typeface.NORMAL);
+        // The update sheet is part of the game: match all other screens and dialogs.
+        v.setTypeface(SovngardeTypeface.face(activity,bold));
         return v;
     }
     private static String size(long value){
