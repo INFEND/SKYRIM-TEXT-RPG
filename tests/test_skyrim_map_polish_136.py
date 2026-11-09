@@ -1,50 +1,42 @@
-"""Map v1.0.36: visible-only taps and true search-to-camera navigation."""
+"""Shared pin layout prevents a different tap target from the one drawn."""
 from pathlib import Path
 import unittest
-
 ROOT=Path(__file__).resolve().parents[1]
 SRC=ROOT/"app/src/main/java/dev/infend/skyrimtext"
-MAP=(SRC/"SkyrimTerrainMapView.java").read_text(encoding="utf-8")
-CAT=(SRC/"SkyrimMapCatalog.java").read_text(encoding="utf-8")
-UI=(SRC/"MainActivity.java").read_text(encoding="utf-8")
-
+MAP=(SRC/"SkyrimTerrainMapView.java").read_text()
+LAYOUT=(SRC/"MapPinLayout.java").read_text()
+UI=(SRC/"MainActivity.java").read_text()
 
 class TerrainMapPolish(unittest.TestCase):
-    def test_hidden_markers_are_not_tappable(self):
-        self.assertIn("private boolean drawn(WorldAtlas.Place p,float zoom)",MAP)
-        self.assertIn("if(!drawn(p,zoom))continue;",MAP)
-        draw=MAP.split("private void select(float x,float y)",1)[0]
-        hit=MAP.split("private void select(float x,float y)",1)[1]
-        self.assertIn("if(!drawn(p,zoom))continue;",draw)
-        self.assertIn("if(!drawn(p,zoom))continue;",hit)
-        self.assertIn("if(zoom>=2.5f||player(p)||major(p))return true;",MAP)
-        self.assertIn("if(scale/Math.max(.0001f,minScale)>=1.6f)",MAP)
+    def test_render_and_hit_test_share_one_visible_snapshot(self):
+        self.assertIn("shown=renderedPins()",MAP)
+        self.assertIn("MapPinLayout.hit(renderedPins()",MAP)
+        self.assertIn("hidden.contains(site.type)",LAYOUT)
+        self.assertIn("site.sheet!=sheet",LAYOUT)
+        self.assertIn("region>=0&&site.region!=region",LAYOUT)
+        self.assertIn("pins=null",MAP)
         self.assertNotIn("game.progress.location=",MAP)
 
-    def test_catalog_can_focus_its_sector_without_faking_coordinates(self):
-        self.assertIn("public void centerOn(SkyrimMapCatalog.Site target)",MAP)
-        self.assertIn("target.x*scale",MAP)
-        self.assertIn("target.y*scale",MAP)
-        self.assertIn("constrain();invalidate();persist();",MAP)
-        self.assertIn("public static int visibleCount(java.util.Set<String> hiddenTypes)",CAT)
-        self.assertIn("SkyrimMapCatalog.visibleCount(hiddenMapTypes)",UI)
+    def test_focus_switches_sheet_and_preserves_world_point(self):
+        focus=MAP[MAP.index("public void centerOn(SkyrimMapCatalog.Site target)"):MAP.index("private void persist()")]
+        self.assertIn("setSheet(target.sheet)",focus)
+        self.assertIn("target.x*scale",focus)
+        self.assertIn("target.y*scale",focus)
+        self.assertIn("constrain();changed();persist();",focus)
+        self.assertIn("No grid-cell positions", (SRC/"SkyrimMapCatalog.java").read_text())
 
-    def test_search_focuses_existing_map_and_fullscreen_can_search(self):
-        self.assertIn("private void searchSkyrimAtlas(SkyrimTerrainMapView activeMap)",UI)
-        self.assertIn("()->searchSkyrimAtlas(terrainMap)",UI)
+    def test_search_pages_every_match_without_duplicate_story_list(self):
+        search=UI[UI.index("private void searchSkyrimAtlas(SkyrimTerrainMapView"):UI.index("private void renderMapTypeFilters()")]
+        self.assertIn("activeMap.centerOn(site)",search)
+        self.assertIn("searchWindow[0].dismiss()",search)
+        self.assertIn("limit[0]+=60",search)
+        self.assertNotIn("for(WorldAtlas.Place",search)
         self.assertIn('mapControl(toolbar,"Поиск",()->searchSkyrimAtlas(map))',UI)
-        self.assertIn("if(activeMap!=null)activeMap.centerOn(place)",UI)
-        self.assertIn("if(activeMap!=null)activeMap.centerOn(site)",UI)
-        self.assertIn("searchWindow[0].dismiss()",UI)
-        self.assertIn("new RuneDialogBuilder(this,accent())",UI)
 
-    def test_camera_saved_when_screen_or_dialog_is_closed(self):
-        self.assertIn("@Override protected void onDetachedFromWindow()",MAP)
-        self.assertIn("persist();",MAP)
-        self.assertIn("terrain_map_zoom",MAP)
-        self.assertIn("terrain_map_x",MAP)
-        self.assertIn("terrain_map_y",MAP)
+    def test_camera_is_restored_after_fullscreen_and_orientation(self):
+        self.assertIn("onDetachedFromWindow()",MAP)
+        self.assertIn("public void restoreCamera()",MAP)
+        self.assertIn("previousScale/Math.max(.0001f,minScale)",MAP)
+        self.assertIn("render();map.saveCamera();",UI)
+        self.assertIn("activeTerrainMap.restoreCamera()",UI)
 
-
-if __name__=="__main__":
-    unittest.main()

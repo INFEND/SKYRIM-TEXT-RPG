@@ -33,7 +33,7 @@ class PlayerInteractionOverhaul(unittest.TestCase):
         self.assertIn('type.equals("Столица")?"Города"', UI)
         self.assertIn('type.equals("Деревня")?"Деревни"', UI)
         self.assertIn("hiddenMapTypes.addAll(types)", UI)
-        self.assertIn("places.removeIf(place->hiddenMapTypes.contains(place.type))", UI)
+        self.assertIn("locations.removeIf(site->hiddenMapTypes.contains(site.type)", UI)
         self.assertIn("Set<String> hiddenTypes", MAP)
         self.assertEqual(MAP.count("if(!visible(p))continue;"), 2)
         self.assertIn("place.name.equals(game.progress.location)||", MAP)
@@ -57,3 +57,4 @@ class PlayerInteractionOverhaul(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+

@@ -1,77 +1,46 @@
-"""User-supplied map montage and touch navigation must work without network."""
+"""Offline sheets and geographic model are separate from the renderer."""
 from pathlib import Path
-import re
 import unittest
-
 ROOT=Path(__file__).resolve().parents[1]
 JAVA=ROOT/"app/src/main/java/dev/infend/skyrimtext"
-MAP=(JAVA/"SkyrimTerrainMapView.java").read_text(encoding="utf-8")
-CATALOG=(JAVA/"SkyrimMapCatalog.java").read_text(encoding="utf-8")
-UI=(JAVA/"MainActivity.java").read_text(encoding="utf-8")
-WORLD=(JAVA/"WorldAtlas.java").read_text(encoding="utf-8")
-ART=ROOT/"app/src/main/assets/maps/skyrim_user_mosaic.webp"
-
+MAP=(JAVA/"SkyrimTerrainMapView.java").read_text()
+UI=(JAVA/"MainActivity.java").read_text()
 
 class InteractiveTerrainMap(unittest.TestCase):
-    def test_six_screenshots_make_one_offline_terrain_texture(self):
-        self.assertTrue(ART.is_file(),"The map MUST be bundled in the APK")
-        encoded=ART.read_bytes()
-        self.assertGreater(len(encoded),100_000)
-        self.assertLess(len(encoded),2_500_000)
-        self.assertEqual(encoded[:4],b"RIFF")
-        self.assertEqual(encoded[8:12],b"WEBP")
-        self.assertIn('TERRAIN="maps/skyrim_user_mosaic.webp"',MAP)
-        self.assertIn("MAP_W=3500",MAP)
-        self.assertIn("MAP_H=1720",MAP)
+    def test_both_terrain_sheets_are_offline_and_bounded(self):
+        for name,maximum in (("skyrim_geographic.webp",4_000_000),("solstheim_terrain.webp",800_000)):
+            data=(ROOT/"app/src/main/assets/maps"/name).read_bytes()
+            self.assertGreater(len(data),100_000)
+            self.assertLess(len(data),maximum)
+            self.assertEqual(data[:4],b"RIFF")
+            self.assertEqual(data[8:12],b"WEBP")
+        self.assertIn("MAP_W=4096,MAP_H=4096",MAP)
         self.assertIn("Bitmap.Config.RGB_565",MAP)
+        self.assertIn("LOADER.execute",MAP)
         self.assertNotIn("https://",MAP)
 
-    def test_map_has_touch_zoom_pan_limits_and_persistent_camera(self):
-        self.assertIn("ScaleGestureDetector",MAP)
-        self.assertIn("GestureDetector",MAP)
-        self.assertIn("onDoubleTap(MotionEvent e)",MAP)
-        self.assertIn("onScroll(MotionEvent a,MotionEvent b",MAP)
-        self.assertIn("getScaleFactor()",MAP)
-        self.assertIn("requestDisallowInterceptTouchEvent(true)",MAP)
-        self.assertIn("private void constrain()",MAP)
-        self.assertIn("minScale*11f",MAP)
-        for token in ("terrain_map_zoom","terrain_map_x","terrain_map_y"):
+    def test_touch_zoom_pan_and_independent_camera_survive(self):
+        for token in ("ScaleGestureDetector","GestureDetector","OverScroller","onDoubleTap",
+                      "requestDisallowInterceptTouchEvent(true)","private void constrain()",
+                      'terrain_map_v2_', 'key("zoom")','key("x")','key("y")',
+                      "public void centerOnPlayer()","public void showWholeProvince()",
+                      "public void setSheet(int next)","onDetachedFromWindow"):
             self.assertIn(token,MAP)
-        self.assertIn("public void showWholeProvince()",MAP)
-        self.assertIn("public void centerOnPlayer()",MAP)
 
-    def test_same_game_places_and_filters_are_preserved(self):
-        self.assertIn("for(WorldAtlas.Place p:WorldAtlas.all())",MAP)
-        self.assertIn("game.progress.location",MAP)
-        self.assertIn("!hiddenTypes.contains(p.type)",MAP)
-        self.assertNotIn("game.progress.location=",MAP)
-        self.assertIn("new SkyrimTerrainMapView(",UI)
-        self.assertIn("mapControl(mapActions",UI)
-        self.assertIn("terrainMap.zoomBy",UI)
-        self.assertIn("terrainMap::showWholeProvince",UI)
-        self.assertIn("terrainMap::centerOnPlayer",UI)
-        self.assertIn("openFullscreenWorldMap()",UI)
-        self.assertIn("this::locationDialog",UI)
+    def test_geographic_selection_uses_validated_travel(self):
+        self.assertIn("WorldAtlas.find(SkyrimMapCatalog.travelDestination(site))",MAP)
+        self.assertIn("callback.selected(place)",MAP)
+        self.assertIn("MapPinLayout.hit(renderedPins()",MAP)
         self.assertIn("TravelPlanner.plan(game,place)",UI)
+        self.assertIn('game.choose("LOC:"+place.name)',UI)
+        self.assertNotIn("game.progress.location=",MAP)
 
-    def test_extra_real_names_are_marked_as_coarse_reference_not_fake_travel(self):
-        pins=re.findall(r'"([A-Za-z0-9][^"\n]*?)\|([A-L][1-8])"',CATALOG)
-        self.assertGreater(len(pins),270)
-        self.assertEqual(len(pins),len(set(name for name,grid in pins)))
-        for name in ("Bleak Falls Barrow","Fort Greenwall","Goldenglow Estate",
-                     "Nightgate Inn","Thieves Guild","Snow Veil Sanctum",
-                     "Ysgramor's Tomb"):
-            self.assertIn(name,CATALOG)
-        self.assertIn("catalogClusters()",MAP)
-        self.assertIn("catalogCallback.selected(catalogBest)",MAP)
-        self.assertIn("if(hiddenTypes.contains(place.type))continue",MAP)
-        self.assertIn("SkyrimMapCatalog.size()",UI)
-        self.assertIn("for(SkyrimMapCatalog.Site site:SkyrimMapCatalog.all())types.add(site.type)",UI)
-        self.assertIn("пока не является отдельным",UI)
-        self.assertIn("private void searchSkyrimAtlas()",UI)
-        self.assertIn("private void atlasSitesDialog(",UI)
-        self.assertIn("private void atlasSiteDialog(",UI)
-        self.assertIn("put(\"Хелген\"",WORLD)
+    def test_sheets_search_and_list_have_consistent_catalog(self):
+        for token in ('terrainMap.setSheet(0)','terrainMap.setSheet(1)',
+                      "SkyrimMapCatalog.size()","site.matches(needle)",
+                      "site==player", "site.grid", "mapListLimit",
+                      "ПОКАЗАТЬ ЕЩЁ 60"):
+            self.assertIn(token,UI)
+        self.assertNotIn("Положение ориентировочное, по справочной сетке",UI)
+        self.assertNotIn("GRID_X",(JAVA/"SkyrimMapCatalog.java").read_text())
 
-if __name__=="__main__":
-    unittest.main()

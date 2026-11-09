@@ -109,9 +109,31 @@ public final class WorldAtlas {
         put("Убежище Драконьего Моста","Форт",3,292,460,"Укреплённый участок важной дороги.");
     }
     private WorldAtlas(){}
-    public static ArrayList<Place> all(){return new ArrayList<>(places);}
-    public static Place find(String name){for(Place p:places)if(p.name.equals(name))return p;return null;}
+    private static boolean geographyAdded;
+    private static synchronized void ensureGeography(){
+        if(geographyAdded)return;
+        geographyAdded=true;
+        for(SkyrimMapCatalog.Site site:SkyrimMapCatalog.all()){
+            int existing=-1;
+            for(int i=0;i<places.size();i++)if(places.get(i).name.equals(site.name)){existing=i;break;}
+            Place old=existing<0?null:places.get(existing);
+            String description=old==null?site.type+" · "+site.grid+". "+
+                "Переход ведёт к этому месту; доступ к отдельным сюжетным областям зависит от событий истории.":old.description;
+            Place location=new Place(site.name,site.type,site.region,
+                old==null?Math.round(site.x):old.x,old==null?Math.round(site.y):old.y,description);
+            if(existing<0)places.add(location);else places.set(existing,location);
+        }
+    }
+    public static ArrayList<Place> all(){ensureGeography();return new ArrayList<>(places);}
+    public static Place find(String name){
+        ensureGeography();
+        SkyrimMapCatalog.Site site=SkyrimMapCatalog.find(name);
+        String canonical=site==null?name:site.name;
+        for(Place p:places)if(p.name.equals(canonical))return p;
+        return null;
+    }
     public static ArrayList<Place> byRegion(int id){
+        ensureGeography();
         ArrayList<Place> a=new ArrayList<>();for(Place p:places)if(p.region==id)a.add(p);
         return a;
     }
@@ -246,3 +268,4 @@ public final class WorldAtlas {
         @Override public boolean performClick(){super.performClick();return true;}
     }
 }
+
