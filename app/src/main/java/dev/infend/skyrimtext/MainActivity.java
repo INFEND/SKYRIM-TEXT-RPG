@@ -1348,7 +1348,27 @@ public final class MainActivity extends Activity {
         LinearLayout overview=card();
         addText(overview,"⌖  ВЫ НАХОДИТЕСЬ: "+game.progress.location,15,accent(),true,10);
         addText(overview,"Регион: "+GameEngine.REGIONS[game.region]+"  •  день "+game.day,13,MUTED,false,9);
-        overview.addView(new WorldAtlas.MapView(this,game,this::locationDialog,hiddenMapTypes),lp(-1,-2));
+        final SkyrimTerrainMapView terrainMap=new SkyrimTerrainMapView(
+            this,game,this::locationDialog,hiddenMapTypes);
+        overview.addView(terrainMap,lp(-1,410));
+        LinearLayout mapActions=row();
+        mapActions.setGravity(Gravity.CENTER);
+        mapActions.setPadding(0,dp(10),0,dp(8));
+        overview.addView(mapActions,lp(-1,-2));
+        mapControl(mapActions,"−",()->terrainMap.zoomBy(1f/1.45f));
+        mapControl(mapActions,"+",()->terrainMap.zoomBy(1.45f));
+        mapControl(mapActions,"Вся карта",terrainMap::showWholeProvince);
+        mapControl(mapActions,"Мой герой",terrainMap::centerOnPlayer);
+        TextView fullMap=text("⛶  ОТКРЫТЬ КАРТУ НА ВЕСЬ ЭКРАН",13,accent(),true);
+        fullMap.setGravity(Gravity.CENTER);
+        fullMap.setPadding(dp(8),dp(12),dp(8),dp(12));
+        fullMap.setBackground(new RuneFrameDrawable(PANEL_2,BORDER,false));
+        overview.addView(fullMap,lp(-1,-2));
+        fullMap.setOnClickListener(v->openFullscreenWorldMap());
+        addText(overview,"Двумя пальцами изменяй масштаб, одним перемещай карту. "+
+            "Повторное касание увеличивает изображение.",12,MUTED,false,6);
+        addText(overview,"Рельеф собран из шести снимков. Участки за их пределами "+
+            "пока восстановлены приблизительно.",11,MUTED,false,7);
         if(LocationGalleryView.hasGallery(game.progress.location)){
             addText(overview,"ᛟ  ГАЛЕРЕЯ ТЕКУЩЕГО МЕСТА",11,accent(),true,12);
             overview.addView(new LocationGalleryView(this,game.progress.location,accent(),false),lp(-1,-2));
@@ -1369,7 +1389,58 @@ public final class MainActivity extends Activity {
             TravelPlanner.Route route=TravelPlanner.plan(game,place);
             String detail=place.type+"  •  "+GameEngine.REGIONS[place.region]+
                 (route.allowed?(route.days>0?"  •  "+route.days+" дн.":""):"  •  Недоступно");
-            actionButton(WorldAtlas.icon(place.type)+"  "+place.name+status,detail,false,()->locationDialog(place));
+            actionButton(WorldAtlas.icon(place.type)+"  "+place.name+status,detail,false,()->{
+                terrainMap.centerOn(place);
+                locationDialog(place);
+            });
+        }
+    }
+    private void mapControl(LinearLayout host,String label,Runnable command){
+        TextView button=text(label,13,TEXT,true);
+        button.setGravity(Gravity.CENTER);
+        button.setPadding(dp(8),dp(9),dp(8),dp(9));
+        button.setBackground(new RuneFrameDrawable(PANEL_2,BORDER,false));
+        LinearLayout.LayoutParams size=new LinearLayout.LayoutParams(0,dp(43),1);
+        size.setMargins(dp(2),0,dp(2),0);
+        host.addView(button,size);
+        button.setContentDescription(label);
+        button.setOnClickListener(v->command.run());
+    }
+    /** Separate immersive map viewer; shares the same persistent camera and filters. */
+    private void openFullscreenWorldMap(){
+        android.app.Dialog popup=new android.app.Dialog(this);
+        popup.requestWindowFeature(android.view.Window.FEATURE_NO_TITLE);
+        FrameLayout scene=new FrameLayout(this);
+        scene.setBackgroundColor(0xff06090a);
+        SkyrimTerrainMapView map=new SkyrimTerrainMapView(
+            this,game,this::locationDialog,hiddenMapTypes);
+        scene.addView(map,new FrameLayout.LayoutParams(-1,-1));
+        LinearLayout toolbar=row();
+        toolbar.setGravity(Gravity.CENTER_VERTICAL);
+        toolbar.setPadding(dp(8),dp(6),dp(8),dp(6));
+        toolbar.setBackgroundColor(0xe506090b);
+        FrameLayout.LayoutParams toolbarSize=new FrameLayout.LayoutParams(
+            -1,dp(57),Gravity.BOTTOM);
+        scene.addView(toolbar,toolbarSize);
+        mapControl(toolbar,"−",()->map.zoomBy(1f/1.5f));
+        mapControl(toolbar,"+",()->map.zoomBy(1.5f));
+        mapControl(toolbar,"Вся карта",map::showWholeProvince);
+        mapControl(toolbar,"К герою",map::centerOnPlayer);
+        TextView close=text("×",33,TEXT,true);
+        close.setGravity(Gravity.CENTER);
+        close.setBackgroundColor(0xc506090b);
+        FrameLayout.LayoutParams closeSize=new FrameLayout.LayoutParams(
+            dp(52),dp(52),Gravity.TOP|Gravity.END);
+        closeSize.setMargins(0,dp(14),dp(14),0);
+        scene.addView(close,closeSize);
+        close.setContentDescription("Закрыть полноэкранную карту");
+        close.setOnClickListener(v->popup.dismiss());
+        popup.setContentView(scene);
+        popup.show();
+        android.view.Window window=popup.getWindow();
+        if(window!=null){
+            window.setBackgroundDrawableResource(android.R.color.transparent);
+            window.setLayout(-1,-1);
         }
     }
     /** Full atlas type filter; reflects both the map markers and location list. */
