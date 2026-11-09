@@ -105,7 +105,7 @@ class AiGameDirectorContracts(unittest.TestCase):
         self.assertIn('if(proposalOnly)return;',ui)
         self.assertIn('completed.customChance!=expectedChance',ui)
         self.assertIn('if(!game.toJson().toString().equals(saved))',ui)
-        self.assertIn('if(value.equals(pendingAiAction()))',ui)
+        self.assertIn('if(compound.equals(pendingAiAction()))',ui)
         self.assertIn('if(aiControlled)payload.put("instructions",chanceOnly?AI_CHANCE_RULES:AI_GAME_RULES)',client)
         self.assertIn('parseChance(String response)',bridge)
         self.assertIn('aiTurnBusy=false;aiTurnPreview="";',ui[handler:second])
