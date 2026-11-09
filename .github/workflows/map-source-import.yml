@@ -1,0 +1,38 @@
+name: Prepare verified map sources
+on:
+  push:
+    branches: [map-source-import]
+    paths: [.github/workflows/map-source-import.yml]
+permissions:
+  contents: write
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Read public UESP map data
+        shell: python
+        run: |
+          import json, pathlib, urllib.request, urllib.parse
+          out=pathlib.Path("docs/map-source");out.mkdir(parents=True,exist_ok=True)
+          def get(url):
+              req=urllib.request.Request(url, headers={"User-Agent":"INFEND-SkyrimTextRPG-map-import/1.0 (offline fan atlas)"})
+              with urllib.request.urlopen(req,timeout=60) as r: return r.read().decode("utf-8")
+          for db in ("sr","db"):
+              for label,url in (
+                  ("worlds",f"https://gamemap.uesp.net/db/gamemap.php?db={db}&action=get_worlds"),
+                  ("config",f"https://gamemap.uesp.net/assets/maps/{db}/config.json"),
+                  ("places",f"https://gamemap.uesp.net/db/gamemap.php?db={db}&action=get_locs&worldid=1")):
+                  try:
+                      raw=get(url); data=json.loads(raw)
+                      (out/f"{db}-{label}.json").write_text(json.dumps(data,ensure_ascii=False,indent=2)+"\n")
+                      print(db,label,len(raw),list(data)[:10])
+                  except Exception as error: print("SOURCE ERROR",url,repr(error))
+          if not list(out.glob("*-worlds.json")): raise RuntimeError("No source metadata retrieved")
+      - name: Save source snapshot on import branch
+        run: |
+          git config user.name INFEND
+          git config user.email 342005527+INFEND@users.noreply.github.com
+          git add docs/map-source
+          git diff --cached --quiet || git commit -m "Record authoritative UESP map metadata for offline atlas"
+          git push origin HEAD:map-source-import
