@@ -42,7 +42,23 @@ public final class SceneState {
             throw new JSONException("Недопустимое состояние факта");
         if(!entries.containsKey(safeId) && entries.size()>=MAX_ENTRIES)
             throw new JSONException("Переполнен журнал сцены");
+        // NPC relationships are persistent achievements: a later generic conversation
+        // must not silently erase a previously confirmed act of help or disclosure.
+        if("npc".equals(kind) && entries.containsKey(safeId)) {
+            String previous=entries.get(safeId).optString("status");
+            int oldRank=npcRelationshipRank(previous);
+            int newRank=npcRelationshipRank(status);
+            if(oldRank>0 && newRank>0 && newRank<oldRank)return;
+        }
         entries.put(safeId,new JSONObject().put("id",safeId).put("title",safeTitle).put("status",status));
+    }
+    private static int npcRelationshipRank(String status) {
+        switch(status) {
+            case "MET": return 1;
+            case "INFORMED": return 2;
+            case "HELPED": return 3;
+            default: return 0; // Other statuses are not ordered relationships.
+        }
     }
     public boolean contains(String kind,String key) throws JSONException {
         return collection(this,kind).containsKey(id(key));
