@@ -63,6 +63,11 @@ public final class SceneState {
     public boolean contains(String kind,String key) throws JSONException {
         return collection(this,kind).containsKey(id(key));
     }
+    /** Return a confirmed status without exposing mutable JSON to callers. */
+    public String status(String kind,String key) throws JSONException {
+        JSONObject entry=collection(this,kind).get(id(key));
+        return entry==null ? "" : entry.optString("status");
+    }
     /** Bounded, read-only context of facts confirmed by the engine. */
     public String confirmedContext() {
         StringBuilder out = new StringBuilder();
