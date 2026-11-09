@@ -70,7 +70,8 @@ public final class MainActivity extends Activity {
     private static final String AI_PENDING_SESSION="ai_pending_session";
     private boolean aiTurnBusy;
     private String aiTurnPreview="",aiTurnStatus="";
-    private TextView aiTurnText,aiProgressInfo;
+    private TextView aiTurnText,aiProgressInfo,aiReasoningText;
+    private String aiReasoningPreview="";
     private final java.util.LinkedHashSet<Integer> selectedAiChoices=new java.util.LinkedHashSet<>();
     private final java.util.HashSet<String> hiddenMapTypes=new java.util.HashSet<>();
     private String aiOwnDraft="";
@@ -664,7 +665,7 @@ public final class MainActivity extends Activity {
     private void renderAiGame(){
         boolean chat=usingChatGpt();
         boolean ready=chat?chatGptOAuth.hasAuthorizedPlan():AiKeyVault.configured(this);
-        aiTurnText=null;aiProgressInfo=null;
+        aiTurnText=null;aiProgressInfo=null;aiReasoningText=null;
         if(LocationGalleryView.hasGallery(game.progress.location)){
             addText(content,"ᛟ  "+game.progress.location.toUpperCase(java.util.Locale.ROOT),12,accent(),true,10);
             content.addView(new LocationGalleryView(this,game.progress.location,accent(),false),lp(-1,-2));
@@ -692,6 +693,11 @@ public final class MainActivity extends Activity {
             statusLayout.leftMargin=dp(12);
             activity.addView(aiProgressInfo,statusLayout);
             content.addView(activity,lp(-1,-2));
+            aiReasoningText=text(aiReasoningPreview.isEmpty()?
+                "Резюме рассуждений: появится, если модель его поддерживает.":
+                "РЕЗЮМЕ РАЗМЫШЛЕНИЙ:\n"+aiReasoningPreview,12,MUTED,false);
+            aiReasoningText.setPadding(dp(5),dp(8),dp(5),dp(8));
+            content.addView(aiReasoningText,lp(-1,-2));
             addText(content,"Точный процент недоступен: сервер не сообщает итоговый объём ответа.",11,MUTED,false,9);
             LinearLayout frame=card();
             aiTurnText=text("",17,TEXT,false);
@@ -859,7 +865,7 @@ public final class MainActivity extends Activity {
         final String saved;
         try{saved=game.toJson().toString();}
         catch(Exception ex){aiTurnStatus="Не удалось прочитать состояние героя";render();return;}
-        aiTurnBusy=true;aiTurnPreview="";
+        aiTurnBusy=true;aiTurnPreview="";aiReasoningPreview="";
         aiTurnStatus=proposalOnly?"Определение вероятности действия…":
             chat?"Подключение к ChatGPT…":"Создание игровой сцены…";
         render();
@@ -875,6 +881,12 @@ public final class MainActivity extends Activity {
                 if(tab==0&&aiTurnText!=null&&prefs.getBoolean("ai_enabled",false)){
                     aiTurnText.setText(SceneTypography.render(visible,accent()));
                 }
+            }
+            @Override public void onReasoningSummary(String summary){
+                if(!aiTurnBusy)return;
+                aiReasoningPreview=summary;
+                if(aiReasoningText!=null)
+                    aiReasoningText.setText("РЕЗЮМЕ РАЗМЫШЛЕНИЙ:\n"+summary);
             }
             @Override public void onComplete(String answer){
                 if(!aiTurnBusy)return;
