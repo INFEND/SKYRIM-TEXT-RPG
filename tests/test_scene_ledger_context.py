@@ -26,8 +26,8 @@ class SceneLedgerContextTests(unittest.TestCase):
         self.assertIn('entry.optString("status")', self.scene)
 
     def test_ai_cannot_directly_write_scene_ledger(self):
-        self.assertNotRegex(self.turn, r'\\.sceneState\\s*\\.\\s*confirm\\s*\\(')
-        self.assertNotRegex(self.client, r'\\.sceneState\\s*\\.\\s*confirm\\s*\\(')
+        self.assertNotRegex(self.turn, r'\.sceneState\s*\.\s*confirm\s*\(')
+        self.assertNotRegex(self.client, r'\.sceneState\s*\.\s*confirm\s*\(')
         self.assertNotIn('sceneState.confirm(', self.client)
         self.assertIn('Only explicit, validated engine-side confirmations', self.scene)
 
