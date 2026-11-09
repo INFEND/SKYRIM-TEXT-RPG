@@ -2377,8 +2377,8 @@ public final class MainActivity extends Activity {
                 }
             });
             otaOptions.addView(seek,lp(-1,46));
-            String result=prefs.getString("ota_background_result","");
-            if(!result.isEmpty())addText(otaOptions,result,12,MUTED,false,0);
+            // Results and errors of update checks belong exclusively in the OTA
+            // dialog. Never append background network text to the settings UI.
         }
         addText(content,"Текущая версия: "+BuildConfig.VERSION_NAME+" ("+BuildConfig.VERSION_CODE+")",12,MUTED,false,20);
         foldSettingsSection("updates","ОБНОВЛЕНИЯ",updatesStart);
