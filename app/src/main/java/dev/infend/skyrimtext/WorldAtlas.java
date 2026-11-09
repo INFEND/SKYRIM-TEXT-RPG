@@ -10,6 +10,9 @@ import android.view.MotionEvent;
 import android.view.View;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.HashSet;
+import java.util.Collections;
 
 public final class WorldAtlas {
     public static final class Place{
@@ -125,11 +128,23 @@ public final class WorldAtlas {
     }
     public static final class MapView extends View {
         private final GameEngine game;
+        private final Set<String> hiddenTypes;
         private final Paint paint=new Paint(3);
         private OnPlace tap;
         private static final int INK=0xffeaeded,GOLD=0xffc7d0d4,WATER=0xff3b464b;
         public interface OnPlace{void selected(Place p);}
-        public MapView(Context c,GameEngine g,OnPlace listener){super(c);game=g;tap=listener;setMinimumHeight(900);}
+        public MapView(Context c,GameEngine g,OnPlace listener){
+            this(c,g,listener,Collections.emptySet());
+        }
+        public MapView(Context c,GameEngine g,OnPlace listener,Set<String> hidden){
+            super(c);game=g;tap=listener;
+            hiddenTypes=new HashSet<>(hidden);
+            setMinimumHeight(900);
+        }
+        private boolean visible(Place place){
+            // Never hide the player's position even if its category is disabled.
+            return place.name.equals(game.progress.location)||!hiddenTypes.contains(place.type);
+        }
         @Override protected void onMeasure(int w,int h){
             int width=MeasureSpec.getSize(w);
             setMeasuredDimension(width,Math.round(width*1.25f));
@@ -171,6 +186,7 @@ public final class WorldAtlas {
             paint.setStyle(Paint.Style.STROKE);paint.setStrokeWidth(2);paint.setColor(0xff747e81);c.drawOval(919,219,1107,524,paint);
             Place player=find(game.progress.location);
             for(Place p:places){
+                if(!visible(p))continue;
                 float x=p.x,y=p.y;
                 boolean city=p.type.contains("Столица")||p.name.equals("Воронья Скала");
                 boolean isPlayer=p.name.equals(game.progress.location);
@@ -220,6 +236,7 @@ public final class WorldAtlas {
             float px=e.getX()*1120f/getWidth(),py=e.getY()*1160f/getHeight();
             Place best=null;double distance=Double.MAX_VALUE;
             for(Place p:places){
+                if(!visible(p))continue;
                 double d=Math.hypot(px-p.x,py-p.y);
                 if(d<distance){best=p;distance=d;}
             }
