@@ -70,7 +70,10 @@ public final class MainActivity extends Activity {
     private static final String AI_PENDING_SESSION="ai_pending_session";
     private boolean aiTurnBusy;
     private String aiTurnPreview="",aiTurnStatus="";
-    private TextView aiTurnText;
+    private TextView aiTurnText,aiProgressInfo;
+    private final java.util.LinkedHashSet<Integer> selectedAiChoices=new java.util.LinkedHashSet<>();
+    private final java.util.HashSet<String> hiddenMapTypes=new java.util.HashSet<>();
+    private String aiOwnDraft="";
 
 
     @Override public void onCreate(Bundle bundle){
@@ -90,6 +93,7 @@ public final class MainActivity extends Activity {
         accentIndex=Math.max(0,Math.min(ACCENTS.length-1,prefs.getInt("accent",0)));
         fontBonus=Math.max(-2,Math.min(4,prefs.getInt("font_bonus",0)));
         animations=prefs.getBoolean("animations",true);
+        hiddenMapTypes.addAll(prefs.getStringSet("map_hidden_types",java.util.Collections.emptySet()));
         updater=new SkyrimOtaController(this);
         OtaUpdateSchedule.configure(this);
         getWindow().setStatusBarColor(BG);getWindow().setNavigationBarColor(BG);
@@ -111,6 +115,7 @@ public final class MainActivity extends Activity {
         super.onDestroy();
     }
     private void newAiSession(){
+        selectedAiChoices.clear();aiOwnDraft="";
         if(aiClient!=null)aiClient.cancel();
         aiSession=java.util.UUID.randomUUID().toString();
         prefs.edit().putString("ai_session",aiSession).apply();
@@ -659,7 +664,12 @@ public final class MainActivity extends Activity {
     private void renderAiGame(){
         boolean chat=usingChatGpt();
         boolean ready=chat?chatGptOAuth.hasAuthorizedPlan():AiKeyVault.configured(this);
-        aiTurnText=null;
+        aiTurnText=null;aiProgressInfo=null;
+        if(LocationGalleryView.hasGallery(game.progress.location)){
+            addText(content,"ᛟ  "+game.progress.location.toUpperCase(java.util.Locale.ROOT),12,accent(),true,10);
+            content.addView(new LocationGalleryView(this,game.progress.location,accent(),false),lp(-1,-2));
+            space(content,13);
+        }
         if(!ready){
             LinearLayout card=card();
             addText(card,"ИИ-ИГРА НЕ ПОДКЛЮЧЕНА",14,accent(),true,11);
@@ -670,6 +680,19 @@ public final class MainActivity extends Activity {
         if(aiTurnBusy) {
             addText(content,"ᛟ  ИИ СОЗДАЁТ ПРОДОЛЖЕНИЕ",12,accent(),true,10);
             if(!aiTurnStatus.isEmpty())addText(content,aiTurnStatus,12,MUTED,false,12);
+            LinearLayout activity=row();
+            ProgressBar spinner=new ProgressBar(this);
+            spinner.setIndeterminate(true);
+            spinner.setIndeterminateTintList(ColorStateList.valueOf(accent()));
+            activity.addView(spinner,lp(35,35));
+            aiProgressInfo=text(aiTurnPreview.isEmpty()?
+                "Размышляет и подготавливает ответ…":
+                "Создано символов сцены: "+aiTurnPreview.length(),13,MUTED,false);
+            LinearLayout.LayoutParams statusLayout=new LinearLayout.LayoutParams(0,-2,1);
+            statusLayout.leftMargin=dp(12);
+            activity.addView(aiProgressInfo,statusLayout);
+            content.addView(activity,lp(-1,-2));
+            addText(content,"Точный процент недоступен: сервер не сообщает итоговый объём ответа.",11,MUTED,false,9);
             LinearLayout frame=card();
             aiTurnText=text("",17,TEXT,false);
             aiTurnText.setTypeface(SovngardeTypeface.face(this,false));
@@ -700,6 +723,7 @@ public final class MainActivity extends Activity {
         makeItemsClickable(aiTurnText,aiTurnText.getText().toString());
         narrative.addView(aiTurnText,lp(-1,-2));
         space(content,16);
+        addText(content,"ВЫБЕРИ ОДИН ИЛИ НЕСКОЛЬКО ВАРИАНТОВ. ОТПРАВКА ТОЛЬКО ПО КНОПКЕ НИЖЕ.",12,MUTED,false,11);
         for(int i=0;i<game.aiTurn.choices.size();i++){
             final AiGameTurn.Option option=game.aiTurn.choices.get(i);
             renderAiChoice(i+1,option);
@@ -710,38 +734,79 @@ public final class MainActivity extends Activity {
         EditText own=new EditText(this);
         own.setTextColor(TEXT);own.setHintTextColor(MUTED);own.setTextSize(sp(16));
         own.setHint("Опиши, что говоришь или делаешь...");
-        String existingPending=pendingAiAction();
-        if(!existingPending.isEmpty())own.setText(existingPending);
+        if(!aiOwnDraft.isEmpty())own.setText(aiOwnDraft);
+        else if(selectedAiChoices.isEmpty()){
+            String existingPending=pendingAiAction();
+            if(!existingPending.isEmpty())own.setText(existingPending);
+        }
+        own.addTextChangedListener(new android.text.TextWatcher(){
+            public void beforeTextChanged(CharSequence s,int start,int count,int after){}
+            public void onTextChanged(CharSequence s,int start,int before,int count){aiOwnDraft=s.toString();}
+            public void afterTextChanged(android.text.Editable e){}
+        });
         own.setInputType(InputType.TYPE_CLASS_TEXT|InputType.TYPE_TEXT_FLAG_MULTI_LINE|InputType.TYPE_TEXT_FLAG_CAP_SENTENCES);
         own.setMinLines(3);own.setMaxLines(7);
         own.setPadding(dp(13),dp(11),dp(13),dp(11));
         own.setBackground(new RuneFrameDrawable(PANEL_2,BORDER,false));
         content.addView(own,lp(-1,-2));
         space(content,10);
-        actionButton("ОТПРАВИТЬ СВОЙ ОТВЕТ","ИИ определит вероятность и последствия этого действия",true,()->{
+        actionButton("ОТПРАВИТЬ","Отправить выбранные ответы и свой текст одним действием",true,()->{
             String value=own.getText().toString().trim();
-            if(value.isEmpty()){toast("Напиши свой ответ");return;}
-            if(value.length()>1500){toast("Не более 1500 символов");return;}
-            if(value.equals(pendingAiAction())){
-                // Retry the same recorded outcome after an API/validation error.
-                int lockedChance=prefs.getInt(AI_PENDING_CHANCE,-1);
-                int lockedDie=prefs.getInt(AI_PENDING_DIE,-1);
-                requestAiTurn(lockedFreeInstruction(value,lockedChance,lockedDie),
-                    true,false,lockedChance,null);
+            if(value.length()>1500){toast("Не более 1500 символов своего текста");return;}
+            java.util.ArrayList<Integer> indexes=new java.util.ArrayList<>(selectedAiChoices);
+            java.util.Collections.sort(indexes);
+            if(indexes.isEmpty()&&value.isEmpty()){toast("Выбери вариант или напиши свой ответ");return;}
+            StringBuilder combined=new StringBuilder();
+            if(!indexes.isEmpty()){
+                combined.append("ВЫБРАННЫЕ ВАРИАНТЫ ИГРОКА (обработай по порядку):\n");
+                for(Integer index:indexes){
+                    if(index<1||index>game.aiTurn.choices.size())continue;
+                    AiGameTurn.Option option=game.aiTurn.choices.get(index-1);
+                    combined.append(index).append(". ").append(option.title).append(". ")
+                        .append(option.detail).append("\n");
+                }
+            }
+            if(!value.isEmpty())combined.append("СОБСТВЕННЫЙ ТЕКСТ ИГРОКА:\n")
+                .append(value).append("\n");
+            String compound=combined.toString();
+            if(!value.isEmpty()){
+                if(compound.equals(pendingAiAction())){
+                    int chance=prefs.getInt(AI_PENDING_CHANCE,-1);
+                    int die=prefs.getInt(AI_PENDING_DIE,-1);
+                    requestAiTurn(lockedFreeInstruction(compound,chance,die),true,false,chance,null);
+                    return;
+                }
+                clearAiPending();
+                requestAiTurn("ОЦЕНКА СВОБОДНОГО ДЕЙСТВИЯ: "+compound+
+                    "\nОцени единый шанс составного действия. Не исполняй до броска Android.",false,true,-2,compound);
                 return;
             }
             clearAiPending();
-            requestAiTurn("ОЦЕНКА СВОБОДНОГО ДЕЙСТВИЯ: "+value+
-                "\nНазови ТОЛЬКО customChance по состоянию персонажа и риску. "+
-                "ЗАПРЕЩЕНО выполнять действие или выдавать эффект до броска.",false,true,-2,value);
+            StringBuilder instruction=new StringBuilder(compound);
+            instruction.append("\nУчитывай конфликты действий: невозможное не исполняй. ");
+            instruction.append("Исходы выполнимых действий уже установлены Android:\n");
+            for(Integer index:indexes){
+                if(index<1||index>game.aiTurn.choices.size())continue;
+                AiGameTurn.Option option=game.aiTurn.choices.get(index-1);
+                int die=option.chance<0?-1:AiGameTurn.roll();
+                instruction.append("Вариант ").append(index).append(": ");
+                if(option.chance<0)instruction.append("без проверки.");
+                else instruction.append("шанс ").append(option.chance).append("%, бросок ")
+                    .append(die).append("/100, ")
+                    .append(AiGameTurn.success(option.chance,die)?"УСПЕХ.":"НЕУДАЧА.");
+                instruction.append("\n");
+            }
+            instruction.append("Продолжи историю, применив effects только за совершённые действия.");
+            requestAiTurn(instruction.toString(),true);
         });
     }
 
     private void renderAiChoice(int number,AiGameTurn.Option option){
         LinearLayout row=row();row.setGravity(Gravity.TOP);
         row.setPadding(dp(12),dp(13),dp(12),dp(13));
-        row.setBackground(new RuneFrameDrawable(PANEL,number==1?accent():BORDER,number==1));
-        TextView ordinal=text("◇ "+number,17,number==1?accent():MUTED,true);
+        boolean selected=selectedAiChoices.contains(number);
+        row.setBackground(new RuneFrameDrawable(PANEL,selected?accent():BORDER,selected));
+        TextView ordinal=text((selected?"✓ ":"◇ ")+number,17,selected?accent():MUTED,true);
         ordinal.setGravity(Gravity.TOP|Gravity.CENTER_HORIZONTAL);
         row.addView(ordinal,lp(48,-2));
         row.addView(new SkyrimIconView(this,
@@ -760,16 +825,14 @@ public final class MainActivity extends Activity {
                 SceneChoiceMeta.chanceColor(option.chance),true,0);
         }else addText(detail,"БЕЗ ПРОВЕРКИ",12,MUTED,false,0);
         row.setClickable(true);row.setFocusable(true);
+        row.setContentDescription("Вариант "+number+". "+option.title+". "+(selected?"Выбран":"Не выбран"));
         row.setOnClickListener(v->{
-            clearAiPending();
-            int die=AiGameTurn.roll();
-            boolean success=AiGameTurn.success(option.chance,die);
-            String result=option.chance<0?"Действие без проверки навыка.":
-                "Вероятность, заданная ИИ: "+option.chance+"%. Реальный бросок: "+die+
-                ". Результат: "+(success?"УСПЕХ":"НЕУДАЧА")+".";
-            requestAiTurn("Игрок нажал вариант "+number+": "+option.title+
-                ". Описание: "+option.detail+". "+result+
-                " Продолжи именно этот исход и верни effects за совершённое действие.",true);
+            if(!selectedAiChoices.add(number))selectedAiChoices.remove(number);
+            boolean active=selectedAiChoices.contains(number);
+            row.setBackground(new RuneFrameDrawable(PANEL,active?accent():BORDER,active));
+            ordinal.setText((active?"✓ ":"◇ ")+number);
+            ordinal.setTextColor(active?accent():MUTED);
+            row.setContentDescription("Вариант "+number+". "+option.title+". "+(active?"Выбран":"Не выбран"));
         });
         LinearLayout.LayoutParams wrap=lp(-1,-2);wrap.bottomMargin=dp(6);
         content.addView(row,wrap);
@@ -797,7 +860,8 @@ public final class MainActivity extends Activity {
         try{saved=game.toJson().toString();}
         catch(Exception ex){aiTurnStatus="Не удалось прочитать состояние героя";render();return;}
         aiTurnBusy=true;aiTurnPreview="";
-        aiTurnStatus=chat?"Подключение к ChatGPT…":"Создание игровой сцены…";
+        aiTurnStatus=proposalOnly?"Определение вероятности действия…":
+            chat?"Подключение к ChatGPT…":"Создание игровой сцены…";
         render();
         final AiStoryClient.Listener listener=new AiStoryClient.Listener(){
             @Override public void onText(String accumulated){
@@ -806,6 +870,8 @@ public final class MainActivity extends Activity {
                 String visible=AiGameTurn.previewScene(accumulated);
                 if(visible.isEmpty()||visible.equals(aiTurnPreview))return;
                 aiTurnPreview=visible;
+                if(aiProgressInfo!=null)
+                    aiProgressInfo.setText("Пишет сцену · "+visible.length()+" символов");
                 if(tab==0&&aiTurnText!=null&&prefs.getBoolean("ai_enabled",false)){
                     aiTurnText.setText(SceneTypography.render(visible,accent()));
                 }
@@ -833,6 +899,7 @@ public final class MainActivity extends Activity {
                     completed.apply(next,actionResolved);
                     next.aiTurn=completed;
                     game=next;
+                    selectedAiChoices.clear();aiOwnDraft="";
                     save();
                     clearAiPending();
                     aiMemory.add(aiSession,"user",instruction);
