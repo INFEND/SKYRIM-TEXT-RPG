@@ -45,8 +45,8 @@ class GeographicSource(unittest.TestCase):
             self.assertTrue(0<=point["displayX"]<=2048 and 0<=point["displayY"]<=2048)
             if point["pinSource"]!="anchor":continue
             lon,lat=reference[point["name"]]["coordinates"][:2]
-            self.assertAlmostEqual(point["displayX"],(lon+180)/360*2048,places=6)
-            self.assertAlmostEqual(point["displayY"],(1-math.asinh(math.tan(math.radians(lat)))/math.pi)/2*2048,places=6)
+            self.assertAlmostEqual(point["displayX"],(lon+180)/360*2048,delta=.00006)
+            self.assertAlmostEqual(point["displayY"],(1-math.asinh(math.tan(math.radians(lat)))/math.pi)/2*2048,delta=.00006)
         ui=(JAVA/"MainActivity.java").read_text()
         self.assertIn("!geographic.registered",ui)
         self.assertIn("Положение метки на рельефе ориентировочное",ui)

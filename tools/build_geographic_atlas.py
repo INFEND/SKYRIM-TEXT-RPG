@@ -145,6 +145,9 @@ for point in points:
         point.update(displayX=x,displayY=y,pinSource="interpolated")
     edge=4096 if point["sheet"]==0 else 2048
     assert 0<=point["displayX"]<=edge and 0<=point["displayY"]<=edge
+    # Stable across libm/Python versions; Android stores float pixels anyway.
+    point["displayX"]=round(point["displayX"],4)
+    point["displayY"]=round(point["displayY"],4)
 
 rows=[]
 for p in points:
