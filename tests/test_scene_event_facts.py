@@ -10,7 +10,8 @@ class SceneEventFactsTest(unittest.TestCase):
     def test_npc_recorded_only_from_talk_action(self):
         self.assertIn('case "TALK": confirmCurrentConversation(); mode="TALK"; break;', ENGINE)
         self.assertRegex(ENGINE, r'case "TALK_HELP":\s*confirmCurrentConversation\(\);')
-        self.assertIn('confirmSceneFact("npc", "local_" + index + "_region_" + region,', ENGINE)
+        self.assertIn('sceneState.confirm("npc", currentConversationId(), currentConversationName(), "MET")', ENGINE)
+        self.assertIn('return "local_" + Math.floorMod(region + day, names.length) + "_region_" + region;', ENGINE)
         self.assertNotIn('confirmCurrentConversation();\n        return new Scene(', ENGINE)
 
     def test_clue_requires_quest_location_and_stage(self):
