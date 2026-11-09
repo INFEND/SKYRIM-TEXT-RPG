@@ -72,16 +72,21 @@ public final class SceneState {
         }
         return out;
     }
+    private static int collectionSize(SceneState state,String kind) {
+        try { return collection(state,kind).size(); }
+        catch(JSONException impossible) { return MAX_ENTRIES; }
+    }
     public static SceneState fromJson(JSONObject data) {
         SceneState state=new SceneState();
         if(data==null)return state;
         // Corruption in one optional record must not erase valid NPCs, clues or places.
-        // Never trust more than MAX_ENTRIES entries per category from a saved game.
+        // Restore up to MAX_ENTRIES valid unique facts, not merely the first 32 array slots.
+        // Bound inspection too, so a maliciously huge save cannot stall loading.
         for(String kind:new String[]{"npc","clue","sublocation"}){
             JSONArray arr=data.optJSONArray(kind);
             if(arr==null)continue;
-            int limit=Math.min(arr.length(),MAX_ENTRIES);
-            for(int i=0;i<limit;i++){
+            int limit=Math.min(arr.length(),4096);
+            for(int i=0;i<limit && collectionSize(state,kind)<MAX_ENTRIES;i++){
                 JSONObject entry=arr.optJSONObject(i);
                 if(entry==null)continue;
                 try {
