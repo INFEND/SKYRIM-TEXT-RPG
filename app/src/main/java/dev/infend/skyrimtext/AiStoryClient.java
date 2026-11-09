@@ -335,6 +335,11 @@ final class AiStoryClient {
         if(game.enemyHp>0)
             out.append("ПРОТИВНИК: ").append(game.enemyName).append(", HP ").append(game.enemyHp)
                     .append('/').append(game.enemyMaxHp).append(", урон ").append(game.enemyDamage).append('\n');
+        String confirmedFacts=game.sceneState==null?"":game.sceneState.confirmedContext();
+        out.append("ПОДТВЕРЖДЁННЫЕ ФАКТЫ СЦЕНЫ (только записи движка):\n");
+        out.append(confirmedFacts.isEmpty()?"Пока нет подтверждённых NPC, улик и подлокаций.\n":confirmedFacts+"\n");
+        out.append("Не выдавай неподтверждённых NPC, улики и подлокации за существующие факты сохранения. "
+                +"ИИ-текст не добавляет факты в SceneState самостоятельно.\n");
         out.append("Предметы в рюкзаке: ");
         java.util.Iterator<String> inv=game.progress.inventory.keys();
         int count=0;
