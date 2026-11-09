@@ -53,6 +53,7 @@ public final class GameEngine {
     public int enemyHp = 0, enemyMaxHp = 0, enemyDamage = 0;
     public RpgProgress progress = new RpgProgress();
     public AiGameTurn aiTurn;
+    public SceneState sceneState = new SceneState();
     public String aiJournal = "";
     private final Random random = new Random();
 
@@ -64,7 +65,7 @@ public final class GameEngine {
         if(name.length()>28)name=name.substring(0,28);
         race=contains(RACES,desiredRace)?desiredRace:"Норд";
         heroClass=contains(CLASSES,desiredClass)?desiredClass:"Без класса";
-        started=true;aiTurn=null;aiJournal="";day=1;hour=8;level=1;xp=0;gold=85;potions=3;manaPotions=1;
+        started=true;aiTurn=null;sceneState=new SceneState();aiJournal="";day=1;hour=8;level=1;xp=0;gold=85;potions=3;manaPotions=1;
         questStage=0;sideQuest=0;sideKills=0;boardCompleted=0;explored=0;victories=0;reputation=0;
         swordUpgraded=false;armorUpgraded=false;
         maxHp=100;maxStamina=100;maxMagicka=100;attack=12;armor=2;
@@ -451,7 +452,8 @@ public final class GameEngine {
          .put("armorUpgraded",armorUpgraded).put("mode",mode).put("message",message).put("enemyName",enemyName)
          .put("battleLog",battleLog).put("battleKind",battleKind).put("enemyIntro",enemyIntro)
          .put("enemyHp",enemyHp).put("enemyMaxHp",enemyMaxHp).put("enemyDamage",enemyDamage).put("progress",progress.toJson())
-         .put("aiJournal",aiJournal).put("aiTurn",aiTurn==null?JSONObject.NULL:aiTurn.save());
+         .put("aiJournal",aiJournal).put("aiTurn",aiTurn==null?JSONObject.NULL:aiTurn.save())
+         .put("sceneState",sceneState.toJson());
         return j;
     }
     public static GameEngine fromJson(String json) {
@@ -480,6 +482,7 @@ public final class GameEngine {
             g.progress=RpgProgress.fromJson(j.optJSONObject("progress"));
             g.aiJournal=j.optString("aiJournal","");
             g.aiTurn=AiGameTurn.restore(j.optJSONObject("aiTurn"));
+            g.sceneState=SceneState.fromJson(j.optJSONObject("sceneState"));
             // Reconcile legacy schema-1 saves with the authoritative quest stage.
             if(g.questStage>=4)g.progress.setQuestOutcome("ash_seals","COMPLETED");
             else if(g.questStage>0)g.progress.setQuestOutcome("ash_seals","ACTIVE");
