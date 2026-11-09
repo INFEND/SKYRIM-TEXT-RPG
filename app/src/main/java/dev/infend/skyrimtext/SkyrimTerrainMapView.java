@@ -68,6 +68,7 @@ public final class SkyrimTerrainMapView extends View {
     private final OnPlace callback;
     private OnCatalog catalogCallback;
     private final Set<String> hiddenTypes;
+    private LinkedHashMap<String,ArrayList<SkyrimMapCatalog.Site>> clusterCache;
     private final SharedPreferences prefs;
     private final Paint terrainPaint=new Paint(Paint.FILTER_BITMAP_FLAG|Paint.ANTI_ALIAS_FLAG);
     private final Paint pinPaint=new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -125,6 +126,7 @@ public final class SkyrimTerrainMapView extends View {
 
     /** One aggregated marker per coarse reference grid cell. */
     private LinkedHashMap<String,ArrayList<SkyrimMapCatalog.Site>> catalogClusters(){
+        if(clusterCache!=null)return clusterCache;
         LinkedHashMap<String,ArrayList<SkyrimMapCatalog.Site>> grouped=new LinkedHashMap<>();
         for(SkyrimMapCatalog.Site place:SkyrimMapCatalog.all()){
             if(hiddenTypes.contains(place.type))continue;
@@ -135,6 +137,7 @@ public final class SkyrimTerrainMapView extends View {
             }
             list.add(place);
         }
+        clusterCache=grouped;
         return grouped;
     }
 
