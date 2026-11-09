@@ -17,6 +17,18 @@ class TerrainMapPolish(unittest.TestCase):
         self.assertIn("pins=null",MAP)
         self.assertNotIn("game.progress.location=",MAP)
 
+    def test_individual_icons_replace_all_screen_cell_number_clusters(self):
+        self.assertNotIn('String count=String.valueOf(pin.sites.size())',MAP)
+        self.assertNotIn('if(pin.sites.size()>1)',MAP)
+        self.assertIn('pin.sizeDp*density',MAP)
+        self.assertIn('MapPinLayout.translate(pins,dx,dy)',MAP)
+        self.assertIn('MapPinLayout.hit(renderedPins()',MAP)
+        self.assertIn('candidates.sort(',LAYOUT)
+        self.assertIn('site.x*scale',LAYOUT)
+        self.assertIn('site.y*scale',LAYOUT)
+        self.assertNotIn('Math.floor(x/cell)',LAYOUT)
+        self.assertIn('return result;',LAYOUT)
+
     def test_focus_switches_sheet_and_preserves_world_point(self):
         focus=MAP[MAP.index("public void centerOn(SkyrimMapCatalog.Site target)"):MAP.index("private void persist()")]
         self.assertIn("setSheet(target.sheet)",focus)
