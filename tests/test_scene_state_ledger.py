@@ -20,7 +20,9 @@ class SceneLedgerContracts(unittest.TestCase):
         self.assertIn('public void confirm(String kind,String key,String title,String status)', source)
         self.assertIn('entries.put(safeId,new JSONObject()', source)
         self.assertIn('!raw.matches(', source)
-        self.assertIn('return new SceneState();', source)
+        self.assertIn('if(data==null)return state', source)
+        self.assertIn('catch(JSONException invalid)', source)
+        self.assertNotIn('return new SceneState();', source)
         for kind in ('npc', 'clue', 'sublocation'):
             self.assertIn('case "'+kind+'":', source)
 
