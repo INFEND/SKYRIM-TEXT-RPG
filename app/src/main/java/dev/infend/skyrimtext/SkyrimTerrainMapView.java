@@ -220,6 +220,14 @@ public final class SkyrimTerrainMapView extends View {
         top=getHeight()/2f-positionY(target)*scale;
         constrain();invalidate();persist();
     }
+    /** Focus an approximate reference sector without inventing precise POI coordinates. */
+    public void centerOn(SkyrimMapCatalog.Site target){
+        if(getWidth()<=0||target==null)return;
+        scale=Math.max(scale,minScale*4.0f);
+        left=getWidth()/2f-target.x*scale;
+        top=getHeight()/2f-target.y*scale;
+        constrain();invalidate();persist();
+    }
     private void persist(){
         if(!initialized||scale<=0)return;
         float cx=(getWidth()/2f-left)/scale;
@@ -236,6 +244,13 @@ public final class SkyrimTerrainMapView extends View {
     }
     private boolean player(WorldAtlas.Place p){
         return p.name.equals(game.progress.location);
+    }
+    /** Hit testing must not open hidden markers on a zoomed-out map. */
+    private boolean drawn(WorldAtlas.Place p,float zoom){
+        if(!visible(p))return false;
+        if(zoom>=2.5f||player(p)||major(p))return true;
+        return zoom>=1.5f&&
+            (p.type.equals("Деревня")||p.type.equals("Поселение"));
     }
     private float screenX(WorldAtlas.Place p){return left+positionX(p)*scale;}
     private float screenY(WorldAtlas.Place p){return top+positionY(p)*scale;}
@@ -283,11 +298,8 @@ public final class SkyrimTerrainMapView extends View {
             }
         }
         for(WorldAtlas.Place p:WorldAtlas.all()){
-            if(!visible(p))continue;
+            if(!drawn(p,zoom))continue;
             boolean selected=player(p),capital=major(p);
-            if(zoom<1.5f&&!selected&&!capital)continue;
-            if(zoom<2.5f&&!selected&&!capital&&!p.type.equals("Деревня")
-                    &&!p.type.equals("Поселение"))continue;
             float x=screenX(p),y=screenY(p);
             if(x<-100||y<-60||x>getWidth()+100||y>getHeight()+60)continue;
             float size=(selected?28:capital?23:17)*density;
@@ -332,8 +344,9 @@ public final class SkyrimTerrainMapView extends View {
     private void select(float x,float y){
         WorldAtlas.Place best=null;float bestDistance=Float.MAX_VALUE;
         float radius=35f*getResources().getDisplayMetrics().density;
+        float zoom=scale/Math.max(.0001f,minScale);
         for(WorldAtlas.Place p:WorldAtlas.all()){
-            if(!visible(p))continue;
+            if(!drawn(p,zoom))continue;
             float dx=x-screenX(p),dy=y-screenY(p);
             float distance=dx*dx+dy*dy;
             if(distance<bestDistance){bestDistance=distance;best=p;}
@@ -372,6 +385,10 @@ public final class SkyrimTerrainMapView extends View {
             if(parent!=null)parent.requestDisallowInterceptTouchEvent(false);
         }
         return true;
+    }
+    @Override protected void onDetachedFromWindow(){
+        persist();
+        super.onDetachedFromWindow();
     }
     @Override public boolean performClick(){super.performClick();return true;}
 }
