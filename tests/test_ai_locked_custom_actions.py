@@ -25,7 +25,7 @@ class AiLockedFreeActionContract(unittest.TestCase):
                          "aiClient.generateChance(key"):
             self.assertIn(fragment,view)
         self.assertIn("int fixedChance=AiGameTurn.parseChance(answer)",view)
-        self.assertIn("if(value.equals(pendingAiAction()))",view)
+        self.assertIn("if(compound.equals(pendingAiAction()))",view)
         self.assertIn("if(expectedChance!=-2&&completed.customChance!=expectedChance)",view)
     def test_regular_ten_buttons_preserved(self):
         ui=source("MainActivity.java")
