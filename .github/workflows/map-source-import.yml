@@ -18,17 +18,20 @@ jobs:
           def get(url):
               req=urllib.request.Request(url, headers={"User-Agent":"INFEND-SkyrimTextRPG-map-import/1.0 (offline fan atlas)"})
               with urllib.request.urlopen(req,timeout=60) as r: return r.read().decode("utf-8")
-          for db in ("sr","db"):
-              for label,url in (
-                  ("worlds",f"https://gamemap.uesp.net/db/gamemap.php?db={db}&action=get_worlds"),
-                  ("config",f"https://gamemap.uesp.net/assets/maps/{db}/config.json"),
-                  ("places",f"https://gamemap.uesp.net/db/gamemap.php?db={db}&action=get_locs&worldid=1")):
-                  try:
-                      raw=get(url); data=json.loads(raw)
-                      (out/f"{db}-{label}.json").write_text(json.dumps(data,ensure_ascii=False,indent=2)+"\n")
-                      print(db,label,len(raw),list(data)[:10])
-                  except Exception as error: print("SOURCE ERROR",url,repr(error))
-          if not list(out.glob("*-worlds.json")): raise RuntimeError("No source metadata retrieved")
+          for slug in ("skyrim","skyrim/solstheim"):
+              url=f"https://itemaps.com/maps/{slug}"
+              try:
+                  import re
+                  raw=get(url)
+                  label=slug.replace("/","-")
+                  (out/f"{label}-page.html").write_text(raw)
+                  scripts=re.findall(r"<script[^>]*>([\\s\\S]*?)</script>",raw)
+                  for i,script in enumerate(scripts):
+                      (out/f"{label}-script-{i}.txt").write_text(script)
+                  print(label,len(raw),[(i,len(s),s[:400]) for i,s in enumerate(scripts)])
+                  print("IMAGES",re.findall(r'(?:src|href)=["\\\x27]([^"\\\x27]+(?:webp|png|jpg|json)[^"\\\x27]*)',raw)[:20])
+              except Exception as error: print("SOURCE ERROR",url,repr(error))
+          if not list(out.glob("*-page.html")): raise RuntimeError("No source metadata retrieved")
       - name: Save source snapshot on import branch
         run: |
           git config user.name INFEND
