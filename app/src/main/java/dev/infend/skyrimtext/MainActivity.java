@@ -82,6 +82,7 @@ public final class MainActivity extends Activity {
     private boolean aiTurnBusy;
     private String aiTurnPreview="",aiTurnStatus="";
     private TextView aiTurnText,aiProgressInfo,aiReasoningText;
+    private Runnable aiDotsTicker;
     private String aiReasoningPreview="";
     private final java.util.LinkedHashSet<Integer> selectedAiChoices=new java.util.LinkedHashSet<>();
     private final java.util.HashSet<String> hiddenMapTypes=new java.util.HashSet<>();
@@ -802,6 +803,9 @@ public final class MainActivity extends Activity {
     private void renderAiGame(){
         boolean chat=usingChatGpt();
         boolean ready=chat?chatGptOAuth.hasAuthorizedPlan():AiKeyVault.configured(this);
+        if(aiProgressInfo!=null&&aiDotsTicker!=null)
+            aiProgressInfo.removeCallbacks(aiDotsTicker);
+        aiDotsTicker=null;
         aiTurnText=null;aiProgressInfo=null;aiReasoningText=null;
         if(LocationGalleryView.hasGallery(game.progress.location)){
             addText(content,"ᛟ  "+game.progress.location.toUpperCase(java.util.Locale.ROOT),12,accent(),true,10);
@@ -816,34 +820,31 @@ public final class MainActivity extends Activity {
             return;
         }
         if(aiTurnBusy) {
-            addText(content,"ᛟ  ИИ СОЗДАЁТ ПРОДОЛЖЕНИЕ",12,accent(),true,10);
-            if(!aiTurnStatus.isEmpty())addText(content,aiTurnStatus,12,MUTED,false,12);
             LinearLayout activity=row();
+            activity.setGravity(Gravity.CENTER_VERTICAL);
+            activity.setPadding(dp(11),dp(16),dp(11),dp(16));
             ProgressBar spinner=new ProgressBar(this);
             spinner.setIndeterminate(true);
             spinner.setIndeterminateTintList(ColorStateList.valueOf(accent()));
             activity.addView(spinner,lp(35,35));
-            aiProgressInfo=text(aiTurnPreview.isEmpty()?
-                "Размышляет и подготавливает ответ…":
-                "Создано символов сцены: "+aiTurnPreview.length(),13,MUTED,false);
+            aiProgressInfo=text("Генерация ответа",16,TEXT,true);
             LinearLayout.LayoutParams statusLayout=new LinearLayout.LayoutParams(0,-2,1);
-            statusLayout.leftMargin=dp(12);
+            statusLayout.leftMargin=dp(13);
             activity.addView(aiProgressInfo,statusLayout);
             content.addView(activity,lp(-1,-2));
-            aiReasoningText=text(aiReasoningPreview.isEmpty()?
-                "Резюме рассуждений: появится, если модель его поддерживает.":
-                "РЕЗЮМЕ РАЗМЫШЛЕНИЙ:\n"+aiReasoningPreview,12,MUTED,false);
-            aiReasoningText.setPadding(dp(5),dp(8),dp(5),dp(8));
-            content.addView(aiReasoningText,lp(-1,-2));
-            addText(content,"Точный процент недоступен: сервер не сообщает итоговый объём ответа.",11,MUTED,false,9);
-            LinearLayout frame=card();
-            aiTurnText=text("",17,TEXT,false);
-            aiTurnText.setTypeface(SovngardeTypeface.face(this,false));
-            aiTurnText.setLineSpacing(dp(7),1.15f);
-            aiTurnText.setText(SceneTypography.render(aiTurnPreview.isEmpty()?
-                    "…":aiTurnPreview,accent()));
-            frame.addView(aiTurnText,lp(-1,-2));
-            actionButton("ОСТАНОВИТЬ ГЕНЕРАЦИЮ","Текущая сцена и характеристики останутся прежними",false,()->{
+            final TextView progressLabel=aiProgressInfo;
+            aiDotsTicker=new Runnable(){
+                private int phase=0;
+                private final String[] frames={"",".","..","..."};
+                @Override public void run(){
+                    if(!aiTurnBusy||tab!=0||aiProgressInfo!=progressLabel)return;
+                    aiProgressInfo.setText("Генерация ответа"+frames[phase++%frames.length]);
+                    aiProgressInfo.postDelayed(this,430L);
+                }
+            };
+            aiProgressInfo.post(aiDotsTicker);
+            space(content,7);
+            actionButton("ОСТАНОВИТЬ","Прервать генерацию без изменения сохранения",false,()->{
                 if(aiClient!=null)aiClient.cancel();
                 awaitingAiToken=false;aiTurnBusy=false;aiTurnPreview="";
                 aiTurnStatus="Генерация остановлена, изменения не сохранены";
@@ -1022,8 +1023,8 @@ public final class MainActivity extends Activity {
                 String visible=AiGameTurn.previewScene(accumulated);
                 if(visible.isEmpty()||visible.equals(aiTurnPreview))return;
                 aiTurnPreview=visible;
-                if(aiProgressInfo!=null)
-                    aiProgressInfo.setText("Пишет сцену · "+visible.length()+" символов");
+                // Keep streaming text buffered; the waiting screen shows only the
+                // animated generation label, without distracting counters.
                 if(tab==0&&aiTurnText!=null&&prefs.getBoolean("ai_enabled",false)){
                     aiTurnText.setText(SceneTypography.render(visible,accent(),game.name,heroColor()));
                 }
@@ -1031,8 +1032,8 @@ public final class MainActivity extends Activity {
             @Override public void onReasoningSummary(String summary){
                 if(!aiTurnBusy)return;
                 aiReasoningPreview=summary;
-                if(aiReasoningText!=null)
-                    aiReasoningText.setText("РЕЗЮМЕ РАЗМЫШЛЕНИЙ:\n"+summary);
+                // Reasoning summaries remain internal to the live request UI.
+                // Do not replace the compact generation status with debug text.
             }
             @Override public void onComplete(String answer){
                 if(!aiTurnBusy)return;
@@ -1211,7 +1212,8 @@ public final class MainActivity extends Activity {
         TextView reply=text(previous.isEmpty()?"ИИ помнит историю беседы. Опиши действие или заговори с персонажем.":previous,17,TEXT,false);
         reply.setLineSpacing(dp(6),1.16f);
         reply.setText(SceneTypography.render(previous.isEmpty()?
-            "ИИ помнит историю беседы. Опиши действие или заговори с персонажем.":previous,accent()));
+            "ИИ помнит историю беседы. Опиши действие или заговори с персонажем.":previous,
+            accent(),game.name,heroColor()));
         panel.addView(reply);
         space(panel,9);
         EditText prompt=new EditText(this);
