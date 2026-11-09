@@ -244,6 +244,17 @@ public final class GameEngine {
         if ("COMBAT".equals(mode) && !("ATTACK".equals(action) || "HEAVY".equals(action)
                 || "MAGIC".equals(action) || "DEFEND".equals(action)
                 || "POTION".equals(action) || "FLEE".equals(action))) return;
+        // Event rewards and penalties are single-use. A stale button or replayed
+        // action must not resolve the same encounter again after mode changes.
+        if (("EVENT_HELP".equals(action) || "EVENT_SEARCH".equals(action)
+                || "EVENT_LEAVE".equals(action)) && !"EVENT".equals(mode)) return;
+        // Conversations cannot be replayed after leaving their actual scene.
+        if (("TALK_HELP".equals(action) || "TALK_GIVE".equals(action))
+                && !"TALK".equals(mode)) return;
+        // A saved or stale quest button must not initiate a second encounter.
+        if (("Q_ACCEPT".equals(action) || "Q_ALTAR".equals(action)
+                || "Q_BOSS".equals(action) || "Q_FINISH".equals(action))
+                && !"QUEST".equals(mode)) return;
         if("DRAGON_OPEN".equals(action)){
             mode="DRAGON";return;
         }
