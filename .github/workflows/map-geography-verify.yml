@@ -1,0 +1,35 @@
+name: Verify geographic atlas
+on:
+  push:
+    branches: [map-geography]
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Execute all regression and Java geographic checks
+        run: python3 -m unittest discover -s tests -p 'test_*.py' -v
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.11.1'
+      - name: Prepare fonts and Android SDK
+        shell: bash
+        run: |
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --install 'platforms;android-35' 'build-tools;35.0.0'
+          mkdir -p app/src/main/assets/fonts
+          curl --fail --location --retry 3 --silent --show-error 'https://raw.githubusercontent.com/B4lex/PlayerHub/e9fa97b3c312eb948f3808f5c2d1f053555d1a48/assets/fonts/Sovngarde%20Light.ttf' -o 'app/src/main/assets/fonts/Sovngarde Light.ttf'
+          curl --fail --location --retry 3 --silent --show-error 'https://raw.githubusercontent.com/B4lex/PlayerHub/e9fa97b3c312eb948f3808f5c2d1f053555d1a48/assets/fonts/Sovngarde%20Bold.ttf' -o 'app/src/main/assets/fonts/Sovngarde Bold.ttf'
+          curl --fail --location --retry 3 --silent --show-error 'https://raw.githubusercontent.com/B4lex/PlayerHub/e9fa97b3c312eb948f3808f5c2d1f053555d1a48/assets/fonts/Sovngarde%20OFL%20License.txt' -o 'app/src/main/assets/fonts/OFL.txt'
+      - name: Compile Android APK
+        run: gradle --no-daemon --stacktrace :app:assembleDebug
+      - uses: actions/upload-artifact@v4
+        with:
+          name: SKYRIM-geographic-atlas-debug
+          path: app/build/outputs/apk/debug/app-debug.apk

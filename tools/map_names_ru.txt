@@ -1,0 +1,140 @@
+Last Vigil (DB)|Последний пост
+Blue Palace|Синий дворец
+Dragonsreach|Драконий Предел
+Hendraheim (CC)|Хендрахейм
+Mistveil Keep|Крепость Миствейл
+Palace of the Kings|Королевский дворец
+Understone Keep|Подкаменная крепость
+Blackbone Isle (CC)|Остров Чёрной Кости
+Bloodchill Cavern (CC)|Пещера Кровавый Холод
+Darkfall Cave (DG)|Пещера Вечерняя Пустота
+Dayspring Canyon (DG)|Каньон Дневной Зари
+Dimhollow Crypt (DG)|Крипта Ночной Пустоты
+Forebears' Holdout (DG)|Убежище Предков
+Frostroot Cave (CC)|Пещера Морозного Корня
+Giant's Tooth (CC)|Зуб Великана
+Gromm's Pass (CC)|Перевал Громма
+Reachcliff Secret Entrance|Тайный вход в Утёсную пещеру
+Red Scar Cavern (CC)|Пещера Красный Шрам
+Rielle (CC)|Риэль
+Rimerock Burrow|Морозная пещера
+Runoff Caverns (CC)|Сточные пещеры
+Ruunvald Excavation (DG)|Раскопки Рунвальда
+Wolfskull Cave|Волчий Череп
+Fallowstone Cave|Пещера Жёлтый Камень
+Giant's Grove|Роща Великанов
+Dawnstar|Данстар
+Falkreath|Фолкрит
+Markarth|Маркарт
+Morthal|Морфал
+Riften|Рифтен
+Solitude|Солитьюд
+Whiterun|Вайтран
+Windhelm|Виндхельм
+Winterhold|Винтерхолд
+College of Winterhold|Коллегия Винтерхолда
+Icewater Jetty (DG)|Причал Ледяных Вод
+Riften Docks (CC)|Рифтенские доки
+Northwind Summit|Вершина Северный Ветер
+Arkngthamz (DG)|Аркнтамз
+Bthardamz|Бтардамз
+Great Lift at Alftand|Великий подъёмник — Альфтанд
+Great Lift at Mzinchaleft|Великий подъёмник — Мзинчалефт
+Great Lift at Raldbthar|Великий подъёмник — Ральдбтхар
+Goldenhills Plantation (CC)|Плантация Золотые Холмы
+Castle Volkihar (DG)|Замок Волкихар
+Darklight Tower|Башня Светотьмы
+Fort Dawnguard (DG)|Форт Стражи Рассвета
+Ancestor Glade (DG)|Поляна Предков
+Markarth Military Camp|Военный лагерь Маркарта
+Reach Imperial Camp|Имперский лагерь Предела
+Riften Military Camp|Военный лагерь Рифтена
+Solitude Military Camp|Военный лагерь Солитьюда
+Whiterun Imperial Camp|Имперский лагерь Вайтрана
+Whiterun Military Camp|Военный лагерь Вайтрана
+Windhelm Military Camp|Военный лагерь Виндхельма
+Sky Haven Temple|Храм Небесной Гавани
+Thieves Guild|Гильдия воров
+Stonehills|Каменные Холмы
+Journeyman's Nook|Уголок подмастерья
+Moldering Ruins (DG)|Обветшалые руины
+Bleak Falls Barrow|Ветреный пик
+Champion's Rest (CC)|Приют Чемпиона
+Labyrinthian|Лабиринтиан
+Sivdur's Respite (CC)|Пристанище Сивдура
+Castle Volkihar Balcony (DG)|Балкон замка Волкихар
+Myrwatch (CC)|Мирвотч
+Forgotten Vale (DG)|Забытая долина
+Wayward Pass|Перевал Странника
+Goldenglow Estate|Золотое поместье
+Redwater Den (DG)|Логово Красная Вода
+Japhet's Folly|Каприз Яфета
+Hammerfell Gate|Врата в Хаммерфелл
+To Solstheim (DB)|Переправа на Солстейм
+Heljarchen Hall (HF)|Хельяркен-холл
+Lakeview Manor (HF)|Поместье Озёрное
+Tundra Homestead (CC)|Усадьба Тундры
+Windstad Manor (HF)|Поместье Уиндстад
+Stendarr's Beacon|Сигнальная башня Стендарра
+Shrine of Kynareth|Святилище Кинарет
+Shrine of Zenithar|Святилище Зенитара
+Beast Stone|Камень Зверя
+Earth Stone|Камень Земли
+Sun Stone|Камень Солнца
+Water Stone|Камень Воды
+Wind Stone|Камень Ветра
+Bujold's Retreat|Убежище Буйольд
+Haknir's Shoal|Отмель Хакнира
+Ashfall's Tear (CC)|Слеза Пепла
+Benkongerike|Бенконгерике
+Bristleback Cave|Пещера Щетиноспин
+Castle Karstaag Caverns|Пещеры замка Карстааг
+Castle Karstaag Ruins|Руины замка Карстааг
+Frossel|Фроссель
+Frostmoon Crag|Ущелье Фростмуна
+Glacial Cave|Ледниковая пещера
+Hrothmund's Barrow|Курган Хротмунда
+Raven Rock|Воронья Скала
+Headwaters of Harstrad|Верховья Харстрада
+Northshore Landing|Пристань на северном берегу
+Saering's Watch|Застава Сиринга
+Fahlbtharz|Фалбтарз
+Kagrumez|Кагрумез
+Nchardak|Нчардак
+Old Attius Farm|Старая ферма Аттия
+Ashfallow Citadel|Пепельная крепость
+Fort Frostmoth|Форт Морозного Мотылька
+Highpoint Tower|Башня Высокая Точка
+Altar of Thrond|Алтарь Тронда
+Brodir Grove|Роща Бродир
+Frykte Peak|Пик Фрикте
+Horker Island|Остров хоркеров
+Hvitkald Peak|Пик Хвиткальд
+Mortrag Peak|Пик Мортраг
+Mount Moesring|Гора Моэсринг
+Stalhrim Source|Источник сталгрима
+Broken Tusk Mine|Шахта Сломанный Бивень
+Damphall Mine|Дамфолл
+Snowclad Ruins|Заснеженные руины
+Bloodskal Barrow|Курган Бладскал
+Gyldenhul Barrow|Курган Гильденхул
+Kolbjorn Barrow|Колбьорн
+Vahlok's Tomb|Гробница Валока
+White Ridge Barrow|Курган Белого Хребта
+Moesring Pass|Перевал Моэсринг
+Thirsk Mead Hall|Медовый зал Тирск
+Abandoned Lodge|Заброшенный дом
+Hrodulf's House|Дом Хродульфа
+Ramshackle Trading Post|Полуразрушенный торговый пост
+Wreck of the Strident Squall|Обломки «Стремительного шквала»
+Tel Mithryn|Тел-Митрин
+Temple of Miraak|Храм Мирака
+To Skyrim|Переправа в Скайрим
+Skaal Village|Деревня скаалов
+Lake Geir|Озеро Гейр
+Lake Honrich|Озеро Хонрик
+Lake Ilinalta|Озеро Илиналта
+Lake Yorgrim|Озеро Йоргрим
+Dunmeth Pass|Данметский перевал
+Pale Pass|Бледный проход
+Black Arts Burial Ground|Кладбище Тёмных Искусств

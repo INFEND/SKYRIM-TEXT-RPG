@@ -1,0 +1,1465 @@
+[
+  {
+    "id": "solstheim-2623",
+    "category": "aedric-shrine",
+    "name": "Shrine of Kynareth",
+    "x": 23823.0,
+    "y": 39381.0
+  },
+  {
+    "id": "solstheim-2624",
+    "category": "aedric-shrine",
+    "name": "Shrine of Zenithar",
+    "x": 40017.0,
+    "y": 58964.0
+  },
+  {
+    "id": "solstheim-2524",
+    "category": "all-maker-stone",
+    "name": "Beast Stone",
+    "x": 62811.0,
+    "y": 58376.0
+  },
+  {
+    "id": "solstheim-2523",
+    "category": "all-maker-stone",
+    "name": "Earth Stone",
+    "x": 22958.0,
+    "y": 30935.0
+  },
+  {
+    "id": "solstheim-2522",
+    "category": "all-maker-stone",
+    "name": "Sun Stone",
+    "x": 72854.0,
+    "y": 34655.0
+  },
+  {
+    "id": "solstheim-2521",
+    "category": "all-maker-stone",
+    "name": "Water Stone",
+    "x": 21588.0,
+    "y": 64459.0
+  },
+  {
+    "id": "solstheim-2520",
+    "category": "all-maker-stone",
+    "name": "Wind Stone",
+    "x": 63355.0,
+    "y": 75109.0
+  },
+  {
+    "id": "solstheim-2552",
+    "category": "camp",
+    "name": "Bujold's Retreat",
+    "x": 80276.0,
+    "y": 58550.0
+  },
+  {
+    "id": "solstheim-2553",
+    "category": "camp",
+    "name": "Haknir's Shoal",
+    "x": 67552.0,
+    "y": 82272.0
+  },
+  {
+    "id": "solstheim-2711",
+    "category": "cave",
+    "name": "Ashfall's Tear (CC)",
+    "x": 31612.0,
+    "y": 42654.0
+  },
+  {
+    "id": "solstheim-2548",
+    "category": "cave",
+    "name": "Benkongerike",
+    "x": 48814.0,
+    "y": 80248.0
+  },
+  {
+    "id": "solstheim-2513",
+    "category": "cave",
+    "name": "Bristleback Cave",
+    "x": 18448.0,
+    "y": 83247.0
+  },
+  {
+    "id": "solstheim-2515",
+    "category": "cave",
+    "name": "Castle Karstaag Caverns",
+    "x": 36832.0,
+    "y": 88320.0
+  },
+  {
+    "id": "solstheim-2545",
+    "category": "cave",
+    "name": "Castle Karstaag Ruins",
+    "x": 33312.0,
+    "y": 89920.0
+  },
+  {
+    "id": "solstheim-2541",
+    "category": "cave",
+    "name": "Frossel",
+    "x": 73271.0,
+    "y": 84589.0
+  },
+  {
+    "id": "solstheim-2532",
+    "category": "cave",
+    "name": "Frostmoon Crag",
+    "x": 41569.0,
+    "y": 57139.0
+  },
+  {
+    "id": "solstheim-2530",
+    "category": "cave",
+    "name": "Glacial Cave",
+    "x": 46899.0,
+    "y": 92687.0
+  },
+  {
+    "id": "solstheim-2554",
+    "category": "cave",
+    "name": "Hrothmund's Barrow",
+    "x": 43520.0,
+    "y": 75284.0
+  },
+  {
+    "id": "solstheim-2625",
+    "category": "chest",
+    "name": "East Empire Pendant 1",
+    "x": 24816.0,
+    "y": 61121.0
+  },
+  {
+    "id": "solstheim-2634",
+    "category": "chest",
+    "name": "East Empire Pendant 10",
+    "x": 61757.0,
+    "y": 40406.0
+  },
+  {
+    "id": "solstheim-2635",
+    "category": "chest",
+    "name": "East Empire Pendant 11",
+    "x": 47477.0,
+    "y": 92769.0
+  },
+  {
+    "id": "solstheim-2636",
+    "category": "chest",
+    "name": "East Empire Pendant 12",
+    "x": 41210.0,
+    "y": 72659.0
+  },
+  {
+    "id": "solstheim-2637",
+    "category": "chest",
+    "name": "East Empire Pendant 13",
+    "x": 43008.0,
+    "y": 68341.0
+  },
+  {
+    "id": "solstheim-2638",
+    "category": "chest",
+    "name": "East Empire Pendant 14",
+    "x": 73504.0,
+    "y": 49493.0
+  },
+  {
+    "id": "solstheim-2639",
+    "category": "chest",
+    "name": "East Empire Pendant 15",
+    "x": 65595.0,
+    "y": 47255.0
+  },
+  {
+    "id": "solstheim-2640",
+    "category": "chest",
+    "name": "East Empire Pendant 16",
+    "x": 66589.0,
+    "y": 92299.0
+  },
+  {
+    "id": "solstheim-2641",
+    "category": "chest",
+    "name": "East Empire Pendant 17",
+    "x": 67683.0,
+    "y": 81783.0
+  },
+  {
+    "id": "solstheim-2642",
+    "category": "chest",
+    "name": "East Empire Pendant 18",
+    "x": 90408.0,
+    "y": 70478.0
+  },
+  {
+    "id": "solstheim-2643",
+    "category": "chest",
+    "name": "East Empire Pendant 19",
+    "x": 78955.0,
+    "y": 100850.0
+  },
+  {
+    "id": "solstheim-2626",
+    "category": "chest",
+    "name": "East Empire Pendant 2",
+    "x": 29525.0,
+    "y": 33187.0
+  },
+  {
+    "id": "solstheim-2627",
+    "category": "chest",
+    "name": "East Empire Pendant 3",
+    "x": 24605.0,
+    "y": 92782.0
+  },
+  {
+    "id": "solstheim-2628",
+    "category": "chest",
+    "name": "East Empire Pendant 4",
+    "x": 23912.0,
+    "y": 80414.0
+  },
+  {
+    "id": "solstheim-2629",
+    "category": "chest",
+    "name": "East Empire Pendant 5",
+    "x": 43578.0,
+    "y": 19733.0
+  },
+  {
+    "id": "solstheim-2630",
+    "category": "chest",
+    "name": "East Empire Pendant 6",
+    "x": 36755.0,
+    "y": 9926.0
+  },
+  {
+    "id": "solstheim-2631",
+    "category": "chest",
+    "name": "East Empire Pendant 7",
+    "x": 40039.0,
+    "y": 59090.0
+  },
+  {
+    "id": "solstheim-2632",
+    "category": "chest",
+    "name": "East Empire Pendant 8",
+    "x": 57354.0,
+    "y": 44324.0
+  },
+  {
+    "id": "solstheim-2633",
+    "category": "chest",
+    "name": "East Empire Pendant 9",
+    "x": 43879.0,
+    "y": 44462.0
+  },
+  {
+    "id": "solstheim-2526",
+    "category": "city",
+    "name": "Raven Rock",
+    "x": 30884.0,
+    "y": 35050.0
+  },
+  {
+    "id": "solstheim-2507",
+    "category": "clearing",
+    "name": "Headwaters of Harstrad",
+    "x": 54028.0,
+    "y": 77964.0
+  },
+  {
+    "id": "solstheim-2527",
+    "category": "dock",
+    "name": "Northshore Landing",
+    "x": 22751.0,
+    "y": 92430.0
+  },
+  {
+    "id": "solstheim-2591",
+    "category": "door",
+    "name": "Abandoned Building",
+    "x": 27688.0,
+    "y": 35957.0
+  },
+  {
+    "id": "solstheim-2573",
+    "category": "door",
+    "name": "Abandoned Lodge",
+    "x": 35466.0,
+    "y": 52369.0
+  },
+  {
+    "id": "solstheim-2598",
+    "category": "door",
+    "name": "Alor House",
+    "x": 29769.0,
+    "y": 37810.0
+  },
+  {
+    "id": "solstheim-2559",
+    "category": "door",
+    "name": "Altar of Thrond Cave",
+    "x": 48782.0,
+    "y": 60878.0
+  },
+  {
+    "id": "solstheim-2574",
+    "category": "door",
+    "name": "Ashfallow Citadel",
+    "x": 66983.0,
+    "y": 41422.0
+  },
+  {
+    "id": "solstheim-2616",
+    "category": "door",
+    "name": "Baldor Iron-Shaper's House 1",
+    "x": 73328.0,
+    "y": 69810.0
+  },
+  {
+    "id": "solstheim-2617",
+    "category": "door",
+    "name": "Baldor Iron-Shaper's House 2",
+    "x": 74075.0,
+    "y": 70007.0
+  },
+  {
+    "id": "solstheim-2580",
+    "category": "door",
+    "name": "Benkongerike",
+    "x": 48479.0,
+    "y": 80829.0
+  },
+  {
+    "id": "solstheim-2577",
+    "category": "door",
+    "name": "Bloodskal Barrow",
+    "x": 27348.0,
+    "y": 46053.0
+  },
+  {
+    "id": "solstheim-2575",
+    "category": "door",
+    "name": "Bristleback Cave",
+    "x": 18879.0,
+    "y": 83789.0
+  },
+  {
+    "id": "solstheim-2571",
+    "category": "door",
+    "name": "Broken Tusk Mine",
+    "x": 23892.0,
+    "y": 79924.0
+  },
+  {
+    "id": "solstheim-2600",
+    "category": "door",
+    "name": "Caerellius House",
+    "x": 31521.0,
+    "y": 33279.0
+  },
+  {
+    "id": "solstheim-2584",
+    "category": "door",
+    "name": "Castle Karstaag Caverns 1",
+    "x": 36465.0,
+    "y": 88301.0
+  },
+  {
+    "id": "solstheim-2585",
+    "category": "door",
+    "name": "Castle Karstaag Caverns 2",
+    "x": 32276.0,
+    "y": 89155.0
+  },
+  {
+    "id": "solstheim-2558",
+    "category": "door",
+    "name": "Coldcinder Cave",
+    "x": 35450.0,
+    "y": 30960.0
+  },
+  {
+    "id": "solstheim-2566",
+    "category": "door",
+    "name": "Damphall Mine",
+    "x": 25889.0,
+    "y": 55493.0
+  },
+  {
+    "id": "solstheim-2615",
+    "category": "door",
+    "name": "Deor Woodcutter's House",
+    "x": 72745.0,
+    "y": 69936.0
+  },
+  {
+    "id": "solstheim-2612",
+    "category": "door",
+    "name": "Edla's House",
+    "x": 73167.0,
+    "y": 71465.0
+  },
+  {
+    "id": "solstheim-2576",
+    "category": "door",
+    "name": "Fahlbtharz",
+    "x": 30960.0,
+    "y": 65864.0
+  },
+  {
+    "id": "solstheim-2572",
+    "category": "door",
+    "name": "Fahlbtharz Grand Hall",
+    "x": 34197.0,
+    "y": 56960.0
+  },
+  {
+    "id": "solstheim-2565",
+    "category": "door",
+    "name": "Fort Frostmoth 1",
+    "x": 53051.0,
+    "y": 25076.0
+  },
+  {
+    "id": "solstheim-2569",
+    "category": "door",
+    "name": "Fort Frostmoth 2",
+    "x": 50723.0,
+    "y": 22477.0
+  },
+  {
+    "id": "solstheim-2603",
+    "category": "door",
+    "name": "Fort Frostmoth 3",
+    "x": 51841.0,
+    "y": 25064.0
+  },
+  {
+    "id": "solstheim-2604",
+    "category": "door",
+    "name": "Fort Frostmoth 4",
+    "x": 51282.0,
+    "y": 23558.0
+  },
+  {
+    "id": "solstheim-2594",
+    "category": "door",
+    "name": "Frossel",
+    "x": 73780.0,
+    "y": 84511.0
+  },
+  {
+    "id": "solstheim-2568",
+    "category": "door",
+    "name": "Glacial Cave",
+    "x": 47619.0,
+    "y": 92028.0
+  },
+  {
+    "id": "solstheim-2619",
+    "category": "door",
+    "name": "Glover Mallory's House",
+    "x": 29064.0,
+    "y": 35738.0
+  },
+  {
+    "id": "solstheim-2564",
+    "category": "door",
+    "name": "Greathall 1",
+    "x": 76470.0,
+    "y": 71057.0
+  },
+  {
+    "id": "solstheim-2579",
+    "category": "door",
+    "name": "Greathall 2",
+    "x": 75172.0,
+    "y": 70709.0
+  },
+  {
+    "id": "solstheim-2588",
+    "category": "door",
+    "name": "Gyldenhul Barrow",
+    "x": 84612.0,
+    "y": 72238.0
+  },
+  {
+    "id": "solstheim-2557",
+    "category": "door",
+    "name": "Harstrad Cave",
+    "x": 52861.0,
+    "y": 78013.0
+  },
+  {
+    "id": "solstheim-2593",
+    "category": "door",
+    "name": "Highpoint Tower",
+    "x": 50849.0,
+    "y": 36136.0
+  },
+  {
+    "id": "solstheim-2610",
+    "category": "door",
+    "name": "Hrodulf's House",
+    "x": 43395.0,
+    "y": 19083.0
+  },
+  {
+    "id": "solstheim-2618",
+    "category": "door",
+    "name": "Hrothmund's Barrow",
+    "x": 43596.0,
+    "y": 75174.0
+  },
+  {
+    "id": "solstheim-2590",
+    "category": "door",
+    "name": "Ienth Farm",
+    "x": 28713.0,
+    "y": 37040.0
+  },
+  {
+    "id": "solstheim-2589",
+    "category": "door",
+    "name": "Kagrumez",
+    "x": 55928.0,
+    "y": 50183.0
+  },
+  {
+    "id": "solstheim-2596",
+    "category": "door",
+    "name": "Kolbjorn Barrow",
+    "x": 37518.0,
+    "y": 26211.0
+  },
+  {
+    "id": "solstheim-2560",
+    "category": "door",
+    "name": "Morvayn Ancestral Tomb",
+    "x": 31265.0,
+    "y": 35120.0
+  },
+  {
+    "id": "solstheim-2599",
+    "category": "door",
+    "name": "Morvayn Manor",
+    "x": 30410.0,
+    "y": 34913.0
+  },
+  {
+    "id": "solstheim-2611",
+    "category": "door",
+    "name": "Morwen's House",
+    "x": 73968.0,
+    "y": 71563.0
+  },
+  {
+    "id": "solstheim-2567",
+    "category": "door",
+    "name": "Nchardak Reading Room",
+    "x": 88104.0,
+    "y": 39298.0
+  },
+  {
+    "id": "solstheim-2614",
+    "category": "door",
+    "name": "Oslaf's House",
+    "x": 71881.0,
+    "y": 70390.0
+  },
+  {
+    "id": "solstheim-2578",
+    "category": "door",
+    "name": "Raven Rock Mine",
+    "x": 29653.0,
+    "y": 40352.0
+  },
+  {
+    "id": "solstheim-2597",
+    "category": "door",
+    "name": "Severin Manor",
+    "x": 25901.0,
+    "y": 37029.0
+  },
+  {
+    "id": "solstheim-2620",
+    "category": "door",
+    "name": "Shaman's Hut",
+    "x": 75506.0,
+    "y": 69718.0
+  },
+  {
+    "id": "solstheim-2561",
+    "category": "door",
+    "name": "Strange Vessel",
+    "x": 42796.0,
+    "y": 67553.0
+  },
+  {
+    "id": "solstheim-2556",
+    "category": "door",
+    "name": "Tel Mithryn 1",
+    "x": 76863.0,
+    "y": 23034.0
+  },
+  {
+    "id": "solstheim-2607",
+    "category": "door",
+    "name": "Tel Mithryn 2",
+    "x": 76802.0,
+    "y": 23057.0
+  },
+  {
+    "id": "solstheim-2606",
+    "category": "door",
+    "name": "Tel Mithryn Apothecary",
+    "x": 76570.0,
+    "y": 24347.0
+  },
+  {
+    "id": "solstheim-2605",
+    "category": "door",
+    "name": "Tel Mithryn Kitchen",
+    "x": 74190.0,
+    "y": 23969.0
+  },
+  {
+    "id": "solstheim-2621",
+    "category": "door",
+    "name": "Tel Mithryn Steward's House",
+    "x": 75124.0,
+    "y": 22858.0
+  },
+  {
+    "id": "solstheim-2602",
+    "category": "door",
+    "name": "Temple",
+    "x": 32848.0,
+    "y": 35142.0
+  },
+  {
+    "id": "solstheim-2595",
+    "category": "door",
+    "name": "Temple of Miraak",
+    "x": 56804.0,
+    "y": 62940.0
+  },
+  {
+    "id": "solstheim-2581",
+    "category": "door",
+    "name": "Temple of Miraak Sanctum",
+    "x": 59795.0,
+    "y": 71748.0
+  },
+  {
+    "id": "solstheim-2592",
+    "category": "door",
+    "name": "The Bulwark",
+    "x": 32017.0,
+    "y": 32507.0
+  },
+  {
+    "id": "solstheim-2563",
+    "category": "door",
+    "name": "The Bulwark Jail 1",
+    "x": 32456.0,
+    "y": 32757.0
+  },
+  {
+    "id": "solstheim-2582",
+    "category": "door",
+    "name": "The Bulwark Jail 2",
+    "x": 32490.0,
+    "y": 32781.0
+  },
+  {
+    "id": "solstheim-2601",
+    "category": "door",
+    "name": "The Retching Netch",
+    "x": 30194.0,
+    "y": 36874.0
+  },
+  {
+    "id": "solstheim-2608",
+    "category": "door",
+    "name": "Thirsk Mead Hall",
+    "x": 67430.0,
+    "y": 58567.0
+  },
+  {
+    "id": "solstheim-2570",
+    "category": "door",
+    "name": "Ulen Ancestral Tomb",
+    "x": 32029.0,
+    "y": 33730.0
+  },
+  {
+    "id": "solstheim-2622",
+    "category": "door",
+    "name": "Vahlok's Tomb",
+    "x": 70917.0,
+    "y": 50150.0
+  },
+  {
+    "id": "solstheim-2583",
+    "category": "door",
+    "name": "White Ridge Barrow",
+    "x": 33500.0,
+    "y": 76835.0
+  },
+  {
+    "id": "solstheim-2562",
+    "category": "door",
+    "name": "White Ridge Sanctum",
+    "x": 33047.0,
+    "y": 69820.0
+  },
+  {
+    "id": "solstheim-2613",
+    "category": "door",
+    "name": "Wulf Wild-Blood's House",
+    "x": 72440.0,
+    "y": 71112.0
+  },
+  {
+    "id": "solstheim-2550",
+    "category": "dragon-lair",
+    "name": "Saering's Watch",
+    "x": 42884.0,
+    "y": 83949.0
+  },
+  {
+    "id": "solstheim-2726",
+    "category": "dragon-mound",
+    "name": "Dragon Mound: Frozen Shoals",
+    "x": 60456.0,
+    "y": 100938.0
+  },
+  {
+    "id": "solstheim-2725",
+    "category": "dragon-mound",
+    "name": "Dragon Mound: Temple Foothills",
+    "x": 62103.0,
+    "y": 48983.0
+  },
+  {
+    "id": "solstheim-2544",
+    "category": "dwarven-ruin",
+    "name": "Fahlbtharz",
+    "x": 30921.0,
+    "y": 65460.0
+  },
+  {
+    "id": "solstheim-2543",
+    "category": "dwarven-ruin",
+    "name": "Kagrumez",
+    "x": 55880.0,
+    "y": 50199.0
+  },
+  {
+    "id": "solstheim-2538",
+    "category": "dwarven-ruin",
+    "name": "Nchardak",
+    "x": 84722.0,
+    "y": 40363.0
+  },
+  {
+    "id": "solstheim-2514",
+    "category": "farm",
+    "name": "Old Attius Farm",
+    "x": 34666.0,
+    "y": 23259.0
+  },
+  {
+    "id": "solstheim-2722",
+    "category": "fishing-spot",
+    "name": "Fishing Spot (CC) 1",
+    "x": 28235.0,
+    "y": 34583.0
+  },
+  {
+    "id": "solstheim-2723",
+    "category": "fishing-spot",
+    "name": "Fishing Spot (CC) 2",
+    "x": 82485.0,
+    "y": 59316.0
+  },
+  {
+    "id": "solstheim-2529",
+    "category": "fort",
+    "name": "Ashfallow Citadel",
+    "x": 66672.0,
+    "y": 41649.0
+  },
+  {
+    "id": "solstheim-2542",
+    "category": "fort",
+    "name": "Fort Frostmoth",
+    "x": 52459.0,
+    "y": 23940.0
+  },
+  {
+    "id": "solstheim-2528",
+    "category": "fort",
+    "name": "Highpoint Tower",
+    "x": 49334.0,
+    "y": 38004.0
+  },
+  {
+    "id": "solstheim-2549",
+    "category": "landmark",
+    "name": "Altar of Thrond",
+    "x": 48656.0,
+    "y": 59824.0
+  },
+  {
+    "id": "solstheim-2546",
+    "category": "landmark",
+    "name": "Brodir Grove",
+    "x": 43753.0,
+    "y": 43975.0
+  },
+  {
+    "id": "solstheim-2504",
+    "category": "landmark",
+    "name": "Frykte Peak",
+    "x": 40331.0,
+    "y": 82291.0
+  },
+  {
+    "id": "solstheim-2539",
+    "category": "landmark",
+    "name": "Horker Island",
+    "x": 88252.0,
+    "y": 70979.0
+  },
+  {
+    "id": "solstheim-2508",
+    "category": "landmark",
+    "name": "Hvitkald Peak",
+    "x": 32748.0,
+    "y": 53603.0
+  },
+  {
+    "id": "solstheim-2505",
+    "category": "landmark",
+    "name": "Mortrag Peak",
+    "x": 33517.0,
+    "y": 82146.0
+  },
+  {
+    "id": "solstheim-2506",
+    "category": "landmark",
+    "name": "Mount Moesring",
+    "x": 42318.0,
+    "y": 64114.0
+  },
+  {
+    "id": "solstheim-2510",
+    "category": "landmark",
+    "name": "Stalhrim Source",
+    "x": 29071.0,
+    "y": 78772.0
+  },
+  {
+    "id": "solstheim-2531",
+    "category": "mine",
+    "name": "Broken Tusk Mine",
+    "x": 22621.0,
+    "y": 80019.0
+  },
+  {
+    "id": "solstheim-2511",
+    "category": "mine",
+    "name": "Damphall Mine",
+    "x": 25738.0,
+    "y": 55271.0
+  },
+  {
+    "id": "solstheim-2512",
+    "category": "nordic-dwelling",
+    "name": "Snowclad Ruins",
+    "x": 50727.0,
+    "y": 69890.0
+  },
+  {
+    "id": "solstheim-2547",
+    "category": "nordic-ruin",
+    "name": "Bloodskal Barrow",
+    "x": 26130.0,
+    "y": 46941.0
+  },
+  {
+    "id": "solstheim-2540",
+    "category": "nordic-ruin",
+    "name": "Gyldenhul Barrow",
+    "x": 84516.0,
+    "y": 72408.0
+  },
+  {
+    "id": "solstheim-2536",
+    "category": "nordic-ruin",
+    "name": "Kolbjorn Barrow",
+    "x": 38040.0,
+    "y": 25760.0
+  },
+  {
+    "id": "solstheim-2551",
+    "category": "nordic-ruin",
+    "name": "Vahlok's Tomb",
+    "x": 70722.0,
+    "y": 51191.0
+  },
+  {
+    "id": "solstheim-2535",
+    "category": "nordic-ruin",
+    "name": "White Ridge Barrow",
+    "x": 33692.0,
+    "y": 76147.0
+  },
+  {
+    "id": "solstheim-2692",
+    "category": "ore-vein",
+    "name": "Corundum Ore Vein 1",
+    "x": 39856.0,
+    "y": 58353.0
+  },
+  {
+    "id": "solstheim-2693",
+    "category": "ore-vein",
+    "name": "Corundum Ore Vein 2",
+    "x": 45703.0,
+    "y": 72319.0
+  },
+  {
+    "id": "solstheim-2694",
+    "category": "ore-vein",
+    "name": "Corundum Ore Vein 3",
+    "x": 80022.0,
+    "y": 59910.0
+  },
+  {
+    "id": "solstheim-2695",
+    "category": "ore-vein",
+    "name": "Ebony Ore Vein 1",
+    "x": 24032.0,
+    "y": 91990.0
+  },
+  {
+    "id": "solstheim-2696",
+    "category": "ore-vein",
+    "name": "Ebony Ore Vein 2",
+    "x": 88015.0,
+    "y": 71301.0
+  },
+  {
+    "id": "solstheim-2675",
+    "category": "ore-vein",
+    "name": "Emerald Geode 1",
+    "x": 31765.0,
+    "y": 43855.0
+  },
+  {
+    "id": "solstheim-2676",
+    "category": "ore-vein",
+    "name": "Emerald Geode 2",
+    "x": 29992.0,
+    "y": 43860.0
+  },
+  {
+    "id": "solstheim-2677",
+    "category": "ore-vein",
+    "name": "Emerald Geode 3",
+    "x": 37950.0,
+    "y": 45029.0
+  },
+  {
+    "id": "solstheim-2678",
+    "category": "ore-vein",
+    "name": "Emerald Geode 4",
+    "x": 38244.0,
+    "y": 44914.0
+  },
+  {
+    "id": "solstheim-2688",
+    "category": "ore-vein",
+    "name": "Gold Ore Vein 1",
+    "x": 29894.0,
+    "y": 44015.0
+  },
+  {
+    "id": "solstheim-2689",
+    "category": "ore-vein",
+    "name": "Gold Ore Vein 2",
+    "x": 38260.0,
+    "y": 45296.0
+  },
+  {
+    "id": "solstheim-2690",
+    "category": "ore-vein",
+    "name": "Gold Ore Vein 3",
+    "x": 37244.0,
+    "y": 45246.0
+  },
+  {
+    "id": "solstheim-2691",
+    "category": "ore-vein",
+    "name": "Gold Ore Vein 4",
+    "x": 75096.0,
+    "y": 82065.0
+  },
+  {
+    "id": "solstheim-2656",
+    "category": "ore-vein",
+    "name": "Heart Stone Deposit 1",
+    "x": 74051.0,
+    "y": 23278.0
+  },
+  {
+    "id": "solstheim-2665",
+    "category": "ore-vein",
+    "name": "Heart Stone Deposit 10",
+    "x": 78861.0,
+    "y": 21277.0
+  },
+  {
+    "id": "solstheim-2666",
+    "category": "ore-vein",
+    "name": "Heart Stone Deposit 11",
+    "x": 79339.0,
+    "y": 21249.0
+  },
+  {
+    "id": "solstheim-2667",
+    "category": "ore-vein",
+    "name": "Heart Stone Deposit 12",
+    "x": 66394.0,
+    "y": 21392.0
+  },
+  {
+    "id": "solstheim-2668",
+    "category": "ore-vein",
+    "name": "Heart Stone Deposit 13",
+    "x": 65540.0,
+    "y": 42107.0
+  },
+  {
+    "id": "solstheim-2669",
+    "category": "ore-vein",
+    "name": "Heart Stone Deposit 14",
+    "x": 27725.0,
+    "y": 22469.0
+  },
+  {
+    "id": "solstheim-2670",
+    "category": "ore-vein",
+    "name": "Heart Stone Deposit 15",
+    "x": 39961.0,
+    "y": 26727.0
+  },
+  {
+    "id": "solstheim-2671",
+    "category": "ore-vein",
+    "name": "Heart Stone Deposit 16",
+    "x": 64771.0,
+    "y": 23475.0
+  },
+  {
+    "id": "solstheim-2672",
+    "category": "ore-vein",
+    "name": "Heart Stone Deposit 17",
+    "x": 44808.0,
+    "y": 19682.0
+  },
+  {
+    "id": "solstheim-2673",
+    "category": "ore-vein",
+    "name": "Heart Stone Deposit 18",
+    "x": 42269.0,
+    "y": 44134.0
+  },
+  {
+    "id": "solstheim-2674",
+    "category": "ore-vein",
+    "name": "Heart Stone Deposit 19",
+    "x": 66139.0,
+    "y": 41961.0
+  },
+  {
+    "id": "solstheim-2657",
+    "category": "ore-vein",
+    "name": "Heart Stone Deposit 2",
+    "x": 59366.0,
+    "y": 30356.0
+  },
+  {
+    "id": "solstheim-2658",
+    "category": "ore-vein",
+    "name": "Heart Stone Deposit 3",
+    "x": 59049.0,
+    "y": 29380.0
+  },
+  {
+    "id": "solstheim-2659",
+    "category": "ore-vein",
+    "name": "Heart Stone Deposit 4",
+    "x": 65078.0,
+    "y": 26480.0
+  },
+  {
+    "id": "solstheim-2660",
+    "category": "ore-vein",
+    "name": "Heart Stone Deposit 5",
+    "x": 44687.0,
+    "y": 19518.0
+  },
+  {
+    "id": "solstheim-2661",
+    "category": "ore-vein",
+    "name": "Heart Stone Deposit 6",
+    "x": 36282.0,
+    "y": 11747.0
+  },
+  {
+    "id": "solstheim-2662",
+    "category": "ore-vein",
+    "name": "Heart Stone Deposit 7",
+    "x": 42760.0,
+    "y": 44493.0
+  },
+  {
+    "id": "solstheim-2663",
+    "category": "ore-vein",
+    "name": "Heart Stone Deposit 8",
+    "x": 42743.0,
+    "y": 43751.0
+  },
+  {
+    "id": "solstheim-2664",
+    "category": "ore-vein",
+    "name": "Heart Stone Deposit 9",
+    "x": 50360.0,
+    "y": 35117.0
+  },
+  {
+    "id": "solstheim-2697",
+    "category": "ore-vein",
+    "name": "Iron Ore Vein",
+    "x": 82777.0,
+    "y": 60994.0
+  },
+  {
+    "id": "solstheim-2698",
+    "category": "ore-vein",
+    "name": "Malachite Ore Vein",
+    "x": 46336.0,
+    "y": 92365.0
+  },
+  {
+    "id": "solstheim-2699",
+    "category": "ore-vein",
+    "name": "Orichalcum Ore Vein 1",
+    "x": 59975.0,
+    "y": 86487.0
+  },
+  {
+    "id": "solstheim-2700",
+    "category": "ore-vein",
+    "name": "Orichalcum Ore Vein 2",
+    "x": 61103.0,
+    "y": 84024.0
+  },
+  {
+    "id": "solstheim-2701",
+    "category": "ore-vein",
+    "name": "Orichalcum Ore Vein 3",
+    "x": 65837.0,
+    "y": 84339.0
+  },
+  {
+    "id": "solstheim-2702",
+    "category": "ore-vein",
+    "name": "Orichalcum Ore Vein 4",
+    "x": 66103.0,
+    "y": 83354.0
+  },
+  {
+    "id": "solstheim-2703",
+    "category": "ore-vein",
+    "name": "Quicksilver Ore Vein",
+    "x": 85557.0,
+    "y": 72964.0
+  },
+  {
+    "id": "solstheim-2679",
+    "category": "ore-vein",
+    "name": "Ruby Geode",
+    "x": 51816.0,
+    "y": 48525.0
+  },
+  {
+    "id": "solstheim-2680",
+    "category": "ore-vein",
+    "name": "Sapphire Geode 1",
+    "x": 39968.0,
+    "y": 58858.0
+  },
+  {
+    "id": "solstheim-2681",
+    "category": "ore-vein",
+    "name": "Sapphire Geode 2",
+    "x": 38316.0,
+    "y": 82018.0
+  },
+  {
+    "id": "solstheim-2682",
+    "category": "ore-vein",
+    "name": "Sapphire Geode 3",
+    "x": 38994.0,
+    "y": 81620.0
+  },
+  {
+    "id": "solstheim-2683",
+    "category": "ore-vein",
+    "name": "Sapphire Geode 4",
+    "x": 45184.0,
+    "y": 71226.0
+  },
+  {
+    "id": "solstheim-2684",
+    "category": "ore-vein",
+    "name": "Sapphire Geode 5",
+    "x": 45598.0,
+    "y": 73240.0
+  },
+  {
+    "id": "solstheim-2685",
+    "category": "ore-vein",
+    "name": "Sapphire Geode 6",
+    "x": 39251.0,
+    "y": 59287.0
+  },
+  {
+    "id": "solstheim-2686",
+    "category": "ore-vein",
+    "name": "Sapphire Geode 7",
+    "x": 33185.0,
+    "y": 69647.0
+  },
+  {
+    "id": "solstheim-2687",
+    "category": "ore-vein",
+    "name": "Sapphire Geode 8",
+    "x": 32546.0,
+    "y": 69838.0
+  },
+  {
+    "id": "solstheim-2704",
+    "category": "ore-vein",
+    "name": "Silver Ore Vein 1",
+    "x": 32733.0,
+    "y": 80281.0
+  },
+  {
+    "id": "solstheim-2705",
+    "category": "ore-vein",
+    "name": "Silver Ore Vein 2",
+    "x": 40239.0,
+    "y": 59143.0
+  },
+  {
+    "id": "solstheim-2706",
+    "category": "ore-vein",
+    "name": "Silver Ore Vein 3",
+    "x": 39359.0,
+    "y": 59111.0
+  },
+  {
+    "id": "solstheim-2707",
+    "category": "ore-vein",
+    "name": "Silver Ore Vein 4",
+    "x": 41672.0,
+    "y": 54071.0
+  },
+  {
+    "id": "solstheim-2708",
+    "category": "ore-vein",
+    "name": "Silver Ore Vein 5",
+    "x": 41607.0,
+    "y": 53799.0
+  },
+  {
+    "id": "solstheim-2709",
+    "category": "ore-vein",
+    "name": "Silver Ore Vein 6",
+    "x": 45360.0,
+    "y": 71445.0
+  },
+  {
+    "id": "solstheim-2710",
+    "category": "ore-vein",
+    "name": "Silver Ore Vein 7",
+    "x": 80378.0,
+    "y": 44407.0
+  },
+  {
+    "id": "solstheim-2644",
+    "category": "ore-vein",
+    "name": "Stalhrim Deposit 1",
+    "x": 29122.0,
+    "y": 78826.0
+  },
+  {
+    "id": "solstheim-2653",
+    "category": "ore-vein",
+    "name": "Stalhrim Deposit 10",
+    "x": 29211.0,
+    "y": 78728.0
+  },
+  {
+    "id": "solstheim-2654",
+    "category": "ore-vein",
+    "name": "Stalhrim Deposit 11",
+    "x": 28275.0,
+    "y": 100200.0
+  },
+  {
+    "id": "solstheim-2655",
+    "category": "ore-vein",
+    "name": "Stalhrim Deposit 12",
+    "x": 28333.0,
+    "y": 99959.0
+  },
+  {
+    "id": "solstheim-2645",
+    "category": "ore-vein",
+    "name": "Stalhrim Deposit 2",
+    "x": 29188.0,
+    "y": 79324.0
+  },
+  {
+    "id": "solstheim-2646",
+    "category": "ore-vein",
+    "name": "Stalhrim Deposit 3",
+    "x": 28982.0,
+    "y": 79285.0
+  },
+  {
+    "id": "solstheim-2647",
+    "category": "ore-vein",
+    "name": "Stalhrim Deposit 4",
+    "x": 28807.0,
+    "y": 79165.0
+  },
+  {
+    "id": "solstheim-2648",
+    "category": "ore-vein",
+    "name": "Stalhrim Deposit 5",
+    "x": 28689.0,
+    "y": 78560.0
+  },
+  {
+    "id": "solstheim-2649",
+    "category": "ore-vein",
+    "name": "Stalhrim Deposit 6",
+    "x": 28814.0,
+    "y": 78386.0
+  },
+  {
+    "id": "solstheim-2650",
+    "category": "ore-vein",
+    "name": "Stalhrim Deposit 7",
+    "x": 29206.0,
+    "y": 78223.0
+  },
+  {
+    "id": "solstheim-2651",
+    "category": "ore-vein",
+    "name": "Stalhrim Deposit 8",
+    "x": 29410.0,
+    "y": 78287.0
+  },
+  {
+    "id": "solstheim-2652",
+    "category": "ore-vein",
+    "name": "Stalhrim Deposit 9",
+    "x": 29583.0,
+    "y": 78408.0
+  },
+  {
+    "id": "solstheim-2534",
+    "category": "pass",
+    "name": "Moesring Pass",
+    "x": 43062.0,
+    "y": 68108.0
+  },
+  {
+    "id": "solstheim-2518",
+    "category": "settlement",
+    "name": "Thirsk Mead Hall",
+    "x": 67274.0,
+    "y": 58587.0
+  },
+  {
+    "id": "solstheim-2516",
+    "category": "shack",
+    "name": "Abandoned Lodge",
+    "x": 35747.0,
+    "y": 52080.0
+  },
+  {
+    "id": "solstheim-2555",
+    "category": "shack",
+    "name": "Hrodulf's House",
+    "x": 43976.0,
+    "y": 19472.0
+  },
+  {
+    "id": "solstheim-2509",
+    "category": "shack",
+    "name": "Ramshackle Trading Post",
+    "x": 57695.0,
+    "y": 43972.0
+  },
+  {
+    "id": "solstheim-2533",
+    "category": "shipwreck",
+    "name": "Wreck of the Strident Squall",
+    "x": 36220.0,
+    "y": 11292.0
+  },
+  {
+    "id": "solstheim-2519",
+    "category": "telvanni-tower",
+    "name": "Tel Mithryn",
+    "x": 75484.0,
+    "y": 23835.0
+  },
+  {
+    "id": "solstheim-2537",
+    "category": "temple",
+    "name": "Temple of Miraak",
+    "x": 56313.0,
+    "y": 59653.0
+  },
+  {
+    "id": "solstheim-2517",
+    "category": "to-skyrim",
+    "name": "To Skyrim",
+    "x": 12404.0,
+    "y": 20717.0
+  },
+  {
+    "id": "solstheim-2525",
+    "category": "town",
+    "name": "Skaal Village",
+    "x": 73452.0,
+    "y": 70790.0
+  }
+]

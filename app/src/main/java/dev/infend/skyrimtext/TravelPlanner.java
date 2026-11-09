@@ -87,10 +87,11 @@ public final class TravelPlanner {
         if(target.type.equals("Иной мир")||target.name.equals("Чёрный Предел")
                 ||target.name.equals("Забытая долина"))
             return blocked("Эта область открывается через сюжетные события и специальные переходы.");
-        if(game.progress.location.equals(target.name))
+        SkyrimMapCatalog.Site current=SkyrimMapCatalog.find(game.progress.location);
+        if(game.progress.location.equals(target.name)||(current!=null&&current.name.equals(target.name)))
             return new Route(true,"",0,0,Collections.singletonList(target.name));
 
-        int from=region(game.region),to=region(target.region);
+        int from=region(current==null?game.region:current.region),to=region(target.region);
         ArrayList<Integer> path=regionPath(from,to);
         if(path.isEmpty())return blocked("Не удалось составить наземный маршрут.");
         int days=0,fare=0;
@@ -120,3 +121,4 @@ public final class TravelPlanner {
         return new Route(true,"",days,fare,stops);
     }
 }
+

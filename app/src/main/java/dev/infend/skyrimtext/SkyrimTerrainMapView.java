@@ -5,7 +5,6 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
 import android.view.GestureDetector;
@@ -13,382 +12,326 @@ import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.view.ViewParent;
-
-import java.util.HashSet;
+import android.widget.OverScroller;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.Executors;
 
-/**
- * A real offline interactive terrain map, built from the six player-provided
- * geographic screenshots. Regions not covered by those screenshots are a
- * subdued terrain interpolation, never presented as exact captured terrain.
- *
- * All markers use the SAME WorldAtlas places used by story/travel/filtering,
- * with one geographic calibration per old atlas hold. No fake locations.
- *
- * Camera is independent of the app's vertical ScrollView: drag and pinch here
- * move the map, while the story and inventory scroll normally elsewhere.
- */
+/** Offline map sheets. A single geographic projection drives all markers. */
 public final class SkyrimTerrainMapView extends View {
-    public interface OnPlace { void selected(WorldAtlas.Place location); }
-    public interface OnCatalog {
-        void selected(ArrayList<SkyrimMapCatalog.Site> locations);
-    }
-
-    public static final String TERRAIN="maps/skyrim_user_mosaic.webp";
-    public static final int MAP_W=3500;
-    public static final int MAP_H=1720;
-
-    private static final int[] OLD_CENTER_X={565,833,803,239,146,416,812,578,373,975};
-    private static final int[] OLD_CENTER_Y={635,938,496,303,676,967,287,247,405,399};
-    private static final int[] NEW_CENTER_X={2020,2660,2720,1220,390,1610,2490,1940,1460,3280};
-    private static final int[] NEW_CENTER_Y={850,1270,555,470,955,1385,265,250,520,300};
-
-    private static Bitmap shared;
-    private static boolean loadAttempted;
-    private static synchronized Bitmap terrain(Context ctx){
-        if(!loadAttempted){
-            loadAttempted=true;
-            try(java.io.InputStream in=ctx.getApplicationContext().getAssets().open(TERRAIN)){
-                BitmapFactory.Options config=new BitmapFactory.Options();
-                config.inPreferredConfig=Bitmap.Config.RGB_565;
-                config.inScaled=false;
-                Bitmap value=BitmapFactory.decodeStream(in,null,config);
-                if(value!=null&&value.getWidth()==MAP_W&&value.getHeight()==MAP_H)
-                    shared=value;
-                else if(value!=null)value.recycle();
-            }catch(Exception ignored){}
-        }
-        return shared;
-    }
+    public interface OnPlace {void selected(WorldAtlas.Place location);}
+    public interface OnCatalog {void selected(ArrayList<SkyrimMapCatalog.Site> locations);}
+    public static final String TERRAIN="maps/skyrim_geographic.webp";
+    public static final int MAP_W=4096,MAP_H=4096;
+    private static final String[] TEXTURES={TERRAIN,"maps/solstheim_geographic.webp"};
+    private static final int[] WIDTH={MAP_W,726},HEIGHT={MAP_H,835};
+    private static final Bitmap[] IMAGES=new Bitmap[2];
+    private static final java.util.concurrent.ExecutorService LOADER=Executors.newSingleThreadExecutor();
 
     private final GameEngine game;
     private final OnPlace callback;
     private OnCatalog catalogCallback;
     private final Set<String> hiddenTypes;
-    private LinkedHashMap<String,ArrayList<SkyrimMapCatalog.Site>> clusterCache;
     private final SharedPreferences prefs;
-    private final Paint terrainPaint=new Paint(Paint.FILTER_BITMAP_FLAG|Paint.ANTI_ALIAS_FLAG);
-    private final Paint pinPaint=new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint imagePaint=new Paint(Paint.FILTER_BITMAP_FLAG);
+    private final Paint ink=new Paint(Paint.ANTI_ALIAS_FLAG);
     private final GestureDetector gesture;
     private final ScaleGestureDetector scaler;
+    private final OverScroller inertia;
+    private final ArrayList<SkyrimMapCatalog.Site> sites=SkyrimMapCatalog.all();
+    private ArrayList<MapPinLayout.Pin> pins;
+    private String focusId="";
+    private int sheet,region=-1;
+    private float scale=1f,minScale=.1f,maxScale=1f,left,top;
+    private boolean initialized,dragged;
+    private volatile boolean loading,failed;
+    private final float density;
+    private final ArrayList<RectF> labels=new ArrayList<>();
 
-    private float scale=1f,minScale=.1f,maxScale=1f;
-    private float left,top;
-    private boolean initialized;
-    private boolean dragged;
-    private float touchX,touchY;
-
-    public SkyrimTerrainMapView(Context context,GameEngine game,
-                                OnPlace callback,Set<String> hiddenTypes){
-        super(context);
-        this.game=game;
-        this.callback=callback;
+    public SkyrimTerrainMapView(Context context,GameEngine game,OnPlace callback,Set<String> hiddenTypes){
+        super(context);this.game=game;this.callback=callback;
         this.hiddenTypes=new HashSet<>(hiddenTypes);
-        this.prefs=context.getSharedPreferences("skyrim_text_v1",Context.MODE_PRIVATE);
-        setLayerType(View.LAYER_TYPE_HARDWARE,null);
-        setContentDescription("Карта Скайрима. Проведи пальцем для перемещения, "
-            +"разведи два пальца для увеличения, нажми на локацию для открытия.");
+        prefs=context.getSharedPreferences("skyrim_text_v1",Context.MODE_PRIVATE);
+        density=getResources().getDisplayMetrics().density;
+        SkyrimMapCatalog.Site player=SkyrimMapCatalog.find(game.progress.location);
+        sheet=Math.max(0,Math.min(1,prefs.getInt("terrain_map_sheet",player==null?0:player.sheet)));
+        inertia=new OverScroller(context);
+        setContentDescription("Карта Скайрима и Солстейма. Перемещай одним пальцем, "+
+            "изменяй масштаб двумя пальцами, нажимай на метки локаций.");
         gesture=new GestureDetector(context,new GestureDetector.SimpleOnGestureListener(){
-            @Override public boolean onDown(MotionEvent e){return true;}
+            @Override public boolean onDown(MotionEvent e){inertia.forceFinished(true);return true;}
             @Override public boolean onScroll(MotionEvent a,MotionEvent b,float dx,float dy){
-                if(!scaler.isInProgress()){
-                    dragged=true;
-                    left-=dx;top-=dy;constrain();invalidate();
-                }
+                if(!scaler.isInProgress()){dragged=true;left-=dx;top-=dy;constrain();changed();}
                 return true;
+            }
+            @Override public boolean onFling(MotionEvent a,MotionEvent b,float vx,float vy){
+                if(scaler.isInProgress())return false;
+                dragged=true;
+                int minX=Math.min(0,Math.round(getWidth()-WIDTH[sheet]*scale));
+                int minY=Math.min(0,Math.round(getHeight()-HEIGHT[sheet]*scale));
+                if(minX==0&&minY==0)return false;
+                inertia.fling(Math.round(left),Math.round(top),Math.round(vx),Math.round(vy),
+                    minX,minX==0?Math.round(left):0,minY,minY==0?Math.round(top):0);
+                postInvalidateOnAnimation();return true;
             }
             @Override public boolean onSingleTapConfirmed(MotionEvent e){
-                if(dragged)return true;
-                select(e.getX(),e.getY());
-                return true;
+                if(!dragged)select(e.getX(),e.getY());return true;
             }
             @Override public boolean onDoubleTap(MotionEvent e){
-                zoomAt(1.85f,e.getX(),e.getY());
-                persist();
+                if(scale>=maxScale*.95f)showWholeProvince();
+                else{zoomAt(1.85f,e.getX(),e.getY());persist();}
                 return true;
             }
         });
-        scaler=new ScaleGestureDetector(context,
-            new ScaleGestureDetector.SimpleOnScaleGestureListener(){
-                @Override public boolean onScale(ScaleGestureDetector detector){
-                    zoomAt(detector.getScaleFactor(),
-                        detector.getFocusX(),detector.getFocusY());
-                    dragged=true;
-                    return true;
-                }
-            });
+        scaler=new ScaleGestureDetector(context,new ScaleGestureDetector.SimpleOnScaleGestureListener(){
+            @Override public boolean onScale(ScaleGestureDetector d){
+                zoomAt(d.getScaleFactor(),d.getFocusX(),d.getFocusY());dragged=true;return true;
+            }
+        });
+        loadTerrain();
     }
-
+    private void loadTerrain(){
+        final int requested=sheet;
+        synchronized(IMAGES){if(IMAGES[requested]!=null){loading=false;failed=false;return;}}
+        loading=true;failed=false;
+        final Context app=getContext().getApplicationContext();
+        LOADER.execute(()->{
+            Bitmap decoded=null;
+            synchronized(IMAGES){decoded=IMAGES[requested];}
+            if(decoded==null){
+                try(java.io.InputStream in=app.getAssets().open(TEXTURES[requested])){
+                    BitmapFactory.Options options=new BitmapFactory.Options();
+                    options.inPreferredConfig=Bitmap.Config.RGB_565;options.inScaled=false;
+                    decoded=BitmapFactory.decodeStream(in,null,options);
+                    if(decoded!=null&&(decoded.getWidth()!=WIDTH[requested]||decoded.getHeight()!=HEIGHT[requested])){
+                        decoded.recycle();decoded=null;
+                    }
+                    synchronized(IMAGES){if(decoded!=null)IMAGES[requested]=decoded;}
+                }catch(Exception ignored){}
+            }
+            final boolean success=decoded!=null;
+            post(()->{if(sheet==requested){loading=false;failed=!success;invalidate();}});
+        });
+    }
     public void setOnCatalog(OnCatalog listener){catalogCallback=listener;}
-
-    /** One aggregated marker per coarse reference grid cell. */
-    private LinkedHashMap<String,ArrayList<SkyrimMapCatalog.Site>> catalogClusters(){
-        if(clusterCache!=null)return clusterCache;
-        LinkedHashMap<String,ArrayList<SkyrimMapCatalog.Site>> grouped=new LinkedHashMap<>();
-        for(SkyrimMapCatalog.Site place:SkyrimMapCatalog.all()){
-            if(hiddenTypes.contains(place.type))continue;
-            ArrayList<SkyrimMapCatalog.Site> list=grouped.get(place.grid);
-            if(list==null){
-                list=new ArrayList<>();
-                grouped.put(place.grid,list);
-            }
-            list.add(place);
-        }
-        clusterCache=grouped;
-        return grouped;
+    public int getSheet(){return sheet;}
+    public void setSheet(int next){
+        next=Math.max(0,Math.min(1,next));if(next==sheet)return;
+        persist();inertia.forceFinished(true);sheet=next;focusId="";initialized=false;
+        prefs.edit().putInt("terrain_map_sheet",sheet).apply();
+        configure(getWidth(),getHeight(),0,0);loadTerrain();changed();
     }
-
-    /** Screenshots were georegistered by their visible city markers. */
-    public static float positionX(WorldAtlas.Place p){
-        int r=Math.max(0,Math.min(p.region,OLD_CENTER_X.length-1));
-        return NEW_CENTER_X[r]+(p.x-OLD_CENTER_X[r])*1.85f;
+    public void setMapRegion(int next){
+        region=next;focusId="";
+        if(next>=0)setSheet(next==9?1:0);
+        changed();
     }
-    public static float positionY(WorldAtlas.Place p){
-        int r=Math.max(0,Math.min(p.region,OLD_CENTER_Y.length-1));
-        return NEW_CENTER_Y[r]+(p.y-OLD_CENTER_Y[r])*1.85f;
+    public static float positionX(WorldAtlas.Place place){
+        SkyrimMapCatalog.Site site=place==null?null:SkyrimMapCatalog.find(place.name);
+        return site==null?Float.NaN:site.x;
     }
-
+    public static float positionY(WorldAtlas.Place place){
+        SkyrimMapCatalog.Site site=place==null?null:SkyrimMapCatalog.find(place.name);
+        return site==null?Float.NaN:site.y;
+    }
     @Override protected void onSizeChanged(int w,int h,int oldW,int oldH){
-        super.onSizeChanged(w,h,oldW,oldH);
-        if(w<=0||h<=0)return;
-        minScale=Math.min(w/(float)MAP_W,h/(float)MAP_H);
-        maxScale=minScale*11f;
-        if(!initialized){
-            initialized=true;
-            float requested=prefs.getFloat("terrain_map_zoom",2.4f);
-            scale=Math.max(minScale,Math.min(maxScale,minScale*requested));
-            float cx=prefs.getFloat("terrain_map_x",Float.NaN);
-            float cy=prefs.getFloat("terrain_map_y",Float.NaN);
-            if(!Float.isFinite(cx)||!Float.isFinite(cy)){
-                WorldAtlas.Place where=WorldAtlas.find(game.progress.location);
-                if(where!=null){cx=positionX(where);cy=positionY(where);}
-                else{cx=NEW_CENTER_X[Math.max(0,Math.min(game.region,9))];
-                     cy=NEW_CENTER_Y[Math.max(0,Math.min(game.region,9))];}
-            }
-            left=w*.5f-cx*scale;top=h*.5f-cy*scale;
-        }else{
-            // Preserve the physical point at the old center across rotation.
-            float cx=(oldW*.5f-left)/Math.max(.0001f,scale);
-            float cy=(oldH*.5f-top)/Math.max(.0001f,scale);
-            scale=Math.max(minScale,Math.min(maxScale,scale));
-            left=w*.5f-cx*scale;top=h*.5f-cy*scale;
-        }
-        constrain();
+        super.onSizeChanged(w,h,oldW,oldH);configure(w,h,oldW,oldH);
     }
-
+    private String key(String property){return "terrain_map_v2_"+sheet+"_"+property;}
+    private void configure(int w,int h,int oldW,int oldH){
+        if(w<=0||h<=0)return;
+        float previousScale=scale;
+        float cx=(oldW*.5f-left)/Math.max(.0001f,previousScale);
+        float cy=(oldH*.5f-top)/Math.max(.0001f,previousScale);
+        float relative=initialized?previousScale/Math.max(.0001f,minScale):2.4f;
+        minScale=Math.min(w/(float)WIDTH[sheet],h/(float)HEIGHT[sheet]);maxScale=minScale*14f;
+        if(!initialized){
+            float z=prefs.getFloat(key("zoom"),sheet==0?2.4f:1.2f);
+            relative=Float.isFinite(z)?z:2.4f;
+            cx=prefs.getFloat(key("x"),Float.NaN);cy=prefs.getFloat(key("y"),Float.NaN);
+            if(!Float.isFinite(cx)||!Float.isFinite(cy)){
+                SkyrimMapCatalog.Site player=SkyrimMapCatalog.find(game.progress.location);
+                cx=player!=null&&player.sheet==sheet?player.x:WIDTH[sheet]/2f;
+                cy=player!=null&&player.sheet==sheet?player.y:HEIGHT[sheet]/2f;
+            }
+            initialized=true;
+        }
+        scale=Math.max(minScale,Math.min(maxScale,minScale*relative));
+        left=w*.5f-cx*scale;top=h*.5f-cy*scale;constrain();changed();
+    }
+    private void changed(){pins=null;invalidate();}
     private void constrain(){
         if(getWidth()<=0||getHeight()<=0)return;
-        float canvasW=MAP_W*scale,canvasH=MAP_H*scale;
-        left=canvasW<=getWidth()?(getWidth()-canvasW)/2f:
-            Math.max(getWidth()-canvasW,Math.min(0,left));
-        top=canvasH<=getHeight()?(getHeight()-canvasH)/2f:
-            Math.max(getHeight()-canvasH,Math.min(0,top));
+        float width=WIDTH[sheet]*scale,height=HEIGHT[sheet]*scale;
+        left=width<=getWidth()?(getWidth()-width)/2f:Math.max(getWidth()-width,Math.min(0,left));
+        top=height<=getHeight()?(getHeight()-height)/2f:Math.max(getHeight()-height,Math.min(0,top));
     }
-    private void zoomAt(float factor,float pivotX,float pivotY){
-        if(!Float.isFinite(factor)||factor<=0)return;
-        float next=Math.max(minScale,Math.min(maxScale,scale*factor));
-        if(scale<=0)return;
-        float ratio=next/scale;
-        left=pivotX-(pivotX-left)*ratio;
-        top=pivotY-(pivotY-top)*ratio;
-        scale=next;
-        constrain();invalidate();
+    private void zoomAt(float factor,float px,float py){
+        if(!initialized||!Float.isFinite(factor)||factor<=0)return;
+        inertia.forceFinished(true);
+        float next=Math.max(minScale,Math.min(maxScale,scale*factor)),ratio=next/scale;
+        left=px-(px-left)*ratio;top=py-(py-top)*ratio;scale=next;constrain();changed();
     }
-
-    public void zoomBy(float multiplier){
-        zoomAt(multiplier,getWidth()/2f,getHeight()/2f);
-        persist();
-    }
+    public void zoomBy(float factor){zoomAt(factor,getWidth()/2f,getHeight()/2f);persist();}
     public void showWholeProvince(){
         if(getWidth()<=0)return;
-        scale=minScale;
-        left=(getWidth()-MAP_W*scale)/2f;
-        top=(getHeight()-MAP_H*scale)/2f;
-        constrain();invalidate();persist();
+        inertia.forceFinished(true);scale=minScale;
+        left=(getWidth()-WIDTH[sheet]*scale)/2f;top=(getHeight()-HEIGHT[sheet]*scale)/2f;
+        constrain();changed();persist();
     }
     public void centerOnPlayer(){
-        WorldAtlas.Place player=WorldAtlas.find(game.progress.location);
+        SkyrimMapCatalog.Site player=SkyrimMapCatalog.find(game.progress.location);
         if(player!=null)centerOn(player);
     }
-    public void centerOn(WorldAtlas.Place target){
-        if(getWidth()<=0||target==null)return;
-        scale=Math.max(scale,minScale*2.7f);
-        left=getWidth()/2f-positionX(target)*scale;
-        top=getHeight()/2f-positionY(target)*scale;
-        constrain();invalidate();persist();
+    public void centerOn(WorldAtlas.Place place){
+        if(place!=null)centerOn(SkyrimMapCatalog.find(place.name));
     }
-    /** Focus an approximate reference sector without inventing precise POI coordinates. */
     public void centerOn(SkyrimMapCatalog.Site target){
-        if(getWidth()<=0||target==null)return;
-        scale=Math.max(scale,minScale*4.0f);
-        left=getWidth()/2f-target.x*scale;
-        top=getHeight()/2f-target.y*scale;
-        constrain();invalidate();persist();
+        if(target==null)return;
+        setSheet(target.sheet);focusId=target.id;
+        if(getWidth()<=0){post(()->centerOn(target));return;}
+        inertia.forceFinished(true);
+        scale=Math.min(maxScale,Math.max(scale,minScale*5.5f));
+        left=getWidth()/2f-target.x*scale;top=getHeight()/2f-target.y*scale;
+        constrain();changed();persist();
     }
     private void persist(){
-        if(!initialized||scale<=0)return;
-        float cx=(getWidth()/2f-left)/scale;
-        float cy=(getHeight()/2f-top)/scale;
-        prefs.edit().putFloat("terrain_map_zoom",scale/minScale)
-            .putFloat("terrain_map_x",cx).putFloat("terrain_map_y",cy).apply();
+        if(!initialized||scale<=0||minScale<=0||getWidth()<=0)return;
+        prefs.edit().putFloat(key("zoom"),scale/minScale)
+            .putFloat(key("x"),(getWidth()/2f-left)/scale)
+            .putFloat(key("y"),(getHeight()/2f-top)/scale)
+            .putInt("terrain_map_sheet",sheet).apply();
     }
-
-    private boolean visible(WorldAtlas.Place p){
-        return p.name.equals(game.progress.location)||!hiddenTypes.contains(p.type);
+    public void saveCamera(){persist();}
+    public void restoreCamera(){
+        initialized=false;sheet=Math.max(0,Math.min(1,prefs.getInt("terrain_map_sheet",sheet)));
+        configure(getWidth(),getHeight(),0,0);loadTerrain();changed();
     }
-    private boolean major(WorldAtlas.Place p){
-        return p.type.equals("Столица")||p.name.equals("Воронья Скала");
+    private ArrayList<MapPinLayout.Pin> renderedPins(){
+        if(pins==null){
+            SkyrimMapCatalog.Site player=SkyrimMapCatalog.find(game.progress.location);
+            pins=MapPinLayout.build(sites,sheet,region,hiddenTypes,player==null?"":player.id,
+                focusId,scale,left,top,getWidth(),getHeight(),density);
+        }
+        return pins;
     }
-    private boolean player(WorldAtlas.Place p){
-        return p.name.equals(game.progress.location);
+    private String symbol(SkyrimMapCatalog.Site site){
+        String t=site.type;
+        if(site.capital())return "столицы владений";
+        if(t.contains("Двемер"))return "двемерские руины";
+        if(t.contains("дракона"))return "логова драконов";
+        if(t.contains("Пещера"))return "пещеры";
+        if(t.contains("Руины")||t.contains("курган"))return "нордские руины";
+        if(t.contains("лагерь")||t.contains("Лагерь"))return "лагеря";
+        if(t.contains("Форт"))return "крепости";
+        if(t.contains("Башня"))return "башни";
+        if(t.contains("Деревня")||t.contains("Поселение"))return "деревни";
+        if(t.contains("Святилище"))return "даэдрические святилища";
+        return "обнаруженные места";
     }
-    /** Hit testing must not open hidden markers on a zoomed-out map. */
-    private boolean drawn(WorldAtlas.Place p,float zoom){
-        if(!visible(p))return false;
-        if(zoom>=2.5f||player(p)||major(p))return true;
-        return zoom>=1.5f&&
-            (p.type.equals("Деревня")||p.type.equals("Поселение"));
-    }
-    private float screenX(WorldAtlas.Place p){return left+positionX(p)*scale;}
-    private float screenY(WorldAtlas.Place p){return top+positionY(p)*scale;}
-
     @Override protected void onDraw(Canvas canvas){
-        super.onDraw(canvas);
-        canvas.drawColor(0xff091011);
-        Bitmap image=terrain(getContext());
-        if(image!=null){
-            terrainPaint.setAlpha(255);
-            canvas.drawBitmap(image,null,new RectF(left,top,
-                left+MAP_W*scale,top+MAP_H*scale),terrainPaint);
-        }
-        // Dark map labels stay legible even over snowy terrain.
-        float density=getResources().getDisplayMetrics().density;
-        float zoom=scale/Math.max(.0001f,minScale);
-        float radius=12f*density;
-        if(zoom>=1.6f){
-            // Multiple real places fall in the same coarse map square. Show
-            // a cluster count instead of claiming fabricated exact coordinates.
-            for(Map.Entry<String,ArrayList<SkyrimMapCatalog.Site>> pair:catalogClusters().entrySet()){
-                ArrayList<SkyrimMapCatalog.Site> list=pair.getValue();
-                if(list.isEmpty())continue;
-                SkyrimMapCatalog.Site site=list.get(0);
-                float x=left+site.x*scale,y=top+site.y*scale;
-                if(x<-60||y<-40||x>getWidth()+60||y>getHeight()+40)continue;
-                float r=(zoom>4f?15f:12f)*density;
-                pinPaint.setStyle(Paint.Style.FILL);
-                pinPaint.setColor(0xe60d1519);
-                canvas.drawCircle(x,y,r+2*density,pinPaint);
-                pinPaint.setColor(0xffc9ced1);
-                canvas.drawCircle(x,y,r,pinPaint);
-                pinPaint.setColor(0xff182124);
-                pinPaint.setTypeface(android.graphics.Typeface.DEFAULT_BOLD);
-                pinPaint.setTextSize(10*density);
-                String count=String.valueOf(list.size());
-                float width=pinPaint.measureText(count);
-                canvas.drawText(count,x-width/2f,y+3*density,pinPaint);
-                if(zoom>=5.6f){
-                    pinPaint.setTypeface(SovngardeTypeface.face(getContext(),false));
-                    pinPaint.setTextSize(12*density);
-                    pinPaint.setColor(0xffdfe5e6);
-                    canvas.drawText(site.grid+" · "+count+" мест",x+r+5*density,y,pinPaint);
-                }
+        super.onDraw(canvas);canvas.drawColor(0xff080c0e);
+        Bitmap image;synchronized(IMAGES){image=IMAGES[sheet];}
+        if(image!=null)canvas.drawBitmap(image,null,new RectF(left,top,left+WIDTH[sheet]*scale,top+HEIGHT[sheet]*scale),imagePaint);
+        ArrayList<MapPinLayout.Pin> shown=renderedPins();labels.clear();
+        for(MapPinLayout.Pin pin:shown){
+            SkyrimMapCatalog.Site site=pin.sites.get(0);
+            int color=pin.player?0xfff2dc98:pin.focus?0xffffffff:0xffd5dfe1;
+            ink.setStyle(Paint.Style.FILL);ink.setColor(0xe0091216);
+            float r=(pin.player?16:pin.sites.size()>1?14:11)*density;
+            canvas.drawCircle(pin.x,pin.y,r,ink);
+            if(pin.sites.size()>1){
+                ink.setColor(color);ink.setStyle(Paint.Style.STROKE);ink.setStrokeWidth(density);
+                canvas.drawCircle(pin.x,pin.y,r,ink);ink.setStyle(Paint.Style.FILL);
+                ink.setTextSize(11*density);ink.setTypeface(android.graphics.Typeface.DEFAULT_BOLD);
+                String count=String.valueOf(pin.sites.size());
+                canvas.drawText(count,pin.x-ink.measureText(count)/2,pin.y+4*density,ink);
+            }else if(!SkyrimIconAtlas.drawMarker(getContext(),canvas,
+                pin.player?"маркер игрока":symbol(site),color,pin.x,pin.y,(pin.player?30:23)*density)){
+                ink.setColor(color);canvas.drawCircle(pin.x,pin.y,5*density,ink);
+            }
+            if(pin.player||pin.focus){
+                ink.setColor(color);ink.setStyle(Paint.Style.STROKE);ink.setStrokeWidth(1.5f*density);
+                canvas.drawCircle(pin.x,pin.y,r+4*density,ink);ink.setStyle(Paint.Style.FILL);
             }
         }
-        for(WorldAtlas.Place p:WorldAtlas.all()){
-            if(!drawn(p,zoom))continue;
-            boolean selected=player(p),capital=major(p);
-            float x=screenX(p),y=screenY(p);
-            if(x<-100||y<-60||x>getWidth()+100||y>getHeight()+60)continue;
-            float size=(selected?28:capital?23:17)*density;
-            String symbol=selected?"маркер игрока":capital?"столицы владений":
-                p.type.contains("Пещера")?"пещеры":
-                p.type.contains("Руины")?"нордские руины":
-                p.type.contains("Форт")?"крепости":
-                p.type.contains("Деревня")?"деревни":
-                p.type.contains("Святилище")?"даэдрические святилища":"обнаруженные места";
-            int color=selected?0xfff5df9b:capital?0xffe4d9c4:0xffc5cbd0;
-            if(!SkyrimIconAtlas.drawMarker(getContext(),canvas,symbol,color,x,y,size)){
-                pinPaint.setStyle(Paint.Style.FILL);pinPaint.setColor(0xff0b1315);
-                canvas.drawCircle(x,y,radius*.74f,pinPaint);
-                pinPaint.setColor(color);canvas.drawCircle(x,y,radius*.48f,pinPaint);
-            }
-            if(selected||capital||(zoom>=4.2f)){
-                pinPaint.setTypeface(SovngardeTypeface.face(getContext(),selected||capital));
-                pinPaint.setTextSize((selected?17:capital?15:13)*density);
-                pinPaint.setStyle(Paint.Style.STROKE);
-                pinPaint.setStrokeWidth(3f*density);
-                pinPaint.setColor(0xe3091014);
-                canvas.drawText(p.name,x+radius+4*density,y-4*density,pinPaint);
-                pinPaint.setStyle(Paint.Style.FILL);pinPaint.setColor(color);
-                canvas.drawText(p.name,x+radius+4*density,y-4*density,pinPaint);
-            }
-            if(selected){
-                pinPaint.setStyle(Paint.Style.STROKE);
-                pinPaint.setColor(0xfff5df9b);pinPaint.setStrokeWidth(1.7f*density);
-                canvas.drawCircle(x,y,radius*1.4f,pinPaint);
-                pinPaint.setStyle(Paint.Style.FILL);
-            }
+        // Reserve text rectangles in priority order, so labels never cover each other.
+        for(int pass=0;pass<3;pass++)for(MapPinLayout.Pin pin:shown){
+            SkyrimMapCatalog.Site site=pin.sites.get(0);
+            int priority=pin.player||pin.focus?0:site.capital()?1:2;
+            if(priority!=pass||pin.sites.size()!=1)continue;
+            if(pass==2&&scale/minScale<4.2f)continue;
+            ink.setTypeface(SovngardeTypeface.face(getContext(),pass<2));
+            ink.setTextSize((pass==0?16:pass==1?14:12)*density);
+            String title=site.name;
+            float maxWidth=Math.min(225*density,getWidth()-18*density);
+            while(title.length()>8&&ink.measureText(title)>maxWidth)title=title.substring(0,title.length()-2);
+            if(!title.equals(site.name))title+="…";
+            float tw=ink.measureText(title);
+            float tx=Math.max(7*density,Math.min(getWidth()-tw-7*density,pin.x+16*density));
+            float ty=Math.max(19*density,Math.min(getHeight()-30*density,pin.y-6*density));
+            RectF rect=new RectF(tx-3*density,ty-17*density,tx+tw+3*density,ty+4*density);
+            boolean overlap=false;for(RectF old:labels)if(RectF.intersects(old,rect)){overlap=true;break;}
+            if(overlap)continue;labels.add(rect);
+            ink.setColor(0xff080d11);ink.setStyle(Paint.Style.STROKE);ink.setStrokeWidth(3*density);
+            canvas.drawText(title,tx,ty,ink);
+            ink.setStyle(Paint.Style.FILL);ink.setColor(pin.player?0xfff2dc98:0xfff0f1eb);
+            canvas.drawText(title,tx,ty,ink);
         }
-        // Small zoom indication. Does not intercept touch or cover map controls.
-        pinPaint.setTypeface(android.graphics.Typeface.DEFAULT);
-        pinPaint.setStyle(Paint.Style.FILL);
-        pinPaint.setTextSize(10*density);
-        pinPaint.setColor(0xfff1f1e9);
-        canvas.drawText(String.format(java.util.Locale.ROOT,"×%.1f",zoom),
-            12*density,getHeight()-13*density,pinPaint);
+        ink.setTypeface(android.graphics.Typeface.DEFAULT);ink.setTextSize(11*density);
+        ink.setStyle(Paint.Style.FILL);ink.setColor(0xe6081115);
+        canvas.drawRect(0,getHeight()-27*density,getWidth(),getHeight(),ink);
+        ink.setColor(0xffe1e7e7);
+        String status=(sheet==0?"СКАЙРИМ":"СОЛСТЕЙМ · РИСОВАННЫЙ АТЛАС")+
+            String.format(java.util.Locale.ROOT,"  ×%.1f",scale/Math.max(.0001f,minScale));
+        if(loading)status+=" · Загрузка рельефа…";
+        else if(failed)status+=" · Рельеф недоступен";
+        if(SkyrimMapCatalog.find(game.progress.location)==null)status+=" · Герой вне поверхности";
+        canvas.drawText(status,10*density,getHeight()-10*density,ink);
     }
-
     private void select(float x,float y){
-        WorldAtlas.Place best=null;float bestDistance=Float.MAX_VALUE;
-        float radius=35f*getResources().getDisplayMetrics().density;
-        float zoom=scale/Math.max(.0001f,minScale);
-        for(WorldAtlas.Place p:WorldAtlas.all()){
-            if(!drawn(p,zoom))continue;
-            float dx=x-screenX(p),dy=y-screenY(p);
-            float distance=dx*dx+dy*dy;
-            if(distance<bestDistance){bestDistance=distance;best=p;}
-        }
-        ArrayList<SkyrimMapCatalog.Site> catalogBest=null;
-        float catalogDistance=Float.MAX_VALUE;
-        if(scale/Math.max(.0001f,minScale)>=1.6f){
-            for(ArrayList<SkyrimMapCatalog.Site> list:catalogClusters().values()){
-                if(list.isEmpty())continue;
-                SkyrimMapCatalog.Site p=list.get(0);
-                float sx=left+p.x*scale,sy=top+p.y*scale;
-                float dx=x-sx,dy=y-sy,distance=dx*dx+dy*dy;
-                if(distance<catalogDistance){catalogDistance=distance;catalogBest=list;}
+        MapPinLayout.Pin pin=MapPinLayout.hit(renderedPins(),x,y,28*density);
+        if(pin==null){performClick();return;}
+        if(pin.sites.size()>1){
+            float minX=Float.MAX_VALUE,minY=Float.MAX_VALUE,maxX=-Float.MAX_VALUE,maxY=-Float.MAX_VALUE;
+            for(SkyrimMapCatalog.Site site:pin.sites){
+                minX=Math.min(minX,site.x);maxX=Math.max(maxX,site.x);
+                minY=Math.min(minY,site.y);maxY=Math.max(maxY,site.y);
             }
+            float spread=Math.max(maxX-minX,maxY-minY)*scale;
+            if(scale<maxScale*.9f&&spread>8*density){
+                zoomAt(1.8f,pin.x,pin.y);persist();
+            }else if(catalogCallback!=null)catalogCallback.selected(new ArrayList<>(pin.sites));
+        }else{
+            SkyrimMapCatalog.Site site=pin.sites.get(0);focusId=site.id;changed();
+            WorldAtlas.Place place=WorldAtlas.find(site.name);
+            if(catalogCallback!=null)catalogCallback.selected(new ArrayList<>(pin.sites));
+            else if(place!=null&&callback!=null)callback.selected(place);
         }
-        if(catalogBest!=null&&catalogDistance<radius*radius
-                &&(best==null||catalogDistance<bestDistance)&&catalogCallback!=null)
-            catalogCallback.selected(catalogBest);
-        else if(best!=null&&bestDistance<radius*radius&&callback!=null)
-            callback.selected(best);
         performClick();
+    }
+    @Override public void computeScroll(){
+        if(inertia.computeScrollOffset()){
+            left=inertia.getCurrX();top=inertia.getCurrY();constrain();pins=null;postInvalidateOnAnimation();
+            if(inertia.isFinished())persist();
+        }
     }
     @Override public boolean onTouchEvent(MotionEvent event){
         int action=event.getActionMasked();
         if(action==MotionEvent.ACTION_DOWN){
-            dragged=false;touchX=event.getX();touchY=event.getY();
-            ViewParent parent=getParent();
+            dragged=false;ViewParent parent=getParent();
             if(parent!=null)parent.requestDisallowInterceptTouchEvent(true);
         }
-        scaler.onTouchEvent(event);
-        gesture.onTouchEvent(event);
+        scaler.onTouchEvent(event);gesture.onTouchEvent(event);
         if(action==MotionEvent.ACTION_POINTER_DOWN)dragged=true;
         if(action==MotionEvent.ACTION_UP||action==MotionEvent.ACTION_CANCEL){
-            persist();
-            ViewParent parent=getParent();
+            persist();ViewParent parent=getParent();
             if(parent!=null)parent.requestDisallowInterceptTouchEvent(false);
         }
         return true;
     }
-    @Override protected void onDetachedFromWindow(){
-        persist();
-        super.onDetachedFromWindow();
-    }
+    @Override protected void onDetachedFromWindow(){inertia.forceFinished(true);persist();super.onDetachedFromWindow();}
     @Override public boolean performClick(){super.performClick();return true;}
 }
+
