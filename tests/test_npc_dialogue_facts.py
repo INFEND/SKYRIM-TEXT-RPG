@@ -27,7 +27,7 @@ class NpcDialogueFactsTest(unittest.TestCase):
 
     def test_full_ledger_cannot_grant_untracked_rewards(self):
         block = ENGINE.split('case "TALK_GIVE":', 1)[1].split('case "BUY_HP":', 1)[0]
-        self.assertLess(block.index('sceneState.confirm("npc", currentConversationId()', block.index("gold-=10;reputation++;addXp(8);"))
+        self.assertLess(block.index('sceneState.confirm("npc", currentConversationId()'), block.index("gold-=10;reputation++;addXp(8);"))
         self.assertIn("catch(JSONException ledgerFull)", block)
         self.assertIn("Награда и септимы не изменились", block)
         self.assertIn("public String status(String kind,String key)", SCENE)
