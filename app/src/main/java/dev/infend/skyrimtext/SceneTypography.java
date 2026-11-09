@@ -80,8 +80,8 @@ public final class SceneTypography {
             boolean heroSpeaker=speaker&&plain.matches("(?iu)ты\\s*:")
                 &&heroName!=null&&!heroName.trim().isEmpty();
             if(heroSpeaker){
-                String safe=heroName.replace("*","").replace("\\n"," ")
-                    .replace("\\r"," ").trim();
+                String safe=heroName.replace("*","").replace("\n"," ")
+                    .replace("\r"," ").trim();
                 if(safe.length()>48)safe=safe.substring(0,48);
                 line=line.startsWith("**")?"**"+safe+":**":safe+":";
             }
