@@ -110,12 +110,9 @@ public final class UpdateManager {
         NetworkCapabilities caps=network==null?null:cm.getNetworkCapabilities(network);
         if(caps==null||!caps.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET))
             throw new IOException("Нет подключения к интернету. Включите Wi-Fi или мобильные данные.");
-        try{InetAddress.getAllByName("github.com");}
-        catch(UnknownHostException e){
-            if(!caps.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED))
-                throw new IOException("Сеть подключена, но интернет или DNS недоступны. Проверьте Wi-Fi, мобильные данные и VPN.",e);
-            throw new IOException("Интернет доступен, но сервер обновлений не определяется. Проверьте DNS и VPN.",e);
-        }
+        // Do not DNS-probe github.com here: a VPN, DNS filter or temporary
+        // GitHub outage must not block the trusted raw.githubusercontent.com mirror.
+        // The HTTPS request below provides the authoritative connectivity result.
     }
     private static String friendly(Exception e){
         if(e instanceof UnknownHostException)return "Не удаётся определить адрес сервера обновлений. Проверьте интернет, DNS и VPN.";
