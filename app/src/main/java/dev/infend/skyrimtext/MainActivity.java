@@ -253,6 +253,7 @@ public final class MainActivity extends Activity {
                         return false;
                     }
                     stageForRender.getViewTreeObserver().removeOnPreDrawListener(this);
+                    updateChromeScrollClip();
                     return true;
                 }
             });
@@ -260,40 +261,34 @@ public final class MainActivity extends Activity {
         resumeViewport(oldScroll,scroll,thisPage);
         if(animations){content.setAlpha(0.8f);content.animate().alpha(1f).setDuration(210).setInterpolator(new DecelerateInterpolator()).start();}
     }
-    /** Overlay is scroll-independent: no relayout, changing content offset or jump. */
+    /**
+     * A fixed-height scrolling canvas, clipped below the visible top chrome.
+     * The chrome itself is translated gradually, never removed or remeasured.
+     * This prevents the heading and stats from drawing OVER the story while
+     * avoiding the jumping viewport caused by resizing a parent LinearLayout.
+     */
     private void handleVerticalScroll(int y,int previousY){
         if(titleOpen||!game.started||topChrome==null)return;
+        if(android.os.SystemClock.uptimeMillis()<chromeIgnoreScrollUntil)return;
+        int height=topChrome.getHeight();
+        if(height<=0)return;
         int delta=y-previousY;
-        if(y<=dp(8)){setChromeVisible(true);chromeScrollTravel=0;return;}
-        if(android.os.SystemClock.uptimeMillis()<chromeIgnoreScrollUntil||Math.abs(delta)<dp(2))
-            return;
-        if((delta>0)==(chromeScrollTravel>0))chromeScrollTravel+=delta;
-        else chromeScrollTravel=delta;
-        if(!chromeHidden&&chromeScrollTravel>dp(19)){
-            setChromeVisible(false);chromeScrollTravel=0;
-        }else if(chromeHidden&&chromeScrollTravel<-dp(11)){
-            setChromeVisible(true);chromeScrollTravel=0;
-        }
+        if(y<=dp(3))chromeScrollTravel=0;
+        else if(delta!=0)chromeScrollTravel=Math.max(0,Math.min(height,chromeScrollTravel+delta));
+        chromeHidden=chromeScrollTravel>=height;
+        updateChromeScrollClip();
     }
-    private void setChromeVisible(boolean visible){
-        if(topChrome==null||chromeHidden==!visible)return;
-        chromeHidden=!visible;
-        chromeIgnoreScrollUntil=android.os.SystemClock.uptimeMillis()+120L;
-        topChrome.animate().cancel();
-        if(visible){
-            topChrome.setVisibility(View.VISIBLE);
-            if(animations){
-                topChrome.setAlpha(0f);
-                topChrome.animate().alpha(1f).setDuration(160L).start();
-            }else topChrome.setAlpha(1f);
-        }else if(animations){
-            final LinearLayout target=topChrome;
-            target.animate().alpha(0f).setDuration(140L).withEndAction(()->{
-                if(target==topChrome&&chromeHidden)target.setVisibility(View.GONE);
-            }).start();
-        }else{
-            topChrome.setVisibility(View.GONE);
-        }
+    private void updateChromeScrollClip(){
+        if(scroll==null||topChrome==null||scroll.getWidth()<=0||scroll.getHeight()<=0)return;
+        int headerHeight=topChrome.getHeight();
+        int hidden=Math.max(0,Math.min(headerHeight,chromeScrollTravel));
+        topChrome.setVisibility(View.VISIBLE);
+        topChrome.setAlpha(1f);
+        topChrome.setTranslationY(-hidden);
+        // Never let text/photographs be visible beneath the stuck-to-top header.
+        int visibleHeader=Math.max(0,headerHeight-hidden);
+        scroll.setClipBounds(new android.graphics.Rect(
+            0,visibleHeader,scroll.getWidth(),scroll.getHeight()));
     }
     private void renderHeader(){
         header=row();header.setPadding(dp(13),dp(9),dp(13),dp(9));
