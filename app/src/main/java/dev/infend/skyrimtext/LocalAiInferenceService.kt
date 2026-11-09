@@ -27,6 +27,7 @@ class LocalAiInferenceService:Service() {
         const val MSG_GENERATE=1
         const val MSG_CANCEL=2
         const val MSG_RESULT=3
+        const val MSG_STATUS=4
     }
     private val scope=CoroutineScope(SupervisorJob()+Dispatchers.IO)
     private val handler=Handler(Looper.getMainLooper()) { message ->
@@ -54,7 +55,7 @@ class LocalAiInferenceService:Service() {
         val path=input.getString("path").orEmpty()
         val instructions=input.getString("system").orEmpty()
         val prompt=input.getString("prompt").orEmpty()
-        val maxTokens=input.getInt("maxTokens",1536).coerceIn(128,2048)
+        val maxTokens=input.getInt("maxTokens",896).coerceIn(16,1536)
         if(busy){
             reply(recipient,id,null,"Локальная модель ещё обрабатывает предыдущий ход.")
             return
@@ -68,11 +69,16 @@ class LocalAiInferenceService:Service() {
             return
         }
         busy=true
+        replyStatus(recipient,id,"Запуск локального движка…")
         scope.launch {
             var answer:String?=null
             var error:String?=null
+            var tokens=0
+            var speed=0f
+            var elapsed=0L
             try {
                 if(cachedPath!=path||cached==null){
+                    replyStatus(recipient,id,"Загрузка GGUF в оперативную память…")
                     cached?.let {Llama.releaseModel(it)}
                     cached=null;cachedPath=""
                     cached=Llama.loadModel(path,LlamaConfig(
@@ -85,22 +91,38 @@ class LocalAiInferenceService:Service() {
                     cachedPath=path
                 }
                 val model=cached ?: kotlin.error("GGUF не загрузился")
-                answer=Llama.complete(model,prompt=prompt,systemPrompt=instructions,
-                    maxTokens=maxTokens).text
+                replyStatus(recipient,id,"Обработка контекста и генерация на CPU (без потокового вывода)…")
+                val started=android.os.SystemClock.elapsedRealtime()
+                val result=Llama.complete(model,prompt=prompt,systemPrompt=instructions,
+                    maxTokens=maxTokens)
+                answer=result.text
+                tokens=result.tokensGenerated
+                speed=result.tokensPerSecond
+                elapsed=android.os.SystemClock.elapsedRealtime()-started
                 if(answer.isNullOrBlank())kotlin.error("Модель вернула пустой ответ")
             }catch(ex:Throwable){
                 error=ex.message?:"Ошибка локального движка"
             }finally{busy=false}
-            reply(recipient,id,answer,error)
+            reply(recipient,id,answer,error,tokens,speed,elapsed)
         }
     }
 
-    private fun reply(to:Messenger,id:Long,answer:String?,error:String?){
+    private fun replyStatus(to:Messenger,id:Long,status:String){
+        val msg=Message.obtain(null,MSG_STATUS)
+        msg.data=Bundle().apply{putLong("id",id);putString("status",status)}
+        try{to.send(msg)}catch(_:Exception){}
+    }
+
+    private fun reply(to:Messenger,id:Long,answer:String?,error:String?,
+                      tokens:Int=0,speed:Float=0f,elapsed:Long=0L){
         val msg=Message.obtain(null,MSG_RESULT)
         msg.data=Bundle().apply{
             putLong("id",id)
             if(answer!=null)putString("answer",answer)
             if(error!=null)putString("error",error)
+            putInt("tokens",tokens)
+            putFloat("speed",speed)
+            putLong("elapsedMs",elapsed)
         }
         try{to.send(msg)}catch(_:Exception){}
     }
