@@ -309,7 +309,8 @@ public final class GameEngine {
             case "Q_FINISH": if(questStage==3 && region==3) {questStage=4;confirmSceneFact("clue", "quest_seal", "Печать хранителей восстановлена", "RESOLVED");gold+=300;reputation+=5;addXp(180);message="Хранители принимают журнал и восстанавливают печать. Скайрим получает ещё один мирный рассвет. Награда: 300 септимов и 180 опыта.";mode="RESULT";} break;
             case "TALK_HELP":
                 confirmCurrentConversation();
-                confirmSceneFact("npc", currentConversationId(), currentConversationName(), "INFORMED");
+                if(!hasNpcStatus("_helped"))
+                    confirmSceneFact("npc", currentConversationId(), currentConversationName(), "INFORMED");
                 message=questStage==1?"Слух подтверждается: ищи старые плиты в Фолкрите.":questStage==2?"О башне в Винтерхолде говорят вполголоса. Возьми зелья.":"Поговаривают, что на дороге появилось больше разбойников.";
                 mode="RESULT";break;
             case "TALK_GIVE":
