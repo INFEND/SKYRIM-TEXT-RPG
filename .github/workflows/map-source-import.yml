@@ -10,28 +10,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Read published Solstheim terrain metadata
+      - name: Read published Solstheim projection configuration
         shell: python
         run: |
-          import pathlib,urllib.request,re,urllib.parse
-          out=pathlib.Path("docs/map-source")
-          for name,url in (("solstheim-terrain","https://skyrimmap.com/solstheim"),("dragonborn-terrain","https://tamrielma.ps/dragonborn/")):
-              try:
-                  with urllib.request.urlopen(url,timeout=60) as r: raw=r.read().decode()
-                  (out/f"{name}.html").write_text(raw)
-                  scripts=re.findall(r'<script[^>]+src=["\x27]([^"\x27]+)',raw)
-                  print(name,len(raw),"SCRIPTS",scripts,"IMAGES",re.findall(r'[^"\'\s<>]+\.(?:jpg|webp|png)[^"\'\s<>]*',raw)[:25])
-                  for i,script in enumerate(scripts[:3]):
-                      link=urllib.parse.urljoin(url,script)
-                      try:
-                          with urllib.request.urlopen(link,timeout=60) as r: body=r.read()
-                          if len(body)<1_000_000:(out/f"{name}-{i}.js").write_bytes(body)
-                      except Exception as error:print("script",link,repr(error))
-              except Exception as error: print(url,repr(error))
-      - name: Save projection metadata on import branch
+          import pathlib,urllib.request
+          with urllib.request.urlopen("https://tamrielma.ps/js/dragonborn-min.js",timeout=60) as r: body=r.read()
+          pathlib.Path("docs/map-source/dragonborn-map.js").write_bytes(body)
+          print("Projection script",len(body))
+      - name: Save projection metadata
         run: |
           git config user.name INFEND
           git config user.email 342005527+INFEND@users.noreply.github.com
-          git add docs/map-source
-          git diff --cached --quiet || git commit -m "Read public terrain metadata for Solstheim calibration"
+          git add docs/map-source/dragonborn-map.js
+          git diff --cached --quiet || git commit -m "Read Solstheim terrain tile projection"
           git push origin HEAD:map-source-import
