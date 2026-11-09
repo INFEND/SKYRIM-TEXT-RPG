@@ -1,0 +1,370 @@
+[
+  {
+    "name": "Glacial Cave",
+    "coordinates": [
+      1.5820313,
+      69.287257,
+      0
+    ]
+  },
+  {
+    "name": "Castle Karstaag Caverns",
+    "coordinates": [
+      -27.2460937,
+      66.6529774,
+      0
+    ]
+  },
+  {
+    "name": "Castle Karstaag Ruins",
+    "coordinates": [
+      -38.2324219,
+      68.2693868,
+      0
+    ]
+  },
+  {
+    "name": "Bristleback Cave",
+    "coordinates": [
+      -78.9257812,
+      53.9560855,
+      0
+    ]
+  },
+  {
+    "name": "Benkongerike",
+    "coordinates": [
+      14.4140625,
+      54.3165232,
+      0
+    ]
+  },
+  {
+    "name": "Hrothmund's Barrow",
+    "coordinates": [
+      -4.0429687,
+      43.9611906,
+      0
+    ]
+  },
+  {
+    "name": "Frossel",
+    "coordinates": [
+      86.9238281,
+      55.9737982,
+      0
+    ]
+  },
+  {
+    "name": "Frostmoon Crag",
+    "coordinates": [
+      -8.0859375,
+      2.6357886,
+      0
+    ]
+  },
+  {
+    "name": "Moesring Pass",
+    "coordinates": [
+      -3.9550781,
+      33.3580616,
+      0
+    ]
+  },
+  {
+    "name": "Wreck of the Strident Squall",
+    "coordinates": [
+      -47.4609375,
+      -82.8969869,
+      0
+    ]
+  },
+  {
+    "name": "Skaal Village",
+    "coordinates": [
+      94.3945313,
+      14.9447849,
+      0
+    ]
+  },
+  {
+    "name": "Thirsk Mead Hall",
+    "coordinates": [
+      72.421875,
+      1.4061088,
+      0
+    ]
+  },
+  {
+    "name": "Tel Mithryn",
+    "coordinates": [
+      118.6523438,
+      -73.0225916,
+      0
+    ]
+  },
+  {
+    "name": "White Ridge Barrow",
+    "coordinates": [
+      -37.6171875,
+      37.9961627,
+      0
+    ]
+  },
+  {
+    "name": "Bloodskal Barrow",
+    "coordinates": [
+      -59.5898437,
+      -27.2155562,
+      0
+    ]
+  },
+  {
+    "name": "Gyldenhul Barrow",
+    "coordinates": [
+      124.1015625,
+      25.4829512,
+      0
+    ]
+  },
+  {
+    "name": "Kolbjorn Barrow",
+    "coordinates": [
+      -31.1132812,
+      -72.422268,
+      0
+    ]
+  },
+  {
+    "name": "Bujold's Retreat",
+    "coordinates": [
+      127.4414063,
+      -25.4829512,
+      0
+    ]
+  },
+  {
+    "name": "Haknir's Shoal",
+    "coordinates": [
+      70.4882813,
+      51.7270282,
+      0
+    ]
+  },
+  {
+    "name": "Ashfallow Citadel",
+    "coordinates": [
+      76.8164063,
+      -45.2130036,
+      0
+    ]
+  },
+  {
+    "name": "Highpoint Tower",
+    "coordinates": [
+      24.2578125,
+      -51.8357775,
+      0
+    ]
+  },
+  {
+    "name": "Fort Frostmoth",
+    "coordinates": [
+      28.828125,
+      -73.2773532,
+      0
+    ]
+  },
+  {
+    "name": "Headwaters of Harstrad",
+    "coordinates": [
+      37.6171875,
+      41.5085773,
+      0
+    ]
+  },
+  {
+    "name": "Abandoned Lodge",
+    "coordinates": [
+      -32.34375,
+      -9.4490618,
+      0
+    ]
+  },
+  {
+    "name": "Hrodulf's House",
+    "coordinates": [
+      -8.5253906,
+      -78.0619892,
+      0
+    ]
+  },
+  {
+    "name": "Ramshackle Trading Post",
+    "coordinates": [
+      56.7773438,
+      -43.0688878,
+      0
+    ]
+  },
+  {
+    "name": "Saering's Watch",
+    "coordinates": [
+      -5.2734375,
+      58.6312166,
+      0
+    ]
+  },
+  {
+    "name": "Damphall Mine",
+    "coordinates": [
+      -58.4472656,
+      -13.410994,
+      0
+    ]
+  },
+  {
+    "name": "Broken Tusk Mine",
+    "coordinates": [
+      -74.8828125,
+      55.1788677,
+      0
+    ]
+  },
+  {
+    "name": "Stalhrim Source",
+    "coordinates": [
+      -53.2617187,
+      55.5783447,
+      0
+    ]
+  },
+  {
+    "name": "Old Attius Farm",
+    "coordinates": [
+      -44.8242187,
+      -76.5168189,
+      0
+    ]
+  },
+  {
+    "name": "Fahlbtharz",
+    "coordinates": [
+      -45.3515625,
+      23.2413461,
+      0
+    ]
+  },
+  {
+    "name": "Kagrumez",
+    "coordinates": [
+      54.4921875,
+      -48.9224993,
+      0
+    ]
+  },
+  {
+    "name": "Nchardak",
+    "coordinates": [
+      148.0078125,
+      -47.5172007,
+      0
+    ]
+  },
+  {
+    "name": "Horker Island",
+    "coordinates": [
+      137.8125,
+      23.2413461,
+      0
+    ]
+  },
+  {
+    "name": "Altar of Thrond",
+    "coordinates": [
+      17.578125,
+      -3.337954,
+      0
+    ]
+  },
+  {
+    "name": "Brodir Grove",
+    "coordinates": [
+      -10.0195312,
+      -46.6795945,
+      0
+    ]
+  },
+  {
+    "name": "Northshore Landing",
+    "coordinates": [
+      -63.3691406,
+      69.4421276,
+      0
+    ]
+  },
+  {
+    "name": "Snowclad Ruins",
+    "coordinates": [
+      22.6757813,
+      31.203405,
+      0
+    ]
+  },
+  {
+    "name": "Earth Stone",
+    "coordinates": [
+      -79.1894531,
+      -66.7225413,
+      0
+    ]
+  },
+  {
+    "name": "Sun Stone",
+    "coordinates": [
+      108.4570313,
+      -63.8600359,
+      0
+    ]
+  },
+  {
+    "name": "Beast Stone",
+    "coordinates": [
+      60.8203125,
+      3.1624555,
+      0
+    ]
+  },
+  {
+    "name": "Water Stone",
+    "coordinates": [
+      -73.828125,
+      17.1407904,
+      0
+    ]
+  },
+  {
+    "name": "Wind Stone",
+    "coordinates": [
+      59.9414063,
+      35.8890501,
+      0
+    ]
+  },
+  {
+    "name": "Raven Rock",
+    "coordinates": [
+      -50.5371094,
+      -58.4477328,
+      0
+    ]
+  },
+  {
+    "name": "Temple of Miraak",
+    "coordinates": [
+      41.6601563,
+      -15.1145529,
+      0
+    ]
+  }
+]
