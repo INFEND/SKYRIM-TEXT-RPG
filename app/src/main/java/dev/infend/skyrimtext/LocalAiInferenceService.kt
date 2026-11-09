@@ -41,7 +41,7 @@ class LocalAiInferenceService:Service() {
         true
     }
     private val messenger=Messenger(handler)
-    private var busy=false
+    @Volatile private var busy=false
     private var cachedPath=""
     private var cached:LlamaModel?=null
 
@@ -84,10 +84,10 @@ class LocalAiInferenceService:Service() {
                     ))
                     cachedPath=path
                 }
-                val model=cached ?: error("GGUF не загрузился")
+                val model=cached ?: kotlin.error("GGUF не загрузился")
                 answer=Llama.complete(model,prompt=prompt,systemPrompt=instructions,
                     maxTokens=maxTokens).text
-                if(answer.isNullOrBlank())error("Модель вернула пустой ответ")
+                if(answer.isNullOrBlank())kotlin.error("Модель вернула пустой ответ")
             }catch(ex:Throwable){
                 error=ex.message?:"Ошибка локального движка"
             }finally{busy=false}
