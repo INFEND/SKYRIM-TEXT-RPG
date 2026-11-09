@@ -20,6 +20,8 @@ import java.util.concurrent.Executors;
 final class AiStoryClient {
     interface Listener {
         void onText(String accumulated);
+        // Only server-provided reasoning summaries, never raw private reasoning.
+        default void onReasoningSummary(String summary){}
         void onComplete(String answer);
         void onError(String message);
     }
@@ -98,6 +100,7 @@ final class AiStoryClient {
         running = true;
         executor.execute(() -> {
             StringBuilder answer = new StringBuilder();
+            StringBuilder reasoningSummary = new StringBuilder();
             boolean completed = false;
             long lastDraw = 0;
             String complete=null;
@@ -116,8 +119,15 @@ final class AiStoryClient {
                 payload.put("store", false);
                 // In auto mode use the model's default. Explicit effort changes
                 // the model's reasoning budget, not just an instruction in prose.
+                JSONObject reasoning=new JSONObject();
                 if(!AiReasoningEffort.isAutomatic(selectedEffort))
-                    payload.put("reasoning",new JSONObject().put("effort",selectedEffort));
+                    reasoning.put("effort",selectedEffort);
+                // Responses API provides an optional readable SUMMARY, not raw CoT.
+                // Do not request this unsupported parameter from the ChatGPT-plan endpoint.
+                if(!chatGptPlan && (model.startsWith("gpt-5")||model.startsWith("gpt-6")
+                    ||model.startsWith("o3")||model.startsWith("o4")))
+                    reasoning.put("summary","auto");
+                if(reasoning.length()>0)payload.put("reasoning",reasoning);
                 if(!chatGptPlan)
                     payload.put("max_output_tokens",AiReasoningEffort.apiOutputLimit(selectedEffort));
                 HttpURLConnection conn = (HttpURLConnection) new URL(ENDPOINT).openConnection();
@@ -154,6 +164,16 @@ final class AiStoryClient {
                         if ("response.incomplete".equals(type))
                             throw new IllegalStateException("ИИ не завершил ответ");
                         if ("response.completed".equals(type))completed=true;
+                        if ("response.reasoning_summary_text.delta".equals(type)){
+                            String delta=event.optString("delta","");
+                            if(!delta.isEmpty()&&reasoningSummary.length()<1800){
+                                reasoningSummary.append(delta,0,Math.min(delta.length(),1800-reasoningSummary.length()));
+                                String view=reasoningSummary.toString();
+                                main.post(()->{
+                                    if(!cancelled&&sequence==id)listener.onReasoningSummary(view);
+                                });
+                            }
+                        }
                         if ("response.output_text.delta".equals(type)) {
                             answer.append(event.optString("delta", ""));
                             long now = System.currentTimeMillis();
