@@ -1350,6 +1350,7 @@ public final class MainActivity extends Activity {
         addText(overview,"Регион: "+GameEngine.REGIONS[game.region]+"  •  день "+game.day,13,MUTED,false,9);
         final SkyrimTerrainMapView terrainMap=new SkyrimTerrainMapView(
             this,game,this::locationDialog,hiddenMapTypes);
+        terrainMap.setOnCatalog(this::atlasSitesDialog);
         overview.addView(terrainMap,lp(-1,410));
         LinearLayout mapActions=row();
         mapActions.setGravity(Gravity.CENTER);
@@ -1374,6 +1375,9 @@ public final class MainActivity extends Activity {
             overview.addView(new LocationGalleryView(this,game.progress.location,accent(),false),lp(-1,-2));
         }
         addText(content,"МЕСТА И ПЕРЕХОДЫ",11,accent(),true,10);
+        actionButton("ПОИСК ПО ВСЕМ ТОЧКАМ АТЛАСА",
+            "Игровые переходы и "+SkyrimMapCatalog.size()+" справочных мест",false,
+            this::searchSkyrimAtlas);
         String[] regions=new String[GameEngine.REGIONS.length+1];regions[0]="Все регионы";
         System.arraycopy(GameEngine.REGIONS,0,regions,1,GameEngine.REGIONS.length);
         android.widget.Spinner filter=spinner(regions,selectedMapRegion+1,i->{
@@ -1383,7 +1387,9 @@ public final class MainActivity extends Activity {
         renderMapTypeFilters();
         java.util.ArrayList<WorldAtlas.Place> places=selectedMapRegion<0?WorldAtlas.all():WorldAtlas.byRegion(selectedMapRegion);
         places.removeIf(place->hiddenMapTypes.contains(place.type));
-        addText(content,"Обозначено мест: "+places.size(),12,MUTED,false,8);
+        addText(content,"Игровых мест: "+places.size()+
+            "  ·  Дополнительных меток: "+SkyrimMapCatalog.size(),
+            12,MUTED,false,8);
         for(WorldAtlas.Place place:places){
             String status=place.name.equals(game.progress.location)?"  •  ВЫ ЗДЕСЬ":"";
             TravelPlanner.Route route=TravelPlanner.plan(game,place);
@@ -1414,6 +1420,7 @@ public final class MainActivity extends Activity {
         scene.setBackgroundColor(0xff06090a);
         SkyrimTerrainMapView map=new SkyrimTerrainMapView(
             this,game,this::locationDialog,hiddenMapTypes);
+        map.setOnCatalog(this::atlasSitesDialog);
         scene.addView(map,new FrameLayout.LayoutParams(-1,-1));
         LinearLayout toolbar=row();
         toolbar.setGravity(Gravity.CENTER_VERTICAL);
@@ -1443,6 +1450,85 @@ public final class MainActivity extends Activity {
             window.setLayout(-1,-1);
         }
     }
+    /** A reference grid cell may include several genuine places. */
+    private void atlasSitesDialog(java.util.ArrayList<SkyrimMapCatalog.Site> sites){
+        if(sites==null||sites.isEmpty())return;
+        if(sites.size()==1){atlasSiteDialog(sites.get(0));return;}
+        String[] names=new String[sites.size()];
+        for(int i=0;i<sites.size();i++){
+            SkyrimMapCatalog.Site site=sites.get(i);
+            names[i]=site.name+"  ·  "+site.type;
+        }
+        new RuneDialogBuilder(this,accent())
+            .setTitle("Места на участке "+sites.get(0).grid)
+            .setItems(names,(dialog,which)->atlasSiteDialog(sites.get(which)))
+            .setNegativeButton("Закрыть",null).show();
+    }
+    private void atlasSiteDialog(SkyrimMapCatalog.Site site){
+        String details="Тип: "+site.type+"\n"
+            +"Сектор карты: "+site.grid+"\n\n"
+            +"Положение ориентировочное, по справочной сетке. "
+            +"Метка помогает найти место, но пока не является отдельным "
+            +"действием путешествия в текстовой RPG.";
+        new RuneDialogBuilder(this,accent()).setTitle(site.name)
+            .setMessage(details).setNegativeButton("Закрыть",null).show();
+    }
+    private void searchSkyrimAtlas(){
+        LinearLayout wrapper=column();
+        wrapper.setPadding(dp(14),dp(6),dp(14),dp(7));
+        EditText query=new EditText(this);
+        query.setSingleLine(true);
+        query.setTextColor(TEXT);
+        query.setHintTextColor(MUTED);
+        query.setTextSize(sp(15));
+        query.setHint("Название места, например, Mzulft");
+        wrapper.addView(query,lp(-1,49));
+        TextView count=text("",12,MUTED,false);
+        wrapper.addView(count,lp(-1,31));
+        ScrollView scroller=new ScrollView(this);
+        scroller.setVerticalScrollBarEnabled(false);
+        LinearLayout matches=column();
+        scroller.addView(matches);
+        wrapper.addView(scroller,lp(-1,420));
+        final Runnable[] refresh={null};
+        refresh[0]=()->{
+            String needle=query.getText().toString().trim().toLowerCase(java.util.Locale.ROOT);
+            matches.removeAllViews();
+            int total=0,visible=0;
+            for(WorldAtlas.Place place:WorldAtlas.all()){
+                if(hiddenMapTypes.contains(place.type))continue;
+                if(!needle.isEmpty()&&!place.name.toLowerCase(java.util.Locale.ROOT).contains(needle))
+                    continue;
+                total++;
+                if(visible++>=55)continue;
+                TextView result=text(place.name+"  ·  "+place.type,15,TEXT,false);
+                result.setPadding(dp(7),dp(10),dp(7),dp(10));
+                matches.addView(result,lp(-1,-2));
+                result.setOnClickListener(v->locationDialog(place));
+            }
+            for(SkyrimMapCatalog.Site site:SkyrimMapCatalog.all()){
+                if(hiddenMapTypes.contains(site.type))continue;
+                if(!needle.isEmpty()&&!site.name.toLowerCase(java.util.Locale.ROOT).contains(needle))
+                    continue;
+                total++;
+                if(visible++>=55)continue;
+                TextView result=text(site.name+"  ·  "+site.type,15,TEXT,false);
+                result.setPadding(dp(7),dp(10),dp(7),dp(10));
+                matches.addView(result,lp(-1,-2));
+                result.setOnClickListener(v->atlasSiteDialog(site));
+            }
+            count.setText("Найдено: "+total+(total>55?
+                "  ·  Показаны первые 55":""));
+        };
+        refresh[0].run();
+        query.addTextChangedListener(new android.text.TextWatcher(){
+            public void beforeTextChanged(CharSequence s,int start,int count,int after){}
+            public void onTextChanged(CharSequence s,int start,int before,int count){refresh[0].run();}
+            public void afterTextChanged(android.text.Editable e){}
+        });
+        new RuneDialogBuilder(this,accent()).setTitle("Поиск по карте Скайрима")
+            .setView(wrapper).setNegativeButton("Закрыть",null).show();
+    }
     /** Full atlas type filter; reflects both the map markers and location list. */
     private void renderMapTypeFilters(){
         LinearLayout panel=card();
@@ -1458,6 +1544,7 @@ public final class MainActivity extends Activity {
         java.util.LinkedHashSet<String> types=new java.util.LinkedHashSet<>();
         types.add("Столица");types.add("Деревня");
         for(WorldAtlas.Place place:WorldAtlas.all())types.add(place.type);
+        for(SkyrimMapCatalog.Site site:SkyrimMapCatalog.all())types.add(site.type);
         LinearLayout commands=row();panel.addView(commands,lp(-1,47));
         TextView all=text("✓  Включить все",13,accent(),true);
         TextView none=text("✕  Скрыть все",13,MUTED,true);
