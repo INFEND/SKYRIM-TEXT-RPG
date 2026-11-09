@@ -11,7 +11,7 @@ class SceneStateRecoveryTest(unittest.TestCase):
         self.assertIn("if(data==null)return state", SOURCE)
 
     def test_one_bad_record_does_not_reset_all_facts(self):
-        self.assertIn("for(int i=0;i<limit;i++)", SOURCE)
+        self.assertIn("for(int i=0;i<limit && collectionSize(state,kind)<MAX_ENTRIES;i++)", SOURCE)
         self.assertIn("JSONObject entry=arr.optJSONObject(i)", SOURCE)
         self.assertIn("catch(JSONException invalid)", SOURCE)
         self.assertNotIn("return new SceneState();", SOURCE)
