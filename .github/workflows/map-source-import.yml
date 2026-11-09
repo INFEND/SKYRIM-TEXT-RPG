@@ -16,6 +16,7 @@ jobs:
         run: |
           import json,pathlib,urllib.request,re,html,io
           from PIL import Image
+          Image.MAX_IMAGE_PIXELS=300_000_000
           out=pathlib.Path("docs/map-source")
           for label in ("skyrim","skyrim-solstheim"):
               raw=(out/f"{label}-page.html").read_text()
@@ -40,7 +41,7 @@ jobs:
                   print("FETCH",key,len(body),body[:120])
               except Exception as error: print("optional",key,repr(error))
           url="https://raw.githubusercontent.com/S1lveric/skyrim-live-tracker/main/public/skyrim_map.jpg"
-          with urllib.request.urlopen(url,timeout=120) as r: im=Image.open(io.BytesIO(r.read())).convert("RGB")
+          with urllib.request.urlopen(url,timeout=120) as r: im=Image.open(io.BytesIO(r.read())); im.draft("RGB",(4096,4096)); im=im.convert("RGB")
           print("TERRAIN",im.size)
           im.thumbnail((4096,4096),Image.Resampling.LANCZOS)
           im.save(out/"skyrim_geographic.webp","WEBP",quality=87,method=6)
