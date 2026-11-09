@@ -15,8 +15,9 @@ class SkyrimAtlas358Contracts(unittest.TestCase):
         self.assertEqual(art[8:12],b"WEBP")
         self.assertIn(b"ALPH",art)
         self.assertIn(b"VP8X",art)
-        self.assertEqual(art[16]&16,16)  # alpha channel
-        self.assertEqual(struct.unpack("<I",b"\\x00"+art[24:27])[0],1727) if False else None
+        self.assertEqual(art[20]&16,16)  # VP8X alpha flag
+        self.assertEqual((int.from_bytes(art[24:27],"little")+1,
+                          int.from_bytes(art[27:30],"little")+1),(1728,1920))
 
     def test_no_aliased_or_duplicate_icons(self):
         j=json.loads(DATA.read_text(encoding="utf-8"))
