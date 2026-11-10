@@ -110,7 +110,7 @@ public final class DragonArc {
 
     public static String status(GameEngine g){
         int stage=Math.max(0,Math.min(FINAL_STAGE,g.progress.dragonStage));
-        return stage==FINAL_STAGE?DragonContinuation.status(g):CHAPTERS[stage]+" • "+PROGRESS[stage];
+        return stage==FINAL_STAGE?DragonContinuation.status(g):CHAPTERS[stage]+" | "+PROGRESS[stage];
     }
     public static GameEngine.Scene scene(GameEngine g){
         int stage=Math.max(0,Math.min(FINAL_STAGE,g.progress.dragonStage));
@@ -118,9 +118,9 @@ public final class DragonArc {
         String destination=DESTINATIONS[stage];
         boolean arrived=destination.equals(g.progress.location);
         String suffix=g.progress.dragonRecent.isEmpty()?"":"\n\nПОСЛЕДСТВИЕ ПОСЛЕДНЕГО ВЫБОРА\n"+g.progress.dragonRecent;
-        GameEngine.Scene s=new GameEngine.Scene("ДРАКОНИЙ СЛЕД • ГЛАВА "+(stage+1),
+        GameEngine.Scene s=new GameEngine.Scene("ДРАКОНИЙ СЛЕД | ГЛАВА "+(stage+1),
             CHAPTERS[stage],NARRATIVE[stage]+"\n\nЦЕЛЬ: "+PROGRESS[stage]+
-            "\nМЕСТО: "+destination+(arrived?" • ты здесь":" • требуется путь")+suffix);
+            "\nМЕСТО: "+destination+(arrived?" | ты здесь":" | требуется путь")+suffix);
         s.primary("DRAGON:"+stage+":0",arrived?ADVANCE[stage]:"Проложить путь в "+destination,
             arrived?"Продолжить главную историю":"Открыть дороги и выбрать путь к цели");
         for(int i=1;i<=8;i++){
