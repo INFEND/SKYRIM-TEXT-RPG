@@ -1,0 +1,437 @@
+{
+  "artwork": "Original generated cinematic environment illustrations; artistic interpretations of Skyrim locations, not game screenshots.",
+  "locations": [
+    {
+      "slug": "helgen",
+      "name": "Хелген",
+      "photos": [
+        {
+          "number": 1,
+          "caption": "Подход к Хелгену",
+          "scene": "Helgen, Skyrim before the dragon attack: approach along the pine forest road toward its main fortified stone arch gate, heavy wooden doors open, round watchtower and stone walls, timber houses visible inside, Falkreath pine mountains in the distance."
+        },
+        {
+          "number": 2,
+          "caption": "Крепостной двор",
+          "scene": "Helgen keep courtyard before the attack, eye level from inside the gate: a small rugged Imperial garrison courtyard, circular stone towers, timber galleries, Nordic houses, an empty cart at the side. Quiet unoccupied central space; no execution, no battle."
+        },
+        {
+          "number": 3,
+          "caption": "Улицы Хелгена",
+          "scene": "Helgen before the attack, a close street between a handful of Nordic timber and stone cottages within the keep's walls, baskets and split firewood, chimney smoke, distant round tower."
+        },
+        {
+          "number": 4,
+          "caption": "Большой зал крепости",
+          "scene": "Interior of Helgen Keep, Skyrim: a sturdy and austere stone garrison hall, heavy wooden beams, long rough table, iron fire brazier, weapon rack and plain Imperial red banner without any text. Cool window daylight balanced with warm flames."
+        },
+        {
+          "number": 5,
+          "caption": "Каменные переходы",
+          "scene": "Inside Helgen Keep, underground medieval Nordic fortress passage: broad worn stone steps, barrel storage, wooden support doors, torches, arched masonry corridor leading into dim blue air, clear navigable structure and readable shadows."
+        },
+        {
+          "number": 6,
+          "caption": "Пещера под крепостью",
+          "scene": "Natural cave below Helgen Keep, Skyrim: an underground cold stream passing over rounded stones, cave exit lit by green pine forest daylight, jagged grey rock ceiling, rooted rocks, peaceful route out of the fortress. No enemies."
+        }
+      ]
+    },
+    {
+      "slug": "ivarstead",
+      "name": "Айварстед",
+      "photos": [
+        {
+          "number": 1,
+          "caption": "Подход к Айварстеду",
+          "scene": "approach to Ivarstead village in Skyrim, narrow stone bridge over the Treva River, a few Nordic thatched timber houses at the eastern foot of the immense Throat of the World, golden autumn birches and dark pines, cloudy mountain daylight."
+        },
+        {
+          "number": 2,
+          "caption": "Деревенская улица",
+          "scene": "inside Ivarstead in Skyrim, quiet dirt lane between low Nordic timber cottages, wood fences, stacked firewood, small herb plots, enormous mountain slopes above, natural autumn daylight, intimate small village scale."
+        },
+        {
+          "number": 3,
+          "caption": "Таверна «Вайлмир»",
+          "scene": "interior of Vilemyr Inn in Ivarstead, Skyrim, rustic Nordic timber room with a long stone hearth, carved wooden beams, rough tables, pottery and a few stools, firelight and cool autumn daylight from a small window, no written signs."
+        },
+        {
+          "number": 4,
+          "caption": "Мост через реку",
+          "scene": "Ivarstead riverside from within the village, rough low stone bridge above fast mountain river, birch leaves on the bank, thatched homes visible behind, Throat of the World foothills in the distance, cinematic natural perspective."
+        },
+        {
+          "number": 5,
+          "caption": "Курган Погребальный Огонь",
+          "scene": "Shroud Hearth Barrow beside Ivarstead, Skyrim, exterior entrance of a small ancient Nordic stone burial mound among autumn birches, weathered carved stone door jambs, moss and an unlit iron brazier, misty cool daylight, no creatures."
+        },
+        {
+          "number": 6,
+          "caption": "Начало Семи тысяч ступеней",
+          "scene": "foot of the Seven Thousand Steps at Ivarstead, Skyrim, view from the village side toward the first ascending worn stone stairway and a small pilgrim shrine on the mountain path, autumn birches below giving way to tall conifers and distant snow, realistic scale."
+        }
+      ]
+    },
+    {
+      "slug": "rorikstead",
+      "name": "Рорикстед",
+      "photos": [
+        {
+          "number": 1,
+          "caption": "Подход к Рорикстеду",
+          "scene": "Rorikstead in Skyrim seen from its approach road: very small Nordic farming hamlet in the rolling golden Whiterun tundra, a few thatched timber houses and a low inn, fenced wheat and cabbage fields, weathered wooden signpost without lettering, mountains far away, clear soft daylight."
+        },
+        {
+          "number": 2,
+          "caption": "Главная улица",
+          "scene": "Rorikstead village street, Skyrim: simple Nordic timber cottages on both sides of a short packed-earth road, hay cart, split-rail fences and golden farmland immediately beyond, open Whiterun tundra, eye level intimate settlement scale."
+        },
+        {
+          "number": 3,
+          "caption": "Таверна «Мороженый фрукт»",
+          "scene": "interior of Frostfruit Inn, Rorikstead, Skyrim: a humble Nordic roadside timber tavern with central firepit, crude benches and tables, barrels, pottery, warm afternoon light, comfortable lived-in room, no written signs."
+        },
+        {
+          "number": 4,
+          "caption": "Поля Рорикстеда",
+          "scene": "within Rorikstead farmland, Skyrim: neat rows of cabbages and golden wheat, low wood fences, hay bales, a modest thatched farmhouse immediately beside the plots, broad tawny Whiterun plains under a blue overcast sky, eye level."
+        },
+        {
+          "number": 5,
+          "caption": "Двор фермерского дома",
+          "scene": "farmstead courtyard within Rorikstead, Skyrim, low Nordic timber-and-stone cottage, cut firewood and a cart, chicken pen, drying herbs, harvested vegetables in baskets, wheat fields through a rustic gate, gentle late afternoon light."
+        },
+        {
+          "number": 6,
+          "caption": "Окраина у холмов",
+          "scene": "Rorikstead from its inner western edge at dusk, Skyrim: village path leading past a few thatched cottages to low tundra hills, warm window glow, distant rocky ridges, pale grass and purple mountain flowers, broad natural sky and realistic Nordic materials."
+        }
+      ]
+    },
+    {
+      "slug": "dragonbridge",
+      "name": "Драконий Мост",
+      "photos": [
+        {
+          "number": 1,
+          "caption": "Подход к Драконьему Мосту",
+          "scene": "Dragon Bridge village in Skyrim, approach road toward the massive ancient stone arched bridge with its distinctive carved dragon head rising over the parapet, Karth River deep below, a tiny Nordic timber village beyond and tall pines. Recognizable Dragon Bridge landmark, soft overcast daylight."
+        },
+        {
+          "number": 2,
+          "caption": "На Драконьем Мосту",
+          "scene": "standing on the old Dragon Bridge in Skyrim, dramatic weathered carved stone dragon-head sculpture beside the parapet, stone paving underfoot, Karth River gorge below and the village roofs ahead, human eye level, Nordic architecture."
+        },
+        {
+          "number": 3,
+          "caption": "Деревенская улица",
+          "scene": "inside Dragon Bridge village in Skyrim, small cluster of Nordic timber and thatch homes along a short road, rough fences and a sawmill yard, forested mountains behind, river mist nearby, realistic village scale and cool morning light."
+        },
+        {
+          "number": 4,
+          "caption": "Таверна «Четыре щита»",
+          "scene": "interior of Four Shields Tavern in Dragon Bridge, Skyrim: warm Nordic wooden roadside inn, open central hearth, heavy roof beams, rustic tables and benches, pottery and barrels, windows looking onto a pine-covered valley, no written signs."
+        },
+        {
+          "number": 5,
+          "caption": "Лесопилка у реки",
+          "scene": "Dragon Bridge settlement sawmill yard, Skyrim: stacks of cut timber, rough sawmill platform by the Karth River, weathered Nordic wood buildings, stone bridge with dragon-head carving visible farther downstream, cool forest light."
+        },
+        {
+          "number": 6,
+          "caption": "Сторожевой пост",
+          "scene": "small military outpost within Dragon Bridge village, Skyrim, austere Nordic timber and stone headquarters beside the short village road, plain Imperial red cloth and weapon racks, sturdy wood fence, river bridge in the background, evening lantern light, no text."
+        }
+      ]
+    },
+    {
+      "slug": "karthwasten",
+      "name": "Картвастен",
+      "photos": [
+        {
+          "number": 1,
+          "caption": "Подход к Картвастену",
+          "scene": "approach to Karthwasten, a tiny silver-mining village in the rocky Reach of Skyrim, three or four simple timber houses on uneven terraces below steep grey crags, mine entrance in a rock face, juniper shrubs and wooden fences, muted daylight."
+        },
+        {
+          "number": 2,
+          "caption": "Улица шахтёрского посёлка",
+          "scene": "the short main lane inside Karthwasten, Skyrim, modest timber miners' homes with shingle and thatch roofs, steep Reach cliffs, stacked firewood, ore baskets and work tools, no city walls, no grand castle, cool realistic light."
+        },
+        {
+          "number": 3,
+          "caption": "Вход в шахту Сануарах",
+          "scene": "outside Sanuarach silver mine in Karthwasten, Skyrim: wooden beams bracing a dark mine entrance cut into a grey rock face, hand cart with silver ore, pickaxes and a small lantern, sparse juniper and moss, village roofs below."
+        },
+        {
+          "number": 4,
+          "caption": "Шахтёрский штрек",
+          "scene": "interior of a working silver mine beneath Karthwasten, Skyrim: low rugged rock tunnel braced by heavy Nordic timber supports, pale ore veins, pickaxes, baskets and an iron lamp, light dust in warm lantern light, realistic and readable."
+        },
+        {
+          "number": 5,
+          "caption": "Двор посёлка",
+          "scene": "central work yard within Karthwasten, Skyrim: ore heaps and a simple stone smelter, wood piles, sturdy timber miner cottages around a small open dirt courtyard, looming Reach stone cliffs, cloudy mountain daylight."
+        },
+        {
+          "number": 6,
+          "caption": "Дом шахтёра",
+          "scene": "interior of a modest Karthwasten miner's home, Skyrim: rough timber beams, stone hearth, low table with bowls, bed with wool blanket, an iron pickaxe resting by the door, simple provisions, warm believable firelight, no luxury."
+        }
+      ]
+    },
+    {
+      "slug": "shorsstone",
+      "name": "Шорский Камень",
+      "photos": [
+        {
+          "number": 1,
+          "caption": "Подход к Шорскому Камню",
+          "scene": "approach to Shor's Stone village in the Rift, Skyrim: a tiny mining hamlet of Nordic timber-and-thatch cottages among golden autumn birches beneath rugged hills, rocky path leading to Redbelly Mine, warm subdued daylight."
+        },
+        {
+          "number": 2,
+          "caption": "Шахтёрская деревня",
+          "scene": "inside Shor's Stone village, Skyrim: intimate small yard between three Nordic timber cottages, hanging lanterns and wood fences, communal stone firepit, golden birch trees, mountains in the background, realistic settlement scale."
+        },
+        {
+          "number": 3,
+          "caption": "Кузница Фильньяра",
+          "scene": "Filnjar's modest outdoor smithy in Shor's Stone, Skyrim: blackened stone forge with orange coals, iron anvil, tongs, a few work tools and ingots on a weathered bench, timber cottage behind, autumn birches, clear believable craft detail."
+        },
+        {
+          "number": 4,
+          "caption": "Вход в Красную шахту",
+          "scene": "Redbelly Mine entrance in Shor's Stone, Skyrim: rough stone portal supported by heavy wooden braces, baskets of iron ore, pickaxes, a single lantern, golden forest and the small village at the edge of frame, cool daylight."
+        },
+        {
+          "number": 5,
+          "caption": "Выработки Красной шахты",
+          "scene": "interior of Redbelly Mine in Shor's Stone, Skyrim, low rocky mining tunnel with wooden supports, iron ore veins and abandoned work cart, lantern light revealing dust and natural stone texture, no spider or enemies."
+        },
+        {
+          "number": 6,
+          "caption": "Вечер у общего очага",
+          "scene": "Shor's Stone village courtyard at blue hour, Skyrim: communal stone firepit outside three Nordic timber cottages, low stools, warm windows and a lit lantern, gold-leaved birches against cool distant mountains, peaceful intimate scene."
+        }
+      ]
+    },
+    {
+      "slug": "kynesgrove",
+      "name": "Кинсгроув",
+      "photos": [
+        {
+          "number": 1,
+          "caption": "Подход к Кинсгроуву",
+          "scene": "approach to Kynesgrove in Eastmarch, Skyrim: a tiny Nordic village beside a grove of tall trees and a volcanic slope south of Windhelm, simple timber cottages and the low Braidwood Inn, pale mist from geothermal ground beyond, subdued cloudy daylight."
+        },
+        {
+          "number": 2,
+          "caption": "Таверна «Деревянное кружево»",
+          "scene": "exterior of Braidwood Inn in Kynesgrove, Skyrim: a modest Nordic timber roadside inn with steep thatched roof, stacked firewood and rough benches beside the entrance, birches and conifers, misty Eastmarch hills, no written signs."
+        },
+        {
+          "number": 3,
+          "caption": "Вход в шахту Паровой Ожог",
+          "scene": "Steamscorch Mine entrance above Kynesgrove, Skyrim: timber-braced opening in dark rock, ore baskets and pickaxes beside a rough trail, a little steam rising among rocks, timber village roofs below, cold daylight."
+        },
+        {
+          "number": 4,
+          "caption": "Штреки шахты",
+          "scene": "inside Steamscorch Mine at Kynesgrove, Skyrim, rough working mine tunnel with timber supports, ore seams glinting in lantern light, carts and baskets, readable rock surfaces and realistic dim light, no monsters."
+        },
+        {
+          "number": 5,
+          "caption": "Роща у посёлка",
+          "scene": "inside the small sacred grove near Kynesgrove village in Skyrim: close tall birch and conifer trunks, quiet woodland path, damp grass, ancient low stones and village cottage rooftops between trees, soft northern mist and natural light."
+        },
+        {
+          "number": 6,
+          "caption": "Зал деревенской таверны",
+          "scene": "interior of Braidwood Inn in Kynesgrove, Skyrim: low Nordic timber room, rough hearth glowing orange, warm tables and benches, practical storage barrels and crockery, cool window light suggesting fog outside, no written signs."
+        }
+      ]
+    },
+    {
+      "slug": "darkwater",
+      "name": "Чёрный Брод",
+      "photos": [
+        {
+          "number": 1,
+          "caption": "Подход к Чёрному Броду",
+          "scene": "approach to Darkwater Crossing in Eastmarch, Skyrim: a very small miners' settlement by the Darkwater River, a Nordic timber farmhouse and a few simple canvas work tents, rough river crossing, reed grass and geothermal mist, no city skyline."
+        },
+        {
+          "number": 2,
+          "caption": "Берег Чёрного Брода",
+          "scene": "within Darkwater Crossing, Skyrim, rustic camp at the riverbank: simple work tents, a rough plank path, hanging cooking pot, ore baskets, one timber farmhouse behind, grey river boulders and distant Eastmarch crags, soft overcast light."
+        },
+        {
+          "number": 3,
+          "caption": "Вход в шахту Золотая Скала",
+          "scene": "Goldenrock Mine at Darkwater Crossing, Skyrim: wooden supports around a shallow rock mine entrance just above the river, a wheelbarrow and corundum ore stones, warm lantern, damp stones and simple mining equipment, no text."
+        },
+        {
+          "number": 4,
+          "caption": "Выработки Золотой Скалы",
+          "scene": "inside Goldenrock Mine at Darkwater Crossing, Skyrim: a compact natural mining tunnel reinforced with rough timbers, rusty brown corundum ore seams, baskets and an iron lantern, clear textured rock, no enemies."
+        },
+        {
+          "number": 5,
+          "caption": "Шахтёрский лагерь",
+          "scene": "miners' camp within Darkwater Crossing, Skyrim: several weathered canvas sleeping tents around a small campfire and cooking pot, wood crates and pickaxes, timber farmhouse at the edge, river and pale sulfurous marshland behind, late afternoon."
+        },
+        {
+          "number": 6,
+          "caption": "Речная переправа",
+          "scene": "Darkwater Crossing in Skyrim seen from the settlement's river edge: a shallow ford and rough stepping stones over a clear swift river, reeds and boulders, a few canvas miners' tents and timber cottage beyond, Eastmarch volcanic landscape, early blue hour."
+        }
+      ]
+    },
+    {
+      "slug": "stonehills",
+      "name": "Каменные Холмы",
+      "photos": [
+        {
+          "number": 1,
+          "caption": "Подход к Каменным Холмам",
+          "scene": "approach to Stonehills, Skyrim: a tiny Nordic mining settlement at the snowy mountain edge of Hjaalmarch, just two or three sturdy timber houses and a mine cut into grey rock, pine forest meeting misty marsh lowland, cold overcast light."
+        },
+        {
+          "number": 2,
+          "caption": "Шахтёрский двор",
+          "scene": "central work yard of Stonehills in Skyrim: modest Nordic timber cottages, chopped wood piles, a work cart and ore baskets on packed dirt, steep rocky hill behind, distant marsh mist, intimate settlement scale."
+        },
+        {
+          "number": 3,
+          "caption": "Вход в шахту Каменные Холмы",
+          "scene": "Rockwallow Mine entrance in Stonehills, Skyrim: rough grey rock mouth braced with thick timbers, an iron lantern, pickaxes and ore baskets, sparse snow on shaded ground and roots, small Nordic village nearby."
+        },
+        {
+          "number": 4,
+          "caption": "Горные выработки",
+          "scene": "inside Rockwallow Mine in Stonehills, Skyrim: iron-bearing rock walls, rugged low mine passage with rough timber braces, ore-filled hand cart, lantern and a few tools, warm dim light and readable stone textures, no enemies."
+        },
+        {
+          "number": 5,
+          "caption": "Дом у шахты",
+          "scene": "interior of a practical Nordic mining household in Stonehills, Skyrim: timber walls and roof beams, small stone hearth, rough table with stew pot and wooden bowls, thick wool bedding, cold northern daylight from a small window, no luxury."
+        },
+        {
+          "number": 6,
+          "caption": "Болотная окраина",
+          "scene": "edge of Stonehills mining hamlet in Skyrim at twilight: a low timber fence and modest cottages in foreground, dark conifers and pale marsh mist spreading toward Hjaalmarch, grey mountains behind, softly glowing windows, no large city."
+        }
+      ]
+    },
+    {
+      "slug": "ravenrock",
+      "name": "Воронья Скала",
+      "photos": [
+        {
+          "number": 1,
+          "caption": "Прибытие в Воронью Скалу",
+          "scene": "arrival by sea at Raven Rock on Solstheim, Skyrim Dragonborn: wooden harbor piers and moored sailing boat, ash-dusted shore, distinctive low organic Redoran shell-shaped Dunmer houses beyond and dark defensive Bulwark wall, overcast ash sky."
+        },
+        {
+          "number": 2,
+          "caption": "Улицы Вороньей Скалы",
+          "scene": "inside Raven Rock, Solstheim: narrow street between low curved ash-coated Redoran shell buildings with red-brown organic plaster, lanterns, crates and alien mushroom flora. Dunmer settlement architecture, not Nordic timber."
+        },
+        {
+          "number": 3,
+          "caption": "Торговая площадь",
+          "scene": "Raven Rock market courtyard, Solstheim: humble market stalls between rounded Redoran shell houses, ash-covered ground, cloth awnings, baskets of provisions and pottery, authentic Dunmer atmosphere, cool daylight."
+        },
+        {
+          "number": 4,
+          "caption": "Храм предков",
+          "scene": "interior of Raven Rock Temple, Solstheim: quiet Dunmer ancestral worship chamber with curved organic stone architecture, ancestral urns, candles and ritual braziers, warm small lights in a grey ash-colored sanctuary."
+        },
+        {
+          "number": 5,
+          "caption": "Стена Бастиона",
+          "scene": "inside Raven Rock looking toward the Bulwark, Solstheim: massive dark ash-dusted protective wall and arched gateway at the edge of the small Redoran settlement, rounded Dunmer houses in foreground, grey ash terrain beyond."
+        },
+        {
+          "number": 6,
+          "caption": "Таверна «Пьяный нетч»",
+          "scene": "interior of the Retching Netch inn in Raven Rock, Solstheim: cosy subterranean Dunmer tavern with rounded organic walls and low alcoves, carved wood tables, clay pottery, warm lanterns and a bar counter. No Nordic longhouse beams."
+        }
+      ]
+    },
+    {
+      "slug": "telmithryn",
+      "name": "Тел-Митрин",
+      "photos": [
+        {
+          "number": 1,
+          "caption": "Подход к Тел-Митрину",
+          "scene": "approach to Tel Mithryn in southeast Solstheim: one enormous living orange-brown Telvanni mushroom tower and three smaller mushroom dwellings rising from grey ash ground and dark rock, sparse alien fungi, calm pale sky. No conventional castle."
+        },
+        {
+          "number": 2,
+          "caption": "Двор грибного поселения",
+          "scene": "within Tel Mithryn, Solstheim: ground-level path among the huge living fungal tower stem and smaller mushroom homes, organic bark-like textures and swollen caps overhead, low roots and sparse ashland fungi, soft overcast light."
+        },
+        {
+          "number": 3,
+          "caption": "Вход в башню",
+          "scene": "entrance at the base of Neloth's living Telvanni mushroom tower in Tel Mithryn: organic archway grown into the immense twisting fungal stem, rough natural steps and warm amber magical glow within, grey ash courtyard beyond."
+        },
+        {
+          "number": 4,
+          "caption": "Зал Нелота",
+          "scene": "interior of Neloth's Telvanni mushroom tower in Tel Mithryn: lofty organic fungal chamber with curved ribbed walls, open central levitation well glowing softly blue, shelves of books, arcane instruments and Dunmer furniture, candlelight."
+        },
+        {
+          "number": 5,
+          "caption": "Алхимическая лаборатория",
+          "scene": "alchemy workspace inside the living mushroom tower of Tel Mithryn: organically curved fungal walls, worn wooden workbench with glass potion vessels, dried ashland plants and mortar, small candle and subtle magic glow."
+        },
+        {
+          "number": 6,
+          "caption": "Жилище управляющего",
+          "scene": "interior of a small mushroom dwelling in Tel Mithryn: cosy rounded organically grown Telvanni room with fungal walls, simple bed, low Dunmer table and pottery, warm amber lamp, doorway opening to ashland daylight."
+        }
+      ]
+    },
+    {
+      "slug": "skaal",
+      "name": "Деревня скаалов",
+      "photos": [
+        {
+          "number": 1,
+          "caption": "Подход к деревне скаалов",
+          "scene": "approach to Skaal Village in northern Solstheim: small circle of sturdy snow-covered Nordic timber longhouses in a clearing, steep thatched roofs weighted with snow, pine forest, grey mountain ridge, pale winter daylight."
+        },
+        {
+          "number": 2,
+          "caption": "Заснеженная площадь",
+          "scene": "central snowy square of Skaal Village, Solstheim: a handful of Nordic timber homes around an open clearing, rough carved wood posts, stacked firewood and a low communal firepit, light snow and cold blue winter air."
+        },
+        {
+          "number": 3,
+          "caption": "Большой дом",
+          "scene": "interior of the Skaal Village great hall: rustic Nordic timber longhouse with thick wooden supports, central glowing hearth, benches, fur rugs, simple carved utensils and winter daylight, warm refuge from the snow."
+        },
+        {
+          "number": 4,
+          "caption": "Кузница скаалов",
+          "scene": "Skaal Village blacksmith's work area on snowy Solstheim: sheltered stone forge glowing orange beside a modest timber house, iron anvil and tongs, a few pale blue stalhrim fragments on the bench, snowy fir trees beyond."
+        },
+        {
+          "number": 5,
+          "caption": "Дом шамана",
+          "scene": "interior of a humble Skaal shaman's timber home: small hearth, rough table, dried herbs and wooden ritual objects, wool blankets and fur bedding, simple rustic Nordic materials, snow-bright daylight from a small window."
+        },
+        {
+          "number": 6,
+          "caption": "Лесная окраина деревни",
+          "scene": "edge of Skaal Village at winter dusk: snowy footpath between low Nordic timber homes and tall snow-laden pines, stacked logs, soft lantern light and glowing windows, white drifts and distant grey mountains."
+        }
+      ]
+    }
+  ]
+}
