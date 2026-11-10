@@ -223,7 +223,7 @@ public final class RpgProgress {
         else if(index==9)g.hp=Math.min(g.maxHp,g.hp+50);
         else if(index==4)g.stamina=Math.min(g.maxStamina,g.stamina+30);
         else if(index==5)g.hp=Math.min(g.maxHp,g.hp+30);
-        recent="Расовый талант: "+racePower(g)+" • разовое восстановление ресурсов (один раз в игровой день).";
+        recent="Расовый талант: "+racePower(g)+" | разовое восстановление ресурсов (один раз в игровой день).";
         return true;
     }
     public JSONObject toJson(){
