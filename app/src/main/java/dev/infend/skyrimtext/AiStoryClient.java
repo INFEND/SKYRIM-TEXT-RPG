@@ -296,7 +296,7 @@ public final class AiStoryClient {
             if(json.opt("detail") instanceof String)detail=json.optString("detail","");
         }catch(Exception ignored){}
         String diagnostic=!code.isEmpty()?code:"";
-        if(!param.isEmpty())diagnostic+=(diagnostic.isEmpty()?"":" · ")+"параметр: "+param;
+        if(!param.isEmpty())diagnostic+=(diagnostic.isEmpty()?"":" | ")+"параметр: "+param;
         if(diagnostic.isEmpty())diagnostic=!message.isEmpty()?message:detail;
         diagnostic=safeServerText(diagnostic);
         String header=chatGptPlan?"ChatGPT":"OpenAI API";
@@ -309,7 +309,7 @@ public final class AiStoryClient {
         if(!diagnostic.isEmpty())result+=": "+diagnostic;
         String requestId=conn.getHeaderField("x-request-id");
         if(requestId!=null && requestId.matches("[a-zA-Z0-9_-]{3,100}"))
-            result+=" · Request ID: "+requestId;
+            result+=" | Request ID: "+requestId;
         return result;
     }
 

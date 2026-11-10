@@ -126,7 +126,7 @@ public final class GameEngine {
     }
 
     private Scene worldScene() {
-        Scene s = new Scene("СКАЙРИМ | ДЕНЬ " + day, progress.location + " · " + REGIONS[region], DESCRIPTIONS[region] + "\n\nМестность: "+progress.location+"." +
+        Scene s = new Scene("СКАЙРИМ | ДЕНЬ " + day, progress.location + " | " + REGIONS[region], DESCRIPTIONS[region] + "\n\nМестность: "+progress.location+"." +
             (message.isEmpty()?"":"\n\n"+message));
         s.primary("DRAGON_OPEN","Главная история | Драконий след",DragonArc.status(this));
         s.add("EXPLORE","Исследовать окрестности","Случайные встречи, тайники и опасности");

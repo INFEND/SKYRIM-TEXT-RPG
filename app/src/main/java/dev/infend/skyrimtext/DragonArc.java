@@ -167,7 +167,7 @@ public final class DragonArc {
             g.addXp(xpReward);
             g.progress.dragonRecent="Глава «"+CHAPTERS[stage]+"» пройдена. Получено "+xpReward+
                 " опыта. Твоя история продолжается.";
-            if(stage==5)g.progress.completed.add("Драконий след • первое испытание • день "+g.day);
+            if(stage==5)g.progress.completed.add("Драконий след | первое испытание | день "+g.day);
             g.mode="DRAGON";
             return false;
         }

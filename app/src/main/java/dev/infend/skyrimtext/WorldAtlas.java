@@ -117,7 +117,7 @@ public final class WorldAtlas {
             int existing=-1;
             for(int i=0;i<places.size();i++)if(places.get(i).name.equals(site.name)){existing=i;break;}
             Place old=existing<0?null:places.get(existing);
-            String description=old==null?site.type+" · "+site.grid+". "+
+            String description=old==null?site.type+" | "+site.grid+". "+
                 "Переход ведёт к этому месту; доступ к отдельным сюжетным областям зависит от событий истории.":old.description;
             Place location=new Place(site.name,site.type,site.region,
                 old==null?Math.round(site.x):old.x,old==null?Math.round(site.y):old.y,description);

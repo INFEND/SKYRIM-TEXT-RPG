@@ -252,7 +252,7 @@ public final class AiGameTurn {
         }
         if(!quest.isEmpty()){
             String state=questStatus;
-            g.aiJournal=quest+" · "+state;
+            g.aiJournal=quest+" | "+state;
             if("COMPLETED".equals(state)&&!g.progress.completed.contains(quest))g.progress.completed.add(quest);
             if("FAILED".equals(state)&&!g.progress.failed.contains(quest))g.progress.failed.add(quest);
         }

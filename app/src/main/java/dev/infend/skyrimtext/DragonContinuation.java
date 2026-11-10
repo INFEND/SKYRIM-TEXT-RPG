@@ -184,13 +184,13 @@ public final class DragonContinuation {
     public static String questObjective(GameEngine g){
         int stage=g.progress.dragonNextStage;
         if(stage>=4)return "Итог пепельного следа: "+questSummary(g)+" "+lead(g)+" "+windhelmVerdict(g);
-        return "Активно: "+TITLES[stage]+" • "+PLACES[stage]
-            +" • свидетельства "+evidenceCount(g,stage)+"/3 • опасная зацепка "+(hasRiskProof(g,stage)?"доказана":"не доказана")+" • неудачные вылазки "+failedCount(g,stage);
+        return "Активно: "+TITLES[stage]+" | "+PLACES[stage]
+            +" | свидетельства "+evidenceCount(g,stage)+"/3 | опасная зацепка "+(hasRiskProof(g,stage)?"доказана":"не доказана")+" | неудачные вылазки "+failedCount(g,stage);
     }
     public static String status(GameEngine g){
         int stage=g.progress.dragonNextStage;
-        return stage>=4?"Драконий след • расследования завершены ("+failedChapters(g)+" провалено)":
-            TITLES[Math.max(0,stage)]+" • "+PLACES[Math.max(0,stage)];
+        return stage>=4?"Драконий след | расследования завершены ("+failedChapters(g)+" провалено)":
+            TITLES[Math.max(0,stage)]+" | "+PLACES[Math.max(0,stage)];
     }
     /** A complete epilogue grounded in the four persisted quest outcomes. */
     private static String epilogue(GameEngine g){
@@ -214,12 +214,12 @@ public final class DragonContinuation {
     }
     public static GameEngine.Scene scene(GameEngine g){
         int stage=g.progress.dragonNextStage;
-        if(stage>=4)return new GameEngine.Scene("ДРАКОНИЙ СЛЕД • ПРОДОЛЖЕНИЕ","Пепельный след",
+        if(stage>=4)return new GameEngine.Scene("ДРАКОНИЙ СЛЕД | ПРОДОЛЖЕНИЕ","Пепельный след",
             epilogue(g))
             .primary("GO_WORLD","Вернуться в мир","Продолжить путешествие");
         boolean here=PLACES[stage].equals(g.progress.location);
-        GameEngine.Scene s=new GameEngine.Scene("ДРАКОНИЙ СЛЕД • ГЛАВА "+(stage+7),TITLES[stage],
-            STORIES[stage]+"\n\nЦЕЛЬ КВЕСТА: "+questObjective(g)+"\n\nМЕСТО: "+PLACES[stage]+(here?" • ты здесь":" • требуется путь")+
+        GameEngine.Scene s=new GameEngine.Scene("ДРАКОНИЙ СЛЕД | ГЛАВА "+(stage+7),TITLES[stage],
+            STORIES[stage]+"\n\nЦЕЛЬ КВЕСТА: "+questObjective(g)+"\n\nМЕСТО: "+PLACES[stage]+(here?" | ты здесь":" | требуется путь")+
             (g.progress.dragonNextRecent.isEmpty()?"":"\n\nПОСЛЕДСТВИЕ\n"+g.progress.dragonNextRecent));
         s.primary("DRAGON_NEXT:"+stage+":0",here?"Завершить расследование":"Проложить путь в "+PLACES[stage],
             here?(exhausted(g,stage)?"Все зацепки исчерпаны: зафиксировать провал": "Собери три свидетельства ("+evidenceCount(g,stage)+"/3) и докажи одну опасную зацепку"):"Открыть маршруты");
@@ -266,7 +266,7 @@ public final class DragonContinuation {
             activateQuest(g,g.progress.dragonNextStage);
             g.addXp(30+stage*15);
             g.progress.dragonNextRecent=stage==0?"Ривервудские свидетельства переданы советникам Вайтрана.":stage==1?"Совет завершён. Следующая цель: Виндхельм. "+lead(g):stage==2?"Стража Виндхельма получила досье. "+lead(g)+" "+windhelmVerdict(g):"Разведка у заставы завершена. "+lead(g)+" "+windhelmVerdict(g);
-            g.progress.completed.add(TITLES[stage]+" • день "+g.day);
+            g.progress.completed.add(TITLES[stage]+" | день "+g.day);
             if(stage==2){
                 // Apply the proven Windhelm outcome once, at quest completion only.
                 // These consequences use existing schema-1 flags and attributes.

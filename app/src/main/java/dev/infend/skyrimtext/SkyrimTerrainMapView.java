@@ -308,9 +308,9 @@ public final class SkyrimTerrainMapView extends View {
         ink.setColor(0xffe1e7e7);
         String status=(sheet==0?"СКАЙРИМ":"СОЛСТЕЙМ")+
             String.format(java.util.Locale.ROOT,"  ×%.1f",scale/Math.max(.0001f,minScale));
-        if(loading)status+=" · Загрузка рельефа…";
-        else if(failed)status+=" · Рельеф недоступен";
-        if(SkyrimMapCatalog.find(game.progress.location)==null)status+=" · Герой вне поверхности";
+        if(loading)status+=" | Загрузка рельефа…";
+        else if(failed)status+=" | Рельеф недоступен";
+        if(SkyrimMapCatalog.find(game.progress.location)==null)status+=" | Герой вне поверхности";
         canvas.drawText(status,10*density,getHeight()-10*density,ink);
     }
     private void select(float x,float y){

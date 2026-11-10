@@ -77,10 +77,19 @@ final class ChatGptOAuth {
         } catch(Exception ignored){return false;}
     }
 
+    boolean hasSignedInAccount(){
+        try{
+            JSONObject session=AiOAuthVault.load(context);
+            return !session.optString("subject","").isEmpty()
+                && (!session.optString("refresh_token","").isEmpty()
+                    || !session.optString("access_token","").isEmpty());
+        }catch(Exception ignored){return false;}
+    }
+
     String accountLabel(){
         try{
             JSONObject s=AiOAuthVault.load(context);
-            if(!hasAuthorizedPlan())return "Не подключён";
+            if(!hasSignedInAccount())return "Не подключён";
             String email=s.optString("email","");
             return email.isEmpty()?"ChatGPT подключён":email;
         }catch(Exception e){return "Не подключён";}

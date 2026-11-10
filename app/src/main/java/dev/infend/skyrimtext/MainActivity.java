@@ -252,7 +252,7 @@ public final class MainActivity extends Activity {
     private boolean showChoiceNumbers(){return prefs.getBoolean("show_choice_numbers",true);}
     private String skillGlyph(String skill){
         if(skill==null||skill.trim().isEmpty())return "skills";
-        String clean=skill.split(" · ",2)[0].trim();
+        String clean=skill.split(" [·|] ",2)[0].trim();
         String exact=SkyrimIconAtlas.exactLabel(this,clean);
         return exact==null?"skills":exact;
     }
@@ -263,7 +263,7 @@ public final class MainActivity extends Activity {
     private LinearLayout column(){LinearLayout l=new LinearLayout(this);l.setOrientation(LinearLayout.VERTICAL);return l;}
     private LinearLayout row(){LinearLayout l=new LinearLayout(this);l.setOrientation(LinearLayout.HORIZONTAL);l.setGravity(Gravity.CENTER_VERTICAL);return l;}
     private TextView text(String str,int size,int color,boolean bold){
-        TextView t=new TextView(this);t.setText(str);t.setTextSize(sp(size));t.setTextColor(color);
+        TextView t=new TextView(this);t.setText(str==null?"":str.replace(" • "," | ").replace(" · "," | "));t.setTextSize(sp(size));t.setTextColor(color);
         t.setFontFeatureSettings("kern");t.setIncludeFontPadding(true);
         t.setTypeface(SovngardeTypeface.face(this,bold));
         return t;
@@ -430,7 +430,7 @@ public final class MainActivity extends Activity {
         addText(label,"ᛟ  ТЕКСТОВАЯ RPG",10,MUTED,false,0);
         if(game.started){
             LinearLayout state=column();state.setGravity(Gravity.END);
-            addText(state,"ДЕНЬ "+game.day+"  ·  "+String.format(java.util.Locale.ROOT,"%02d:00",game.hour),11,TEXT,true,2);
+            addText(state,"ДЕНЬ "+game.day+"  |  "+String.format(java.util.Locale.ROOT,"%02d:00",game.hour),11,TEXT,true,2);
             addText(state,"УРОВЕНЬ "+game.level,10,MUTED,false,0);
             header.addView(state,lp(-2,-2));
             if(!prefs.getBoolean("ai_enabled",false)){
@@ -616,7 +616,7 @@ public final class MainActivity extends Activity {
         });
         titleButton("Настройки",false,()->{titleOpen=false;tab=5;render();});
         titleButton("О игре",false,()->new RuneDialogBuilder(this,accent())
-            .setTitle("СКАЙРИМ · ТЕКСТОВАЯ RPG")
+            .setTitle("СКАЙРИМ | ТЕКСТОВАЯ RPG")
             .setMessage("Интерактивная история северных земель. Выборы, путешествия, дневник и кодекс. Самостоятельный неофициальный проект.")
             .setPositiveButton("Закрыть",null).show());
         titleRule();
@@ -747,7 +747,7 @@ public final class MainActivity extends Activity {
         }
         space(content,16);
         LinearLayout narrative=card();
-        addText(narrative,"ᚱ  ГЛАВА  ·  "+s.kicker.toUpperCase(java.util.Locale.ROOT),11,accent(),false,13);
+        addText(narrative,"ᚱ  ГЛАВА  |  "+s.kicker.toUpperCase(java.util.Locale.ROOT),11,accent(),false,13);
         TextView body=text("",18,TEXT,false);
         body.setTypeface(SovngardeTypeface.face(this,false));
         body.setText(SceneTypography.render(s.body,accent(),game.name,heroColor()));
@@ -777,11 +777,11 @@ public final class MainActivity extends Activity {
     }
 
     private void renderStorySnapshot(){
-        addText(content,game.name+" · "+game.race+" · Уровень "+game.level,17,TEXT,true,7);
-        addText(content,"⌖ "+game.progress.location+"  ·  День "+game.day+"  ·  Опыт "+game.xp,13,MUTED,false,7);
+        addText(content,game.name+" | "+game.race+" | Уровень "+game.level,17,TEXT,true,7);
+        addText(content,"⌖ "+game.progress.location+"  |  День "+game.day+"  |  Опыт "+game.xp,13,MUTED,false,7);
         addText(content,"Вес: "+
             String.format(java.util.Locale.forLanguageTag("ru"),"%.1f",game.progress.carryWeight())+
-            "/50 кг  ·  "+game.gold+" септимов",13,accent(),false,12);
+            "/50 кг  |  "+game.gold+" септимов",13,accent(),false,12);
     }
 
     private void renderStoryJournal(){
@@ -791,13 +791,13 @@ public final class MainActivity extends Activity {
         LinearLayout journal=card();
         addText(journal,"ᚱ  ЖУРНАЛ ПРИКЛЮЧЕНИЙ",11,accent(),true,10);
         if(game.questStage>0&&game.questStage<4)
-            addText(journal,"◉  Пепельные печати · "+game.questStatus(),13,TEXT,false,7);
+            addText(journal,"◉  Пепельные печати | "+game.questStatus(),13,TEXT,false,7);
         if(game.progress.dragonStage>=0&&game.progress.dragonStage<DragonArc.FINAL_STAGE)
-            addText(journal,"◉  Драконий след · "+DragonArc.status(game),13,TEXT,false,7);
+            addText(journal,"◉  Драконий след | "+DragonArc.status(game),13,TEXT,false,7);
         if(game.sideQuest==1)
-            addText(journal,"◉  Опасные дороги · "+game.sideKills+"/3",13,MUTED,false,7);
+            addText(journal,"◉  Опасные дороги | "+game.sideKills+"/3",13,MUTED,false,7);
         if("EVENT".equals(game.mode))
-            addText(journal,"!  Случайная встреча · исход ещё неизвестен",13,0xfff18e60,true,1);
+            addText(journal,"!  Случайная встреча | исход ещё неизвестен",13,0xfff18e60,true,1);
     }
 
     /** Only the value is bold; the attribute label remains regular. */
@@ -959,7 +959,7 @@ public final class MainActivity extends Activity {
             aiProgressInfo.post(aiDotsTicker);
             if("local".equals(source)){
                 LinearLayout live=card();
-                addText(live,"ТЕКСТ ЛОКАЛЬНОЙ МОДЕЛИ · ПРЕДПРОСМОТР",11,accent(),true,9);
+                addText(live,"ТЕКСТ ЛОКАЛЬНОЙ МОДЕЛИ | ПРЕДПРОСМОТР",11,accent(),true,9);
                 aiTurnText=text(aiTurnPreview.isEmpty()?"Ожидание первых токенов…" : aiTurnPreview,17,TEXT,false);
                 aiTurnText.setTypeface(SovngardeTypeface.face(this,false));
                 aiTurnText.setLineSpacing(dp(5),1.12f);
@@ -1260,9 +1260,9 @@ public final class MainActivity extends Activity {
         return "chatgpt".equals(resolvedAiProvider());
     }
     private void aiProviderDialog(){
-        String[] labels={"Автоматически · Работа/Codex → API → офлайн",
-                "ChatGPT · расход лимитов Работа/Codex","OpenAI API · отдельная оплата",
-                "Локальная модель · GGUF · без интернета"};
+        String[] labels={"Автоматически | Работа/Codex → API → офлайн",
+                "ChatGPT | расход лимитов Работа/Codex","OpenAI API | отдельная оплата",
+                "Локальная модель | GGUF | без интернета"};
         String mode=aiProviderMode();
         int selected="chatgpt".equals(mode)?1:"api".equals(mode)?2:"local".equals(mode)?3:0;
         new RuneDialogBuilder(this,accent()).setTitle("Источник ИИ")
@@ -1278,7 +1278,7 @@ public final class MainActivity extends Activity {
     private void aiReasoningEffortDialog(){
         String[] choices=AiReasoningEffort.LABELS;
         int selected=AiReasoningEffort.position(selectedReasoningEffort());
-        new RuneDialogBuilder(this,accent()).setTitle("Уровень размышления · настройка игры")
+        new RuneDialogBuilder(this,accent()).setTitle("Уровень размышления | настройка игры")
             .setSingleChoiceItems(choices,selected,(dialog,which)->{
                 String effort=AiReasoningEffort.VALUES[which];
                 prefs.edit().putString("ai_reasoning_effort",effort).apply();
@@ -1329,7 +1329,7 @@ public final class MainActivity extends Activity {
                 if(chosen.equals(models.get(i).slug))selected=i;
             }
             if(isFinishing()||isDestroyed())return;
-            new RuneDialogBuilder(this,accent()).setTitle("Модели · Работа/Codex")
+            new RuneDialogBuilder(this,accent()).setTitle("Модели | Работа/Codex")
                 .setSingleChoiceItems(labels,selected,(dialog,which)->{
                     prefs.edit().putString("ai_chatgpt_model",models.get(which).slug).apply();
                     if(aiClient!=null)aiClient.cancel();if(localAiClient!=null)localAiClient.cancel();
@@ -1341,7 +1341,7 @@ public final class MainActivity extends Activity {
     private void renderAiStoryPanel(){
         LinearLayout panel=card();
         String source=resolvedAiProvider();
-        addText(panel,"ᚱ  ИИ-МАСТЕР · "+("local".equals(source)?"ОФЛАЙН GGUF":usingChatGpt()?"РАБОТА / CODEX":"OPENAI API"),11,accent(),true,8);
+        addText(panel,"ᚱ  ИИ-МАСТЕР | "+("local".equals(source)?"ОФЛАЙН GGUF":usingChatGpt()?"РАБОТА / CODEX":"OPENAI API"),11,accent(),true,8);
         addText(panel,"Свободный диалог и повествование. Инвентарь, бой, награды и перемещения изменяются только игровыми действиями.",12,MUTED,false,12);
         boolean chatgpt=usingChatGpt();
         boolean local="local".equals(source);
@@ -1374,9 +1374,9 @@ public final class MainActivity extends Activity {
         panel.addView(prompt,lp(-1,-2));
         space(panel,9);
         String selectedModel=local?"Qwen3.5-9B":prefs.getString(chatgpt?"ai_chatgpt_model":"ai_api_model",chatgpt?"":AiModelCatalog.DEFAULT_API);
-        String modelLabel=selectedModel.isEmpty()?"не выбрана":local?"Qwen3.5-9B · GGUF":chatgpt?selectedModel:AiModelCatalog.label(selectedModel);
-        String providerLabel=local?"Источник: локальная модель · без интернета":chatgpt?"Источник: ChatGPT · лимиты Работа/Codex":
-                "Источник: OpenAI API · отдельная оплата";
+        String modelLabel=selectedModel.isEmpty()?"не выбрана":local?"Qwen3.5-9B | GGUF":chatgpt?selectedModel:AiModelCatalog.label(selectedModel);
+        String providerLabel=local?"Источник: локальная модель | без интернета":chatgpt?"Источник: ChatGPT | лимиты Работа/Codex":
+                "Источник: OpenAI API | отдельная оплата";
         TextView status=text(providerLabel+"\nМодель (выбрана в игре): "+modelLabel+
                 "\nРазмышление (настройка игры): "+AiReasoningEffort.label(selectedReasoningEffort()),11,MUTED,false);
         panel.addView(status);
@@ -1504,7 +1504,7 @@ public final class MainActivity extends Activity {
         section("АТЛАС СЕВЕРА","Карта Скайрима","Выбери материк или Солстейм. Нажми на метку, чтобы открыть место и маршрут.");
         LinearLayout overview=card();
         addText(overview,"⌖  ВЫ НАХОДИТЕСЬ: "+game.progress.location,15,accent(),true,10);
-        addText(overview,"День "+game.day+"  ·  "+SkyrimMapCatalog.size()+" локаций",13,MUTED,false,9);
+        addText(overview,"День "+game.day+"  |  "+SkyrimMapCatalog.size()+" локаций",13,MUTED,false,9);
         final SkyrimTerrainMapView terrainMap=new SkyrimTerrainMapView(this,game,this::locationDialog,hiddenMapTypes);
         activeTerrainMap=terrainMap;
         terrainMap.setMapRegion(selectedMapRegion);
@@ -1541,7 +1541,7 @@ public final class MainActivity extends Activity {
         locations.removeIf(site->hiddenMapTypes.contains(site.type)||(selectedMapRegion>=0&&site.region!=selectedMapRegion));
         final java.text.Collator names=java.text.Collator.getInstance(new java.util.Locale("ru"));
         locations.sort((a,b)->names.compare(a.name,b.name));
-        addText(content,"Найдено локаций: "+locations.size()+"  ·  показано "+Math.min(mapListLimit,locations.size()),12,MUTED,false,8);
+        addText(content,"Найдено локаций: "+locations.size()+"  |  показано "+Math.min(mapListLimit,locations.size()),12,MUTED,false,8);
         int shown=0;
         for(SkyrimMapCatalog.Site site:locations){
             if(shown++>=mapListLimit)break;
@@ -1660,7 +1660,7 @@ public final class MainActivity extends Activity {
         String[] names=new String[sites.size()];
         for(int i=0;i<sites.size();i++){
             SkyrimMapCatalog.Site site=sites.get(i);
-            names[i]=site.name+"  ·  "+site.type;
+            names[i]=site.name+"  |  "+site.type;
         }
         new RuneDialogBuilder(this,accent())
             .setTitle("Локации рядом")
@@ -1672,7 +1672,7 @@ public final class MainActivity extends Activity {
         WorldAtlas.Place place=WorldAtlas.find(SkyrimMapCatalog.travelDestination(site));
         if(place!=null){locationDialog(place);return;}
         new RuneDialogBuilder(this,accent()).setTitle(site.name)
-            .setMessage(site.type+" · "+site.grid).setNegativeButton("Закрыть",null).show();
+            .setMessage(site.type+" | "+site.grid).setNegativeButton("Закрыть",null).show();
     }
     private void searchSkyrimAtlas(){
         searchSkyrimAtlas(null);
@@ -1720,7 +1720,7 @@ public final class MainActivity extends Activity {
                     atlasSiteDialog(site);
                 });
             }
-            count.setText("Найдено: "+found.size()+"  ·  показано "+Math.min(limit[0],found.size()));
+            count.setText("Найдено: "+found.size()+"  |  показано "+Math.min(limit[0],found.size()));
             if(found.isEmpty())matches.addView(text("Подходящих локаций нет. Проверь название и фильтры.",14,MUTED,false),lp(-1,-2));
             if(found.size()>limit[0]){
                 TextView more=text("ПОКАЗАТЬ ЕЩЁ 60",14,accent(),true);
@@ -2125,7 +2125,7 @@ public final class MainActivity extends Activity {
         java.util.function.IntConsumer update=h->{
             int total=game.hour+h;
             amount.setText(h+" Ч");
-            clock.setText("ДЕНЬ "+(game.day+total/24)+"   ·   "+
+            clock.setText("ДЕНЬ "+(game.day+total/24)+"   |   "+
                 String.format(java.util.Locale.ROOT,"%02d:00",total%24));
         };
         update.accept(1);
@@ -2338,14 +2338,14 @@ public final class MainActivity extends Activity {
         LinearLayout completed=card();
         addText(completed,"ЗАВЕРШЁННЫЕ ЗАДАНИЯ",12,accent(),true,9);
         if(game.progress.dragonStage>=DragonArc.FINAL_STAGE)
-            addText(completed,"◇ Драконий след · первое испытание",14,TEXT,false,7);
+            addText(completed,"◇ Драконий след | первое испытание",14,TEXT,false,7);
         if(game.progress.dragonStage>=DragonArc.FINAL_STAGE){
             String[] investigations={"Письмо под пеплом","Совет за закрытыми дверями","След пепельного гонца"};
             for(int i=0;i<Math.min(3,game.progress.dragonNextStage);i++)
                 addText(completed,"◇ "+investigations[i],14,TEXT,false,6);
         }
         if(game.questStage==4)addText(completed,"◇ Пепельные печати",14,TEXT,false,6);
-        if(game.boardCompleted>0)addText(completed,"◇ Опасные дороги · заказов: "+game.boardCompleted,14,TEXT,false,6);
+        if(game.boardCompleted>0)addText(completed,"◇ Опасные дороги | заказов: "+game.boardCompleted,14,TEXT,false,6);
         if(game.progress.completed.isEmpty()&&game.questStage!=4
                 &&game.progress.dragonStage<DragonArc.FINAL_STAGE&&game.boardCompleted==0)
             addText(completed,"Завершённых поручений пока нет.",14,MUTED,false,0);
@@ -2513,7 +2513,8 @@ public final class MainActivity extends Activity {
                 "несколько минут; стадия и время отображаются в игровом режиме.",
                 12,MUTED,false,10);
         }else if("chatgpt".equals(effectiveProvider)){
-            boolean signedIn=chatGptOAuth.hasAuthorizedPlan();
+            boolean signedIn=chatGptOAuth.hasSignedInAccount();
+            boolean authorized=chatGptOAuth.hasAuthorizedPlan();
             // One account action; login and logout are mutually exclusive.
             if(signedIn){
                 actionButton("Выйти из ChatGPT",chatGptOAuth.accountLabel()+
@@ -2525,9 +2526,14 @@ public final class MainActivity extends Activity {
                                 chatGptOAuth.signOut((success,message)->{toast(message);render();});
                             }).show();
                     });
-                actionButton("Модель | Работа/Codex",
-                    prefs.getString("ai_chatgpt_model","Не выбрана")+
-                    " | выбрана внутри игры",false,this::chatGptModelDialog);
+                if(authorized){
+                    actionButton("Модель | Работа/Codex",
+                        prefs.getString("ai_chatgpt_model","Не выбрана")+
+                        " | выбрана внутри игры",false,this::chatGptModelDialog);
+                }else{
+                    addText(content,"Вход выполнен, но разрешение использовать лимиты ChatGPT не предоставлено. "
+                        +"Для повторной авторизации сначала выйди из аккаунта.",12,MUTED,false,10);
+                }
             }else{
                 actionButton("Войти в ChatGPT",
                     "Авторизация в системном браузере | лимиты Работа/Codex",
