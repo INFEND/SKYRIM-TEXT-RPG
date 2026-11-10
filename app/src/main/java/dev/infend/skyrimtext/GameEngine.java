@@ -108,7 +108,7 @@ public final class GameEngine {
     private Scene baseScene(){
         if (!started) return new Scene("НОВАЯ ИСТОРИЯ", "Твоя сага начинается", "Создай героя, чтобы отправиться в суровые северные земли. Каждое решение меняет путь, а прогресс сохраняется автоматически.");
         switch(mode) {
-            case "INTRO": return new Scene("ПРОЛОГ • ДЕНЬ "+day,progress.startId,
+            case "INTRO": return new Scene("ПРОЛОГ | ДЕНЬ "+day,progress.startId,
                 progress.recent+"\n\n"+DESCRIPTIONS[Math.max(0,Math.min(region,DESCRIPTIONS.length-1))]+
                 "\n\nСегодня дорога не обещает лёгких ответов. На ветру пахнет костром, снегом и переменами. Любой случайный попутчик может оказаться союзником, а любое решение оставить след.")
                 .primary("GO_WORLD","Сделать первый шаг","Начать историю и выйти на дорогу");
@@ -126,16 +126,16 @@ public final class GameEngine {
     }
 
     private Scene worldScene() {
-        Scene s = new Scene("СКАЙРИМ • ДЕНЬ " + day, progress.location + " · " + REGIONS[region], DESCRIPTIONS[region] + "\n\nМестность: "+progress.location+"." +
+        Scene s = new Scene("СКАЙРИМ | ДЕНЬ " + day, progress.location + " · " + REGIONS[region], DESCRIPTIONS[region] + "\n\nМестность: "+progress.location+"." +
             (message.isEmpty()?"":"\n\n"+message));
-        s.primary("DRAGON_OPEN","Главная история • Драконий след",DragonArc.status(this));
+        s.primary("DRAGON_OPEN","Главная история | Драконий след",DragonArc.status(this));
         s.add("EXPLORE","Исследовать окрестности","Случайные встречи, тайники и опасности");
-        s.add("QUEST","История хранителей","Пепельные печати • " + questStatus());
+        s.add("QUEST","История хранителей","Пепельные печати | " + questStatus());
         s.add("TALK","Поговорить с местными","Слухи, события и полезные сведения");
         s.add("TRAVEL","Отправиться в путь","Выбрать другой город");
         s.add("SHOP","Торговая лавка","Зелья, оружие и снаряжение");
         s.add("BOARD","Доска заказов","Дополнительное поручение");
-        s.add("REST","Отдохнуть в трактире","20 септимов • восстановить силы");
+        s.add("REST","Отдохнуть в трактире","20 септимов | восстановить силы");
         return s;
     }
 
@@ -145,7 +145,7 @@ public final class GameEngine {
             WorldAtlas.Place target=WorldAtlas.find(TravelPlanner.HUBS[i]);
             TravelPlanner.Route route=TravelPlanner.plan(this,target);
             s.add("REGION:"+i,REGIONS[i],regionHint(i)+(route.allowed?
-                " • "+route.days+" дн."+(route.fare>0?" • "+route.fare+" септимов":""):" • "+route.problem));
+                " | "+route.days+" дн."+(route.fare>0?" | "+route.fare+" септимов":""):" | "+route.problem));
         }
         return s.add("GO_WORLD","Остаться здесь","Вернуться в город");
     }
@@ -183,11 +183,11 @@ public final class GameEngine {
             .add("GO_WORLD","Попрощаться","Вернуться на улицу");
     }
     private Scene shopScene() {
-        return new Scene("ТОРГОВЛЯ • " + REGIONS[region], "Северная лавка", "На прилавке лежат походные припасы и изделия кузнеца.\n\nТвой кошель: " + gold + " септимов.")
-            .primary("BUY_HP","Лечебное зелье • 35", "Восстанавливает 45 здоровья")
-            .add("BUY_MP","Зелье магии • 30", "Восстанавливает 35 магии")
-            .add("BUY_SWORD",swordUpgraded?"Клинок приобретён":"Закалённый клинок • 180", swordUpgraded?"Уже в инвентаре":"Постоянно +6 к атаке")
-            .add("BUY_ARMOR",armorUpgraded?"Доспех приобретён":"Стальной нагрудник • 160",armorUpgraded?"Уже в инвентаре":"Постоянно +4 к защите")
+        return new Scene("ТОРГОВЛЯ | " + REGIONS[region], "Северная лавка", "На прилавке лежат походные припасы и изделия кузнеца.\n\nТвой кошель: " + gold + " септимов.")
+            .primary("BUY_HP","Лечебное зелье | 35", "Восстанавливает 45 здоровья")
+            .add("BUY_MP","Зелье магии | 30", "Восстанавливает 35 магии")
+            .add("BUY_SWORD",swordUpgraded?"Клинок приобретён":"Закалённый клинок | 180", swordUpgraded?"Уже в инвентаре":"Постоянно +6 к атаке")
+            .add("BUY_ARMOR",armorUpgraded?"Доспех приобретён":"Стальной нагрудник | 160",armorUpgraded?"Уже в инвентаре":"Постоянно +4 к защите")
             .add("GO_WORLD","Покинуть лавку","Вернуться на улицу");
     }
     private Scene eventScene() {
@@ -197,11 +197,11 @@ public final class GameEngine {
             .add("EVENT_LEAVE","Пройти мимо","Не рисковать");
     }
     private Scene battleScene() {
-        return new Scene("БОЙ • " + REGIONS[region], enemyName, enemyIntro + "\n\n" + battleLog +
+        return new Scene("БОЙ | " + REGIONS[region], enemyName, enemyIntro + "\n\n" + battleLog +
             "\n\nПротивник: " + enemyHp + "/" + enemyMaxHp + " здоровья.\nТы: " + hp + "/" + maxHp + " здоровья.")
             .primary("ATTACK","Обычный удар","Стабильный урон, без затрат")
-            .add("HEAVY","Сильный удар","−10 выносливости • риск промаха")
-            .add("MAGIC","Магическая вспышка","−12 магии • усиленный урон")
+            .add("HEAVY","Сильный удар","−10 выносливости | риск промаха")
+            .add("MAGIC","Магическая вспышка","−12 магии | усиленный урон")
             .add("DEFEND","Защититься","Уменьшить ответный урон")
             .add("POTION","Выпить лечебное зелье","Осталось: " + potions)
             .add("FLEE","Отступить","Шанс выйти из боя без награды");
@@ -429,11 +429,11 @@ public final class GameEngine {
                 int found=28+random.nextInt(44);gold+=found;addXp(10);
                 message="Под камнем найдено "+found+" септимов. Получено 10 опыта.";
             }
-            progress.completed.add((help?"Помощь путнику":"Исследование находки")+" • день "+day);
+            progress.completed.add((help?"Помощь путнику":"Исследование находки")+" | день "+day);
         }else{
             if(help){reputation=Math.max(-50,reputation-1);message="Незнакомец принимает жест за угрозу и уходит. Репутация −1.";}
             else{hp=Math.max(1,hp-17);message="Сработала старая ловушка! −17 здоровья.";}
-            progress.failed.add((help?"Помощь путнику":"Исследование находки")+" • день "+day);
+            progress.failed.add((help?"Помощь путнику":"Исследование находки")+" | день "+day);
         }
         mode="RESULT";
     }
