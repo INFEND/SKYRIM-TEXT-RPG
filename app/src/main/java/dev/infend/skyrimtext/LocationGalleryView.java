@@ -37,13 +37,16 @@ import java.util.zip.ZipInputStream;
 public final class LocationGalleryView extends LinearLayout {
     private static final String[] CITIES={
         "Вайтран","Виндхельм","Винтерхолд","Данстар","Маркарт",
-        "Морфал","Ривервуд","Рифтен","Солитьюд","Фолкрит"
+        "Морфал","Ривервуд","Рифтен","Солитьюд","Фолкрит",
+        "Хелген","Айварстед","Рорикстед","Драконий Мост","Картвастен","Шорский Камень","Кинсгроув","Чёрный Брод","Каменные Холмы","Воронья Скала","Тел-Митрин","Деревня скаалов"
     };
     private static final String[] SLUGS={
         "whiterun","windhelm","winterhold","dawnstar","markarth",
-        "morthal","riverwood","riften","solitude","falkreath"
+        "morthal","riverwood","riften","solitude","falkreath",
+        "helgen","ivarstead","rorikstead","dragonbridge","karthwasten","shorsstone","kynesgrove","darkwater","stonehills","ravenrock","telmithryn","skaal"
     };
     private static final Map<String,String> ID_BY_CITY=new HashMap<>();
+    private static final Map<String,Integer> PHOTO_INDEX_BY_CITY=new HashMap<>();
     /** Labels follow location/sub-location names, not gallery image numbers. */
     private static final String[][] PHOTO_LABELS={
         {"Панорама Вайтрана","Главные ворота","Рынок","Ветреный район","Йоррваскр","Драконий Предел"},
@@ -52,10 +55,22 @@ public final class LocationGalleryView extends LinearLayout {
         {"Подход к Данстару","Порт","Главная улица","Таверна","У причала","Заснеженная бухта"},
         {"Городские ворота","Каменные улицы","Рынок","Храм Дибеллы","Подкаменная крепость","Террасы Маркарта"},
         {"Подход к Морфалу","Деревянный мост","Главная улица","Таверна","Болотные окраины","Деревня у болота"},
-        {"Подход к Ривервуду","Главная улица","Кузница Алвора","Лесопилка","Река у деревни"},
+        {"Подход к Ривервуду","Главная улица","Кузница Алвора","Лесопилка","Река у деревни","Таверна «Спящий великан»"},
         {"Городские ворота","Рынок","Городские каналы","Порт","Крепость Миствейл","Нижние улицы"},
         {"Главные ворота","Рынок","Синий дворец","Главная площадь","Городская арка","Набережная"},
-        {"Подход к Фолкриту","Главная улица","Рынок","Зал мёртвых","Кладбище","Лесная окраина"}
+        {"Подход к Фолкриту","Главная улица","Рынок","Зал мёртвых","Кладбище","Лесная окраина"},
+        {"Подход к Хелгену","Крепостной двор","Улицы Хелгена","Большой зал крепости","Каменные переходы","Пещера под крепостью"},
+        {"Подход к Айварстеду","Деревенская улица","Таверна «Вайлмир»","Мост через реку","Курган Погребальный Огонь","Начало Семи тысяч ступеней"},
+        {"Подход к Рорикстеду","Главная улица","Таверна «Мороженый фрукт»","Поля Рорикстеда","Двор фермерского дома","Окраина у холмов"},
+        {"Подход к Драконьему Мосту","На Драконьем Мосту","Деревенская улица","Таверна «Четыре щита»","Лесопилка у реки","Сторожевой пост"},
+        {"Подход к Картвастену","Улица шахтёрского посёлка","Вход в шахту Сануарах","Шахтёрский штрек","Двор посёлка","Дом шахтёра"},
+        {"Подход к Шорскому Камню","Шахтёрская деревня","Кузница Фильньяра","Вход в Красную шахту","Выработки Красной шахты","Вечер у общего очага"},
+        {"Подход к Кинсгроуву","Таверна «Деревянное кружево»","Вход в шахту Паровой Ожог","Штреки шахты","Роща у посёлка","Зал деревенской таверны"},
+        {"Подход к Чёрному Броду","Берег Чёрного Брода","Вход в шахту Золотая Скала","Выработки Золотой Скалы","Шахтёрский лагерь","Речная переправа"},
+        {"Подход к Каменным Холмам","Шахтёрский двор","Вход в шахту Каменные Холмы","Горные выработки","Дом у шахты","Болотная окраина"},
+        {"Прибытие в Воронью Скалу","Улицы Вороньей Скалы","Торговая площадь","Храм предков","Стена Бастиона","Таверна «Пьяный нетч»"},
+        {"Подход к Тел-Митрину","Двор грибного поселения","Вход в башню","Зал Нелота","Алхимическая лаборатория","Жилище управляющего"},
+        {"Подход к деревне скаалов","Заснеженная площадь","Большой дом","Кузница скаалов","Дом шамана","Лесная окраина деревни"}
     };
     private static final ExecutorService IO=Executors.newFixedThreadPool(2);
     private static final Set<String> PREFETCHING=java.util.Collections.synchronizedSet(new HashSet<>());
@@ -64,12 +79,26 @@ public final class LocationGalleryView extends LinearLayout {
         @Override protected int sizeOf(String key,Bitmap bitmap){return bitmap.getByteCount();}
     };
     static{
-        for(int i=0;i<CITIES.length;i++)ID_BY_CITY.put(CITIES[i],SLUGS[i]);
+        if(CITIES.length!=SLUGS.length||CITIES.length!=PHOTO_LABELS.length)
+            throw new IllegalStateException("Несогласованный каталог галерей");
+        for(int i=0;i<CITIES.length;i++){
+            ID_BY_CITY.put(locationKey(CITIES[i]),SLUGS[i]);
+            PHOTO_INDEX_BY_CITY.put(locationKey(CITIES[i]),i);
+        }
+        alias("Камень Шора","Шорский Камень");
+        alias("Роща Кин","Кинсгроув");
     }
-    public static boolean hasGallery(String location){return ID_BY_CITY.containsKey(location);}
+    private static String locationKey(String location){
+        return location==null?"":location.trim().toLowerCase(new Locale("ru")).replace('ё','е');
+    }
+    private static void alias(String name,String canonical){
+        ID_BY_CITY.put(locationKey(name),ID_BY_CITY.get(locationKey(canonical)));
+        PHOTO_INDEX_BY_CITY.put(locationKey(name),PHOTO_INDEX_BY_CITY.get(locationKey(canonical)));
+    }
+    public static boolean hasGallery(String location){return ID_BY_CITY.containsKey(locationKey(location));}
     public static int imageCount(String location){
         if(!hasGallery(location))return 0;
-        return "Ривервуд".equals(location)?5:6;
+        return PHOTO_LABELS[PHOTO_INDEX_BY_CITY.get(locationKey(location))].length;
     }
     public static String[] locations(){return CITIES.clone();}
 
@@ -96,12 +125,13 @@ public final class LocationGalleryView extends LinearLayout {
     }
     private static String archive(String slug,int number){
         if("riften".equals(slug))return number<=3?"riften.zip":"riften_extra.zip";
+        if("riverwood".equals(slug)&&number==6)return "riverwood_extra.zip";
         return slug+".zip";
     }
     private static String captionFor(String location,int index){
-        for(int i=0;i<CITIES.length;i++)if(CITIES[i].equals(location))
-            return PHOTO_LABELS[i][Math.max(0,Math.min(index,PHOTO_LABELS[i].length-1))];
-        return location;
+        Integer city=PHOTO_INDEX_BY_CITY.get(locationKey(location));
+        if(city==null)return location;
+        return PHOTO_LABELS[city][Math.max(0,Math.min(index,PHOTO_LABELS[city].length-1))];
     }
     private static String cacheKey(String slug,int number,boolean full){
         return slug+"/"+number+"/"+(full?"full":"small");
@@ -124,7 +154,7 @@ public final class LocationGalleryView extends LinearLayout {
     public LocationGalleryView(Context context,String location,int accent,boolean fullscreen){
         super(context);
         if(!hasGallery(location))throw new IllegalArgumentException("Галерея не найдена: "+location);
-        this.location=location;this.slug=ID_BY_CITY.get(location);
+        this.location=location;this.slug=ID_BY_CITY.get(locationKey(location));
         this.accent=accent;this.fullscreen=fullscreen;
         setOrientation(VERTICAL);
         setPadding(dp(10),dp(10),dp(10),dp(12));
