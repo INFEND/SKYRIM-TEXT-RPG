@@ -33,7 +33,9 @@ class SourceScopedSettings(unittest.TestCase):
     def test_exactly_one_account_action(self):
         chat=SCOPED.split('}else if("chatgpt".equals(effectiveProvider))',1)[1].split(
             '}else if("api".equals(effectiveProvider))',1)[0]
-        self.assertIn("boolean signedIn=chatGptOAuth.hasAuthorizedPlan()",chat)
+        self.assertIn("boolean signedIn=chatGptOAuth.hasSignedInAccount()",chat)
+        self.assertIn("boolean authorized=chatGptOAuth.hasAuthorizedPlan()",chat)
+        self.assertIn("if(authorized)",chat)
         self.assertIn("if(signedIn)",chat)
         self.assertIn('actionButton("Выйти из ChatGPT"',chat)
         self.assertIn('actionButton("Войти в ChatGPT"',chat)
@@ -46,7 +48,10 @@ class SourceScopedSettings(unittest.TestCase):
     def test_no_bullet_separators_in_current_user_interface(self):
         for name in ("MainActivity.java","GameEngine.java","TravelPlanner.java",
                      "WorldAtlas.java"):
-            self.assertNotIn("•",(ROOT_JAVA/name).read_text(encoding="utf-8"),name)
+            source=(ROOT_JAVA/name).read_text(encoding="utf-8")
+            # Legacy separators may occur only as input to the display normalizer.
+            source=source.replace('str.replace(" • "," | ")','str.replace("LEGACY_SEPARATOR"," | ")')
+            self.assertNotIn("•",source,name)
         # Identifiers in old save data are deliberately not rewritten:
         old=(ROOT_JAVA/"RpgProgress.java").read_text(encoding="utf-8")
         self.assertIn("Пепельные печати • день ",old)
