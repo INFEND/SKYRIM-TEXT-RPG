@@ -383,5 +383,131 @@
     "caption": "Речная переправа",
     "source": "artwork_sources/darkwater/06.png",
     "source_git_sha": "e588a9235c8a7846628f224fd0fbd5aced45e3e4"
+  },
+  {
+    "slug": "ravenrock",
+    "number": 1,
+    "caption": "Прибытие в Воронью Скалу",
+    "source": "artwork_sources/ravenrock/01.png",
+    "source_git_sha": "0a80fb85b0092b94d908a18d52fbd6a6d20e1c3d"
+  },
+  {
+    "slug": "ravenrock",
+    "number": 2,
+    "caption": "Улицы Вороньей Скалы",
+    "source": "artwork_sources/ravenrock/02.png",
+    "source_git_sha": "b3da669c77b587ed7c38b9dc841a24b89966d161"
+  },
+  {
+    "slug": "ravenrock",
+    "number": 3,
+    "caption": "Торговая площадь",
+    "source": "artwork_sources/ravenrock/03.png",
+    "source_git_sha": "25bc3711afb3b2e6979b080d33407f2e283fdfb0"
+  },
+  {
+    "slug": "ravenrock",
+    "number": 4,
+    "caption": "Храм предков",
+    "source": "artwork_sources/ravenrock/04.png",
+    "source_git_sha": "24d01ccfd89fdb807a6d9893bb58da994ba6aa8c"
+  },
+  {
+    "slug": "ravenrock",
+    "number": 5,
+    "caption": "Стена Бастиона",
+    "source": "artwork_sources/ravenrock/05.png",
+    "source_git_sha": "863ceaded6fef60470261106f0c01cabbe5b7dc8"
+  },
+  {
+    "slug": "ravenrock",
+    "number": 6,
+    "caption": "Таверна «Пьяный нетч»",
+    "source": "artwork_sources/ravenrock/06.png",
+    "source_git_sha": "4ec5e3e157dc95e17582961d7475e45560369be8"
+  },
+  {
+    "slug": "telmithryn",
+    "number": 1,
+    "caption": "Подход к Тел-Митрину",
+    "source": "artwork_sources/telmithryn/01.png",
+    "source_git_sha": "86060161703072d17b410eb3e4aea4678fb8e449"
+  },
+  {
+    "slug": "telmithryn",
+    "number": 2,
+    "caption": "Двор грибного поселения",
+    "source": "artwork_sources/telmithryn/02.png",
+    "source_git_sha": "01aa304eb6c1144d756f6cbb6a6d6ea19f344037"
+  },
+  {
+    "slug": "telmithryn",
+    "number": 3,
+    "caption": "Вход в башню",
+    "source": "artwork_sources/telmithryn/03.png",
+    "source_git_sha": "c799a68ffa87a297cf2bb17d138bcd00ba022ea4"
+  },
+  {
+    "slug": "telmithryn",
+    "number": 4,
+    "caption": "Зал Нелота",
+    "source": "artwork_sources/telmithryn/04.png",
+    "source_git_sha": "3ca425e8a948a6e12d7099793e1eee0cf0d56373"
+  },
+  {
+    "slug": "telmithryn",
+    "number": 5,
+    "caption": "Алхимическая лаборатория",
+    "source": "artwork_sources/telmithryn/05.png",
+    "source_git_sha": "edece45b01f006a66b4d58a3f6ff5e4b656470cb"
+  },
+  {
+    "slug": "telmithryn",
+    "number": 6,
+    "caption": "Жилище управляющего",
+    "source": "artwork_sources/telmithryn/06.png",
+    "source_git_sha": "fffc0a1a3d6405af41796f9136a2fa6d37aa98fd"
+  },
+  {
+    "slug": "skaal",
+    "number": 1,
+    "caption": "Подход к деревне скаалов",
+    "source": "artwork_sources/skaal/01.png",
+    "source_git_sha": "7eaaaf1d46ed7932818335d1979ab8c9c7698006"
+  },
+  {
+    "slug": "skaal",
+    "number": 2,
+    "caption": "Заснеженная площадь",
+    "source": "artwork_sources/skaal/02.png",
+    "source_git_sha": "f12e3db1d601ca3dd26f6e6a009a86e585926771"
+  },
+  {
+    "slug": "skaal",
+    "number": 3,
+    "caption": "Большой дом",
+    "source": "artwork_sources/skaal/03.png",
+    "source_git_sha": "73d3db49298111a3cff6a05e8ac6a67cd65b47a4"
+  },
+  {
+    "slug": "skaal",
+    "number": 4,
+    "caption": "Кузница скаалов",
+    "source": "artwork_sources/skaal/04.png",
+    "source_git_sha": "cc0f0381414d6249aec8ae9437aeecbc63e81c3f"
+  },
+  {
+    "slug": "skaal",
+    "number": 5,
+    "caption": "Дом шамана",
+    "source": "artwork_sources/skaal/05.png",
+    "source_git_sha": "7a8c43f1922b51d3b1a8ea354807169b8b8bf415"
+  },
+  {
+    "slug": "skaal",
+    "number": 6,
+    "caption": "Лесная окраина деревни",
+    "source": "artwork_sources/skaal/06.png",
+    "source_git_sha": "25f28c12f515b7f3badfb7a013d875b083b89c24"
   }
 ]
