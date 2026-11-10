@@ -41,7 +41,7 @@ public final class TravelPlanner {
             if (!allowed) return problem;
             if (days == 0) return "Ты уже находишься здесь.";
             return String.format(Locale.forLanguageTag("ru"),
-                "В пути: %d дн.  •  Переправа: %d септимов\n\nМаршрут: %s",
+                "В пути: %d дн.  |  Переправа: %d септимов\n\nМаршрут: %s",
                 days, fare, String.join(" → ", stops));
         }
     }
