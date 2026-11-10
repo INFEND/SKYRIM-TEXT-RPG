@@ -242,7 +242,7 @@ public final class WorldAtlas {
             paint.setStyle(Paint.Style.FILL);paint.setColor(INK);paint.setTextSize(26);
             c.drawText("ᛟ   С К А Й Р И М   ᛟ",52,70,paint);
             paint.setTextSize(16);paint.setColor(0xffb8c0c3);
-            c.drawText("УСЛОВНАЯ ИГРОВАЯ СХЕМА • НАЖМИ НА МЕТКУ",52,98,paint);
+            c.drawText("УСЛОВНАЯ ИГРОВАЯ СХЕМА | НАЖМИ НА МЕТКУ",52,98,paint);
             // Compass rose and engraved rim; the atlas remains an explicitly schematic map.
             color(GOLD,2);
             c.drawCircle(1023,83,30,paint);
