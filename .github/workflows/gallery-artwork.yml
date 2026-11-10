@@ -25,6 +25,12 @@ jobs:
         run: python -m pip install 'Pillow==11.3.0' 'numpy==2.2.6' 'scipy==1.15.3'
       - name: Encode new images and verify old archives
         run: python tools/optimize_location_gallery.py artwork_sources/index.json
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Check gallery catalogs and game regressions
+        run: python -m unittest discover -s tests -p 'test_*.py' -v
       - name: Save optimized artwork to preparation branch
         env:
           ARTWORK_BRANCH: gallery-artwork-20261110
