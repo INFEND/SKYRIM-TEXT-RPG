@@ -957,6 +957,15 @@ public final class MainActivity extends Activity {
                 }
             };
             aiProgressInfo.post(aiDotsTicker);
+            if("local".equals(source)){
+                LinearLayout live=card();
+                addText(live,"ТЕКСТ ЛОКАЛЬНОЙ МОДЕЛИ · ПРЕДПРОСМОТР",11,accent(),true,9);
+                aiTurnText=text(aiTurnPreview.isEmpty()?"Ожидание первых токенов…" : aiTurnPreview,17,TEXT,false);
+                aiTurnText.setTypeface(SovngardeTypeface.face(this,false));
+                aiTurnText.setLineSpacing(dp(5),1.12f);
+                live.addView(aiTurnText,lp(-1,-2));
+                addText(live,"Пока сцена генерируется, сохранение и игровые характеристики не изменяются.",12,MUTED,false,4);
+            }
             space(content,7);
             actionButton("ОСТАНОВИТЬ","Прервать генерацию без изменения сохранения",false,()->{
                 if(aiClient!=null)aiClient.cancel();if(localAiClient!=null)localAiClient.cancel();
