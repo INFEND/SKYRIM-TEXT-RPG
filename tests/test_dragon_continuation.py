@@ -61,6 +61,15 @@ class DragonContinuationContracts(unittest.TestCase):
         self.assertIn('if(risky&&g.stamina<7)',c)
         self.assertIn('new Random().nextInt(100)<probability',c)
         self.assertIn('int probability=chance(g,action)',c)
+    def test_risky_roll_never_consumes_invalid_probability(self):
+        c=source("DragonContinuation.java")
+        roll=c.index("int probability=chance(g,action);")
+        guard=c.index("if(risky&&probability<0)return;",roll)
+        consume=c.index("g.progress.dragonNextUsed.add(action);g.day++;",roll)
+        self.assertLess(roll,guard)
+        self.assertLess(guard,consume)
+        self.assertIn("new Random().nextInt(100)<probability",c)
+
     def test_evidence_gate_and_skill_rewards(self):
         c=source("DragonContinuation.java")
         self.assertIn("evidenceCount(g,stage)<3",c)
