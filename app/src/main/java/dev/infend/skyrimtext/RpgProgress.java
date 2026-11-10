@@ -197,10 +197,10 @@ public final class RpgProgress {
         switch(action){
             case "Q_ACCEPT":setQuestOutcome("ash_seals","ACTIVE");recent="Принято сюжетное поручение: «Пепельные печати».";break;
             case "Q_ALTAR":
-                if(g.questStage>oldQuest)completed.add("Исследование древнего алтаря | день "+g.day);
+                if(g.questStage>oldQuest)completed.add("Исследование древнего алтаря • день "+g.day);
                 break;
             case "Q_FINISH":
-                if(g.questStage>oldQuest){setQuestOutcome("ash_seals","COMPLETED");completed.add("Пепельные печати | день "+g.day);}
+                if(g.questStage>oldQuest){setQuestOutcome("ash_seals","COMPLETED");completed.add("Пепельные печати • день "+g.day);}
                 break;
             case "EXPLORE":skillExperience(g,9,6);break;
             case "TALK_HELP":skillExperience(g,12,6);break;

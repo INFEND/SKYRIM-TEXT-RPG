@@ -266,7 +266,7 @@ public final class DragonContinuation {
             activateQuest(g,g.progress.dragonNextStage);
             g.addXp(30+stage*15);
             g.progress.dragonNextRecent=stage==0?"Ривервудские свидетельства переданы советникам Вайтрана.":stage==1?"Совет завершён. Следующая цель: Виндхельм. "+lead(g):stage==2?"Стража Виндхельма получила досье. "+lead(g)+" "+windhelmVerdict(g):"Разведка у заставы завершена. "+lead(g)+" "+windhelmVerdict(g);
-            g.progress.completed.add(TITLES[stage]+" | день "+g.day);
+            g.progress.completed.add(TITLES[stage]+" • день "+g.day);
             if(stage==2){
                 // Apply the proven Windhelm outcome once, at quest completion only.
                 // These consequences use existing schema-1 flags and attributes.

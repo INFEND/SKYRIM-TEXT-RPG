@@ -263,7 +263,7 @@ public final class MainActivity extends Activity {
     private LinearLayout column(){LinearLayout l=new LinearLayout(this);l.setOrientation(LinearLayout.VERTICAL);return l;}
     private LinearLayout row(){LinearLayout l=new LinearLayout(this);l.setOrientation(LinearLayout.HORIZONTAL);l.setGravity(Gravity.CENTER_VERTICAL);return l;}
     private TextView text(String str,int size,int color,boolean bold){
-        TextView t=new TextView(this);t.setText(str==null?"":str.replace(" • "," | ").replace(" · "," | "));t.setTextSize(sp(size));t.setTextColor(color);
+        TextView t=new TextView(this);t.setText(str==null?"":str.replace(" "+(char)8226+" "," | ").replace(" "+(char)183+" "," | "));t.setTextSize(sp(size));t.setTextColor(color);
         t.setFontFeatureSettings("kern");t.setIncludeFontPadding(true);
         t.setTypeface(SovngardeTypeface.face(this,bold));
         return t;

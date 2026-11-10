@@ -24,7 +24,7 @@ class StreamingLocalAi(unittest.TestCase):
 
     def test_partial_scene_is_visible_and_never_committed(self):
         ui=(SRC/"MainActivity.java").read_text(encoding="utf-8")
-        self.assertIn("ТЕКСТ ЛОКАЛЬНОЙ МОДЕЛИ · ПРЕДПРОСМОТР",ui)
+        self.assertIn("ТЕКСТ ЛОКАЛЬНОЙ МОДЕЛИ | ПРЕДПРОСМОТР",ui)
         self.assertIn("AiGameTurn.previewScene(accumulated)",ui)
         self.assertIn("aiTurnText.setText(SceneTypography.render(visible",ui)
         self.assertIn("AiGameTurn completed=AiGameTurn.parse(answer)",ui)

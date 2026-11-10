@@ -80,9 +80,9 @@ class DragonContinuationContracts(unittest.TestCase):
     def test_quest_objectives_and_branching_conclusions(self):
         c=source("DragonContinuation.java")
         self.assertIn("public static String questObjective(GameEngine g)",c)
-        self.assertIn("evidenceCount(g,stage)+\"/3 • опасная зацепка \"",c)
+        self.assertIn("evidenceCount(g,stage)+\"/3 | опасная зацепка \"",c)
         self.assertIn('(hasRiskProof(g,stage)?"доказана":"не доказана")',c)
-        self.assertIn('" • неудачные вылазки "+failedCount(g,stage)',c)
+        self.assertIn('" | неудачные вылазки "+failedCount(g,stage)',c)
         self.assertIn("private static String lead(GameEngine g)",c)
         self.assertIn("if(seal&&dates)",c)
         self.assertIn("if(courier&&scout)",c)
