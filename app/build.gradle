@@ -8,7 +8,7 @@ if (signingFile.exists()) {
 
 android {
     namespace 'dev.infend.skyrimtext'
-    compileSdk 35
+    compileSdk 36
 
     defaultConfig {
         applicationId 'dev.infend.skyrimtext'
@@ -49,6 +49,6 @@ android {
 
 
 dependencies {
-    implementation 'dev.ffmpegkit-maintained:llama-android:0.1.1'
+    implementation 'io.github.ljcamargo:llamacpp-kotlin:0.4.0'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.9.0'
 }
