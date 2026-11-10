@@ -33,7 +33,7 @@ jobs:
         run: |
           echo "ANDROID_HOME=${ANDROID_HOME:-unset}"
           "${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager" --version
-          "${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager" --install 'platforms;android-35' 'build-tools;35.0.0'
+          "${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager" --install 'platforms;android-35' 'platforms;android-36' 'build-tools;35.0.0'
       - name: Gate signed releases on all Python regression checks
         run: python3 -m unittest discover -s tests -p 'test_*.py' -v
       - name: Bundle exact user-supplied Sovngarde fonts
