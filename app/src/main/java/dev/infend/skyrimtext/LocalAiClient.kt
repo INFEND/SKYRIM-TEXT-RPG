@@ -36,6 +36,17 @@ class LocalAiClient(private val context: Context) {
                 if(!closed&&busy&&id==generation)activeListener else null
             }
             listener?.onLocalStatus(reply.data.getString("status").orEmpty())
+        }else if(reply.what==LocalAiInferenceService.MSG_TEXT) {
+            val id=reply.data.getLong("id",-1L)
+            val listener=synchronized(guard) {
+                if(!closed&&busy&&id==generation)activeListener else null
+            }
+            if(listener!=null) {
+                val partial=reply.data.getString("text").orEmpty()
+                val tokens=reply.data.getInt("tokens",0)
+                if(partial.isNotEmpty())listener.onText(partial)
+                if(tokens>0)listener.onLocalStatus("Генерация: "+tokens+" токенов")
+            }
         }else if(reply.what==LocalAiInferenceService.MSG_RESULT) {
             val id=reply.data.getLong("id",-1L)
             val listener: AiStoryClient.Listener?
@@ -69,7 +80,7 @@ class LocalAiClient(private val context: Context) {
         val prompt=AiStoryClient.localUserPrompt(game,history,command,controlled)
         // Full scenes require a structured JSON with ten choices. CPU-only 9B
         // inference is slow: keep the budget finite rather than waiting on 2048 tokens.
-        val maxTokens=if(chanceOnly)80 else if(controlled)1024 else 448
+        val maxTokens=if(chanceOnly)128 else if(controlled)2304 else 768
         return start(modelPath,system,prompt,maxTokens,listener)
     }
 
@@ -114,7 +125,7 @@ class LocalAiClient(private val context: Context) {
         request.replyTo=incoming
         pending=request
         listener.onLocalStatus("Подключение к отдельному процессу модели…")
-        // Native completion does not stream; never leave the game waiting forever.
+        // Native completion streams tokens, but a hardware hang must still time out.
         val expiry=Runnable {
             val timedOut=synchronized(guard){busy&&generation==id&&!closed}
             if(timedOut){
