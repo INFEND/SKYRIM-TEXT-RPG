@@ -301,7 +301,10 @@ public final class DragonContinuation {
         if(g.progress.dragonNextUsed.contains(action))return;
         boolean risky=choice==3||choice==5||choice==7;
         if(risky&&g.stamina<7){g.progress.dragonNextRecent="Слишком мало сил для опасной попытки.";return;}
+        // Calculate against the still-available action: chance() rejects consumed leads.
+        // Register the attempt only after the roll probability is fixed.
         int probability=chance(g,action);
+        if(risky&&probability<0)return;
         g.progress.dragonNextUsed.add(action);g.day++;
         String[] pair=OPTIONS[stage][choice-1].split("\\|",2);
         if(risky){
