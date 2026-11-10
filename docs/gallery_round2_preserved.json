@@ -1,0 +1,31 @@
+{
+  "base_commit": "d117d8fb541c1bf0d7daee98a5bb28e84842dbb0",
+  "previous_location_count": 22,
+  "previous_image_count": 132,
+  "archives": {
+    "winterhold.zip": "521e48bfc27864fb941be175bc51bb796958f2edf2297e90c68dfea04e15a5d8",
+    "markarth.zip": "7725ea25a3e39d1842073ac77f4a0b65770f756c67ff243da79724df64114e50",
+    "windhelm.zip": "f3b6798470456efcd02dac172bf6f9df5c44dd0d946e66e02e8b5066d1137e26",
+    "dawnstar.zip": "3f5a83b9873074027cf5bc344c4267bf0e7ca93d0b0add205d3d9c6aa105efd5",
+    "riften.zip": "f199b7ae8812093e69f84ae88ee3d58c4405298222ade30b638404a64c07bc69",
+    "falkreath.zip": "df95a129ca7eed2eee175b2566a1ac1d4a80dca09643f0b227b99e17c4ff9f73",
+    "solitude.zip": "ae9aed2cf0e773ffa17f33d9efa14aa575aa6a25e1a16c5f7d5c5d0ded43bba5",
+    "riften_extra.zip": "f4323a16703ba45fbb5768ef82571b65379e19757c3c3de85a60aa4ab2db2611",
+    "whiterun.zip": "366fbb79f5667559324239cdd62e3d7c094b927de4613fad03734e485443629f",
+    "riverwood.zip": "153f21b0eb883cde9381eb1b69911028718cdcfbf737bec4c392beec19b9ae30",
+    "morthal.zip": "c02858a0e0fa158bf6287abcaaf2987c616f24713fd6221d65ba0c62f98fc661",
+    "riverwood_extra.zip": "4e5b5890d9b19783bffd8623cbf59d24af8918a704c04e68e02a632904053839",
+    "helgen.zip": "2d33b3f6d5af789c6a33667b67173a6ffb2c4e7db4c40ddb829efaa91fa4ae9e",
+    "ivarstead.zip": "2f810aa7f9b17bace1f4e9d44202a1e540e9b7889b305890979c3c0e2790d851",
+    "rorikstead.zip": "5906a20b620e15d488c7fba90408b011c030ff6df6d3ef399fd5c8ee657a377a",
+    "dragonbridge.zip": "168e27b8c79014215b298044da9fa759e6f61a42c74db6cc931968e66d4d450a",
+    "karthwasten.zip": "6088fa71428f43b1ab53f0677d4d9376d50645e264c203165f17a199bf2441bb",
+    "shorsstone.zip": "ebeba8f11cf83ccc245d07d96f863e463784528a70b1135982b770f8c6a5cdbe",
+    "kynesgrove.zip": "8df1f00c718ef1cbe150981d8aaa0bf40f69ad5a56cff8ce3d10404d396752eb",
+    "darkwater.zip": "f7dd3813b45ff859bb3f209ad38b2841779a77f425e4b44bc9a6d0c5c4c2ce3a",
+    "stonehills.zip": "75bdf4400dafdc5fb43ad1d5128970bbc008b4bcdef3731352358c5411d51a38",
+    "ravenrock.zip": "aaa5a3fae22e501df9d5eea472a974867a085103bed27a3212202b68317300c9",
+    "telmithryn.zip": "f2924f7285db14910976b73954d4dc3e2809f0b123cc2dacb041464bcfeb0c61",
+    "skaal.zip": "686c65268af0019bbda9029ecd30dd3a7c4b9db1195323ada21a004d3095b2aa"
+  }
+}

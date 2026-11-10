@@ -1,0 +1,555 @@
+[
+  {
+    "slug": "riverwood",
+    "number": 6,
+    "caption": "Таверна «Спящий великан»",
+    "source": "artwork_sources/riverwood/06.png",
+    "source_git_sha": "14604782d5d577dfe269da4b21f61cd81a296592"
+  },
+  {
+    "slug": "helgen",
+    "number": 1,
+    "caption": "Подход к Хелгену",
+    "source": "artwork_sources/helgen/01.png",
+    "source_git_sha": "41a12356d42dcd006bf81be5c89241a44b53d36f"
+  },
+  {
+    "slug": "helgen",
+    "number": 2,
+    "caption": "Крепостной двор",
+    "source": "artwork_sources/helgen/02.png",
+    "source_git_sha": "fd42eb414cea107e7d1cac82c2e265fb614e13d8"
+  },
+  {
+    "slug": "helgen",
+    "number": 3,
+    "caption": "Улицы Хелгена",
+    "source": "artwork_sources/helgen/03.png",
+    "source_git_sha": "411355726ce835ab89bf4aac40998de50bb1b016"
+  },
+  {
+    "slug": "helgen",
+    "number": 4,
+    "caption": "Большой зал крепости",
+    "source": "artwork_sources/helgen/04.png",
+    "source_git_sha": "50e7a14e1ba21e494688cfee6178d2f4c77ec496"
+  },
+  {
+    "slug": "helgen",
+    "number": 5,
+    "caption": "Каменные переходы",
+    "source": "artwork_sources/helgen/05.png",
+    "source_git_sha": "dd6c39d563b05c2330af0285ad039744a6da30db"
+  },
+  {
+    "slug": "helgen",
+    "number": 6,
+    "caption": "Пещера под крепостью",
+    "source": "artwork_sources/helgen/06.png",
+    "source_git_sha": "21f239bbb4a01d06cab0db75ce6f51ec3fd9d939"
+  },
+  {
+    "slug": "ivarstead",
+    "number": 1,
+    "caption": "Подход к Айварстеду",
+    "source": "artwork_sources/ivarstead/01.png",
+    "source_git_sha": "ea38a0a5beeee75cd9b093d4f88bb83972eb42c1"
+  },
+  {
+    "slug": "ivarstead",
+    "number": 2,
+    "caption": "Деревенская улица",
+    "source": "artwork_sources/ivarstead/02.png",
+    "source_git_sha": "86c2056c4f6c76757e6b99944c0969379c0b704a"
+  },
+  {
+    "slug": "ivarstead",
+    "number": 3,
+    "caption": "Таверна «Вайлмир»",
+    "source": "artwork_sources/ivarstead/03.png",
+    "source_git_sha": "7648b8f9ebdb8fb9e04c6a6612bd40f8f8b6bc89"
+  },
+  {
+    "slug": "ivarstead",
+    "number": 4,
+    "caption": "Мост через реку",
+    "source": "artwork_sources/ivarstead/04.png",
+    "source_git_sha": "5597f9a343ff688beb4be2da39deb4bd8a53b9ce"
+  },
+  {
+    "slug": "ivarstead",
+    "number": 5,
+    "caption": "Курган Погребальный Огонь",
+    "source": "artwork_sources/ivarstead/05.png",
+    "source_git_sha": "1f4e37b0b44c308683a186d59b8eb01d30dd17c6"
+  },
+  {
+    "slug": "ivarstead",
+    "number": 6,
+    "caption": "Начало Семи тысяч ступеней",
+    "source": "artwork_sources/ivarstead/06.png",
+    "source_git_sha": "1a034a6091c5cda0c96c8af8c028549b699b7e91"
+  },
+  {
+    "slug": "rorikstead",
+    "number": 1,
+    "caption": "Подход к Рорикстеду",
+    "source": "artwork_sources/rorikstead/01.png",
+    "source_git_sha": "6d59e2f8cac4a2c79cc26c54c784f78f4b22ced9"
+  },
+  {
+    "slug": "rorikstead",
+    "number": 2,
+    "caption": "Главная улица",
+    "source": "artwork_sources/rorikstead/02.png",
+    "source_git_sha": "99775aa4ce69ef118f507ee07964878d2ca93cf1"
+  },
+  {
+    "slug": "rorikstead",
+    "number": 3,
+    "caption": "Таверна «Мороженый фрукт»",
+    "source": "artwork_sources/rorikstead/03.png",
+    "source_git_sha": "eedb9f906debda5372321e7f71782ef6a82e92ed"
+  },
+  {
+    "slug": "rorikstead",
+    "number": 4,
+    "caption": "Поля Рорикстеда",
+    "source": "artwork_sources/rorikstead/04.png",
+    "source_git_sha": "11a5cf05dc21403acc4e52590478406729a97b84"
+  },
+  {
+    "slug": "rorikstead",
+    "number": 5,
+    "caption": "Двор фермерского дома",
+    "source": "artwork_sources/rorikstead/05.png",
+    "source_git_sha": "1e6f92cf5f01164f270b65a186bee534b5a585bf"
+  },
+  {
+    "slug": "rorikstead",
+    "number": 6,
+    "caption": "Окраина у холмов",
+    "source": "artwork_sources/rorikstead/06.png",
+    "source_git_sha": "94230ad1d70f83efd3c2f83e4bdcb0f9efd74b97"
+  },
+  {
+    "slug": "dragonbridge",
+    "number": 1,
+    "caption": "Подход к Драконьему Мосту",
+    "source": "artwork_sources/dragonbridge/01.png",
+    "source_git_sha": "57d931076c991a196b51aafe0d968ba4a03b6170"
+  },
+  {
+    "slug": "dragonbridge",
+    "number": 2,
+    "caption": "На Драконьем Мосту",
+    "source": "artwork_sources/dragonbridge/02.png",
+    "source_git_sha": "2d52221fad90bff65a1e6d4b66e5960b5a130d67"
+  },
+  {
+    "slug": "dragonbridge",
+    "number": 3,
+    "caption": "Деревенская улица",
+    "source": "artwork_sources/dragonbridge/03.png",
+    "source_git_sha": "de6c8941eaf12d6265eac2a70f1204987c43c2a1"
+  },
+  {
+    "slug": "dragonbridge",
+    "number": 4,
+    "caption": "Таверна «Четыре щита»",
+    "source": "artwork_sources/dragonbridge/04.png",
+    "source_git_sha": "4cf39347f6e81d4406078bb300dc80c426bf5ee4"
+  },
+  {
+    "slug": "dragonbridge",
+    "number": 5,
+    "caption": "Лесопилка у реки",
+    "source": "artwork_sources/dragonbridge/05.png",
+    "source_git_sha": "739892d9ff4d7495bd6bd53467602b12f533b4e7"
+  },
+  {
+    "slug": "dragonbridge",
+    "number": 6,
+    "caption": "Сторожевой пост",
+    "source": "artwork_sources/dragonbridge/06.png",
+    "source_git_sha": "5688beb74b23397f6054235c6957050196217d61"
+  },
+  {
+    "slug": "karthwasten",
+    "number": 1,
+    "caption": "Подход к Картвастену",
+    "source": "artwork_sources/karthwasten/01.png",
+    "source_git_sha": "eb541bfdcc77b39fe833f2660bc45c595192ee7e"
+  },
+  {
+    "slug": "karthwasten",
+    "number": 2,
+    "caption": "Улица шахтёрского посёлка",
+    "source": "artwork_sources/karthwasten/02.png",
+    "source_git_sha": "32ceaa23d0b225c1fd7dfed8edda33499488e72c"
+  },
+  {
+    "slug": "karthwasten",
+    "number": 3,
+    "caption": "Вход в шахту Сануарах",
+    "source": "artwork_sources/karthwasten/03.png",
+    "source_git_sha": "c86973ef1926033f8a82e6663b4240b482706ebd"
+  },
+  {
+    "slug": "karthwasten",
+    "number": 4,
+    "caption": "Шахтёрский штрек",
+    "source": "artwork_sources/karthwasten/04.png",
+    "source_git_sha": "79d1c3fa823908cfb06a5b695912872a5ef4df78"
+  },
+  {
+    "slug": "karthwasten",
+    "number": 5,
+    "caption": "Двор посёлка",
+    "source": "artwork_sources/karthwasten/05.png",
+    "source_git_sha": "8179c3f59fe676d089ef4746a12adb224806a024"
+  },
+  {
+    "slug": "karthwasten",
+    "number": 6,
+    "caption": "Дом шахтёра",
+    "source": "artwork_sources/karthwasten/06.png",
+    "source_git_sha": "89a41b35af93b05740b759f62a6ccf3fe6fe7474"
+  },
+  {
+    "slug": "shorsstone",
+    "number": 1,
+    "caption": "Подход к Шорскому Камню",
+    "source": "artwork_sources/shorsstone/01.png",
+    "source_git_sha": "93e7879474ac5a64be6d167d47af9e7ec9f9fc1a"
+  },
+  {
+    "slug": "shorsstone",
+    "number": 2,
+    "caption": "Шахтёрская деревня",
+    "source": "artwork_sources/shorsstone/02.png",
+    "source_git_sha": "aaecadaf6a6bc7902adb1fd8ce4d2fb15da0fd57"
+  },
+  {
+    "slug": "shorsstone",
+    "number": 3,
+    "caption": "Кузница Фильньяра",
+    "source": "artwork_sources/shorsstone/03.png",
+    "source_git_sha": "46b2fa2788cccb52502107dce4d8bb4145216e0c"
+  },
+  {
+    "slug": "shorsstone",
+    "number": 4,
+    "caption": "Вход в Красную шахту",
+    "source": "artwork_sources/shorsstone/04.png",
+    "source_git_sha": "639307289d102f9b1cb071fd3a7b060787baa7f2"
+  },
+  {
+    "slug": "shorsstone",
+    "number": 5,
+    "caption": "Выработки Красной шахты",
+    "source": "artwork_sources/shorsstone/05.png",
+    "source_git_sha": "1c3e198edecf2a04e9516b0e112735b0af0d9c25"
+  },
+  {
+    "slug": "shorsstone",
+    "number": 6,
+    "caption": "Вечер у общего очага",
+    "source": "artwork_sources/shorsstone/06.png",
+    "source_git_sha": "f3d7d2fd7aca3861d79e025913aa802ea4e8aba6"
+  },
+  {
+    "slug": "kynesgrove",
+    "number": 1,
+    "caption": "Подход к Кинсгроуву",
+    "source": "artwork_sources/kynesgrove/01.png",
+    "source_git_sha": "8d7a527a4663a2df708818e1c756915ad593b0c3"
+  },
+  {
+    "slug": "kynesgrove",
+    "number": 2,
+    "caption": "Таверна «Деревянное кружево»",
+    "source": "artwork_sources/kynesgrove/02.png",
+    "source_git_sha": "840d88bf53b9b118eeba9dc929b30f06bf8ff778"
+  },
+  {
+    "slug": "kynesgrove",
+    "number": 3,
+    "caption": "Вход в шахту Паровой Ожог",
+    "source": "artwork_sources/kynesgrove/03.png",
+    "source_git_sha": "8f3a0548a0327eec5d0bd3da659e86d03bfc2ecd"
+  },
+  {
+    "slug": "kynesgrove",
+    "number": 4,
+    "caption": "Штреки шахты",
+    "source": "artwork_sources/kynesgrove/04.png",
+    "source_git_sha": "80d2d580630f99dd891229a57b88b9651bb1e11b"
+  },
+  {
+    "slug": "kynesgrove",
+    "number": 5,
+    "caption": "Роща у посёлка",
+    "source": "artwork_sources/kynesgrove/05.png",
+    "source_git_sha": "7acf9f6d3649dd5dc91b6315cecda0c1f3b050d2"
+  },
+  {
+    "slug": "kynesgrove",
+    "number": 6,
+    "caption": "Зал деревенской таверны",
+    "source": "artwork_sources/kynesgrove/06.png",
+    "source_git_sha": "da3c6fdf27fbf30c3dc00f38be9afc4f7439487d"
+  },
+  {
+    "slug": "darkwater",
+    "number": 1,
+    "caption": "Подход к Чёрному Броду",
+    "source": "artwork_sources/darkwater/01.png",
+    "source_git_sha": "5d85c107fa012e0780f9b79fe9e287e3bc3c6a58"
+  },
+  {
+    "slug": "darkwater",
+    "number": 2,
+    "caption": "Берег Чёрного Брода",
+    "source": "artwork_sources/darkwater/02.png",
+    "source_git_sha": "8b36d566e76a2bcde54834ec24714352687b99b1"
+  },
+  {
+    "slug": "darkwater",
+    "number": 3,
+    "caption": "Вход в шахту Золотая Скала",
+    "source": "artwork_sources/darkwater/03.png",
+    "source_git_sha": "0bd7ab2a526cd321f00e7258195780c2936abaeb"
+  },
+  {
+    "slug": "darkwater",
+    "number": 4,
+    "caption": "Выработки Золотой Скалы",
+    "source": "artwork_sources/darkwater/04.png",
+    "source_git_sha": "0b31105410bb2b38c22475b3651a5d502dd89c91"
+  },
+  {
+    "slug": "darkwater",
+    "number": 5,
+    "caption": "Шахтёрский лагерь",
+    "source": "artwork_sources/darkwater/05.png",
+    "source_git_sha": "3466868ceb4745f2d8a7a93bb4de00d71cd0a4e1"
+  },
+  {
+    "slug": "stonehills",
+    "number": 1,
+    "caption": "Подход к Каменным Холмам",
+    "source": "artwork_sources/stonehills/01.png",
+    "source_git_sha": "9e60c00c1ea6634877ce4a0aa753356b5b1df2f6"
+  },
+  {
+    "slug": "stonehills",
+    "number": 2,
+    "caption": "Шахтёрский двор",
+    "source": "artwork_sources/stonehills/02.png",
+    "source_git_sha": "7e019b6eabdeeec46d8d8984cb48d2e98b683b11"
+  },
+  {
+    "slug": "stonehills",
+    "number": 3,
+    "caption": "Вход в шахту Каменные Холмы",
+    "source": "artwork_sources/stonehills/03.png",
+    "source_git_sha": "212af4667c544d89395c9980969476a7dddc0515"
+  },
+  {
+    "slug": "stonehills",
+    "number": 4,
+    "caption": "Горные выработки",
+    "source": "artwork_sources/stonehills/04.png",
+    "source_git_sha": "071cd7d0b34e98f8f71e9b3815d41ef348dc14a0"
+  },
+  {
+    "slug": "stonehills",
+    "number": 5,
+    "caption": "Дом у шахты",
+    "source": "artwork_sources/stonehills/05.png",
+    "source_git_sha": "ff541abe2fdf5f0b286b718c77cbe0564040c5bd"
+  },
+  {
+    "slug": "stonehills",
+    "number": 6,
+    "caption": "Болотная окраина",
+    "source": "artwork_sources/stonehills/06.png",
+    "source_git_sha": "b952841e5d033821d22377b801cfafbd847225e8"
+  },
+  {
+    "slug": "darkwater",
+    "number": 6,
+    "caption": "Речная переправа",
+    "source": "artwork_sources/darkwater/06.png",
+    "source_git_sha": "e588a9235c8a7846628f224fd0fbd5aced45e3e4"
+  },
+  {
+    "slug": "ravenrock",
+    "number": 1,
+    "caption": "Прибытие в Воронью Скалу",
+    "source": "artwork_sources/ravenrock/01.png",
+    "source_git_sha": "0a80fb85b0092b94d908a18d52fbd6a6d20e1c3d"
+  },
+  {
+    "slug": "ravenrock",
+    "number": 2,
+    "caption": "Улицы Вороньей Скалы",
+    "source": "artwork_sources/ravenrock/02.png",
+    "source_git_sha": "b3da669c77b587ed7c38b9dc841a24b89966d161"
+  },
+  {
+    "slug": "ravenrock",
+    "number": 3,
+    "caption": "Торговая площадь",
+    "source": "artwork_sources/ravenrock/03.png",
+    "source_git_sha": "25bc3711afb3b2e6979b080d33407f2e283fdfb0"
+  },
+  {
+    "slug": "ravenrock",
+    "number": 4,
+    "caption": "Храм предков",
+    "source": "artwork_sources/ravenrock/04.png",
+    "source_git_sha": "24d01ccfd89fdb807a6d9893bb58da994ba6aa8c"
+  },
+  {
+    "slug": "ravenrock",
+    "number": 5,
+    "caption": "Стена Бастиона",
+    "source": "artwork_sources/ravenrock/05.png",
+    "source_git_sha": "863ceaded6fef60470261106f0c01cabbe5b7dc8"
+  },
+  {
+    "slug": "ravenrock",
+    "number": 6,
+    "caption": "Таверна «Пьяный нетч»",
+    "source": "artwork_sources/ravenrock/06.png",
+    "source_git_sha": "4ec5e3e157dc95e17582961d7475e45560369be8"
+  },
+  {
+    "slug": "telmithryn",
+    "number": 1,
+    "caption": "Подход к Тел-Митрину",
+    "source": "artwork_sources/telmithryn/01.png",
+    "source_git_sha": "86060161703072d17b410eb3e4aea4678fb8e449"
+  },
+  {
+    "slug": "telmithryn",
+    "number": 2,
+    "caption": "Двор грибного поселения",
+    "source": "artwork_sources/telmithryn/02.png",
+    "source_git_sha": "01aa304eb6c1144d756f6cbb6a6d6ea19f344037"
+  },
+  {
+    "slug": "telmithryn",
+    "number": 3,
+    "caption": "Вход в башню",
+    "source": "artwork_sources/telmithryn/03.png",
+    "source_git_sha": "c799a68ffa87a297cf2bb17d138bcd00ba022ea4"
+  },
+  {
+    "slug": "telmithryn",
+    "number": 4,
+    "caption": "Зал Нелота",
+    "source": "artwork_sources/telmithryn/04.png",
+    "source_git_sha": "3ca425e8a948a6e12d7099793e1eee0cf0d56373"
+  },
+  {
+    "slug": "telmithryn",
+    "number": 5,
+    "caption": "Алхимическая лаборатория",
+    "source": "artwork_sources/telmithryn/05.png",
+    "source_git_sha": "edece45b01f006a66b4d58a3f6ff5e4b656470cb"
+  },
+  {
+    "slug": "telmithryn",
+    "number": 6,
+    "caption": "Жилище управляющего",
+    "source": "artwork_sources/telmithryn/06.png",
+    "source_git_sha": "fffc0a1a3d6405af41796f9136a2fa6d37aa98fd"
+  },
+  {
+    "slug": "skaal",
+    "number": 1,
+    "caption": "Подход к деревне скаалов",
+    "source": "artwork_sources/skaal/01.png",
+    "source_git_sha": "7eaaaf1d46ed7932818335d1979ab8c9c7698006"
+  },
+  {
+    "slug": "skaal",
+    "number": 2,
+    "caption": "Заснеженная площадь",
+    "source": "artwork_sources/skaal/02.png",
+    "source_git_sha": "f12e3db1d601ca3dd26f6e6a009a86e585926771"
+  },
+  {
+    "slug": "skaal",
+    "number": 3,
+    "caption": "Большой дом",
+    "source": "artwork_sources/skaal/03.png",
+    "source_git_sha": "73d3db49298111a3cff6a05e8ac6a67cd65b47a4"
+  },
+  {
+    "slug": "skaal",
+    "number": 4,
+    "caption": "Кузница скаалов",
+    "source": "artwork_sources/skaal/04.png",
+    "source_git_sha": "cc0f0381414d6249aec8ae9437aeecbc63e81c3f"
+  },
+  {
+    "slug": "skaal",
+    "number": 5,
+    "caption": "Дом шамана",
+    "source": "artwork_sources/skaal/05.png",
+    "source_git_sha": "7a8c43f1922b51d3b1a8ea354807169b8b8bf415"
+  },
+  {
+    "slug": "skaal",
+    "number": 6,
+    "caption": "Лесная окраина деревни",
+    "source": "artwork_sources/skaal/06.png",
+    "source_git_sha": "25f28c12f515b7f3badfb7a013d875b083b89c24"
+  },
+  {
+    "slug": "highhrothgar",
+    "number": 1,
+    "caption": "Подход к монастырю",
+    "source": "artwork_sources_round2/highhrothgar/01.png",
+    "source_git_sha": "d9441db58e6d1b1d2ef4e51e602488d6cf32419f"
+  },
+  {
+    "slug": "highhrothgar",
+    "number": 2,
+    "caption": "Большой зал",
+    "source": "artwork_sources_round2/highhrothgar/02.png",
+    "source_git_sha": "c3d3448597bfd55d4ffffd8b1f85651c29a72c92"
+  },
+  {
+    "slug": "highhrothgar",
+    "number": 3,
+    "caption": "Каменные переходы",
+    "source": "artwork_sources_round2/highhrothgar/03.png",
+    "source_git_sha": "2ae213b69478f0df796aae39a48de9e83f3877c1"
+  },
+  {
+    "slug": "highhrothgar",
+    "number": 4,
+    "caption": "Покои Седобородых",
+    "source": "artwork_sources_round2/highhrothgar/04.png",
+    "source_git_sha": "520b49fedd74f7e980830ef5b76fb56260f4688a"
+  },
+  {
+    "slug": "highhrothgar",
+    "number": 5,
+    "caption": "Внутренний двор",
+    "source": "artwork_sources_round2/highhrothgar/05.png",
+    "source_git_sha": "dfb9a660e4b7e609c7a29944f15108363b8c8ae7"
+  },
+  {
+    "slug": "highhrothgar",
+    "number": 6,
+    "caption": "Врата к горной тропе",
+    "source": "artwork_sources_round2/highhrothgar/06.png",
+    "source_git_sha": "060e5cc5b6df924b40c41e429f3e8b70f52871db"
+  }
+]
