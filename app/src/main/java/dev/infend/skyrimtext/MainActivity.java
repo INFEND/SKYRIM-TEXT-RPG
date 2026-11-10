@@ -650,14 +650,14 @@ public final class MainActivity extends Activity {
         addText(racial,"РАСОВЫЙ ТАЛАНТ",10,accent(),true,6);
         addText(racial,RpgContent.POWERS[race],14,MUTED,false,0);
 
-        addText(content,"КЛАСС • НЕОБЯЗАТЕЛЬНО",11,accent(),true,9);
+        addText(content,"КЛАСС | НЕОБЯЗАТЕЛЬНО",11,accent(),true,9);
         chips(GameEngine.CLASSES,selectedClass,value->{draftName=nameField.getText().toString();selectedClass=value;render();});
         int cls=0;for(int i=0;i<GameEngine.CLASSES.length;i++)if(GameEngine.CLASSES[i].equals(selectedClass))cls=i;
         addText(content,RpgContent.CLASS_DETAILS[cls],13,MUTED,false,15);
 
         LinearLayout stats=card();addText(stats,"СТАРТОВЫЕ ХАРАКТЕРИСТИКИ",11,accent(),true,7);
         int used=initialPoints[0]+initialPoints[1]+initialPoints[2];
-        addText(stats,"Свободных очков: "+(5-used)+" / 5  •  +10 к выбранному ресурсу за очко",13,MUTED,false,12);
+        addText(stats,"Свободных очков: "+(5-used)+" / 5  |  +10 к выбранному ресурсу за очко",13,MUTED,false,12);
         for(int i=0;i<3;i++){
             final int index=i;LinearLayout line=row();stats.addView(line,lp(-1,50));
             line.addView(text(RpgContent.ATTRIBUTES[i],14,TEXT,false),new LinearLayout.LayoutParams(0,-2,1));
@@ -2074,7 +2074,7 @@ public final class MainActivity extends Activity {
     private void showLibrary(){
         java.util.ArrayList<String> docs=ItemCatalog.loreDocuments(this);
         if(docs.isEmpty()){toast("Библиотека не загружена");return;}
-        new RuneDialogBuilder(this,accent()).setTitle("Личная библиотека • "+docs.size()+" документов")
+        new RuneDialogBuilder(this,accent()).setTitle("Личная библиотека | "+docs.size()+" документов")
             .setItems(docs.toArray(new String[0]),(d,position)->showDocument(docs.get(position)))
             .setNegativeButton("Закрыть",null).show();
     }
@@ -2140,7 +2140,7 @@ public final class MainActivity extends Activity {
     }
     private void renderHero(){
         skyrimTopTabs(3);
-        section("ЛИЧНОЕ ДЕЛО",""+game.name,game.race+" • "+game.heroClass+" • уровень "+game.level);
+        section("ЛИЧНОЕ ДЕЛО",""+game.name,game.race+" | "+game.heroClass+" | уровень "+game.level);
         content.addView(new NordicArtView(this,NordicArtView.STORY),lp(-1,125));space(content,12);
         if(!prefs.getBoolean("ai_enabled",false))
             actionButton("Ожидать","Выбрать от 1 до 24 часов отдыха",false,this::showWaitDialog);
@@ -2154,12 +2154,12 @@ public final class MainActivity extends Activity {
         addText(items,"Доспех: "+(game.armorUpgraded?"Стальной нагрудник":"Дорожная одежда"),15,TEXT,false,11);
         addText(items,"Лечебные зелья: "+game.potions,14,MUTED,false,6);
         addText(items,"Зелья магии: "+game.manaPotions,14,MUTED,false,0);
-        actionButton("Выпить лечебное зелье","+45 здоровья • без боя",false,()->{
+        actionButton("Выпить лечебное зелье","+45 здоровья | без боя",false,()->{
             toast(game.drinkHealing()?"Здоровье восстановлено":"Зелье не требуется или закончилось");save();render();});
-        actionButton("Выпить зелье магии","+35 магии • без боя",false,()->{
+        actionButton("Выпить зелье магии","+35 магии | без боя",false,()->{
             toast(game.drinkMana()?"Магия восстановлена":"Зелье не требуется или закончилось");game.progress.sync(game);save();render();});
         LinearLayout race=card();addText(race,"НАСЛЕДИЕ РАСЫ",11,accent(),true,12);
-        addText(race,game.race+" • пассивно",16,TEXT,true,7);
+        addText(race,game.race+" | пассивно",16,TEXT,true,7);
         addText(race,game.progress.racePassive(game),14,MUTED,false,13);
         addText(race,"Талант",13,accent(),true,5);
         addText(race,game.progress.racePower(game),14,TEXT,false,7);
@@ -2454,8 +2454,7 @@ public final class MainActivity extends Activity {
         int aiStart=content.getChildCount();
         space(content,6);addText(content,"ИИ-ПРИКЛЮЧЕНИЕ",11,accent(),true,11);
         LinearLayout aiCard=card();
-        addText(aiCard,"ИСТОЧНИК МОДЕЛИ И РАЗМЫШЛЕНИЯ",11,accent(),true,8);
-        addText(aiCard,"Подключение ChatGPT расходует доступные лимиты «Работа / Codex», НЕ лимиты обычного «Чата». Онлайн-модели выбираются отдельно. Через API действует своя оплата. GGUF работает на устройстве без сети и API-ключей.",12,MUTED,false,10);
+        addText(aiCard,"ИСТОЧНИК ИИ",11,accent(),true,8);
         Switch aiToggle=new Switch(this);
         aiToggle.setText("ИИ управляет всей игрой, сценами и вариантами");
         aiToggle.setTextSize(sp(14));aiToggle.setTextColor(TEXT);
@@ -2463,52 +2462,103 @@ public final class MainActivity extends Activity {
         aiToggle.setChecked(prefs.getBoolean("ai_enabled",false));
         aiToggle.setOnCheckedChangeListener((v,on)->{
             prefs.edit().putBoolean("ai_enabled",on).apply();
-            if(!on && aiClient!=null){aiClient.cancel();if(localAiClient!=null)localAiClient.cancel();aiTurnBusy=false;awaitingAiToken=false;}
+            if(!on){
+                if(aiClient!=null)aiClient.cancel();
+                if(localAiClient!=null)localAiClient.cancel();
+                aiTurnBusy=false;awaitingAiToken=false;
+            }
         });
         aiCard.addView(aiToggle,lp(-1,48));
-        addText(aiCard,"В «Авто» приоритет у разрешённой подписки ChatGPT (Работа/Codex), затем у настроенного API, затем GGUF. При исчерпании лимита ChatGPT скрытого перехода на платный API нет. Обычный «Чат» и его личные настройки не считываются.",12,MUTED,false,0);
         String provider=aiProviderMode();
-        actionButton("Источник ИИ","chatgpt".equals(provider)?"ChatGPT · Работа/Codex":
-            "api".equals(provider)?"OpenAI API · отдельная оплата":
-            "local".equals(provider)?"Локальная GGUF · офлайн":
-                "Автоматически · Работа/Codex → API → GGUF",true,this::aiProviderDialog);
-        actionButton("Локальная модель · GGUF",
-            localModelReady()?"Готово · "+new java.io.File(LocalAiModelStore.path(prefs)).getName()+
-                " · без интернета":"Не выбрана · импорт из Download",true,this::selectLocalModel);
-        actionButton("ПРОВЕРИТЬ ЛОКАЛЬНУЮ МОДЕЛЬ",
-            localModelReady()?"Короткий тест запуска и скорости · не меняет сохранение":"Сначала импортируй GGUF",
-            false,this::testLocalModel);
-        float lastTps=prefs.getFloat("ai_local_last_tps",0f);
-        if(lastTps>0f)addText(aiCard,"Последний замер: "+
-            String.format(java.util.Locale.ROOT,"%.2f ток/с",lastTps)+
-            " (скорость генерации, не загрузки модели).",12,MUTED,false,7);
-        addText(aiCard,"GGUF копируется в папку игры: требуется ещё около 5,7 ГБ свободного места для Qwen3.5-9B. После импорта приложение работает независимо от PocketPal. Ускорение GPU и потоковая выдача локальных токенов пока не поддерживаются. Во время CPU-генерации отображается стадия и время; большая модель может отвечать несколько минут.",12,MUTED,false,10);
-        actionButton("Вход ChatGPT · Работа/Codex",chatGptOAuth.accountLabel()+
-            " · авторизация в системном браузере",false,this::loginChatGpt);
-        if(chatGptOAuth.hasAuthorizedPlan()){
-            actionButton("Модель · Работа/Codex",prefs.getString("ai_chatgpt_model","Не выбрана")+
-                " · доступна по аккаунту, выбрана внутри игры",false,this::chatGptModelDialog);
-            actionButton("Выйти из ChatGPT","Завершить авторизованную сессию",false,()->{
-                new RuneDialogBuilder(this,accent()).setTitle("Выйти из ChatGPT?")
-                    .setNegativeButton("Отмена",null).setPositiveButton("Выйти",(d,w)->{
-                        if(aiClient!=null)aiClient.cancel();if(localAiClient!=null)localAiClient.cancel();
-                        chatGptOAuth.signOut((success,message)->{toast(message);render();});
-                    }).show();
-            });
+        actionButton("Источник ИИ",
+            "chatgpt".equals(provider)?"ChatGPT | Работа/Codex":
+            "api".equals(provider)?"OpenAI API | отдельная оплата":
+            "local".equals(provider)?"Локальная GGUF | офлайн":
+                "Автоматически | Работа/Codex → API → GGUF",
+            true,this::aiProviderDialog);
+        // AUTO shows only the effectively selected engine, never every engine.
+        String effectiveProvider=resolvedAiProvider();
+        if("auto".equals(provider)){
+            String chosen="chatgpt".equals(effectiveProvider)?"ChatGPT | Работа/Codex":
+                "api".equals(effectiveProvider)?"OpenAI API":
+                "local".equals(effectiveProvider)?"Локальная GGUF":"не найден";
+            addText(content,"Автоматический выбор: "+chosen+
+                ". Приоритет: ChatGPT → API → GGUF. Платный API "+
+                "не запускается скрыто после исчерпания лимитов ChatGPT.",
+                12,MUTED,false,10);
         }
-        actionButton("Модель · OpenAI API",AiModelCatalog.label(prefs.getString("ai_api_model",AiModelCatalog.DEFAULT_API))+
-                " · отдельный API-ключ",false,this::apiModelDialog);
-        actionButton("Уровень размышления · в игре",AiReasoningEffort.label(selectedReasoningEffort())+
-            " · отправляется выбранной модели, не копируется из Чата/Работы",false,this::aiReasoningEffortDialog);
-        addText(content,"«Автоматически» означает уровень по умолчанию у выбранной модели. Это не синхронизация ползунка из ChatGPT. Уровни доступны не для всех моделей; высокие значения могут отвечать медленнее и увеличивать расходы API.",12,MUTED,false,11);
-        actionButton("Ввести / заменить OpenAI API-ключ",AiKeyVault.configured(this)?"Ключ уже сохранён (зашифрован)":"Ключ не настроен",false,this::aiKeyDialog);
-        if(AiKeyVault.configured(this))actionButton("Удалить сохранённый API-ключ","Не затрагивает игру и историю",false,()->{
-            new RuneDialogBuilder(this,accent()).setTitle("Удалить ключ API?")
-                .setNegativeButton("Отмена",null).setPositiveButton("Удалить",(d,w)->{
-                    if(aiClient!=null)aiClient.cancel();if(localAiClient!=null)localAiClient.cancel();
-                    AiKeyVault.clear(this);render();
-                }).show();
-        });
+        if("local".equals(effectiveProvider)){
+            actionButton("Локальная модель | GGUF",
+                localModelReady()?"Готово | "+new java.io.File(LocalAiModelStore.path(prefs)).getName()+
+                    " | без интернета":"Не выбрана | импорт из Download",
+                true,this::selectLocalModel);
+            actionButton("ПРОВЕРИТЬ ЛОКАЛЬНУЮ МОДЕЛЬ",
+                localModelReady()?"Тест запуска и скорости | сохранение не меняется":
+                    "Сначала импортируй GGUF",false,this::testLocalModel);
+            float lastTps=prefs.getFloat("ai_local_last_tps",0f);
+            if(lastTps>0f)addText(content,"Последний замер: "+
+                String.format(java.util.Locale.ROOT,"%.2f ток/с",lastTps)+
+                " (скорость генерации).",12,MUTED,false,7);
+            addText(content,"GGUF хранится на устройстве. Импорт модели требует "+
+                "свободного места. Локальная CPU-генерация может занимать "+
+                "несколько минут; стадия и время отображаются в игровом режиме.",
+                12,MUTED,false,10);
+        }else if("chatgpt".equals(effectiveProvider)){
+            boolean signedIn=chatGptOAuth.hasAuthorizedPlan();
+            // One account action; login and logout are mutually exclusive.
+            if(signedIn){
+                actionButton("Выйти из ChatGPT",chatGptOAuth.accountLabel()+
+                    " | завершить сессию",false,()->{
+                        new RuneDialogBuilder(this,accent()).setTitle("Выйти из ChatGPT?")
+                            .setNegativeButton("Отмена",null).setPositiveButton("Выйти",(d,w)->{
+                                if(aiClient!=null)aiClient.cancel();
+                                if(localAiClient!=null)localAiClient.cancel();
+                                chatGptOAuth.signOut((success,message)->{toast(message);render();});
+                            }).show();
+                    });
+                actionButton("Модель | Работа/Codex",
+                    prefs.getString("ai_chatgpt_model","Не выбрана")+
+                    " | выбрана внутри игры",false,this::chatGptModelDialog);
+            }else{
+                actionButton("Войти в ChatGPT",
+                    "Авторизация в системном браузере | лимиты Работа/Codex",
+                    false,this::loginChatGpt);
+            }
+            actionButton("Уровень размышления",
+                AiReasoningEffort.label(selectedReasoningEffort())+
+                " | настройка игры",false,this::aiReasoningEffortDialog);
+            addText(content,"ChatGPT использует разрешённые лимиты Работа/Codex, "+
+                "не обычного Чата. Параметры модели выбираются внутри игры.",
+                12,MUTED,false,10);
+        }else if("api".equals(effectiveProvider)){
+            actionButton("Модель | OpenAI API",
+                AiModelCatalog.label(prefs.getString("ai_api_model",AiModelCatalog.DEFAULT_API))+
+                " | отдельный API-ключ",false,this::apiModelDialog);
+            actionButton("Уровень размышления",
+                AiReasoningEffort.label(selectedReasoningEffort())+
+                " | отправляется модели",false,this::aiReasoningEffortDialog);
+            actionButton("Ввести / заменить OpenAI API-ключ",
+                AiKeyVault.configured(this)?"Ключ сохранён (зашифрован)":"Ключ не настроен",
+                false,this::aiKeyDialog);
+            if(AiKeyVault.configured(this)){
+                actionButton("Удалить сохранённый API-ключ",
+                    "Не затрагивает игру и историю",false,()->{
+                        new RuneDialogBuilder(this,accent()).setTitle("Удалить ключ API?")
+                            .setNegativeButton("Отмена",null).setPositiveButton("Удалить",(d,w)->{
+                                if(aiClient!=null)aiClient.cancel();
+                                if(localAiClient!=null)localAiClient.cancel();
+                                AiKeyVault.clear(this);render();
+                            }).show();
+                    });
+            }
+            addText(content,"API оплачивается отдельно. Уровни размышления "+
+                "доступны не у всех моделей и могут увеличивать задержку и расходы.",
+                12,MUTED,false,10);
+        }else{
+            addText(content,"Ни один источник ИИ не настроен. Выбери ChatGPT, "+
+                "OpenAI API или локальную GGUF в меню «Источник ИИ».",
+                13,MUTED,false,11);
+        }
         foldSettingsSection("ai","ИИ-ПРИКЛЮЧЕНИЕ И МОДЕЛИ",aiStart);
         int updatesStart=content.getChildCount();
         space(content,6);addText(content,"ОБНОВЛЕНИЯ",11,accent(),true,11);
