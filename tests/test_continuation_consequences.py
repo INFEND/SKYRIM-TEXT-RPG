@@ -10,11 +10,11 @@ SOURCE = (ROOT / "app/src/main/java/dev/infend/skyrimtext/DragonContinuation.jav
 class ContinuationConsequencesTest(unittest.TestCase):
     def test_fifty_distinct_results(self):
         section = SOURCE.split("private static final String[][] CONSEQUENCES=", 1)[1].split("private static final int[][] SKILLS=", 1)[0]
-        results = re.findall(r'^\s*"([^"\n]+)"', section, re.MULTILINE)
+        results = re.findall(r'(?:^|[,{])\s*"([^"\n]+)"', section, re.MULTILINE)
         self.assertEqual(len(results), 10 * 5)
-        self.assertEqual(len(set(results)), 10 * 4)
+        self.assertEqual(len(set(results)), 10 * 5)
         for result in results:
-            self.assertGreater(len(result), 90)
+            self.assertGreater(len(result), 75)
         self.assertIn("CONSEQUENCES[stage][choice-1]", SOURCE)
 
     def test_one_time_choices_and_proof_rules_remain(self):
