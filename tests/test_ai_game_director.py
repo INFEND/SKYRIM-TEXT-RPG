@@ -126,6 +126,31 @@ class AiGameDirectorContracts(unittest.TestCase):
         commit=bridge.index('for(String name:inventoryChanges.keySet())')
         self.assertLess(validate,commit)
 
+    def test_ai_encounter_facts_are_validated_before_commit(self):
+        bridge=code("AiGameTurn.java")
+        director=code("AiStoryClient.java")
+        engine=code("GameEngine.java")
+        self.assertIn('e.has("sceneFacts")',bridge)
+        self.assertIn('facts.length()>12',bridge)
+        self.assertIn('nextSceneState=SceneState.fromJson(g.sceneState.toJson())',bridge)
+        self.assertIn('nextSceneState.confirm(kind,id,title,status)',bridge)
+        self.assertIn('if(nextSceneState!=null)g.sceneState=nextSceneState;',bridge)
+        self.assertIn('!factIds.add(kind+":"+id)',bridge)
+        self.assertIn('sceneFacts:[{kind,id,title,status}]',director)
+        self.assertIn('sceneState=SceneState.fromJson(j.optJSONObject("sceneState"))',engine)
+        self.assertIn('put("sceneState",sceneState.toJson())',engine)
+        self.assertLess(bridge.index('nextSceneState.confirm(kind,id,title,status)'),
+                        bridge.index('// Commit only after all model-controlled fields'))
+        self.assertGreater(bridge.index('if(nextSceneState!=null)g.sceneState=nextSceneState;'),
+                           bridge.index('for(String name:inventoryChanges.keySet())'))
+
+    def test_scene_facts_do_not_apply_without_resolved_action(self):
+        bridge=code("AiGameTurn.java")
+        self.assertIn('if(!acted||effects==null)return;',bridge)
+        for status in ("MET","INFORMED","HELPED","HOSTILE","DEAD","MISSING",
+                       "FOUND","EXAMINED","USED","DISCOVERED","VISITED","CLEARED"):
+            self.assertIn('"'+status+'"',bridge)
+
     def test_story_stream_is_not_a_json_dump(self):
         client=code("AiStoryClient.java")
         ui=code("MainActivity.java")
