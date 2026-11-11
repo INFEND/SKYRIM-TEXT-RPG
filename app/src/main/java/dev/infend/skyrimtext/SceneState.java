@@ -38,19 +38,45 @@ public final class SceneState {
     public void confirm(String kind,String key,String title,String status) throws JSONException {
         LinkedHashMap<String,JSONObject> entries=collection(this,kind);
         String safeId=id(key), safeTitle=label(title);
-        if(status==null || !status.matches("[A-Z_]{2,24}"))
+        if(!allowedStatus(kind,status))
             throw new JSONException("Недопустимое состояние факта");
         if(!entries.containsKey(safeId) && entries.size()>=MAX_ENTRIES)
             throw new JSONException("Переполнен журнал сцены");
-        // NPC relationships are persistent achievements: a later generic conversation
-        // must not silently erase a previously confirmed act of help or disclosure.
-        if("npc".equals(kind) && entries.containsKey(safeId)) {
+        if(entries.containsKey(safeId)) {
             String previous=entries.get(safeId).optString("status");
-            int oldRank=npcRelationshipRank(previous);
-            int newRank=npcRelationshipRank(status);
-            if(oldRank>0 && newRank>0 && newRank<oldRank)return;
+            // A confirmed death is terminal; evidence and discovered places cannot
+            // revert to an earlier stage after loading or another AI turn.
+            if("npc".equals(kind)) {
+                if("DEAD".equals(previous) && !"DEAD".equals(status))
+                    throw new JSONException("Погибший NPC не может вернуться");
+                int oldRank=npcRelationshipRank(previous), newRank=npcRelationshipRank(status);
+                if(oldRank>0 && newRank>0 && newRank<oldRank)
+                    throw new JSONException("Откат отношений NPC запрещён");
+            } else if(factRank(kind,status)<factRank(kind,previous)) {
+                throw new JSONException("Откат подтверждённого факта запрещён");
+            }
         }
         entries.put(safeId,new JSONObject().put("id",safeId).put("title",safeTitle).put("status",status));
+    }
+    private static boolean allowedStatus(String kind,String status) {
+        if(status==null)return false;
+        switch(kind) {
+            case "npc": return "MET".equals(status)||"INFORMED".equals(status)||
+                "HELPED".equals(status)||"HOSTILE".equals(status)||
+                "MISSING".equals(status)||"DEAD".equals(status);
+            case "clue": return "FOUND".equals(status)||"EXAMINED".equals(status)||"USED".equals(status);
+            case "sublocation": return "DISCOVERED".equals(status)||"VISITED".equals(status)||"CLEARED".equals(status);
+            default: return false;
+        }
+    }
+    private static int factRank(String kind,String status) {
+        if("clue".equals(kind)) {
+            switch(status) {case "FOUND":return 1;case "EXAMINED":return 2;case "USED":return 3;default:return 0;}
+        }
+        if("sublocation".equals(kind)) {
+            switch(status) {case "DISCOVERED":return 1;case "VISITED":return 2;case "CLEARED":return 3;default:return 0;}
+        }
+        return 0;
     }
     private static int npcRelationshipRank(String status) {
         switch(status) {
