@@ -19,6 +19,20 @@ class DragonContinuationContracts(unittest.TestCase):
         self.assertIn('s.add("DRAGON_NEXT:"+stage+":99"',c)
         self.assertIn('if(g.progress.dragonNextUsed.contains(action))return;',c)
         self.assertIn('g.progress.dragonNextUsed.add(action)',c)
+    def test_eleventh_chapter_and_persistent_actions(self):
+        c=source("DragonContinuation.java")
+        p=source("RpgProgress.java")
+        g=source("GameEngine.java")
+        self.assertIn('"Под сводами кургана"',c)
+        self.assertIn('"Проверить шаткую каменную перемычку|',c)
+        self.assertIn('"Подготовить верёвки и носилки|',c)
+        self.assertIn('if(stage==4){',c)
+        self.assertIn('boolean innerRoute=proved(g,4,1)&&proved(g,4,3)',c)
+        self.assertIn('chapter<5;chapter++',g)
+        self.assertIn('Math.min(5,obj.optInt("dragonNextStage",0))',p)
+        self.assertIn('DRAGON_NEXT:[0-4]:(?:[1-9]|10)',p)
+        self.assertIn('DRAGON_NEXT:[0-4]:[357]',p)
+
     def test_tenth_chapter_expedition_and_save_contract(self):
         c=source("DragonContinuation.java")
         progress=source("RpgProgress.java")
@@ -32,10 +46,10 @@ class DragonContinuationContracts(unittest.TestCase):
         self.assertIn('boolean route=proved(g,3,1)&&proved(g,3,3)',c)
         self.assertIn('boolean rune=proved(g,3,5)&&proved(g,3,7)',c)
         self.assertIn('boolean people=proved(g,3,2)&&proved(g,3,6)&&proved(g,3,10)',c)
-        self.assertIn('chapter<4;chapter++',game)
-        self.assertIn('Math.min(4,obj.optInt("dragonNextStage",0))',progress)
-        self.assertIn('DRAGON_NEXT:[0123]:[357]',progress)
-        self.assertIn('DRAGON_NEXT:[0123]:(?:[1-9]|10)',progress)
+        self.assertIn('chapter<5;chapter++',game)
+        self.assertIn('Math.min(5,obj.optInt("dragonNextStage",0))',progress)
+        self.assertIn('DRAGON_NEXT:[0-4]:[357]',progress)
+        self.assertIn('DRAGON_NEXT:[0-4]:(?:[1-9]|10)',progress)
 
     def test_epilogue_reflects_saved_outcomes_without_fake_weather(self):
         c=source("DragonContinuation.java")
@@ -46,7 +60,7 @@ class DragonContinuationContracts(unittest.TestCase):
         self.assertIn("if(failedChapters(g)>0)",c)
         self.assertIn("return text.toString();",c)
         self.assertIn("epilogue(g)",c)
-        self.assertIn("Продолжение похода внутрь курганов пока недоступно",c)
+        self.assertIn("Дальнейшее исследование глубин кургана пока недоступно",c)
         self.assertNotIn("Расследования в Ривервуде, Вайтране и Виндхельме завершены. \"+questSummary",c)
 
     def test_chapter_quest_ledger_transitions(self):
@@ -87,10 +101,10 @@ class DragonContinuationContracts(unittest.TestCase):
         self.assertIn("if(seal&&dates)",c)
         self.assertIn("if(courier&&scout)",c)
         self.assertIn("!g.progress.dragonNextFailed.contains",c)
-        self.assertIn("Продолжение похода внутрь курганов пока недоступно.",c)
+        self.assertIn("Дальнейшее исследование глубин кургана пока недоступно.",c)
     def test_windhelm_actions_reachable_and_saveable(self):
         c=source("DragonContinuation.java")
-        self.assertIn('action.matches("DRAGON_NEXT:[0123]:(?:[0-9]|10|99)")',c)
+        self.assertIn('action.matches("DRAGON_NEXT:[0-4]:(?:[0-9]|10|99)")',c)
         self.assertNotIn('action.matches("DRAGON_NEXT:[01]:[0-9]")',c)
         self.assertIn('g.progress.dragonNextStage++',c)
         self.assertIn('if(stage==2){',c)
@@ -152,8 +166,8 @@ class DragonContinuationContracts(unittest.TestCase):
         for field in ('dragonNextStage','dragonNextRecent','dragonNextUsed'):
             self.assertIn('.put("'+field+'"',p)
         self.assertIn('obj.optInt("dragonNextStage",0)',p)
-        self.assertIn('Math.min(4,obj.optInt("dragonNextStage",0))',p)
-        self.assertIn('DRAGON_NEXT:[0123]:(?:[1-9]|10)',p)
-        self.assertIn('DRAGON_NEXT:[0123]:[357]',p)
+        self.assertIn('Math.min(5,obj.optInt("dragonNextStage",0))',p)
+        self.assertIn('DRAGON_NEXT:[0-4]:(?:[1-9]|10)',p)
+        self.assertIn('DRAGON_NEXT:[0-4]:[357]',p)
         self.assertIn('j.put("schema",1)',game)
 if __name__=="__main__": unittest.main()
