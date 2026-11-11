@@ -230,6 +230,39 @@ public final class AiGameTurn {
                 requiredEnemyInt(enemy,"damage",0,1000);
             }
         }
+        // Persist only facts attached to a successfully resolved action. Validate
+        // the complete batch against a detached ledger before changing the game.
+        SceneState nextSceneState=null;
+        if(e.has("sceneFacts")){
+            if(!(e.opt("sceneFacts") instanceof JSONArray))
+                throw new JSONException("Факты сцены должны быть массивом");
+            JSONArray facts=e.getJSONArray("sceneFacts");
+            if(facts.length()>12)throw new JSONException("Слишком много фактов сцены");
+            nextSceneState=SceneState.fromJson(g.sceneState.toJson());
+            java.util.HashSet<String> factIds=new java.util.HashSet<>();
+            for(int i=0;i<facts.length();i++){
+                JSONObject fact=facts.optJSONObject(i);
+                if(fact==null)throw new JSONException("Неверная запись факта сцены");
+                String kind=fact.optString("kind","");
+                String id=fact.optString("id","");
+                String title=fact.optString("title","");
+                String status=fact.optString("status","");
+                if(!("npc".equals(kind)||"clue".equals(kind)||"sublocation".equals(kind)))
+                    throw new JSONException("Недопустимый тип факта");
+                if(!factIds.add(kind+":"+id))throw new JSONException("Повтор факта сцены");
+                if("npc".equals(kind) &&
+                    !("MET".equals(status)||"INFORMED".equals(status)||"HELPED".equals(status)||
+                      "HOSTILE".equals(status)||"DEAD".equals(status)||"MISSING".equals(status)))
+                    throw new JSONException("Недопустимое состояние NPC");
+                if("clue".equals(kind) &&
+                    !("FOUND".equals(status)||"EXAMINED".equals(status)||"USED".equals(status)))
+                    throw new JSONException("Недопустимое состояние улики");
+                if("sublocation".equals(kind) &&
+                    !("DISCOVERED".equals(status)||"VISITED".equals(status)||"CLEARED".equals(status)))
+                    throw new JSONException("Недопустимое состояние подлокации");
+                nextSceneState.confirm(kind,id,title,status);
+            }
+        }
         // Commit only after all model-controlled fields have passed validation.
         for(String name:inventoryChanges.keySet())
             g.progress.quantity(name,g.progress.quantity(name)+inventoryChanges.get(name));
@@ -256,6 +289,7 @@ public final class AiGameTurn {
             if("COMPLETED".equals(state)&&!g.progress.completed.contains(quest))g.progress.completed.add(quest);
             if("FAILED".equals(state)&&!g.progress.failed.contains(quest))g.progress.failed.add(quest);
         }
+        if(nextSceneState!=null)g.sceneState=nextSceneState;
         if(!journal.isEmpty()){g.progress.recent=journal;if(g.aiJournal.isEmpty())g.aiJournal=journal;}
         g.progress.sync(g);
     }
