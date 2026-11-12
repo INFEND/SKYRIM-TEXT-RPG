@@ -28,6 +28,7 @@ public final class SkyrimOtaController {
                         .putString(OtaUpdateSchedule.PREF_AVAILABLE_NAME,info.versionName).apply();
                     long installed=BuildConfig.VERSION_CODE;
                     display().offer(info.versionName,info.notesFor(installed),()->download(info));
+                    display().downloadSize(info.sizeBytes,info.isThin());
                 }else if(manual)display().current(BuildConfig.VERSION_NAME);
             }
             public void downloaded(java.io.File f){}
@@ -47,7 +48,12 @@ public final class SkyrimOtaController {
                 display().stage("Проверка завершена","Открываем системный установщик...");
                 ui.postDelayed(()->{if(screen!=null)screen.dismiss();UpdateManager.install(activity);},240L);
             }
-            public void error(String message){busy=false;display().fail(message,()->download(release));}
+            public void error(String message){
+                busy=false;
+                if(release.isThin()){
+                    display().fail(message+"\nМожно повторить с полным APK.",()->download(release.fullVersion()));
+                }else display().fail(message,()->download(release));
+            }
         });
     }
     public void onHostResume(){

@@ -175,6 +175,20 @@ final class ResourceStore {
             if(progress!=null)progress.update(e.label,++done,entries.size());
         }
     }
+    /** Called on an OTA worker before selecting a thin package. The same serial
+     * executor owns migration, deletion and downloads so the check cannot race them. */
+    static boolean canUseThin(Context c){
+        Context app=c.getApplicationContext();
+        try{return IO.submit(()->{
+            Catalog a=catalog(app);
+            if(!a.bundled)return true; // Already using persistent optional resources.
+            migrate(app,null);
+            for(Entry e:a.entries.values()){
+                if(!removed(app,e)&&(!local(app,e)||!valid(file(app,e),e)))return false;
+            }
+            return true;
+        }).get();}catch(Exception e){return false;}
+    }
     static void start(Context c){
         Context app=c.getApplicationContext();
         if(!STARTED.compareAndSet(false,true))return;

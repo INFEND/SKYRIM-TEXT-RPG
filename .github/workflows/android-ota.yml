@@ -36,15 +36,8 @@ jobs:
           "${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager" --install 'platforms;android-35' 'platforms;android-36' 'build-tools;35.0.0'
       - name: Gate signed releases on all Python regression checks
         run: python3 -m unittest discover -s tests -p 'test_*.py' -v
-      - name: Generate signed optional-resource catalog (bridge or thin build)
-        env:
-          THIN: ${{ vars.SKYRIM_THIN_RESOURCES }}
-        run: |
-          if [[ "$THIN" == "true" ]]; then
-            python3 scripts/build_resource_catalog.py --commit "$GITHUB_SHA" --thin
-          else
-            python3 scripts/build_resource_catalog.py --commit "$GITHUB_SHA"
-          fi
+      - name: Generate signed optional-resource catalog (full build)
+        run: python3 scripts/build_resource_catalog.py --commit "$GITHUB_SHA"
       - name: Bundle exact user-supplied Sovngarde fonts
         shell: bash
         run: |
@@ -126,10 +119,26 @@ jobs:
           unzip -l app/build/outputs/apk/release/app-release.apk | grep -F "assets/fonts/Sovngarde Light.ttf"
           unzip -l app/build/outputs/apk/release/app-release.apk | grep -F "assets/fonts/Sovngarde Bold.ttf"
           unzip -l app/build/outputs/apk/release/app-release.apk | grep -F "assets/fonts/OFL.txt"
+      - name: Preserve full APK and build signed thin APK
+        if: steps.signing.outputs.available == 'true' && steps.release_version.outputs.publish == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          cp app/build/outputs/apk/release/app-release.apk dist/SKYRIM-TEXT-RPG.apk
+          python3 scripts/build_resource_catalog.py --commit "$GITHUB_SHA" --thin
+          gradle --no-daemon --stacktrace :app:clean :app:assembleRelease
+          cp app/build/outputs/apk/release/app-release.apk dist/SKYRIM-TEXT-RPG-thin.apk
+          python3 tools/verify_resource_apks.py
+          for apk in dist/SKYRIM-TEXT-RPG.apk dist/SKYRIM-TEXT-RPG-thin.apk; do
+            "${ANDROID_HOME}/build-tools/35.0.0/apksigner" verify --print-certs "$apk"
+          done
+          full=$("${ANDROID_HOME}/build-tools/35.0.0/apksigner" verify --print-certs dist/SKYRIM-TEXT-RPG.apk | grep 'Signer #1 certificate SHA-256 digest:')
+          thin=$("${ANDROID_HOME}/build-tools/35.0.0/apksigner" verify --print-certs dist/SKYRIM-TEXT-RPG-thin.apk | grep 'Signer #1 certificate SHA-256 digest:')
+          test "$full" = "$thin"
+          [[ "${full,,}" == *"8a0d221b9c31007b55ac0baed5597a0b638881f7fef6650a6e7bd0e2b49793fe"* ]]
       - name: Create update manifest and release notes
         if: steps.signing.outputs.available == 'true' && steps.release_version.outputs.publish == 'true'
         run: |
-          cp app/build/outputs/apk/release/app-release.apk dist/SKYRIM-TEXT-RPG.apk
           python3 tools/build_manifest.py
           python3 tools/check_ota_contract.py
           "${ANDROID_HOME}/build-tools/35.0.0/apksigner" verify --print-certs dist/SKYRIM-TEXT-RPG.apk
@@ -143,6 +152,7 @@ jobs:
           body_path: dist/release_notes.md
           files: |
             dist/SKYRIM-TEXT-RPG.apk
+            dist/SKYRIM-TEXT-RPG-thin.apk
             dist/update.json
           fail_on_unmatched_files: true
           draft: false
@@ -174,6 +184,8 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: SKYRIM-TEXT-RPG-signed
-          path: dist/SKYRIM-TEXT-RPG.apk
+          path: |
+            dist/SKYRIM-TEXT-RPG.apk
+            dist/SKYRIM-TEXT-RPG-thin.apk
           if-no-files-found: error
           retention-days: 30

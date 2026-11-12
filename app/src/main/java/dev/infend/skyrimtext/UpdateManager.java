@@ -55,6 +55,21 @@ public final class UpdateManager {
         public final String versionName,apkUrl,sha256,notes,packageName;
         public final long sizeBytes;
         private final List<OtaHistory.Entry> history;
+        private final String thinUrl,thinHash;
+        private final long thinSize;
+        private final Release fullRelease;
+        public boolean isThin(){return fullRelease!=null;}
+        public Release fullVersion(){return fullRelease==null?this:fullRelease;}
+        Release preferThin(Context context){
+            if(thinUrl.isEmpty()||!ResourceStore.canUseThin(context))return this;
+            return new Release(this);
+        }
+        private Release(Release full){
+            versionCode=full.versionCode;versionName=full.versionName;notes=full.notes;
+            packageName=full.packageName;history=full.history;
+            apkUrl=full.thinUrl;sha256=full.thinHash;sizeBytes=full.thinSize;
+            thinUrl="";thinHash="";thinSize=-1;fullRelease=full;
+        }
         public String notesFor(long installedVersionCode){
             return OtaHistory.merge(history,installedVersionCode,versionCode,notes);
         }
@@ -96,6 +111,14 @@ public final class UpdateManager {
                 }
             }
             history=entries;
+            JSONObject thin=j.optJSONObject("thinApk");
+            String url=thin==null?"":thin.optString("url","");
+            String hash=thin==null?"":thin.optString("sha256","").toLowerCase(Locale.US);
+            long size=thin==null?-1:thin.optLong("sizeBytes",-1);
+            boolean usable=OtaUrlPolicy.trustedThinApk(url,versionName)&&
+                hash.matches("[0-9a-f]{64}")&&size>0&&sizeBytes>size&&size<=MAX_APK;
+            thinUrl=usable?url:"";thinHash=usable?hash:"";thinSize=usable?size:-1;
+            fullRelease=null;
         }
     }
     private static void checkHttps(String url)throws IOException{
@@ -284,7 +307,8 @@ public final class UpdateManager {
                 Release info=fetchLatest(activity.getApplicationContext(),
                     message->activity.runOnUiThread(()->cb.status(message)));
                 long installed=activity.getPackageManager().getPackageInfo(activity.getPackageName(),0).getLongVersionCode();
-                activity.runOnUiThread(()->cb.release(info,info.versionCode>installed));
+                Release selected=info.versionCode>installed?info.preferThin(activity.getApplicationContext()):info;
+                activity.runOnUiThread(()->cb.release(selected,selected.versionCode>installed));
             }catch(Exception e){
                 String error=friendly(e);
                 activity.runOnUiThread(()->cb.error(error));
