@@ -23,6 +23,46 @@ public final class RpgProgress {
     private final int[] combatPerks=new int[6];
     private final LinkedHashMap<String,String> equipped=new LinkedHashMap<>();
     private boolean equipmentInitialized;
+    // One improved exemplar per item ID until the inventory supports individual instances.
+    private final LinkedHashMap<String,Integer> tempered=new LinkedHashMap<>();
+    private static final String[] QUALITY={"Обычное","Хорошее","Отличное","Превосходное","Безупречное","Эпическое","Легендарное"};
+    private static final int[] TEMPER_LEVELS={0,14,31,65,100,134,168};
+    public int temperQuality(String id){return quantity(id)>0?tempered.getOrDefault(id,0):0;}
+    public String temperQualityName(String id){return QUALITY[temperQuality(id)];}
+    public int smithingQuality(){
+        int tier=0;for(int i=1;i<TEMPER_LEVELS.length;i++)if(skillLevel(6)>=TEMPER_LEVELS[i])tier=i;
+        return tier;
+    }
+    public String smithingQualityName(){return QUALITY[smithingQuality()];}
+    public double temperBonus(ItemCatalog.Item item){
+        int tier=temperQuality(item.id);
+        if(tier==0)return 0;
+        double bonus=tier==1?1:1+(tier-1)*1.8;
+        return "body".equals(item.slot())?2*bonus:bonus;
+    }
+    public boolean atForge(){
+        String[] towns={"Вайтран","Ривервуд","Виндхельм","Маркарт","Рифтен","Солитьюд","Данстар","Фолкрит","Морфал","Воронья Скала","Деревня скаалов","Драконий Мост","Шорский Камень","Картвастен"};
+        for(String town:towns)if(town.equalsIgnoreCase(location))return true;
+        return false;
+    }
+    public String temperBlock(ItemCatalog.Item item,GameEngine g){
+        String material=item.temperMaterial();
+        if(material.isEmpty())return "Улучшение этого предмета пока недоступно";
+        if(quantity(item.id)!=1)return "Для улучшения нужен одиночный экземпляр";
+        if("COMBAT".equals(g.mode)||!atForge())return "Нужна кузница в поселении, вне боя";
+        if(smithingQuality()<=temperQuality(item.id))return "Нужен более высокий навык кузнечного дела";
+        if(quantity(material)<1)return "Не хватает материала: "+material;
+        return "";
+    }
+    public boolean temper(ItemCatalog.Item item,GameEngine g){
+        if(!temperBlock(item,g).isEmpty())return false;
+        int next=smithingQuality();
+        if(!removeItem(item.temperMaterial(),1))return false;
+        tempered.put(item.id,next);
+        skillExperience(g,6,Math.max(1,30+next*15));
+        return true;
+    }
+
     private static final String[] SLOTS={"weapon","shield","head","body","hands","feet","ring","neck","ammo"};
     public static boolean isCombatPerk(int skill){return skill==0||skill==1||skill==2||skill==4||skill==5;}
     public int combatPerkRank(int skill){return isCombatPerk(skill)?combatPerks[skill]:0;}
@@ -137,7 +177,7 @@ public final class RpgProgress {
         cleanEquipment();
     }
     public void quantity(String id,int n){
-        try{inventory.put(id,Math.max(0,n));}catch(Exception ignored){}
+        try{inventory.put(id,Math.max(0,n));if(n<=0)tempered.remove(id);}catch(Exception ignored){}
     }
     public int quantity(String id){return inventory.optInt(id,0);}
     public boolean addItem(String id,int quantity){
@@ -312,6 +352,7 @@ public final class RpgProgress {
              .put("questOutcomes",new JSONObject(questOutcomes))
              .put("perks",perkPoints).put("combatPerks",new JSONArray(combatPerks))
              .put("equipmentInitialized",equipmentInitialized).put("equipped",new JSONObject(equipped))
+             .put("tempered",new JSONObject(tempered))
              .put("activePowerDay",activePowerDay).put("difficulty",difficulty)
              .put("actionDay",actionDay).put("attemptedToday",new JSONArray(attemptedToday))
              .put("dragonStage",dragonStage).put("dragonInsight",dragonInsight)
@@ -375,6 +416,12 @@ public final class RpgProgress {
         if(gear!=null)for(String slot:SLOTS){
             String id=gear.optString(slot,"");if(!id.isEmpty())p.equipped.put(slot,id);
         }
+        JSONObject temper=obj.optJSONObject("tempered");
+        if(temper!=null){Iterator<String> keys=temper.keys();while(keys.hasNext()){
+            String id=keys.next();ItemCatalog.Item item=ItemCatalog.find(id);int quality=temper.optInt(id,0);
+            if(item!=null&&p.quantity(id)>0&&!item.temperMaterial().isEmpty()&&quality>0&&quality<=6)
+                p.tempered.put(id,quality);
+        }}
         p.cleanEquipment();
         JSONArray done=obj.optJSONArray("completed"),bad=obj.optJSONArray("failed");
         if(done!=null)for(int i=0;i<done.length();i++)p.completed.add(done.optString(i));

@@ -2087,9 +2087,27 @@ public final class MainActivity extends Activity {
         addText(view,item.description,14,TEXT,false,12);
         addText(view,"ЭФФЕКТ",11,accent(),true,5);
         addText(view,item.effect,13,MUTED,false,3);
+        if(game.progress.quantity(item.id)>0&&!item.temperMaterial().isEmpty()){
+            addText(view,"КУЗНЕЧНОЕ УЛУЧШЕНИЕ",11,accent(),true,5);
+            addText(view,"Качество: "+game.progress.temperQualityName(item.id)+
+                (game.progress.quantity(item.id)>1&&game.progress.temperQuality(item.id)>0?" (1 экземпляр)":"")+
+                "\nМатериал: "+item.temperMaterial()+" | "+game.progress.quantity(item.temperMaterial())+
+                "\nДоступное качество: "+game.progress.smithingQualityName(),13,TEXT,false,5);
+            String blocked=game.progress.temperBlock(item,game);
+            if(!blocked.isEmpty())addText(view,blocked,12,MUTED,false,4);
+        }
         AlertDialog.Builder dialog=new RuneDialogBuilder(this,accent()).setTitle("Сведения о предмете")
             .setView(view).setNegativeButton("Закрыть",null);
         if(game.progress.quantity(item.id)>0){
+            if(!item.temperMaterial().isEmpty()&&game.progress.temperBlock(item,game).isEmpty())
+                dialog.setNeutralButton("Улучшить",(d,w)->{
+                    new RuneDialogBuilder(this,accent()).setTitle("Улучшить "+item.name+"?")
+                        .setMessage("Расход: 1 × "+item.temperMaterial()+"\nКачество: "+game.progress.smithingQualityName())
+                        .setNegativeButton("Отмена",null).setPositiveButton("Улучшить",(a,b)->{
+                            if(game.progress.temper(item,game)){save();render();toast("Предмет улучшен");}
+                            else toast(game.progress.temperBlock(item,game));
+                        }).show();
+                });
             if(!item.slot().isEmpty()){
                 boolean worn=game.progress.equipped(item.id);
                 addText(view,worn?"ЭКИПИРОВАНО":"Не экипировано",12,accent(),true,6);

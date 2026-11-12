@@ -16,7 +16,7 @@ class EquipmentCatalog(unittest.TestCase):
     def test_base_stats_and_ui(self):
         self.assertIn('{7,9,25},{8,11,30},{4,2,10}',CAT)
         self.assertIn('{31,35,275}',CAT)
-        self.assertIn('baseStat*(1+progress.skillLevel(statSkill)',CAT)
+        self.assertIn('(baseStat+progress.temperBonus(this))*(1+progress.skillLevel(statSkill)',CAT)
         self.assertIn('progress.combatPerkRank(statSkill)',CAT)
         self.assertIn('baseStat<0',CAT)
         self.assertIn('focused.statLabel(game.progress)',UI)
