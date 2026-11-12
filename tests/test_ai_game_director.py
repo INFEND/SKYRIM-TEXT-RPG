@@ -162,6 +162,21 @@ class AiGameDirectorContracts(unittest.TestCase):
         self.assertLess(bridge.index('Нельзя покинуть локацию во время боя'),
                         bridge.index('// Commit only after all model-controlled fields'))
 
+    def test_native_combat_is_committed_before_ai_narration(self):
+        ui=code("MainActivity.java")
+        start=ui.index("private void resolveNativeAiCombat(String action)")
+        body=ui[start:ui.index("private void renderAiChoice(",start)]
+        self.assertIn('!"COMBAT".equals(game.mode)',body)
+        self.assertIn("game.enemyHp<=0",body)
+        self.assertIn("game.stamina<10",body)
+        self.assertIn("game.magicka<12",body)
+        self.assertIn("game.potions<=0",body)
+        self.assertLess(body.index("game.choose(action)"),body.index("game.aiTurn=null"))
+        self.assertLess(body.index("save();"),body.index("requestAiTurn("))
+        self.assertIn('Не применяй effects.",false)',body)
+        for action in ("ATTACK","HEAVY","MAGIC","DEFEND","POTION","FLEE"):
+            self.assertIn('resolveNativeAiCombat("'+action+'")',ui)
+
     def test_story_stream_is_not_a_json_dump(self):
         client=code("AiStoryClient.java")
         ui=code("MainActivity.java")
