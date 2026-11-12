@@ -151,6 +151,17 @@ class AiGameDirectorContracts(unittest.TestCase):
                        "FOUND","EXAMINED","USED","DISCOVERED","VISITED","CLEARED"):
             self.assertIn('"'+status+'"',bridge)
 
+    def test_ai_cannot_reverse_time_or_escape_pending_battle(self):
+        bridge=code("AiGameTurn.java")
+        self.assertIn('if(addHours<0 || change(e,"dayDelta",30)<0)',bridge)
+        self.assertIn('Игровое время нельзя переводить назад',bridge)
+        self.assertIn('g.enemyHp>0 && place!=null',bridge)
+        self.assertIn('!place.name.equals(g.progress.location)',bridge)
+        self.assertIn('g.enemyHp>0 && (health==0 || !name.equals(g.enemyName))',bridge)
+        self.assertIn('ИИ не может завершить или заменить незавершённый бой',bridge)
+        self.assertLess(bridge.index('Нельзя покинуть локацию во время боя'),
+                        bridge.index('// Commit only after all model-controlled fields'))
+
     def test_story_stream_is_not_a_json_dump(self):
         client=code("AiStoryClient.java")
         ui=code("MainActivity.java")
