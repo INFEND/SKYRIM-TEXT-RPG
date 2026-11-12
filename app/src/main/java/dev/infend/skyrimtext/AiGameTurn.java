@@ -278,7 +278,14 @@ public final class AiGameTurn {
             g.enemyName=health>0?limited(enemy.optString("name",""),70):"";g.enemyHp=health;
             g.enemyMaxHp=health>0?requiredEnemyInt(enemy,"maxHp",health,50000):0;
             g.enemyDamage=health>0?requiredEnemyInt(enemy,"damage",0,1000):0;
-            g.battleKind=health>0?"AI":"";
+            // Preserve native quest/dragon encounter identity and enable engine combat.
+            if(health>0){
+                if(g.battleKind.isEmpty() || !"COMBAT".equals(g.mode))g.battleKind="AI";
+                g.mode="COMBAT";
+            }else{
+                g.battleKind="";
+                if("COMBAT".equals(g.mode))g.mode="WORLD";
+            }
         }
         g.maxHp=maxHp;g.hp=hp;g.maxStamina=maxSt;g.stamina=st;g.maxMagicka=maxMg;g.magicka=mg;
         g.gold=gold;g.day=day;g.hour=nextHour;g.reputation=rep;g.attack=attack;g.armor=armor;g.potions=pots;g.manaPotions=manaPots;
