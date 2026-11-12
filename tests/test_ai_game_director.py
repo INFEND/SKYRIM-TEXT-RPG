@@ -185,11 +185,24 @@ class AiGameDirectorContracts(unittest.TestCase):
                      '"WILD".equals(game.battleKind)','default:return false'):
             self.assertIn(rule,body)
         self.assertIn("if(!nativeAiCombatAvailable(action))return;",ui)
-        self.assertIn("if(!nativeAiCombatAvailable(option.combatAction))",ui)
+        self.assertIn("if(!nativeAiCombatAvailable(action))",ui)
+        self.assertIn("action=game.aiTurn.choices.get(index).combatAction",ui)
         self.assertIn("boolean available=!combat||nativeAiCombatAvailable(option.combatAction)",ui)
         self.assertIn("if(!available)return;",ui)
         self.assertIn("if(!wasSelected)selectedAiChoices.add(number);",ui)
         self.assertIn('ДЕЙСТВИЕ НЕДОСТУПНО',ui)
+
+    def test_typed_combat_uses_only_explicit_native_commands(self):
+        ui=code("MainActivity.java")
+        start=ui.index("static String typedNativeCombatAction")
+        body=ui[start:ui.index("private boolean nativeAiCombatAvailable",start)]
+        for action in ("ATTACK","HEAVY","MAGIC","DEFEND","POTION","FLEE"):
+            self.assertIn('return "'+action+'"',body)
+        self.assertIn('default:return "";',body)
+        self.assertNotIn(".contains(",body)
+        self.assertIn("action=typedNativeCombatAction(value)",ui)
+        self.assertIn("resolveNativeAiCombat(action)",ui)
+        self.assertIn("if(index<0||index>=game.aiTurn.choices.size())return;",ui)
 
     def test_story_stream_is_not_a_json_dump(self):
         client=code("AiStoryClient.java")
