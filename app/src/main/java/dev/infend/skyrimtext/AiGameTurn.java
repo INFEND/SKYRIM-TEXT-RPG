@@ -158,6 +158,8 @@ public final class AiGameTurn {
     private static int cap(long x,int min,int max){return (int)Math.max(min,Math.min(max,x));}
     public void apply(GameEngine g,boolean acted)throws JSONException{
         if(!acted||effects==null)return;
+        // Active encounters are owned exclusively by native combat.
+        if(g.enemyHp>0)throw new JSONException("Сначала выполни боевое действие через движок");
         JSONObject e=effects;
         int maxHp=cap((long)g.maxHp+change(e,"maxHpDelta",50),1,10000);
         int maxSt=cap((long)g.maxStamina+change(e,"maxStaminaDelta",50),1,10000);
