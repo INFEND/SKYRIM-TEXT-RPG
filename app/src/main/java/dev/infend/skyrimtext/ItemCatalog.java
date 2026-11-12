@@ -253,7 +253,10 @@ public final class ItemCatalog {
     static void registerSupplement(String name,String category,String icon,double weight,int cost,String desc,String effect,double stat,int skill){
         put(name,category,icon,weight,cost,desc,effect,stat,skill);
     }
-    static { ApparelAndPotionCatalog.register(); WorldItemCatalog.register(); LibraryItemCatalog.register(); }
+    static void registerMissing(String name,String category,String icon,double weight,int cost,String desc,String effect,double stat,int skill){
+        if(!items.containsKey(name))put(name,category,icon,weight,cost,desc,effect,stat,skill);
+    }
+    static { ApparelAndPotionCatalog.register(); WorldItemCatalog.register(); LibraryItemCatalog.register(); CommonItemCatalog.register(); }
     private ItemCatalog(){}
     public static synchronized void initialize(Context c){
         if(loaded)return;
