@@ -177,6 +177,20 @@ class AiGameDirectorContracts(unittest.TestCase):
         for action in ("ATTACK","HEAVY","MAGIC","DEFEND","POTION","FLEE"):
             self.assertIn('resolveNativeAiCombat("'+action+'")',ui)
 
+    def test_native_combat_choices_are_validated_at_selection_and_execution(self):
+        ui=code("MainActivity.java")
+        start=ui.index("private boolean nativeAiCombatAvailable(String action)")
+        body=ui[start:ui.index("private void resolveNativeAiCombat",start)]
+        for rule in ('game.stamina>=10','game.magicka>=12','game.potions>0',
+                     '"WILD".equals(game.battleKind)','default:return false'):
+            self.assertIn(rule,body)
+        self.assertIn("if(!nativeAiCombatAvailable(action))return;",ui)
+        self.assertIn("if(!nativeAiCombatAvailable(option.combatAction))",ui)
+        self.assertIn("boolean available=!combat||nativeAiCombatAvailable(option.combatAction)",ui)
+        self.assertIn("if(!available)return;",ui)
+        self.assertIn("if(!wasSelected)selectedAiChoices.add(number);",ui)
+        self.assertIn('ДЕЙСТВИЕ НЕДОСТУПНО',ui)
+
     def test_story_stream_is_not_a_json_dump(self):
         client=code("AiStoryClient.java")
         ui=code("MainActivity.java")
