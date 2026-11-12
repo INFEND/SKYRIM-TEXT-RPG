@@ -199,6 +199,7 @@ public final class SkyrimIconView extends View {
             case "драгоценности":return "valuables";
             case "артефакты":return "artifacts";
             case "боеприпасы":return "bows";
+            case "камни душ":return "gems";
             case "книги":return "book";
             case "свитки":return "scrolls";
             default:return iconForLabel(category);

@@ -253,7 +253,7 @@ public final class ItemCatalog {
     static void registerSupplement(String name,String category,String icon,double weight,int cost,String desc,String effect,double stat,int skill){
         put(name,category,icon,weight,cost,desc,effect,stat,skill);
     }
-    static { ApparelAndPotionCatalog.register(); }
+    static { ApparelAndPotionCatalog.register(); WorldItemCatalog.register(); }
     private ItemCatalog(){}
     public static synchronized void initialize(Context c){
         if(loaded)return;
@@ -266,6 +266,7 @@ public final class ItemCatalog {
                 JSONObject o=list.getJSONObject(i);
                 String name=o.optString("name","");
                 if(name.length()<2)continue;
+                if(items.containsKey(name))continue; // Do not overwrite verified built-in stats.
                 put(name,o.optString("category","Еда"),"♨",
                     Math.max(0,o.optDouble("weight",0.5)),Math.max(0,o.optInt("cost",0)),
                     o.optString("description",""),o.optString("effect",""));
