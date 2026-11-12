@@ -414,8 +414,8 @@ public final class UpdateManager {
                     ResourceStore.migrate(a,(label,done,total)->a.runOnUiThread(()->{
                         if(!a.isFinishing()&&!a.isDestroyed())migration.stage("Сохранение ресурсов",done+" / "+total+" | "+label);
                     }));
-                    a.runOnUiThread(()->{if(a.isFinishing()||a.isDestroyed())return;migration.dismiss();launchVerifiedInstaller(a);});
-                }catch(Exception e){a.runOnUiThread(()->{if(!a.isFinishing()&&!a.isDestroyed())migration.fail("Не удалось сохранить ресурсы: "+friendly(e),()->install(a));});}
+                    a.runOnUiThread(()->{if(a.isFinishing()||a.isDestroyed()||!migration.isShowing())return;migration.dismiss();launchVerifiedInstaller(a);});
+                }catch(Exception e){a.runOnUiThread(()->{if(!a.isFinishing()&&!a.isDestroyed())migration.fail("Не удалось сохранить ресурсы: "+friendly(e),()->{migration.dismiss();install(a);});});}
             });
         }catch(Exception e){
             OtaProgressDialog screen=new OtaProgressDialog(a);
@@ -424,6 +424,10 @@ public final class UpdateManager {
     }
     private static void launchVerifiedInstaller(Activity a){
         try{
+            File apk=apkFile(a);
+            PackageInfo archive=a.getPackageManager().getPackageArchiveInfo(apk.getAbsolutePath(),0);
+            if(archive==null)throw new IOException("Не удалось открыть APK");
+            verifyApk(a,apk,archive.getLongVersionCode());
             Uri content=Uri.parse("content://"+a.getPackageName()+".updates/apk");
             // A self-update kills the old SKYRIM TEXT RPG process. Launching the
             // system installer as a child of our Activity can leave its

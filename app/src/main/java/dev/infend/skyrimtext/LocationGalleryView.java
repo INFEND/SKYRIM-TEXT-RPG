@@ -106,7 +106,7 @@ public final class LocationGalleryView extends LinearLayout {
     private final int accent;
     private final boolean fullscreen;
     private final ImageView photo;
-    private final TextView page;
+    private final TextView page,missingPhoto;
     private int current=0,requested=0;
 
     private int dp(float value){return Math.round(value*getResources().getDisplayMetrics().density);}
@@ -181,6 +181,11 @@ public final class LocationGalleryView extends LinearLayout {
         photo.setContentDescription("Изображение локации "+location);
         photo.setFocusable(true);
         viewport.addView(photo,new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.MATCH_PARENT));
+        missingPhoto=text("ЗАГРУЗИТЬ ИЗОБРАЖЕНИЯ",16,accent);
+        missingPhoto.setGravity(Gravity.CENTER);
+        missingPhoto.setVisibility(View.GONE);
+        viewport.addView(missingPhoto,new FrameLayout.LayoutParams(-1,-1));
+        missingPhoto.setOnClickListener(v->openResourceManager());
         final GestureDetector detector=new GestureDetector(context,new GestureDetector.SimpleOnGestureListener(){
             @Override public boolean onDown(MotionEvent e){return true;}
             @Override public boolean onFling(MotionEvent e1,MotionEvent e2,float vx,float vy){
@@ -223,16 +228,19 @@ public final class LocationGalleryView extends LinearLayout {
         });
         photo.setOnClickListener(v->{
             if(!ResourceStore.has(getContext(),"gallery/"+archive(slug,current+1))){
-                if(getContext() instanceof android.app.Activity){
-                    android.app.Activity a=(android.app.Activity)getContext();
-                    new ResourceManagerDialog(a,accent,()->{show(current);prefetch();}).show();
-                }
+                openResourceManager();
             }else if(!fullscreen)openFullscreen();
         });
 
         // No redundant instructions, page counter or arrow overlays.
         show(0);
         prefetch();
+    }
+    private void openResourceManager(){
+        if(getContext() instanceof android.app.Activity){
+            android.app.Activity a=(android.app.Activity)getContext();
+            new ResourceManagerDialog(a,accent,()->{show(current);prefetch();},"gallery:"+slug).show();
+        }
     }
     private void move(int delta){
         int count=imageCount(location);
@@ -242,11 +250,17 @@ public final class LocationGalleryView extends LinearLayout {
         current=index;
         final int target=++requested;
         page.setText(captionFor(location,index));
-        if(!ResourceStore.has(getContext(),"gallery/"+archive(slug,index+1))){
-            photo.setImageDrawable(null);page.setText("Загрузить изображения");
+        String resourcePath="gallery/"+archive(slug,index+1);
+        if(!ResourceStore.has(getContext(),resourcePath)){
+            photo.setImageDrawable(null);page.setText("Изображения отсутствуют");
+            missingPhoto.setVisibility(View.VISIBLE);
             photo.setContentDescription("Изображения отсутствуют. Нажми для загрузки.");
+            ResourceStore.requestGallery(getContext(),resourcePath,()->{
+                if(isAttachedToWindow()&&target==requested&&ResourceStore.has(getContext(),resourcePath)){show(index);prefetch();}
+            });
             return;
         }
+        missingPhoto.setVisibility(View.GONE);
         photo.setContentDescription("Изображение локации "+location);
         photo.animate().cancel();
         // Keep the previous picture visible while the next cached preview resolves.
@@ -263,6 +277,7 @@ public final class LocationGalleryView extends LinearLayout {
             post(()->{
                 if(target!=requested)return;
                 if(bitmap!=null)present(target,bitmap);
+                else{photo.setImageDrawable(null);missingPhoto.setVisibility(View.VISIBLE);}
             });
         });
     }

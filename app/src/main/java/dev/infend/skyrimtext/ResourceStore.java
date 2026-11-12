@@ -28,6 +28,7 @@ final class ResourceStore {
     private static final AtomicBoolean STARTED=new AtomicBoolean();
     private static volatile int generation;
     private static volatile Catalog catalog;
+    private static final Set<String> AUTO_GALLERY=Collections.synchronizedSet(new HashSet<>());
     static final class Entry {
         final String path,group,label,sha,url; final long size;
         Entry(JSONObject j,String commit)throws Exception{
@@ -67,6 +68,23 @@ final class ResourceStore {
     private static SharedPreferences prefs(Context c){return c.getSharedPreferences(PREF,Context.MODE_PRIVATE);}
     static boolean wifiOnly(Context c){return prefs(c).getBoolean("wifi_only",false);}
     static void wifiOnly(Context c,boolean value){prefs(c).edit().putBoolean("wifi_only",value).apply();}
+    static boolean autoGallery(Context c){return prefs(c).getBoolean("auto_gallery",false);}
+    static void autoGallery(Context c,boolean value){prefs(c).edit().putBoolean("auto_gallery",value).apply();}
+    static boolean autoUpdate(Context c){return prefs(c).getBoolean("auto_update",false);}
+    static void autoUpdate(Context c,boolean value){prefs(c).edit().putBoolean("auto_update",value).apply();}
+    static boolean automaticAllowed(Context c,String path){
+        try{Entry e=catalog(c).entries.get(path);return e!=null&&!removed(c,e);}
+        catch(Exception ignored){return false;}
+    }
+    static void requestGallery(Context c,String path,Runnable done){
+        Context app=c.getApplicationContext();
+        if(!autoGallery(app)||!automaticAllowed(app,path)||has(app,path)||!AUTO_GALLERY.add(path))return;
+        IO.execute(()->{
+            try{Entry e=catalog(app).entries.get(path);
+                if(e!=null&&!removed(app,e))download(app,e,false,new AtomicBoolean(false),null);
+            }catch(Exception ignored){}finally{AUTO_GALLERY.remove(path);UI.post(done);}
+        });
+    }
     private static File file(Context c,Entry e){return new File(new File(c.getFilesDir(),"resource_store/v1"),e.path);}
     private static File part(Context c,Entry e){return new File(file(c,e).getPath()+".part");}
     private static boolean removed(Context c,Entry e){return prefs(c).getBoolean("removed:"+e.path,false);}
@@ -106,8 +124,7 @@ final class ResourceStore {
             if(verify){
                 if(valid(f,e)){prefs(c).edit().putString("sha:"+e.path,e.sha).apply();return State.READY;}
                 String previous=prefs(c).getString("sha:"+e.path,"");
-                prefs(c).edit().remove("sha:"+e.path).apply();
-                changed();
+                if(e.sha.equals(previous)){prefs(c).edit().remove("sha:"+e.path).apply();changed();}
                 return !previous.isEmpty()&&!previous.equals(e.sha)?State.OLD:State.DAMAGED;
             }
             if(local(c,e))return State.READY;
@@ -123,18 +140,18 @@ final class ResourceStore {
     static long storedBytes(Context c,Entry e){return file(c,e).length()+part(c,e).length();}
     static long partialBytes(Context c,Entry e){return part(c,e).length();}
     interface Progress {void update(String label,long done,long total);}
-    private static void publish(Context c,Entry e,File temp)throws Exception{
+    private static void publish(Context c,Entry e,File temp,boolean notify)throws Exception{
         if(!valid(temp,e)){temp.delete();throw new IOException("Контрольная сумма не совпадает: "+e.label);}
         File target=file(c,e);
         Files.move(temp.toPath(),target.toPath(),StandardCopyOption.ATOMIC_MOVE,StandardCopyOption.REPLACE_EXISTING);
-        if(!prefs(c).edit().putString("sha:"+e.path,e.sha).remove("removed:"+e.path).commit())
+        if(!prefs(c).edit().putString("sha:"+e.path,e.sha).remove("removed:"+e.path).remove("partial:"+e.path).commit())
             throw new IOException("Не удалось сохранить состояние ресурса");
-        changed();
+        if(notify)changed();
     }
     private static void parent(File f)throws IOException{
         File p=f.getParentFile();if(!p.isDirectory()&&!p.mkdirs())throw new IOException("Не удалось создать хранилище");
     }
-    private static void copyBundled(Context c,Entry e,AtomicBoolean stop)throws Exception{
+    private static void copyBundled(Context c,Entry e,AtomicBoolean stop,boolean notify)throws Exception{
         File tmp=new File(file(c,e).getPath()+".seed");parent(tmp);
         try{
             try(InputStream in=c.getAssets().open(e.path);FileOutputStream out=new FileOutputStream(tmp)){
@@ -142,7 +159,8 @@ final class ResourceStore {
                 while((n=in.read(buf))!=-1){if(stop.get())throw new InterruptedIOException("Остановлено");bytes+=n;if(bytes>e.size)throw new IOException("Лишние данные");out.write(buf,0,n);}
                 out.getFD().sync();
             }
-            publish(c,e,tmp);
+            publish(c,e,tmp,notify);
+            part(c,e).delete();
         }finally{tmp.delete();}
     }
     /** Bridge preserves old embedded assets before the installer replaces the APK. */
@@ -150,14 +168,29 @@ final class ResourceStore {
         Catalog a=catalog(c);if(!a.bundled)return;
         List<Entry> entries=new ArrayList<>(a.entries.values());int done=0;
         for(Entry e:entries){
-            if(!removed(c,e)&&!local(c,e))copyBundled(c,e,new AtomicBoolean(false));
+            if(!removed(c,e)){
+                if(!local(c,e)||!valid(file(c,e),e))
+                    copyBundled(c,e,new AtomicBoolean(false),false);
+            }
             if(progress!=null)progress.update(e.label,++done,entries.size());
         }
     }
     static void start(Context c){
         Context app=c.getApplicationContext();
         if(!STARTED.compareAndSet(false,true))return;
-        IO.execute(()->{try{migrate(app,null);}catch(Exception ignored){/* explicit manager or pre-install retries */}});
+        IO.execute(()->{
+            try{migrate(app,null);}catch(Exception ignored){/* explicit manager or pre-install retries */}
+            try{
+                for(Entry e:entries(app)){
+                    boolean installed=file(app,e).isFile()&&!removed(app,e);
+                    State state=state(app,e,true);
+                    // Newly added or intentionally removed packs are never auto-downloaded.
+                    if(installed&&state==State.OLD&&autoUpdate(app)){
+                        try{download(app,e,false,new AtomicBoolean(false),null);}catch(Exception ignored){}
+                    }
+                }
+            }catch(Exception ignored){}
+        });
     }
     static void checkNetwork(Context c)throws IOException{
         ConnectivityManager cm=(ConnectivityManager)c.getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -172,7 +205,7 @@ final class ResourceStore {
         if(!force&&!removed(c,e)&&local(c,e))return;
         if(!force&&catalog(c).bundled){
             // A bridge APK can restore its own verified copy without network traffic.
-            copyBundled(c,e,stop);return;
+            copyBundled(c,e,stop,true);return;
         }
         checkNetwork(c);
         File tmp=part(c,e);parent(tmp);
@@ -181,7 +214,7 @@ final class ResourceStore {
         if(!e.sha.equals(prefs(c).getString(partialKey,""))||tmp.length()>e.size)tmp.delete();
         if(!prefs(c).edit().putString(partialKey,e.sha).commit())throw new IOException("Не удалось записать состояние загрузки");
         long offset=tmp.length();
-        if(offset==e.size){publish(c,e,tmp);return;}
+        if(offset==e.size){publish(c,e,tmp,true);return;}
         HttpsURLConnection conn=(HttpsURLConnection)new URL(e.url).openConnection();
         conn.setInstanceFollowRedirects(false);conn.setConnectTimeout(15000);conn.setReadTimeout(15000);
         conn.setRequestProperty("Accept-Encoding","identity");
@@ -205,7 +238,7 @@ final class ResourceStore {
                 out.getFD().sync();if(done!=e.size)throw new EOFException("Загрузка не завершена; можно продолжить");
             }
             if(stop.get())throw new InterruptedIOException("Загрузка остановлена; прогресс сохранён");
-            publish(c,e,tmp);
+            publish(c,e,tmp,true);
         }finally{conn.disconnect();}
     }
     static void delete(Context c,Entry e)throws IOException{

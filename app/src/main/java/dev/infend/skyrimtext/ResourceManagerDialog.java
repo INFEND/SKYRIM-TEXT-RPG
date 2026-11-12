@@ -17,12 +17,14 @@ final class ResourceManagerDialog {
     private ProgressBar bar;
     private Button stopButton;
     private final Set<String> selected=new LinkedHashSet<>();
+    private final String initialGroup;
     private final LinkedHashMap<String,List<ResourceStore.Entry>> groups=new LinkedHashMap<>();
     private final Map<String,ResourceStore.State> states=new HashMap<>();
     private final AtomicBoolean stop=new AtomicBoolean();
     private boolean busy;
     private long lastProgressAt;
-    ResourceManagerDialog(Activity a,int color,Runnable refresh){activity=a;accent=color;refreshed=refresh;}
+    ResourceManagerDialog(Activity a,int color,Runnable refresh){this(a,color,refresh,"");}
+    ResourceManagerDialog(Activity a,int color,Runnable refresh,String group){activity=a;accent=color;refreshed=refresh;initialGroup=group;}
     private int dp(int n){return Math.round(n*activity.getResources().getDisplayMetrics().density);}
     private TextView text(String s,int size,int color){
         TextView v=new TextView(activity);v.setText(s);v.setTextSize(size);v.setTextColor(color);
@@ -40,9 +42,15 @@ final class ResourceManagerDialog {
         summary=text("Проверка каталога…",15,0xffe0e5e7);root.addView(summary);
         status=text("",12,0xffb9c3c7);root.addView(status);
         bar=new ProgressBar(activity,null,android.R.attr.progressBarStyleHorizontal);bar.setMax(1000);bar.setVisibility(View.GONE);root.addView(bar);
-        controls=column();root.addView(controls);
+        ScrollView scroll=new ScrollView(activity);LinearLayout scrolling=column();scroll.addView(scrolling);
+        root.addView(scroll,new LinearLayout.LayoutParams(-1,dp(390)));
+        controls=column();scrolling.addView(controls);
         Switch wifi=new Switch(activity);wifi.setText("Загрузка только через Wi-Fi");wifi.setTextColor(Color.WHITE);
         wifi.setChecked(ResourceStore.wifiOnly(activity));wifi.setOnCheckedChangeListener((v,on)->ResourceStore.wifiOnly(activity,on));controls.addView(wifi);
+        Switch lazy=new Switch(activity);lazy.setText("Докачивать фото при посещении локации");lazy.setTextColor(Color.WHITE);
+        lazy.setChecked(ResourceStore.autoGallery(activity));lazy.setOnCheckedChangeListener((v,on)->ResourceStore.autoGallery(activity,on));controls.addView(lazy);
+        Switch updates=new Switch(activity);updates.setText("Автообновлять установленные ресурсы");updates.setTextColor(Color.WHITE);
+        updates.setChecked(ResourceStore.autoUpdate(activity));updates.setOnCheckedChangeListener((v,on)->ResourceStore.autoUpdate(activity,on));controls.addView(updates);
         button(controls,"Проверить целостность",()->run("check",false));
         button(controls,"Докачать отсутствующие / повреждённые",()->run("download",false));
         button(controls,"Выбрать всё / снять выбор",()->{if(selected.size()==groups.size())selected.clear();else selected.addAll(groups.keySet());draw();});
@@ -51,14 +59,14 @@ final class ResourceManagerDialog {
         button(controls,"Удалить выбранные",this::confirmDelete);
         stopButton=button(root,"Остановить / продолжить позже",()->{stop.set(true);status.setText("Останавливаю операцию…");});
         stopButton.setVisibility(View.GONE);
-        ScrollView scroll=new ScrollView(activity);list=column();scroll.addView(list);
-        root.addView(scroll,new LinearLayout.LayoutParams(-1,dp(290)));
+        list=column();scrolling.addView(list);
         dialog=new RuneDialogBuilder(activity,accent).setTitle("УПРАВЛЕНИЕ РЕСУРСАМИ")
             .setView(root).setNegativeButton("Закрыть",null).create();
         dialog.setOnDismissListener(d->{stop.set(true);if(!activity.isFinishing()&&!activity.isDestroyed())refreshed.run();});
         dialog.show();
         try{for(ResourceStore.Entry e:ResourceStore.entries(activity))groups.computeIfAbsent(e.group,k->new ArrayList<>()).add(e);}
         catch(Exception e){status.setText("Каталог ресурсов отсутствует: "+e.getMessage());return;}
+        if(groups.containsKey(initialGroup))selected.add(initialGroup);
         run("check",false);
     }
     private String size(long n){return String.format(Locale.ROOT,"%.1f МиБ",n/1048576.0);}

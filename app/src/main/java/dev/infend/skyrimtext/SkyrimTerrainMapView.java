@@ -121,7 +121,7 @@ public final class SkyrimTerrainMapView extends View {
                 }catch(Exception ignored){}
             }
             final boolean success=decoded!=null;
-            post(()->{if(sheet==requested){loading=false;failed=!success;invalidate();}});
+            post(()->{if(sheet==requested){if(generation!=ResourceStore.generation()){loadTerrain();return;}loading=false;failed=!success;invalidate();}});
         });
     }
     public void setOnCatalog(OnCatalog listener){catalogCallback=listener;}
