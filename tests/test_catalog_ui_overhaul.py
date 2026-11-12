@@ -16,7 +16,12 @@ class CatalogUiOverhaul(unittest.TestCase):
         self.assertIn('addChoiceStat(prose,"НАВЫК",SceneChoiceMeta.skillName(c.action)',UI)
         self.assertIn('addChoiceStat(prose,"ШАНС УСПЕХА",chance+"%"',UI)
         self.assertIn('addChoiceStat(detail,"НАВЫК",option.skill.isEmpty()',UI)
-        self.assertIn('addChoiceStat(detail,"ШАНС УСПЕХА",option.chance+"%"',UI)
+        choice=UI.split("private void renderAiChoice(",1)[1].split("private void requestAiTurn(",1)[0]
+        self.assertIn('addChoiceStat(detail,"ШАНС УСПЕХА",displayedChance+"%"',choice)
+        self.assertIn('SceneChoiceMeta.chanceColor(displayedChance)',choice)
+        self.assertIn('if(displayedChance>=0)',choice)
+        self.assertIn('game.progress.chance(game,option.combatAction):-1):option.chance',choice)
+        self.assertNotIn('addChoiceStat(detail,"ШАНС УСПЕХА",option.chance',choice)
         self.assertIn('public static String skillName(String action)',META)
 
     def test_inventory_subtitle_replaces_old_copy(self):
