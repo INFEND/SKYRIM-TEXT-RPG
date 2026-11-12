@@ -35,14 +35,15 @@ class SourceScopedSettings(unittest.TestCase):
             '}else if("api".equals(effectiveProvider))',1)[0]
         self.assertIn("boolean signedIn=chatGptOAuth.hasSignedInAccount()",chat)
         self.assertIn("boolean authorized=chatGptOAuth.hasAuthorizedPlan()",chat)
-        self.assertIn("if(authorized)",chat)
+        self.assertIn("if(authorized&&!accountActionBusy)",chat)
         self.assertIn("if(signedIn)",chat)
-        self.assertIn('actionButton("Выйти из ChatGPT"',chat)
-        self.assertIn('actionButton("Войти в ChatGPT"',chat)
-        self.assertIn("chatGptOAuth.signOut(",chat)
-        self.assertIn("this::loginChatGpt",chat)
-        self.assertEqual(chat.count('actionButton("Войти в ChatGPT"'),1)
-        self.assertEqual(chat.count('actionButton("Выйти из ChatGPT"'),1)
+        self.assertIn('signedIn?"Выйти из ChatGPT":"Войти в ChatGPT"',chat)
+        self.assertIn("signedIn?this::logoutChatGpt:this::loginChatGpt",chat)
+        self.assertEqual(chat.count("actionButton(accountTitle,accountDetail,false,accountAction)"),1)
+        self.assertIn("accountRow.setEnabled(!accountActionBusy)",chat)
+        self.assertIn("accountRow.setClickable(!accountActionBusy)",chat)
+        self.assertIn("chatGptOAuth.signOut(",UI)
+        self.assertIn("cancelAiForSourceChange()",UI)
         self.assertNotIn('actionButton("Вход ChatGPT',SCOPED)
 
     def test_no_bullet_separators_in_current_user_interface(self):
@@ -52,6 +53,9 @@ class SourceScopedSettings(unittest.TestCase):
             # Legacy separators may occur only as input to the display normalizer.
             source=source.replace('str.replace(" • "," | ")','str.replace("LEGACY_SEPARATOR"," | ")')
             self.assertNotIn("•",source,name)
+        typography=(ROOT_JAVA/"SceneTypography.java").read_text(encoding="utf-8")
+        self.assertIn("String text=displaySeparators(raw).replace",typography)
+        self.assertIn("SceneTypography.displaySeparators(str)",UI)
         # Identifiers in old save data are deliberately not rewritten:
         old=(ROOT_JAVA/"RpgProgress.java").read_text(encoding="utf-8")
         self.assertIn("Пепельные печати • день ",old)

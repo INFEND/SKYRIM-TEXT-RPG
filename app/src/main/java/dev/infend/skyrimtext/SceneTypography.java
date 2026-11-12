@@ -46,8 +46,14 @@ public final class SceneTypography {
             out.setSpan(new StyleSpan(Typeface.ITALIC),italic,out.length(),Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
     }
 
+    // Display-only migration; never rewrite saved quest identifiers or raw AI data.
+    static String displaySeparators(String raw){
+        return raw==null?"":raw.replace(" "+(char)8226+" "," | ")
+            .replace(" "+(char)183+" "," | ");
+    }
+
     private static String normalize(String raw){
-        String text=raw.replace("\r\n","\n").replace('\r','\n');
+        String text=displaySeparators(raw).replace("\r\n","\n").replace('\r','\n');
         // The provider sometimes produces "смотришь. Стражник:" in a prose line.
         // Move a marked (or a clearly unmarked) speaker to its own paragraph.
         text=text.replaceAll("([.!?…])\\h+(\\*\\*[А-ЯЁ][^:\\n]{1,55}:\\*\\*)","$1\n\n$2");

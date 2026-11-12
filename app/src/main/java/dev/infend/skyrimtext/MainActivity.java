@@ -75,6 +75,7 @@ public final class MainActivity extends Activity {
     private SkyrimOtaController updater;
     private ChatGptOAuth chatGptOAuth;
     private boolean awaitingAiToken;
+    private boolean accountActionBusy;
     private AiStoryMemory aiMemory;
     private AiStoryClient aiClient;
     private LocalAiClient localAiClient;
@@ -263,7 +264,7 @@ public final class MainActivity extends Activity {
     private LinearLayout column(){LinearLayout l=new LinearLayout(this);l.setOrientation(LinearLayout.VERTICAL);return l;}
     private LinearLayout row(){LinearLayout l=new LinearLayout(this);l.setOrientation(LinearLayout.HORIZONTAL);l.setGravity(Gravity.CENTER_VERTICAL);return l;}
     private TextView text(String str,int size,int color,boolean bold){
-        TextView t=new TextView(this);t.setText(str==null?"":str.replace(" "+(char)8226+" "," | ").replace(" "+(char)183+" "," | "));t.setTextSize(sp(size));t.setTextColor(color);
+        TextView t=new TextView(this);t.setText(SceneTypography.displaySeparators(str));t.setTextSize(sp(size));t.setTextColor(color);
         t.setFontFeatureSettings("kern");t.setIncludeFontPadding(true);
         t.setTypeface(SovngardeTypeface.face(this,bold));
         return t;
@@ -558,7 +559,7 @@ public final class MainActivity extends Activity {
         TextView mark=text("◇",19,primary?accent():MUTED,false);
         mark.setGravity(Gravity.CENTER);row.addView(mark,lp(24,28));
         LinearLayout.LayoutParams p=lp(-1,-2);p.bottomMargin=dp(7);content.addView(row,p);
-        row.setClickable(true);row.setFocusable(true);row.setContentDescription(title+". "+detail);
+        row.setClickable(true);row.setFocusable(true);row.setContentDescription(SceneTypography.displaySeparators(title+". "+detail));
         row.setOnClickListener(v->onClick.run());return mark;
     }
     private void titleButton(String caption,boolean active,Runnable callback){
@@ -1369,9 +1370,17 @@ public final class MainActivity extends Activity {
         new RuneDialogBuilder(this,accent()).setTitle("Источник ИИ")
             .setSingleChoiceItems(labels,selected,(dialog,which)->{
                 prefs.edit().putString("ai_provider",which==1?"chatgpt":which==2?"api":which==3?"local":"auto").apply();
-                if(aiClient!=null)aiClient.cancel();if(localAiClient!=null)localAiClient.cancel();
+                cancelAiForSourceChange();
                 dialog.dismiss();render();
             }).setNegativeButton("Закрыть",null).show();
+    }
+    private void cancelAiForSourceChange(){
+        awaitingAiToken=false;
+        aiTurnBusy=false;
+        aiTurnPreview="";
+        aiReasoningPreview="";
+        if(aiClient!=null)aiClient.cancel();
+        if(localAiClient!=null)localAiClient.cancel();
     }
     private String selectedReasoningEffort(){
         return AiReasoningEffort.normalize(prefs.getString("ai_reasoning_effort",AiReasoningEffort.DEFAULT));
@@ -1400,11 +1409,16 @@ public final class MainActivity extends Activity {
             }).setNegativeButton("Закрыть",null).show();
     }
     private void loginChatGpt(){
+        if(accountActionBusy||chatGptOAuth.hasSignedInAccount())return;
+        accountActionBusy=true;
         toast("Вход ChatGPT: для игры используются лимиты Работа/Codex");
         chatGptOAuth.signIn(this,(success,message)->{
+            accountActionBusy=false;
+            if(isFinishing()||isDestroyed())return;
             toast(message);
             if(tab==5)render();
             if(success)chatGptOAuth.loadModels((models,error)->{
+                if(isFinishing()||isDestroyed()||!chatGptOAuth.hasAuthorizedPlan()||accountActionBusy)return;
                 if(error!=null||models.isEmpty()){toast(error==null?"Нет доступных моделей ChatGPT":error);return;}
                 String current=prefs.getString("ai_chatgpt_model","");
                 boolean exists=false;
@@ -1417,10 +1431,29 @@ public final class MainActivity extends Activity {
                 if(tab==5)render();
             });
         });
+        if(tab==5)render();
+    }
+    private void logoutChatGpt(){
+        if(accountActionBusy||!chatGptOAuth.hasSignedInAccount())return;
+        new RuneDialogBuilder(this,accent()).setTitle("Выйти из ChatGPT?")
+            .setNegativeButton("Отмена",null).setPositiveButton("Выйти",(d,w)->{
+                if(accountActionBusy)return;
+                accountActionBusy=true;
+                cancelAiForSourceChange();
+                chatGptOAuth.signOut((success,message)->{
+                    accountActionBusy=false;
+                    if(isFinishing()||isDestroyed())return;
+                    toast(message);
+                    if(tab==5)render();
+                });
+                if(tab==5)render();
+            }).show();
     }
     private void chatGptModelDialog(){
         toast("Получаю доступные модели ChatGPT для Работы/Codex…");
         chatGptOAuth.loadModels((models,error)->{
+            if(isFinishing()||isDestroyed()||tab!=5||!usingChatGpt()
+                ||!chatGptOAuth.hasAuthorizedPlan()||accountActionBusy)return;
             if(error!=null){toast(error);return;}
             if(models.isEmpty()){toast("Нет доступных моделей ChatGPT");return;}
             String[] labels=new String[models.size()];
@@ -2616,29 +2649,25 @@ public final class MainActivity extends Activity {
         }else if("chatgpt".equals(effectiveProvider)){
             boolean signedIn=chatGptOAuth.hasSignedInAccount();
             boolean authorized=chatGptOAuth.hasAuthorizedPlan();
-            // One account action; login and logout are mutually exclusive.
+            // A single account control is rebuilt with the current session state.
+            String accountTitle=signedIn?"Выйти из ChatGPT":"Войти в ChatGPT";
+            String accountDetail=accountActionBusy?"Выполняется "+(signedIn?"выход…":"вход…"):
+                signedIn?chatGptOAuth.accountLabel()+" | завершить сессию":
+                "Авторизация в системном браузере | лимиты Работа/Codex";
+            Runnable accountAction=signedIn?this::logoutChatGpt:this::loginChatGpt;
+            TextView accountMark=actionButton(accountTitle,accountDetail,false,accountAction);
+            View accountRow=(View)accountMark.getParent();
+            accountRow.setEnabled(!accountActionBusy);
+            accountRow.setClickable(!accountActionBusy);
             if(signedIn){
-                actionButton("Выйти из ChatGPT",chatGptOAuth.accountLabel()+
-                    " | завершить сессию",false,()->{
-                        new RuneDialogBuilder(this,accent()).setTitle("Выйти из ChatGPT?")
-                            .setNegativeButton("Отмена",null).setPositiveButton("Выйти",(d,w)->{
-                                if(aiClient!=null)aiClient.cancel();
-                                if(localAiClient!=null)localAiClient.cancel();
-                                chatGptOAuth.signOut((success,message)->{toast(message);render();});
-                            }).show();
-                    });
-                if(authorized){
+                if(authorized&&!accountActionBusy){
                     actionButton("Модель | Работа/Codex",
                         prefs.getString("ai_chatgpt_model","Не выбрана")+
                         " | выбрана внутри игры",false,this::chatGptModelDialog);
-                }else{
+                }else if(!authorized){
                     addText(content,"Вход выполнен, но разрешение использовать лимиты ChatGPT не предоставлено. "
                         +"Для повторной авторизации сначала выйди из аккаунта.",12,MUTED,false,10);
                 }
-            }else{
-                actionButton("Войти в ChatGPT",
-                    "Авторизация в системном браузере | лимиты Работа/Codex",
-                    false,this::loginChatGpt);
             }
             actionButton("Уровень размышления",
                 AiReasoningEffort.label(selectedReasoningEffort())+
