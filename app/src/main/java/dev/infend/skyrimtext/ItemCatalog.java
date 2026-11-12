@@ -253,7 +253,7 @@ public final class ItemCatalog {
     static void registerSupplement(String name,String category,String icon,double weight,int cost,String desc,String effect,double stat,int skill){
         put(name,category,icon,weight,cost,desc,effect,stat,skill);
     }
-    static { ApparelAndPotionCatalog.register(); WorldItemCatalog.register(); }
+    static { ApparelAndPotionCatalog.register(); WorldItemCatalog.register(); LibraryItemCatalog.register(); }
     private ItemCatalog(){}
     public static synchronized void initialize(Context c){
         if(loaded)return;

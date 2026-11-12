@@ -43,17 +43,15 @@ class GalleryAndAiStats(unittest.TestCase):
         self.assertNotIn(".setNegativeButton(",full)
         self.assertNotIn("RuneFrameDrawable",full)
 
-    def test_ai_story_shows_health_and_all_tabs_autohide_header(self):
+    def test_ai_story_shows_health_at_top_of_scroll_document(self):
         self.assertIn("if(game.started)renderBars();",UI)
         self.assertNotIn('game.started && !(tab==0&&prefs.getBoolean("ai_enabled",false))',UI)
-        self.assertIn("handleVerticalScroll(y,oldY)",UI)
-        self.assertIn("chromeScrollTravel+delta",UI)
-        self.assertIn("Math.min(height,chromeScrollTravel+delta)",UI)
-        self.assertIn("topChrome.setTranslationY(-hidden)",UI)
-        self.assertIn("scroll.setClipBounds(new android.graphics.Rect(",UI)
+        self.assertIn("page.addView(topChrome,lp(-1,-2))",UI)
+        self.assertIn("page.addView(content,lp(-1,-2))",UI)
         self.assertIn("topChrome.addView(stats,lp(-1,-2))",UI)
-        self.assertNotIn("topChrome.setVisibility(View.GONE)",UI)
-        self.assertIn("topChrome.setVisibility(View.VISIBLE)",UI)
+        self.assertNotIn("handleVerticalScroll",UI)
+        self.assertNotIn("topChrome.setTranslationY",UI)
+        self.assertNotIn("scroll.setClipBounds",UI)
         for name in ('"ЗДОРОВЬЕ"','"ЗАПАС СИЛ"','"МАГИЯ"'):
             self.assertIn(name,UI)
 

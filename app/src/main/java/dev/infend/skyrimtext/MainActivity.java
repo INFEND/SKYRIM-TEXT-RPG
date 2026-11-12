@@ -47,11 +47,6 @@ public final class MainActivity extends Activity {
     private GameEngine game;
     private SharedPreferences prefs;
     private LinearLayout root, content, header, topChrome;
-    private FrameLayout scrollStage;
-    private View chromeScrollSpacer;
-    private boolean chromeHidden;
-    private int chromeScrollTravel;
-    private long chromeIgnoreScrollUntil;
     private ScrollView scroll;
     private String renderedPage="";
     private static final class PageScroll {
@@ -323,37 +318,23 @@ public final class MainActivity extends Activity {
         root=column();root.setBackground(new SkyrimBackdropDrawable());root.setFitsSystemWindows(true);
         setContentView(root);
         activeTerrainMap=null;
-        // The game header must float OVER the scrolling content. Removing a
-        // vertical LinearLayout child on scroll causes relayout, snap-back and
-        // an infinite show/hide oscillation when the user reverses direction.
-        scrollStage=new FrameLayout(this);
-        root.addView(scrollStage,new LinearLayout.LayoutParams(-1,0,1));
+        // Header and health belong to the scroll document, not a floating overlay.
+        // One stable vertical hierarchy: no direction-based translations or clipping.
         scroll=new ScrollView(this);scroll.setFillViewport(false);scroll.setClipToPadding(false);
         scroll.setVerticalScrollBarEnabled(false);
         scroll.setDescendantFocusability(ViewGroup.FOCUS_BEFORE_DESCENDANTS);
         scroll.setFocusableInTouchMode(true);
-        scroll.requestFocus();
-        scrollStage.addView(scroll,new FrameLayout.LayoutParams(-1,-1));
-
-        topChrome=column();
-        scrollStage.addView(topChrome,new FrameLayout.LayoutParams(-1,-2,Gravity.TOP));
-        chromeHidden=false;chromeScrollTravel=0;
-        // Restored scroll offsets are not user flings. Never toggle the header
-        // in response to our own render() / first-layout scroll events.
-        chromeIgnoreScrollUntil=android.os.SystemClock.uptimeMillis()+350L;
+        root.addView(scroll,new LinearLayout.LayoutParams(-1,0,1));
+        LinearLayout page=column();scroll.addView(page,new ScrollView.LayoutParams(-1,-2));
+        topChrome=column();page.addView(topChrome,lp(-1,-2));
         if(!titleOpen){
             renderHeader();
             if(game.started)renderSkillLevelNotice();
             if(game.started)renderBars();
         }
-
-        scroll.setOnScrollChangeListener((View view,int x,int y,int oldX,int oldY)->
-            handleVerticalScroll(y,oldY));
-        content=column();content.setPadding(dp(13),dp(17),dp(13),dp(28));scroll.addView(content);
-        // Reserve the same header height inside the scroller only at its top.
-        // Sliding/hiding the floating header never changes scroll viewport size.
-        chromeScrollSpacer=new View(this);
-        content.addView(chromeScrollSpacer,new LinearLayout.LayoutParams(-1,0));
+        content=column();content.setPadding(dp(13),dp(17),dp(13),dp(28));
+        page.addView(content,lp(-1,-2));
+        scroll.requestFocus();
         if(titleOpen)renderTitle();
         else if(!game.started && tab!=5)renderNewGame();
         else if(tab==0)renderStory();
@@ -365,58 +346,9 @@ public final class MainActivity extends Activity {
         else renderSettings();
         if(!titleOpen&&game.started)renderNav();
         SovngardeTypeface.applyTree(root);
-        // Compute the true font-scaled height before the first displayed frame,
-        // including any genuine skill-level notice (no guessed dp constants).
-        final FrameLayout stageForRender=scrollStage;
-        final LinearLayout chromeForRender=topChrome;
-        final View spacerForRender=chromeScrollSpacer;
-        stageForRender.getViewTreeObserver().addOnPreDrawListener(
-            new android.view.ViewTreeObserver.OnPreDrawListener(){
-                @Override public boolean onPreDraw(){
-                    if(stageForRender!=scrollStage)return true;
-                    int required=chromeForRender.getMeasuredHeight();
-                    if(spacerForRender.getLayoutParams().height!=required){
-                        spacerForRender.getLayoutParams().height=required;
-                        spacerForRender.requestLayout();
-                        return false;
-                    }
-                    stageForRender.getViewTreeObserver().removeOnPreDrawListener(this);
-                    updateChromeScrollClip();
-                    return true;
-                }
-            });
         renderedPage=thisPage;
         resumeViewport(oldScroll,scroll,thisPage);
         if(animations){content.setAlpha(0.8f);content.animate().alpha(1f).setDuration(210).setInterpolator(new DecelerateInterpolator()).start();}
-    }
-    /**
-     * A fixed-height scrolling canvas, clipped below the visible top chrome.
-     * The chrome itself is translated gradually, never removed or remeasured.
-     * This prevents the heading and stats from drawing OVER the story while
-     * avoiding the jumping viewport caused by resizing a parent LinearLayout.
-     */
-    private void handleVerticalScroll(int y,int previousY){
-        if(titleOpen||!game.started||topChrome==null)return;
-        if(android.os.SystemClock.uptimeMillis()<chromeIgnoreScrollUntil)return;
-        int height=topChrome.getHeight();
-        if(height<=0)return;
-        int delta=y-previousY;
-        if(y<=dp(3))chromeScrollTravel=0;
-        else if(delta!=0)chromeScrollTravel=Math.max(0,Math.min(height,chromeScrollTravel+delta));
-        chromeHidden=chromeScrollTravel>=height;
-        updateChromeScrollClip();
-    }
-    private void updateChromeScrollClip(){
-        if(scroll==null||topChrome==null||scroll.getWidth()<=0||scroll.getHeight()<=0)return;
-        int headerHeight=topChrome.getHeight();
-        int hidden=Math.max(0,Math.min(headerHeight,chromeScrollTravel));
-        topChrome.setVisibility(View.VISIBLE);
-        topChrome.setAlpha(1f);
-        topChrome.setTranslationY(-hidden);
-        // Never let text/photographs be visible beneath the stuck-to-top header.
-        int visibleHeader=Math.max(0,headerHeight-hidden);
-        scroll.setClipBounds(new android.graphics.Rect(
-            0,visibleHeader,scroll.getWidth(),scroll.getHeight()));
     }
     private void renderHeader(){
         header=row();header.setPadding(dp(13),dp(9),dp(13),dp(9));
