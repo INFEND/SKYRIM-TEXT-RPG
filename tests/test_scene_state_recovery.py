@@ -30,19 +30,23 @@ class SceneStateRecoveryTest(unittest.TestCase):
         self.assertIn("state.confirm(kind,key", SOURCE)
 
     def test_npc_relationship_progress_cannot_be_downgraded(self):
-        self.assertIn('if("npc".equals(kind) && entries.containsKey(safeId))', SOURCE)
-        self.assertIn('if(oldRank>0 && newRank>0 && newRank<oldRank)return;', SOURCE)
+        self.assertIn('if(entries.containsKey(safeId))', SOURCE)
+        self.assertIn('if("npc".equals(kind))', SOURCE)
+        self.assertRegex(SOURCE, r'if\(oldRank>0 && newRank>0 && newRank<oldRank\)\s*throw new JSONException')
         self.assertIn('case "MET": return 1;', SOURCE)
         self.assertIn('case "INFORMED": return 2;', SOURCE)
         self.assertIn('case "HELPED": return 3;', SOURCE)
 
     def test_non_relationship_statuses_are_not_forced_into_order(self):
         self.assertIn('default: return 0;', SOURCE)
-        self.assertIn('if(oldRank>0 && newRank>0 && newRank<oldRank)return;', SOURCE)
+        self.assertRegex(SOURCE, r'if\(oldRank>0 && newRank>0 && newRank<oldRank\)\s*throw new JSONException')
 
     def test_only_validated_engine_facts_enter_context(self):
         self.assertIn("state.confirm(kind,key,entry.getString", SOURCE)
-        self.assertIn('status.matches("[A-Z_]{2,24}")', SOURCE)
+        self.assertRegex(SOURCE, r'if\(!allowedStatus\(kind,status\)\)\s*throw new JSONException')
+        self.assertIn('case "npc": return "MET".equals(status)', SOURCE)
+        self.assertIn('case "clue": return "FOUND".equals(status)', SOURCE)
+        self.assertIn('case "sublocation": return "DISCOVERED".equals(status)', SOURCE)
         self.assertIn("confirmedContext()", SOURCE)
 
 
