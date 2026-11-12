@@ -116,9 +116,15 @@ public final class AiStoryClient {
             +"следом **— Реплика**. Не изменяй самостоятельно здоровье, квесты, "
             +"инвентарь или локацию. Не управляй героем. Верни только сюжетный текст.";
     }
+    private static String genderInstruction(GameEngine game){
+        return CharacterIdentity.FEMALE.equals(game.gender)?
+            "Персонаж игрока — женщина. Согласуй обращения и действия в женском роде.\n":
+            "Персонаж игрока — мужчина. Согласуй обращения и действия в мужском роде.\n";
+    }
     static String localUserPrompt(GameEngine game,String history,String command,boolean aiControlled){
         StringBuilder b=new StringBuilder();
-        b.append("ГЕРОЙ: ").append(crop(game.name,55)).append("; раса ").append(game.race)
+        b.append(genderInstruction(game));
+        b.append("ГЕРОЙ: ").append(crop(game.name,55)).append("; пол ").append(game.gender).append("; раса ").append(game.race)
             .append("; класс ").append(game.heroClass).append("; уровень ").append(game.level)
             .append("; локация ").append(game.progress.location).append("; день ").append(game.day)
             .append("; час ").append(game.hour).append(".\n");
@@ -342,8 +348,9 @@ public final class AiStoryClient {
     private static String context(GameEngine g, String history, String input) {
         GameEngine.Scene scene = g.scene();
         StringBuilder out = new StringBuilder();
+        out.append(genderInstruction(g));
         out.append("ПРОВЕРЕННЫЕ ФАКТЫ ИГРОВОГО ДВИЖКА:\n");
-        out.append("Герой: ").append(g.name).append("; раса: ").append(g.race)
+        out.append("Герой: ").append(g.name).append("; пол: ").append(g.gender).append("; раса: ").append(g.race)
                 .append("; класс: ").append(g.heroClass).append("; уровень: ").append(g.level)
                 .append("; опыт: ").append(g.xp).append('/').append(g.level*80).append('\n');
         out.append("Место: ").append(g.progress.location).append(", ").append(GameEngine.REGIONS[g.region])
@@ -407,7 +414,8 @@ public final class AiStoryClient {
 
     private static String contextAi(GameEngine game,String memory,String command){
         StringBuilder out=new StringBuilder("ИИ-РЕЖИМ: обычные офлайн-сцены и кнопки выключены. Создай свои десять вариантов и управляй характеристиками через effects.\n");
-        out.append("Герой: ").append(game.name).append("; ").append(game.race).append("; класс ")
+        out.append(genderInstruction(game));
+        out.append("Герой: ").append(game.name).append("; пол ").append(game.gender).append("; ").append(game.race).append("; класс ")
                 .append(game.heroClass).append("; уровень ").append(game.level).append("; опыт ").append(game.xp).append('\n');
         out.append("Локация: ").append(game.progress.location).append("; регион ").append(GameEngine.REGIONS[game.region])
                 .append("; день ").append(game.day).append("; время ")

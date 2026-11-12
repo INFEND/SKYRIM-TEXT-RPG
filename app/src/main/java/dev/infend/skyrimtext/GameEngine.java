@@ -43,6 +43,8 @@ public final class GameEngine {
 
     public boolean started;
     public String name = "Странник", race = "Норд", heroClass = "Воин";
+    public String gender = CharacterIdentity.MALE;
+    public int portrait = 1;
     public int region = 0, day = 1, hour = 8, level = 1, xp = 0, maxHp = 100, hp = 100;
     public int maxStamina = 65, stamina = 65, maxMagicka = 40, magicka = 40;
     public int gold = 85, potions = 3, manaPotions = 1, attack = 12, armor = 2;
@@ -61,7 +63,13 @@ public final class GameEngine {
         start(desiredName,desiredRace,desiredClass,0,new int[]{0,0,0});
     }
     public void start(String desiredName,String desiredRace,String desiredClass,int origin,int[] points){
-        name=desiredName==null||desiredName.trim().isEmpty()?RpgContent.randomName():desiredName.trim();
+        start(desiredName,desiredRace,desiredClass,origin,points,CharacterIdentity.MALE,1);
+    }
+    public void start(String desiredName,String desiredRace,String desiredClass,int origin,int[] points,
+                      String desiredGender,int desiredPortrait){
+        gender=CharacterIdentity.normalizeGender(desiredGender);
+        portrait=CharacterIdentity.normalizePortrait(desiredPortrait);
+        name=desiredName==null||desiredName.trim().isEmpty()?RpgContent.randomName(gender):desiredName.trim();
         if(name.length()>28)name=name.substring(0,28);
         race=contains(RACES,desiredRace)?desiredRace:"Норд";
         heroClass=contains(CLASSES,desiredClass)?desiredClass:"Без класса";
@@ -525,6 +533,7 @@ public final class GameEngine {
     public JSONObject toJson() throws JSONException {
         JSONObject j=new JSONObject();
         j.put("schema",1).put("started",started).put("name",name).put("race",race).put("heroClass",heroClass)
+         .put("gender",gender).put("portrait",portrait)
          .put("region",region).put("day",day).put("hour",hour).put("level",level).put("xp",xp).put("maxHp",maxHp).put("hp",hp)
          .put("maxStamina",maxStamina).put("stamina",stamina).put("maxMagicka",maxMagicka).put("magicka",magicka)
          .put("gold",gold).put("potions",potions).put("manaPotions",manaPotions).put("attack",attack).put("armor",armor)
@@ -545,6 +554,8 @@ public final class GameEngine {
             if(j.optInt("schema")!=1)return g;
             g.started=j.optBoolean("started",false);g.name=j.optString("name",g.name);
             g.race=j.optString("race",g.race);g.heroClass=j.optString("heroClass",g.heroClass);
+            g.gender=CharacterIdentity.normalizeGender(j.optString("gender",CharacterIdentity.MALE));
+            g.portrait=CharacterIdentity.normalizePortrait(j.optInt("portrait",1));
             g.region=Math.max(0,Math.min(REGIONS.length-1,j.optInt("region",0)));
             g.day=Math.max(1,j.optInt("day",1));g.hour=Math.max(0,Math.min(23,j.optInt("hour",8)));g.level=Math.max(1,j.optInt("level",1));g.xp=Math.max(0,j.optInt("xp",0));
             g.maxHp=Math.max(1,j.optInt("maxHp",100));g.hp=Math.max(0,Math.min(g.maxHp,j.optInt("hp",100)));

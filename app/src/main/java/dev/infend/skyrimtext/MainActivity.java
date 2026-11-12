@@ -57,6 +57,8 @@ public final class MainActivity extends Activity {
     private EditText nameField;
     private int tab=0, accentIndex=0, fontBonus=0;
     private String draftName="", selectedRace="Норд", selectedClass="Без класса";
+    private String selectedGender=CharacterIdentity.MALE;
+    private int selectedPortrait=1;
     private int selectedStart=0,selectedMapRegion=-1;
     private int mapListLimit=60;
     private SkyrimTerrainMapView activeTerrainMap;
@@ -109,6 +111,16 @@ public final class MainActivity extends Activity {
         ItemCatalog.initialize(this);
         SovngardeTypeface.preload(this);
         game=GameEngine.fromJson(prefs.getString("save",null));
+        if(bundle!=null){
+            draftName=bundle.getString("hero_name","");
+            selectedRace=bundle.getString("hero_race","Норд");
+            selectedClass=bundle.getString("hero_class","Без класса");
+            selectedGender=CharacterIdentity.normalizeGender(bundle.getString("hero_gender"));
+            selectedPortrait=CharacterIdentity.normalizePortrait(bundle.getInt("hero_portrait",1));
+            selectedStart=Math.max(0,Math.min(RpgContent.STARTS.length-1,bundle.getInt("hero_start",0)));
+            int[] points=bundle.getIntArray("hero_points");
+            if(points!=null&&points.length==3)System.arraycopy(points,0,initialPoints,0,3);
+        }
         restoreAiDraft();
         accentIndex=Math.max(0,Math.min(ACCENTS.length-1,prefs.getInt("accent",0)));
         fontBonus=Math.max(-2,Math.min(4,prefs.getInt("font_bonus",0)));
@@ -127,6 +139,14 @@ public final class MainActivity extends Activity {
             if(now-last>6L*60*60*1000){prefs.edit().putLong("last_check",now).apply();updater.check(false);}
         }
     }}
+    @Override protected void onSaveInstanceState(Bundle state){
+        if(!game.started&&nameField!=null)draftName=nameField.getText().toString();
+        state.putString("hero_name",draftName);state.putString("hero_race",selectedRace);
+        state.putString("hero_class",selectedClass);state.putString("hero_gender",selectedGender);
+        state.putInt("hero_portrait",selectedPortrait);state.putInt("hero_start",selectedStart);
+        state.putIntArray("hero_points",initialPoints.clone());
+        super.onSaveInstanceState(state);
+    }
     @Override protected void onPause(){save();super.onPause();}
     @Override protected void onDestroy(){
         if(aiClient!=null)aiClient.shutdown();
@@ -558,13 +578,16 @@ public final class MainActivity extends Activity {
         foot.setGravity(Gravity.CENTER);content.addView(foot,lp(-1,36));
     }
     private void renderNewGame(){
-        section("НОВАЯ ИСТОРИЯ","Твоя легенда начинается","Выбери место старта, расу, путь развития и распределение первых пяти очков. Каждый выбор влияет на историю героя.");
-        content.addView(new NordicArtView(this,NordicArtView.STORY),lp(-1,165));
-        space(content,15);
+        section("НОВАЯ ИСТОРИЯ","Твоя легенда начинается","Выбери пол, расу и портрет персонажа. Затем определи имя, начало истории и распредели первые пять очков.");
+        addText(content,"ПОЛ",11,accent(),true,9);
+        chips(CharacterIdentity.GENDERS,selectedGender,value->{
+            draftName=nameField.getText().toString();selectedGender=value;selectedPortrait=1;render();
+        });
+        space(content,9);
         LinearLayout details=card();addText(details,"ИМЯ ПЕРСОНАЖА",11,accent(),true,10);
         LinearLayout nameLine=row();details.addView(nameLine,lp(-1,-2));
         nameField=new EditText(this);nameField.setSingleLine(true);nameField.setTextColor(TEXT);nameField.setHintTextColor(MUTED);
-        nameField.setHint("Имя героя");nameField.setTextSize(sp(16));
+        nameField.setHint("Имя персонажа");nameField.setTextSize(sp(16));
         nameField.setFilters(new android.text.InputFilter[]{new android.text.InputFilter.LengthFilter(28)});
         nameField.setPadding(dp(11),dp(8),dp(11),dp(8));nameField.setBackground(new RuneFrameDrawable(PANEL_2,0xff85745f,false));
         nameField.setText(draftName);nameLine.addView(nameField,new LinearLayout.LayoutParams(0,dp(48),1));
@@ -572,11 +595,16 @@ public final class MainActivity extends Activity {
         LinearLayout.LayoutParams diceLp=lp(48,48);diceLp.leftMargin=dp(7);nameLine.addView(nameDice,diceLp);
         nameDice.setBackground(bg(PANEL_2,accent(),10));
         nameDice.setContentDescription("Сгенерировать случайное имя");
-        nameDice.setOnClickListener(v->{draftName=RpgContent.randomName();nameField.setText(draftName);nameField.setSelection(draftName.length());});
+        nameDice.setOnClickListener(v->{draftName=CharacterIdentity.FEMALE.equals(selectedGender)?
+            RpgContent.randomName(selectedGender):RpgContent.randomName();
+            nameField.setText(draftName);nameField.setSelection(draftName.length());});
         addText(details,"Нажми ⟳, чтобы получить случайное имя.",12,MUTED,false,0);
 
         addText(content,"РАСА",11,accent(),true,9);
-        chips(GameEngine.RACES,selectedRace,value->{draftName=nameField.getText().toString();selectedRace=value;render();});
+        chips(GameEngine.RACES,selectedRace,value->{
+            draftName=nameField.getText().toString();selectedRace=value;selectedPortrait=1;render();
+        });
+        renderPortraitChoices();
         int race=RpgContent.raceIndex(selectedRace);
         LinearLayout racial=card();
         addText(racial,"ПАССИВНЫЙ ЭФФЕКТ",10,accent(),true,6);
@@ -624,10 +652,41 @@ public final class MainActivity extends Activity {
         actionButton("НАЧАТЬ ПУТЕШЕСТВИЕ","Игра с сохранением, выбором судьбы и последствиями решений",true,()->{
             int n=initialPoints[0]+initialPoints[1]+initialPoints[2];
             if(n!=5){toast("Распредели все 5 свободных очков");return;}
-            newAiSession();game.start(nameField.getText().toString(),selectedRace,selectedClass,selectedStart,initialPoints);
+            newAiSession();game.start(nameField.getText().toString(),selectedRace,selectedClass,selectedStart,
+                initialPoints,selectedGender,selectedPortrait);
             tab=0;save();render();
         });
         addText(content,"Неофициальная самостоятельная история в знакомом северном мире.",12,MUTED,false,0);
+    }
+    private void renderPortraitChoices(){
+        addText(content,"ПОРТРЕТ",11,accent(),true,9);
+        LinearLayout choices=row();content.addView(choices,lp(-1,-2));
+        for(int i=1;i<=CharacterIdentity.PORTRAITS_PER_GENDER;i++){
+            final int portrait=i;
+            LinearLayout tile=column();tile.setTag(i);tile.setPadding(dp(3),dp(3),dp(3),dp(3));
+            LinearLayout.LayoutParams params=new LinearLayout.LayoutParams(0,-2,1);
+            if(i>1)params.leftMargin=dp(7);
+            choices.addView(tile,params);
+            tile.addView(new CharacterPortraitView(this,selectedRace,selectedGender,i),lp(-1,-2));
+            TextView label=text("",10,TEXT,true);label.setGravity(Gravity.CENTER);
+            tile.addView(label,lp(-1,32));
+            tile.setFocusable(true);
+            tile.setOnClickListener(v->{selectedPortrait=portrait;updatePortraitChoices(choices);});
+        }
+        updatePortraitChoices(choices);
+        addText(content,"Выбери один из трёх образов. Он будет отображаться в личном деле.",12,MUTED,false,15);
+    }
+    private void updatePortraitChoices(LinearLayout choices){
+        for(int i=0;i<choices.getChildCount();i++){
+            LinearLayout tile=(LinearLayout)choices.getChildAt(i);
+            int portrait=(Integer)tile.getTag();boolean active=portrait==selectedPortrait;
+            tile.setSelected(active);
+            tile.setBackground(new RuneFrameDrawable(PANEL_2,active?accent():BORDER,active));
+            tile.setContentDescription(selectedRace+", "+selectedGender+", образ "+portrait+
+                (active?", выбран":""));
+            TextView label=(TextView)tile.getChildAt(1);
+            label.setText(active?"ВЫБРАН":"ОБРАЗ "+portrait);label.setTextColor(active?accent():MUTED);
+        }
     }
     private android.widget.Spinner spinner(String[] options,int position,java.util.function.IntConsumer onChange){
         android.widget.Spinner sp=new android.widget.Spinner(this);
@@ -2247,10 +2306,13 @@ public final class MainActivity extends Activity {
     private void renderHero(){
         skyrimTopTabs(3);
         section("ЛИЧНОЕ ДЕЛО",""+game.name,game.race+" | "+game.heroClass+" | уровень "+game.level);
-        content.addView(new NordicArtView(this,NordicArtView.STORY),lp(-1,125));space(content,12);
+        CharacterPortraitView portrait=new CharacterPortraitView(this,game.race,game.gender,game.portrait);
+        LinearLayout.LayoutParams portraitParams=lp(150,-2);portraitParams.gravity=Gravity.CENTER_HORIZONTAL;
+        content.addView(portrait,portraitParams);space(content,12);
         if(!prefs.getBoolean("ai_enabled",false))
             actionButton("Ожидать","Выбрать от 1 до 24 часов отдыха",false,this::showWaitDialog);
         LinearLayout c=card();addText(c,"ХАРАКТЕРИСТИКИ",11,accent(),true,9);
+        heroEntry(c,"Пол",game.gender);
         heroEntry(c,"Опыт",game.xp+" / "+(game.level*80));
         heroEntry(c,"Атака",String.valueOf(game.effectiveAttack()));heroEntry(c,"Защита",String.valueOf(game.effectiveArmor()));
         heroEntry(c,"Септимы",game.gold+" септимов");heroEntry(c,"Репутация",String.valueOf(game.reputation));

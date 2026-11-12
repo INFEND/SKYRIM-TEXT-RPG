@@ -71,8 +71,11 @@ public final class RpgContent {
     };
     public static String[] startParts(int idx){return STARTS[Math.max(0,Math.min(idx,STARTS.length-1))].split("\\|",4);}
     public static int raceIndex(String name){for(int i=0;i<RACES.length;i++)if(RACES[i].equals(name))return i;return 0;}
-    public static String randomName(){
-        String[] first={"Хрольф","Руна","Фарен","Эйла","Велин","Дравен","Арвел","Ирин","Брин","Хадрик","Сальма","Мирен","Кейран","Ливия","Торвин"};
+    public static String randomName(){return randomName(CharacterIdentity.MALE);}
+    public static String randomName(String gender){
+        String[] first=CharacterIdentity.FEMALE.equals(gender)?
+            new String[]{"Руна","Эйла","Ирин","Сальма","Ливия","Ингрид","Карина","Элин","Мира","Фрейда"}:
+            new String[]{"Хрольф","Фарен","Велин","Дравен","Арвел","Брин","Хадрик","Мирен","Кейран","Торвин"};
         String[] last={"Серый Волк","Снежный Путь","Тихий Лист","Северный Ветер","Огненный Камень","Пепельный След","из Фолкрита","Ледяное Сердце","Быстрый Шаг"};
         Random r=new Random();return first[r.nextInt(first.length)]+" "+last[r.nextInt(last.length)];
     }

@@ -17,5 +17,14 @@ with zipfile.ZipFile(full) as a,zipfile.ZipFile(thin) as b:
         assert path not in b.namelist(),path
     for path in ("assets/icons/skyrim_icons_48.webp","assets/lore_bundle.zip","assets/fonts/Sovngarde Light.ttf","assets/fonts/Sovngarde Bold.ttf","assets/fonts/OFL.txt","AndroidManifest.xml","classes.dex"):
         assert a.read(path)==b.read(path),path
+    portraits=json.loads((ROOT/"docs/portrait_compression_report.json").read_text())
+    expected={"assets/portraits/"+p["file"] for p in portraits["portraits"]}
+    assert len(expected)==60
+    for apk in (a,b):
+        assert {p for p in apk.namelist() if p.startswith("assets/portraits/") and p.endswith(".webp")}==expected
+        for portrait in portraits["portraits"]:
+            path="assets/portraits/"+portrait["file"]
+            data=apk.read(path)
+            assert len(data)==portrait["encoded_bytes"] and hashlib.sha256(data).hexdigest()==portrait["sha256"],path
 assert thin.stat().st_size<full.stat().st_size
 print(f"Verified full {full.stat().st_size} bytes, thin {thin.stat().st_size} bytes")

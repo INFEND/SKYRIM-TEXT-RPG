@@ -54,7 +54,7 @@ jobs:
             | sha256sum --check --strict
           echo "Exact font files verified against uploaded ZIP; fonts included in APK."
       - name: Assemble debug APK
-        run: gradle --no-daemon --stacktrace :app:assembleDebug
+        run: gradle --no-daemon --stacktrace :app:testDebugUnitTest :app:assembleDebug
       - name: Verify Sovngarde TTF and license inside debug APK
         shell: bash
         run: |
