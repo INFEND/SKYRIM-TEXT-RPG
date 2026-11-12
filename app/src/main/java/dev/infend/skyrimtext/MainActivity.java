@@ -976,6 +976,16 @@ public final class MainActivity extends Activity {
             return;
         }
         if(!aiTurnStatus.isEmpty())addText(content,aiTurnStatus,12,MUTED,false,11);
+        if("COMBAT".equals(game.mode)&&game.enemyHp>0){
+            addText(content,"БОЙ | "+game.enemyName+" | "+game.enemyHp+"/"+game.enemyMaxHp,14,accent(),true,8);
+            actionButton("УДАР","Обычная атака",true,()->resolveNativeAiCombat("ATTACK"));
+            actionButton("СИЛЬНЫЙ УДАР","10 единиц сил | "+game.progress.chance(game,"HEAVY")+"%",game.stamina>=10,()->resolveNativeAiCombat("HEAVY"));
+            actionButton("МАГИЯ","12 единиц магии",game.magicka>=12,()->resolveNativeAiCombat("MAGIC"));
+            actionButton("ЗАЩИТА","Восстановить силы и уменьшить входящий урон",true,()->resolveNativeAiCombat("DEFEND"));
+            actionButton("ЛЕЧЕБНОЕ ЗЕЛЬЕ","В наличии: "+game.potions,game.potions>0,()->resolveNativeAiCombat("POTION"));
+            if("WILD".equals(game.battleKind))
+                actionButton("ОТСТУПИТЬ","Шанс: "+game.progress.chance(game,"FLEE")+"%",true,()->resolveNativeAiCombat("FLEE"));
+        }
         if(game.aiTurn==null){
             addText(content,"ИИ-Мастер создаст первую сцену из истории твоего героя. Затем появятся десять вариантов действий и поле собственного ответа.",15,TEXT,false,15);
             actionButton("НАЧАТЬ ИИ-ПРИКЛЮЧЕНИЕ","Сгенерировать первую сцену и десять решений",true,()->
@@ -1071,6 +1081,25 @@ public final class MainActivity extends Activity {
             instruction.append("Продолжи историю, применив effects только за совершённые действия.");
             requestAiTurn(instruction.toString(),true);
         });
+    }
+
+    /** Native combat is committed once before requesting prose; a failed model
+     * request cannot reroll the attack or duplicate its rewards. */
+    private void resolveNativeAiCombat(String action){
+        if(aiTurnBusy||!"COMBAT".equals(game.mode)||game.enemyHp<=0)return;
+        if("HEAVY".equals(action)&&game.stamina<10)return;
+        if("MAGIC".equals(action)&&game.magicka<12)return;
+        if("POTION".equals(action)&&game.potions<=0)return;
+        if("FLEE".equals(action)&&!"WILD".equals(game.battleKind))return;
+        game.choose(action);
+        String outcome="COMBAT".equals(game.mode)?game.battleLog:game.message;
+        game.aiTurn=null;
+        selectedAiChoices.clear();aiOwnDraft="";clearAiDraft();clearAiPending();
+        save();
+        aiMemory.add(aiSession,"event",outcome);
+        requestAiTurn("Движок уже выполнил боевое действие. Итог: "+outcome+
+            "\nОпиши только подтверждённый исход и предложи десять следующих вариантов. Не применяй effects.",false);
+        if(!aiTurnBusy)render();
     }
 
     private void renderAiChoice(int number,AiGameTurn.Option option){
