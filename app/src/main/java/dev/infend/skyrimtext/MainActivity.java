@@ -1037,6 +1037,11 @@ public final class MainActivity extends Activity {
             java.util.ArrayList<Integer> indexes=new java.util.ArrayList<>(selectedAiChoices);
             java.util.Collections.sort(indexes);
             if(indexes.isEmpty()&&value.isEmpty()){toast("Выбери вариант или напиши свой ответ");return;}
+            // Combat is authoritative: never submit a generic AI effects patch during a live encounter.
+            if("COMBAT".equals(game.mode)&&game.enemyHp>0){
+                toast("Во время боя используй боевые действия над сценой");
+                return;
+            }
             StringBuilder combined=new StringBuilder();
             if(!indexes.isEmpty()){
                 combined.append("ВЫБРАННЫЕ ВАРИАНТЫ ИГРОКА (обработай по порядку):\n");
@@ -1093,6 +1098,12 @@ public final class MainActivity extends Activity {
         if("FLEE".equals(action)&&!"WILD".equals(game.battleKind))return;
         game.choose(action);
         String outcome="COMBAT".equals(game.mode)?game.battleLog:game.message;
+        // Native retreat and defeat leave the old enemy HP in the engine.
+        // Clear the finished encounter before sending the next AI context.
+        if(!"COMBAT".equals(game.mode)){
+            game.enemyHp=0;game.enemyMaxHp=0;game.enemyDamage=0;
+            game.enemyName="";game.battleKind="";
+        }
         game.aiTurn=null;
         selectedAiChoices.clear();aiOwnDraft="";clearAiDraft();clearAiPending();
         save();
