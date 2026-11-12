@@ -1039,14 +1039,24 @@ public final class MainActivity extends Activity {
             if(indexes.isEmpty()&&value.isEmpty()){toast("Выбери вариант или напиши свой ответ");return;}
             // Combat is authoritative: never submit a generic AI effects patch during a live encounter.
             if("COMBAT".equals(game.mode)&&game.enemyHp>0){
-                if(indexes.size()!=1||!value.isEmpty()){
-                    toast("В бою выбери одно боевое действие без дополнительного текста");return;
+                String action;
+                if(indexes.isEmpty()){
+                    action=typedNativeCombatAction(value);
+                    if(action.isEmpty()){
+                        toast("Укажи одну команду: удар, сильный удар, магия, защита, зелье или отступление");return;
+                    }
+                }else{
+                    if(indexes.size()!=1||!value.isEmpty()){
+                        toast("В бою выбери одну команду или введи её текстом");return;
+                    }
+                    int index=indexes.get(0)-1;
+                    if(index<0||index>=game.aiTurn.choices.size())return;
+                    action=game.aiTurn.choices.get(index).combatAction;
                 }
-                AiGameTurn.Option option=game.aiTurn.choices.get(indexes.get(0)-1);
-                if(!nativeAiCombatAvailable(option.combatAction)){
-                    toast("Выбери доступную боевую команду над сценой");return;
+                if(!nativeAiCombatAvailable(action)){
+                    toast("Это боевое действие сейчас недоступно");return;
                 }
-                resolveNativeAiCombat(option.combatAction);
+                resolveNativeAiCombat(action);
                 return;
             }
             StringBuilder combined=new StringBuilder();
@@ -1097,6 +1107,22 @@ public final class MainActivity extends Activity {
 
     /** Native combat is committed once before requesting prose; a failed model
      * request cannot reroll the attack or duplicate its rewards. */
+    // Exact aliases only: never infer an attack from negation or compound prose.
+    static String typedNativeCombatAction(String value){
+        if(value==null)return "";
+        String command=value.trim().toLowerCase(java.util.Locale.ROOT)
+            .replace('ё','е').replaceAll("\\s+"," ").replaceAll("[.!]+$","").trim();
+        switch(command){
+            case "удар":case "атаковать":case "атакую":case "обычная атака":return "ATTACK";
+            case "сильный удар":case "мощный удар":case "силовая атака":return "HEAVY";
+            case "магия":case "магическая атака":case "атакую магией":return "MAGIC";
+            case "защита":case "защищаюсь":case "блок":case "блокировать":return "DEFEND";
+            case "зелье":case "лечебное зелье":case "выпить лечебное зелье":return "POTION";
+            case "отступление":case "отступить":case "отступаю":case "бежать":return "FLEE";
+            default:return "";
+        }
+    }
+
     private boolean nativeAiCombatAvailable(String action){
         if(!"COMBAT".equals(game.mode)||game.enemyHp<=0)return false;
         switch(action){
