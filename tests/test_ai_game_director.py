@@ -162,6 +162,13 @@ class AiGameDirectorContracts(unittest.TestCase):
         self.assertLess(bridge.index('Нельзя покинуть локацию во время боя'),
                         bridge.index('// Commit only after all model-controlled fields'))
 
+    def test_active_combat_rejects_generic_effects_before_any_mutation(self):
+        bridge=code("AiGameTurn.java")
+        guard=bridge.index('if(g.enemyHp>0)throw new JSONException')
+        self.assertLess(bridge.index('if(!acted||effects==null)return;'),guard)
+        self.assertLess(guard,bridge.index('int maxHp=cap'))
+        self.assertLess(guard,bridge.index('// Commit only after all model-controlled fields'))
+
     def test_native_combat_is_committed_before_ai_narration(self):
         ui=code("MainActivity.java")
         start=ui.index("private void resolveNativeAiCombat(String action)")
