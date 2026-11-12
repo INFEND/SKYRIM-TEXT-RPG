@@ -9,9 +9,9 @@ import java.util.HashSet;
 /** AI-controlled turn; validate every patch before committing a cloned GameEngine. */
 public final class AiGameTurn {
     public static final class Option {
-        public final String title,detail,skill;
+        public final String title,detail,skill,combatAction;
         public final int chance;
-        Option(String t,String d,String s,int c){title=t;detail=d;skill=s;chance=c;}
+        Option(String t,String d,String s,int c,String a){title=t;detail=d;skill=s;chance=c;combatAction=a;}
     }
     private static final SecureRandom DICE=new SecureRandom();
     public final String scene,journal;
@@ -78,9 +78,12 @@ public final class AiGameTurn {
             if(title.length()<4||detail.length()<8||!unique.add(title.toLowerCase(java.util.Locale.ROOT)))
                 throw new JSONException("Действия пусты либо повторяются");
             turn.choices.add(new Option(title,detail,limited(c.optString("skill",""),65),
-                    probability(c,"chance")));
+                    probability(c,"chance"),combatAction(c.optString("combatAction",""))));
         }
         return turn;
+    }
+    private static String combatAction(String action){
+        switch(action){case "ATTACK":case "HEAVY":case "MAGIC":case "DEFEND":case "POTION":case "FLEE":return action;default:return "";}
     }
     /** Short, isolated AI request. The returned chance is locked before a roll. */
     public static int parseChance(String response)throws JSONException{
@@ -99,7 +102,9 @@ public final class AiGameTurn {
         JSONArray array=new JSONArray();
         for(Option o:choices){
             JSONObject c=new JSONObject().put("title",o.title).put("detail",o.detail).put("skill",o.skill);
-            c.put("chance",o.chance<0?JSONObject.NULL:o.chance);array.put(c);
+            c.put("chance",o.chance<0?JSONObject.NULL:o.chance);
+            if(!o.combatAction.isEmpty())c.put("combatAction",o.combatAction);
+            array.put(c);
         }
         return out.put("choices",array);
     }
