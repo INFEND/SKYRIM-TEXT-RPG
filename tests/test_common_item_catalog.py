@@ -4,9 +4,9 @@ class CommonCatalogTest(unittest.TestCase):
     def test_new_records(self):
         src=(ROOT/"CommonItemCatalog.java").read_text()
         rows=re.findall(r'add\("([^"]+)","([^"]+)",',src)
-        self.assertEqual(len(rows),378)
+        self.assertEqual(len(rows),456)
         self.assertEqual(len({n for n,c in rows}),len(rows))
-        for category,count in {"Ключи":223,"Книги":67,"Разное":51,"Квестовые предметы":24,"Одежда":10,"Инструменты":1,"Артефакты":2}.items():
+        for category,count in {"Ключи":223,"Книги":133,"Разное":51,"Квестовые предметы":24,"Одежда":10,"Инструменты":1,"Артефакты":2,"Оружие":12}.items():
             self.assertEqual(sum(c==category for n,c in rows),count)
         self.assertIn('CommonItemCatalog.register()',(ROOT/"ItemCatalog.java").read_text())
         self.assertIn('if(!items.containsKey(name))put',(ROOT/"ItemCatalog.java").read_text())

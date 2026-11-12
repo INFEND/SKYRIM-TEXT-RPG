@@ -9,15 +9,16 @@ AI=(BASE/"AiStoryClient.java").read_text(encoding="utf-8")
 
 
 class PlayerScreens134(unittest.TestCase):
-    def test_sticky_header_scrolls_out_without_overlapping_story(self):
+    def test_header_scrolls_as_first_child_without_overlay(self):
         main=UI.split("private void render(){",1)[1].split("private void renderHeader(){",1)[0]
-        self.assertIn("scrollStage.addView(topChrome,new FrameLayout.LayoutParams(-1,-2,Gravity.TOP))",main)
-        self.assertIn("chromeScrollTravel+delta",main)
-        self.assertIn("topChrome.setTranslationY(-hidden)",main)
-        self.assertIn("int visibleHeader=Math.max(0,headerHeight-hidden)",main)
-        self.assertIn("scroll.setClipBounds(new android.graphics.Rect(",main)
-        self.assertNotIn("topChrome.setVisibility(View.GONE)",main)
-        self.assertIn("chromeForRender.getMeasuredHeight()",main)
+        self.assertIn("scroll.addView(page,new ScrollView.LayoutParams(-1,-2))",main)
+        self.assertIn("page.addView(topChrome,lp(-1,-2))",main)
+        self.assertIn("page.addView(content,lp(-1,-2))",main)
+        self.assertLess(main.index("page.addView(topChrome"),main.index("page.addView(content"))
+        self.assertNotIn("topChrome.setTranslationY",UI)
+        self.assertNotIn("scroll.setClipBounds",UI)
+        self.assertNotIn("handleVerticalScroll",UI)
+        self.assertIn("resumeViewport(oldScroll,scroll,thisPage)",main)
 
     def test_player_speaker_is_named_and_customizable_gold_default(self):
         self.assertIn('heroSpeaker=speaker&&plain.matches("(?iu)ты',TYPO)

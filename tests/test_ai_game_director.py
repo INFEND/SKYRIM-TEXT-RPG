@@ -15,7 +15,8 @@ class AiGameDirectorContracts(unittest.TestCase):
         self.assertLess(body.index("renderAiGame();return;"),body.index("GameEngine.Scene s=game.scene()"))
         # AI storyteller replaces offline prose, but must preserve live RPG stats.
         self.assertIn("if(game.started)renderBars();",ui)
-        self.assertIn("handleVerticalScroll(y,oldY)",ui)
+        self.assertIn("page.addView(topChrome,lp(-1,-2))",ui)
+        self.assertNotIn("handleVerticalScroll",ui)
 
     def test_exactly_ten_ai_options_and_user_input_below(self):
         bridge=code("AiGameTurn.java")
