@@ -407,6 +407,23 @@ public final class UpdateManager {
             PackageInfo archive=pm.getPackageArchiveInfo(apk.getAbsolutePath(),0);
             if(archive==null)throw new IOException("Не удалось открыть APK");
             verifyApk(a,apk,archive.getLongVersionCode());
+            OtaProgressDialog migration=new OtaProgressDialog(a);migration.show();
+            migration.stage("Сохранение ресурсов","Подготовка локальных файлов перед обновлением…");
+            ResourceStore.IO.execute(()->{
+                try{
+                    ResourceStore.migrate(a,(label,done,total)->a.runOnUiThread(()->{
+                        if(!a.isFinishing()&&!a.isDestroyed())migration.stage("Сохранение ресурсов",done+" / "+total+" | "+label);
+                    }));
+                    a.runOnUiThread(()->{if(a.isFinishing()||a.isDestroyed())return;migration.dismiss();launchVerifiedInstaller(a);});
+                }catch(Exception e){a.runOnUiThread(()->{if(!a.isFinishing()&&!a.isDestroyed())migration.fail("Не удалось сохранить ресурсы: "+friendly(e),()->install(a));});}
+            });
+        }catch(Exception e){
+            OtaProgressDialog screen=new OtaProgressDialog(a);
+            screen.show();screen.fail(friendly(e),null);
+        }
+    }
+    private static void launchVerifiedInstaller(Activity a){
+        try{
             Uri content=Uri.parse("content://"+a.getPackageName()+".updates/apk");
             // A self-update kills the old SKYRIM TEXT RPG process. Launching the
             // system installer as a child of our Activity can leave its

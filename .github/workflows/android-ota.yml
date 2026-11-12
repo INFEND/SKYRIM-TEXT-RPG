@@ -36,6 +36,15 @@ jobs:
           "${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager" --install 'platforms;android-35' 'platforms;android-36' 'build-tools;35.0.0'
       - name: Gate signed releases on all Python regression checks
         run: python3 -m unittest discover -s tests -p 'test_*.py' -v
+      - name: Generate signed optional-resource catalog (bridge or thin build)
+        env:
+          THIN: ${{ vars.SKYRIM_THIN_RESOURCES }}
+        run: |
+          if [[ "$THIN" == "true" ]]; then
+            python3 scripts/build_resource_catalog.py --commit "$GITHUB_SHA" --thin
+          else
+            python3 scripts/build_resource_catalog.py --commit "$GITHUB_SHA"
+          fi
       - name: Bundle exact user-supplied Sovngarde fonts
         shell: bash
         run: |

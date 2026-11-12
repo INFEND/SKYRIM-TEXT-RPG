@@ -134,7 +134,7 @@ public final class LocationGalleryView extends LinearLayout {
         return PHOTO_LABELS[city][Math.max(0,Math.min(index,PHOTO_LABELS[city].length-1))];
     }
     private static String cacheKey(String slug,int number,boolean full){
-        return slug+"/"+number+"/"+(full?"full":"small");
+        return ResourceStore.generation()+"/"+slug+"/"+number+"/"+(full?"full":"small");
     }
     /** Decode the city's compact previews once, ahead of swipes. No loading overlay. */
     private void prefetch(){
@@ -221,7 +221,14 @@ public final class LocationGalleryView extends LinearLayout {
                 return true;
             }
         });
-        photo.setOnClickListener(v->{if(!fullscreen)openFullscreen();});
+        photo.setOnClickListener(v->{
+            if(!ResourceStore.has(getContext(),"gallery/"+archive(slug,current+1))){
+                if(getContext() instanceof android.app.Activity){
+                    android.app.Activity a=(android.app.Activity)getContext();
+                    new ResourceManagerDialog(a,accent,()->{show(current);prefetch();}).show();
+                }
+            }else if(!fullscreen)openFullscreen();
+        });
 
         // No redundant instructions, page counter or arrow overlays.
         show(0);
@@ -235,6 +242,12 @@ public final class LocationGalleryView extends LinearLayout {
         current=index;
         final int target=++requested;
         page.setText(captionFor(location,index));
+        if(!ResourceStore.has(getContext(),"gallery/"+archive(slug,index+1))){
+            photo.setImageDrawable(null);page.setText("Загрузить изображения");
+            photo.setContentDescription("Изображения отсутствуют. Нажми для загрузки.");
+            return;
+        }
+        photo.setContentDescription("Изображение локации "+location);
         photo.animate().cancel();
         // Keep the previous picture visible while the next cached preview resolves.
         // Never show a "loading" banner during manual swiping.
@@ -265,7 +278,7 @@ public final class LocationGalleryView extends LinearLayout {
     }
     private static Bitmap decode(Context context,String slug,int index,boolean full){
         String file=String.format(Locale.ROOT,"%02d.webp",index);
-        try(InputStream raw=context.getAssets().open("gallery/"+archive(slug,index));
+        try(InputStream raw=ResourceStore.open(context,"gallery/"+archive(slug,index));
             ZipInputStream zip=new ZipInputStream(new BufferedInputStream(raw,65536))){
             ZipEntry entry;byte[] buf=new byte[32768];
             while((entry=zip.getNextEntry())!=null){
@@ -302,6 +315,7 @@ public final class LocationGalleryView extends LinearLayout {
         render[0]=()->{
             int number=selected[0]+1;
             int ticket=++generation[0];
+            if(!ResourceStore.has(context,"gallery/"+archive(slug,number))){image.setImageDrawable(null);return;}
             String fullKey=cacheKey(slug,number,true);
             Bitmap full=CACHE.get(fullKey);
             if(full!=null&&!full.isRecycled()){

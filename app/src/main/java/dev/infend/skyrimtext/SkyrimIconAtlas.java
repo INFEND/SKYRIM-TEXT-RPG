@@ -32,6 +32,7 @@ public final class SkyrimIconAtlas {
     private static final Map<String,String> aliases=new HashMap<>();
     private static Bitmap atlas;
     private static boolean attempted;
+    private static int resourceGeneration=-1;
 
     static {
         aliases.put("story","История");
@@ -102,10 +103,12 @@ public final class SkyrimIconAtlas {
         return key==null?"":key.toLowerCase(Locale.ROOT).replace('ё','е').trim();
     }
     private static synchronized void ensure(Context context){
+        int now=ResourceStore.generation();
+        if(resourceGeneration!=now){resourceGeneration=now;attempted=false;atlas=null;glyphs.clear();}
         if(attempted)return;
         attempted=true;
-        try(InputStream image=context.getAssets().open(IMAGE);
-            InputStream data=context.getAssets().open(INDEX)) {
+        try(InputStream image=ResourceStore.open(context,IMAGE);
+            InputStream data=ResourceStore.open(context,INDEX)) {
             BitmapFactory.Options config=new BitmapFactory.Options();
             config.inScaled=false;
             Bitmap loaded=BitmapFactory.decodeStream(image,null,config);

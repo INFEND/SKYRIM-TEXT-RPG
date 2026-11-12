@@ -110,6 +110,7 @@ public final class MainActivity extends Activity {
         aiClient=new AiStoryClient();
         localAiClient=new LocalAiClient(this);
         chatGptOAuth=new ChatGptOAuth(this);
+        ResourceStore.start(this);
         ItemCatalog.initialize(this);
         SovngardeTypeface.preload(this);
         game=GameEngine.fromJson(prefs.getString("save",null));
@@ -2708,6 +2709,7 @@ public final class MainActivity extends Activity {
         int updatesStart=content.getChildCount();
         space(content,6);addText(content,"ОБНОВЛЕНИЯ",11,accent(),true,11);
         actionButton("Проверить обновления","Проверка подписи, история изменений и установка внутри приложения",true,()->updater.check(true));
+        actionButton("Управление ресурсами","Проверка, докачка, восстановление и выборочное удаление",false,()->new ResourceManagerDialog(this,accent(),this::render).show());
         LinearLayout otaOptions=card();addText(otaOptions,"АВТОМАТИЧЕСКИЕ ПРОВЕРКИ",11,accent(),true,10);
         Switch onLaunch=new Switch(this);onLaunch.setText("Проверять при запуске");onLaunch.setTextSize(sp(14));
         onLaunch.setTextColor(TEXT);onLaunch.setChecked(prefs.getBoolean(OtaUpdateSchedule.PREF_ON_LAUNCH,true));

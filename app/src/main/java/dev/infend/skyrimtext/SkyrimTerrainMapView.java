@@ -27,6 +27,7 @@ public final class SkyrimTerrainMapView extends View {
     private static final String[] TEXTURES={TERRAIN,"maps/solstheim_terrain.webp"};
     private static final int[] WIDTH={MAP_W,2048},HEIGHT={MAP_H,2048};
     private static final Bitmap[] IMAGES=new Bitmap[2];
+    private static int resourceGeneration=-1;
     private static final java.util.concurrent.ExecutorService LOADER=Executors.newSingleThreadExecutor();
 
     private final GameEngine game;
@@ -98,21 +99,25 @@ public final class SkyrimTerrainMapView extends View {
     }
     private void loadTerrain(){
         final int requested=sheet;
-        synchronized(IMAGES){if(IMAGES[requested]!=null){loading=false;failed=false;return;}}
+        final int generation=ResourceStore.generation();
+        synchronized(IMAGES){
+            if(resourceGeneration!=generation){java.util.Arrays.fill(IMAGES,null);resourceGeneration=generation;}
+            if(IMAGES[requested]!=null){loading=false;failed=false;return;}
+        }
         loading=true;failed=false;
         final Context app=getContext().getApplicationContext();
         LOADER.execute(()->{
             Bitmap decoded=null;
             synchronized(IMAGES){decoded=IMAGES[requested];}
             if(decoded==null){
-                try(java.io.InputStream in=app.getAssets().open(TEXTURES[requested])){
+                try(java.io.InputStream in=ResourceStore.open(app,TEXTURES[requested])){
                     BitmapFactory.Options options=new BitmapFactory.Options();
                     options.inPreferredConfig=Bitmap.Config.RGB_565;options.inScaled=false;
                     decoded=BitmapFactory.decodeStream(in,null,options);
                     if(decoded!=null&&(decoded.getWidth()!=WIDTH[requested]||decoded.getHeight()!=HEIGHT[requested])){
                         decoded.recycle();decoded=null;
                     }
-                    synchronized(IMAGES){if(decoded!=null)IMAGES[requested]=decoded;}
+                    synchronized(IMAGES){if(decoded!=null&&resourceGeneration==generation)IMAGES[requested]=decoded;}
                 }catch(Exception ignored){}
             }
             final boolean success=decoded!=null;

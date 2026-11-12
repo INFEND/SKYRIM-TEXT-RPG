@@ -48,7 +48,7 @@ class LocationGalleryContracts(unittest.TestCase):
         self.assertIn("GestureDetector",viewer)
         self.assertIn("onFling",viewer)
         self.assertIn('return number<=3?"riften.zip":"riften_extra.zip"',viewer)
-        self.assertIn('getAssets().open("gallery/"+archive(slug,index))',viewer)
+        self.assertIn('ResourceStore.open(context,"gallery/"+archive(slug,index))',viewer)
         self.assertIn("BitmapFactory.decodeByteArray",viewer)
         self.assertIn("getApplicationContext()",viewer)
         self.assertIn("openFullscreen()",viewer)
