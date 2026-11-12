@@ -1043,7 +1043,7 @@ public final class MainActivity extends Activity {
                     toast("В бою выбери одно боевое действие без дополнительного текста");return;
                 }
                 AiGameTurn.Option option=game.aiTurn.choices.get(indexes.get(0)-1);
-                if(option.combatAction.isEmpty()){
+                if(!nativeAiCombatAvailable(option.combatAction)){
                     toast("Выбери доступную боевую команду над сценой");return;
                 }
                 resolveNativeAiCombat(option.combatAction);
@@ -1097,12 +1097,25 @@ public final class MainActivity extends Activity {
 
     /** Native combat is committed once before requesting prose; a failed model
      * request cannot reroll the attack or duplicate its rewards. */
+    private boolean nativeAiCombatAvailable(String action){
+        if(!"COMBAT".equals(game.mode)||game.enemyHp<=0)return false;
+        switch(action){
+            case "ATTACK":case "DEFEND":return true;
+            case "HEAVY":return game.stamina>=10;
+            case "MAGIC":return game.magicka>=12;
+            case "POTION":return game.potions>0;
+            case "FLEE":return "WILD".equals(game.battleKind);
+            default:return false;
+        }
+    }
+
     private void resolveNativeAiCombat(String action){
         if(aiTurnBusy||!"COMBAT".equals(game.mode)||game.enemyHp<=0)return;
         if("HEAVY".equals(action)&&game.stamina<10)return;
         if("MAGIC".equals(action)&&game.magicka<12)return;
         if("POTION".equals(action)&&game.potions<=0)return;
         if("FLEE".equals(action)&&!"WILD".equals(game.battleKind))return;
+        if(!nativeAiCombatAvailable(action))return;
         game.choose(action);
         String outcome="COMBAT".equals(game.mode)?game.battleLog:game.message;
         // Native retreat and defeat leave the old enemy HP in the engine.
@@ -1150,9 +1163,21 @@ public final class MainActivity extends Activity {
             addChoiceStat(detail,"ШАНС УСПЕХА",displayedChance+"%",
                 SceneChoiceMeta.chanceColor(displayedChance),0);
         }else addText(detail,"БЕЗ ПРОВЕРКИ",12,MUTED,false,0);
-        row.setClickable(true);row.setFocusable(true);
+        boolean available=!combat||nativeAiCombatAvailable(option.combatAction);
+        if(!available){
+            addText(detail,"ДЕЙСТВИЕ НЕДОСТУПНО",12,MUTED,true,0);
+            row.setAlpha(0.55f);
+        }
+        row.setClickable(available);row.setFocusable(available);
         row.setContentDescription("Вариант "+number+". "+option.title+". "+(selected?"Выбран":"Не выбран"));
         row.setOnClickListener(v->{
+            if(!available)return;
+            if(combat){
+                boolean wasSelected=selectedAiChoices.contains(number);
+                selectedAiChoices.clear();
+                if(!wasSelected)selectedAiChoices.add(number);
+                persistAiDraft();render();return;
+            }
             if(!selectedAiChoices.add(number))selectedAiChoices.remove(number);
             persistAiDraft();
             boolean active=selectedAiChoices.contains(number);
