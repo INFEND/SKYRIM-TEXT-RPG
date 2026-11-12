@@ -2008,8 +2008,10 @@ public final class MainActivity extends Activity {
             top.addView(details,new LinearLayout.LayoutParams(0,-2,1));
             addText(details,focused.name.toUpperCase(java.util.Locale.ROOT),18,TEXT,true,7);
             addText(details,focused.effect,12,MUTED,false,8);
-            addText(details,"ВЕС "+String.format(java.util.Locale.forLanguageTag("ru"),"%.2f",focused.weight)
-                    +"     СТОИМОСТЬ "+focused.value,12,accent(),true,0);
+            String stat=focused.statLabel(game.progress);
+            if(!stat.isEmpty())addText(details,stat,12,accent(),true,5);
+            addText(details,"СТОИМОСТЬ "+focused.value+"     ВЕС "+
+                    String.format(java.util.Locale.forLanguageTag("ru"),"%.2f",focused.weight),12,accent(),true,0);
             selected.addView(new SkyrimRuleView(this,accent()),lp(-1,17));
             addText(selected,focused.description,14,TEXT,false,9);
             TextView detail=text("◇  ПОДРОБНЕЕ / ИСПОЛЬЗОВАТЬ",12,accent(),true);
@@ -2077,8 +2079,10 @@ public final class MainActivity extends Activity {
         addText(words,item.name,17,TEXT,true,4);
         addText(words,item.category,12,MUTED,false,0);
         view.addView(new SkyrimRuleView(this,accent()),lp(-1,22));
+        String stat=item.statLabel(game.progress);
+        if(!stat.isEmpty())addText(view,stat,14,accent(),true,6);
         addText(view,String.format(java.util.Locale.forLanguageTag("ru"),
-            "Вес: %.2f кг     Стоимость: %d септимов",item.weight,item.value),
+            "Стоимость: %d септимов     Вес: %.2f кг",item.value,item.weight),
             13,accent(),false,12);
         addText(view,item.description,14,TEXT,false,12);
         addText(view,"ЭФФЕКТ",11,accent(),true,5);

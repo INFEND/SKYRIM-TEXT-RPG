@@ -124,14 +124,14 @@ public final class SkyrimIconView extends View {
     public static String iconForLabel(String label){
         if(label==null||label.trim().isEmpty())return "favorites";
         String t=label.toLowerCase(Locale.ROOT).replace('ё','е');
-        if(has(t,"пользовательск")&&has(t,"оруж","клин","меч"))return "customweapon";
-        if(has(t,"пользовательск")&&has(t,"предмет","вещ"))return "customitems";
         if(has(t,"драконь","драконов")&&has(t,"кост"))return "dragonbones";
         if(has(t,"драконь","драконов")&&has(t,"чешу"))return "dragonscales";
         if(has(t,"драгоценн")&&has(t,"камн"))return "gems";
         if(has(t,"боев","военн")&&has(t,"молот"))return "warhammers";
         if(has(t,"двуруч")&&has(t,"молот"))return "warhammers";
         if(has(t,"арбалет"))return "crossbows";
+        if(has(t,"стрела","болт"))return "bows";
+        if(has(t,"булава"))return "weapon";
         if(has(t,"кинжал","бритва"))return "daggers";
         if(has(t,"топор","секир"))return "axes";
         if(has(t,"меч","клинок","сабл"))return "swords";
@@ -185,7 +185,7 @@ public final class SkyrimIconView extends View {
         String key=category.trim().toLowerCase(Locale.ROOT).replace('ё','е');
         switch(key){
             case "все":return "bag";
-            case "валюта":case "деньги":case "септимы":return "septims";
+            case "деньги":case "септимы":return "septims";
             case "еда":case "пища":return "food";
             case "напитки":return "drinks";
             case "зелья":return "potion";
@@ -198,8 +198,7 @@ public final class SkyrimIconView extends View {
             case "ингредиенты":return "ingredients";
             case "драгоценности":return "valuables";
             case "артефакты":return "artifacts";
-            case "пользовательское оружие":return "customweapon";
-            case "пользовательские предметы":return "customitems";
+            case "боеприпасы":return "bows";
             case "книги":return "book";
             case "свитки":return "scrolls";
             default:return iconForLabel(category);

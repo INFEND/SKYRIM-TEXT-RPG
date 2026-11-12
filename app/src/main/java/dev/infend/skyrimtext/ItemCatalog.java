@@ -15,18 +15,49 @@ public final class ItemCatalog {
         public final String id, name, category, icon, description, effect;
         public final double weight;
         public final int value;
-        Item(String n,String cat,String ic,double kg,int septims,String desc,String eff){
+        // -1 means not verified / not applicable, not a fabricated zero.
+        public final double baseStat;
+        public final int statSkill;
+        Item(String n,String cat,String ic,double kg,int septims,String desc,String eff,double stat,int skill){
             id=n;name=n;category=cat;icon=ic;weight=kg;value=septims;description=desc;effect=eff;
+            baseStat=stat;statSkill=skill;
+        }
+        public boolean weapon(){return "Оружие".equals(category)||"Боеприпасы".equals(category)||statSkill>=0&&statSkill<=2;}
+        public boolean wearable(){return "Броня".equals(category)||"Одежда".equals(category)||"Украшения".equals(category)||statSkill>=4;}
+        public double currentStat(RpgProgress progress){
+            if(baseStat<0||statSkill<0||progress==null)return baseStat;
+            return baseStat*(1+progress.skillLevel(statSkill)*(weapon()?0.005:0.004));
+        }
+        public String statLabel(RpgProgress progress){
+            if(!weapon()&&!wearable())return "";
+            String label=weapon()?"УРОН":"БРОНЯ";
+            if(baseStat<0)return label+": не определён";
+            String base=formatStat(baseStat),current=formatStat(currentStat(progress));
+            return label+": "+current+(statSkill>=0?" | базовый: "+base:"");
+        }
+        private static String formatStat(double n){
+            return String.format(Locale.forLanguageTag("ru"),n==Math.rint(n)?"%.0f":"%.1f",n);
         }
     }
     private static final LinkedHashMap<String,Item> items=new LinkedHashMap<>();
     private static boolean loaded=false;
     private static void put(String name,String category,String icon,double weight,int cost,String desc,String effect){
-        items.put(name,new Item(name,category,icon,weight,cost,desc,effect));
+        double stat=("Одежда".equals(category)||"Украшения".equals(category))?0:-1;
+        put(name,category,icon,weight,cost,desc,effect,stat,-1);
+    }
+    private static void put(String name,String category,String icon,double weight,int cost,String desc,String effect,double stat,int skill){
+        items.put(name,new Item(name,category,icon,weight,cost,desc,effect,stat,skill));
+    }
+    private static void weapon(String name,double[] row,int skill){
+        put(name,"Оружие","⚔",row[1],(int)row[2],"Оружие Скайрима.",
+            skill==0?"Одноручное оружие.":skill==1?"Двуручное оружие.":"Стрельба.",row[0],skill);
+    }
+    private static void armor(String name,double[] row,int skill,String effect){
+        put(name,"Броня","⬟",row[1],(int)row[2],"Снаряжение Скайрима.",effect,row[0],skill);
     }
     static {
-        put("Септимы","Валюта","◈",0,1,"Монеты имперской чеканки. Не занимают переносимый вес.","Расчётная валюта.");
-        put("Походный клинок","Оружие","⚔",8,25,"Простое дорожное оружие с потемневшей гардой.","Ближний бой.");
+        put("Септимы","","◈",0,1,"Монеты имперской чеканки. Не занимают переносимый вес.","Средство расчёта.");
+        put("Походный клинок","Оружие","⚔",8,25,"Простое дорожное оружие с потемневшей гардой.","Ближний бой.",7,0);
         put("Дорожная одежда","Одежда","♟",1.5,10,"Обычная одежда странника. Защищает от пыли, но не от стали.","Базовое снаряжение.");
         put("Лечебное зелье","Зелья","◉",0.5,35,"Красноватая жидкость из алхимической лавки.","Восстанавливает здоровье.");
         put("Зелье магии","Зелья","◉",0.5,30,"Тягучий синий состав для мага.","Восстанавливает магию.");
@@ -45,35 +76,84 @@ public final class ItemCatalog {
         put("Драконья кость","Материалы","⬟",15,500,"Останки древнего крылатого существа.","Кузнечное дело.");
         put("Драконья чешуя","Материалы","⬟",10,250,"Твёрдая защитная пластина.","Кузнечное дело.");
         put("Кожаные полоски","Материалы","▤",0.1,3,"Узкие кожаные ленты.","Ремонт и изготовление вещей.");
-        String[] metals={"Железный","Стальной","Орочий","Двемерский","Эльфийский","Стеклянный","Эбонитовый","Даэдрический","Драконий"};
-        String[] feminine={"Железная","Стальная","Орочья","Двемерская","Эльфийская","Стеклянная","Эбонитовая","Даэдрическая","Драконья"};
-        String[] plural={"Железные","Стальные","Орочьи","Двемерские","Эльфийские","Стеклянные","Эбонитовые","Даэдрические","Драконьи"};
-        int[] prices={25,45,95,135,185,280,410,800,1000};
-        for(int i=0;i<metals.length;i++){
-            String metal=metals[i];int value=prices[i];
-            put(metal+" меч","Оружие","⚔",8+i*1.1,value,
-                "Одноручный меч, выкованный из материала «"+metal.toLowerCase(Locale.ROOT)+"».","Одноручное оружие.");
-            put(metal+" боевой топор","Оружие","⚒",10+i*1.3,value+15,
-                "Тяжёлое рубящее оружие для ближнего боя.","Одноручное оружие.");
-            put(metal+" кинжал","Оружие","⚔",2.5+i*.45,value/2,
-                "Короткий клинок для скрытного и быстрого удара.","Одноручное оружие.");
-            put(metal+" двуручный меч","Оружие","⚔",16+i*1.7,value*2,
-                "Большой клинок с тяжёлой рукоятью.","Двуручное оружие.");
-            put(metal+" боевой молот","Оружие","⚒",18+i*1.8,value*2,
-                "Оружие, способное пробить крепкую броню.","Двуручное оружие.");
-            put(metal+" лук","Оружие","➶",7+i*.5,value,
-                "Дальний бой и прицельная стрельба.","Стрельба.");
-            put(metal+" шлем","Броня","◭",3+i*.8,value,
-                "Защита головы; ковка материала "+metal.toLowerCase(Locale.ROOT)+".","Элемент доспеха.");
-            put(feminine[i]+" кираса","Броня","⬟",17+i*2,value*3,
-                "Нагрудная часть защитного комплекта.","Защита туловища.");
-            put(plural[i]+" перчатки","Броня","✥",3+i*.5,value,
-                "Защитные перчатки для боя.","Защита рук.");
-            put(plural[i]+" сапоги","Броня","♟",4+i*.6,value,
-                "Кованая обувь для сложных переходов.","Защита ног.");
-            put(metal+" щит","Броня","⬡",10+i,value*2,
-                "Круглый защитный щит для блокирования.","Блокирование.");
+        // Base-game/Dawnguard/Dragonborn data: damage or armor, weight, value.
+        // Keep existing Russian IDs for save compatibility.
+        String[] metals={"Железный","Стальной","Орочий","Двемерский","Эльфийский","Стеклянный","Эбонитовый","Даэдрический","Драконий","Нордский","Сталгримовый"};
+        String[] feminine={"Железная","Стальная","Орочья","Двемерская","Эльфийская","Стеклянная","Эбонитовая","Даэдрическая","Драконья","Нордская резная","Сталгримовая"};
+        String[] plural={"Железные","Стальные","Орочьи","Двемерские","Эльфийские","Стеклянные","Эбонитовые","Даэдрические","Драконьи","Нордские резные","Сталгримовые"};
+        // sword, war axe, dagger, mace, greatsword, battleaxe, warhammer, bow.
+        double[][][] weapons={
+            {{7,9,25},{8,11,30},{4,2,10},{9,13,35},{15,16,50},{16,20,55},{18,24,60},{6,5,30}},
+            {{8,10,45},{9,12,55},{5,2.5,18},{10,14,65},{17,17,90},{18,21,100},{20,25,110},{7,7,50}},
+            {{9,11,75},{10,13,90},{6,3,30},{11,15,105},{18,18,75},{19,25,165},{21,26,180},{10,9,150}},
+            {{10,12,135},{11,14,165},{7,3.5,55},{12,16,190},{19,19,270},{20,23,300},{22,27,325},{12,10,270}},
+            {{11,13,235},{12,15,280},{8,4,95},{13,17,330},{20,20,470},{21,24,520},{23,28,565},{13,12,470}},
+            {{12,14,410},{13,16,490},{9,4.5,165},{14,18,575},{21,22,820},{22,25,900},{24,29,985},{15,14,820}},
+            {{13,15,720},{15,17,865},{10,5,290},{16,19,1000},{22,22,1440},{23,26,1585},{25,30,1725},{17,16,1440}},
+            {{14,16,1250},{15,18,1500},{11,6,500},{16,20,1750},{24,23,2500},{25,27,2750},{27,31,4000},{19,18,2500}},
+            {{15,19,1500},{16,21,1700},{12,6.5,600},{17,22,2000},{25,27,2725},{26,30,3000},{28,33,4275},{20,20,2725}},
+            {{11,12,290},{12,14,350},{8,3.5,115},{13,16,410},{20,19,585},{21,23,650},{23,27,700},{13,11,580}},
+            {{13,14,985},{15,16,1180},{10,4.5,395},{16,18,1375},{23,21,1970},{24,25,2150},{26,29,2850},{17,15,1800}}
+        };
+        String[] kinds={"меч","боевой топор","кинжал","булава","двуручный меч","секира","боевой молот","лук"};
+        for(int i=0;i<metals.length;i++)for(int k=0;k<kinds.length;k++){
+            if(k==7&&i<2)continue;
+            String name=metals[i]+" "+kinds[k];
+            // Russian feminine inflection for newly introduced maces and battleaxes.
+            if(k==3||k==5)name=feminine[i].replace(" резная","")+" "+kinds[k];
+            weapon(name,weapons[i][k],k<4?0:k<7?1:2);
         }
+        weapon("Длинный лук",weapons[0][7],2);
+        weapon("Охотничий лук",weapons[1][7],2);
+        // Legacy IDs retained for saved games, not additional vanilla bow forms.
+        weapon("Железный лук",weapons[0][7],2);weapon("Стальной лук",weapons[1][7],2);
+        weapon("Арбалет",new double[]{19,14,120},2);
+        weapon("Улучшенный арбалет",new double[]{19,15,200},2);
+        weapon("Двемерский арбалет",new double[]{22,20,350},2);
+        weapon("Улучшенный двемерский арбалет",new double[]{22,21,550},2);
+        // helmet, cuirass, gauntlets, boots, shield
+        double[][][] armors={
+            {{15,5,60},{25,30,125},{10,5,25},{10,6,25},{20,12,60}},
+            {{17,5,125},{31,35,275},{12,4,55},{12,8,55},{24,12,150}},
+            {{20,8,500},{40,35,1000},{15,7,200},{15,7,200},{30,14,500}},
+            {{18,12,200},{34,45,400},{13,8,85},{13,10,85},{26,12,225}},
+            {{13,1,110},{29,4,225},{8,1,45},{8,1,45},{21,4,115}},
+            {{16,2,450},{38,7,900},{11,2,190},{11,2,190},{27,6,450}},
+            {{21,10,750},{43,38,1500},{16,7,275},{16,7,275},{32,14,750}},
+            {{23,15,1600},{49,50,3200},{18,6,625},{18,10,625},{36,15,1600}},
+            {{22,8,1050},{46,40,2125},{17,8,425},{17,8,425},{34,15,1050}},
+            {{20,7,550},{43,37,1600},{15,6,220},{15,6,220},{26.5,10,335}},
+            {{22,7,1135},{46,38,2200},{17,7,450},{17,7,450}}
+        };
+        for(int i=0;i<armors.length;i++){
+            int skill=i==4||i==5?5:4;double[][] a=armors[i];
+            String prefix=i==9?"Нордский резной":metals[i];
+            armor(prefix+" шлем",a[0],skill,"Защита головы.");
+            // Existing save IDs kept exactly, including Стальная кираса.
+            put(feminine[i]+" кираса","Броня","⬟",a[1][1],(int)a[1][2],"Нагрудная часть защитного комплекта.","Защита туловища.",a[1][0],skill);
+            put(plural[i]+" перчатки","Броня","✥",a[2][1],(int)a[2][2],"Защитные перчатки.","Защита рук.",a[2][0],skill);
+            armor(plural[i]+" сапоги",a[3],skill,"Защита ног.");
+            if(a.length>4)armor(metals[i]+" щит",a[4],skill,"Блокирование.");
+        }
+        armor("Кожаная кираса",new double[]{26,6,125},5,"Защита туловища.");
+        armor("Кожаные сапоги",new double[]{7,2,25},5,"Защита ног.");
+        armor("Кожаные наручи",new double[]{7,2,25},5,"Защита рук.");
+        armor("Кожаный шлем",new double[]{12,2,60},5,"Защита головы.");
+        armor("Кираса из шкур",new double[]{20,5,50},5,"Защита туловища.");
+        armor("Сапоги из шкур",new double[]{5,1,10},5,"Защита ног.");
+        armor("Наручи из шкур",new double[]{5,1,10},5,"Защита рук.");
+        armor("Шлем из шкур",new double[]{10,2,25},5,"Защита головы.");
+        armor("Щит из шкур",new double[]{15,4,25},5,"Блокирование.");
+        armor("Драконья чешуйчатая кираса",new double[]{41,10,1500},5,"Защита туловища.");
+        armor("Драконьи чешуйчатые сапоги",new double[]{12,3,300},5,"Защита ног.");
+        armor("Драконьи чешуйчатые перчатки",new double[]{12,3,300},5,"Защита рук.");
+        armor("Драконий чешуйчатый шлем",new double[]{17,4,750},5,"Защита головы.");
+        armor("Драконий чешуйчатый щит",new double[]{29,6,750},5,"Блокирование.");
+        String[] arrows={"Железная","Стальная","Орочья","Двемерская","Эльфийская","Стеклянная","Эбонитовая","Даэдрическая","Драконья","Нордская","Сталгримовая"};
+        int[][] ammo={{8,1},{10,2},{12,3},{14,4},{16,5},{18,6},{20,7},{24,8},{25,9},{12,3},{20,7}};
+        for(int i=0;i<arrows.length;i++)put(arrows[i]+" стрела","Боеприпасы","➶",0,ammo[i][1],"Стрела для лука.","Боеприпас.",ammo[i][0],-1);
+        put("Стальной болт","Боеприпасы","➶",0,1,"Болт для арбалета.","Боеприпас.",10,-1);
+        put("Двемерский болт","Боеприпасы","➶",0,3,"Болт для арбалета.","Боеприпас.",14,-1);
         String[][] attire={
             {"Капюшон мага","0.5","12"},{"Одеяние ученика","1","30"},{"Одеяние архимага","1","3265"},
             {"Шляпа путника","0.5","5"},{"Сапоги странника","1","8"},{"Кожаные перчатки","0.5","6"},
@@ -97,9 +177,9 @@ public final class ItemCatalog {
             "Щит Ауриэля","Лук Ауриэля","Кольцо Хирсина","Бритва Мерунеса"};
         for(String n:artifacts)put(n,"Артефакты","✦",n.contains("Молот")?25:n.contains("свиток")?1:8,
             1800,"Редкий артефакт, связанный с легендами и опасными историями северных земель.","Уникальный предмет.");
-        put("Клинок «Кай»","Пользовательское оружие","⚔",6.0,1000,"Редкий клинок из персонального архива приключений.","Уникальное снаряжение.");
-        put("Арбалет «Рик»","Пользовательское оружие","➶",8.0,1200,"Арбалет из пользовательской коллекции предметов.","Стрельба.");
-        put("Эликсир Жизни","Пользовательские предметы","✧",0.5,0,"Редкое средство из пользовательской библиотеки.","Мощное исцеление, подробности в Кодексе.");
+        put("Клинок «Кай»","Оружие","⚔",6.0,1000,"Редкий клинок из персонального архива приключений.","Одноручное оружие.");
+        put("Арбалет «Рик»","Оружие","➶",8.0,1200,"Редкий арбалет из персонального архива.","Стрельба.");
+        put("Эликсир Жизни","Зелья","✧",0.5,0,"Редкое средство из личной библиотеки.","Мощное исцеление, подробности в Кодексе.");
     }
     private ItemCatalog(){}
     public static synchronized void initialize(Context c){
@@ -119,12 +199,16 @@ public final class ItemCatalog {
             }
         }catch(Exception ignored){}
     }
-    public static ArrayList<Item> all(){return new ArrayList<>(items.values());}
+    public static ArrayList<Item> all(){
+        ArrayList<Item> list=new ArrayList<>();
+        for(Item item:items.values())if(!item.category.isEmpty())list.add(item);
+        return list;
+    }
     public static Item find(String id){return items.get(id);}
     public static int count(){return items.size();}
     public static ArrayList<Item> sorted(String category,String by){
         ArrayList<Item> list=new ArrayList<>();
-        for(Item x:items.values())if(category==null||"Все".equals(category)||x.category.equals(category))list.add(x);
+        for(Item x:all())if(category==null||"Все".equals(category)||x.category.equals(category))list.add(x);
         if("Вес".equals(by))list.sort((a,b)->Double.compare(a.weight,b.weight));
         else if("Цена".equals(by))list.sort((a,b)->Integer.compare(b.value,a.value));
         else list.sort((a,b)->a.name.compareToIgnoreCase(b.name));
@@ -132,7 +216,7 @@ public final class ItemCatalog {
     }
     public static ArrayList<String> groups(){
         LinkedHashSet<String> seen=new LinkedHashSet<>();seen.add("Все");
-        for(Item i:items.values())seen.add(i.category);
+        for(Item i:all())seen.add(i.category);
         return new ArrayList<>(seen);
     }
     public static byte[] asset(Context context,String requested){

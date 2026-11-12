@@ -30,9 +30,8 @@ class CatalogUiOverhaul(unittest.TestCase):
 
     def test_icon_mappings_use_real_item_glyphs(self):
         for name,glyph in (
-            ("валюта","septims"),("еда","food"),("напитки","drinks"),
-            ("зелья","potion"),("пользовательское оружие","customweapon"),
-            ("пользовательские предметы","customitems"),
+            ("септимы","septims"),("еда","food"),("напитки","drinks"),
+            ("зелья","potion"),("боеприпасы","bows"),
         ):
             self.assertIn('case "'+name+'":',ICONS)
             self.assertIn('return "'+glyph+'";',ICONS)
