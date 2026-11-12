@@ -353,7 +353,7 @@ public final class AiStoryClient {
                 .append("; магия: ").append(g.magicka).append('/').append(g.maxMagicka)
                 .append("; септимы: ").append(g.gold).append("; репутация: ").append(g.reputation)
                 .append("; масса поклажи: ").append(g.progress.carryWeight()).append("/50 кг.\n");
-        out.append("Боевые показатели: атака ").append(g.attack).append("; защита ").append(g.armor)
+        out.append("Боевые показатели: атака ").append(g.effectiveAttack()).append("; защита ").append(g.effectiveArmor())
                 .append("; лечебные зелья ").append(g.potions)
                 .append("; зелья магии ").append(g.manaPotions).append('\n');
         out.append("Основной квест: ").append(g.questStatus()).append(". ")
@@ -415,8 +415,8 @@ public final class AiStoryClient {
         out.append("Здоровье ").append(game.hp).append('/').append(game.maxHp)
                 .append(", выносливость ").append(game.stamina).append('/').append(game.maxStamina)
                 .append(", магия ").append(game.magicka).append('/').append(game.maxMagicka)
-                .append(", септимы ").append(game.gold).append(", атака ").append(game.attack)
-                .append(", защита ").append(game.armor).append(", репутация ").append(game.reputation)
+                .append(", септимы ").append(game.gold).append(", атака ").append(game.effectiveAttack())
+                .append(", защита ").append(game.effectiveArmor()).append(", репутация ").append(game.reputation)
                 .append(", вес ").append(game.progress.carryWeight()).append("/50 кг\n");
         out.append("Лечебные зелья ").append(game.potions).append(", зелья магии ").append(game.manaPotions).append('\n');
         out.append("Сюжет Пепельные печати: ").append(game.questStatus()).append(", ").append(game.questDetails()).append('\n');

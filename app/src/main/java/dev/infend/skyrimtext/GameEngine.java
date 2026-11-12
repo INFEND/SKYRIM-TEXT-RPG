@@ -186,8 +186,8 @@ public final class GameEngine {
         return new Scene("ТОРГОВЛЯ | " + REGIONS[region], "Северная лавка", "На прилавке лежат походные припасы и изделия кузнеца.\n\nТвой кошель: " + gold + " септимов.")
             .primary("BUY_HP","Лечебное зелье | 35", "Восстанавливает 45 здоровья")
             .add("BUY_MP","Зелье магии | 30", "Восстанавливает 35 магии")
-            .add("BUY_SWORD",swordUpgraded?"Клинок приобретён":"Закалённый клинок | 180", swordUpgraded?"Уже в инвентаре":"Постоянно +6 к атаке")
-            .add("BUY_ARMOR",armorUpgraded?"Доспех приобретён":"Стальной нагрудник | 160",armorUpgraded?"Уже в инвентаре":"Постоянно +4 к защите")
+            .add("BUY_SWORD",swordUpgraded?"Клинок приобретён":"Закалённый клинок | 180", swordUpgraded?"Уже в инвентаре":"Стальной меч | экипируется при покупке")
+            .add("BUY_ARMOR",armorUpgraded?"Доспех приобретён":"Стальной нагрудник | 160",armorUpgraded?"Уже в инвентаре":"Стальная кираса | экипируется при покупке")
             .add("GO_WORLD","Покинуть лавку","Вернуться на улицу");
     }
     private Scene eventScene() {
@@ -383,7 +383,9 @@ public final class GameEngine {
             case "SWORD":swordUpgraded=true;attack+=6;break;
             case "ARMOR":armorUpgraded=true;armor+=4;break;
         }
-        progress.sync(this);message=success;mode="RESULT";
+        progress.sync(this);
+        if(item.equals("SWORD")||item.equals("ARMOR"))progress.shopEquip(target);
+        message=success;mode="RESULT";
     }
     private void explore() {
         explored++;stamina=Math.max(0,stamina-5);
@@ -447,14 +449,23 @@ public final class GameEngine {
         enemyName=name;enemyHp=health;enemyMaxHp=health;enemyDamage=dmg;battleKind=kind;enemyIntro=intro;
         battleLog="В бою важна тактика. Следи за запасом сил и магии.";mode="COMBAT";
     }
+    // Retain class/quest/AI bonuses in old saves without counting the legacy
+    // shop's fixed equipment bonus twice. New gear uses the catalog statistic.
+    public int effectiveAttack(){
+        int intrinsic=Math.max(0,attack-(swordUpgraded?6:0)-7);
+        return Math.max(1,intrinsic+(int)Math.round(progress.equippedDamage()));
+    }
+    public int effectiveArmor(){
+        return Math.max(0,armor-(armorUpgraded?4:0))+(int)Math.round(progress.equippedArmor());
+    }
     private void combatTurn(String action) {
         if(!mode.equals("COMBAT"))return;
         int damage=0;boolean defending=false;String actionText="";
         switch(action){
-            case "ATTACK": damage=Math.max(1,attack+random.nextInt(9)-3);actionText="Ты наносишь удар: −"+damage+" здоровья врагу.";break;
+            case "ATTACK": damage=Math.max(1,effectiveAttack()+random.nextInt(9)-3);actionText="Ты наносишь удар: −"+damage+" здоровья врагу.";break;
             case "HEAVY":if(stamina<10){battleLog="Недостаточно выносливости для сильного удара.";return;}
                 int hitChance=progress.chance(this,"HEAVY");stamina-=10;
-                if(random.nextInt(100)<hitChance){damage=Math.max(1,attack*2+random.nextInt(9));actionText="Сильный удар! −"+damage+" здоровья врагу.";}else actionText="Сильный удар проходит мимо.";break;
+                if(random.nextInt(100)<hitChance){damage=Math.max(1,effectiveAttack()*2+random.nextInt(9));actionText="Сильный удар! −"+damage+" здоровья врагу.";}else actionText="Сильный удар проходит мимо.";break;
             case "MAGIC":if(magicka<12){battleLog="Недостаточно магии. Нужны 12 единиц.";return;}magicka-=12;damage=18+level*4+random.nextInt(8);actionText="Магическая вспышка обжигает врага: −"+damage+".";break;
             case "DEFEND": defending=true;stamina=Math.min(maxStamina,stamina+12);magicka=Math.min(maxMagicka,magicka+5);actionText="Ты встаёшь в оборону, восстанавливая силы.";break;
             case "POTION":if(potions==0){battleLog="Лечебных зелий больше нет.";return;}potions--;int restored=Math.min(45,maxHp-hp);hp+=restored;actionText="Ты восстанавливаешь "+restored+" здоровья.";break;
@@ -463,7 +474,8 @@ public final class GameEngine {
         }
         enemyHp=Math.max(0,enemyHp-damage);
         if(enemyHp==0) {winBattle(actionText);return;}
-        int incoming=Math.max(1,enemyDamage+random.nextInt(8)-armor-(defending?enemyDamage/2+3:0));
+        int rawIncoming=Math.max(1,enemyDamage+random.nextInt(8)-Math.max(0,armor-(armorUpgraded?4:0))-(defending?enemyDamage/2+3:0));
+        int incoming=Math.max(1,(int)Math.round(rawIncoming*(1-progress.damageReduction())));
         hp=Math.max(0,hp-incoming);stamina=Math.min(maxStamina,stamina+3);
         battleLog=actionText+"\n"+enemyName+" отвечает: −"+incoming+" здоровья.";
         if(hp==0) {

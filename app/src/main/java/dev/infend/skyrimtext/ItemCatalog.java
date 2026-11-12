@@ -26,8 +26,22 @@ public final class ItemCatalog {
         public boolean wearable(){return "Броня".equals(category)||"Одежда".equals(category)||"Украшения".equals(category)||statSkill>=4;}
         public double currentStat(RpgProgress progress){
             if(baseStat<0||statSkill<0||progress==null)return baseStat;
-            return baseStat*(1+progress.skillLevel(statSkill)*(weapon()?0.005:0.004));
+            double rank=(slot().equals("shield")?0:progress.combatPerkRank(statSkill))*0.2;
+            return baseStat*(1+progress.skillLevel(statSkill)*(weapon()?0.005:0.004))*(1+rank);
         }
+        public String slot(){
+            if(weapon())return "Боеприпасы".equals(category)?"ammo":"weapon";
+            if(!wearable())return "";
+            String n=name.toLowerCase(Locale.ROOT).replace('ё','е');
+            if(n.contains("щит"))return "shield";
+            if(n.contains("кольц"))return "ring";
+            if(n.contains("ожерел")||n.contains("амулет"))return "neck";
+            if(n.contains("шлем")||n.contains("капюшон")||n.contains("шляп")||n.contains("маск")||n.contains("диадем"))return "head";
+            if(n.contains("перчат")||n.contains("наруч")||n.contains("рукавиц"))return "hands";
+            if(n.contains("сапог")||n.contains("ботин")||n.contains("обув"))return "feet";
+            return "body";
+        }
+        public boolean twoHanded(){return weapon()&&(statSkill==1||statSkill==2)&&!"Боеприпасы".equals(category);}
         public String statLabel(RpgProgress progress){
             if(!weapon()&&!wearable())return "";
             String label=weapon()?"УРОН":"БРОНЯ";

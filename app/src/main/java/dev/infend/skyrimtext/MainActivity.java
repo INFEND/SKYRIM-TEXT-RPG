@@ -2033,7 +2033,7 @@ public final class MainActivity extends Activity {
             LinearLayout itemRow=row();itemRow.setPadding(dp(7),dp(10),dp(8),dp(10));
             itemRow.setBackgroundColor(active?0xa02a2e30:0x98050607);
             itemRow.addView(new SkyrimIconView(this,SkyrimIconView.iconForItem(item.name,item.category),active?accent():MUTED),lp(22,23));
-            TextView name=text(item.name+" ×"+game.progress.quantity(item.id),14,active?accent():TEXT,active);
+            TextView name=text((game.progress.equipped(item.id)?"◆ ":"")+item.name+" ×"+game.progress.quantity(item.id),14,active?accent():TEXT,active);
             name.setMaxLines(2);LinearLayout.LayoutParams np=new LinearLayout.LayoutParams(0,-2,1);
             np.leftMargin=dp(8);itemRow.addView(name,np);
             TextView measure=text(String.format(java.util.Locale.forLanguageTag("ru"),"%.1f",item.weight),
@@ -2090,7 +2090,15 @@ public final class MainActivity extends Activity {
         AlertDialog.Builder dialog=new RuneDialogBuilder(this,accent()).setTitle("Сведения о предмете")
             .setView(view).setNegativeButton("Закрыть",null);
         if(game.progress.quantity(item.id)>0){
-            if("Лечебное зелье".equals(item.id)||"Зелье магии".equals(item.id))
+            if(!item.slot().isEmpty()){
+                boolean worn=game.progress.equipped(item.id);
+                addText(view,worn?"ЭКИПИРОВАНО":"Не экипировано",12,accent(),true,6);
+                if(!"COMBAT".equals(game.mode))dialog.setPositiveButton(worn?"Снять":"Экипировать",(d,w)->{
+                    if(worn){game.progress.unequip(item.id);save();render();}
+                    else if(game.progress.equip(item.id)){save();render();}
+                    else toast("Сначала сними двуручное оружие");
+                });
+            }else if("Лечебное зелье".equals(item.id)||"Зелье магии".equals(item.id))
                 dialog.setPositiveButton("Использовать",(d,w)->{
                     boolean result="Лечебное зелье".equals(item.id)?game.drinkHealing():game.drinkMana();
                     game.progress.sync(game);save();render();
@@ -2294,12 +2302,15 @@ public final class MainActivity extends Activity {
             actionButton("Ожидать","Выбрать от 1 до 24 часов отдыха",false,this::showWaitDialog);
         LinearLayout c=card();addText(c,"ХАРАКТЕРИСТИКИ",11,accent(),true,9);
         heroEntry(c,"Опыт",game.xp+" / "+(game.level*80));
-        heroEntry(c,"Атака",String.valueOf(game.attack));heroEntry(c,"Защита",String.valueOf(game.armor));
+        heroEntry(c,"Атака",String.valueOf(game.effectiveAttack()));heroEntry(c,"Защита",String.valueOf(game.effectiveArmor()));
         heroEntry(c,"Септимы",game.gold+" септимов");heroEntry(c,"Репутация",String.valueOf(game.reputation));
         heroEntry(c,"Победы",String.valueOf(game.victories));heroEntry(c,"Исследований",String.valueOf(game.explored));
         LinearLayout items=card();addText(items,"СНАРЯЖЕНИЕ",11,accent(),true,12);
-        addText(items,"Оружие: "+(game.swordUpgraded?"Закалённый клинок":"Походный клинок"),15,TEXT,false,10);
-        addText(items,"Доспех: "+(game.armorUpgraded?"Стальной нагрудник":"Дорожная одежда"),15,TEXT,false,11);
+        addText(items,"Оружие: "+game.progress.equippedName("weapon"),15,TEXT,false,10);
+        String[] gearSlots={"body","head","hands","feet","shield","ring","neck","ammo"};
+        String[] gearLabels={"Доспех","Голова","Руки","Ноги","Щит","Кольцо","Амулет","Боеприпасы"};
+        for(int i=0;i<gearSlots.length;i++)addText(items,gearLabels[i]+": "+game.progress.equippedName(gearSlots[i]),15,TEXT,false,6);
+        addText(items,"Снижение физического урона: "+String.format(java.util.Locale.ROOT,"%.1f%%",100*game.progress.damageReduction()),12,accent(),true,8);
         addText(items,"Лечебные зелья: "+game.potions,14,MUTED,false,6);
         addText(items,"Зелья магии: "+game.manaPotions,14,MUTED,false,0);
         actionButton("Выпить лечебное зелье","+45 здоровья | без боя",false,()->{
@@ -2353,9 +2364,18 @@ public final class MainActivity extends Activity {
         String details=RpgContent.SKILL_DESCRIPTIONS[index]+"\n\nУровень: "+lvl+
             "\nОпыт навыка: "+game.progress.skillXp[index]+" / "+game.progress.skillNeed(index)+
             "\n\nВетка талантов: ученик → адепт → мастер.";
+        boolean combat=RpgProgress.isCombatPerk(index);
+        int rank=game.progress.combatPerkRank(index);
+        if(combat)details+="\n\n"+game.progress.combatPerkName(index)+": "+rank+" / 5"
+            +"\nБонус: +"+(rank*20)+"%"+(rank<5?"\nСледующий ранг: навык "+game.progress.nextCombatPerkLevel(index):"");
         AlertDialog.Builder builder=new RuneDialogBuilder(this,accent()).setTitle(RpgContent.SKILLS[index])
             .setMessage(details).setNegativeButton("Закрыть",null);
-        if(game.progress.perkPoints>0&&lvl>=20)
+        if(combat){
+            if(game.progress.perkPoints>0&&rank<5&&lvl>=game.progress.nextCombatPerkLevel(index))
+                builder.setPositiveButton("Повысить ранг",(d,w)->{
+                    if(game.progress.buyCombatPerk(index)){save();render();toast("Талант развит");}
+                });
+        }else if(game.progress.perkPoints>0&&lvl>=20)
             builder.setPositiveButton("Развить талант",(d,w)->{
                 game.progress.perkPoints--;game.progress.skillExperience(game,index,70);
                 save();render();toast("Очко таланта применено");

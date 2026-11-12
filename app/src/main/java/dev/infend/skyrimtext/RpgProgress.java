@@ -20,6 +20,74 @@ public final class RpgProgress {
 
     public final int[] skillLevels = new int[RpgContent.SKILLS.length];
     public final int[] skillXp = new int[RpgContent.SKILLS.length];
+    private final int[] combatPerks=new int[6];
+    private final LinkedHashMap<String,String> equipped=new LinkedHashMap<>();
+    private boolean equipmentInitialized;
+    private static final String[] SLOTS={"weapon","shield","head","body","hands","feet","ring","neck","ammo"};
+    public static boolean isCombatPerk(int skill){return skill==0||skill==1||skill==2||skill==4||skill==5;}
+    public int combatPerkRank(int skill){return isCombatPerk(skill)?combatPerks[skill]:0;}
+    public int nextCombatPerkLevel(int skill){
+        int rank=combatPerkRank(skill);
+        if(rank>=5)return 101;
+        int[] levels=(skill==2||skill==4||skill==5)?new int[]{0,20,40,60,80}:new int[]{0,20,40,60,80};
+        return levels[rank];
+    }
+    public String combatPerkName(int skill){
+        switch(skill){case 0:return "Сильная рука";case 1:return "Варвар";case 2:return "Избыточное натяжение";
+            case 4:return "Джаггернаут";case 5:return "Ловкость в обороне";default:return "";}
+    }
+    public boolean buyCombatPerk(int skill){
+        if(!isCombatPerk(skill)||perkPoints<1||combatPerkRank(skill)>=5||skillLevel(skill)<nextCombatPerkLevel(skill))return false;
+        combatPerks[skill]++;perkPoints--;return true;
+    }
+    private void cleanEquipment(){
+        for(String slot:SLOTS){
+            String id=equipped.get(slot);
+            if(id==null)continue;
+            ItemCatalog.Item item=ItemCatalog.find(id);
+            if(item==null||quantity(id)<1||!slot.equals(item.slot()))equipped.remove(slot);
+        }
+        ItemCatalog.Item weapon=ItemCatalog.find(equipped.get("weapon"));
+        if(weapon!=null&&weapon.twoHanded())equipped.remove("shield");
+    }
+    public boolean equipped(String id){return id!=null&&equipped.containsValue(id)&&quantity(id)>0;}
+    public boolean equip(String id){
+        ItemCatalog.Item item=ItemCatalog.find(id);
+        if(item==null||item.slot().isEmpty()||quantity(id)<1)return false;
+        if("shield".equals(item.slot())){
+            ItemCatalog.Item weapon=ItemCatalog.find(equipped.get("weapon"));
+            if(weapon!=null&&weapon.twoHanded())return false;
+        }
+        equipmentInitialized=true;
+        equipped.put(item.slot(),id);cleanEquipment();return true;
+    }
+    public void unequip(String id){if(id==null)return;equipmentInitialized=true;equipped.values().removeIf(id::equals);}
+    public String equippedName(String slot){String id=equipped.get(slot);return id==null||quantity(id)<1?"Не надето":id;}
+    public double equippedDamage(){
+        ItemCatalog.Item item=ItemCatalog.find(equipped.get("weapon"));
+        return item!=null&&quantity(item.id)>0&&item.baseStat>=0?item.currentStat(this):0;
+    }
+    public int equippedWeaponSkill(){
+        ItemCatalog.Item item=ItemCatalog.find(equipped.get("weapon"));
+        return item!=null&&quantity(item.id)>0&&item.statSkill>=0&&item.statSkill<=2?item.statSkill:0;
+    }
+    public double equippedArmor(){
+        double total=0;
+        for(String slot:SLOTS){
+            ItemCatalog.Item item=ItemCatalog.find(equipped.get(slot));
+            if(item!=null&&quantity(item.id)>0&&item.wearable()&&item.baseStat>0)total+=item.currentStat(this);
+        }
+        return total;
+    }
+    public int armorPieces(){
+        int count=0;
+        for(String slot:SLOTS){ItemCatalog.Item item=ItemCatalog.find(equipped.get(slot));
+            if(item!=null&&quantity(item.id)>0&&item.wearable()&&item.baseStat>0)count++;}
+        return count;
+    }
+    public double damageReduction(){return Math.min(0.8,(equippedArmor()+25*armorPieces())*0.0012);}
+    public void shopEquip(String id){equip(id);}
+
     public final int[] spent = new int[3];
     public String startId="Хелген", location="Хелген";
     public String recent="Новая история начинается.";
@@ -61,6 +129,12 @@ public final class RpgProgress {
         quantity("Зелье магии",Math.max(0,g.manaPotions));
         if(g.swordUpgraded){quantity("Походный клинок",0);quantity("Стальной меч",1);}
         if(g.armorUpgraded){quantity("Дорожная одежда",0);quantity("Стальная кираса",1);}
+        if(!equipmentInitialized){
+            equipmentInitialized=true;
+            equip(g.swordUpgraded?"Стальной меч":"Походный клинок");
+            equip(g.armorUpgraded?"Стальная кираса":"Дорожная одежда");
+        }
+        cleanEquipment();
     }
     public void quantity(String id,int n){
         try{inventory.put(id,Math.max(0,n));}catch(Exception ignored){}
@@ -74,7 +148,9 @@ public final class RpgProgress {
     }
     public boolean removeItem(String id,int amount){
         if(amount<1||quantity(id)<amount)return false;
-        quantity(id,quantity(id)-amount);return true;
+        quantity(id,quantity(id)-amount);
+        if(quantity(id)==0)unequip(id);
+        return true;
     }
     public double carryWeight(){
         double sum=0;Iterator<String> names=inventory.keys();
@@ -234,7 +310,9 @@ public final class RpgProgress {
              .put("skillXp",new JSONArray(skillXp)).put("inventory",inventory)
              .put("completed",new JSONArray(completed)).put("failed",new JSONArray(failed))
              .put("questOutcomes",new JSONObject(questOutcomes))
-             .put("perks",perkPoints).put("activePowerDay",activePowerDay).put("difficulty",difficulty)
+             .put("perks",perkPoints).put("combatPerks",new JSONArray(combatPerks))
+             .put("equipmentInitialized",equipmentInitialized).put("equipped",new JSONObject(equipped))
+             .put("activePowerDay",activePowerDay).put("difficulty",difficulty)
              .put("actionDay",actionDay).put("attemptedToday",new JSONArray(attemptedToday))
              .put("dragonStage",dragonStage).put("dragonInsight",dragonInsight)
              .put("dragonRecent",dragonRecent).put("dragonUsed",new JSONArray(dragonUsed))
@@ -289,6 +367,15 @@ public final class RpgProgress {
             p.quantity("Стальная кираса",Math.max(legacyArmor,p.quantity("Стальная кираса")));
             p.inventory.remove("Стальной кираса");
         }
+        JSONArray perkRanks=obj.optJSONArray("combatPerks");
+        if(perkRanks!=null)for(int i=0;i<p.combatPerks.length;i++)
+            if(isCombatPerk(i))p.combatPerks[i]=Math.max(0,Math.min(5,perkRanks.optInt(i,0)));
+        p.equipmentInitialized=obj.optBoolean("equipmentInitialized",false);
+        JSONObject gear=obj.optJSONObject("equipped");
+        if(gear!=null)for(String slot:SLOTS){
+            String id=gear.optString(slot,"");if(!id.isEmpty())p.equipped.put(slot,id);
+        }
+        p.cleanEquipment();
         JSONArray done=obj.optJSONArray("completed"),bad=obj.optJSONArray("failed");
         if(done!=null)for(int i=0;i<done.length();i++)p.completed.add(done.optString(i));
         if(bad!=null)for(int i=0;i<bad.length();i++)p.failed.add(bad.optString(i));
