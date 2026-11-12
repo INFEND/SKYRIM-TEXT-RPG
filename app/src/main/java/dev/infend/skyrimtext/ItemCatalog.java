@@ -59,10 +59,10 @@ public final class ItemCatalog {
             String n=name.toLowerCase(Locale.ROOT).replace('ё','е');
             if(n.contains("щит"))return "shield";
             if(n.contains("кольц"))return "ring";
-            if(n.contains("ожерел")||n.contains("амулет"))return "neck";
-            if(n.contains("шлем")||n.contains("капюшон")||n.contains("шляп")||n.contains("маск")||n.contains("диадем"))return "head";
+            if(n.contains("ожерел")||n.contains("амулет")||n.contains("медальон"))return "neck";
+            if(n.contains("шлем")||n.contains("маск")||n.contains("диадем")||n.contains("корона")||n.contains("венец")||n.contains("головной убор")||n.contains("колпак")||n.contains("шапка")||n.contains("шляп")||n.startsWith("капюшон")||n.contains("капюшон вампира"))return "head";
             if(n.contains("перчат")||n.contains("наруч")||n.contains("рукавиц"))return "hands";
-            if(n.contains("сапог")||n.contains("ботин")||n.contains("обув"))return "feet";
+            if(n.contains("сапог")||n.contains("ботин")||n.contains("обув")||n.contains("сандал"))return "feet";
             return "body";
         }
         public boolean twoHanded(){return weapon()&&(statSkill==1||statSkill==2)&&!"Боеприпасы".equals(category);}
@@ -249,6 +249,11 @@ public final class ItemCatalog {
         put("Арбалет «Рик»","Оружие","➶",8.0,1200,"Редкий арбалет из персонального архива.","Стрельба.");
         put("Эликсир Жизни","Зелья","✧",0.5,0,"Редкое средство из личной библиотеки.","Мощное исцеление, подробности в Кодексе.");
     }
+    // Supplement uses existing name as save key, so replacements preserve quantities.
+    static void registerSupplement(String name,String category,String icon,double weight,int cost,String desc,String effect,double stat,int skill){
+        put(name,category,icon,weight,cost,desc,effect,stat,skill);
+    }
+    static { ApparelAndPotionCatalog.register(); }
     private ItemCatalog(){}
     public static synchronized void initialize(Context c){
         if(loaded)return;
@@ -274,6 +279,7 @@ public final class ItemCatalog {
     }
     public static Item find(String id){return items.get(id);}
     public static int count(){return items.size();}
+    public static int countCategory(String category){return sorted(category,"Название").size();}
     public static ArrayList<Item> sorted(String category,String by){
         ArrayList<Item> list=new ArrayList<>();
         for(Item x:all())if(category==null||"Все".equals(category)||x.category.equals(category))list.add(x);
