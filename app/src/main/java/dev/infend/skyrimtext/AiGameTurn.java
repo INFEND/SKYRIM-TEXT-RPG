@@ -162,6 +162,8 @@ public final class AiGameTurn {
         int mg=cap((long)g.magicka+change(e,"magickaDelta",500),0,maxMg);
         int gold=cap((long)g.gold+change(e,"goldDelta",5000),0,10000000);
         int addHours=change(e,"hourDelta",24);
+        if(addHours<0 || change(e,"dayDelta",30)<0)
+            throw new JSONException("Игровое время нельзя переводить назад");
         int totalHours=g.hour+addHours;
         int nextHour=Math.floorMod(totalHours,24);
         int day=cap((long)g.day+change(e,"dayDelta",30)+Math.floorDiv(totalHours,24),1,1000000);
@@ -175,6 +177,9 @@ public final class AiGameTurn {
         String loc=limited(e.optString("location",""),80);
         WorldAtlas.Place place=loc.isEmpty()?null:WorldAtlas.find(loc);
         if(!loc.isEmpty()&&place==null)throw new JSONException("Неизвестная локация: "+loc);
+        // A pending encounter cannot be escaped by an AI location patch.
+        if(g.enemyHp>0 && place!=null && !place.name.equals(g.progress.location))
+            throw new JSONException("Нельзя покинуть локацию во время боя");
         java.util.LinkedHashMap<String,Integer> inventoryChanges=new java.util.LinkedHashMap<>();
         if(e.has("inventory") && !e.isNull("inventory") && !(e.opt("inventory") instanceof JSONArray))
             throw new JSONException("Инвентарь должен быть массивом");
@@ -225,6 +230,8 @@ public final class AiGameTurn {
             String name=limited(enemy.optString("name",""),70);
             int health=requiredEnemyInt(enemy,"hp",0,50000);
             if(health>0&&name.isEmpty())throw new JSONException("Противник без имени");
+            if(g.enemyHp>0 && (health==0 || !name.equals(g.enemyName)))
+                throw new JSONException("ИИ не может завершить или заменить незавершённый бой");
             if(health>0){
                 requiredEnemyInt(enemy,"maxHp",health,50000);
                 requiredEnemyInt(enemy,"damage",0,1000);
