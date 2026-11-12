@@ -1039,7 +1039,14 @@ public final class MainActivity extends Activity {
             if(indexes.isEmpty()&&value.isEmpty()){toast("Выбери вариант или напиши свой ответ");return;}
             // Combat is authoritative: never submit a generic AI effects patch during a live encounter.
             if("COMBAT".equals(game.mode)&&game.enemyHp>0){
-                toast("Во время боя используй боевые действия над сценой");
+                if(indexes.size()!=1||!value.isEmpty()){
+                    toast("В бою выбери одно боевое действие без дополнительного текста");return;
+                }
+                AiGameTurn.Option option=game.aiTurn.choices.get(indexes.get(0)-1);
+                if(option.combatAction.isEmpty()){
+                    toast("Выбери доступную боевую команду над сценой");return;
+                }
+                resolveNativeAiCombat(option.combatAction);
                 return;
             }
             StringBuilder combined=new StringBuilder();
@@ -1135,10 +1142,13 @@ public final class MainActivity extends Activity {
         title.setTypeface(SovngardeTypeface.face(this,true));
         detail.addView(title);space(detail,6);
         addText(detail,option.detail,14,MUTED,false,7);
-        if(option.chance>=0){
+        boolean combat="COMBAT".equals(game.mode)&&game.enemyHp>0;
+        int displayedChance=combat?("HEAVY".equals(option.combatAction)||"FLEE".equals(option.combatAction)
+            ?game.progress.chance(game,option.combatAction):-1):option.chance;
+        if(displayedChance>=0){
             addChoiceStat(detail,"НАВЫК",option.skill.isEmpty()?"Способности":option.skill,accent(),3);
-            addChoiceStat(detail,"ШАНС УСПЕХА",option.chance+"%",
-                SceneChoiceMeta.chanceColor(option.chance),0);
+            addChoiceStat(detail,"ШАНС УСПЕХА",displayedChance+"%",
+                SceneChoiceMeta.chanceColor(displayedChance),0);
         }else addText(detail,"БЕЗ ПРОВЕРКИ",12,MUTED,false,0);
         row.setClickable(true);row.setFocusable(true);
         row.setContentDescription("Вариант "+number+". "+option.title+". "+(selected?"Выбран":"Не выбран"));
