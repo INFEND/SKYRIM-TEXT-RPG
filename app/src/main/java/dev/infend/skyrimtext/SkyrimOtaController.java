@@ -16,6 +16,7 @@ public final class SkyrimOtaController {
     private boolean resumed,hidden,checking,manualCheck,installing;
     private int checkGeneration;
     private String checkStatus="",lastRender="";
+    private UpdateManager.Release offered;
     private final Runnable tick=new Runnable(){public void run(){if(!resumed)return;refresh();ui.postDelayed(this,300);}};
     SkyrimOtaController(MainActivity a){activity=a;}
     private int dp(int n){return Math.round(n*activity.getResources().getDisplayMetrics().density);}
@@ -29,6 +30,7 @@ public final class SkyrimOtaController {
         OtaDownloadService.Snapshot s=OtaDownloadService.snapshot(activity);
         if(s!=null){display();refresh();}
         else if(checking){display().stage(checkStatus,"Подключение к серверу…");display().controls(this::hide,this::cancelCheck);}
+        else if(offered!=null)showOffer(offered);
         else check(true);
     }
     void attachMini(LinearLayout root){
@@ -49,14 +51,14 @@ public final class SkyrimOtaController {
         OtaDownloadService.Snapshot s=OtaDownloadService.snapshot(activity);
         boolean showing=screen!=null&&screen.isShowing();
         if(mini!=null){
-            boolean show=!installing&&!showing&&(s!=null||checking&&manualCheck&&hidden);
+            boolean show=!installing&&!showing&&(s!=null||checking&&manualCheck&&hidden||offered!=null&&hidden);
             mini.setVisibility(show?View.VISIBLE:View.GONE);
             if(show){
-                miniLabel.setText(s!=null?s.message:checkStatus);
+                miniLabel.setText(s!=null?s.message:offered!=null?"Доступно обновление "+offered.versionName:checkStatus);
                 long a=s==null?0:s.received,b=s==null?-1:s.total;
                 int percent=b>0?(int)Math.min(100,a*100/b):0;
-                miniBytes.setText(s==null?"Проверка обновления":s.release.versionName+" | "+OtaProgressDialog.size(a)+(b>0?" / "+OtaProgressDialog.size(b)+" | "+percent+"%":""));
-                miniBar.setIndeterminate(s==null||s.active()&&b<=0);
+                miniBytes.setText(s==null?(offered!=null?OtaProgressDialog.size(offered.sizeBytes):"Проверка обновления"):s.release.versionName+" | "+OtaProgressDialog.size(a)+(b>0?" / "+OtaProgressDialog.size(b)+" | "+percent+"%":""));
+                miniBar.setIndeterminate(s==null?checking:s.active()&&b<=0);
                 miniBar.setProgress(b>0?(int)Math.min(1000,a*1000/b):0);
             }
         }
@@ -79,15 +81,23 @@ public final class SkyrimOtaController {
                     .setPositiveButton("Загрузить",(d,w)->download(release.fullVersion())).show():null);
         }
     }
+    private void showOffer(UpdateManager.Release info){
+        offered=info;hidden=false;
+        display().controls(this::hide,null);
+        display().offer(info.versionName,info.notesFor(BuildConfig.VERSION_CODE),()->download(info));
+        display().downloadSize(info.sizeBytes,info.isThin());refresh();
+    }
     private void cancelCheck(){
         checkGeneration++;checking=false;manualCheck=false;hidden=true;
         if(screen!=null)screen.dismiss();refresh();
     }
     public void check(boolean manual){
+        if(installing&&manual)installing=false;
         if(installing)return;
         OtaDownloadService.Snapshot pending=OtaDownloadService.snapshot(activity);
         if(pending!=null){if(manual)open();return;}
         if(checking){if(manual){manualCheck=true;open();}return;}
+        if(offered!=null&&manual){showOffer(offered);return;}
         checking=true;manualCheck=manual;hidden=!manual;
         int token=++checkGeneration;
         checkStatus="Проверка соединения…";
@@ -105,11 +115,9 @@ public final class SkyrimOtaController {
                     activity.getSharedPreferences("skyrim_text_v1",0).edit()
                         .putLong(OtaUpdateSchedule.PREF_AVAILABLE_CODE,info.versionCode)
                         .putString(OtaUpdateSchedule.PREF_AVAILABLE_NAME,info.versionName).apply();
-                    if(resumed&&(!manualCheck||!hidden)){
-                        hidden=false;display().controls(null,null);
-                        display().offer(info.versionName,info.notesFor(BuildConfig.VERSION_CODE),()->download(info));
-                        display().downloadSize(info.sizeBytes,info.isThin());
-                    }
+                    offered=info;
+                    if(resumed&&(!manualCheck||!hidden))showOffer(info);
+                    else hidden=true;
                 }else if(manualCheck&&!hidden&&resumed){display().controls(null,null);display().current(BuildConfig.VERSION_NAME);}
                 refresh();
             }
@@ -122,7 +130,7 @@ public final class SkyrimOtaController {
         });
     }
     private void download(UpdateManager.Release release){
-        hidden=false;installing=false;lastRender="";
+        offered=null;hidden=false;installing=false;lastRender="";
         if(!OtaDownloadService.start(activity,release)){
             OtaDownloadService.Snapshot s=OtaDownloadService.snapshot(activity);
             if(s==null){display().fail("Не удалось запустить фоновую загрузку.",()->download(release));return;}

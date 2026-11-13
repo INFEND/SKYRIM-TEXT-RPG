@@ -14,6 +14,8 @@ public final class OtaDownloadService extends Service {
     private static final Handler MAIN=new Handler(Looper.getMainLooper());
     private static volatile Snapshot live;
     private static volatile boolean running;
+    private static volatile long generation;
+    private long workerGeneration;
     private UpdateManager.DownloadControl control;
     private PowerManager.WakeLock lock;
     private long lastNotification;
@@ -33,20 +35,22 @@ public final class OtaDownloadService extends Service {
     }
     static Snapshot snapshot(Context c){
         Snapshot s=live;
-        if(running&&s!=null)return s;
+        if(s!=null&&s.release.versionCode>BuildConfig.VERSION_CODE&&(running||!s.active()))return s;
         UpdateManager.Release r=savedRelease(c);if(r==null)return null;
         String phase=prefs(c).getString("phase","paused");
         long bytes=UpdateManager.partialBytes(c,r);
         if("ready".equals(phase)&&UpdateManager.apkFile(c).isFile()&&
             (r.sizeBytes<0||UpdateManager.apkFile(c).length()==r.sizeBytes))
             return new Snapshot(r,"ready","Готово к установке",UpdateManager.apkFile(c).length(),r.sizeBytes);
-        return new Snapshot(r,"paused",prefs(c).getString("message","Загрузка остановлена. Можно продолжить."),bytes,r.sizeBytes);
+        String message="paused".equals(phase)?prefs(c).getString("message","Загрузка остановлена. Можно продолжить."):
+            "Загрузка прервана. Продолжение доступно.";
+        return new Snapshot(r,"paused",message,bytes,r.sizeBytes);
     }
     static boolean start(Context c,UpdateManager.Release r){
         if(running)return false;
         if(!prefs(c).edit().putString("manifest",r.manifestJson()).putBoolean("thin",r.isThin())
             .putString("phase","prepare").putString("message","Подготовка загрузки").commit())return false;
-        running=true;live=new Snapshot(r,"prepare","Подготовка загрузки",UpdateManager.partialBytes(c,r),r.sizeBytes);
+        generation++;running=true;live=new Snapshot(r,"prepare","Подготовка загрузки",UpdateManager.partialBytes(c,r),r.sizeBytes);
         try{c.startForegroundService(new Intent(c,OtaDownloadService.class).setAction(START));return true;}
         catch(Exception e){running=false;live=null;prefs(c).edit().putString("phase","paused").putString("message",UpdateManager.friendly(e)).apply();return false;}
     }
@@ -59,12 +63,13 @@ public final class OtaDownloadService extends Service {
         if(i!=null&&CANCEL.equals(i.getAction())){
             if(control!=null){control.cancel();Snapshot s=live;
                 if(s!=null)publish(new Snapshot(s.release,"stopping","Остановка загрузки",s.received,s.total));}
+            else if(!running)stopSelf();
             return START_NOT_STICKY;
         }
         if(control!=null)return START_NOT_STICKY;
         UpdateManager.Release r=savedRelease(this);
         if(r==null){stopSelf();running=false;return START_NOT_STICKY;}
-        running=true;control=new UpdateManager.DownloadControl();
+        running=true;workerGeneration=generation;control=new UpdateManager.DownloadControl();
         live=new Snapshot(r,"prepare","Подготовка загрузки",UpdateManager.partialBytes(this,r),r.sizeBytes);
         NotificationManager nm=getSystemService(NotificationManager.class);
         nm.createNotificationChannel(new NotificationChannel(CHANNEL,"Загрузка обновлений Skyrim",NotificationManager.IMPORTANCE_LOW));
@@ -94,6 +99,7 @@ public final class OtaDownloadService extends Service {
         return START_NOT_STICKY;
     }
     private void publish(Snapshot s){
+        if(workerGeneration!=generation)return;
         live=s;long now=SystemClock.elapsedRealtime();
         if(now-lastNotification<500&&"download".equals(s.phase))return;
         lastNotification=now;
@@ -103,6 +109,7 @@ public final class OtaDownloadService extends Service {
     }
     private void finish(Snapshot s){
         MAIN.post(()->{
+            if(workerGeneration!=generation)return;
             prefs(this).edit().putString("phase",s.phase).putString("message",s.message).commit();
             live=s;control=null;running=false;
             releaseLock();

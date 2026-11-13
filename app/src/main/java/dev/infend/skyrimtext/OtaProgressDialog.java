@@ -216,7 +216,7 @@ public final class OtaProgressDialog {
         rotating(false);if(numberAnim!=null)numberAnim.cancel();bar.setIndeterminate(false);
         heading.setText("Обновление приостановлено");label.setText("Загрузка остановлена");details.setText(message);
         renderNumbers(amount,total);secondary.setText("СКРЫТЬ");primary.setText("ПРОДОЛЖИТЬ");primary.setVisibility(View.VISIBLE);primary.setOnClickListener(v->resume.run());
-        cancel.setVisibility(full==null?View.GONE:View.VISIBLE);cancel.setText("ПОЛНЫЙ APK");cancelAction=full;
+        cancel.setVisibility(full==null?View.GONE:View.VISIBLE);cancel.setText("ПОЛНЫЙ");cancelAction=full;
     }
     public void ready(long amount,long total,Runnable install){
         rotating(false);if(numberAnim!=null)numberAnim.cancel();bar.setIndeterminate(false);renderNumbers(amount,total);

@@ -322,7 +322,7 @@ public final class UpdateManager {
             }
         },"skyrim-text-rpg-update-check").start();
     }
-    static File partialFile(Context c){return new File(new File(c.getFilesDir(),"ota"),APK_FILE+".part");}
+    static File partialFile(Context c){return new File(new File(c.getFilesDir(),"ota"),APK_FILE+".part.apk");}
     private static SharedPreferences partialPrefs(Context c){return c.getSharedPreferences("ota_partial_v2",0);}
     private static String identity(Release r){return r.versionCode+"|"+r.apkUrl+"|"+r.sha256+"|"+r.sizeBytes;}
     static long partialBytes(Context c,Release r){
