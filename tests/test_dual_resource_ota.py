@@ -12,7 +12,7 @@ class DualOtaTest(unittest.TestCase):
         self.assertIn('!removed(app,e)&&(!local(app,e)||!valid(file(app,e),e))',store)
         self.assertIn('trustedThinApk(url,versionName)',ota)
         self.assertIn('SKYRIM-TEXT-RPG-thin.apk',policy)
-        self.assertIn('verifyApk(activity,apk,r.versionCode)',ota)
+        self.assertIn('verifyApk(context,temp,r.versionCode)',ota)
         self.assertIn('release.fullVersion()', (JAVA/"SkyrimOtaController.java").read_text())
     def test_release_publishes_both_and_verifies_contents(self):
         wf=(ROOT/".github/workflows/android-ota.yml").read_text()

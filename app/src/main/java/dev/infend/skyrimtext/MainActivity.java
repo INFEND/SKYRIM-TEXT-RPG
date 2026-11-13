@@ -147,8 +147,10 @@ public final class MainActivity extends Activity {
         state.putIntArray("hero_points",initialPoints.clone());
         super.onSaveInstanceState(state);
     }
-    @Override protected void onPause(){save();super.onPause();}
+    @Override protected void onPause(){if(updater!=null)updater.onHostPause();save();super.onPause();}
+    @Override protected void onNewIntent(Intent intent){super.onNewIntent(intent);setIntent(intent);if(updater!=null&&intent.getBooleanExtra("ota_open_from_notification",false))updater.onNotificationIntent();}
     @Override protected void onDestroy(){
+        if(updater!=null)updater.onHostDestroy();
         if(aiClient!=null)aiClient.shutdown();
         if(localAiClient!=null)localAiClient.shutdown();
         if(chatGptOAuth!=null)chatGptOAuth.shutdown();
@@ -344,6 +346,7 @@ public final class MainActivity extends Activity {
         scroll.setVerticalScrollBarEnabled(false);
         scroll.setDescendantFocusability(ViewGroup.FOCUS_BEFORE_DESCENDANTS);
         scroll.setFocusableInTouchMode(true);
+        if(updater!=null)updater.attachMini(root);
         root.addView(scroll,new LinearLayout.LayoutParams(-1,0,1));
         LinearLayout page=column();scroll.addView(page,new ScrollView.LayoutParams(-1,-2));
         topChrome=column();page.addView(topChrome,lp(-1,-2));

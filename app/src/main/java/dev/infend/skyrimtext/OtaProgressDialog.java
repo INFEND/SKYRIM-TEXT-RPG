@@ -27,7 +27,8 @@ import java.util.Locale;
 public final class OtaProgressDialog {
     private final Activity activity;
     private final Dialog dialog;
-    private final TextView heading, label, details, bytes, percent, primary, secondary;
+    private final TextView heading, label, details, bytes, percent, primary, secondary, cancel;
+    private Runnable hideAction,cancelAction;
     private final CenteredRing mark;
     private final ProgressBar bar;
     private final android.widget.ScrollView notesScroll;
@@ -78,7 +79,7 @@ public final class OtaProgressDialog {
         v.setTypeface(SovngardeTypeface.face(activity,bold));
         return v;
     }
-    private static String size(long value){
+    static String size(long value){
         if(value<0)return "—";
         if(value<1024)return value+" Б";
         double v=value/1024d;if(v<1024)return String.format(Locale.forLanguageTag("ru"),"%.1f КБ",v);
@@ -141,19 +142,22 @@ public final class OtaProgressDialog {
         secondary=text("СКРЫТЬ",12,muted,true);secondary.setGravity(Gravity.CENTER);
         secondary.setPadding(dp(16),dp(14),dp(16),dp(14));
         secondary.setBackground(new RuneFrameDrawable(0xff12191d,stroke,false));
-        secondary.setOnClickListener(v->dismiss());
+        secondary.setOnClickListener(v->{if(hideAction!=null)hideAction.run();else dismiss();});
         actions.addView(secondary);
         primary=text("ПОВТОРИТЬ",12,accent,true);primary.setGravity(Gravity.CENTER);
         primary.setBackground(new RuneFrameDrawable(0xff27261f,accent,true));primary.setPadding(dp(16),dp(13),dp(16),dp(13));
         LinearLayout.LayoutParams ap=new LinearLayout.LayoutParams(-2,-2);ap.leftMargin=dp(8);
         actions.addView(primary,ap);primary.setVisibility(View.GONE);
+        cancel=text("ОТМЕНИТЬ",12,muted,true);cancel.setGravity(Gravity.CENTER);cancel.setPadding(dp(10),dp(14),dp(10),dp(14));
+        cancel.setOnClickListener(v->{if(cancelAction!=null)cancelAction.run();});actions.addView(cancel);cancel.setVisibility(View.GONE);
         dialog.setContentView(root);dialog.setCancelable(true);
+        dialog.setOnCancelListener(d->{if(hideAction!=null)hideAction.run();});
         dialog.setOnDismissListener(ignore->{
             if(numberAnim!=null)numberAnim.cancel();
             if(spin!=null)spin.cancel();
             if(sweepAnim!=null)sweepAnim.cancel();
             mark.animate().cancel();
-            shown=false;
+            spinning=false;shown=false;
         });
     }
     public void show(){
@@ -205,6 +209,24 @@ public final class OtaProgressDialog {
                     .withEndAction(()->mark.setRotation(0f)).start();
             }else mark.setRotation(0f);
         }
+    }
+    public void controls(Runnable hide,Runnable stop){hideAction=hide;cancelAction=stop;cancel.setVisibility(stop==null?View.GONE:View.VISIBLE);}
+    public void transferNotes(String notes){showNotes(notes);}
+    public void paused(String message,long amount,long total,Runnable resume,Runnable full){
+        rotating(false);if(numberAnim!=null)numberAnim.cancel();bar.setIndeterminate(false);
+        heading.setText("Обновление приостановлено");label.setText("Загрузка остановлена");details.setText(message);
+        renderNumbers(amount,total);secondary.setText("СКРЫТЬ");primary.setText("ПРОДОЛЖИТЬ");primary.setVisibility(View.VISIBLE);primary.setOnClickListener(v->resume.run());
+        cancel.setVisibility(full==null?View.GONE:View.VISIBLE);cancel.setText("ПОЛНЫЙ APK");cancelAction=full;
+    }
+    public void ready(long amount,long total,Runnable install){
+        rotating(false);if(numberAnim!=null)numberAnim.cancel();bar.setIndeterminate(false);renderNumbers(amount,total);
+        heading.setText("Обновление загружено");label.setText("Готово к установке");details.setText("Подпись и SHA-256 проверены");
+        secondary.setText("СКРЫТЬ");primary.setText("УСТАНОВИТЬ");primary.setVisibility(View.VISIBLE);primary.setOnClickListener(v->install.run());cancel.setVisibility(View.GONE);
+    }
+    public void activeTransfer(String phase,String message,long amount,long total,Runnable hide,Runnable stop){
+        controls(hide,stop);cancel.setText("ОТМЕНИТЬ");secondary.setText("СКРЫТЬ");
+        if("download".equals(phase))downloading(amount,total);
+        else{label.setText(message);details.setText("Обновление в фоне");primary.setVisibility(View.GONE);rotating(true);bar.setIndeterminate(true);renderNumbers(amount,total);}
     }
     public void stage(String step,String hint){
         heading.setText("Обновление SKYRIM TEXT RPG");label.setText(step);details.setText(hint);

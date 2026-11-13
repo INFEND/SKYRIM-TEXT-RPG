@@ -58,6 +58,13 @@ public final class UpdateManager {
         private final String thinUrl,thinHash;
         private final long thinSize;
         private final Release fullRelease;
+        private final String rawManifest;
+        String manifestJson(){return rawManifest;}
+        static Release restore(String json,boolean thin)throws Exception{
+            Release full=new Release(new JSONObject(json));
+            if(thin){if(full.thinUrl.isEmpty())throw new IOException("Нет облегчённого пакета");return new Release(full);}
+            return full;
+        }
         public boolean isThin(){return fullRelease!=null;}
         public Release fullVersion(){return fullRelease==null?this:fullRelease;}
         Release preferThin(Context context){
@@ -68,7 +75,7 @@ public final class UpdateManager {
             versionCode=full.versionCode;versionName=full.versionName;notes=full.notes;
             packageName=full.packageName;history=full.history;
             apkUrl=full.thinUrl;sha256=full.thinHash;sizeBytes=full.thinSize;
-            thinUrl="";thinHash="";thinSize=-1;fullRelease=full;
+            thinUrl="";thinHash="";thinSize=-1;fullRelease=full;rawManifest=full.rawManifest;
         }
         public String notesFor(long installedVersionCode){
             return OtaHistory.merge(history,installedVersionCode,versionCode,notes);
@@ -118,7 +125,7 @@ public final class UpdateManager {
             boolean usable=OtaUrlPolicy.trustedThinApk(url,versionName)&&
                 hash.matches("[0-9a-f]{64}")&&size>0&&sizeBytes>size&&size<=MAX_APK;
             thinUrl=usable?url:"";thinHash=usable?hash:"";thinSize=usable?size:-1;
-            fullRelease=null;
+            fullRelease=null;rawManifest=j.toString();
         }
     }
     private static void checkHttps(String url)throws IOException{
@@ -137,7 +144,7 @@ public final class UpdateManager {
         // GitHub outage must not block the trusted raw.githubusercontent.com mirror.
         // The HTTPS request below provides the authoritative connectivity result.
     }
-    private static String friendly(Exception e){
+    static String friendly(Exception e){
         if(e instanceof UnknownHostException)return "Не удаётся определить адрес сервера обновлений. Проверьте интернет, DNS и VPN.";
         if(e instanceof SocketTimeoutException)return "Сервер обновлений не ответил вовремя. Попробуйте ещё раз.";
         if(e instanceof SSLException)return "Ошибка защищённого соединения. Проверьте дату, время и настройки VPN.";
@@ -315,71 +322,124 @@ public final class UpdateManager {
             }
         },"skyrim-text-rpg-update-check").start();
     }
-    public static void download(Activity activity,Release r,Callback cb){
-        new Thread(()->{
-            File folder=new File(activity.getFilesDir(),"ota");
-            File temp=new File(folder,APK_FILE+".part");
-            File apk=new File(folder,APK_FILE);
+    static File partialFile(Context c){return new File(new File(c.getFilesDir(),"ota"),APK_FILE+".part");}
+    private static SharedPreferences partialPrefs(Context c){return c.getSharedPreferences("ota_partial_v2",0);}
+    private static String identity(Release r){return r.versionCode+"|"+r.apkUrl+"|"+r.sha256+"|"+r.sizeBytes;}
+    static long partialBytes(Context c,Release r){
+        File f=partialFile(c);
+        return identity(r).equals(partialPrefs(c).getString("identity",""))&&f.isFile()&&f.length()<=MAX_APK
+            &&(r.sizeBytes<0||f.length()<=r.sizeBytes)?f.length():0;
+    }
+    static final class DownloadControl {
+        volatile boolean cancelled;
+        volatile HttpsURLConnection active;
+        void cancel(){
+            cancelled=true;
+            HttpsURLConnection conn=active;
+            if(conn!=null)new Thread(conn::disconnect,"ota-cancel-socket").start();
+        }
+        void check()throws InterruptedIOException{
+            if(cancelled||Thread.currentThread().isInterrupted())throw new InterruptedIOException("Загрузка остановлена. Прогресс сохранён.");
+        }
+    }
+    /** Service worker, no Activity references. Resume only the identical trusted release. */
+    static File downloadResumable(Context context,Release r,DownloadControl control,Callback cb)throws Exception{
+        File temp=partialFile(context),folder=temp.getParentFile(),apk=apkFile(context);
+        if(!folder.isDirectory()&&!folder.mkdirs())throw new IOException("Не удалось создать папку обновлений.");
+        if(!identity(r).equals(partialPrefs(context).getString("identity",""))||temp.length()>MAX_APK||
+            (r.sizeBytes>0&&temp.length()>r.sizeBytes)){
+            if(temp.exists()&&!temp.delete())throw new IOException("Не удалось очистить несовместимый фрагмент.");
+            if(!partialPrefs(context).edit().putString("identity",identity(r)).commit())throw new IOException("Не удалось сохранить идентификатор загрузки.");
+        }
+        long received=temp.length(),total=r.sizeBytes;
+        cb.progress(received,total);control.check();
+        if(r.sizeBytes>0&&folder.getUsableSpace()<r.sizeBytes-received+4L*1024*1024)
+            throw new IOException("Недостаточно свободного места для обновления.");
+        if(total<0||received<total){
+            internetReady(context);
+            HttpsURLConnection c=null;
             try{
-                internetReady(activity);
-                if(!folder.isDirectory()&&!folder.mkdirs())throw new IOException("Не удалось создать папку обновлений во внутренней памяти.");
-                if(r.sizeBytes>MAX_APK)throw new IOException("Размер обновления превышает 512 МБ.");
-                if(r.sizeBytes>0&&folder.getUsableSpace()<r.sizeBytes+4L*1024*1024)
-                    throw new IOException("Недостаточно свободного места для обновления. Освободите память устройства.");
-                HttpsURLConnection c=openApk(r.apkUrl,r.versionName);
-                long received=0L;
-                long total;
-                MessageDigest digest=MessageDigest.getInstance("SHA-256");
-                try{
-                    long serverLength=c.getContentLengthLong();
-                    if(serverLength>MAX_APK)throw new IOException("Слишком большой APK.");
-                    if(r.sizeBytes>0&&serverLength>0&&serverLength!=r.sizeBytes)
-                        throw new IOException("Сервер вернул файл другого размера.");
-                    total=r.sizeBytes>0?r.sizeBytes:serverLength;
-                    final long visibleTotal=total;
-                    activity.runOnUiThread(()->cb.progress(0L,visibleTotal));
-                    try(InputStream in=new BufferedInputStream(c.getInputStream(),128*1024);
-                        FileOutputStream out=new FileOutputStream(temp,false)){
-                        byte[] buf=new byte[128*1024];
-                        int n;long lastReport=0L;
-                        while((n=in.read(buf))!=-1){
-                            received+=n;
-                            if(received>MAX_APK)throw new IOException("Превышен допустимый размер обновления.");
-                            out.write(buf,0,n);digest.update(buf,0,n);
-                            long now=System.currentTimeMillis();
-                            if(now-lastReport>120L){
-                                lastReport=now;
-                                final long current=received;
-                                activity.runOnUiThread(()->cb.progress(current,visibleTotal));
-                            }
-                        }
-                        out.getFD().sync();
-                    }catch(FileNotFoundException e){
-                        throw new IOException("Не удалось создать файл обновления. Проверьте свободное место.",e);
+                // Follow only HTTPS redirects from the pinned official release URL.
+                String url=r.apkUrl;
+                for(int redirects=0;;redirects++){
+                    control.check();
+                    c=connection(url);control.active=c;c.setInstanceFollowRedirects(false);
+                    c.setRequestProperty("Accept-Encoding","identity");
+                    if(received>0)c.setRequestProperty("Range","bytes="+received+"-");
+                    int code=c.getResponseCode();
+                    if(code==301||code==302||code==303||code==307||code==308){
+                        if(redirects>=5)throw new IOException("Слишком много перенаправлений APK.");
+                        String location=c.getHeaderField("Location");
+                        if(location==null)throw new IOException("Нет адреса перенаправления APK.");
+                        URL next=new URL(new URL(url),location);
+                        checkHttps(next.toString());
+                        String host=next.getHost().toLowerCase(Locale.ROOT);
+                        if(!host.equals("github.com")&&!host.endsWith(".githubusercontent.com")&&!host.equals("githubusercontent.com"))
+                            throw new IOException("Недоверенный сервер APK.");
+                        c.disconnect();url=next.toString();continue;
                     }
-                }finally{c.disconnect();}
-                if(r.sizeBytes>0&&received!=r.sizeBytes)
-                    throw new IOException("Файл загрузился не полностью. Повторите загрузку.");
-                final long complete=received;
-                final long full=r.sizeBytes>0?r.sizeBytes:received;
-                activity.runOnUiThread(()->{
-                    cb.progress(complete,full);
-                    cb.status("Проверяем целостность и подпись…");
-                });
-                StringBuilder hash=new StringBuilder(64);
-                for(byte b:digest.digest())hash.append(String.format(Locale.US,"%02x",b&255));
-                if(!hash.toString().equals(r.sha256))throw new IOException("Контрольная сумма SHA-256 не совпала. Файл отклонён.");
-                try{Files.move(temp.toPath(),apk.toPath(),StandardCopyOption.REPLACE_EXISTING);}
-                catch(IOException move){throw new IOException("Не удалось сохранить APK во внутренней памяти. Проверьте свободное место.",move);}
-                try{verifyApk(activity,apk,r.versionCode);}
-                catch(Exception invalid){apk.delete();throw invalid;}
-                activity.runOnUiThread(()->cb.downloaded(apk));
-            }catch(Exception e){
-                temp.delete();
-                final String error=friendly(e);
-                activity.runOnUiThread(()->cb.error(error));
-            }
-        },"skyrim-text-rpg-update-download").start();
+                    control.check();
+                    long length=c.getContentLengthLong();
+                    if(code==206&&received>0){
+                        String range=c.getHeaderField("Content-Range");
+                        java.util.regex.Matcher m=java.util.regex.Pattern.compile("bytes ([0-9]+)-([0-9]+)/([0-9]+)").matcher(range==null?"":range);
+                        if(!m.matches())throw new IOException("Сервер вернул неверный диапазон.");
+                        long first=Long.parseLong(m.group(1)),last=Long.parseLong(m.group(2)),size=Long.parseLong(m.group(3));
+                        if(first!=received||last!=size-1||size>MAX_APK||size<=received||
+                            (total>0&&size!=total)||(length>=0&&length!=size-received))
+                            throw new IOException("Диапазон загрузки не совпадает с APK.");
+                        total=size;
+                    }else if(code==200){
+                        if(length>MAX_APK||(total>0&&length>=0&&length!=total))throw new IOException("Размер APK не совпадает.");
+                        if(total<0)total=length;
+                        if(received>0){
+                            // A server ignoring Range must restart, never append a full response.
+                            if(total>0&&folder.getUsableSpace()<total+4L*1024*1024)throw new IOException("Недостаточно места для повторной загрузки.");
+                            received=0;cb.status("Сервер не поддерживает продолжение. Загрузка заново.");
+                        }
+                    }else{requireOk(c,"Загрузка APK");throw new IOException("Неожиданный ответ сервера.");}
+                    break;
+                }
+                cb.progress(received,total);
+                try(InputStream in=new BufferedInputStream(c.getInputStream(),128*1024);
+                    FileOutputStream out=new FileOutputStream(temp,received>0)){
+                    byte[] buf=new byte[128*1024];long lastReport=0;int n;
+                    try{
+                        while(true){
+                            control.check();n=in.read(buf);if(n==-1)break;control.check();
+                            if(received+n>MAX_APK||(total>0&&received+n>total)){
+                                throw new IOException("Сервер прислал лишние данные.");
+                            }
+                            out.write(buf,0,n);received+=n;
+                            long now=android.os.SystemClock.elapsedRealtime();
+                            if(now-lastReport>=200){lastReport=now;cb.progress(received,total);}
+                        }
+                    }finally{out.getFD().sync();}
+                }
+            }finally{control.active=null;if(c!=null)c.disconnect();}
+        }
+        control.check();
+        if(total>0&&received!=total)throw new EOFException("Загрузка прервана. Можно продолжить с сохранённого места.");
+        if(received<=0)throw new IOException("Пустой APK.");
+        cb.progress(received,total>0?total:received);
+        cb.status("Проверка SHA-256 и подписи");
+        MessageDigest digest=MessageDigest.getInstance("SHA-256");
+        try(InputStream in=new BufferedInputStream(new FileInputStream(temp),128*1024)){
+            byte[] buf=new byte[128*1024];int n;
+            while((n=in.read(buf))!=-1){control.check();digest.update(buf,0,n);}
+        }
+        StringBuilder hash=new StringBuilder(64);
+        for(byte v:digest.digest())hash.append(String.format(Locale.US,"%02x",v&255));
+        if(!hash.toString().equals(r.sha256)){
+            temp.delete();throw new IOException("Контрольная сумма SHA-256 не совпала. Повреждённый файл удалён.");
+        }
+        control.check();
+        // Verify before publishing: an old valid APK cannot be replaced with a bad one.
+        try{verifyApk(context,temp,r.versionCode);}
+        catch(Exception invalid){temp.delete();throw invalid;}
+        control.check();
+        Files.move(temp.toPath(),apk.toPath(),StandardCopyOption.REPLACE_EXISTING,StandardCopyOption.ATOMIC_MOVE);
+        return apk;
     }
     /** An archive is accepted only if Android will recognize it as THIS installed app. */
     public static void verifyApk(Context c,File file,long expectedCode)throws Exception{

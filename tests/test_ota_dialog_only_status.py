@@ -33,13 +33,13 @@ class OnlyOtaDialogDisplaysCheckStatus(unittest.TestCase):
 
     def test_manual_ota_status_and_retries_remain_in_the_update_dialog(self):
         controller=source("SkyrimOtaController.java")
-        self.assertIn("if(manual)display().stage(message",controller)
-        self.assertIn("if(manual)display().fail(message,()->check(true))",controller)
-        self.assertIn("display().offer(info.versionName,info.notesFor(installed)",controller)
-        self.assertIn("display().downloading(amount,total)",controller)
+        self.assertIn("display().stage(message",controller)
+        self.assertIn("display().fail(message,()->check(true))",controller)
+        self.assertIn("display().offer(info.versionName,info.notesFor(BuildConfig.VERSION_CODE)",controller)
+        self.assertIn("screen.activeTransfer(s.phase,s.message,s.received,s.total",controller)
         self.assertIn("private OtaProgressDialog display()",controller)
-        # Automatic startup checks stay silent unless a real update is offered.
-        self.assertIn("if(manual)display().stage",controller)
+        self.assertIn("if(manual){display().stage",controller)
+        self.assertIn("if(updater!=null)updater.attachMini(root)",source("MainActivity.java"))
 
 
 if __name__=="__main__":
