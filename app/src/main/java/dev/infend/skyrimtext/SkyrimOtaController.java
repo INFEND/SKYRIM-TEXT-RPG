@@ -95,7 +95,13 @@ public final class SkyrimOtaController {
         if(installing&&manual)installing=false;
         if(installing)return;
         OtaDownloadService.Snapshot pending=OtaDownloadService.snapshot(activity);
-        if(pending!=null){if(manual)open();return;}
+        if(pending!=null){
+            if(manual){
+                if("paused".equals(pending.phase))download(pending.release);
+                else open();
+            }
+            return;
+        }
         if(checking){if(manual){manualCheck=true;open();}return;}
         if(offered!=null&&manual){showOffer(offered);return;}
         checking=true;manualCheck=manual;hidden=!manual;
@@ -131,11 +137,20 @@ public final class SkyrimOtaController {
     }
     private void download(UpdateManager.Release release){
         offered=null;hidden=false;installing=false;lastRender="";
-        if(!OtaDownloadService.start(activity,release)){
+        boolean started=OtaDownloadService.start(activity,release);
+        if(!started){
             OtaDownloadService.Snapshot s=OtaDownloadService.snapshot(activity);
             if(s==null){display().fail("Не удалось запустить фоновую загрузку.",()->download(release));return;}
         }
         display();refresh();
+        if(started&&Build.VERSION.SDK_INT>=33&&activity.checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS)
+            !=android.content.pm.PackageManager.PERMISSION_GRANTED){
+            SharedPreferences p=activity.getSharedPreferences("skyrim_text_v1",0);
+            if(!p.getBoolean("ota_transfer_notification_requested",false)){
+                p.edit().putBoolean("ota_transfer_notification_requested",true).apply();
+                activity.requestPermissions(new String[]{android.Manifest.permission.POST_NOTIFICATIONS},918);
+            }
+        }
     }
     public void onHostResume(){
         resumed=true;ui.removeCallbacks(tick);ui.post(tick);

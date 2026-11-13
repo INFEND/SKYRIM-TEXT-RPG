@@ -19,6 +19,8 @@ class ResumeOta(unittest.TestCase):
         for token in ("attachMini","mini.setOnClickListener(v->open())","OtaDownloadService.cancel(activity)","screen.paused","screen.ready","onHostPause"):
             self.assertIn(token,s)
         self.assertNotIn("UpdateManager.download(activity",s)
+        self.assertIn('if("paused".equals(pending.phase))download(pending.release)',s)
+        self.assertIn("activity.requestPermissions",s)
         self.assertIn("offered=info",s)
         self.assertIn("else if(offered!=null)showOffer(offered)",s)
         self.assertIn('APK_FILE+".part.apk"',(JAVA/"UpdateManager.java").read_text())

@@ -40,11 +40,12 @@ public final class OtaDownloadService extends Service {
         String phase=prefs(c).getString("phase","paused");
         long bytes=UpdateManager.partialBytes(c,r);
         if("ready".equals(phase)&&UpdateManager.apkFile(c).isFile()&&
-            (r.sizeBytes<0||UpdateManager.apkFile(c).length()==r.sizeBytes))
-            return new Snapshot(r,"ready","Готово к установке",UpdateManager.apkFile(c).length(),r.sizeBytes);
+            (r.sizeBytes<0||UpdateManager.apkFile(c).length()==r.sizeBytes)){
+            live=new Snapshot(r,"ready","Готово к установке",UpdateManager.apkFile(c).length(),r.sizeBytes);return live;
+        }
         String message="paused".equals(phase)?prefs(c).getString("message","Загрузка остановлена. Можно продолжить."):
             "Загрузка прервана. Продолжение доступно.";
-        return new Snapshot(r,"paused",message,bytes,r.sizeBytes);
+        live=new Snapshot(r,"paused",message,bytes,r.sizeBytes);return live;
     }
     static boolean start(Context c,UpdateManager.Release r){
         if(running)return false;
@@ -71,12 +72,17 @@ public final class OtaDownloadService extends Service {
         if(r==null){stopSelf();running=false;return START_NOT_STICKY;}
         running=true;workerGeneration=generation;control=new UpdateManager.DownloadControl();
         live=new Snapshot(r,"prepare","Подготовка загрузки",UpdateManager.partialBytes(this,r),r.sizeBytes);
-        NotificationManager nm=getSystemService(NotificationManager.class);
-        nm.createNotificationChannel(new NotificationChannel(CHANNEL,"Загрузка обновлений Skyrim",NotificationManager.IMPORTANCE_LOW));
-        if(Build.VERSION.SDK_INT>=29)startForeground(ID,notification(live),ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC);
-        else startForeground(ID,notification(live));
-        PowerManager pm=(PowerManager)getSystemService(POWER_SERVICE);
-        if(pm!=null){lock=pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,"Skyrim:OtaDownload");lock.setReferenceCounted(false);lock.acquire(2*60*60*1000L);}
+        try{
+            NotificationManager nm=getSystemService(NotificationManager.class);
+            nm.createNotificationChannel(new NotificationChannel(CHANNEL,"Загрузка обновлений Skyrim",NotificationManager.IMPORTANCE_LOW));
+            if(Build.VERSION.SDK_INT>=29)startForeground(ID,notification(live),ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC);
+            else startForeground(ID,notification(live));
+            PowerManager pm=(PowerManager)getSystemService(POWER_SERVICE);
+            if(pm!=null){lock=pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,"Skyrim:OtaDownload");lock.setReferenceCounted(false);lock.acquire(2*60*60*1000L);}
+        }catch(Exception e){
+            finish(new Snapshot(r,"paused",UpdateManager.friendly(e),UpdateManager.partialBytes(this,r),r.sizeBytes));
+            return START_NOT_STICKY;
+        }
         final UpdateManager.DownloadControl task=control;
         new Thread(()->{
             try{
