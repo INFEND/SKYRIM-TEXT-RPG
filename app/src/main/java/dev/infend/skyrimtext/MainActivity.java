@@ -643,9 +643,9 @@ public final class MainActivity extends Activity {
         for(String[] slot:new String[][]{{"head","Голова"},{"body","Доспех"},{"hands","Руки"},{"feet","Ноги"}}){
             gearSlot(slots,slot[0],slot[1]);
         }
-        layout.addView(new VisualEffectsView.HeroSilhouette(this,accent()),lp(80,172));
+        layout.addView(new VisualEffectsView.HeroSilhouette(this,accent(),game.progress),lp(80,172));
         LinearLayout right=column();right.setPadding(dp(6),0,0,0);layout.addView(right,new LinearLayout.LayoutParams(0,-2,1));
-        for(String[] slot:new String[][]{{"weapon","Оружие"},{"shield","Щит"},{"ring","Кольцо"},{"neck","Амулет"}}){
+        for(String[] slot:new String[][]{{"weapon","Оружие"},{"shield","Щит"},{"ring","Кольцо"},{"neck","Амулет"},{"ammo","Боеприпасы"}}){
             gearSlot(right,slot[0],slot[1]);
         }
         items.addView(layout,lp(-1,-2));
@@ -680,30 +680,32 @@ public final class MainActivity extends Activity {
     private void tradeVisual(){
         if(!"SHOP".equals(game.mode))return;
         if(!visual("trade")){actionButton("ПРОДАТЬ ПРЕДМЕТ","Продажа неэкипированных вещей",false,this::sellDialog);return;}
-        LinearLayout c=card();addText(c,"ТОРГОВЛЯ | "+game.gold+" септимов",14,ITEM_GOLD,true,10);
+        LinearLayout c=card();addText(c,"ТОРГОВЛЯ | "+game.gold+" септимов",14,ITEM_GOLD,true,7);
+        addText(c,"Кошелёк торговца: "+game.merchantGold()+" | Поставка: день "+game.merchantRestockDay(),12,MUTED,false,10);
         LinearLayout r=row();c.addView(r,lp(-1,-2));LinearLayout a=column(),b=column();a.setPadding(0,0,dp(4),0);b.setPadding(dp(4),0,0,0);
         r.addView(a,new LinearLayout.LayoutParams(0,-2,1));r.addView(b,new LinearLayout.LayoutParams(0,-2,1));
         addText(a,"КУПИТЬ",13,accent(),true,8);addText(b,"ПРОДАТЬ",13,accent(),true,8);
         String[][] stock={{"BUY_HP","Лечебное зелье","35"},{"BUY_MP","Зелье магии","30"},{"BUY_SWORD","Стальной меч","180"},{"BUY_ARMOR","Стальная кираса","160"}};
         for(String[] entry:stock){
             if(("BUY_SWORD".equals(entry[0])&&game.swordUpgraded)||("BUY_ARMOR".equals(entry[0])&&game.armorUpgraded))continue;
-            int price=Integer.parseInt(entry[2]);ItemCatalog.Item item=ItemCatalog.find(entry[1]);if(item!=null)tradeTile(a,item,price,()->buyFromTrade(entry[0],item,price));
+            int price=Integer.parseInt(entry[2]);ItemCatalog.Item item=ItemCatalog.find(entry[1]);if(item!=null)tradeTile(a,item,price,"У торговца: "+game.merchantStock(entry[0]),()->buyFromTrade(entry[0],item,price));
         }
         int shown=0;for(ItemCatalog.Item item:game.progress.owned("Все","Название"))if(game.canSell(item)){
-            if(shown++>=6)break;tradeTile(b,item,game.salePrice(item),()->confirmSale(item));
+            if(shown++>=6)break;tradeTile(b,item,game.salePrice(item),"У героя: "+game.progress.quantity(item.id),()->confirmSale(item));
         }
         if(shown==0)addText(b,"Нет доступных предметов",12,MUTED,false,6);
         actionButton("ВЕСЬ ИНВЕНТАРЬ ДЛЯ ПРОДАЖИ","Экипированные и защищённые предметы недоступны",false,this::sellDialog);
     }
-    private void tradeTile(LinearLayout host,ItemCatalog.Item item,int price,Runnable click){
+    private void tradeTile(LinearLayout host,ItemCatalog.Item item,int price,String stock,Runnable click){
         LinearLayout tile=column();tile.setPadding(dp(7),dp(8),dp(7),dp(8));tile.setBackground(new RuneFrameDrawable(PANEL,BORDER,false));
         tile.addView(new SkyrimIconView(this,SkyrimIconView.iconForItem(item.name,item.category),accent()),lp(28,30));
         addText(tile,item.name,12,TEXT,true,4);addText(tile,price+" септимов | "+itemNumber(item.weight)+" кг",11,ITEM_GOLD,false,4);
-        addText(tile,"В наличии у героя: "+game.progress.quantity(item.id),10,MUTED,false,0);
+        addText(tile,stock,10,MUTED,false,0);
         host.addView(tile,lp(-1,-2));space(host,5);tile.setOnClickListener(view->click.run());
     }
     private void buyFromTrade(String action,ItemCatalog.Item item,int price){
         if(!"SHOP".equals(game.mode))return;
+        if(game.merchantStock(action)<=0){toast("Товар закончился. Поставка: день "+game.merchantRestockDay());return;}
         new RuneDialogBuilder(this,accent()).setTitle(item.name).setMessage("Купить за "+price+" септимов?\n"+item.description)
             .setNegativeButton("Отмена",null).setPositiveButton("Купить",(d,w)->{
                 if(!"SHOP".equals(game.mode))return;
@@ -714,8 +716,9 @@ public final class MainActivity extends Activity {
     }
     private void confirmSale(ItemCatalog.Item item){
         if(!game.canSell(item))return;
+        if(game.merchantGold()<game.salePrice(item)){toast("У торговца недостаточно септимов");return;}
         new RuneDialogBuilder(this,accent()).setTitle(item.name).setMessage("Продать 1 шт. за "+game.salePrice(item)+" септимов?")
-            .setNegativeButton("Отмена",null).setPositiveButton("Продать",(d,w)->{if(game.sellOne(item.id)){recentItemGains.clear();save();render();toast(game.message);}}).show();
+            .setNegativeButton("Отмена",null).setPositiveButton("Продать",(d,w)->{if(game.sellOne(item.id)){recentItemGains.clear();save();render();toast(game.message);}else toast("Продажа недоступна");}).show();
     }
     private void sellDialog(){
         if(!"SHOP".equals(game.mode))return;

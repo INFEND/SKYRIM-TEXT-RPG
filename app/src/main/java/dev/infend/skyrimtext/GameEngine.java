@@ -61,6 +61,10 @@ public final class GameEngine {
     public boolean lastHeavyHit,lastMiss;
     public final int[] holdReputation=new int[10];
     public void resetBattleVisuals(){poisonTurns=frostTurns=battleTurns=battleDealt=battleTaken=lastDealt=lastTaken=lastHealing=lastBlocked=0;lastHeavyHit=lastMiss=false;}
+    private MerchantLedger merchants=new MerchantLedger();
+    public int merchantGold(){return merchants.budget(region,day);}
+    public int merchantStock(String action){return merchants.stock(region,day,action.startsWith("BUY_")?action.substring(4):action);}
+    public int merchantRestockDay(){return merchants.restockDay(day);}
     public boolean canSell(ItemCatalog.Item item){
         return started&&"SHOP".equals(mode)&&item!=null&&item.value>0&&progress.quantity(item.id)>0
             &&!progress.equipped(item.id)&&!"Квестовые предметы".equals(item.category)&&!"Ключи".equals(item.category)
@@ -71,7 +75,8 @@ public final class GameEngine {
     public int salePrice(ItemCatalog.Item item){return item==null||item.value<=0?0:Math.max(1,(int)((long)item.value*(30+progress.skillLevel(12)/5)/100));}
     public boolean sellOne(String id){
         ItemCatalog.Item item=ItemCatalog.find(id);if(!canSell(item))return false;
-        int price=salePrice(item);if((long)gold+price>Integer.MAX_VALUE||!progress.removeItem(id,1))return false;
+        int price=salePrice(item);if((long)gold+price>Integer.MAX_VALUE||merchantGold()<price||!progress.removeItem(id,1))return false;
+        if(!merchants.pay(region,day,price)){progress.addItem(id,1);return false;}
         gold+=price;progress.sync(this);message="Продано: "+item.name+" | +"+price+" септимов.";recordVisualEvent(message);return true;
     }
     public final java.util.LinkedHashSet<String> visitedVisual=new java.util.LinkedHashSet<>();
@@ -131,7 +136,7 @@ public final class GameEngine {
         progress=RpgProgress.newHero(this,origin,points);
         String[] back=RpgContent.startParts(origin);
         region=Integer.parseInt(back[2]);
-        mode="INTRO";message="";resetBattleVisuals();java.util.Arrays.fill(holdReputation,0);visitedVisual.clear();visualChronicle=new org.json.JSONArray();visitedVisual.add(progress.location);
+        mode="INTRO";message="";merchants=new MerchantLedger();resetBattleVisuals();java.util.Arrays.fill(holdReputation,0);visitedVisual.clear();visualChronicle=new org.json.JSONArray();visitedVisual.add(progress.location);
     }
 
     public Scene scene() {
@@ -219,9 +224,9 @@ public final class GameEngine {
             .add("GO_WORLD","Попрощаться","Вернуться на улицу");
     }
     private Scene shopScene() {
-        return new Scene("ТОРГОВЛЯ | " + REGIONS[region], "Северная лавка", "На прилавке лежат походные припасы и изделия кузнеца.\n\nТвой кошель: " + gold + " септимов.")
-            .primary("BUY_HP","Лечебное зелье | 35", "Восстанавливает 45 здоровья")
-            .add("BUY_MP","Зелье магии | 30", "Восстанавливает 35 магии")
+        return new Scene("ТОРГОВЛЯ | " + REGIONS[region], "Северная лавка", "На прилавке лежат походные припасы и изделия кузнеца.\n\nТвой кошель: " + gold + " септимов.\nКошелёк торговца: "+merchantGold()+" септимов.\nНовая поставка: день "+merchantRestockDay()+".")
+            .primary("BUY_HP","Лечебное зелье | 35", "Восстанавливает 45 здоровья | Осталось: "+merchantStock("HP"))
+            .add("BUY_MP","Зелье магии | 30", "Восстанавливает 35 магии | Осталось: "+merchantStock("MP"))
             .add("BUY_SWORD",swordUpgraded?"Клинок приобретён":"Закалённый клинок | 180", swordUpgraded?"Уже в инвентаре":"Стальной меч | экипируется при покупке")
             .add("BUY_ARMOR",armorUpgraded?"Доспех приобретён":"Стальной нагрудник | 160",armorUpgraded?"Уже в инвентаре":"Стальная кираса | экипируется при покупке")
             .add("GO_WORLD","Покинуть лавку","Вернуться на улицу");
@@ -395,6 +400,8 @@ public final class GameEngine {
         }
     }
     private void buy(int price,String success,String item) {
+        if(!"SHOP".equals(mode))return;
+        if(merchantStock(item)<=0){message="Товар закончился. Новая поставка: день "+merchantRestockDay()+".";mode="RESULT";return;}
         if((item.equals("SWORD")&&swordUpgraded)||(item.equals("ARMOR")&&armorUpgraded)) {
             message="Этот предмет у тебя уже есть.";mode="RESULT";return;
         }
@@ -412,6 +419,7 @@ public final class GameEngine {
             message="Нельзя взять предмет: вес превысит 50 кг. Септимы не списаны.";
             mode="RESULT";return;
         }
+        if(!merchants.purchase(region,day,item,price)){message="Товар закончился.";mode="RESULT";return;}
         gold-=price;
         switch(item){
             case "HP":potions++;break;
@@ -581,7 +589,7 @@ public final class GameEngine {
          .put("battleLog",battleLog).put("battleKind",battleKind).put("enemyIntro",enemyIntro)
          .put("enemyHp",enemyHp).put("enemyMaxHp",enemyMaxHp).put("enemyDamage",enemyDamage).put("progress",progress.toJson())
          .put("aiJournal",aiJournal).put("aiTurn",aiTurn==null?JSONObject.NULL:aiTurn.save())
-         .put("sceneState",sceneState.toJson())
+         .put("sceneState",sceneState.toJson()).put("merchants",merchants.toJson())
          .put("visitedVisual",new org.json.JSONArray(visitedVisual)).put("visualChronicle",visualChronicle)
          .put("holdReputation",new org.json.JSONArray(holdReputation)).put("poisonTurns",poisonTurns).put("frostTurns",frostTurns).put("battleTurns",battleTurns).put("battleDealt",battleDealt).put("battleTaken",battleTaken);
         return j;
@@ -612,6 +620,7 @@ public final class GameEngine {
             g.battleKind=j.optString("battleKind","");g.enemyIntro=j.optString("enemyIntro","");
             g.enemyHp=Math.max(0,j.optInt("enemyHp",0));g.enemyMaxHp=Math.max(0,j.optInt("enemyMaxHp",0));g.enemyDamage=Math.max(0,j.optInt("enemyDamage",0));
             g.progress=RpgProgress.fromJson(j.optJSONObject("progress"));
+            g.merchants=MerchantLedger.fromJson(j.optJSONObject("merchants"));
             org.json.JSONArray holds=j.optJSONArray("holdReputation");if(holds!=null)for(int i=0;i<g.holdReputation.length;i++)g.holdReputation[i]=Math.max(-100,Math.min(100,holds.optInt(i,0)));
             if("COMBAT".equals(g.mode)){g.poisonTurns=Math.max(0,Math.min(2,j.optInt("poisonTurns")));g.frostTurns=Math.max(0,Math.min(2,j.optInt("frostTurns")));}
             g.battleTurns=Math.max(0,j.optInt("battleTurns"));g.battleDealt=Math.max(0,j.optInt("battleDealt"));g.battleTaken=Math.max(0,j.optInt("battleTaken"));

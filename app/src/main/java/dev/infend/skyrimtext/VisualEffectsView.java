@@ -65,13 +65,24 @@ final class VisualEffectsView extends View {
         }
     }
     static final class HeroSilhouette extends View {
-        private final Paint p=new Paint(Paint.ANTI_ALIAS_FLAG);private final int color;
-        HeroSilhouette(Context c,int color){super(c);this.color=color;setImportantForAccessibility(IMPORTANT_FOR_ACCESSIBILITY_NO);}
+        private final Paint p=new Paint(Paint.ANTI_ALIAS_FLAG);private final int color;private final RpgProgress gear;
+        HeroSilhouette(Context c,int color,RpgProgress gear){super(c);this.color=color;this.gear=gear;setImportantForAccessibility(IMPORTANT_FOR_ACCESSIBILITY_NO);}
+        private boolean worn(String slot){return !"Не надето".equals(gear.equippedName(slot));}
+        private void plate(Canvas c,float l,float t,float r,float b){p.setColor(color);p.setAlpha(120);c.drawRoundRect(l,t,r,b,3,3,p);p.setAlpha(255);}
         @Override protected void onDraw(Canvas c){
             float w=getWidth(),h=getHeight();c.save();c.scale(w/80f,h/172f);
             p.setColor(0xff273036);p.setStyle(Paint.Style.FILL);c.drawCircle(40,20,12,p);
             Path body=new Path();body.moveTo(22,39);body.lineTo(58,39);body.lineTo(73,87);body.lineTo(61,92);body.lineTo(51,65);body.lineTo(52,99);body.lineTo(62,160);body.lineTo(46,160);body.lineTo(40,111);body.lineTo(34,160);body.lineTo(18,160);body.lineTo(28,99);body.lineTo(29,65);body.lineTo(19,92);body.lineTo(7,87);body.close();c.drawPath(body,p);
-            p.setColor(color);p.setStyle(Paint.Style.STROKE);p.setStrokeWidth(1.2f);c.drawPath(body,p);c.drawCircle(40,20,12,p);p.setStyle(Paint.Style.FILL);c.restore();
+            p.setColor(color);p.setStyle(Paint.Style.STROKE);p.setStrokeWidth(1.2f);c.drawPath(body,p);c.drawCircle(40,20,12,p);p.setStyle(Paint.Style.FILL);
+            if(worn("head"))plate(c,27,8,53,28);
+            if(worn("body"))plate(c,24,39,56,87);
+            if(worn("hands")){plate(c,8,78,21,93);plate(c,59,78,72,93);}
+            if(worn("feet")){plate(c,18,145,34,164);plate(c,46,145,62,164);}
+            if(worn("shield")){p.setColor(color);p.setAlpha(170);c.drawOval(2,56,27,99,p);p.setAlpha(255);}
+            if(worn("weapon")){p.setColor(color);p.setStrokeWidth(3);c.drawLine(68,87,78,33,p);}
+            if(worn("neck")){p.setColor(color);c.drawCircle(40,43,4,p);}
+            if(worn("ring")){p.setColor(color);c.drawCircle(65,86,3,p);}
+            c.restore();
         }
     }
     static final class SkillStars extends View {
