@@ -61,9 +61,9 @@ public final class GameEngine {
     public SceneState sceneState = new SceneState();
     public String aiJournal = "";
     public int poisonTurns,frostTurns,battleTurns,battleDealt,battleTaken,lastDealt,lastTaken,lastHealing,lastBlocked;
-    public boolean lastHeavyHit,lastMiss;
+    public boolean lastHeavyHit,lastMiss,lastCritical;
     public final int[] holdReputation=new int[10];
-    public void resetBattleVisuals(){poisonTurns=frostTurns=battleTurns=battleDealt=battleTaken=lastDealt=lastTaken=lastHealing=lastBlocked=0;lastHeavyHit=lastMiss=false;}
+    public void resetBattleVisuals(){poisonTurns=frostTurns=battleTurns=battleDealt=battleTaken=lastDealt=lastTaken=lastHealing=lastBlocked=0;lastHeavyHit=lastMiss=lastCritical=false;}
     private MerchantLedger merchants=new MerchantLedger();
     FactionCampaign factions=new FactionCampaign();
     public int merchantGold(){return merchants.budget(region,day);}
@@ -525,7 +525,7 @@ public final class GameEngine {
     }
     private void combatTurn(String action) {
         if(!mode.equals("COMBAT"))return;
-        lastDealt=lastTaken=lastHealing=lastBlocked=0;lastHeavyHit=lastMiss=false;
+        lastDealt=lastTaken=lastHealing=lastBlocked=0;lastHeavyHit=lastMiss=lastCritical=false;
         int damage=0;boolean defending=false;String actionText="";
         switch(action){
             case "ATTACK": damage=Math.max(1,effectiveAttack()+random.nextInt(9)-3);actionText="Ты наносишь удар: −"+damage+" здоровья врагу.";break;
@@ -537,6 +537,9 @@ public final class GameEngine {
             case "POTION":if(potions==0){battleLog="Лечебных зелий больше нет.";return;}potions--;int restored=Math.min(45+5*progress.branches.rank(14),maxHp-hp);hp+=restored;lastHealing=restored;actionText="Ты восстанавливаешь "+restored+" здоровья.";break;
             case "FLEE":if(battleKind.equals("WILD")&&random.nextInt(100)<progress.chance(this,"FLEE")){mode="RESULT";poisonTurns=frostTurns=0;message="Ты уходишь от противника. Трофеев нет.";return;}actionText="Попытка отступить не удалась.";break;
             default:return;
+        }
+        if("ATTACK".equals(action)&&damage>0&&random.nextInt(100)<8){
+            lastCritical=true;damage=Math.max(1,(int)Math.round(damage*1.5));actionText="Критический удар! −"+damage+" здоровья врагу.";
         }
         lastDealt=Math.min(enemyHp,damage);lastHeavyHit="HEAVY".equals(action)&&lastDealt>0;lastMiss="HEAVY".equals(action)&&lastDealt==0;battleDealt+=lastDealt;battleTurns++;
         enemyHp=Math.max(0,enemyHp-damage);

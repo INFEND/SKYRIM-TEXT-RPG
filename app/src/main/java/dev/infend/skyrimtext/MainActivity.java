@@ -409,16 +409,32 @@ public final class MainActivity extends Activity {
     private static String npcStatusLabel(String status){
         switch(status){case "MET":return "Знакомство";case "HELPED":return "Благодарность";case "INFORMED":return "Обмен сведениями";case "HOSTILE":return "Враждебность";case "DEAD":return "Погиб";case "MISSING":return "Пропал";default:return "Отношение неизвестно";}
     }
-    private CharacterPortraitView npcPortrait(String name){
+    private View npcPortrait(String name){
+        NpcProfiles.Profile profile=NpcProfiles.find(name);
+        if(profile!=null){
+            if(profile.dragon)return npcEmblem(profile.name,"dragon");
+            String path=CharacterIdentity.portraitPath(profile.race,profile.gender,profile.variant);
+            if(ResourceStore.has(this,path))return new CharacterPortraitView(this,profile.race,profile.gender,profile.variant);
+            return npcEmblem(profile.name,"hero");
+        }
         String lower=name.toLowerCase(java.util.Locale.ROOT);
         String race=lower.contains("ирилет")||lower.contains("данмер")?"Данмер":lower.contains("каджит")?"Каджит":lower.contains("аргониан")?"Аргонианин":lower.contains("альтмер")?"Альтмер":lower.contains("орк")?"Орк":lower.contains("импер")||lower.contains("хадвар")?"Имперец":"Норд";
         boolean female=lower.contains("ирилет")||lower.contains("дельфин")||lower.contains("гердур")||lower.contains("торговка")||lower.contains("женщина")||lower.contains("жрица")||lower.contains("хозяйка")||lower.contains("девушка");
-        return new CharacterPortraitView(this,race,female?CharacterIdentity.FEMALE:CharacterIdentity.MALE,1+Math.floorMod(name.hashCode(),3));
+        String gender=female?CharacterIdentity.FEMALE:CharacterIdentity.MALE;int variant=1+Math.floorMod(name.hashCode(),3);
+        if(ResourceStore.has(this,CharacterIdentity.portraitPath(race,gender,variant)))return new CharacterPortraitView(this,race,gender,variant);
+        return npcEmblem(name,"hero");
+    }
+    private View npcEmblem(String name,String glyph){
+        LinearLayout tile=column();tile.setGravity(Gravity.CENTER);tile.setMinimumHeight(dp(88));
+        tile.setBackground(new RuneFrameDrawable(PANEL,accent(),false));tile.addView(new SkyrimIconView(this,glyph,accent()),lp(40,48));
+        TextView letter=text(name.isEmpty()?"?":name.substring(0,1),15,accent(),true);letter.setGravity(Gravity.CENTER);tile.addView(letter,lp(-1,-2));return tile;
     }
     private void npcDetails(String name){
         LinearLayout panel=column();panel.setGravity(Gravity.CENTER);panel.setPadding(dp(12),dp(12),dp(12),dp(12));
         panel.addView(npcPortrait(name),lp(112,-2));
-        addText(panel,"Иллюстративный образ, не канонический портрет",11,MUTED,false,10);
+        NpcProfiles.Profile profile=NpcProfiles.find(name);
+        if(profile!=null){addText(panel,profile.race+" | "+profile.role,14,TEXT,true,8);}
+        addText(panel,"Иллюстративный образ или эмблема, не индивидуальный портрет",11,MUTED,false,10);
         addText(panel,npcStatusLabel(game.sceneState.npcStatusByName(name)),15,TEXT,true,8);
         new RuneDialogBuilder(this,accent()).setTitle(name).setView(panel).setNegativeButton("Закрыть",null).show();
     }
@@ -426,19 +442,15 @@ public final class MainActivity extends Activity {
     private void decorateNarrative(LinearLayout host,TextView body,String raw){
         if(!visual("narrative"))body.setText(body.getText().toString());
         if(visual("portraits")){
-            java.util.LinkedHashSet<String> speakers=new java.util.LinkedHashSet<>();
-            java.util.regex.Matcher names=java.util.regex.Pattern.compile("(?m)^\\s*(?:\\*\\*)?([^:\\n*]{2,48}):(?:\\*\\*)?\\s*$").matcher(raw);
-            while(names.find()&&speakers.size()<8){
-                String name=names.group(1).trim();
-                if(!name.isEmpty()&&!name.equalsIgnoreCase("ты")&&!name.equalsIgnoreCase(game.name))speakers.add(name);
-            }
+            java.util.LinkedHashSet<String> speakers=NpcProfiles.speakers(raw,game.name);
             if(!speakers.isEmpty()){
                 HorizontalScrollView strip=new HorizontalScrollView(this);strip.setHorizontalScrollBarEnabled(false);
                 LinearLayout avatars=row();strip.addView(avatars);
                 for(String name:speakers){
                     LinearLayout person=column();person.setGravity(Gravity.CENTER);
                     person.setPadding(dp(5),dp(4),dp(5),dp(8));person.addView(npcPortrait(name),lp(68,-2));
-                    TextView label=text(name,10,MUTED,false);label.setGravity(Gravity.CENTER);label.setMaxLines(2);
+                    NpcProfiles.Profile profile=NpcProfiles.find(name);
+                    TextView label=text(profile==null?name:profile.name,10,MUTED,false);label.setGravity(Gravity.CENTER);label.setMaxLines(2);
                     person.addView(label,lp(-1,-2));TextView relation=text(npcStatusLabel(game.sceneState.npcStatusByName(name)),10,accent(),false);relation.setGravity(Gravity.CENTER);person.addView(relation,lp(-1,-2));
                     avatars.addView(person,lp(94,-2));person.setOnClickListener(view->npcDetails(name));
                 }
@@ -515,7 +527,7 @@ public final class MainActivity extends Activity {
             if(!before.enemy.equals(after.enemyName)&&after.victories==before.victories)hit=0;
             int received=Math.max(0,before.hp-after.hp);
             if(after.lastDealt>0)hit=after.lastDealt;if(after.lastTaken>0)received=after.lastTaken;
-            if(hit>0)combatLabel((after.lastHeavyHit?"СИЛЬНЫЙ УДАР":"УРОН ВРАГУ")+"\n−"+hit,ITEM_GOLD);
+            if(hit>0)combatLabel((after.lastCritical?"КРИТИЧЕСКИЙ УДАР":after.lastHeavyHit?"СИЛЬНЫЙ УДАР":"УРОН ВРАГУ")+"\n−"+hit,ITEM_GOLD);
             if(received>0)combatLabel("ПОЛУЧЕН УРОН\n−"+received,ITEM_DOWN);
             if(after.lastHealing>0)combatLabel("ЛЕЧЕНИЕ\n+"+after.lastHealing,ITEM_UP);
             if(after.lastBlocked>0)combatLabel("ЗАБЛОКИРОВАНО\n"+after.lastBlocked,accent());

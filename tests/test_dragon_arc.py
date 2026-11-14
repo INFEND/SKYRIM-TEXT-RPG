@@ -52,7 +52,8 @@ class DragonArcContracts(unittest.TestCase):
         self.assertIn('progress.dragonStage=4;',game)
         self.assertIn('if ("COMBAT".equals(mode)',game)
         self.assertIn('case "DRAGON": return DragonArc.scene(this);',game)
-        self.assertIn('s.primary("DRAGON_OPEN"',game)
+        self.assertIn('s.primary("CANON_OPEN"',game)
+        self.assertIn('s.add("DRAGON_OPEN"',game)
         self.assertIn('DragonArc.status(this)',game)
 
     def test_schema_one_legacy_saves_stay_compatible(self):

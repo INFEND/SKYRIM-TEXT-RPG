@@ -133,7 +133,8 @@ public final class RpgProgress {
     }
     public double damageReduction(){
         boolean heavy=false,light=false;for(String slot:SLOTS){ItemCatalog.Item item=ItemCatalog.find(equipped.get(slot));if(item!=null&&item.wearable()&&item.baseStat>0){heavy|=item.statSkill==4;light|=item.statSkill==5;}}
-        return Math.min(0.8,(equippedArmor()+25*armorPieces())*0.0012+(heavy?.02*branches.rank(4):0)+(light?.02*branches.rank(5):0));
+        double base=Math.min(0.8,(equippedArmor()+25*armorPieces())*0.0012);
+        return Math.min(0.8,base+(heavy?.02*branches.rank(4):0)+(light?.02*branches.rank(5):0));
     }
     public void shopEquip(String id){equip(id);}
 
