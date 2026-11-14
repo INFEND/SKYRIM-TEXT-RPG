@@ -22,6 +22,7 @@ public final class RpgProgress {
     public final int[] skillXp = new int[RpgContent.SKILLS.length];
     private final int[] combatPerks=new int[6];
     private final int[] studyPerks=new int[RpgContent.SKILLS.length];
+    TalentBranches branches=new TalentBranches();
     public int talentRank(int skill){return skill<0||skill>=studyPerks.length?0:isCombatPerk(skill)?combatPerkRank(skill):studyPerks[skill];}
     public int talentNeed(int skill,int rank){return isCombatPerk(skill)?Math.max(0,(rank-1)*20):rank*20;}
     public boolean canBuyTalent(int skill){int rank=talentRank(skill);return skill>=0&&skill<studyPerks.length&&rank<5&&perkPoints>0&&skillLevel(skill)>=talentNeed(skill,rank+1);}
@@ -130,7 +131,10 @@ public final class RpgProgress {
             if(item!=null&&quantity(item.id)>0&&item.wearable()&&item.baseStat>0)count++;}
         return count;
     }
-    public double damageReduction(){return Math.min(0.8,(equippedArmor()+25*armorPieces())*0.0012);}
+    public double damageReduction(){
+        boolean heavy=false,light=false;for(String slot:SLOTS){ItemCatalog.Item item=ItemCatalog.find(equipped.get(slot));if(item!=null&&item.wearable()&&item.baseStat>0){heavy|=item.statSkill==4;light|=item.statSkill==5;}}
+        return Math.min(0.8,(equippedArmor()+25*armorPieces())*0.0012+(heavy?.02*branches.rank(4):0)+(light?.02*branches.rank(5):0));
+    }
     public void shopEquip(String id){equip(id);}
 
     public final int[] spent = new int[3];
@@ -216,7 +220,7 @@ public final class RpgProgress {
     public void skillExperience(GameEngine g,int index,int amount){
         if(index<0||index>=skillLevels.length||amount<=0)return;
         if(skillLevels[index]<100){
-            skillXp[index]+=amount;
+            skillXp[index]+=amount+branches.experienceBonus(index,amount);
             while(skillLevels[index]<100&&skillXp[index]>=skillNeed(index)){
                 skillXp[index]-=skillNeed(index);skillLevels[index]++;
                 if(skillLevels[index]==100)skillXp[index]=0;
@@ -230,7 +234,7 @@ public final class RpgProgress {
         int difficulty=baseDifficulty+Math.max(0,15-g.level)*2;
         int danger=Math.max(0,g.region/2)+difficulty/10;
         int skill=skillIndex<0?0:(skillLevel(skillIndex)-15)/2;
-        int context=Math.min(18,g.reputation/3)+skill-((int)carryWeight()>45?8:0);
+        int context=Math.min(18,g.reputation/3)+skill+branches.chanceBonus(skillIndex)-((int)carryWeight()>45?8:0);
         return RpgContent.successChance(g,stat,difficulty,danger,exhaustion,context);
     }
     public int chance(GameEngine g,String action){
@@ -355,7 +359,7 @@ public final class RpgProgress {
              .put("skillXp",new JSONArray(skillXp)).put("inventory",inventory)
              .put("completed",new JSONArray(completed)).put("failed",new JSONArray(failed))
              .put("questOutcomes",new JSONObject(questOutcomes))
-             .put("perks",perkPoints).put("combatPerks",new JSONArray(combatPerks)).put("studyPerks",new JSONArray(studyPerks))
+             .put("perks",perkPoints).put("combatPerks",new JSONArray(combatPerks)).put("studyPerks",new JSONArray(studyPerks)).put("talentBranches",branches.toJson())
              .put("equipmentInitialized",equipmentInitialized).put("equipped",new JSONObject(equipped))
              .put("tempered",new JSONObject(tempered))
              .put("activePowerDay",activePowerDay).put("difficulty",difficulty)
@@ -370,6 +374,7 @@ public final class RpgProgress {
     }
     public static RpgProgress fromJson(JSONObject obj){
         RpgProgress p=new RpgProgress();if(obj==null)return p;
+        p.branches=TalentBranches.fromJson(obj.optJSONArray("talentBranches"));
         p.startId=obj.optString("startId","Хелген");p.location=obj.optString("location","Хелген");
         p.recent=obj.optString("recent","");p.perkPoints=Math.max(0,obj.optInt("perks",0));
         p.activePowerDay=obj.optInt("activePowerDay",-1);p.difficulty=obj.optInt("difficulty",0);

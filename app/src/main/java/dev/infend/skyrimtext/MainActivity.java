@@ -676,9 +676,30 @@ public final class MainActivity extends Activity {
         factionRow(c,"Защитники Вайтрана",game.progress.dragonStage>=4?"Помог в битве с драконом":game.progress.dragonStage>=3?"Принято поручение":"Нет подтверждённых связей");
         factionRow(c,"Седобородые",game.progress.dragonStage>=DragonArc.FINAL_STAGE?"Первое испытание пройдено":game.progress.dragonStage>=5?"Достигнут Высокий Хротгар":"Нет подтверждённых связей");
         factionRow(c,"Хранители печатей",game.questStage==4?"Печати восстановлены":game.questStage>0?"Поручение принято":"Нет подтверждённых связей");
-        for(String name:new String[]{"Соратники","Коллегия Винтерхолда","Гильдия воров","Тёмное Братство","Имперский легион","Братья Бури","Стража Рассвета"})factionRow(c,name,"Членство не подтверждено");
+        for(int i=0;i<FactionCampaign.NAMES.length;i++){final int index=i;factionRow(c,FactionCampaign.NAMES[i],game.factions.rank(i)+" | "+game.factions.task(i));}
         org.json.JSONArray npcs=game.sceneState.npcFacts();if(npcs.length()>0)addText(c,"ЗНАКОМСТВА",11,accent(),true,9);
         for(int i=0;i<npcs.length();i++){JSONObject n=npcs.optJSONObject(i);if(n!=null)factionRow(c,n.optString("title"),npcStatusLabel(n.optString("status")));}
+    }
+    private void factionDialog(){
+        String[] labels=new String[FactionCampaign.NAMES.length];
+        for(int i=0;i<labels.length;i++)labels[i]=FactionCampaign.NAMES[i]+" | "+game.factions.rank(i);
+        new RuneDialogBuilder(this,accent()).setTitle("Фракции").setItems(labels,(d,i)->factionDetails(i)).setNegativeButton("Закрыть",null).show();
+    }
+    private void factionDetails(int f){
+        LinearLayout panel=column();panel.setPadding(dp(14),dp(12),dp(14),dp(12));
+        panel.addView(new SkyrimIconView(this,FactionCampaign.ICONS[f],accent()),lp(48,52));
+        addText(panel,game.factions.rank(f),20,ITEM_GOLD,true,10);
+        addText(panel,"Поручения: "+Math.max(0,game.factions.stage(f)-1)+" / 3",13,MUTED,false,8);
+        addText(panel,game.factions.task(f),16,TEXT,true,9);
+        addText(panel,"Место: "+game.factions.place(f),13,MUTED,false,8);
+        int chance=game.factions.chance(game,f);if(chance>=0){addText(panel,"Шанс успеха: "+chance+"% | −10 выносливости",13,SceneChoiceMeta.chanceColor(chance),true,8);}
+        String blocked=game.factions.block(game,f);if(!blocked.isEmpty())addText(panel,blocked,13,ITEM_DOWN,false,6);
+        addText(panel,"Авторская цепочка поручений текстовой игры.",11,MUTED,false,0);
+        AlertDialog.Builder dialog=new RuneDialogBuilder(this,accent()).setTitle(FactionCampaign.NAMES[f]).setView(panel).setNegativeButton("Закрыть",null);
+        if(blocked.isEmpty())dialog.setPositiveButton(game.factions.stage(f)==0?"Вступить":"Выполнить",(d,w)->{
+            if(game.factions.perform(game,f)){save();render();toast(game.message);factionDetails(f);}
+        });
+        dialog.show();
     }
     private void reputationRow(LinearLayout host,String name,int score,String status){
         LinearLayout line=row();line.addView(new SkyrimIconView(this,"shield",accent()),lp(27,30));LinearLayout detail=column();line.addView(detail,new LinearLayout.LayoutParams(0,-2,1));addText(detail,name,13,TEXT,true,3);
@@ -3207,6 +3228,7 @@ public final class MainActivity extends Activity {
         if(!prefs.getBoolean("ai_enabled",false))
             actionButton("Ожидать","Выбрать от 1 до 24 часов отдыха",false,this::showWaitDialog);
         reputationPanel();
+        actionButton("ФРАКЦИИ","Членство, ранги и поручения",false,this::factionDialog);
         LinearLayout c=card();addText(c,"ХАРАКТЕРИСТИКИ",11,accent(),true,9);
         heroEntry(c,"Пол",game.gender);
         heroEntry(c,"Опыт",game.xp+" / "+(game.level*80));
@@ -3284,10 +3306,21 @@ public final class MainActivity extends Activity {
                 addText(words,"Ранг "+i+" | "+(acquired?"Изучен":available?"Доступен":"Закрыт"),14,acquired?ITEM_GOLD:TEXT,true,3);
                 addText(words,"Навык "+need+" | "+(combat?"+20% за ранг":"+70 опыта при изучении"),11,MUTED,false,6);box.addView(node,lp(-1,-2));
             }
+            addText(box,"СПЕЦИАЛИЗАЦИИ",12,accent(),true,8);
+            for(int i=0;i<2;i++){int nodeIndex=i;boolean owned=game.progress.branches.rank(index)>i;
+                String requirement="Навык "+(i==0?30:60)+" | Основной ранг "+(i+1);
+                addText(box,TalentBranches.NAMES[index][i]+" | "+(owned?"Изучен":requirement),14,owned?ITEM_GOLD:TEXT,true,4);
+                addText(box,TalentBranches.effect(index),11,MUTED,false,8);
+            }
             ScrollView scroller=new ScrollView(this);scroller.addView(box);builder.setView(scroller);
-        }else builder.setMessage(details+"\n"+title+" "+rank+"/5");
+        }else builder.setMessage(details+"\n"+title+" "+rank+"/5"+"\nСпециализации: "+game.progress.branches.rank(index)+"/2");
         if(game.progress.canBuyTalent(index))builder.setPositiveButton("Изучить следующий ранг",(d,w)->{
             if(combat?game.progress.buyCombatPerk(index):game.progress.buyTalent(game,index)){save();render();toast("Талант развит");}
+        });
+        if(game.progress.branches.canBuy(game.progress,index))builder.setNeutralButton("Специализация",(d,w)->{
+            int r=game.progress.branches.rank(index);new RuneDialogBuilder(this,accent()).setTitle(TalentBranches.NAMES[index][r]).setMessage(TalentBranches.effect(index)+"\nЦена: 1 очко таланта.").setNegativeButton("Отмена",null).setPositiveButton("Изучить",(dd,ww)->{
+                if(game.progress.branches.buy(game.progress,index)){save();render();toast("Специализация изучена");showSkill(index);}
+            }).show();
         });
         builder.show();
     }

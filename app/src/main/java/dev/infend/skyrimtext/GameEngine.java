@@ -62,6 +62,7 @@ public final class GameEngine {
     public final int[] holdReputation=new int[10];
     public void resetBattleVisuals(){poisonTurns=frostTurns=battleTurns=battleDealt=battleTaken=lastDealt=lastTaken=lastHealing=lastBlocked=0;lastHeavyHit=lastMiss=false;}
     private MerchantLedger merchants=new MerchantLedger();
+    FactionCampaign factions=new FactionCampaign();
     public int merchantGold(){return merchants.budget(region,day);}
     public int merchantStock(String action){return merchants.stock(region,day,action.startsWith("BUY_")?action.substring(4):action);}
     public int merchantRestockDay(){return merchants.restockDay(day);}
@@ -72,7 +73,7 @@ public final class GameEngine {
             &&!"Походный клинок".equals(item.id)&&!"Дорожная одежда".equals(item.id)
             &&!(swordUpgraded&&"Стальной меч".equals(item.id))&&!(armorUpgraded&&"Стальная кираса".equals(item.id));
     }
-    public int salePrice(ItemCatalog.Item item){return item==null||item.value<=0?0:Math.max(1,(int)((long)item.value*(30+progress.skillLevel(12)/5)/100));}
+    public int salePrice(ItemCatalog.Item item){return item==null||item.value<=0?0:Math.max(1,(int)((long)item.value*(30+progress.skillLevel(12)/5+5*progress.branches.rank(12))/100));}
     public boolean sellOne(String id){
         ItemCatalog.Item item=ItemCatalog.find(id);if(!canSell(item))return false;
         int price=salePrice(item);if((long)gold+price>Integer.MAX_VALUE||merchantGold()<price||!progress.removeItem(id,1))return false;
@@ -147,7 +148,7 @@ public final class GameEngine {
         progress=RpgProgress.newHero(this,origin,points);
         String[] back=RpgContent.startParts(origin);
         region=Integer.parseInt(back[2]);
-        mode="INTRO";message="";merchants=new MerchantLedger();resetBattleVisuals();java.util.Arrays.fill(holdReputation,0);visitedVisual.clear();visualChronicle=new org.json.JSONArray();visitedVisual.add(progress.location);
+        mode="INTRO";message="";merchants=new MerchantLedger();factions=new FactionCampaign();resetBattleVisuals();java.util.Arrays.fill(holdReputation,0);visitedVisual.clear();visualChronicle=new org.json.JSONArray();visitedVisual.add(progress.location);
     }
 
     public Scene scene() {
@@ -508,7 +509,7 @@ public final class GameEngine {
     // shop's fixed equipment bonus twice. New gear uses the catalog statistic.
     public int effectiveAttack(){
         int intrinsic=Math.max(0,attack-(swordUpgraded?6:0)-7);
-        return Math.max(1,intrinsic+(int)Math.round(progress.equippedDamage()));
+        return Math.max(1,intrinsic+(int)Math.round(progress.equippedDamage()*(1+.05*progress.branches.rank(progress.equippedWeaponSkill()))));
     }
     public int effectiveArmor(){
         return Math.max(0,armor-(armorUpgraded?4:0))+(int)Math.round(progress.equippedArmor());
@@ -522,9 +523,9 @@ public final class GameEngine {
             case "HEAVY":if(stamina<10){battleLog="Недостаточно выносливости для сильного удара.";return;}
                 int hitChance=progress.chance(this,"HEAVY");stamina-=10;
                 if(random.nextInt(100)<hitChance){damage=Math.max(1,effectiveAttack()*2+random.nextInt(9));actionText="Сильный удар! −"+damage+" здоровья врагу.";}else actionText="Сильный удар проходит мимо.";break;
-            case "MAGIC":if(magicka<12){battleLog="Недостаточно магии. Нужны 12 единиц.";return;}magicka-=12;damage=18+level*4+random.nextInt(8);actionText="Магическая вспышка обжигает врага: −"+damage+".";break;
+            case "MAGIC":if(magicka<12){battleLog="Недостаточно магии. Нужны 12 единиц.";return;}magicka-=12;damage=(int)Math.round((18+level*4+random.nextInt(8))*(1+.05*progress.branches.rank(13)));actionText="Магическая вспышка обжигает врага: −"+damage+".";break;
             case "DEFEND": defending=true;stamina=Math.min(maxStamina,stamina+12);magicka=Math.min(maxMagicka,magicka+5);actionText="Ты встаёшь в оборону, восстанавливая силы.";break;
-            case "POTION":if(potions==0){battleLog="Лечебных зелий больше нет.";return;}potions--;int restored=Math.min(45,maxHp-hp);hp+=restored;lastHealing=restored;actionText="Ты восстанавливаешь "+restored+" здоровья.";break;
+            case "POTION":if(potions==0){battleLog="Лечебных зелий больше нет.";return;}potions--;int restored=Math.min(45+5*progress.branches.rank(14),maxHp-hp);hp+=restored;lastHealing=restored;actionText="Ты восстанавливаешь "+restored+" здоровья.";break;
             case "FLEE":if(battleKind.equals("WILD")&&random.nextInt(100)<progress.chance(this,"FLEE")){mode="RESULT";poisonTurns=frostTurns=0;message="Ты уходишь от противника. Трофеев нет.";return;}actionText="Попытка отступить не удалась.";break;
             default:return;
         }
@@ -532,7 +533,7 @@ public final class GameEngine {
         enemyHp=Math.max(0,enemyHp-damage);
         if(enemyHp==0) {poisonTurns=frostTurns=0;winBattle(actionText);return;}
         int baseIncoming=enemyDamage+random.nextInt(8)-Math.max(0,armor-(armorUpgraded?4:0));
-        int rawIncoming=Math.max(1,baseIncoming-(defending?enemyDamage/2+3:0));
+        int rawIncoming=Math.max(1,baseIncoming-(defending?enemyDamage/2+3+2*progress.branches.rank(3):0));
         int incoming=Math.max(1,(int)Math.round(rawIncoming*(1-progress.damageReduction())));
         if(defending)lastBlocked=Math.max(0,Math.max(1,(int)Math.round(Math.max(1,baseIncoming)*(1-progress.damageReduction())))-incoming);
         int poisoned=poisonTurns>0?Math.max(1,maxHp/40):0;
@@ -582,7 +583,7 @@ public final class GameEngine {
         progress.sync(this);
         return true;
     }
-    public boolean drinkHealing() {if(!started||potions<=0||hp>=maxHp)return false;potions--;hp=Math.min(maxHp,hp+45);return true;}
+    public boolean drinkHealing() {if(!started||potions<=0||hp>=maxHp)return false;potions--;hp=Math.min(maxHp,hp+45+5*progress.branches.rank(14));return true;}
     public boolean drinkMana() {if(!started||manaPotions<=0||magicka>=maxMagicka)return false;manaPotions--;magicka=Math.min(maxMagicka,magicka+35);return true;}
     public String questStatus() {switch(questStage){case 0:return "не начато";case 1:return "Фолкрит";case 2:return "Винтерхолд";case 3:return "Солитьюд";default:return "завершено";}}
     public String questDetails() {switch(questStage){case 0:return "Поговори с хранителем в разделе «Главная история».";case 1:return "Доберись до Фолкрита и осмотри алтарь.";case 2:return "Найди башню в Винтерхолде и победи пепельного стража.";case 3:return "Передай журнал хранителям Солитьюда.";default:return "Сюжетная линия завершена. Ты можешь продолжать приключения.";}}
@@ -600,7 +601,7 @@ public final class GameEngine {
          .put("battleLog",battleLog).put("battleKind",battleKind).put("enemyIntro",enemyIntro)
          .put("enemyHp",enemyHp).put("enemyMaxHp",enemyMaxHp).put("enemyDamage",enemyDamage).put("progress",progress.toJson())
          .put("aiJournal",aiJournal).put("aiTurn",aiTurn==null?JSONObject.NULL:aiTurn.save())
-         .put("sceneState",sceneState.toJson()).put("merchants",merchants.toJson())
+         .put("sceneState",sceneState.toJson()).put("merchants",merchants.toJson()).put("factions",factions.toJson())
          .put("visitedVisual",new org.json.JSONArray(visitedVisual)).put("visualChronicle",visualChronicle)
          .put("holdReputation",new org.json.JSONArray(holdReputation)).put("poisonTurns",poisonTurns).put("frostTurns",frostTurns).put("battleTurns",battleTurns).put("battleDealt",battleDealt).put("battleTaken",battleTaken);
         return j;
@@ -631,7 +632,7 @@ public final class GameEngine {
             g.battleKind=j.optString("battleKind","");g.enemyIntro=j.optString("enemyIntro","");
             g.enemyHp=Math.max(0,j.optInt("enemyHp",0));g.enemyMaxHp=Math.max(0,j.optInt("enemyMaxHp",0));g.enemyDamage=Math.max(0,j.optInt("enemyDamage",0));
             g.progress=RpgProgress.fromJson(j.optJSONObject("progress"));
-            g.merchants=MerchantLedger.fromJson(j.optJSONObject("merchants"));
+            g.merchants=MerchantLedger.fromJson(j.optJSONObject("merchants"));g.factions=FactionCampaign.fromJson(j.optJSONObject("factions"));
             org.json.JSONArray holds=j.optJSONArray("holdReputation");if(holds!=null)for(int i=0;i<g.holdReputation.length;i++)g.holdReputation[i]=Math.max(-100,Math.min(100,holds.optInt(i,0)));
             if("COMBAT".equals(g.mode)){g.poisonTurns=Math.max(0,Math.min(2,j.optInt("poisonTurns")));g.frostTurns=Math.max(0,Math.min(2,j.optInt("frostTurns")));}
             g.battleTurns=Math.max(0,j.optInt("battleTurns"));g.battleDealt=Math.max(0,j.optInt("battleDealt"));g.battleTaken=Math.max(0,j.optInt("battleTaken"));
