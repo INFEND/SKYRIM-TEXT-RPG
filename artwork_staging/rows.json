@@ -1,0 +1,234 @@
+[
+  {
+    "slug": "highhrothgar",
+    "number": 7,
+    "caption": "Высокий Хротгар на семитысячных ступенях",
+    "id": 0,
+    "source": "artwork_staging/0.png",
+    "source_git_sha": "514e415077dc558f2e8cb406f17bd874f239cdff"
+  },
+  {
+    "slug": "highhrothgar",
+    "number": 8,
+    "caption": "Своды Высокого Хротгара",
+    "id": 2,
+    "source": "artwork_staging/2.png",
+    "source_git_sha": "93825cc3672000aff31e23bba28a28254616d836"
+  },
+  {
+    "slug": "highhrothgar",
+    "number": 9,
+    "caption": "Заснеженный тренировочный двор",
+    "id": 3,
+    "source": "artwork_staging/3.png",
+    "source_git_sha": "2e0e9366a68eed27181cb31942f0900b4ef68cc2"
+  },
+  {
+    "slug": "highhrothgar",
+    "number": 10,
+    "caption": "Кельи Высокого Хротгара",
+    "id": 4,
+    "source": "artwork_staging/4.png",
+    "source_git_sha": "d02cdf5670e3d01c8ae1e723083a501590ca9bee"
+  },
+  {
+    "slug": "highhrothgar",
+    "number": 11,
+    "caption": "Зал совета",
+    "id": 5,
+    "source": "artwork_staging/5.png",
+    "source_git_sha": "40729a9ed557eb52ad84ad279341f56246ec9804"
+  },
+  {
+    "slug": "bleakfallsbarrow",
+    "number": 1,
+    "caption": "Заснеженный Ветреный пик",
+    "id": 6,
+    "source": "artwork_staging/6.png",
+    "source_git_sha": "2e9337b0b369fb1316d8e3473273faf7356a4378"
+  },
+  {
+    "slug": "bleakfallsbarrow",
+    "number": 2,
+    "caption": "Разрушенный зал храма",
+    "id": 7,
+    "source": "artwork_staging/7.png",
+    "source_git_sha": "fd8c0847eba8a5ba86bede16b8c9c8bd1841c5e6"
+  },
+  {
+    "slug": "bleakfallsbarrow",
+    "number": 3,
+    "caption": "Зал загадки",
+    "id": 8,
+    "source": "artwork_staging/8.png",
+    "source_git_sha": "647808b5e6587f741667a54d18452a6119ad72b0"
+  },
+  {
+    "slug": "bleakfallsbarrow",
+    "number": 4,
+    "caption": "Дверь с замком Драконьего когтя",
+    "id": 9,
+    "source": "artwork_staging/9.png",
+    "source_git_sha": "62296e130874282e0ba136543ddc86366018c8a5"
+  },
+  {
+    "slug": "bleakfallsbarrow",
+    "number": 5,
+    "caption": "Саркофаг у Стены Слов",
+    "id": 10,
+    "source": "artwork_staging/10.png",
+    "source_git_sha": "e64f9ea603a77df2dcbcd7cfe9521173a364af88"
+  },
+  {
+    "slug": "bleakfallsbarrow",
+    "number": 6,
+    "caption": "Сумрачные коридоры",
+    "id": 11,
+    "source": "artwork_staging/11.png",
+    "source_git_sha": "aeaa3c52dd5f37213c9c993af1c9d20afbbdcd44"
+  },
+  {
+    "slug": "blackreach",
+    "number": 1,
+    "caption": "Город двемеров",
+    "id": 12,
+    "source": "artwork_staging/12.png",
+    "source_git_sha": "19fbd583ab9a0862d1f5133dd88f23e1a6a28648"
+  },
+  {
+    "slug": "blackreach",
+    "number": 2,
+    "caption": "Сияющая грибная роща",
+    "id": 13,
+    "source": "artwork_staging/13.png",
+    "source_git_sha": "0eb1c9586b68b90e75e214bd3850a4ad66a32b24"
+  },
+  {
+    "slug": "blackreach",
+    "number": 3,
+    "caption": "Город под янтарной сферой",
+    "id": 15,
+    "source": "artwork_staging/15.png",
+    "source_git_sha": "457c56e51bc87a25d35481dda14a32deeb440158"
+  },
+  {
+    "slug": "blackreach",
+    "number": 4,
+    "caption": "Светящийся водопад",
+    "id": 17,
+    "source": "artwork_staging/17.png",
+    "source_git_sha": "3807c390239c996c91609e72704358fdfa6f2f62"
+  },
+  {
+    "slug": "blackreach",
+    "number": 5,
+    "caption": "Лаборатория Синдериона",
+    "id": 19,
+    "source": "artwork_staging/19.png",
+    "source_git_sha": "c64c47d329aed51bee99d62f93768db15b307b3a"
+  },
+  {
+    "slug": "labyrinthian",
+    "number": 1,
+    "caption": "Руины Бромьюнаара",
+    "id": 18,
+    "source": "artwork_staging/18.png",
+    "source_git_sha": "d65cbb7869811c3af1d7b8d384487e697b53b731"
+  },
+  {
+    "slug": "labyrinthian",
+    "number": 2,
+    "caption": "Зал со скелетом дракона",
+    "id": 14,
+    "source": "artwork_staging/14.png",
+    "source_git_sha": "9bb298aae9856de03e3eb0d4a5c9f348f9a6bb94"
+  },
+  {
+    "slug": "labyrinthian",
+    "number": 3,
+    "caption": "Ледяной коридор",
+    "id": 16,
+    "source": "artwork_staging/16.png",
+    "source_git_sha": "037bda4032c04ee391e7ee0291cc8f2af8eb8727"
+  },
+  {
+    "slug": "labyrinthian",
+    "number": 4,
+    "caption": "Затонувший зал",
+    "id": 20,
+    "source": "artwork_staging/20.png",
+    "source_git_sha": "b3b5f4d06c98298f9d8d80bee38ef62ac284ecc9"
+  },
+  {
+    "slug": "labyrinthian",
+    "number": 5,
+    "caption": "Лестницы в тумане",
+    "id": 21,
+    "source": "artwork_staging/21.png",
+    "source_git_sha": "efa03b62060405c5b597b7ce90192e15db758b40"
+  },
+  {
+    "slug": "labyrinthian",
+    "number": 6,
+    "caption": "Лабиринт Шалидора",
+    "id": 24,
+    "source": "artwork_staging/24.png",
+    "source_git_sha": "7e4652a20c598e769d4f697b3e9c002a94f0e7fa"
+  },
+  {
+    "slug": "collegewinterhold",
+    "number": 1,
+    "caption": "Коллегия над морской бездной",
+    "id": 23,
+    "source": "artwork_staging/23.png",
+    "source_git_sha": "888794533ec939fd13a9cb8b7bc69cb19b5ad37f"
+  },
+  {
+    "slug": "collegewinterhold",
+    "number": 2,
+    "caption": "Круглая галерея",
+    "id": 22,
+    "source": "artwork_staging/22.png",
+    "source_git_sha": "b64f372f01d0697cdb66b86366e2ae78953a10f8"
+  },
+  {
+    "slug": "collegewinterhold",
+    "number": 3,
+    "caption": "Библиотека Арканеума",
+    "id": 25,
+    "source": "artwork_staging/25.png",
+    "source_git_sha": "a939f071b89d3a00f4bc00f0b2bcec1070326353"
+  },
+  {
+    "slug": "collegewinterhold",
+    "number": 4,
+    "caption": "Кузница в Миддене",
+    "id": 27,
+    "source": "artwork_staging/27.png",
+    "source_git_sha": "eae07b548e555fa8e7edac94f8ab9bf98a8aabd7"
+  },
+  {
+    "slug": "throatoftheworld",
+    "number": 1,
+    "caption": "Снежный путь к Глотке Мира",
+    "id": 1,
+    "source": "artwork_staging/1.png",
+    "source_git_sha": "6ae8fe82e756c506cabe36966fb8d697ab78fec7"
+  },
+  {
+    "slug": "throatoftheworld",
+    "number": 2,
+    "caption": "Заснеженная Стена Слов",
+    "id": 26,
+    "source": "artwork_staging/26.png",
+    "source_git_sha": "5b9418402a134c4178bf308732b8309e86fe5550"
+  },
+  {
+    "slug": "ustengrav",
+    "number": 1,
+    "caption": "Устенгрев в туманных болотах",
+    "id": 28,
+    "source": "artwork_staging/28.png",
+    "source_git_sha": "7d015c82d43c869eb9d9bf578b8a50595bff6a23"
+  }
+]

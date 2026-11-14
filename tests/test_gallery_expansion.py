@@ -47,8 +47,8 @@ class GalleryExpansion(unittest.TestCase):
 
     def test_all_new_images_match_measured_report(self):
         report = json.loads((ROOT/"docs/gallery_expansion_compression.json").read_text())
-        self.assertEqual(report["image_count"], 79)
-        self.assertEqual(len(report["packs"]), 14)
+        self.assertEqual(report["image_count"], 108)
+        self.assertEqual(len(report["packs"]), 21)
         observed = set()
         original_bytes = 0
         archive_bytes = 0
@@ -81,7 +81,7 @@ class GalleryExpansion(unittest.TestCase):
                     self.assertLessEqual(photo["chroma_mean_absolute_error"], 2.5)
                     self.assertLessEqual(photo["chroma_95th_percentile_error"], 7)
                     original_bytes += photo["original_bytes"]
-        self.assertEqual(len(observed), 79)
+        self.assertEqual(len(observed), 108)
         self.assertEqual(original_bytes, report["original_bytes"])
         self.assertEqual(archive_bytes, report["archive_bytes"])
 
@@ -100,10 +100,11 @@ class GalleryExpansion(unittest.TestCase):
             methods.append(match.group(0))
         probe = r'''
     public static void main(String[] args){
-        if(locations().length!=23)throw new AssertionError("location count");
+        if(locations().length!=29)throw new AssertionError("location count");
         for(String name:locations()){
-            if(!hasGallery(name)||imageCount(name)!=6)throw new AssertionError(name);
-            for(int n=0;n<6;n++){
+            int expected=switch(name){case "Высокий Хротгар"->11; case "Чёрный Предел"->5; case "Коллегия Винтерхолда"->4; case "Глотка Мира"->2; case "Устенгрев"->1; default->6;};
+            if(!hasGallery(name)||imageCount(name)!=expected)throw new AssertionError(name);
+            for(int n=0;n<expected;n++){
                 if(captionFor(name,n).trim().isEmpty())throw new AssertionError(name);
             }
         }
@@ -113,7 +114,7 @@ class GalleryExpansion(unittest.TestCase):
             {" ДРАКОНИЙ МОСТ ","Драконий Мост"},{"High Hrothgar","Высокий Хротгар"}
         };
         for(String[] pair:pairs){
-            if(!hasGallery(pair[0])||imageCount(pair[0])!=6)throw new AssertionError(pair[0]);
+            if(!hasGallery(pair[0])||imageCount(pair[0])!=imageCount(pair[1]))throw new AssertionError(pair[0]);
             if(!ID_BY_CITY.get(locationKey(pair[0])).equals(
                 ID_BY_CITY.get(locationKey(pair[1]))))throw new AssertionError("alias");
             if(!captionFor(pair[0],5).equals(captionFor(pair[1],5)))throw new AssertionError("caption");
@@ -122,7 +123,9 @@ class GalleryExpansion(unittest.TestCase):
             throw new AssertionError("unknown location");
         if(!archive("riverwood",5).equals("riverwood.zip")
             ||!archive("riverwood",6).equals("riverwood_extra.zip")
-            ||!archive("riften",4).equals("riften_extra.zip"))
+            ||!archive("riften",4).equals("riften_extra.zip")
+            ||!archive("highhrothgar",6).equals("highhrothgar.zip")
+            ||!archive("highhrothgar",7).equals("highhrothgar_extra.zip"))
             throw new AssertionError("archive routing");
     }
 '''

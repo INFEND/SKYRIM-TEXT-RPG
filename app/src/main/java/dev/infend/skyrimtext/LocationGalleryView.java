@@ -38,12 +38,12 @@ public final class LocationGalleryView extends LinearLayout {
     private static final String[] CITIES={
         "Вайтран","Виндхельм","Винтерхолд","Данстар","Маркарт",
         "Морфал","Ривервуд","Рифтен","Солитьюд","Фолкрит",
-        "Хелген","Айварстед","Рорикстед","Драконий Мост","Картвастен","Шорский Камень","Кинсгроув","Чёрный Брод","Каменные Холмы","Воронья Скала","Тел-Митрин","Деревня скаалов","Высокий Хротгар"
+        "Хелген","Айварстед","Рорикстед","Драконий Мост","Картвастен","Шорский Камень","Кинсгроув","Чёрный Брод","Каменные Холмы","Воронья Скала","Тел-Митрин","Деревня скаалов","Высокий Хротгар","Ветреный пик","Чёрный Предел","Лабиринтиан","Коллегия Винтерхолда","Глотка Мира","Устенгрев"
     };
     private static final String[] SLUGS={
         "whiterun","windhelm","winterhold","dawnstar","markarth",
         "morthal","riverwood","riften","solitude","falkreath",
-        "helgen","ivarstead","rorikstead","dragonbridge","karthwasten","shorsstone","kynesgrove","darkwater","stonehills","ravenrock","telmithryn","skaal","highhrothgar"
+        "helgen","ivarstead","rorikstead","dragonbridge","karthwasten","shorsstone","kynesgrove","darkwater","stonehills","ravenrock","telmithryn","skaal","highhrothgar","bleakfallsbarrow","blackreach","labyrinthian","collegewinterhold","throatoftheworld","ustengrav"
     };
     private static final Map<String,String> ID_BY_CITY=new HashMap<>();
     private static final Map<String,Integer> PHOTO_INDEX_BY_CITY=new HashMap<>();
@@ -71,7 +71,13 @@ public final class LocationGalleryView extends LinearLayout {
         {"Прибытие в Воронью Скалу","Улицы Вороньей Скалы","Торговая площадь","Храм предков","Стена Бастиона","Таверна «Пьяный нетч»"},
         {"Подход к Тел-Митрину","Двор грибного поселения","Вход в башню","Зал Нелота","Алхимическая лаборатория","Жилище управляющего"},
         {"Подход к деревне скаалов","Заснеженная площадь","Большой дом","Кузница скаалов","Дом шамана","Лесная окраина деревни"},
-        {"Подход к монастырю","Большой зал","Каменные переходы","Покои Седобородых","Внутренний двор","Врата к горной тропе"}
+        {"Подход к монастырю","Большой зал","Каменные переходы","Покои Седобородых","Внутренний двор","Врата к горной тропе","Высокий Хротгар на семитысячных ступенях","Своды Высокого Хротгара","Заснеженный тренировочный двор","Кельи Высокого Хротгара","Зал совета"},
+        {"Заснеженный Ветреный пик","Разрушенный зал храма","Зал загадки","Дверь с замком Драконьего когтя","Саркофаг у Стены Слов","Сумрачные коридоры"},
+        {"Город двемеров","Сияющая грибная роща","Город под янтарной сферой","Светящийся водопад","Лаборатория Синдериона"},
+        {"Руины Бромьюнаара","Зал со скелетом дракона","Ледяной коридор","Затонувший зал","Лестницы в тумане","Лабиринт Шалидора"},
+        {"Коллегия над морской бездной","Круглая галерея","Библиотека Арканеума","Кузница в Миддене"},
+        {"Снежный путь к Глотке Мира","Заснеженная Стена Слов"},
+        {"Устенгрев в туманных болотах"}
     };
     private static final ExecutorService IO=Executors.newFixedThreadPool(2);
     private static final Set<String> PREFETCHING=java.util.Collections.synchronizedSet(new HashSet<>());
@@ -89,6 +95,14 @@ public final class LocationGalleryView extends LinearLayout {
         alias("Камень Шора","Шорский Камень");
         alias("Роща Кин","Кинсгроув");
         alias("High Hrothgar","Высокий Хротгар");
+        alias("Пещера Чёрный Предел","Чёрный Предел");
+        alias("Bleak Falls Barrow","Ветреный пик");
+        alias("Blackreach","Чёрный Предел");
+        alias("Labyrinthian","Лабиринтиан");
+        alias("College of Winterhold","Коллегия Винтерхолда");
+        alias("Throat of the World","Глотка Мира");
+        alias("Ustengrav","Устенгрев");
+        alias("Устенграв","Устенгрев");
     }
     private static String locationKey(String location){
         return location==null?"":location.trim().toLowerCase(new Locale("ru")).replace('ё','е');
@@ -128,6 +142,7 @@ public final class LocationGalleryView extends LinearLayout {
     private static String archive(String slug,int number){
         if("riften".equals(slug))return number<=3?"riften.zip":"riften_extra.zip";
         if("riverwood".equals(slug)&&number==6)return "riverwood_extra.zip";
+        if("highhrothgar".equals(slug)&&number>6)return "highhrothgar_extra.zip";
         return slug+".zip";
     }
     private static String captionFor(String location,int index){

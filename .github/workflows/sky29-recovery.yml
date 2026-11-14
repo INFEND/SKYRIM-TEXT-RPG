@@ -1,0 +1,51 @@
+name: SKY29 verified resource recovery
+on:
+  push:
+    branches: [gallery-sky29-20261114]
+  workflow_dispatch:
+permissions:
+  contents: write
+  actions: write
+concurrency:
+  group: sky29-recovery
+  cancel-in-progress: false
+jobs:
+  recover:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Install verified encoder
+        run: python -m pip install Pillow==12.3.0 numpy==2.3.5 scipy==1.17.0
+      - name: Restore exact source bytes and encode new packs
+        run: python artwork_staging/prepare.py
+      - name: Run all regressions
+        run: python -m unittest discover -s tests -p 'test_*.py' -v
+      - name: Publish only optimized production changes
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'INFEND'
+          git config user.email 'INFEND@users.noreply.github.com'
+          git fetch origin main
+          test "$(git rev-parse origin/main)" = 93d15724edeac2ef3bcab1b1bd1c86c711c5e436
+          git add -- app/src/main/java/dev/infend/skyrimtext/LocationGalleryView.java scripts/build_resource_catalog.py tests/test_location_galleries.py tests/test_gallery_expansion.py app/build.gradle release_notes/history.json CHANGELOG.md docs/gallery_expansion_artwork.json release_notes/v1.0.71.txt docs/SKY29_RECOVERY.md docs/gallery_expansion_compression.json app/src/main/assets/gallery/highhrothgar_extra.zip app/src/main/assets/gallery/bleakfallsbarrow.zip app/src/main/assets/gallery/blackreach.zip app/src/main/assets/gallery/labyrinthian.zip app/src/main/assets/gallery/collegewinterhold.zip app/src/main/assets/gallery/throatoftheworld.zip app/src/main/assets/gallery/ustengrav.zip
+          git commit -m 'Prepare verified SKY29 resource packages'
+          READY=$(git rev-parse HEAD)
+          git worktree add --detach /tmp/sky29-main 93d15724edeac2ef3bcab1b1bd1c86c711c5e436
+          cd /tmp/sky29-main
+          git checkout "$READY" -- app/src/main/java/dev/infend/skyrimtext/LocationGalleryView.java scripts/build_resource_catalog.py tests/test_location_galleries.py tests/test_gallery_expansion.py app/build.gradle release_notes/history.json CHANGELOG.md docs/gallery_expansion_artwork.json release_notes/v1.0.71.txt docs/SKY29_RECOVERY.md docs/gallery_expansion_compression.json app/src/main/assets/gallery/highhrothgar_extra.zip app/src/main/assets/gallery/bleakfallsbarrow.zip app/src/main/assets/gallery/blackreach.zip app/src/main/assets/gallery/labyrinthian.zip app/src/main/assets/gallery/collegewinterhold.zip app/src/main/assets/gallery/throatoftheworld.zip app/src/main/assets/gallery/ustengrav.zip
+          git commit -m 'Add 29 recovered Skyrim images as external resources v1.0.71'
+          git push origin HEAD:main
+          gh workflow run android-ota.yml --ref main
