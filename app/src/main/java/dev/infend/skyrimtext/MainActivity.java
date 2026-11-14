@@ -65,6 +65,8 @@ public final class MainActivity extends Activity {
     private final int[] initialPoints={0,0,0};
     private String selectedCategory="Все",selectedSort="Название";
     private String focusedInventoryId="";
+    private final java.util.LinkedHashMap<String,Integer> recentItemGains=new java.util.LinkedHashMap<>();
+    private static final int ITEM_DAMAGE=0xffcb7770, ITEM_ARMOR=0xff8baecc, ITEM_GOLD=0xffc6b17d, ITEM_UP=0xff79cc9c, ITEM_DOWN=0xffe47b7b, ITEM_MAGIC=0xffb0a2db;
     private static final String SKILL_HUD_OWNER="skill_hud_owner";
     private static final String SKILL_HUD_SNAPSHOT="skill_hud_snapshot";
     private boolean animations=true, titleOpen=true;
@@ -158,6 +160,7 @@ public final class MainActivity extends Activity {
         super.onDestroy();
     }
     private void newAiSession(){
+        recentItemGains.clear();
         selectedAiChoices.clear();aiOwnDraft="";clearAiDraft();
         if(aiClient!=null)aiClient.cancel();if(localAiClient!=null)localAiClient.cancel();
         aiSession=java.util.UUID.randomUUID().toString();
@@ -754,6 +757,7 @@ public final class MainActivity extends Activity {
         body.setLineSpacing(dp(7),1.16f);
         makeItemsClickable(body,body.getText().toString());
         narrative.addView(body);
+        renderItemGains();
         renderStoryJournal();
         if(prefs.getBoolean("ai_enabled",false)) renderAiStoryPanel();
         space(content,12);
@@ -761,12 +765,15 @@ public final class MainActivity extends Activity {
         addText(content,s.choices.size()+" доступных вариантов. Вероятность показана только для настоящих проверок.",12,MUTED,false,15);
         int number=0;
         for(GameEngine.Choice c:s.choices){
+            if("SHOP".equals(game.mode))renderShopItem(c.action);
             storyChoice(++number,c,()->{
                 if(aiClient!=null)aiClient.cancel();if(localAiClient!=null)localAiClient.cancel();
                 int old=game.questStage;
+                java.util.Map<String,Integer> before=itemSnapshot(game);
                 game.choose(c.action);
                 if(!c.action.startsWith("ACT:"))game.progress.observe(game,c.action,old);
                 game.progress.sync(game);
+                captureItemGains(before,game,false);
                 if(prefs.getBoolean("ai_enabled",false))
                     aiMemory.add(aiSession,"event","Игровое действие: "+c.title+". Текущее сообщение движка: "+game.message);
                 save();tab=0;render();
@@ -999,6 +1006,7 @@ public final class MainActivity extends Activity {
         aiTurnText.setText(SceneTypography.render(game.aiTurn.scene,accent(),game.name,heroColor()));
         makeItemsClickable(aiTurnText,aiTurnText.getText().toString());
         narrative.addView(aiTurnText,lp(-1,-2));
+        renderItemGains();
         space(content,16);
         addText(content,"ВЫБЕРИ ОДИН ИЛИ НЕСКОЛЬКО ВАРИАНТОВ. ОТПРАВКА ТОЛЬКО ПО КНОПКЕ НИЖЕ.",12,MUTED,false,11);
         for(int i=0;i<game.aiTurn.choices.size();i++){
@@ -1142,7 +1150,10 @@ public final class MainActivity extends Activity {
         if("POTION".equals(action)&&game.potions<=0)return;
         if("FLEE".equals(action)&&!"WILD".equals(game.battleKind))return;
         if(!nativeAiCombatAvailable(action))return;
+        java.util.Map<String,Integer> before=itemSnapshot(game);
         game.choose(action);
+        game.progress.sync(game);
+        captureItemGains(before,game,false);
         String outcome="COMBAT".equals(game.mode)?game.battleLog:game.message;
         // Native retreat and defeat leave the old enemy HP in the engine.
         // Clear the finished encounter before sending the next AI context.
@@ -1292,7 +1303,10 @@ public final class MainActivity extends Activity {
                     if(expectedChance!=-2&&completed.customChance!=expectedChance)
                         throw new IllegalStateException("ИИ изменил шанс после броска");
                     GameEngine next=GameEngine.fromJson(saved);
+                    java.util.Map<String,Integer> before=itemSnapshot(next);
                     completed.apply(next,actionResolved);
+                    next.progress.sync(next);
+                    captureItemGains(before,next,!actionResolved);
                     next.aiTurn=completed;
                     game=next;
                     selectedAiChoices.clear();aiOwnDraft="";clearAiDraft();
@@ -1947,11 +1961,155 @@ public final class MainActivity extends Activity {
         }
         if(route.allowed&&route.days>0){
             dialog.setPositiveButton("Начать переход",(d,w)->{
-                game.choose("LOC:"+place.name);game.progress.sync(game);save();tab=0;render();
+                java.util.Map<String,Integer> before=itemSnapshot(game);game.choose("LOC:"+place.name);game.progress.sync(game);captureItemGains(before,game,false);save();tab=0;render();
             });
         }
         dialog.show();
     }
+
+    // Shared item presentation: combat values and equipped slot come from the engine.
+    private String itemNumber(double n){
+        return String.format(java.util.Locale.forLanguageTag("ru"),n==Math.rint(n)?"%.0f":"%.1f",n);
+    }
+    private boolean hasItemStat(ItemCatalog.Item item){
+        return item.baseStat>0&&(item.weapon()||item.wearable());
+    }
+    private String itemType(ItemCatalog.Item item){
+        if(item.weapon()&&!"Боеприпасы".equals(item.category)){
+            if(item.statSkill==0)return "Одноручное оружие";
+            if(item.statSkill==1)return "Двуручное оружие";
+            if(item.statSkill==2)return "Оружие дальнего боя";
+        }
+        if(item.wearable()&&item.statSkill==4)return "Тяжёлая броня";
+        if(item.wearable()&&item.statSkill==5)return "Лёгкая броня";
+        return item.category.isEmpty()?"Валюта":item.category;
+    }
+    private double itemDelta(ItemCatalog.Item item){
+        if(!hasItemStat(item)||item.slot().isEmpty()||game.progress.equipped(item.id))return Double.NaN;
+        ItemCatalog.Item worn=ItemCatalog.find(game.progress.equippedName(item.slot()));
+        if(worn==null||worn.baseStat<0)return Double.NaN;
+        return Math.round(item.currentStat(game.progress)*10)/10.0-
+            Math.round(worn.currentStat(game.progress)*10)/10.0;
+    }
+    private LinearLayout itemMetric(String label,String glyph,String value,int color,double delta,boolean large){
+        LinearLayout metric=column();metric.setGravity(Gravity.CENTER);
+        TextView caption=text(label,10,MUTED,true);caption.setGravity(Gravity.CENTER);
+        metric.addView(caption,lp(-1,-2));
+        LinearLayout line=row();line.setGravity(Gravity.CENTER);
+        line.addView(new SkyrimIconView(this,glyph,color),lp(large?23:17,large?23:17));
+        TextView number=text(value,large?23:17,color,true);
+        LinearLayout.LayoutParams n=lp(-2,-2);n.leftMargin=dp(3);line.addView(number,n);
+        metric.addView(line,lp(-1,-2));
+        if(!Double.isNaN(delta)&&Math.abs(delta)>=0.05){
+            TextView change=text((delta>0?"▲ +":"▼ −")+itemNumber(Math.abs(delta)),11,delta>0?ITEM_UP:ITEM_DOWN,true);
+            change.setGravity(Gravity.CENTER);metric.addView(change,lp(-1,-2));
+            metric.setContentDescription(label+" "+value+", изменение "+(delta>0?"+":"−")+itemNumber(Math.abs(delta)));
+        }else metric.setContentDescription(label+" "+value);
+        return metric;
+    }
+    private void itemSmallMetric(LinearLayout host,String glyph,String value,int color){
+        LinearLayout metric=row();
+        metric.addView(new SkyrimIconView(this,glyph,color),lp(15,15));
+        TextView v=text(value,12,color,false);
+        LinearLayout.LayoutParams p=lp(-2,-2);p.leftMargin=dp(3);metric.addView(v,p);
+        LinearLayout.LayoutParams m=lp(-2,-2);m.rightMargin=dp(8);host.addView(metric,m);
+    }
+    private LinearLayout itemSummary(ItemCatalog.Item item,int quantity,boolean active,boolean showWeight,int price){
+        LinearLayout itemRow=row();itemRow.setMinimumHeight(dp(62));
+        itemRow.setPadding(dp(9),dp(9),dp(9),dp(9));
+        itemRow.setBackground(new RuneFrameDrawable(active?0xff17191a:0xff080808,active?accent():0xff44494b,false));
+        itemRow.addView(new SkyrimIconView(this,SkyrimIconView.iconForItem(item.name,item.category),active?accent():MUTED),lp(39,43));
+        LinearLayout words=column();LinearLayout.LayoutParams wp=new LinearLayout.LayoutParams(0,-2,1);
+        wp.leftMargin=dp(9);itemRow.addView(words,wp);
+        TextView name=text((game.progress.equipped(item.id)?"◆ ":"")+item.name+(quantity>1?" ×"+quantity:""),14,TEXT,true);
+        name.setMaxLines(3);words.addView(name,lp(-1,-2));
+        addText(words,itemType(item),11,MUTED,false,3);
+        LinearLayout small=row();words.addView(small,lp(-1,-2));
+        if(showWeight)itemSmallMetric(small,"bag",itemNumber(item.weight)+" кг",MUTED);
+        itemSmallMetric(small,"septims",String.valueOf(price),ITEM_GOLD);
+        if(hasItemStat(item)){
+            boolean weapon=item.weapon();
+            itemRow.addView(itemMetric(weapon?"УРОН":"БРОНЯ",weapon?"weapon":"shield",
+                itemNumber(item.currentStat(game.progress)),weapon?ITEM_DAMAGE:ITEM_ARMOR,itemDelta(item),false),lp(79,-2));
+        }
+        return itemRow;
+    }
+    private void itemDetailMetrics(LinearLayout host,ItemCatalog.Item item){
+        LinearLayout metrics=row();metrics.setGravity(Gravity.CENTER);
+        if(hasItemStat(item)){
+            boolean weapon=item.weapon();
+            metrics.addView(itemMetric(weapon?"УРОН":"БРОНЯ",weapon?"weapon":"shield",
+                itemNumber(item.currentStat(game.progress)),weapon?ITEM_DAMAGE:ITEM_ARMOR,itemDelta(item),true),new LinearLayout.LayoutParams(0,-2,1));
+        }
+        metrics.addView(itemMetric("ВЕС","bag",itemNumber(item.weight),MUTED,Double.NaN,true),new LinearLayout.LayoutParams(0,-2,1));
+        metrics.addView(itemMetric("ЦЕНА","septims",String.valueOf(item.value),ITEM_GOLD,Double.NaN,true),new LinearLayout.LayoutParams(0,-2,1));
+        host.addView(metrics,lp(-1,-2));space(host,9);
+        if(hasItemStat(item)){
+            addText(host,"Базовое значение: "+itemNumber(item.baseStat),12,MUTED,false,5);
+            if(!Double.isNaN(itemDelta(item)))addText(host,"Сравнение: "+game.progress.equippedName(item.slot()),11,MUTED,false,5);
+            if(item.twoHanded()&&!"Не надето".equals(game.progress.equippedName("shield")))
+                addText(host,"Двуручное оружие снимает экипированный щит.",12,ITEM_DOWN,false,5);
+        }
+    }
+    private void itemEffect(LinearLayout host,ItemCatalog.Item item){
+        if(item.effect==null||item.effect.trim().isEmpty())return;
+        String e=item.effect.toLowerCase(java.util.Locale.ROOT);
+        boolean magic=e.contains("зачар")||e.contains("поглощ")||e.contains("урон огн")||e.contains("урон холод")||e.contains("урон мороз");
+        LinearLayout line=row();line.setGravity(Gravity.CENTER_VERTICAL);
+        line.addView(new SkyrimIconView(this,e.contains("огн")?"огонь":e.contains("мороз")?"мороз":magic?"зачарование":"book",magic?ITEM_MAGIC:MUTED),lp(22,22));
+        TextView value=text(item.effect,13,magic?ITEM_MAGIC:MUTED,false);
+        LinearLayout.LayoutParams vp=new LinearLayout.LayoutParams(0,-2,1);vp.leftMargin=dp(8);
+        line.addView(value,vp);host.addView(line,lp(-1,-2));space(host,5);
+    }
+    private java.util.Map<String,Integer> itemSnapshot(GameEngine state){
+        java.util.Map<String,Integer> result=new java.util.HashMap<>();
+        java.util.Iterator<String> keys=state.progress.inventory.keys();
+        while(keys.hasNext()){String id=keys.next();result.put(id,state.progress.quantity(id));}
+        return result;
+    }
+    private void captureItemGains(java.util.Map<String,Integer> before,GameEngine state,boolean keepIfEmpty){
+        java.util.Map<String,Integer> after=itemSnapshot(state);
+        java.util.LinkedHashMap<String,Integer> gains=new java.util.LinkedHashMap<>();
+        for(String id:after.keySet()){
+            int delta=after.get(id)-before.getOrDefault(id,0);
+            if(delta>0&&!"Септимы".equals(id)&&ItemCatalog.find(id)!=null)gains.put(id,delta);
+        }
+        if(!keepIfEmpty||!gains.isEmpty()){recentItemGains.clear();recentItemGains.putAll(gains);}
+    }
+    private void renderItemGains(){
+        if(recentItemGains.isEmpty())return;
+        LinearLayout rewards=card();
+        addText(rewards,"ПОЛУЧЕНЫ ПРЕДМЕТЫ",11,ITEM_GOLD,true,8);
+        for(java.util.Map.Entry<String,Integer> gain:recentItemGains.entrySet()){
+            ItemCatalog.Item item=ItemCatalog.find(gain.getKey());if(item==null)continue;
+            LinearLayout entry=itemSummary(item,gain.getValue(),false,true,item.value);
+            rewards.addView(entry,lp(-1,-2));entry.setOnClickListener(v->itemDialog(item));
+            itemEffect(rewards,item);
+        }
+        addText(rewards,"Добавлено в инвентарь",12,ITEM_UP,false,0);
+    }
+    private void renderShopItem(String action){
+        String id;int price;
+        switch(action){
+            case "BUY_SWORD":if(game.swordUpgraded)return;id="Стальной меч";price=180;break;
+            case "BUY_ARMOR":if(game.armorUpgraded)return;id="Стальная кираса";price=160;break;
+            case "BUY_HP":id="Лечебное зелье";price=35;break;
+            case "BUY_MP":id="Зелье магии";price=30;break;
+            default:return;
+        }
+        ItemCatalog.Item item=ItemCatalog.find(id);if(item==null)return;
+        LinearLayout entry=itemSummary(item,0,false,true,price);
+        content.addView(entry,lp(-1,-2));entry.setOnClickListener(v->itemDialog(item));
+    }
+    private boolean canDiscardItem(ItemCatalog.Item item){
+        return !"COMBAT".equals(game.mode)&&game.progress.quantity(item.id)>0
+            &&!"Квестовые предметы".equals(item.category)&&!"Ключи".equals(item.category)
+            &&!"Септимы".equals(item.id)&&!"Лечебное зелье".equals(item.id)&&!"Зелье магии".equals(item.id)
+            &&!"Походный клинок".equals(item.id)&&!"Дорожная одежда".equals(item.id)
+            &&!(game.swordUpgraded&&"Стальной меч".equals(item.id))
+            &&!(game.armorUpgraded&&"Стальная кираса".equals(item.id));
+    }
+
     private void renderInventory(){
         game.progress.sync(game);
         section("СУМКА ПУТНИКА","Инвентарь","Предметы и снаряжение");
@@ -1999,49 +2157,21 @@ public final class MainActivity extends Activity {
         ItemCatalog.Item focused=focusedInventoryId.isEmpty()?null:ItemCatalog.find(focusedInventoryId);
         if(focused!=null){
             LinearLayout selected=card();
-            LinearLayout top=row();selected.addView(top,lp(-1,-2));
-            SkyrimIconView image=new SkyrimIconView(this,SkyrimIconView.iconForItem(focused.name,focused.category),accent());
-            top.addView(image,lp(70,78));
-            LinearLayout details=column();details.setPadding(dp(9),0,0,0);
-            top.addView(details,new LinearLayout.LayoutParams(0,-2,1));
-            addText(details,focused.name.toUpperCase(java.util.Locale.ROOT),18,TEXT,true,7);
-            addText(details,focused.effect,12,MUTED,false,8);
-            String stat=focused.statLabel(game.progress);
-            if(!stat.isEmpty())addText(details,stat,12,accent(),true,5);
-            addText(details,"СТОИМОСТЬ "+focused.value+"     ВЕС "+
-                    String.format(java.util.Locale.forLanguageTag("ru"),"%.2f",focused.weight),12,accent(),true,0);
+            selected.addView(itemSummary(focused,game.progress.quantity(focused.id),true,false,focused.value),lp(-1,-2));
             selected.addView(new SkyrimRuleView(this,accent()),lp(-1,17));
+            itemDetailMetrics(selected,focused);
+            itemEffect(selected,focused);
             addText(selected,focused.description,14,TEXT,false,9);
             TextView detail=text("◇  ПОДРОБНЕЕ / ИСПОЛЬЗОВАТЬ",12,accent(),true);
             detail.setGravity(Gravity.END);selected.addView(detail,lp(-1,30));
             detail.setOnClickListener(v->itemDialog(focused));
         }
-        // Skyrim's familiar name / weight / value table, without bulky cards.
-        LinearLayout tableHead=row();tableHead.setPadding(dp(8),dp(7),dp(8),dp(8));
-        tableHead.setBackgroundColor(0xb5000000);
-        TextView title=text("НАЗВАНИЕ",12,MUTED,true);
-        tableHead.addView(title,new LinearLayout.LayoutParams(0,-2,1));
-        TextView w=text("ВЕС",11,MUTED,true);w.setGravity(Gravity.END);tableHead.addView(w,lp(63,-2));
-        TextView v=text("ЦЕНА",11,MUTED,true);v.setGravity(Gravity.END);tableHead.addView(v,lp(58,-2));
-        content.addView(tableHead,lp(-1,-2));
-        content.addView(new SkyrimRuleView(this,0xff707577),lp(-1,10));
         if(owned.isEmpty())addText(content,"В выбранной категории нет предметов.",15,MUTED,false,14);
         for(ItemCatalog.Item item:owned){
             final boolean active=item.id.equals(focusedInventoryId);
-            LinearLayout itemRow=row();itemRow.setPadding(dp(7),dp(10),dp(8),dp(10));
-            itemRow.setBackgroundColor(active?0xa02a2e30:0x98050607);
-            itemRow.addView(new SkyrimIconView(this,SkyrimIconView.iconForItem(item.name,item.category),active?accent():MUTED),lp(22,23));
-            TextView name=text((game.progress.equipped(item.id)?"◆ ":"")+item.name+" ×"+game.progress.quantity(item.id),14,active?accent():TEXT,active);
-            name.setMaxLines(2);LinearLayout.LayoutParams np=new LinearLayout.LayoutParams(0,-2,1);
-            np.leftMargin=dp(8);itemRow.addView(name,np);
-            TextView measure=text(String.format(java.util.Locale.forLanguageTag("ru"),"%.1f",item.weight),
-                12,active?TEXT:MUTED,false);measure.setGravity(Gravity.END);
-            itemRow.addView(measure,lp(63,-2));
-            TextView price=text(String.valueOf(item.value),12,active?TEXT:MUTED,false);
-            price.setGravity(Gravity.END);itemRow.addView(price,lp(58,-2));
-            content.addView(itemRow,lp(-1,-2));
-            View separator=new View(this);separator.setBackgroundColor(0xff262b2d);
-            content.addView(separator,lp(-1,1));
+            LinearLayout itemRow=itemSummary(item,game.progress.quantity(item.id),active,true,item.value);
+            LinearLayout.LayoutParams entry=lp(-1,-2);entry.bottomMargin=dp(4);
+            content.addView(itemRow,entry);
             itemRow.setOnClickListener(view->{focusedInventoryId=item.id;render();});
             itemRow.setOnLongClickListener(view->{itemDialog(item);return true;});
         }
@@ -2077,14 +2207,10 @@ public final class MainActivity extends Activity {
         addText(words,item.name,17,TEXT,true,4);
         addText(words,item.category,12,MUTED,false,0);
         view.addView(new SkyrimRuleView(this,accent()),lp(-1,22));
-        String stat=item.statLabel(game.progress);
-        if(!stat.isEmpty())addText(view,stat,14,accent(),true,6);
-        addText(view,String.format(java.util.Locale.forLanguageTag("ru"),
-            "Стоимость: %d септимов     Вес: %.2f кг",item.value,item.weight),
-            13,accent(),false,12);
+        itemDetailMetrics(view,item);
+        view.addView(new SkyrimRuleView(this,accent()),lp(-1,14));
         addText(view,item.description,14,TEXT,false,12);
-        addText(view,"ЭФФЕКТ",11,accent(),true,5);
-        addText(view,item.effect,13,MUTED,false,3);
+        itemEffect(view,item);
         if(game.progress.quantity(item.id)>0&&!item.temperMaterial().isEmpty()){
             addText(view,"КУЗНЕЧНОЕ УЛУЧШЕНИЕ",11,accent(),true,5);
             addText(view,"Качество: "+game.progress.temperQualityName(item.id)+
@@ -2121,7 +2247,21 @@ public final class MainActivity extends Activity {
                     toast(result?"Зелье использовано":"Нет необходимости использовать зелье");
                 });
         }
-        dialog.show();
+        if(canDiscardItem(item)){
+            TextView discard=text("ВЫБРОСИТЬ  ×1",13,ITEM_DOWN,true);
+            discard.setGravity(Gravity.CENTER);view.addView(discard,lp(-1,43));
+            discard.setOnClickListener(v->new RuneDialogBuilder(this,accent()).setTitle("Выбросить предмет?")
+                .setMessage(item.name+" ×1").setNegativeButton("Отмена",null)
+                .setPositiveButton("Выбросить",(d,w)->{
+                    if(canDiscardItem(item)&&game.progress.removeItem(item.id,1)){
+                        save();render();toast("Предмет выброшен");
+                        discard.setEnabled(false);discard.setText("ПРЕДМЕТ ВЫБРОШЕН");
+                    }
+                }).show());
+        }
+        ScrollView itemScroll=new ScrollView(this);itemScroll.setFillViewport(false);
+        itemScroll.addView(view);
+        dialog.setView(itemScroll).show();
     }
 
     /** Compact expandable catalog, with dedicated atlas icons and no list weights. */
@@ -2208,23 +2348,7 @@ public final class MainActivity extends Activity {
                 // Build rows for collapsed categories too: the first tap must
                 // reveal items immediately, without resetting search or scroll.
                 for(ItemCatalog.Item item:categoryItems){
-                    LinearLayout itemRow=row();
-                    itemRow.setMinimumHeight(dp(46));
-                    itemRow.setPadding(dp(9),dp(7),dp(8),dp(7));
-                    itemRow.setBackgroundColor(0xb2090d0f);
-                    itemRow.addView(new SkyrimIconView(this,
-                        SkyrimIconView.iconForItem(item.name,item.category),accent()),lp(25,25));
-                    TextView itemName=text(item.name,14,TEXT,false);
-                    itemName.setMaxLines(2);
-                    itemName.setEllipsize(android.text.TextUtils.TruncateAt.END);
-                    LinearLayout.LayoutParams np=new LinearLayout.LayoutParams(0,-2,1);
-                    np.leftMargin=dp(9);
-                    itemRow.addView(itemName,np);
-                    TextView price=text(item.value+" ◈",11,MUTED,false);
-                    price.setGravity(Gravity.END|Gravity.CENTER_VERTICAL);
-                    LinearLayout.LayoutParams priceP=lp(75,-2);
-                    priceP.leftMargin=dp(6);
-                    itemRow.addView(price,priceP);
+                    LinearLayout itemRow=itemSummary(item,0,false,false,item.value);
                     entries.addView(itemRow,lp(-1,-2));
                     View sep=new View(this);sep.setBackgroundColor(0xff252b2e);
                     entries.addView(sep,lp(-1,1));
@@ -2854,7 +2978,7 @@ public final class MainActivity extends Activity {
     @Override public void onBackPressed(){if(titleOpen){super.onBackPressed();return;}
         if(!game.started||tab==5||tab==6){titleOpen=true;render();return;}
         if(game.started&&tab!=0){tab=0;render();return;}
-        if(game.started&&!game.mode.equals("WORLD")&&!game.mode.equals("COMBAT")){game.choose("GO_WORLD");save();render();return;}
+        if(game.started&&!game.mode.equals("WORLD")&&!game.mode.equals("COMBAT")){recentItemGains.clear();game.choose("GO_WORLD");save();render();return;}
         super.onBackPressed();}
 }
 

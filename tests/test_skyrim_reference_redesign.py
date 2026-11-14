@@ -42,7 +42,7 @@ class SkyrimReferenceRedesign(unittest.TestCase):
         ui=code("MainActivity.java")
         self.assertIn("HorizontalScrollView categoryScroll",ui)
         self.assertIn('String[] sorts={"Название","Вес","Цена"}',ui)
-        self.assertIn('TextView price=text(String.valueOf(item.value)',ui)
+        self.assertIn('itemSummary(item,game.progress.quantity(item.id),active,true,item.value)',ui)
         self.assertIn('focusedInventoryId=item.id',ui)
         self.assertIn('skyrimTopTabs(4)',ui)
         self.assertIn('skyrimTopTabs(3)',ui)
