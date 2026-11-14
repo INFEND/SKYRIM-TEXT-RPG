@@ -3252,13 +3252,19 @@ public final class MainActivity extends Activity {
         if(game.progress.canBuyTalent(index))builder.setPositiveButton("Изучить следующий ранг",(d,w)->{
             if(combat?game.progress.buyCombatPerk(index):game.progress.buyTalent(game,index)){save();render();toast("Талант развит");}
         });
-        if(!visual("stars")){for(int k=0;k<AdvancedPerks.NAMES.length;k++)if(AdvancedPerks.SKILL[k]==index){builder.setNeutralButton("Таланты", (d,w)->advancedPerkDialog(index));break;}}
-        if(game.progress.branches.canBuy(game.progress,index))builder.setNeutralButton("Специализация",(d,w)->{
-            int r=game.progress.branches.rank(index);new RuneDialogBuilder(this,accent()).setTitle(TalentBranches.NAMES[index][r]).setMessage(TalentBranches.effect(index)+"\nЦена: 1 очко таланта.").setNegativeButton("Отмена",null).setPositiveButton("Изучить",(dd,ww)->{
-                if(game.progress.branches.buy(game.progress,index)){save();render();toast("Специализация изучена");showSkill(index);}
-            }).show();
+        builder.setNeutralButton("Таланты",(d,w)->{
+            new RuneDialogBuilder(this,accent()).setTitle("Развитие навыка").setItems(new String[]{"Специализации","Особые таланты"},(dd,i)->{
+                if(i==0)specializationDialog(index);else advancedPerkDialog(index);
+            }).setNegativeButton("Закрыть",null).show();
         });
         builder.show();
+    }
+    private void specializationDialog(int index){
+        int r=game.progress.branches.rank(index);
+        if(!game.progress.branches.canBuy(game.progress,index)){toast("Условия изучения не выполнены или все специализации изучены");return;}
+        new RuneDialogBuilder(this,accent()).setTitle(TalentBranches.NAMES[index][r]).setMessage(TalentBranches.effect(index)+"\nЦена: 1 очко таланта.").setNegativeButton("Отмена",null).setPositiveButton("Изучить",(dd,ww)->{
+            if(game.progress.branches.buy(game.progress,index)){save();render();toast("Специализация изучена");showSkill(index);}
+        }).show();
     }
 
     private void advancedPerkDialog(int index){
