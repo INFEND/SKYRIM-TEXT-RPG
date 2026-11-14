@@ -4,10 +4,10 @@
     1920,
     1080
   ],
-  "image_count": 73,
-  "original_bytes": 248056952,
-  "archive_bytes": 41203438,
-  "reduction_percent": 83.39,
+  "image_count": 79,
+  "original_bytes": 267667058,
+  "archive_bytes": 44400618,
+  "reduction_percent": 83.41,
   "quality_steps": [
     76,
     80,
@@ -4601,6 +4601,398 @@
               "worst_128px_luma_ssim": 0.9799709320068359,
               "chroma_mean_absolute_error": 1.342705573832175,
               "chroma_95th_percentile_error": 4.0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "highhrothgar",
+      "archive": "highhrothgar.zip",
+      "archive_bytes": 3197180,
+      "archive_sha256": "7d3e78d95afd38dffa2106fcf2a8c2344a04851bf7f8cc84f99942eecf78ba0b",
+      "photos": [
+        {
+          "number": 1,
+          "caption": "Подход к монастырю",
+          "source_git_sha": "d9441db58e6d1b1d2ef4e51e602488d6cf32419f",
+          "original_sha256": "1b244c5b4eed819c484f0776d45e99f0743cd251de369df148560d2ca4f0c017",
+          "original_bytes": 3151598,
+          "source_dimensions": [
+            1672,
+            941
+          ],
+          "dimensions": [
+            1672,
+            941
+          ],
+          "encoded_bytes": 485328,
+          "quality": 92,
+          "sha256": "0a6253c1ff7a445a058be77ee12b30777000df78917737ad7400a4777fb9f1aa",
+          "full_resolution_luma_ssim": 0.9883919358253479,
+          "worst_128px_luma_ssim": 0.9824657440185547,
+          "chroma_mean_absolute_error": 0.8684862001637269,
+          "chroma_95th_percentile_error": 2.0,
+          "trials": [
+            {
+              "quality": 76,
+              "bytes": 217488,
+              "full_resolution_luma_ssim": 0.9495529532432556,
+              "worst_128px_luma_ssim": 0.9245270490646362,
+              "chroma_mean_absolute_error": 1.1301472906253656,
+              "chroma_95th_percentile_error": 3.0
+            },
+            {
+              "quality": 80,
+              "bytes": 259870,
+              "full_resolution_luma_ssim": 0.9619343876838684,
+              "worst_128px_luma_ssim": 0.9442287683486938,
+              "chroma_mean_absolute_error": 1.0839386227621028,
+              "chroma_95th_percentile_error": 3.0
+            },
+            {
+              "quality": 84,
+              "bytes": 304350,
+              "full_resolution_luma_ssim": 0.9701098799705505,
+              "worst_128px_luma_ssim": 0.9511433839797974,
+              "chroma_mean_absolute_error": 1.029771468813082,
+              "chroma_95th_percentile_error": 3.0
+            },
+            {
+              "quality": 88,
+              "bytes": 382420,
+              "full_resolution_luma_ssim": 0.9811745285987854,
+              "worst_128px_luma_ssim": 0.970838189125061,
+              "chroma_mean_absolute_error": 0.9525277878059074,
+              "chroma_95th_percentile_error": 3.0
+            },
+            {
+              "quality": 92,
+              "bytes": 485328,
+              "full_resolution_luma_ssim": 0.9883919358253479,
+              "worst_128px_luma_ssim": 0.9824657440185547,
+              "chroma_mean_absolute_error": 0.8684862001637269,
+              "chroma_95th_percentile_error": 2.0
+            }
+          ]
+        },
+        {
+          "number": 2,
+          "caption": "Большой зал",
+          "source_git_sha": "c3d3448597bfd55d4ffffd8b1f85651c29a72c92",
+          "original_sha256": "f95e7ddbbb9aa5b0a5205d6f923dfaf11876b3b434646e49bfb3c9b5678a8c3c",
+          "original_bytes": 3304891,
+          "source_dimensions": [
+            1672,
+            941
+          ],
+          "dimensions": [
+            1672,
+            941
+          ],
+          "encoded_bytes": 561928,
+          "quality": 92,
+          "sha256": "2b092a1f0d0ef0193c9933668e018e77dd008cfce86641f53a926aa80b8ecef3",
+          "full_resolution_luma_ssim": 0.9885697960853577,
+          "worst_128px_luma_ssim": 0.9817375540733337,
+          "chroma_mean_absolute_error": 0.9973286333890954,
+          "chroma_95th_percentile_error": 3.0,
+          "trials": [
+            {
+              "quality": 76,
+              "bytes": 240106,
+              "full_resolution_luma_ssim": 0.9430376887321472,
+              "worst_128px_luma_ssim": 0.9246609210968018,
+              "chroma_mean_absolute_error": 1.3272439988000142,
+              "chroma_95th_percentile_error": 4.0
+            },
+            {
+              "quality": 80,
+              "bytes": 289818,
+              "full_resolution_luma_ssim": 0.9571484923362732,
+              "worst_128px_luma_ssim": 0.9431042075157166,
+              "chroma_mean_absolute_error": 1.268646177079255,
+              "chroma_95th_percentile_error": 4.0
+            },
+            {
+              "quality": 84,
+              "bytes": 346846,
+              "full_resolution_luma_ssim": 0.9695594310760498,
+              "worst_128px_luma_ssim": 0.9569580554962158,
+              "chroma_mean_absolute_error": 1.2013780133117065,
+              "chroma_95th_percentile_error": 3.0
+            },
+            {
+              "quality": 88,
+              "bytes": 430784,
+              "full_resolution_luma_ssim": 0.980235755443573,
+              "worst_128px_luma_ssim": 0.9705190658569336,
+              "chroma_mean_absolute_error": 1.1130061804351474,
+              "chroma_95th_percentile_error": 3.0
+            },
+            {
+              "quality": 92,
+              "bytes": 561928,
+              "full_resolution_luma_ssim": 0.9885697960853577,
+              "worst_128px_luma_ssim": 0.9817375540733337,
+              "chroma_mean_absolute_error": 0.9973286333890954,
+              "chroma_95th_percentile_error": 3.0
+            }
+          ]
+        },
+        {
+          "number": 3,
+          "caption": "Каменные переходы",
+          "source_git_sha": "2ae213b69478f0df796aae39a48de9e83f3877c1",
+          "original_sha256": "8a783b781d0ea383d3fff07608241990019ff08a5916add699c8fa3a67561bf5",
+          "original_bytes": 3049082,
+          "source_dimensions": [
+            1672,
+            941
+          ],
+          "dimensions": [
+            1672,
+            941
+          ],
+          "encoded_bytes": 460262,
+          "quality": 92,
+          "sha256": "9127291f51dde6398cd3e4ddae8ff4919f428f76f75eacde3eccd38ae53625df",
+          "full_resolution_luma_ssim": 0.9851438403129578,
+          "worst_128px_luma_ssim": 0.9786213636398315,
+          "chroma_mean_absolute_error": 0.8900424062765357,
+          "chroma_95th_percentile_error": 2.0,
+          "trials": [
+            {
+              "quality": 76,
+              "bytes": 190632,
+              "full_resolution_luma_ssim": 0.9364302158355713,
+              "worst_128px_luma_ssim": 0.9172865152359009,
+              "chroma_mean_absolute_error": 1.1350940539688512,
+              "chroma_95th_percentile_error": 3.0
+            },
+            {
+              "quality": 80,
+              "bytes": 230234,
+              "full_resolution_luma_ssim": 0.9512035846710205,
+              "worst_128px_luma_ssim": 0.9393247961997986,
+              "chroma_mean_absolute_error": 1.0894262695188361,
+              "chroma_95th_percentile_error": 3.0
+            },
+            {
+              "quality": 84,
+              "bytes": 282028,
+              "full_resolution_luma_ssim": 0.9638356566429138,
+              "worst_128px_luma_ssim": 0.9548131823539734,
+              "chroma_mean_absolute_error": 1.0297215753372417,
+              "chroma_95th_percentile_error": 3.0
+            },
+            {
+              "quality": 88,
+              "bytes": 346538,
+              "full_resolution_luma_ssim": 0.9743152260780334,
+              "worst_128px_luma_ssim": 0.96584153175354,
+              "chroma_mean_absolute_error": 0.9602167855635612,
+              "chroma_95th_percentile_error": 3.0
+            },
+            {
+              "quality": 92,
+              "bytes": 460262,
+              "full_resolution_luma_ssim": 0.9851438403129578,
+              "worst_128px_luma_ssim": 0.9786213636398315,
+              "chroma_mean_absolute_error": 0.8900424062765357,
+              "chroma_95th_percentile_error": 2.0
+            }
+          ]
+        },
+        {
+          "number": 4,
+          "caption": "Покои Седобородых",
+          "source_git_sha": "520b49fedd74f7e980830ef5b76fb56260f4688a",
+          "original_sha256": "6459bd8732c34dfbe5e77526795895f10c02ccd697f927219031a083f0b9d579",
+          "original_bytes": 3175247,
+          "source_dimensions": [
+            1672,
+            941
+          ],
+          "dimensions": [
+            1672,
+            941
+          ],
+          "encoded_bytes": 501274,
+          "quality": 92,
+          "sha256": "a34270b4161d7da9d7d4b3f959b6172da75e7def61da9499bca1aabb1ca3772d",
+          "full_resolution_luma_ssim": 0.9867902994155884,
+          "worst_128px_luma_ssim": 0.980751633644104,
+          "chroma_mean_absolute_error": 0.9419255830863024,
+          "chroma_95th_percentile_error": 3.0,
+          "trials": [
+            {
+              "quality": 76,
+              "bytes": 217128,
+              "full_resolution_luma_ssim": 0.9405772089958191,
+              "worst_128px_luma_ssim": 0.9182854890823364,
+              "chroma_mean_absolute_error": 1.2194264220593993,
+              "chroma_95th_percentile_error": 3.0
+            },
+            {
+              "quality": 80,
+              "bytes": 258528,
+              "full_resolution_luma_ssim": 0.9543179273605347,
+              "worst_128px_luma_ssim": 0.9374561309814453,
+              "chroma_mean_absolute_error": 1.1721035724999873,
+              "chroma_95th_percentile_error": 3.0
+            },
+            {
+              "quality": 84,
+              "bytes": 311996,
+              "full_resolution_luma_ssim": 0.9665219187736511,
+              "worst_128px_luma_ssim": 0.9539467692375183,
+              "chroma_mean_absolute_error": 1.1033395578357545,
+              "chroma_95th_percentile_error": 3.0
+            },
+            {
+              "quality": 88,
+              "bytes": 383304,
+              "full_resolution_luma_ssim": 0.9768775105476379,
+              "worst_128px_luma_ssim": 0.9682363271713257,
+              "chroma_mean_absolute_error": 1.0233371171867451,
+              "chroma_95th_percentile_error": 3.0
+            },
+            {
+              "quality": 92,
+              "bytes": 501274,
+              "full_resolution_luma_ssim": 0.9867902994155884,
+              "worst_128px_luma_ssim": 0.980751633644104,
+              "chroma_mean_absolute_error": 0.9419255830863024,
+              "chroma_95th_percentile_error": 3.0
+            }
+          ]
+        },
+        {
+          "number": 5,
+          "caption": "Внутренний двор",
+          "source_git_sha": "dfb9a660e4b7e609c7a29944f15108363b8c8ae7",
+          "original_sha256": "bb994a80bf293fbd44c71ce2e202d0c8427068b5836d83bc5360c301e7eca2f1",
+          "original_bytes": 3491149,
+          "source_dimensions": [
+            1672,
+            941
+          ],
+          "dimensions": [
+            1672,
+            941
+          ],
+          "encoded_bytes": 600810,
+          "quality": 92,
+          "sha256": "f69b1c13e387ba7171439f2279fdea987e110bfbca396fe81599d0dbe7cfdcda",
+          "full_resolution_luma_ssim": 0.9905301332473755,
+          "worst_128px_luma_ssim": 0.9834167957305908,
+          "chroma_mean_absolute_error": 0.9688979325669017,
+          "chroma_95th_percentile_error": 3.0,
+          "trials": [
+            {
+              "quality": 76,
+              "bytes": 276334,
+              "full_resolution_luma_ssim": 0.9524573683738708,
+              "worst_128px_luma_ssim": 0.9292112588882446,
+              "chroma_mean_absolute_error": 1.3173294977856196,
+              "chroma_95th_percentile_error": 4.0
+            },
+            {
+              "quality": 80,
+              "bytes": 322586,
+              "full_resolution_luma_ssim": 0.9637325406074524,
+              "worst_128px_luma_ssim": 0.9463886022567749,
+              "chroma_mean_absolute_error": 1.2572288337257016,
+              "chroma_95th_percentile_error": 3.0
+            },
+            {
+              "quality": 84,
+              "bytes": 385508,
+              "full_resolution_luma_ssim": 0.9742282629013062,
+              "worst_128px_luma_ssim": 0.9622414112091064,
+              "chroma_mean_absolute_error": 1.1785874998093242,
+              "chroma_95th_percentile_error": 3.0
+            },
+            {
+              "quality": 88,
+              "bytes": 466370,
+              "full_resolution_luma_ssim": 0.9831261038780212,
+              "worst_128px_luma_ssim": 0.9746499061584473,
+              "chroma_mean_absolute_error": 1.0965003381315814,
+              "chroma_95th_percentile_error": 3.0
+            },
+            {
+              "quality": 92,
+              "bytes": 600810,
+              "full_resolution_luma_ssim": 0.9905301332473755,
+              "worst_128px_luma_ssim": 0.9834167957305908,
+              "chroma_mean_absolute_error": 0.9688979325669017,
+              "chroma_95th_percentile_error": 3.0
+            }
+          ]
+        },
+        {
+          "number": 6,
+          "caption": "Врата к горной тропе",
+          "source_git_sha": "060e5cc5b6df924b40c41e429f3e8b70f52871db",
+          "original_sha256": "510a1dd10981891d3840141f1881731b7631dc04cceb6029bf8cdd7915210525",
+          "original_bytes": 3438139,
+          "source_dimensions": [
+            1672,
+            941
+          ],
+          "dimensions": [
+            1672,
+            941
+          ],
+          "encoded_bytes": 587016,
+          "quality": 92,
+          "sha256": "34fe293d9287778a56a1c348862b7e40d6fe7923c357770ac8ccaec417032481",
+          "full_resolution_luma_ssim": 0.9903376698493958,
+          "worst_128px_luma_ssim": 0.985112190246582,
+          "chroma_mean_absolute_error": 0.9971999272889983,
+          "chroma_95th_percentile_error": 3.0,
+          "trials": [
+            {
+              "quality": 76,
+              "bytes": 273570,
+              "full_resolution_luma_ssim": 0.9540717601776123,
+              "worst_128px_luma_ssim": 0.9323529005050659,
+              "chroma_mean_absolute_error": 1.3551201511168511,
+              "chroma_95th_percentile_error": 4.0
+            },
+            {
+              "quality": 80,
+              "bytes": 318376,
+              "full_resolution_luma_ssim": 0.9643476605415344,
+              "worst_128px_luma_ssim": 0.9446144104003906,
+              "chroma_mean_absolute_error": 1.2918631685725763,
+              "chroma_95th_percentile_error": 4.0
+            },
+            {
+              "quality": 84,
+              "bytes": 379126,
+              "full_resolution_luma_ssim": 0.9749059081077576,
+              "worst_128px_luma_ssim": 0.962177038192749,
+              "chroma_mean_absolute_error": 1.21160681144461,
+              "chroma_95th_percentile_error": 3.0
+            },
+            {
+              "quality": 88,
+              "bytes": 456750,
+              "full_resolution_luma_ssim": 0.9830660820007324,
+              "worst_128px_luma_ssim": 0.9744116067886353,
+              "chroma_mean_absolute_error": 1.1296779106010606,
+              "chroma_95th_percentile_error": 3.0
+            },
+            {
+              "quality": 92,
+              "bytes": 587016,
+              "full_resolution_luma_ssim": 0.9903376698493958,
+              "worst_128px_luma_ssim": 0.985112190246582,
+              "chroma_mean_absolute_error": 0.9971999272889983,
+              "chroma_95th_percentile_error": 3.0
             }
           ]
         }

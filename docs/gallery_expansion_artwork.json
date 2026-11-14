@@ -504,6 +504,42 @@
           "final_prompt": "Use case: stylized-concept. Single final environment artwork for a Skyrim village gallery. Scene: snowy footpath INSIDE the edge of SKAAL VILLAGE at blue-hour winter dusk. Three low rustic NORDIC TIMBER LOG HOUSES with steep snow-covered thatch roofs, stacked firewood, orange lanterns and glowing small windows, dense snow-laden FIR TREES surrounding the clearing. Background consists ONLY of fir forest and an ordinary low grey snow ridge. NO mushrooms, NO mushroom houses, NO giant fungi, NO towers, NO fortresses, NO castles, NO Dunmer shell buildings, NO volcano, NO lava. Authentic modest snowy Nordic settlement. Detailed realistic cinematic fantasy materials and readable gentle light, 16:9 wide horizontal full bleed. No text, no UI, no watermark, no borders, no collage."
         }
       ]
+    },
+    {
+      "slug": "highhrothgar",
+      "name": "Высокий Хротгар",
+      "photos": [
+        {
+          "number": 1,
+          "caption": "Подход к монастырю",
+          "source": "gallery-artwork-20261110-story:artwork_sources_round2/highhrothgar/01.png"
+        },
+        {
+          "number": 2,
+          "caption": "Большой зал",
+          "source": "gallery-artwork-20261110-story:artwork_sources_round2/highhrothgar/02.png"
+        },
+        {
+          "number": 3,
+          "caption": "Каменные переходы",
+          "source": "gallery-artwork-20261110-story:artwork_sources_round2/highhrothgar/03.png"
+        },
+        {
+          "number": 4,
+          "caption": "Покои Седобородых",
+          "source": "gallery-artwork-20261110-story:artwork_sources_round2/highhrothgar/04.png"
+        },
+        {
+          "number": 5,
+          "caption": "Внутренний двор",
+          "source": "gallery-artwork-20261110-story:artwork_sources_round2/highhrothgar/05.png"
+        },
+        {
+          "number": 6,
+          "caption": "Врата к горной тропе",
+          "source": "gallery-artwork-20261110-story:artwork_sources_round2/highhrothgar/06.png"
+        }
+      ]
     }
   ],
   "additional_photos": [

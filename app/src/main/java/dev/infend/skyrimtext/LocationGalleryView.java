@@ -38,12 +38,12 @@ public final class LocationGalleryView extends LinearLayout {
     private static final String[] CITIES={
         "Вайтран","Виндхельм","Винтерхолд","Данстар","Маркарт",
         "Морфал","Ривервуд","Рифтен","Солитьюд","Фолкрит",
-        "Хелген","Айварстед","Рорикстед","Драконий Мост","Картвастен","Шорский Камень","Кинсгроув","Чёрный Брод","Каменные Холмы","Воронья Скала","Тел-Митрин","Деревня скаалов"
+        "Хелген","Айварстед","Рорикстед","Драконий Мост","Картвастен","Шорский Камень","Кинсгроув","Чёрный Брод","Каменные Холмы","Воронья Скала","Тел-Митрин","Деревня скаалов","Высокий Хротгар"
     };
     private static final String[] SLUGS={
         "whiterun","windhelm","winterhold","dawnstar","markarth",
         "morthal","riverwood","riften","solitude","falkreath",
-        "helgen","ivarstead","rorikstead","dragonbridge","karthwasten","shorsstone","kynesgrove","darkwater","stonehills","ravenrock","telmithryn","skaal"
+        "helgen","ivarstead","rorikstead","dragonbridge","karthwasten","shorsstone","kynesgrove","darkwater","stonehills","ravenrock","telmithryn","skaal","highhrothgar"
     };
     private static final Map<String,String> ID_BY_CITY=new HashMap<>();
     private static final Map<String,Integer> PHOTO_INDEX_BY_CITY=new HashMap<>();
@@ -70,7 +70,8 @@ public final class LocationGalleryView extends LinearLayout {
         {"Подход к Каменным Холмам","Шахтёрский двор","Вход в шахту Каменные Холмы","Горные выработки","Дом у шахты","Болотная окраина"},
         {"Прибытие в Воронью Скалу","Улицы Вороньей Скалы","Торговая площадь","Храм предков","Стена Бастиона","Таверна «Пьяный нетч»"},
         {"Подход к Тел-Митрину","Двор грибного поселения","Вход в башню","Зал Нелота","Алхимическая лаборатория","Жилище управляющего"},
-        {"Подход к деревне скаалов","Заснеженная площадь","Большой дом","Кузница скаалов","Дом шамана","Лесная окраина деревни"}
+        {"Подход к деревне скаалов","Заснеженная площадь","Большой дом","Кузница скаалов","Дом шамана","Лесная окраина деревни"},
+        {"Подход к монастырю","Большой зал","Каменные переходы","Покои Седобородых","Внутренний двор","Врата к горной тропе"}
     };
     private static final ExecutorService IO=Executors.newFixedThreadPool(2);
     private static final Set<String> PREFETCHING=java.util.Collections.synchronizedSet(new HashSet<>());
@@ -87,6 +88,7 @@ public final class LocationGalleryView extends LinearLayout {
         }
         alias("Камень Шора","Шорский Камень");
         alias("Роща Кин","Кинсгроув");
+        alias("High Hrothgar","Высокий Хротгар");
     }
     private static String locationKey(String location){
         return location==null?"":location.trim().toLowerCase(new Locale("ru")).replace('ё','е');

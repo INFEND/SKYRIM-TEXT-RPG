@@ -47,8 +47,8 @@ class GalleryExpansion(unittest.TestCase):
 
     def test_all_new_images_match_measured_report(self):
         report = json.loads((ROOT/"docs/gallery_expansion_compression.json").read_text())
-        self.assertEqual(report["image_count"], 73)
-        self.assertEqual(len(report["packs"]), 13)
+        self.assertEqual(report["image_count"], 79)
+        self.assertEqual(len(report["packs"]), 14)
         observed = set()
         original_bytes = 0
         archive_bytes = 0
@@ -81,7 +81,7 @@ class GalleryExpansion(unittest.TestCase):
                     self.assertLessEqual(photo["chroma_mean_absolute_error"], 2.5)
                     self.assertLessEqual(photo["chroma_95th_percentile_error"], 7)
                     original_bytes += photo["original_bytes"]
-        self.assertEqual(len(observed), 73)
+        self.assertEqual(len(observed), 79)
         self.assertEqual(original_bytes, report["original_bytes"])
         self.assertEqual(archive_bytes, report["archive_bytes"])
 
@@ -100,7 +100,7 @@ class GalleryExpansion(unittest.TestCase):
             methods.append(match.group(0))
         probe = r'''
     public static void main(String[] args){
-        if(locations().length!=22)throw new AssertionError("location count");
+        if(locations().length!=23)throw new AssertionError("location count");
         for(String name:locations()){
             if(!hasGallery(name)||imageCount(name)!=6)throw new AssertionError(name);
             for(int n=0;n<6;n++){
@@ -110,7 +110,7 @@ class GalleryExpansion(unittest.TestCase):
         String[][] pairs={
             {"Камень Шора","Шорский Камень"},{"Роща Кин","Кинсгроув"},
             {"Черный Брод","Чёрный Брод"},{" каменные холмы ","Каменные Холмы"},
-            {" ДРАКОНИЙ МОСТ ","Драконий Мост"}
+            {" ДРАКОНИЙ МОСТ ","Драконий Мост"},{"High Hrothgar","Высокий Хротгар"}
         };
         for(String[] pair:pairs){
             if(!hasGallery(pair[0])||imageCount(pair[0])!=6)throw new AssertionError(pair[0]);
