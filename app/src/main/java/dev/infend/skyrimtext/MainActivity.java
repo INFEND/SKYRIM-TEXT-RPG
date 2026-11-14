@@ -426,7 +426,7 @@ public final class MainActivity extends Activity {
             if(after.victories>before.victories){
                 long earned=after.xp-before.xp;
                 for(int i=before.level;i<after.level;i++)earned+=i*80L;
-                victoryVisual=before.enemy+"\\n+"+Math.max(0,after.gold-before.gold)+" септимов  |  +"+Math.max(0,earned)+" опыта";
+                victoryVisual=before.enemy+"\n+"+Math.max(0,after.gold-before.gold)+" септимов  |  +"+Math.max(0,earned)+" опыта";
             }
         }
         String event=moved?travelVisual:!victoryVisual.isEmpty()?("Победа: "+before.enemy):
@@ -504,7 +504,7 @@ public final class MainActivity extends Activity {
             for(int k=i;k<Math.min(i+3,RpgContent.SKILLS.length);k++){
                 final int index=k;LinearLayout node=column();node.setGravity(Gravity.CENTER);
                 node.addView(new VisualEffectsView.SkillStars(this,game.progress.skillLevel(k),accent()),lp(-1,49));
-                TextView label=text(RpgContent.SKILLS[k]+"\\n"+game.progress.skillLevel(k),11,TEXT,true);
+                TextView label=text(RpgContent.SKILLS[k]+"\n"+game.progress.skillLevel(k),11,TEXT,true);
                 label.setGravity(Gravity.CENTER);node.addView(label,lp(-1,-2));
                 r.addView(node,new LinearLayout.LayoutParams(0,-2,1));node.setOnClickListener(v->showSkill(index));
             }
@@ -1026,9 +1026,9 @@ public final class MainActivity extends Activity {
         body.setTypeface(SovngardeTypeface.face(this,false));
         body.setText(SceneTypography.render(s.body,accent(),game.name,heroColor()));
         body.setLineSpacing(dp(7),1.16f);
-        makeItemsClickable(body,body.getText().toString());
         narrative.addView(body);
         decorateNarrative(narrative,body,s.body);
+        makeItemsClickable(body,body.getText().toString());
         renderVisualResults();tradeVisual();
         renderItemGains();
         renderStoryJournal();
@@ -1274,6 +1274,7 @@ public final class MainActivity extends Activity {
             if("WILD".equals(game.battleKind))
                 actionButton("ОТСТУПИТЬ","Шанс: "+game.progress.chance(game,"FLEE")+"%",true,()->resolveNativeAiCombat("FLEE"));
         }
+        renderVisualResults();
         if(game.aiTurn==null){
             addText(content,"ИИ-Мастер создаст первую сцену из истории твоего героя. Затем появятся десять вариантов действий и поле собственного ответа.",15,TEXT,false,15);
             actionButton("НАЧАТЬ ИИ-ПРИКЛЮЧЕНИЕ","Сгенерировать первую сцену и десять решений",true,()->
@@ -1285,10 +1286,9 @@ public final class MainActivity extends Activity {
         aiTurnText.setTypeface(SovngardeTypeface.face(this,false));
         aiTurnText.setLineSpacing(dp(7),1.16f);
         aiTurnText.setText(SceneTypography.render(game.aiTurn.scene,accent(),game.name,heroColor()));
-        makeItemsClickable(aiTurnText,aiTurnText.getText().toString());
         narrative.addView(aiTurnText,lp(-1,-2));
         decorateNarrative(narrative,aiTurnText,game.aiTurn.scene);
-        renderVisualResults();
+        makeItemsClickable(aiTurnText,aiTurnText.getText().toString());
         renderItemGains();
         space(content,16);
         addText(content,"ВЫБЕРИ ОДИН ИЛИ НЕСКОЛЬКО ВАРИАНТОВ. ОТПРАВКА ТОЛЬКО ПО КНОПКЕ НИЖЕ.",12,MUTED,false,11);
@@ -2248,6 +2248,10 @@ public final class MainActivity extends Activity {
             wrapper.addView(description,lp(-1,-2));
             routePreview(wrapper,route);
             dialog.setView(scroller);
+        }else if(visual("travel")&&route.allowed&&route.days>0){
+            LinearLayout wrapper=column();wrapper.setPadding(dp(14),dp(10),dp(14),dp(12));
+            addText(wrapper,body,14,TEXT,false,10);routePreview(wrapper,route);
+            ScrollView scroller=new ScrollView(this);scroller.addView(wrapper);dialog.setView(scroller);
         }else{
             dialog.setMessage(body);
         }
