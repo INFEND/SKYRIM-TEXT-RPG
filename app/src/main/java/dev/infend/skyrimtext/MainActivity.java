@@ -336,8 +336,204 @@ public final class MainActivity extends Activity {
             }
         });
     }
+
+    private boolean visual(String key){return prefs.getBoolean("visual_"+key,true);}
+    private void visualSettings(){
+        int start=content.getChildCount();
+        LinearLayout panel=card();
+        addText(panel,"Каждый эффект можно отключить отдельно. Игровые правила не меняются.",13,MUTED,false,12);
+        String[][] options={{"weather","Живая погода"},{"status","Эффекты состояния"},{"portraits","Собеседники и аватары"},{"narrative","Оформление повествования"},{"choices","Расширенные карточки действий"},{"reveal","Плавное раскрытие текста"},{"stars","Созвездия навыков"},{"gear","Силуэт и экипировка"},{"damage","Показатели урона"},{"victory","Итоги победы"},{"fog","Туман войны"},{"travel","Маршрут путешествия"},{"chronicle","Хроника приключений"},{"reputation","Репутация и отношения"},{"loot","Карточки добычи"},{"trade","Панель торговли"},{"defeat","Экран поражения"},{"notice","Тематические уведомления"}};
+        for(String[] option:options){
+            Switch toggle=new Switch(this);
+            toggle.setText(option[1]);toggle.setTextColor(TEXT);toggle.setTextSize(sp(14));
+            toggle.setThumbTintList(ColorStateList.valueOf(accent()));toggle.setChecked(visual(option[0]));
+            toggle.setMinHeight(dp(46));panel.addView(toggle,lp(-1,-2));
+            toggle.setOnCheckedChangeListener((v,on)->prefs.edit().putBoolean("visual_"+option[0],on).apply());
+        }
+        foldSettingsSection("visual","ВИЗУАЛЬНЫЕ ЭФФЕКТЫ",start);
+    }
+    private View sceneGallery(String location){
+        LocationGalleryView gallery=new LocationGalleryView(this,location,accent(),false);
+        if(!visual("weather"))return gallery;
+        WorldWeather weather=WorldWeather.at(game.region,location,game.day,game.hour);
+        if(!location.equalsIgnoreCase(game.progress.location))return gallery;
+        if(!java.util.Arrays.asList("snow","blizzard","rain","storm","fog").contains(weather.glyph))return gallery;
+        FrameLayout frame=new FrameLayout(this);
+        frame.addView(gallery,new FrameLayout.LayoutParams(-1,-2));
+        VisualEffectsView particles=new VisualEffectsView(this,weather.glyph,animations);
+        frame.addView(particles,new FrameLayout.LayoutParams(-1,-1));
+        return frame;
+    }
+    private void stateEffects(){
+        if(!visual("status")||!game.started||titleOpen)return;
+        float fraction=game.hp/(float)Math.max(1,game.maxHp);
+        if(fraction>=.65f)return;
+        root.setForeground(new VisualEffectsView.EdgeDrawable(fraction<.25f?0x99b51c27:0x55b51c27));
+    }
+    private String lastNarrative="";
+    private void decorateNarrative(LinearLayout host,TextView body,String raw){
+        if(!visual("narrative"))body.setText(body.getText().toString());
+        if(visual("portraits")){
+            java.util.LinkedHashSet<String> speakers=new java.util.LinkedHashSet<>();
+            java.util.regex.Matcher names=java.util.regex.Pattern.compile("(?m)^\\s*(?:\\*\\*)?([^:\\n*]{2,48}):(?:\\*\\*)?\\s*$").matcher(raw);
+            while(names.find()&&speakers.size()<4){
+                String name=names.group(1).trim();
+                if(!name.isEmpty()&&!name.equalsIgnoreCase("ты")&&!name.equalsIgnoreCase(game.name))speakers.add(name);
+            }
+            if(!speakers.isEmpty()){
+                LinearLayout avatars=row();
+                for(String name:speakers){
+                    LinearLayout person=column();person.setGravity(Gravity.CENTER);
+                    person.addView(new SkyrimIconView(this,"hero",accent()),lp(34,37));
+                    TextView label=text(name,10,MUTED,false);label.setGravity(Gravity.CENTER);label.setMaxLines(2);
+                    person.addView(label,lp(-1,-2));avatars.addView(person,new LinearLayout.LayoutParams(0,-2,1));
+                }
+                host.addView(avatars,0,lp(-1,-2));
+            }
+        }
+        if(visual("reveal")&&animations&&!raw.equals(lastNarrative)){
+            lastNarrative=raw;body.setAlpha(.15f);
+            body.animate().alpha(1f).setDuration(360).start();
+            body.setOnLongClickListener(v->{body.animate().cancel();body.setAlpha(1f);return false;});
+        }
+    }
+    private void choiceExtras(LinearLayout host,String action){
+        if(!visual("choices"))return;
+        String cost="";
+        if("HEAVY".equals(action))cost="−10 выносливости";
+        else if("MAGIC".equals(action))cost="−12 магии";
+        else if("POTION".equals(action))cost="−1 лечебное зелье";
+        else if("DEFEND".equals(action))cost="Восстановление сил | снижение урона";
+        else if("FLEE".equals(action))cost="Риск неудачного отступления";
+        if(!cost.isEmpty())addText(host,cost,12,ITEM_GOLD,true,3);
+    }
+    private static final class VisualSnapshot {
+        final String location,mode,enemy;final int hp,enemyHp,victories,gold,xp,level,day;
+        VisualSnapshot(GameEngine g){location=g.progress.location;mode=g.mode;enemy=g.enemyName;hp=g.hp;enemyHp=g.enemyHp;victories=g.victories;gold=g.gold;xp=g.xp;level=g.level;day=g.day;}
+    }
+    private String combatVisual="",victoryVisual="",travelVisual="";
+    private void recordVisual(VisualSnapshot before,GameEngine after,String action){
+        combatVisual="";victoryVisual="";travelVisual="";
+        after.visitedVisual.add(after.progress.location);
+        boolean moved=!before.location.equals(after.progress.location);
+        if(moved)travelVisual=before.location+" → "+after.progress.location+" | "+Math.max(0,after.day-before.day)+" дн.";
+        if("COMBAT".equals(before.mode)){
+            int hit=Math.max(0,before.enemyHp-after.enemyHp);
+            if(!before.enemy.equals(after.enemyName)&&after.victories==before.victories)hit=0;
+            int received=Math.max(0,before.hp-after.hp);
+            if(!"DEFEAT".equals(after.mode)&&(hit>0||received>0))
+                combatVisual=(hit>0?"−"+hit+" врагу":"")+(received>0?(hit>0?"  |  ":"")+"−"+received+" герою":"");
+            if(after.victories>before.victories){
+                long earned=after.xp-before.xp;
+                for(int i=before.level;i<after.level;i++)earned+=i*80L;
+                victoryVisual=before.enemy+"\\n+"+Math.max(0,after.gold-before.gold)+" септимов  |  +"+Math.max(0,earned)+" опыта";
+            }
+        }
+        String event=moved?travelVisual:!victoryVisual.isEmpty()?("Победа: "+before.enemy):
+            "DEFEAT".equals(after.mode)?"Поражение":after.mode.equals("COMBAT")?after.battleLog:after.message;
+        if(event==null||event.trim().isEmpty())event=action;
+        after.recordVisualEvent(event);
+    }
+    private void renderVisualResults(){
+        if(visual("damage")&&!combatVisual.isEmpty()){
+            LinearLayout box=card();TextView t=text(combatVisual,21,ITEM_DOWN,true);t.setGravity(Gravity.CENTER);box.addView(t);
+            if(animations){t.setTranslationY(dp(8));t.setAlpha(.2f);t.animate().translationY(0).alpha(1).setDuration(300).start();}
+        }
+        if(visual("victory")&&!victoryVisual.isEmpty()){
+            LinearLayout box=card();addText(box,"◇  ПОБЕДА",23,ITEM_GOLD,true,10);addText(box,victoryVisual,16,TEXT,false,4);
+        }
+        if(visual("travel")&&!travelVisual.isEmpty()){
+            LinearLayout box=card();addText(box,"ПУТЕШЕСТВИЕ ЗАВЕРШЕНО",12,accent(),true,8);addText(box,travelVisual,15,TEXT,false,0);
+        }
+        if(visual("defeat")&&"DEFEAT".equals(game.mode)){
+            LinearLayout box=card();box.setBackground(new RuneFrameDrawable(0xff190c0d,ITEM_DOWN,false));
+            TextView t=text("ПОРАЖЕНИЕ",26,ITEM_DOWN,true);t.setGravity(Gravity.CENTER);box.addView(t);
+            addText(box,game.message,15,TEXT,false,0);
+            if(animations){box.setAlpha(.2f);box.animate().alpha(1).setDuration(600).start();}
+        }
+    }
+    private void routePreview(LinearLayout host,TravelPlanner.Route route){
+        if(!visual("travel")||!route.allowed||route.days==0)return;
+        addText(host,"МАРШРУТ | "+route.days+" дн. | "+route.fare+" септимов",12,ITEM_GOLD,true,9);
+        for(int i=0;i<route.stops.size();i++){
+            LinearLayout line=row();line.addView(new SkyrimIconView(this,"map",accent()),lp(23,25));
+            addText(line,(i==0?"Отправление: ":i==route.stops.size()-1?"Прибытие: ":"Переход: ")+route.stops.get(i),13,TEXT,false,0);
+            host.addView(line,lp(-1,-2));
+        }
+    }
+    private void renderChronicle(){
+        if(!visual("chronicle"))return;
+        LinearLayout c=card();addText(c,"ХРОНИКА ПРИКЛЮЧЕНИЙ",12,accent(),true,12);
+        for(int i=game.visualChronicle.length()-1;i>=0;i--){
+            JSONObject entry=game.visualChronicle.optJSONObject(i);if(entry==null)continue;
+            addText(c,"◇  День "+entry.optInt("day")+" | "+entry.optString("location"),12,ITEM_GOLD,true,4);
+            addText(c,entry.optString("event"),14,TEXT,false,11);
+        }
+        if(game.visualChronicle.length()==0)addText(c,"Новые события появятся после совершённых действий.",13,MUTED,false,0);
+    }
+    private void reputationPanel(){
+        if(!visual("reputation"))return;
+        LinearLayout c=card();addText(c,"РЕПУТАЦИЯ И ОТНОШЕНИЯ",12,accent(),true,10);
+        int rep=game.reputation;
+        addText(c,"Общая репутация: "+(rep>0?"+":"")+rep,17,rep>=0?ITEM_UP:ITEM_DOWN,true,7);
+        android.widget.ProgressBar bar=new android.widget.ProgressBar(this,null,android.R.attr.progressBarStyleHorizontal);
+        bar.setMax(200);bar.setProgress(100+Math.max(-100,Math.min(100,rep)));
+        bar.setProgressTintList(ColorStateList.valueOf(rep>=0?ITEM_UP:ITEM_DOWN));c.addView(bar,lp(-1,5));
+        String facts=game.sceneState.confirmedContext();
+        if(!facts.isEmpty())addText(c,facts,12,MUTED,false,0);
+    }
+    private void gearVisual(LinearLayout items){
+        if(!visual("gear"))return;
+        LinearLayout layout=row();layout.setGravity(Gravity.CENTER_VERTICAL);
+        LinearLayout slots=column();layout.addView(slots,new LinearLayout.LayoutParams(0,-2,1));
+        for(String[] slot:new String[][]{{"head","Голова"},{"body","Доспех"},{"hands","Руки"},{"feet","Ноги"}}){
+            addText(slots,slot[1],10,MUTED,true,2);addText(slots,game.progress.equippedName(slot[0]),12,TEXT,false,7);
+        }
+        layout.addView(new VisualEffectsView.HeroSilhouette(this,accent()),lp(80,172));
+        LinearLayout right=column();right.setPadding(dp(6),0,0,0);layout.addView(right,new LinearLayout.LayoutParams(0,-2,1));
+        for(String[] slot:new String[][]{{"weapon","Оружие"},{"shield","Щит"},{"ring","Кольцо"},{"neck","Амулет"}}){
+            addText(right,slot[1],10,MUTED,true,2);addText(right,game.progress.equippedName(slot[0]),12,TEXT,false,7);
+        }
+        items.addView(layout,lp(-1,-2));
+    }
+    private void starSkills(){
+        if(!visual("stars"))return;
+        LinearLayout c=card();addText(c,"СОЗВЕЗДИЯ НАВЫКОВ",12,ITEM_GOLD,true,10);
+        for(int i=0;i<RpgContent.SKILLS.length;i+=3){
+            LinearLayout r=row();c.addView(r,lp(-1,-2));
+            for(int k=i;k<Math.min(i+3,RpgContent.SKILLS.length);k++){
+                final int index=k;LinearLayout node=column();node.setGravity(Gravity.CENTER);
+                node.addView(new VisualEffectsView.SkillStars(this,game.progress.skillLevel(k),accent()),lp(-1,49));
+                TextView label=text(RpgContent.SKILLS[k]+"\\n"+game.progress.skillLevel(k),11,TEXT,true);
+                label.setGravity(Gravity.CENTER);node.addView(label,lp(-1,-2));
+                r.addView(node,new LinearLayout.LayoutParams(0,-2,1));node.setOnClickListener(v->showSkill(index));
+            }
+        }
+    }
+    private void tradeVisual(){
+        if(!visual("trade")||!"SHOP".equals(game.mode))return;
+        LinearLayout c=card();addText(c,"ТОРГОВЕЦ  ◇  ПОКУПАТЕЛЬ",12,ITEM_GOLD,true,10);
+        LinearLayout r=row();c.addView(r,lp(-1,-2));
+        LinearLayout a=column(),b=column();r.addView(a,new LinearLayout.LayoutParams(0,-2,1));r.addView(b,new LinearLayout.LayoutParams(0,-2,1));
+        addText(a,"Ассортимент",13,accent(),true,5);addText(a,"Зелья | оружие | броня",12,TEXT,false,0);
+        addText(b,"Твой кошелёк",13,accent(),true,5);addText(b,game.gold+" септимов",16,ITEM_GOLD,true,0);
+        addText(b,itemNumber(game.progress.carryWeight())+" / 50 кг",12,MUTED,false,0);
+    }
+    private void themedNotice(String message){
+        if(!visual("notice")||root==null||!root.isAttachedToWindow()){Toast.makeText(this,message,Toast.LENGTH_SHORT).show();return;}
+        android.view.ViewGroup decor=findViewById(android.R.id.content);
+        if(!(decor instanceof FrameLayout)){Toast.makeText(this,message,Toast.LENGTH_SHORT).show();return;}
+        TextView notice=text(message,14,TEXT,true);notice.setGravity(Gravity.CENTER);notice.setPadding(dp(16),dp(12),dp(16),dp(12));
+        notice.setBackground(new RuneFrameDrawable(0xff101315,accent(),false));
+        FrameLayout.LayoutParams p=new FrameLayout.LayoutParams(-1,-2,Gravity.TOP);
+        p.setMargins(dp(15),dp(12),dp(15),0);decor.addView(notice,p);
+        if(animations){notice.setAlpha(0f);notice.animate().alpha(1f).setDuration(160).start();}
+        notice.postDelayed(()->{if(notice.getParent()==decor)decor.removeView(notice);},2400);
+    }
+
     private void render(){
         rememberViewport();
+        if(game.started&&game.visitedVisual.add(game.progress.location))save();
         String thisPage=viewportKey();
         PageScroll oldScroll=scrollCache.get(thisPage);
         root=column();root.setBackground(new SkyrimBackdropDrawable());root.setFitsSystemWindows(true);
@@ -371,6 +567,7 @@ public final class MainActivity extends Activity {
         else if(tab==6)renderCodex();
         else renderSettings();
         if(!titleOpen&&game.started)renderNav();
+        stateEffects();
         SovngardeTypeface.applyTree(root);
         renderedPage=thisPage;
         resumeViewport(oldScroll,scroll,thisPage);
@@ -817,7 +1014,7 @@ public final class MainActivity extends Activity {
         renderStorySnapshot();
         if(LocationGalleryView.hasGallery(game.progress.location)){
             addText(content,"ᛟ  ВИДЫ ЛОКАЦИИ",11,accent(),true,9);
-            content.addView(new LocationGalleryView(this,game.progress.location,accent(),false),lp(-1,-2));
+            content.addView(sceneGallery(game.progress.location),lp(-1,-2));
             renderLocationWeather(content);
         }else{
             content.addView(new NordicArtView(this,NordicArtView.STORY),lp(-1,188));
@@ -831,6 +1028,8 @@ public final class MainActivity extends Activity {
         body.setLineSpacing(dp(7),1.16f);
         makeItemsClickable(body,body.getText().toString());
         narrative.addView(body);
+        decorateNarrative(narrative,body,s.body);
+        renderVisualResults();tradeVisual();
         renderItemGains();
         renderStoryJournal();
         if(prefs.getBoolean("ai_enabled",false)) renderAiStoryPanel();
@@ -844,10 +1043,12 @@ public final class MainActivity extends Activity {
                 if(aiClient!=null)aiClient.cancel();if(localAiClient!=null)localAiClient.cancel();
                 int old=game.questStage;
                 java.util.Map<String,Integer> before=itemSnapshot(game);
+                VisualSnapshot visualBefore=new VisualSnapshot(game);
                 game.choose(c.action);
                 if(!c.action.startsWith("ACT:"))game.progress.observe(game,c.action,old);
                 game.progress.sync(game);
                 captureItemGains(before,game,false);
+                recordVisual(visualBefore,game,c.title);
                 if(prefs.getBoolean("ai_enabled",false))
                     aiMemory.add(aiSession,"event","Игровое действие: "+c.title+". Текущее сообщение движка: "+game.message);
                 save();tab=0;render();
@@ -910,7 +1111,7 @@ public final class MainActivity extends Activity {
         }
         SkyrimIconView glyph=new SkyrimIconView(this,
             chance>=0?skillGlyph(SceneChoiceMeta.skillName(c.action)):"skills",accent());
-        box.addView(glyph,lp(31,34));
+        if(visual("choices"))box.addView(glyph,lp(31,34));
         LinearLayout prose=column();
         LinearLayout.LayoutParams size=new LinearLayout.LayoutParams(0,-2,1);
         size.leftMargin=dp(13);box.addView(prose,size);
@@ -923,6 +1124,11 @@ public final class MainActivity extends Activity {
             desc.setLineSpacing(dp(3),1.12f);prose.addView(desc);
         }
         space(prose,6);
+        choiceExtras(prose,c.action);
+        if(visual("travel")&&c.action.startsWith("REGION:")){
+            int target=Integer.parseInt(c.action.substring(7));
+            if(target>=0&&target<TravelPlanner.HUBS.length)routePreview(prose,TravelPlanner.plan(game,WorldAtlas.find(TravelPlanner.HUBS[target])));
+        }
         if(chance>=0){
             addChoiceStat(prose,"НАВЫК",SceneChoiceMeta.skillName(c.action),accent(),4);
             addChoiceStat(prose,"ШАНС УСПЕХА",chance+"%",SceneChoiceMeta.chanceColor(chance),0);
@@ -1000,7 +1206,7 @@ public final class MainActivity extends Activity {
         aiTurnText=null;aiProgressInfo=null;aiReasoningText=null;
         if(LocationGalleryView.hasGallery(game.progress.location)){
             addText(content,"ᛟ  "+game.progress.location.toUpperCase(java.util.Locale.ROOT),12,accent(),true,10);
-            content.addView(new LocationGalleryView(this,game.progress.location,accent(),false),lp(-1,-2));
+            content.addView(sceneGallery(game.progress.location),lp(-1,-2));
             renderLocationWeather(content);
             space(content,13);
         }
@@ -1081,6 +1287,8 @@ public final class MainActivity extends Activity {
         aiTurnText.setText(SceneTypography.render(game.aiTurn.scene,accent(),game.name,heroColor()));
         makeItemsClickable(aiTurnText,aiTurnText.getText().toString());
         narrative.addView(aiTurnText,lp(-1,-2));
+        decorateNarrative(narrative,aiTurnText,game.aiTurn.scene);
+        renderVisualResults();
         renderItemGains();
         space(content,16);
         addText(content,"ВЫБЕРИ ОДИН ИЛИ НЕСКОЛЬКО ВАРИАНТОВ. ОТПРАВКА ТОЛЬКО ПО КНОПКЕ НИЖЕ.",12,MUTED,false,11);
@@ -1226,9 +1434,11 @@ public final class MainActivity extends Activity {
         if("FLEE".equals(action)&&!"WILD".equals(game.battleKind))return;
         if(!nativeAiCombatAvailable(action))return;
         java.util.Map<String,Integer> before=itemSnapshot(game);
+        VisualSnapshot visualBefore=new VisualSnapshot(game);
         game.choose(action);
         game.progress.sync(game);
         captureItemGains(before,game,false);
+        recordVisual(visualBefore,game,action);
         String outcome="COMBAT".equals(game.mode)?game.battleLog:game.message;
         // Native retreat and defeat leave the old enemy HP in the engine.
         // Clear the finished encounter before sending the next AI context.
@@ -1259,7 +1469,7 @@ public final class MainActivity extends Activity {
             row.addView(ordinal,ordinalSize);
         }
         SkyrimIconView glyph=new SkyrimIconView(this,skillGlyph(option.skill),accent());
-        row.addView(glyph,lp(31,34));
+        if(visual("choices"))row.addView(glyph,lp(31,34));
         LinearLayout detail=column();
         LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(0,-2,1);
         p.leftMargin=dp(13);row.addView(detail,p);
@@ -1267,6 +1477,7 @@ public final class MainActivity extends Activity {
         title.setTypeface(SovngardeTypeface.face(this,true));
         detail.addView(title);space(detail,6);
         addText(detail,option.detail,14,MUTED,false,7);
+        choiceExtras(detail,option.combatAction);
         boolean combat="COMBAT".equals(game.mode)&&game.enemyHp>0;
         int displayedChance=combat?("HEAVY".equals(option.combatAction)||"FLEE".equals(option.combatAction)
             ?game.progress.chance(game,option.combatAction):-1):option.chance;
@@ -1379,9 +1590,12 @@ public final class MainActivity extends Activity {
                         throw new IllegalStateException("ИИ изменил шанс после броска");
                     GameEngine next=GameEngine.fromJson(saved);
                     java.util.Map<String,Integer> before=itemSnapshot(next);
+                    VisualSnapshot visualBefore=new VisualSnapshot(next);
                     completed.apply(next,actionResolved);
                     next.progress.sync(next);
                     captureItemGains(before,next,!actionResolved);
+                    if(!actionResolved)recordVisual(visualBefore,next,completed.journal.isEmpty()?"Продолжение истории":completed.journal);
+                    else next.recordVisualEvent(completed.journal.isEmpty()?"Продолжение истории":completed.journal);
                     next.aiTurn=completed;
                     game=next;
                     selectedAiChoices.clear();aiOwnDraft="";clearAiDraft();
@@ -1749,7 +1963,7 @@ public final class MainActivity extends Activity {
         addText(overview,"Два полных листа рельефа работают без интернета. Масштаб и положение каждого листа сохраняются отдельно.",11,MUTED,false,7);
         if(LocationGalleryView.hasGallery(game.progress.location)){
             addText(overview,"ᛟ  ГАЛЕРЕЯ ТЕКУЩЕГО МЕСТА",11,accent(),true,12);
-            overview.addView(new LocationGalleryView(this,game.progress.location,accent(),false),lp(-1,-2));
+            overview.addView(sceneGallery(game.progress.location),lp(-1,-2));
             renderLocationWeather(overview);
         }
         addText(content,"МЕСТА И ПЕРЕХОДЫ",11,accent(),true,10);
@@ -2032,13 +2246,14 @@ public final class MainActivity extends Activity {
             description.setLineSpacing(dp(4),1.05f);
             description.setPadding(dp(8),dp(13),dp(8),dp(5));
             wrapper.addView(description,lp(-1,-2));
+            routePreview(wrapper,route);
             dialog.setView(scroller);
         }else{
             dialog.setMessage(body);
         }
         if(route.allowed&&route.days>0){
             dialog.setPositiveButton("Начать переход",(d,w)->{
-                java.util.Map<String,Integer> before=itemSnapshot(game);game.choose("LOC:"+place.name);game.progress.sync(game);captureItemGains(before,game,false);save();tab=0;render();
+                java.util.Map<String,Integer> before=itemSnapshot(game);VisualSnapshot visualBefore=new VisualSnapshot(game);game.choose("LOC:"+place.name);game.progress.sync(game);captureItemGains(before,game,false);recordVisual(visualBefore,game,place.name);save();tab=0;render();
             });
         }
         dialog.show();
@@ -2154,13 +2369,14 @@ public final class MainActivity extends Activity {
         if(!keepIfEmpty||!gains.isEmpty()){recentItemGains.clear();recentItemGains.putAll(gains);}
     }
     private void renderItemGains(){
-        if(recentItemGains.isEmpty())return;
+        if(recentItemGains.isEmpty()||!visual("loot"))return;
         LinearLayout rewards=card();
         addText(rewards,"ПОЛУЧЕНЫ ПРЕДМЕТЫ",11,ITEM_GOLD,true,8);
         for(java.util.Map.Entry<String,Integer> gain:recentItemGains.entrySet()){
             ItemCatalog.Item item=ItemCatalog.find(gain.getKey());if(item==null)continue;
             LinearLayout entry=itemSummary(item,gain.getValue(),false,true,item.value);
             rewards.addView(entry,lp(-1,-2));entry.setOnClickListener(v->itemDialog(item));
+            if(animations){entry.setAlpha(.25f);entry.animate().alpha(1).setDuration(260).start();}
             itemEffect(rewards,item);
         }
         addText(rewards,"Добавлено в инвентарь",12,ITEM_UP,false,0);
@@ -2523,6 +2739,7 @@ public final class MainActivity extends Activity {
                 ()->new ResourceManagerDialog(this,accent(),this::render,ResourceStore.portraitGroup(portraitPath)).show());
         if(!prefs.getBoolean("ai_enabled",false))
             actionButton("Ожидать","Выбрать от 1 до 24 часов отдыха",false,this::showWaitDialog);
+        reputationPanel();
         LinearLayout c=card();addText(c,"ХАРАКТЕРИСТИКИ",11,accent(),true,9);
         heroEntry(c,"Пол",game.gender);
         heroEntry(c,"Опыт",game.xp+" / "+(game.level*80));
@@ -2530,6 +2747,7 @@ public final class MainActivity extends Activity {
         heroEntry(c,"Септимы",game.gold+" септимов");heroEntry(c,"Репутация",String.valueOf(game.reputation));
         heroEntry(c,"Победы",String.valueOf(game.victories));heroEntry(c,"Исследований",String.valueOf(game.explored));
         LinearLayout items=card();addText(items,"СНАРЯЖЕНИЕ",11,accent(),true,12);
+        gearVisual(items);
         addText(items,"Оружие: "+game.progress.equippedName("weapon"),15,TEXT,false,10);
         String[] gearSlots={"body","head","hands","feet","shield","ring","neck","ammo"};
         String[] gearLabels={"Доспех","Голова","Руки","Ноги","Щит","Кольцо","Амулет","Боеприпасы"};
@@ -2557,6 +2775,7 @@ public final class MainActivity extends Activity {
         addText(stats,"Стартовые очки: +"+game.progress.spent[0]+" / +"+game.progress.spent[1]+" / +"+game.progress.spent[2],12,MUTED,false,0);
         addText(content,"НАВЫКИ И ДРЕВА РАЗВИТИЯ",11,accent(),true,12);
         addText(content,"Свободных очков талантов: "+game.progress.perkPoints,13,MUTED,false,13);
+        starSkills();
         for(int i=0;i<RpgContent.SKILLS.length;i++){
             final int index=i;int lvl=game.progress.skillLevel(i);
             LinearLayout skill=row();skill.setPadding(dp(12),dp(10),dp(12),dp(10));
@@ -2664,6 +2883,7 @@ public final class MainActivity extends Activity {
     private void renderJournal(){
         skyrimTopTabs(4);
         section("ЛЕТОПИСЬ СЕВЕРА","Журнал","Выбирай задание, чтобы увидеть описание и текущую цель.");
+        renderChronicle();
         String[] entries=game.aiJournal.isEmpty()?
             new String[]{"Драконий след","Пепельные печати","Опасные дороги"}:
             new String[]{"Драконий след","Пепельные печати","Опасные дороги","Задание ИИ"};
@@ -2843,6 +3063,7 @@ public final class MainActivity extends Activity {
             nameColors.addView(line,lp(-1,44));
         }
         foldSettingsSection("appearance","ОФОРМЛЕНИЕ И ЧИТАЕМОСТЬ",appearanceStart);
+        visualSettings();
         int aiStart=content.getChildCount();
         space(content,6);addText(content,"ИИ-ПРИКЛЮЧЕНИЕ",11,accent(),true,11);
         LinearLayout aiCard=card();
@@ -3050,7 +3271,7 @@ public final class MainActivity extends Activity {
             area.setOnClickListener(v->{if(tab!=id){tab=id;render();}});
         }
     }
-    public void toast(String message){Toast.makeText(this,message,Toast.LENGTH_SHORT).show();}
+    public void toast(String message){themedNotice(message);}
     int currentAccent(){return accent();}
     @Override public void onBackPressed(){if(titleOpen){super.onBackPressed();return;}
         if(!game.started||tab==5||tab==6){titleOpen=true;render();return;}

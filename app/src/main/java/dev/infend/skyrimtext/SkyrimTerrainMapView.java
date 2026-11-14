@@ -253,6 +253,14 @@ public final class SkyrimTerrainMapView extends View {
         super.onDraw(canvas);canvas.drawColor(0xff080c0e);
         Bitmap image;synchronized(IMAGES){image=IMAGES[sheet];}
         if(image!=null)canvas.drawBitmap(image,null,new RectF(left,top,left+WIDTH[sheet]*scale,top+HEIGHT[sheet]*scale),imagePaint);
+        if(prefs.getBoolean("visual_fog",true)){
+            android.graphics.Path clear=new android.graphics.Path();
+            for(String visited:game.visitedVisual){SkyrimMapCatalog.Site discovered=SkyrimMapCatalog.find(visited);
+                if(discovered!=null&&discovered.sheet==sheet)clear.addCircle(left+discovered.x*scale,top+discovered.y*scale,145f*scale,android.graphics.Path.Direction.CW);}
+            int layer=canvas.save();canvas.clipOutPath(clear);
+            ink.setStyle(Paint.Style.FILL);ink.setColor(0x99000000);
+            canvas.drawRect(left,top,left+WIDTH[sheet]*scale,top+HEIGHT[sheet]*scale,ink);canvas.restoreToCount(layer);
+        }
         ArrayList<MapPinLayout.Pin> shown=renderedPins();labels.clear();
         // Markers never collapse into moving numeric clusters: each icon has
         // one immutable location ID and world coordinate. Size changes only

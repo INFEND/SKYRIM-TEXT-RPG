@@ -57,6 +57,17 @@ public final class GameEngine {
     public AiGameTurn aiTurn;
     public SceneState sceneState = new SceneState();
     public String aiJournal = "";
+    public final java.util.LinkedHashSet<String> visitedVisual=new java.util.LinkedHashSet<>();
+    public org.json.JSONArray visualChronicle=new org.json.JSONArray();
+    public void recordVisualEvent(String event){
+        if(event==null||event.trim().isEmpty())return;
+        String value=event.trim();if(value.length()>360)value=value.substring(0,360);
+        try{org.json.JSONObject entry=new org.json.JSONObject().put("day",day).put("location",progress.location).put("event",value);
+            org.json.JSONObject last=visualChronicle.optJSONObject(visualChronicle.length()-1);
+            if(last!=null&&last.toString().equals(entry.toString()))return;
+            if(visualChronicle.length()>=80)visualChronicle.remove(0);visualChronicle.put(entry);
+        }catch(org.json.JSONException ignored){}
+    }
     private final Random random = new Random();
 
     public void start(String desiredName, String desiredRace, String desiredClass) {
@@ -103,7 +114,7 @@ public final class GameEngine {
         progress=RpgProgress.newHero(this,origin,points);
         String[] back=RpgContent.startParts(origin);
         region=Integer.parseInt(back[2]);
-        mode="INTRO";message="";
+        mode="INTRO";message="";visitedVisual.clear();visualChronicle=new org.json.JSONArray();visitedVisual.add(progress.location);
     }
 
     public Scene scene() {
@@ -543,7 +554,8 @@ public final class GameEngine {
          .put("battleLog",battleLog).put("battleKind",battleKind).put("enemyIntro",enemyIntro)
          .put("enemyHp",enemyHp).put("enemyMaxHp",enemyMaxHp).put("enemyDamage",enemyDamage).put("progress",progress.toJson())
          .put("aiJournal",aiJournal).put("aiTurn",aiTurn==null?JSONObject.NULL:aiTurn.save())
-         .put("sceneState",sceneState.toJson());
+         .put("sceneState",sceneState.toJson())
+         .put("visitedVisual",new org.json.JSONArray(visitedVisual)).put("visualChronicle",visualChronicle);
         return j;
     }
     public static GameEngine fromJson(String json) {
@@ -572,6 +584,11 @@ public final class GameEngine {
             g.battleKind=j.optString("battleKind","");g.enemyIntro=j.optString("enemyIntro","");
             g.enemyHp=Math.max(0,j.optInt("enemyHp",0));g.enemyMaxHp=Math.max(0,j.optInt("enemyMaxHp",0));g.enemyDamage=Math.max(0,j.optInt("enemyDamage",0));
             g.progress=RpgProgress.fromJson(j.optJSONObject("progress"));
+            org.json.JSONArray visited=j.optJSONArray("visitedVisual");
+            if(visited!=null)for(int i=0;i<Math.min(visited.length(),2000);i++){String v=visited.optString(i);if(!v.isEmpty())g.visitedVisual.add(v);}
+            if(g.started)g.visitedVisual.add(g.progress.location);
+            org.json.JSONArray history=j.optJSONArray("visualChronicle");
+            if(history!=null)for(int i=Math.max(0,history.length()-80);i<history.length();i++){org.json.JSONObject entry=history.optJSONObject(i);if(entry!=null)g.visualChronicle.put(entry);}
             g.aiJournal=j.optString("aiJournal","");
             g.aiTurn=AiGameTurn.restore(j.optJSONObject("aiTurn"));
             g.sceneState=SceneState.fromJson(j.optJSONObject("sceneState"));
