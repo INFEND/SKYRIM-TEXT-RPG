@@ -3,8 +3,8 @@
 import argparse, hashlib, json, pathlib, re, subprocess
 ROOT=pathlib.Path(__file__).resolve().parents[1]
 ASSETS=ROOT/"app/src/main/assets"
-CITIES=dict(zip("whiterun windhelm winterhold dawnstar markarth morthal riverwood riften solitude falkreath helgen ivarstead rorikstead dragonbridge karthwasten shorsstone kynesgrove darkwater stonehills ravenrock telmithryn skaal highhrothgar".split(),
-    "Вайтран|Виндхельм|Винтерхолд|Данстар|Маркарт|Морфал|Ривервуд|Рифтен|Солитьюд|Фолкрит|Хелген|Айварстед|Рорикстед|Драконий Мост|Картвастен|Шорский Камень|Кинсгроув|Чёрный Брод|Каменные Холмы|Воронья Скала|Тел-Митрин|Деревня скаалов|Высокий Хротгар".split("|")))
+CITIES=dict(zip("whiterun windhelm winterhold dawnstar markarth morthal riverwood riften solitude falkreath helgen ivarstead rorikstead dragonbridge karthwasten shorsstone kynesgrove darkwater stonehills ravenrock telmithryn skaal highhrothgar bleakfallsbarrow blackreach labyrinthian collegewinterhold throatoftheworld ustengrav".split(),
+    "Вайтран|Виндхельм|Винтерхолд|Данстар|Маркарт|Морфал|Ривервуд|Рифтен|Солитьюд|Фолкрит|Хелген|Айварстед|Рорикстед|Драконий Мост|Картвастен|Шорский Камень|Кинсгроув|Чёрный Брод|Каменные Холмы|Воронья Скала|Тел-Митрин|Деревня скаалов|Высокий Хротгар|Ветреный пик|Чёрный Предел|Лабиринтиан|Коллегия Винтерхолда|Глотка Мира|Устенгрев".split("|")))
 MAPS={"skyrim_geographic.webp":"Карта Скайрима","skyrim_user_mosaic.webp":"Дополнительная карта Скайрима","solstheim_terrain.webp":"Карта Солстейма"}
 RACES=dict(zip("nord breton dunmer khajiit imperial orc redguard altmer bosmer argonian".split(),
     "Норды|Бретонцы|Данмеры|Каджиты|Имперцы|Орки|Редгарды|Альтмеры|Босмеры|Аргониане".split("|")))

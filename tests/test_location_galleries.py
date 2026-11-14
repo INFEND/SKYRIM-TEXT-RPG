@@ -15,13 +15,13 @@ class LocationGalleryContracts(unittest.TestCase):
             "whiterun":6,"windhelm":6,"winterhold":6,
             "dawnstar":6,"markarth":6,"morthal":6,
             "riverwood":6,"riften":6,"solitude":6,"falkreath":6,
-            "helgen":6,"ivarstead":6,"rorikstead":6,"dragonbridge":6,"karthwasten":6,"shorsstone":6,"kynesgrove":6,"darkwater":6,"stonehills":6,"ravenrock":6,"telmithryn":6,"skaal":6,"highhrothgar":6
+            "helgen":6,"ivarstead":6,"rorikstead":6,"dragonbridge":6,"karthwasten":6,"shorsstone":6,"kynesgrove":6,"darkwater":6,"stonehills":6,"ravenrock":6,"telmithryn":6,"skaal":6,"highhrothgar":11,"bleakfallsbarrow":6,"blackreach":5,"labyrinthian":6,"collegewinterhold":4,"throatoftheworld":2,"ustengrav":1
         }
-        self.assertEqual(len(expected),23)
-        self.assertEqual(sum(expected.values()),138)
+        self.assertEqual(len(expected),29)
+        self.assertEqual(sum(expected.values()),167)
         for slug,n in expected.items():
             packages=[ASSETS/f"{slug}.zip"]
-            if slug in ("riften","riverwood"):packages.append(ASSETS/f"{slug}_extra.zip")
+            if slug in ("riften","riverwood","highhrothgar"):packages.append(ASSETS/f"{slug}_extra.zip")
             observed={}
             for package in packages:
                 self.assertTrue(package.is_file(),f"Missing {package}")
@@ -40,10 +40,10 @@ class LocationGalleryContracts(unittest.TestCase):
 
     def test_small_assets_and_no_external_sources(self):
         packs=list(ASSETS.glob("*.zip"))
-        self.assertEqual(len(packs),25)
+        self.assertEqual(len(packs),32)
         size=sum(x.stat().st_size for x in packs)
         self.assertGreater(size,12_000_000)
-        self.assertLess(size,75_000_000,"Compressed artwork unexpectedly inflated")
+        self.assertLess(size,100_000_000,"Compressed artwork unexpectedly inflated")
         viewer=(JAVA/"LocationGalleryView.java").read_text(encoding="utf-8")
         self.assertIn("GestureDetector",viewer)
         self.assertIn("onFling",viewer)
