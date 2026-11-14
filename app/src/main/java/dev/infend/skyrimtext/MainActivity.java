@@ -1325,7 +1325,7 @@ public final class MainActivity extends Activity {
     }
     private void renderStory(){
         boolean canonical="CANON".equals(game.mode)||("COMBAT".equals(game.mode)&&"CANONICAL".equals(game.battleKind));
-        if(!canonical){if(prefs.getBoolean("ai_enabled",false)){renderAiGame();return;}}
+        if(prefs.getBoolean("ai_enabled",false)&&!canonical){renderAiGame();return;}
         GameEngine.Scene s=game.scene();section(s.kicker,s.title,"");
         if(LocationGalleryView.hasGallery(game.progress.location)){
             addText(content,"ᛟ  ВИДЫ ЛОКАЦИИ",11,accent(),true,9);

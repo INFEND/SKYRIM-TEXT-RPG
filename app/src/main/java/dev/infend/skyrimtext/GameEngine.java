@@ -202,7 +202,7 @@ public final class GameEngine {
         Scene s = new Scene("СКАЙРИМ | ДЕНЬ " + day, progress.location + " | " + REGIONS[region], DESCRIPTIONS[region] + "\n\nМестность: "+progress.location+"." +
             (message.isEmpty()?"":"\n\n"+message));
         s.primary("CANON_OPEN","Главная история | Путь Довакина",CanonicalCampaign.objective(this));
-        s.primary("DRAGON_OPEN","Драконий след",DragonArc.status(this));
+        s.add("DRAGON_OPEN","Драконий след",DragonArc.status(this));
         s.add("EXPLORE","Исследовать окрестности","Случайные встречи, тайники и опасности");
         s.add("QUEST","История хранителей","Пепельные печати | " + questStatus());
         s.add("TALK","Поговорить с местными","Слухи, события и полезные сведения");
@@ -317,9 +317,10 @@ public final class GameEngine {
         if (!started || action==null) return;
         // A pending battle cannot be escaped by invoking a world, map or quest action.
         // This guard also protects saved games restored directly into COMBAT mode.
+        if("CANON_SHOUT".equals(action)){if("COMBAT".equals(mode)&&"CANONICAL".equals(battleKind))combatTurn(action);return;}
         if ("COMBAT".equals(mode) && !("ATTACK".equals(action) || "HEAVY".equals(action)
                 || "MAGIC".equals(action) || "DEFEND".equals(action)
-                || "POTION".equals(action) || "FLEE".equals(action) || "CANON_SHOUT".equals(action))) return;
+                || "POTION".equals(action) || "FLEE".equals(action))) return;
         // Event rewards and penalties are single-use. A stale button or replayed
         // action must not resolve the same encounter again after mode changes.
         if (("EVENT_HELP".equals(action) || "EVENT_SEARCH".equals(action)
@@ -436,7 +437,6 @@ public final class GameEngine {
             case "DEFEND": combatTurn("DEFEND");break;
             case "POTION": combatTurn("POTION");break;
             case "FLEE": combatTurn("FLEE");break;
-            case "CANON_SHOUT":combatTurn("CANON_SHOUT");break;
         }
     }
     private void buy(int price,String success,String item) {
