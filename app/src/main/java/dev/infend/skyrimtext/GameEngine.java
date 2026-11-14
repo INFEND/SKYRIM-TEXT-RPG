@@ -586,7 +586,9 @@ public final class GameEngine {
     }
     private void winBattle(String lastHit) {
         int reward=25+random.nextInt(26)+level*4;int gain=30+level*9;
-        gold+=reward;victories++;if(sideQuest==1&&sideKills<3)sideKills++;
+        boolean nonlethal="CANONICAL".equals(battleKind)&&(canonicalStage==22||canonicalStage==27||canonicalStage==30);
+        if(nonlethal)reward=0;
+        gold+=reward;victories++;if(!nonlethal&&sideQuest==1&&sideKills<3)sideKills++;
         if("QUEST".equals(battleKind)) {questStage=3;reward+=50;gold+=50;gain+=65;}
         if("DRAGON".equals(battleKind)&&progress.dragonStage==3){
             progress.dragonStage=4;

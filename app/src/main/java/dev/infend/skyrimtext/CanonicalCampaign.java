@@ -48,7 +48,7 @@ public final class CanonicalCampaign {
         new Stage("Бесконечная пора","Высокий Хротгар",0,"Созвать Туллия и Ульфрика","Ты убеждаешь Седобородых открыть монастырь для переговоров, затем обращаешься к обеим сторонам.","Арнгейр","Если военачальники согласятся услышать друг друга, мы примем их здесь.","Пригласить обе стороны","Созвать мирный совет","Объяснить общую угрозу обеим армиям","Опыт убеждения облегчает переговоры.","",0,0,0),
         new Stage("Мирный совет","Высокий Хротгар",0,"Заключить временное перемирие","Вокруг стола спорят Ульфрик, Туллий, ярлы и их советники. Эсберн напоминает о цене затянувшейся войны.","Эсберн","Пока вы спорите о земле, Алдуин становится сильнее. Сейчас всем необходима передышка.","Предложить равный обмен","Заключить перемирие","Поддержать Империю в споре","Выбор меняет отношение сторон и записывается в журнал.","",0,0,0),
         new Stage("Призыв Одавинга","Драконий Предел",0,"Узнать имя дракона и подготовить ловушку","Клинки открывают имя Одавинга и требуют решения о Партурнаксе. Ты готовишься использовать новый Крик.","Эсберн","Имя дракона даст тебе возможность позвать его. Но прежде реши, как относишься к его сородичу на горе.","Пощадить Партурнакса","Открыть путь к ловушке","Отказаться решать судьбу Партурнакса сейчас","Твоё отношение к Клинкам меняется, но поиски продолжаются.","",0,0,0),
-        new Stage("Ловушка для Одавинга","Драконий Предел",0,"Поймать дракона и узнать путь к Алдуину","Цепи в галерее приготовлены. Одавинг откликается на вызов, и его нужно заманить под механизм.","Ярл Балгруф","Мои люди готовы. Заставь дракона подойти туда, где мы сможем сомкнуть ловушку.","Заманить Одавинга","Обездвижить его и договориться","Подготовить цепи и укрытия","Подготовка позволяет удержать дракона быстрее.","Одавинг",190,13,2289),
+        new Stage("Ловушка для Одавинга","Драконий Предел",0,"Поймать дракона и узнать путь к Алдуину","Цепи в галерее приготовлены. Одавинг откликается на вызов, и его нужно заманить под механизм.","Ярл Балгруф","Мои люди готовы. Заставь дракона подойти туда, где мы сможем сомкнуть ловушку.","Заманить Одавинга","Обездвижить его и договориться","Подготовить цепи и укрытия","Подготовка позволяет удержать дракона быстрее.","Одавинг",190,13,2281),
         new Stage("Дом Пожирателя Мира","Скулдафн",2,"Добраться до портала в Совнгард","Одавинг приносит тебя к храму. За стенами Скулдафна ждут драугры и жрец, охраняющий портал.","Одавинг","Дальше путь лежит через храм. Я не смогу сопровождать тебя за его пределами.","Победить Накрина","Открыть портал","Изучить храмовые ловушки","Разведка ослабляет охранника портала.","Накрин",200,14,2383),
         new Stage("Совнгард","Совнгард",0,"Провести заблудившуюся душу к Залу","Туман скрывает тропу. Погибший воин просит помочь найти Зал доблести, пока Алдуин охотится за душами.","Погибший воин","Я потерял дорогу в этой мгле. Если видишь путь, позволь идти рядом.","Проводить душу","Добраться до моста","Разведать дорогу сквозь туман","Снижается риск потери сил.","",0,0,0),
         new Stage("Зал доблести","Зал доблести",0,"Пройти испытание Тсуна","На мосту стоит Тсун. Он требует доказательства, что живой герой достоин войти в чертог Шора.","Тсун","Твой путь необычен. Докажи в бою, что достоин перейти этот мост.","Принять испытание","Завоевать право войти","Подготовиться к поединку","Снижается опасность испытания.","Тсун",185,13,2442),
@@ -94,7 +94,12 @@ public final class CanonicalCampaign {
         StoryDialoguePack.Chapter c=p.chapter(g.canonicalStage);
         if(c.id!=g.canonicalStage)return list;
         for(StoryDialoguePack.Line l:c.lines()){
-            boolean post=!s.enemy.isEmpty()&&s.split>0&&l.sourceLine>=s.split;
+            boolean post=g.canonicalStage==25?l.sourceLine>=2094:
+                !s.enemy.isEmpty()&&s.split>0&&l.sourceLine>=s.split;
+            // The recording contains a single negotiated outcome. Do not put
+            // that branch's words in an alternative outcome's NPC mouths.
+            if(g.canonicalStage==25&&post&&g.canonicalTreaty!=1&&
+                (l.sourceLine<2121||l.sourceLine>2151))continue;
             if(post==(g.canonicalPhase==1))list.add(l);
         }
         return list;
@@ -108,6 +113,7 @@ public final class CanonicalCampaign {
         Stage s=stage(g.canonicalStage);
         List<StoryDialoguePack.Line> lines=lines(g);int page=Math.min(g.canonicalPage,lastPage(lines));
         StringBuilder body=new StringBuilder(g.canonicalPhase==0?s.intro:
+            g.canonicalStage==25?"Стороны выслушивают предложенные условия и возвращаются к переговорам.":
             "Опасность позади. "+s.detail+".");
         if(!g.canonicalRecent.isEmpty())body.append("\n\n").append(g.canonicalRecent);
         if(lines.isEmpty()&&g.canonicalPhase==0)body.append("\n\n").append(dialogue(s.speaker,s.dialogue));
@@ -122,12 +128,17 @@ public final class CanonicalCampaign {
             scene.primary(action(g,"NEXT"),"Ответить и продолжить разговор","Следующая часть текущей сцены");
             return scene;
         }
-        if(g.canonicalPhase==1)return scene.primary(action(g,"ADVANCE"),s.detail,"Завершить текущий этап задания");
+        if(g.canonicalPhase==1)return scene.primary(action(g,"ADVANCE"),g.canonicalStage==25?"Подписать перемирие":s.detail,"Завершить текущий этап задания");
         String primary=s.primary;
-        if(g.canonicalStage==25&&g.canonicalTreaty!=0)primary="Подписать согласованные условия";
+        if(g.canonicalStage==25)primary="Предложить обмен Маркарта на Рифтен";
         if(g.canonicalStage==26&&g.canonicalPaarthurnax!=0)primary="Продолжить подготовку ловушки";
         scene.primary(action(g,"MAIN"),primary,s.detail);
-        if(!g.canonicalPrepared){scene.add(action(g,"ALT"),s.alternate,s.altEffect);if(g.canonicalStage==25)scene.add(action(g,"STORM"),"Поддержать Братьев Бури","Изменяет отношение сторон");}
+        if(!g.canonicalPrepared){
+            if(g.canonicalStage==25){
+                scene.add(action(g,"ALT"),"Потребовать дополнительных гарантий для Империи","Укрепляет отношения с Империей");
+                scene.add(action(g,"STORM"),"Потребовать дополнительных гарантий для Братьев Бури","Укрепляет отношения с Братьями Бури");
+            }else scene.add(action(g,"ALT"),s.alternate,s.altEffect);
+        }
         if(g.hp<g.maxHp||g.stamina<g.maxStamina||g.magicka<g.maxMagicka)
             scene.add(action(g,"REST"),"Передохнуть","Один час отдыха восстанавливает часть сил");
         scene.add(action(g,"LEAVE"),"Отложить поручение","Вернуться к свободному путешествию; этап сохранится");
@@ -170,13 +181,13 @@ public final class CanonicalCampaign {
         if(g.progress.completed.size()>80)g.progress.completed.remove(0);
         g.recordVisualEvent("Главная история: "+stage(id).title+" завершено");
         // Story flags are authoritative; an inventory limit can never block a quest.
-        if(id==5)g.progress.addItem("Драконий камень",1);
+        if(id==5&&g.progress.quantity("Драконий камень")==0)g.progress.addItem("Драконий камень",1);
         if(id==6)g.canonicalShouts|=1;
         if(id==7){g.reputation+=5;g.gold+=50;}
         if(id==8)g.canonicalShouts|=1;
         if(id==9)g.progress.addItem("Рог Юргена Призывателя Ветра",1);
         if(id==17)g.canonicalShouts|=2;
-        if(id==21)g.progress.addItem("Древний свиток",1);
+        if(id==21&&g.progress.quantity("Древний свиток")==0)g.progress.addItem("Древний свиток",1);
         if(id==22)g.canonicalShouts|=4;
         if(id==26)g.canonicalShouts|=8;
         if(id==32)g.canonicalShouts|=16;
@@ -199,12 +210,22 @@ public final class CanonicalCampaign {
         if("LEAVE".equals(verb)){g.mode="WORLD";g.message="Поручение сохранено: "+s.goal;return;}
         if("REST".equals(verb)&&g.canonicalPhase==0){if(g.waitHours(1))g.canonicalRecent="Ты восстановил часть сил.";return;}
         if(g.canonicalPhase==1){if("ADVANCE".equals(verb))advance(g);return;}
-        if("STORM".equals(verb)&&g.canonicalStage==25&&!g.canonicalPrepared){g.canonicalPrepared=true;g.canonicalTreaty=3;g.holdReputation[2]=Math.min(100,g.holdReputation[2]+5);g.holdReputation[3]=Math.max(-100,g.holdReputation[3]-5);g.canonicalRecent="Ты поддержал Братьев Бури. Стороны согласились на перемирие.";g.recordVisualEvent(g.canonicalRecent);return;}
+        if(g.canonicalStage==25&&("MAIN".equals(verb)||"ALT".equals(verb)||"STORM".equals(verb))){
+            if(g.canonicalTreaty==0){
+                g.canonicalTreaty="ALT".equals(verb)?2:"STORM".equals(verb)?3:1;
+                if(g.canonicalTreaty==2){g.holdReputation[3]=Math.min(100,g.holdReputation[3]+5);g.holdReputation[2]=Math.max(-100,g.holdReputation[2]-5);}
+                if(g.canonicalTreaty==3){g.holdReputation[2]=Math.min(100,g.holdReputation[2]+5);g.holdReputation[3]=Math.max(-100,g.holdReputation[3]-5);}
+            }
+            g.canonicalPrepared=true;g.canonicalPhase=1;g.canonicalPage=0;
+            g.canonicalRecent=g.canonicalTreaty==1?"Ты предлагаешь обмен владениями, чтобы добиться временного прекращения огня.":
+                g.canonicalTreaty==2?"Ты настаиваешь на гарантиях безопасности имперских гарнизонов. Стороны обсуждают условия временной передышки.":
+                "Ты настаиваешь на гарантиях безопасности владений Братьев Бури. Стороны обсуждают условия временной передышки.";
+            g.recordVisualEvent(g.canonicalRecent);return;
+        }
         if("ALT".equals(verb)&&!g.canonicalPrepared){
             g.canonicalPrepared=true;g.canonicalRecent=s.altEffect;
             int id=g.canonicalStage;
-            if(id==25){g.canonicalTreaty=2;g.holdReputation[3]=Math.min(100,g.holdReputation[3]+5);g.holdReputation[2]=Math.max(-100,g.holdReputation[2]-5);}
-            else if(id==26){g.canonicalPaarthurnax=2;}
+            if(id==26){g.canonicalPaarthurnax=2;}
             else if(id==2||id==12){
                 int chance=g.progress.chance(g,2,9,20);
                 if(new Random().nextInt(100)<chance){
@@ -223,7 +244,6 @@ public final class CanonicalCampaign {
             // The actual fight is handled by the existing turn-based combat engine.
             g.beginCanonicalBattle(s.enemy,health,damage,s.intro);
         }else{
-            if(g.canonicalStage==25&&g.canonicalTreaty==0)g.canonicalTreaty=1;
             if(g.canonicalStage==26&&g.canonicalPaarthurnax==0)g.canonicalPaarthurnax=1;
             advance(g);
         }
@@ -235,6 +255,10 @@ public final class CanonicalCampaign {
     }
     static void victory(GameEngine g){
         if(g.canonicalStage<1||g.canonicalStage>COUNT)return;
+        if(g.canonicalPhase!=0)return;
+        if(g.canonicalStage==5&&g.progress.quantity("Драконий камень")==0)g.progress.addItem("Драконий камень",1);
+        if(g.canonicalStage==6)g.canonicalShouts|=1;
+        if(g.canonicalStage==21&&g.progress.quantity("Древний свиток")==0)g.progress.addItem("Древний свиток",1);
         g.canonicalPhase=1;g.canonicalPage=0;g.canonicalRecent=g.message;g.mode="CANON";
     }
     public static String combatShout(GameEngine g){return (g.canonicalShouts&4)!=0&&"Алдуин".equals(g.enemyName)?"Драконобой":"Безжалостная сила";}
