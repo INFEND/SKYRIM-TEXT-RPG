@@ -79,10 +79,6 @@ public final class MainActivity extends Activity {
     private AiStoryClient aiClient;
     private LocalAiClient localAiClient;
     private static final int REQUEST_LOCAL_GGUF=7107;
-    private static final int REQUEST_STORY_PACK=7108;
-    private StoryDialoguePack storyPack;
-    private boolean storyPackBusy,storyPackLoaded,storyChapterList;
-    private String storyPackError="";
     private String aiSession;
     private static final String AI_PENDING_ACTION="ai_pending_action";
     private static final String AI_PENDING_CHANCE="ai_pending_chance";
@@ -176,8 +172,6 @@ public final class MainActivity extends Activity {
         super.onActivityResult(requestCode,resultCode,data);
         if(requestCode==REQUEST_LOCAL_GGUF&&resultCode==RESULT_OK&&data!=null&&data.getData()!=null)
             importLocalModel(data.getData());
-        else if(requestCode==REQUEST_STORY_PACK&&resultCode==RESULT_OK&&data!=null&&data.getData()!=null)
-            loadStoryPack(data.getData());
     }
     private void selectLocalModel(){
         if(localAiClient!=null&&localAiClient.isRunning()){toast("Заверши текущую генерацию");return;}
@@ -303,7 +297,6 @@ public final class MainActivity extends Activity {
     private void addText(LinearLayout parent,String str,int size,int color,boolean bold,int bottom){TextView t=text(str,size,color,bold);parent.addView(t);if(bottom>0)space(parent,bottom);}
     private String viewportKey(){
         if(titleOpen)return "title";
-        if(tab==7)return storyChapterList?"story-chapters":"story-"+prefs.getInt("story_pack_chapter",1)+"-"+prefs.getInt("story_pack_page",0);
         return (!game.started?"new-":"tab-")+tab;
     }
     private void findHorizontal(View node,java.util.List<HorizontalScrollView> found){
@@ -861,7 +854,6 @@ public final class MainActivity extends Activity {
         page.addView(content,lp(-1,-2));
         scroll.requestFocus();
         if(titleOpen)renderTitle();
-        else if(tab==7)renderStoryPack();
         else if(!game.started && tab!=5)renderNewGame();
         else if(tab==0)renderStory();
         else if(tab==1)renderMap();
@@ -1319,7 +1311,7 @@ public final class MainActivity extends Activity {
     }
     private void renderStory(){
         boolean canonical="CANON".equals(game.mode)||("COMBAT".equals(game.mode)&&"CANONICAL".equals(game.battleKind));
-        if(prefs.getBoolean("ai_enabled",false)&&!canonical){renderAiGame();return;}
+        if(!canonical){if(prefs.getBoolean("ai_enabled",false)){renderAiGame();return;}}
         GameEngine.Scene s=game.scene();section(s.kicker,s.title,"");
         if(LocationGalleryView.hasGallery(game.progress.location)){
             addText(content,"ᛟ  ВИДЫ ЛОКАЦИИ",11,accent(),true,9);
@@ -1367,121 +1359,6 @@ public final class MainActivity extends Activity {
         }
         space(content,5);
         addText(content,"Каждое действие сохраняется автоматически",11,MUTED,false,0);
-    }
-
-    private void openStoryPack(){
-        titleOpen=false;tab=7;storyChapterList=false;
-        if(!storyPackLoaded&&!storyPackBusy)loadStoryPack(null);else render();
-    }
-    private android.util.AtomicFile storyPackFile(){
-        return new android.util.AtomicFile(new java.io.File(getFilesDir(),"imported_story_v7.json"));
-    }
-    private void chooseStoryPack(){
-        if(storyPackBusy)return;
-        Intent picker=new Intent(Intent.ACTION_OPEN_DOCUMENT);
-        picker.addCategory(Intent.CATEGORY_OPENABLE);picker.setType("*/*");
-        try{startActivityForResult(picker,REQUEST_STORY_PACK);}
-        catch(Exception e){toast("Не удалось открыть выбор файла");}
-    }
-    private static byte[] readStoryBytes(java.io.InputStream in)throws java.io.IOException{
-        if(in==null)throw new java.io.IOException("Файл недоступен");
-        try(java.io.InputStream input=in;java.io.ByteArrayOutputStream out=new java.io.ByteArrayOutputStream()){
-            byte[] buffer=new byte[16384];int n;
-            while((n=input.read(buffer))!=-1){
-                if(out.size()+n>StoryDialoguePack.MAX_BYTES)throw new java.io.IOException("Размер файла больше 4 МБ");
-                out.write(buffer,0,n);
-            }
-            return out.toByteArray();
-        }
-    }
-    private void loadStoryPack(Uri uri){
-        if(storyPackBusy)return;
-        storyPackBusy=true;storyPackError="";render();
-        new Thread(()->{
-            StoryDialoguePack parsed=null;String error="";
-            try{
-                android.util.AtomicFile file=storyPackFile();
-                if(uri!=null||file.getBaseFile().exists()){
-                    byte[] bytes=readStoryBytes(uri==null?file.openRead():getContentResolver().openInputStream(uri));
-                    String json=java.nio.charset.StandardCharsets.UTF_8.newDecoder()
-                        .decode(java.nio.ByteBuffer.wrap(bytes)).toString();
-                    if(json.startsWith("\uFEFF"))json=json.substring(1);
-                    parsed=StoryDialoguePack.parse(json);
-                    if(uri!=null){
-                        java.io.FileOutputStream stream=file.startWrite();
-                        try{stream.write(bytes);file.finishWrite(stream);}
-                        catch(Exception e){file.failWrite(stream);throw e;}
-                    }
-                }
-            }catch(Exception e){error="Не удалось открыть сюжетную базу: "+(e.getMessage()==null?"неверный файл":e.getMessage());parsed=null;}
-            final StoryDialoguePack result=parsed;final String failure=error;
-            runOnUiThread(()->{
-                if(isFinishing()||isDestroyed())return;
-                storyPackBusy=false;storyPackLoaded=true;storyPackError=failure;
-                if(result!=null){
-                    storyPack=result;
-                    if(uri!=null){
-                        prefs.edit().remove("story_pack_chapter").remove("story_pack_page").apply();
-                        storyChapterList=false;toast("Сюжетная база загружена");
-                    }
-                }
-                if(!failure.isEmpty())toast(failure);
-                if(tab==7&&!titleOpen)render();
-            });
-        },"story-pack-import").start();
-    }
-    private void storyPosition(int chapter,int page){
-        prefs.edit().putInt("story_pack_chapter",chapter).putInt("story_pack_page",page).apply();
-        storyChapterList=false;render();
-    }
-    private void renderStoryPack(){
-        section("СЮЖЕТНАЯ БАЗА","История Довакина","Отдельный режим чтения сюжетных диалогов. Прогресс героя, задания и сохранения не изменяются.");
-        actionButton("Вернуться",game.started?"К приключению":"В главное меню",false,()->{
-            if(game.started){tab=0;titleOpen=false;}else titleOpen=true;
-            render();
-        });
-        if(storyPackBusy){addText(content,"Загрузка и проверка файла…",15,accent(),true,12);return;}
-        if(!storyPackError.isEmpty())addText(content,storyPackError,13,MUTED,false,12);
-        if(storyPack==null){
-            actionButton("Импорт сюжетной базы","Выбери файл SKYRIM_story_core_v7.json",true,this::chooseStoryPack);
-            addText(content,"Файл сохраняется только на твоём устройстве. После импорта интернет не требуется.",14,MUTED,false,12);
-            return;
-        }
-        addText(content,storyPack.chapters().size()+" глав | "+storyPack.segments+" записей | "+storyPack.uncertainSegments+" с отметкой неопределённости",12,MUTED,false,12);
-        StoryDialoguePack.Chapter chapter=storyPack.chapter(prefs.getInt("story_pack_chapter",1));
-        if(storyChapterList){
-            for(StoryDialoguePack.Chapter c:storyPack.chapters()){
-                actionButton(c.id+". "+c.title,c.lines().size()+" реплик",c.id==chapter.id,()->storyPosition(c.id,0));
-            }
-            actionButton("Импорт другой базы","Текущая заменится только после успешной проверки",false,this::chooseStoryPack);
-            return;
-        }
-        actionButton("Список глав","Выбрать любую из "+storyPack.chapters().size()+" глав",false,()->{storyChapterList=true;render();});
-        int page=chapter.page(prefs.getInt("story_pack_page",0));
-        LinearLayout panel=card();
-        addText(panel,"ГЛАВА "+chapter.id+"  |  "+(page+1)+"/"+chapter.pages(),11,accent(),true,10);
-        addText(panel,chapter.title,20,TEXT,true,16);
-        int end=Math.min(chapter.lines().size(),(page+1)*StoryDialoguePack.PAGE_SIZE);
-        for(int i=page*StoryDialoguePack.PAGE_SIZE;i<end;i++){
-            StoryDialoguePack.Line line=chapter.lines().get(i);
-            addText(panel,line.speaker+":",16,accent(),true,4);
-            TextView quote=text("— "+line.text,17,TEXT,false);
-            quote.setLineSpacing(dp(4),1.13f);panel.addView(quote);
-            if(line.uncertain)addText(panel,"Частично восстановлено | #"+line.id,11,MUTED,false,3);
-            space(panel,15);
-        }
-        int index=storyPack.chapters().indexOf(chapter);
-        if(page+1<chapter.pages())actionButton("Продолжить","Следующие реплики",true,()->storyPosition(chapter.id,page+1));
-        else if(index+1<storyPack.chapters().size()){
-            StoryDialoguePack.Chapter next=storyPack.chapters().get(index+1);
-            actionButton("Следующая глава",next.title,true,()->storyPosition(next.id,0));
-        }else addText(content,"Конец сюжетной базы",18,accent(),true,12);
-        if(page>0)actionButton("Назад","Предыдущие реплики",false,()->storyPosition(chapter.id,page-1));
-        else if(index>0){
-            StoryDialoguePack.Chapter previous=storyPack.chapters().get(index-1);
-            actionButton("Предыдущая глава",previous.title,false,()->storyPosition(previous.id,previous.pages()-1));
-        }
-        addText(content,"Позиция чтения сохраняется автоматически.",12,MUTED,false,8);
     }
 
     private void renderStoryJournal(){
@@ -3396,7 +3273,7 @@ public final class MainActivity extends Activity {
             actionButton("Открыть полную карту","Отметки, маршруты и расположение героя",true,()->{tab=1;render();});
         }
     }
-    private String selectedJournalEntry="Драконий след";
+    private String selectedJournalEntry="Путь Довакина";
     private void renderJournal(){
         skyrimTopTabs(4);
         section("ЛЕТОПИСЬ СЕВЕРА","Журнал","Выбирай задание, чтобы увидеть описание и текущую цель.");
@@ -3447,15 +3324,15 @@ public final class MainActivity extends Activity {
             actionButton("Продолжить главную историю","Перейти к текущему заданию",true,()->{game.choose("CANON_OPEN");save();tab=0;render();});
         }else if("Драконий след".equals(title)){
             actionButton("Продолжить историю","Следующее доступное сюжетное решение",true,()->{
-                game.mode="DRAGON";save();tab=0;render();
+                game.choose("DRAGON_OPEN");save();tab=0;render();
             });
         }else if("Пепельные печати".equals(title)){
             actionButton("Открыть историю хранителей","Посмотреть текущую главу",true,()->{
-                game.mode="QUEST";save();tab=0;render();
+                game.choose("QUEST");save();tab=0;render();
             });
         }else if("Опасные дороги".equals(title)){
             actionButton("Вернуться к объявлениям","Разговоры и заказы доступны в поселениях",false,()->{
-                game.mode="WORLD";save();tab=0;render();
+                game.choose("GO_WORLD");save();tab=0;render();
             });
         }else{
             actionButton("Продолжить ИИ-приключение","Вернуться к сцене ИИ",true,()->{tab=0;render();});

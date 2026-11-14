@@ -49,6 +49,7 @@ public final class GameEngine {
     public int maxStamina = 65, stamina = 65, maxMagicka = 40, magicka = 40;
     public int gold = 85, potions = 3, manaPotions = 1, attack = 12, armor = 2;
     public int canonicalStage=0,canonicalPhase=0,canonicalPage=0,canonicalShouts=0,canonicalTreaty=0,canonicalPaarthurnax=0;
+    public int canonicalShoutCooldown=0;
     public boolean canonicalPrepared=false;
     public String canonicalRecent="";
     public int questStage = 0, sideQuest = 0, sideKills = 0, boardCompleted = 0, explored = 0, victories = 0, reputation = 0;
@@ -151,7 +152,7 @@ public final class GameEngine {
         progress=RpgProgress.newHero(this,origin,points);
         String[] back=RpgContent.startParts(origin);
         region=Integer.parseInt(back[2]);
-        canonicalStage=canonicalPhase=canonicalPage=canonicalShouts=canonicalTreaty=canonicalPaarthurnax=0;canonicalPrepared=false;canonicalRecent="";
+        canonicalStage=canonicalPhase=canonicalPage=canonicalShouts=canonicalTreaty=canonicalPaarthurnax=canonicalShoutCooldown=0;canonicalPrepared=false;canonicalRecent="";
         mode="INTRO";message="";merchants=new MerchantLedger();factions=new FactionCampaign();resetBattleVisuals();java.util.Arrays.fill(holdReputation,0);visitedVisual.clear();visualChronicle=new org.json.JSONArray();visitedVisual.add(progress.location);
     }
 
@@ -187,7 +188,7 @@ public final class GameEngine {
         Scene s = new Scene("СКАЙРИМ | ДЕНЬ " + day, progress.location + " | " + REGIONS[region], DESCRIPTIONS[region] + "\n\nМестность: "+progress.location+"." +
             (message.isEmpty()?"":"\n\n"+message));
         s.primary("CANON_OPEN","Главная история | Путь Довакина",CanonicalCampaign.objective(this));
-        s.add("DRAGON_OPEN","Драконий след",DragonArc.status(this));
+        s.primary("DRAGON_OPEN","Драконий след",DragonArc.status(this));
         s.add("EXPLORE","Исследовать окрестности","Случайные встречи, тайники и опасности");
         s.add("QUEST","История хранителей","Пепельные печати | " + questStatus());
         s.add("TALK","Поговорить с местными","Слухи, события и полезные сведения");
@@ -256,14 +257,16 @@ public final class GameEngine {
             .add("EVENT_LEAVE","Пройти мимо","Не рисковать");
     }
     private Scene battleScene() {
-        return new Scene("БОЙ | " + REGIONS[region], enemyName, enemyIntro + "\n\n" + battleLog +
+        Scene s=new Scene("БОЙ | " + REGIONS[region], enemyName, enemyIntro + "\n\n" + battleLog +
             "\n\nПротивник: " + enemyHp + "/" + enemyMaxHp + " здоровья.\nТы: " + hp + "/" + maxHp + " здоровья.")
             .primary("ATTACK","Обычный удар","Стабильный урон, без затрат")
             .add("HEAVY","Сильный удар","−10 выносливости | риск промаха")
             .add("MAGIC","Магическая вспышка","−12 магии | усиленный урон")
             .add("DEFEND","Защититься","Уменьшить ответный урон")
-            .add("POTION","Выпить лечебное зелье","Осталось: " + potions)
-            .add("FLEE","Отступить","Шанс выйти из боя без награды");
+            .add("POTION","Выпить лечебное зелье","Осталось: " + potions);
+        if("WILD".equals(battleKind))s.add("FLEE","Отступить","Шанс выйти из боя без награды");
+        if("CANONICAL".equals(battleKind)&&canonicalShouts!=0&&canonicalShoutCooldown==0)s.add("CANON_SHOUT",CanonicalCampaign.combatShout(this),"Урон и ослабление врага | Восстановление 3 хода");
+        return s;
     }
 
     /** Record only facts produced by successful, engine-authorized actions. */
@@ -302,7 +305,7 @@ public final class GameEngine {
         // This guard also protects saved games restored directly into COMBAT mode.
         if ("COMBAT".equals(mode) && !("ATTACK".equals(action) || "HEAVY".equals(action)
                 || "MAGIC".equals(action) || "DEFEND".equals(action)
-                || "POTION".equals(action) || "FLEE".equals(action))) return;
+                || "POTION".equals(action) || "FLEE".equals(action) || "CANON_SHOUT".equals(action))) return;
         // Event rewards and penalties are single-use. A stale button or replayed
         // action must not resolve the same encounter again after mode changes.
         if (("EVENT_HELP".equals(action) || "EVENT_SEARCH".equals(action)
@@ -417,6 +420,7 @@ public final class GameEngine {
             case "DEFEND": combatTurn("DEFEND");break;
             case "POTION": combatTurn("POTION");break;
             case "FLEE": combatTurn("FLEE");break;
+            case "CANON_SHOUT":combatTurn("CANON_SHOUT");break;
         }
     }
     private void buy(int price,String success,String item) {
@@ -509,7 +513,7 @@ public final class GameEngine {
         else if(sideKills>=3){sideQuest=0;sideKills=0;gold+=120;addXp(65);message="Заказ выполнен. +120 септимов, +65 опыта.";mode="RESULT";}
         else {message="Заказ активен. Побеждено противников: "+sideKills+"/3.";mode="RESULT";}
     }
-    void beginCanonicalBattle(String name,int health,int damage,String intro){startBattle(name,health,damage,"CANONICAL",intro);}
+    void beginCanonicalBattle(String name,int health,int damage,String intro){canonicalShoutCooldown=0;startBattle(name,health,damage,"CANONICAL",intro);}
     private void startBattle(String name,int health,int dmg,String kind,String intro) {
         resetBattleVisuals();enemyName=name;enemyHp=health;enemyMaxHp=health;enemyDamage=dmg;battleKind=kind;enemyIntro=intro;
         battleLog="В бою важна тактика. Следи за запасом сил и магии.";mode="COMBAT";
@@ -533,6 +537,8 @@ public final class GameEngine {
                 int hitChance=progress.chance(this,"HEAVY");stamina-=10;
                 if(random.nextInt(100)<hitChance){damage=Math.max(1,effectiveAttack()*2+random.nextInt(9));actionText="Сильный удар! −"+damage+" здоровья врагу.";}else actionText="Сильный удар проходит мимо.";break;
             case "MAGIC":if(magicka<12){battleLog="Недостаточно магии. Нужны 12 единиц.";return;}magicka-=12;damage=(int)Math.round((18+level*4+random.nextInt(8))*(1+.05*progress.branches.rank(13)));actionText="Магическая вспышка обжигает врага: −"+damage+".";break;
+            case "CANON_SHOUT":if(!"CANONICAL".equals(battleKind)||canonicalShouts==0||canonicalShoutCooldown>0)return;
+                damage=24+level*3+((canonicalShouts&4)!=0?12:0);defending=true;canonicalShoutCooldown=3;actionText=CanonicalCampaign.combatShout(this)+": −"+damage+" здоровья врагу.";break;
             case "DEFEND": defending=true;stamina=Math.min(maxStamina,stamina+12);magicka=Math.min(maxMagicka,magicka+5);actionText="Ты встаёшь в оборону, восстанавливая силы.";break;
             case "POTION":if(potions==0){battleLog="Лечебных зелий больше нет.";return;}potions--;int restored=Math.min(45+5*progress.branches.rank(14),maxHp-hp);hp+=restored;lastHealing=restored;actionText="Ты восстанавливаешь "+restored+" здоровья.";break;
             case "FLEE":if(battleKind.equals("WILD")&&random.nextInt(100)<progress.chance(this,"FLEE")){mode="RESULT";poisonTurns=frostTurns=0;message="Ты уходишь от противника. Трофеев нет.";return;}actionText="Попытка отступить не удалась.";break;
@@ -541,6 +547,7 @@ public final class GameEngine {
         if("ATTACK".equals(action)&&damage>0&&random.nextInt(100)<8){
             lastCritical=true;damage=Math.max(1,(int)Math.round(damage*1.5));actionText="Критический удар! −"+damage+" здоровья врагу.";
         }
+        if(!"CANON_SHOUT".equals(action)&&canonicalShoutCooldown>0)canonicalShoutCooldown--;
         lastDealt=Math.min(enemyHp,damage);lastHeavyHit="HEAVY".equals(action)&&lastDealt>0;lastMiss="HEAVY".equals(action)&&lastDealt==0;battleDealt+=lastDealt;battleTurns++;
         enemyHp=Math.max(0,enemyHp-damage);
         if(enemyHp==0) {poisonTurns=frostTurns=0;winBattle(actionText);return;}
@@ -576,7 +583,12 @@ public final class GameEngine {
         if("QUEST".equals(battleKind))message+="\n\nЗа стражем ты находишь журнал хранителя. Следующая цель: Солитьюд.";
         if("DRAGON".equals(battleKind))message+="\n\n"+progress.dragonRecent;
         if(sideQuest==1)message+="\nЗаказ доски: "+sideKills+"/3.";
-        if("CANONICAL".equals(battleKind))CanonicalCampaign.victory(this);
+        if("CANONICAL".equals(battleKind)){
+            if(canonicalStage==27)message="Ловушка сомкнулась. Одавинг жив и готов к разговору.";
+            if(canonicalStage==30)message="Тсун признаёт твоё мастерство и пропускает к Залу доблести.";
+            if(canonicalStage==22)message="Алдуин отступает. Он ещё жив.";
+            CanonicalCampaign.victory(this);
+        }
     }
     public void addXp(int amount) {
         xp+=amount;
@@ -609,7 +621,7 @@ public final class GameEngine {
          .put("maxStamina",maxStamina).put("stamina",stamina).put("maxMagicka",maxMagicka).put("magicka",magicka)
          .put("gold",gold).put("potions",potions).put("manaPotions",manaPotions).put("attack",attack).put("armor",armor)
          .put("canonicalStage",canonicalStage).put("canonicalPhase",canonicalPhase).put("canonicalPage",canonicalPage)
-         .put("canonicalShouts",canonicalShouts).put("canonicalTreaty",canonicalTreaty).put("canonicalPaarthurnax",canonicalPaarthurnax)
+         .put("canonicalShoutCooldown",canonicalShoutCooldown).put("canonicalShouts",canonicalShouts).put("canonicalTreaty",canonicalTreaty).put("canonicalPaarthurnax",canonicalPaarthurnax)
          .put("canonicalPrepared",canonicalPrepared).put("canonicalRecent",canonicalRecent)
          .put("questStage",questStage).put("sideQuest",sideQuest).put("sideKills",sideKills).put("boardCompleted",boardCompleted).put("explored",explored)
          .put("victories",victories).put("reputation",reputation).put("swordUpgraded",swordUpgraded)
@@ -641,7 +653,8 @@ public final class GameEngine {
             g.attack=Math.max(1,j.optInt("attack",12));g.armor=Math.max(0,j.optInt("armor",2));
             g.canonicalStage=Math.max(0,Math.min(CanonicalCampaign.COUNT+1,j.optInt("canonicalStage",0)));
             g.canonicalPhase=Math.max(0,Math.min(1,j.optInt("canonicalPhase",0)));g.canonicalPage=Math.max(0,Math.min(500,j.optInt("canonicalPage",0)));
-            g.canonicalShouts=j.optInt("canonicalShouts",0)&31;g.canonicalTreaty=Math.max(0,Math.min(2,j.optInt("canonicalTreaty",0)));
+            g.canonicalShoutCooldown=Math.max(0,Math.min(3,j.optInt("canonicalShoutCooldown",0)));
+            g.canonicalShouts=j.optInt("canonicalShouts",0)&31;g.canonicalTreaty=Math.max(0,Math.min(3,j.optInt("canonicalTreaty",0)));
             g.canonicalPaarthurnax=Math.max(0,Math.min(2,j.optInt("canonicalPaarthurnax",0)));g.canonicalPrepared=j.optBoolean("canonicalPrepared",false);
             g.canonicalRecent=j.optString("canonicalRecent","");if(g.canonicalRecent.length()>8192)g.canonicalRecent=g.canonicalRecent.substring(0,8192);
             g.questStage=Math.max(0,Math.min(4,j.optInt("questStage",0)));g.sideQuest=j.optInt("sideQuest",0);

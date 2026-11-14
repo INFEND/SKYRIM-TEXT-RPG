@@ -123,8 +123,11 @@ public final class CanonicalCampaign {
             return scene;
         }
         if(g.canonicalPhase==1)return scene.primary(action(g,"ADVANCE"),s.detail,"Завершить текущий этап задания");
-        scene.primary(action(g,"MAIN"),s.primary,s.detail);
-        if(!g.canonicalPrepared)scene.add(action(g,"ALT"),s.alternate,s.altEffect);
+        String primary=s.primary;
+        if(g.canonicalStage==25&&g.canonicalTreaty!=0)primary="Подписать согласованные условия";
+        if(g.canonicalStage==26&&g.canonicalPaarthurnax!=0)primary="Продолжить подготовку ловушки";
+        scene.primary(action(g,"MAIN"),primary,s.detail);
+        if(!g.canonicalPrepared){scene.add(action(g,"ALT"),s.alternate,s.altEffect);if(g.canonicalStage==25)scene.add(action(g,"STORM"),"Поддержать Братьев Бури","Изменяет отношение сторон");}
         if(g.hp<g.maxHp||g.stamina<g.maxStamina||g.magicka<g.maxMagicka)
             scene.add(action(g,"REST"),"Передохнуть","Один час отдыха восстанавливает часть сил");
         scene.add(action(g,"LEAVE"),"Отложить поручение","Вернуться к свободному путешествию; этап сохранится");
@@ -168,6 +171,7 @@ public final class CanonicalCampaign {
         g.recordVisualEvent("Главная история: "+stage(id).title+" завершено");
         // Story flags are authoritative; an inventory limit can never block a quest.
         if(id==5)g.progress.addItem("Драконий камень",1);
+        if(id==6)g.canonicalShouts|=1;
         if(id==7){g.reputation+=5;g.gold+=50;}
         if(id==8)g.canonicalShouts|=1;
         if(id==9)g.progress.addItem("Рог Юргена Призывателя Ветра",1);
@@ -195,6 +199,7 @@ public final class CanonicalCampaign {
         if("LEAVE".equals(verb)){g.mode="WORLD";g.message="Поручение сохранено: "+s.goal;return;}
         if("REST".equals(verb)&&g.canonicalPhase==0){if(g.waitHours(1))g.canonicalRecent="Ты восстановил часть сил.";return;}
         if(g.canonicalPhase==1){if("ADVANCE".equals(verb))advance(g);return;}
+        if("STORM".equals(verb)&&g.canonicalStage==25&&!g.canonicalPrepared){g.canonicalPrepared=true;g.canonicalTreaty=3;g.holdReputation[2]=Math.min(100,g.holdReputation[2]+5);g.holdReputation[3]=Math.max(-100,g.holdReputation[3]-5);g.canonicalRecent="Ты поддержал Братьев Бури. Стороны согласились на перемирие.";g.recordVisualEvent(g.canonicalRecent);return;}
         if("ALT".equals(verb)&&!g.canonicalPrepared){
             g.canonicalPrepared=true;g.canonicalRecent=s.altEffect;
             int id=g.canonicalStage;
@@ -212,6 +217,7 @@ public final class CanonicalCampaign {
         }
         if(!"MAIN".equals(verb))return;
         if(!s.enemy.isEmpty()){
+            if(g.canonicalStage==22)g.canonicalShouts|=4;
             int health=Math.max(35,s.hp+Math.min(60,g.level*3)-(g.canonicalPrepared?25:0));
             int damage=Math.max(3,s.damage+Math.min(5,g.level/4)-(g.canonicalPrepared?3:0));
             // The actual fight is handled by the existing turn-based combat engine.
@@ -231,6 +237,7 @@ public final class CanonicalCampaign {
         if(g.canonicalStage<1||g.canonicalStage>COUNT)return;
         g.canonicalPhase=1;g.canonicalPage=0;g.canonicalRecent=g.message;g.mode="CANON";
     }
+    public static String combatShout(GameEngine g){return (g.canonicalShouts&4)!=0&&"Алдуин".equals(g.enemyName)?"Драконобой":"Безжалостная сила";}
     public static String shouts(GameEngine g){
         StringBuilder b=new StringBuilder();
         String[] names={"Безжалостная сила","Чистое небо","Драконобой","Зов дракона","Зов доблести"};
