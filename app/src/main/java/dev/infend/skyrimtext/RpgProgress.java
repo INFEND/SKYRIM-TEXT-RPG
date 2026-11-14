@@ -140,7 +140,7 @@ public final class RpgProgress {
         int heavyPieces=0,lightPieces=0;
         for(String slot:new String[]{"head","body","hands","feet"}){ItemCatalog.Item item=ItemCatalog.find(equipped.get(slot));if(item!=null&&item.baseStat>0){if(item.statSkill==4)heavyPieces++;if(item.statSkill==5)lightPieces++;}}
         double fit=heavyPieces==4&&advanced.has(AdvancedPerks.WELL_FITTED)?.05:lightPieces==4&&advanced.has(AdvancedPerks.CUSTOM_FIT)?.05:0;
-        return Math.min(0.8,base+(heavy?.02*branches.rank(4):0)+(light?.02*branches.rank(5):0)+fit);
+        return Math.min(0.8,base+(heavy?.02*branches.rank(4):0)+(light?.02*branches.rank(5):0)+fit+(armorPieces()==0&&advanced.has(AdvancedPerks.MAGE_ARMOR)?.05:0));
     }
     public void shopEquip(String id){equip(id);}
 
@@ -227,7 +227,7 @@ public final class RpgProgress {
     public void skillExperience(GameEngine g,int index,int amount){
         if(index<0||index>=skillLevels.length||amount<=0)return;
         if(skillLevels[index]<100){
-            skillXp[index]+=amount+branches.experienceBonus(index,amount);
+            skillXp[index]+=amount+branches.experienceBonus(index,amount)+(index==8&&advanced.has(AdvancedPerks.ENCHANTER)?amount/5:0);
             while(skillLevels[index]<100&&skillXp[index]>=skillNeed(index)){
                 skillXp[index]-=skillNeed(index);skillLevels[index]++;
                 if(skillLevels[index]==100)skillXp[index]=0;
@@ -241,7 +241,7 @@ public final class RpgProgress {
         int difficulty=baseDifficulty+Math.max(0,15-g.level)*2;
         int danger=Math.max(0,g.region/2)+difficulty/10;
         int skill=skillIndex<0?0:(skillLevel(skillIndex)-15)/2;
-        int context=Math.min(18,g.reputation/3)+skill+branches.chanceBonus(skillIndex)+(skillIndex==12&&advanced.has(AdvancedPerks.PERSUASION)?5:0)-((int)carryWeight()>45?8:0);
+        int context=Math.min(18,g.reputation/3)+skill+branches.chanceBonus(skillIndex)+advanced.checkBonus(skillIndex)+(skillIndex==12&&advanced.has(AdvancedPerks.PERSUASION)?5:0)-((int)carryWeight()>45?8:0);
         return RpgContent.successChance(g,stat,difficulty,danger,exhaustion,context);
     }
     public int chance(GameEngine g,String action){
@@ -337,10 +337,11 @@ public final class RpgProgress {
                 break;
             case "EXPLORE":skillExperience(g,9,6);break;
             case "TALK_HELP":skillExperience(g,12,6);break;
-            case "ATTACK":skillExperience(g,0,8);break;
-            case "MAGIC":skillExperience(g,13,8);break;
-            case "HEAVY":skillExperience(g,1,8);break;
-            case "DEFEND":skillExperience(g,3,8);break;
+            case "ATTACK":if(g.lastDealt>0)skillExperience(g,equippedWeaponSkill(),8);break;
+            case "MAGIC":if(g.lastDealt>0)skillExperience(g,13,8);break;
+            case "HEAVY":if(g.lastDealt>0)skillExperience(g,equippedWeaponSkill(),8);break;
+            case "DEFEND":if(g.lastBlocked>0)skillExperience(g,3,8);break;
+            case "POTION":if(g.lastHealing>0)skillExperience(g,14,6);break;
             case "FLEE":skillExperience(g,9,8);break;
         }
         sync(g);

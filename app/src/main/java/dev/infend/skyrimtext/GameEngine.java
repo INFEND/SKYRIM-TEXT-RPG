@@ -394,7 +394,7 @@ public final class GameEngine {
             } catch (JSONException ignored) {
                 // Optional scene metadata cannot invalidate a completed journey.
             }
-            stamina=Math.max(1,stamina-Math.min(Math.max(0,stamina-1),route.days*6));
+            stamina=Math.max(1,stamina-Math.min(Math.max(0,stamina-1),route.days*(progress.advanced.has(AdvancedPerks.STEALTH)?5:6)));
             magicka=Math.max(1,magicka-Math.min(Math.max(0,magicka-1),route.days*2));
             String roadEvent=RoadEvents.resolve(this,route);
             message="Ты преодолеваешь дорогу, постепенно оставляя за спиной стоянки, перевалы и чужие костры. "+
@@ -583,7 +583,7 @@ public final class GameEngine {
             case "CANON_SHOUT":if(!"CANONICAL".equals(battleKind)||canonicalShouts==0||canonicalShoutCooldown>0)return;
                 damage=24+level*3+((canonicalShouts&4)!=0?12:0);defending=true;canonicalShoutCooldown=3;actionText=CanonicalCampaign.combatShout(this)+": −"+damage+" здоровья врагу.";break;
             case "DEFEND": defending=true;stamina=Math.min(maxStamina,stamina+12);magicka=Math.min(maxMagicka,magicka+5+(progress.advanced.has(AdvancedPerks.RECOVERY)?3:0));actionText="Ты встаёшь в оборону, восстанавливая силы.";break;
-            case "POTION":if(potions==0){battleLog="Лечебных зелий больше нет.";return;}potions--;int restored=Math.min(45+5*progress.branches.rank(14),maxHp-hp);hp+=restored;lastHealing=restored;actionText="Ты восстанавливаешь "+restored+" здоровья.";break;
+            case "POTION":if(potions==0){battleLog="Лечебных зелий больше нет.";return;}potions--;int restored=Math.min(healingAmount(),maxHp-hp);hp+=restored;lastHealing=restored;actionText="Ты восстанавливаешь "+restored+" здоровья.";break;
             case "FLEE":if(battleKind.equals("WILD")&&random.nextInt(100)<progress.chance(this,"FLEE")){mode="RESULT";poisonTurns=frostTurns=0;message="Ты уходишь от противника. Трофеев нет.";return;}actionText="Попытка отступить не удалась.";break;
             default:return;
         }
@@ -653,8 +653,11 @@ public final class GameEngine {
         progress.sync(this);
         return true;
     }
-    public boolean drinkHealing() {if(!started||potions<=0||hp>=maxHp)return false;potions--;hp=Math.min(maxHp,hp+45+5*progress.branches.rank(14));return true;}
-    public boolean drinkMana() {if(!started||manaPotions<=0||magicka>=maxMagicka)return false;manaPotions--;magicka=Math.min(maxMagicka,magicka+35);return true;}
+    public int healingAmount(){return 45+5*progress.branches.rank(14)+(progress.advanced.has(AdvancedPerks.PHYSICIAN)?10:0);}
+    public int staminaPotionAmount(){return 50+(progress.advanced.has(AdvancedPerks.PHYSICIAN)?10:0);}
+    public boolean drinkHealing() {if(!started||"COMBAT".equals(mode)||potions<=0||hp>=maxHp)return false;potions--;hp=Math.min(maxHp,hp+healingAmount());progress.sync(this);return true;}
+    public boolean drinkStamina(){if(!started||"COMBAT".equals(mode)||stamina>=maxStamina||!progress.removeItem("Зелье запаса сил",1))return false;stamina=Math.min(maxStamina,stamina+staminaPotionAmount());progress.sync(this);return true;}
+    public boolean drinkMana() {if(!started||"COMBAT".equals(mode)||manaPotions<=0||magicka>=maxMagicka)return false;manaPotions--;magicka=Math.min(maxMagicka,magicka+35);return true;}
     public String questStatus() {switch(questStage){case 0:return "не начато";case 1:return "Фолкрит";case 2:return "Винтерхолд";case 3:return "Солитьюд";default:return "завершено";}}
     public String questDetails() {switch(questStage){case 0:return "Поговори с хранителем в разделе «Главная история».";case 1:return "Доберись до Фолкрита и осмотри алтарь.";case 2:return "Найди башню в Винтерхолде и победи пепельного стража.";case 3:return "Передай журнал хранителям Солитьюда.";default:return "Сюжетная линия завершена. Ты можешь продолжать приключения.";}}
     private static boolean contains(String[] arr,String v){for(String s:arr)if(s.equals(v))return true;return false;}

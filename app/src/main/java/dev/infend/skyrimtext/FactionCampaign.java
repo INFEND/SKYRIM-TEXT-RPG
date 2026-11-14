@@ -19,18 +19,28 @@ final class FactionCampaign {
         {"Пройти испытание выносливости","Собрать сведения о северном тракте","Представить отчёт командиру","Проверить северный дозор","Организовать доставку припасов","Представить итоговый отчёт"},
         {"Подготовиться к дозору","Исследовать следы ночных существ","Передать наблюдения дозорным","Выяснить источник ночных слухов","Подготовить безопасную стоянку","Завершить проверку дозора"}};
     static final int[][] SKILLS={{0,9,12,0,3,1},{13,15,12,15,8,13},{9,10,12,9,11,12},{9,16,12,9,10,16},{3,9,12,3,12,0},{1,9,12,1,3,12},{2,14,12,9,14,2}};
-    private final int[] stage=new int[NAMES.length],attemptDay=new int[NAMES.length];
+    private static final String[][] SCENES={
+        {"Во дворе Йоррваскра звонит сталь. Наставник предлагает продемонстрировать спокойствие и точность, а не бездумную силу.","Рабочие лесопилки жалуются на следы у дороги. Изучи обстановку или расспроси свидетелей.","В зале Соратников ждут отчёт о защите путников. Сопоставь сведения, прежде чем докладывать.","Караван не прибыл к лесопилке вовремя. Предстоит выяснить, что задержало возчиков.","Лесная дорога нуждается в дозоре. Найди безопасные позиции для будущей охраны.","Наставник требует объяснить, чему научили прежние поручения. Успех подтверждает твоё мастерство."},
+        {"У края моста ощущаются остаточные чары. Наставники хотят получить наблюдение, а не догадку.","В Данстаре сохранились записи об аномалии. Проверь совпадения с наблюдениями Коллегии.","В Арканеуме предстоит защитить выводы перед скептически настроенными магами.","На северном побережье обнаружены необычные руны. Изучи их структуру или обратись к свидетелям.","В Виндхельме нужно найти человека, видевшего проявление чар. Установи, заслуживают ли его слова доверия.","Собери результаты в единое исследование и представь их Коллегии."},
+        {"Связной указывает на незаметный проход. Нужно проверить его безопасность, не привлекая внимания.","В Маркарте исчезла переписка. Придётся разобраться в следах, не выдавая интерес гильдии.","Связной ждёт подтверждённых сведений. Ошибочное донесение подорвёт доверие.","Проверь путь груза через город, прежде чем использовать его для следующей доставки.","Несколько связных перестали выходить на связь. Найди безопасный способ восстановить контакт.","Гильдия оценивает твою надёжность. Согласуй условия дальнейшего сотрудничества."},
+        {"Представитель организации проверяет, умеешь ли ты хранить тайну и замечать опасность.","В Морфале пропало послание. Установи, где его видели в последний раз.","Связной ожидает отчёт, основанный на наблюдениях, а не слухах.","Появился ложный след. Отдели подтверждённые сведения от приманки.","Тайник больше нельзя считать надёжным. Проверь его состояние и доложи.","Последнее испытание требует подтвердить верность данному обещанию."},
+        {"На тренировочном дворе офицер проверяет дисциплину и умение защищаться.","У Драконьего Моста необходимо разведать дорогу. От точности отчёта зависит дозор.","Командир ждёт сведений о безопасности тракта, включая препятствия.","Пост у моста нуждается в усилении. Проверь подходы и укрытия.","В Морфале требуется согласовать снабжение гарнизона. Выясни, что действительно доступно.","Представь командиру итоговый отчёт об операции и её последствиях."},
+        {"Дозорный в Виндхельме предлагает испытание на выносливость и выдержку.","Северный тракт плохо просматривается. Собери сведения о состоянии дороги.","Командир ждёт донесение о маршрутах и угрозах.","Проверь северный дозор. Узнай, какие участки остаются без наблюдения.","В Винтерхолде необходимо организовать доставку припасов. Проверь условия и договорённости.","Итоговый отчёт должен подтвердить выполненные задачи, не скрывая трудностей."},
+        {"Дозорные проверяют готовность героя к ночным вылазкам.","У Айварстеда замечены необычные следы. Установи их происхождение по доступным признакам.","Передай наблюдения дозорным, чтобы они могли выбрать дальнейшие меры.","Ночные слухи участились. Найди их источник и отдели опасность от суеверий.","Подготовь безопасную стоянку для путников и проверь доступные укрытия.","Дозорные ждут итог проверки и рекомендации по защите дорог."}
+    };
+    private final int[] stage=new int[NAMES.length],attemptDay=new int[NAMES.length],trust=new int[NAMES.length];
     private final Random random=new Random();
     FactionCampaign(){java.util.Arrays.fill(attemptDay,-1);}
+    int trust(int f){return valid(f)?trust[f]:0;}
     int stage(int f){return valid(f)?stage[f]:0;}
     boolean valid(int f){return f>=0&&f<NAMES.length;}
     String rank(int f){return new String[]{"Не вступил","Новобранец","Посвящённый","Проверенный член","Ветеран","Доверенный член","Наставник","Заслуженный член"}[stage(f)];}
     String task(int f){int s=stage(f);return s==0?"Вступить в "+NAMES[f]:s>TASK_COUNT?"Цепочка поручений завершена":TASKS[f][s-1];}
     String place(int f){int s=stage(f);return s==0?HOME[f]:s>TASK_COUNT?HOME[f]:PLACES[f][s-1];}
     int chance(GameEngine g,int f){return chance(g,f,false);}
-    int chance(GameEngine g,int f,boolean talk){int s=stage(f);return s<1||s>TASK_COUNT?-1:g.progress.chance(g,2,talk?12:SKILLS[f][s-1],18+s*5+(talk?5:0));}
+    int chance(GameEngine g,int f,boolean talk){int s=stage(f);return s<1||s>TASK_COUNT?-1:g.progress.chance(g,2,talk?12:SKILLS[f][s-1],18+s*5+(talk?5:0)-Math.max(-5,Math.min(5,trust[f]/10)));}
     String description(int f){int s=stage(f);if(s==0)return "Представься местному представителю и согласись на поручения.";if(s>TASK_COUNT)return "Все поручения выполнены. Твои заслуги записаны в журнале.";
-        return s<=3?"Представитель ждёт результата: "+task(f)+". Можно действовать с помощью профильного навыка или убеждения.":"Новая ступень доверия. "+task(f)+". Поручение требует самостоятельной проверки, а результат будет сохранён.";}
+        return SCENES[f][s-1]+"\n\nВыбери профильный навык или переговоры.";}
 
     String block(GameEngine g,int f){
         if(!valid(f)||!g.started)return "Нет доступного поручения";
@@ -48,8 +58,8 @@ final class FactionCampaign {
         if(stage[f]==0){stage[f]=1;g.progress.setQuestOutcome("faction_"+f,"ACTIVE");g.message="Ты вступаешь в организацию «"+NAMES[f]+"». Первое поручение: "+task(f);g.recordVisualEvent(g.message);return true;}
         int step=stage[f],skill=talk?12:SKILLS[f][step-1],probability=chance(g,f,talk);
         attemptDay[f]=g.day;g.stamina-=10;
-        if(random.nextInt(100)>=probability){g.message="Поручение не удалось: "+TASKS[f][step-1]+". Повторить можно в другой день.";g.recordVisualEvent(g.message);return true;}
-        stage[f]++;int reward=20+step*15;g.gold=(int)Math.min(Integer.MAX_VALUE,(long)g.gold+reward);
+        if(random.nextInt(100)>=probability){trust[f]=Math.max(-100,trust[f]-3);g.message="Поручение не удалось: "+TASKS[f][step-1]+". Повторить можно в другой день.";g.recordVisualEvent(g.message);return true;}
+        stage[f]++;trust[f]=Math.min(100,trust[f]+12);int reward=20+step*15;g.gold=(int)Math.min(Integer.MAX_VALUE,(long)g.gold+reward);
         g.reputation++;g.holdReputation[g.region]=Math.min(100,g.holdReputation[g.region]+1);
         g.progress.skillExperience(g,skill,25+step*15);
         if(stage[f]==4){g.progress.setQuestOutcome("faction_"+f,"COMPLETED");g.progress.setQuestOutcome("faction_veteran_"+f,"ACTIVE");}
@@ -58,10 +68,10 @@ final class FactionCampaign {
         g.progress.sync(g);g.message="Выполнено: "+TASKS[f][step-1]+". "+NAMES[f]+" | "+rank(f)+" | +"+reward+" септимов.";
         g.recordVisualEvent(g.message);return true;
     }
-    JSONObject toJson(){JSONObject o=new JSONObject();try{o.put("stage",new JSONArray(stage)).put("attemptDay",new JSONArray(attemptDay));}catch(Exception ignored){}return o;}
+    JSONObject toJson(){JSONObject o=new JSONObject();try{o.put("stage",new JSONArray(stage)).put("attemptDay",new JSONArray(attemptDay)).put("trust",new JSONArray(trust));}catch(Exception ignored){}return o;}
     static FactionCampaign fromJson(JSONObject o){
-        FactionCampaign f=new FactionCampaign();if(o==null)return f;JSONArray s=o.optJSONArray("stage"),d=o.optJSONArray("attemptDay");
-        for(int i=0;i<NAMES.length;i++){if(s!=null)f.stage[i]=Math.max(0,Math.min(TASK_COUNT+1,s.optInt(i,0)));if(d!=null)f.attemptDay[i]=Math.max(-1,d.optInt(i,-1));}
+        FactionCampaign f=new FactionCampaign();if(o==null)return f;JSONArray s=o.optJSONArray("stage"),d=o.optJSONArray("attemptDay"),t=o.optJSONArray("trust");
+        for(int i=0;i<NAMES.length;i++){if(s!=null)f.stage[i]=Math.max(0,Math.min(TASK_COUNT+1,s.optInt(i,0)));if(d!=null)f.attemptDay[i]=Math.max(-1,d.optInt(i,-1));f.trust[i]=t==null?Math.max(0,f.stage[i]-1)*12:Math.max(-100,Math.min(100,t.optInt(i,0)));}
         if(f.stage[4]>0&&f.stage[5]>0)f.stage[5]=0;
         return f;
     }

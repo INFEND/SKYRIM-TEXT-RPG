@@ -703,7 +703,8 @@ public final class MainActivity extends Activity {
     private void factionDetails(int f){
         LinearLayout panel=column();panel.setPadding(dp(14),dp(12),dp(14),dp(12));
         panel.addView(new SkyrimIconView(this,FactionCampaign.ICONS[f],accent()),lp(48,52));
-        addText(panel,game.factions.rank(f),20,ITEM_GOLD,true,10);
+        addText(panel,game.factions.rank(f),20,ITEM_GOLD,true,6);
+        addText(panel,"Доверие: "+game.factions.trust(f)+" / 100",13,MUTED,false,9);
         addText(panel,"Поручения: "+Math.max(0,game.factions.stage(f)-1)+" / "+FactionCampaign.TASK_COUNT,13,MUTED,false,8);
         addText(panel,game.factions.task(f),16,TEXT,true,9);
         addText(panel,game.factions.description(f),14,MUTED,false,8);
@@ -1428,6 +1429,7 @@ public final class MainActivity extends Activity {
         if(bottom>0)space(target,bottom);
     }
 
+    private String choiceSkillName(String action){return "HEAVY".equals(action)?RpgContent.SKILLS[game.progress.equippedWeaponSkill()]:SceneChoiceMeta.skillName(action);}
     private void storyChoice(int position,GameEngine.Choice c,Runnable onClick){
         int chance=game.progress.chance(game,c.action);
         LinearLayout box=row();box.setGravity(Gravity.CENTER_VERTICAL);
@@ -1441,7 +1443,7 @@ public final class MainActivity extends Activity {
             box.addView(ordinal,ordinalSize);
         }
         SkyrimIconView glyph=new SkyrimIconView(this,
-            chance>=0?skillGlyph(SceneChoiceMeta.skillName(c.action)):"skills",accent());
+            chance>=0?skillGlyph(choiceSkillName(c.action)):"skills",accent());
         if(visual("choices"))box.addView(glyph,lp(31,34));
         LinearLayout prose=column();
         LinearLayout.LayoutParams size=new LinearLayout.LayoutParams(0,-2,1);
@@ -1461,7 +1463,7 @@ public final class MainActivity extends Activity {
             if(target>=0&&target<TravelPlanner.HUBS.length)routePreview(prose,TravelPlanner.plan(game,WorldAtlas.find(TravelPlanner.HUBS[target])));
         }
         if(chance>=0){
-            addChoiceStat(prose,"НАВЫК",SceneChoiceMeta.skillName(c.action),accent(),4);
+            addChoiceStat(prose,"НАВЫК",choiceSkillName(c.action),accent(),4);
             addChoiceStat(prose,"ШАНС УСПЕХА",chance+"%",SceneChoiceMeta.chanceColor(chance),0);
         }else addText(prose,"БЕЗ ПРОВЕРКИ",11,0xffb8c1c4,false,0);
         LinearLayout.LayoutParams layout=lp(-1,-2);layout.bottomMargin=dp(5);
@@ -2962,13 +2964,13 @@ public final class MainActivity extends Activity {
         boolean owned=game.progress.quantity(item.id)>0;
         boolean worn=game.progress.equipped(item.id);
         String primary=owned&&!"COMBAT".equals(game.mode)&&!item.slot().isEmpty()?(worn?"СНЯТЬ":"ЭКИПИРОВАТЬ"):
-            owned&&("Лечебное зелье".equals(item.id)||"Зелье магии".equals(item.id))?"ИСПОЛЬЗОВАТЬ":"ЗАКРЫТЬ";
+            owned&&!"COMBAT".equals(game.mode)&&("Лечебное зелье".equals(item.id)||"Зелье магии".equals(item.id)||"Зелье запаса сил".equals(item.id))?"ИСПОЛЬЗОВАТЬ":"ЗАКРЫТЬ";
         TextView equip=itemAction(primary);
         actions.addView(equip,new LinearLayout.LayoutParams(0,dp(44),1));
         equip.setOnClickListener(v->{
             if("ЗАКРЫТЬ".equals(primary)){dialog.dismiss();return;}
             if("ИСПОЛЬЗОВАТЬ".equals(primary)){
-                boolean result="Лечебное зелье".equals(item.id)?game.drinkHealing():game.drinkMana();
+                boolean result="Лечебное зелье".equals(item.id)?game.drinkHealing():"Зелье магии".equals(item.id)?game.drinkMana():game.drinkStamina();
                 game.progress.sync(game);save();dialog.dismiss();render();
                 toast(result?"Зелье использовано":"Нет необходимости использовать зелье");return;
             }
@@ -3196,10 +3198,11 @@ public final class MainActivity extends Activity {
         addText(items,"Снижение физического урона: "+String.format(java.util.Locale.ROOT,"%.1f%%",100*game.progress.damageReduction()),12,accent(),true,8);
         addText(items,"Лечебные зелья: "+game.potions,14,MUTED,false,6);
         addText(items,"Зелья магии: "+game.manaPotions,14,MUTED,false,0);
-        actionButton("Выпить лечебное зелье","+45 здоровья | без боя",false,()->{
+        actionButton("Выпить лечебное зелье","+"+game.healingAmount()+" здоровья | без боя",false,()->{
             toast(game.drinkHealing()?"Здоровье восстановлено":"Зелье не требуется или закончилось");save();render();});
         actionButton("Выпить зелье магии","+35 магии | без боя",false,()->{
             toast(game.drinkMana()?"Магия восстановлена":"Зелье не требуется или закончилось");game.progress.sync(game);save();render();});
+        if(game.progress.quantity("Зелье запаса сил")>0)actionButton("Выпить зелье запаса сил","+"+game.staminaPotionAmount()+" выносливости | без боя",false,()->{toast(game.drinkStamina()?"Выносливость восстановлена":"Зелье недоступно");save();render();});
         LinearLayout race=card();addText(race,"НАСЛЕДИЕ РАСЫ",11,accent(),true,12);
         addText(race,game.race+" | пассивно",16,TEXT,true,7);
         addText(race,game.progress.racePassive(game),14,MUTED,false,13);
