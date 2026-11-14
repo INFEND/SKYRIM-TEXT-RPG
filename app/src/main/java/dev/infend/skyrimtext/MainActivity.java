@@ -302,6 +302,7 @@ public final class MainActivity extends Activity {
     private void addText(LinearLayout parent,String str,int size,int color,boolean bold,int bottom){TextView t=text(str,size,color,bold);parent.addView(t);if(bottom>0)space(parent,bottom);}
     private String viewportKey(){
         if(titleOpen)return "title";
+        if(tab==7)return storyChapterList?"story-chapters":"story-"+prefs.getInt("story_pack_chapter",1)+"-"+prefs.getInt("story_pack_page",0);
         return (!game.started?"new-":"tab-")+tab;
     }
     private void findHorizontal(View node,java.util.List<HorizontalScrollView> found){
@@ -1393,7 +1394,7 @@ public final class MainActivity extends Activity {
     }
     private void storyPosition(int chapter,int page){
         prefs.edit().putInt("story_pack_chapter",chapter).putInt("story_pack_page",page).apply();
-        storyChapterList=false;render();scroll.post(()->scroll.scrollTo(0,0));
+        storyChapterList=false;render();
     }
     private void renderStoryPack(){
         section("СЮЖЕТНАЯ БАЗА","История Довакина","Отдельный режим чтения сюжетных диалогов. Прогресс героя, задания и сохранения не изменяются.");
@@ -1408,7 +1409,7 @@ public final class MainActivity extends Activity {
             addText(content,"Файл сохраняется только на твоём устройстве. После импорта интернет не требуется.",14,MUTED,false,12);
             return;
         }
-        addText(content,storyPack.chapters().size()+" глав • "+storyPack.segments+" записей • "+storyPack.uncertainSegments+" с отметкой неопределённости",12,MUTED,false,12);
+        addText(content,storyPack.chapters().size()+" глав | "+storyPack.segments+" записей | "+storyPack.uncertainSegments+" с отметкой неопределённости",12,MUTED,false,12);
         StoryDialoguePack.Chapter chapter=storyPack.chapter(prefs.getInt("story_pack_chapter",1));
         if(storyChapterList){
             for(StoryDialoguePack.Chapter c:storyPack.chapters()){
@@ -1417,7 +1418,7 @@ public final class MainActivity extends Activity {
             actionButton("Импорт другой базы","Текущая заменится только после успешной проверки",false,this::chooseStoryPack);
             return;
         }
-        actionButton("Список глав","Выбрать любую из "+storyPack.chapters().size()+" глав",false,()->{storyChapterList=true;render();scroll.post(()->scroll.scrollTo(0,0));});
+        actionButton("Список глав","Выбрать любую из "+storyPack.chapters().size()+" глав",false,()->{storyChapterList=true;render();});
         int page=chapter.page(prefs.getInt("story_pack_page",0));
         LinearLayout panel=card();
         addText(panel,"ГЛАВА "+chapter.id+"  |  "+(page+1)+"/"+chapter.pages(),11,accent(),true,10);
@@ -1428,7 +1429,7 @@ public final class MainActivity extends Activity {
             addText(panel,line.speaker+":",16,accent(),true,4);
             TextView quote=text("— "+line.text,17,TEXT,false);
             quote.setLineSpacing(dp(4),1.13f);panel.addView(quote);
-            if(line.uncertain)addText(panel,"Частично восстановлено · #"+line.id,11,MUTED,false,3);
+            if(line.uncertain)addText(panel,"Частично восстановлено | #"+line.id,11,MUTED,false,3);
             space(panel,15);
         }
         int index=storyPack.chapters().indexOf(chapter);
