@@ -10,10 +10,11 @@ class AiGameDirectorContracts(unittest.TestCase):
     def test_ai_mode_hides_offline_story_before_reading_scene(self):
         ui=code("MainActivity.java")
         start=ui.index("private void renderStory(){")
-        body=ui[start:start+300]
+        body=ui[start:ui.index("private void renderStoryJournal()",start)]
         self.assertRegex(body,r'if\(!canonical\)\{if\(prefs\.getBoolean\("ai_enabled",false\)\)\{renderAiGame\(\);return;\}\}|if\(prefs\.getBoolean\("ai_enabled",false\)&&!canonical\)\{renderAiGame\(\);return;\}')
         self.assertIn('"CANON".equals(game.mode)',body)
         self.assertIn('"CANONICAL".equals(game.battleKind)',body)
+        self.assertIn('"FACTION".equals(game.battleKind)',body)
         self.assertLess(body.index("renderAiGame();return;"),body.index("GameEngine.Scene s=game.scene()"))
         # AI storyteller replaces offline prose, but must preserve live RPG stats.
         self.assertIn("if(game.started)renderBars();",ui)

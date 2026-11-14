@@ -10,3 +10,5 @@ class FactionStoriesTest(unittest.TestCase):
         self.assertIn('started(5)||g.factions.stage(5)>0',s)
         self.assertIn('factionStoryDialog(f)',m)
         self.assertIn('"FACTION".equals(game.battleKind)',m)
+        self.assertNotIn('{"За гранью смерти","Каирн Душ"',s)
+        self.assertNotIn('{"Прикосновение к небу","Забытая долина"',s)
