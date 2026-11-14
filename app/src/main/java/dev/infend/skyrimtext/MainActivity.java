@@ -160,6 +160,7 @@ public final class MainActivity extends Activity {
         super.onDestroy();
     }
     private void newAiSession(){
+        combatVisual="";victoryVisual="";travelVisual="";travelStops=java.util.Collections.emptyList();lastNarrative="";
         recentItemGains.clear();
         selectedAiChoices.clear();aiOwnDraft="";clearAiDraft();
         if(aiClient!=null)aiClient.cancel();if(localAiClient!=null)localAiClient.cancel();
@@ -367,8 +368,41 @@ public final class MainActivity extends Activity {
     private void stateEffects(){
         if(!visual("status")||!game.started||titleOpen)return;
         float fraction=game.hp/(float)Math.max(1,game.maxHp);
-        if(fraction>=.65f)return;
-        root.setForeground(new VisualEffectsView.EdgeDrawable(fraction<.25f?0x99b51c27:0x55b51c27));
+        WorldWeather w=WorldWeather.at(game.region,game.progress.location,game.day,game.hour);
+        int color=game.poisonTurns>0?0x9954b76a:game.frostTurns>0?0x997cc9ef:fraction<.25f?0x99b51c27:
+            fraction<.65f?0x55b51c27:w.temperature<=-10?0x447cc9ef:game.stamina*4<game.maxStamina?0x55799357:game.magicka*4<game.maxMagicka?0x556b78cc:0;
+        if(color!=0){
+            VisualEffectsView.EdgeDrawable edge=new VisualEffectsView.EdgeDrawable(color);root.setForeground(edge);
+            if(animations&&fraction<.25f){
+                android.animation.ValueAnimator pulse=android.animation.ValueAnimator.ofInt(140,255);
+                pulse.setDuration(650);pulse.setRepeatMode(android.animation.ValueAnimator.REVERSE);pulse.setRepeatCount(3);
+                pulse.addUpdateListener(a->{edge.setAlpha((Integer)a.getAnimatedValue());edge.invalidateSelf();});pulse.start();
+            }
+        }
+        StringBuilder status=new StringBuilder();
+        if(game.poisonTurns>0)status.append("Отравление: ").append(game.poisonTurns).append(" х.  ");
+        if(game.frostTurns>0)status.append("Обморожение: ").append(game.frostTurns).append(" х.  ");
+        if(fraction<.25f)status.append("Критическое здоровье  ");
+        if(game.stamina*4<game.maxStamina)status.append("Истощение  ");
+        if(game.magicka*4<game.maxMagicka)status.append("Мало магии  ");
+        if(w.temperature<=-10)status.append("Сильный холод");
+        if(status.length()>0){TextView label=text(status.toString().trim(),12,TEXT,true);label.setGravity(Gravity.CENTER);label.setPadding(dp(6),dp(5),dp(6),dp(5));label.setBackgroundColor(0xff151719);topChrome.addView(label,lp(-1,-2));}
+    }
+    private static String npcStatusLabel(String status){
+        switch(status){case "MET":return "Знакомство";case "HELPED":return "Благодарность";case "INFORMED":return "Обмен сведениями";case "HOSTILE":return "Враждебность";case "DEAD":return "Погиб";case "MISSING":return "Пропал";default:return "Отношение неизвестно";}
+    }
+    private CharacterPortraitView npcPortrait(String name){
+        String lower=name.toLowerCase(java.util.Locale.ROOT);
+        String race=lower.contains("ирилет")||lower.contains("данмер")?"Данмер":lower.contains("каджит")?"Каджит":lower.contains("аргониан")?"Аргонианин":lower.contains("альтмер")?"Альтмер":lower.contains("орк")?"Орк":lower.contains("импер")||lower.contains("хадвар")?"Имперец":"Норд";
+        boolean female=lower.contains("ирилет")||lower.contains("дельфин")||lower.contains("гердур")||lower.contains("торговка")||lower.contains("женщина")||lower.contains("жрица")||lower.contains("хозяйка")||lower.contains("девушка");
+        return new CharacterPortraitView(this,race,female?CharacterIdentity.FEMALE:CharacterIdentity.MALE,1+Math.floorMod(name.hashCode(),3));
+    }
+    private void npcDetails(String name){
+        LinearLayout panel=column();panel.setGravity(Gravity.CENTER);panel.setPadding(dp(12),dp(12),dp(12),dp(12));
+        panel.addView(npcPortrait(name),lp(112,-2));
+        addText(panel,"Иллюстративный образ, не канонический портрет",11,MUTED,false,10);
+        addText(panel,npcStatusLabel(game.sceneState.npcStatusByName(name)),15,TEXT,true,8);
+        new RuneDialogBuilder(this,accent()).setTitle(name).setView(panel).setNegativeButton("Закрыть",null).show();
     }
     private String lastNarrative="";
     private void decorateNarrative(LinearLayout host,TextView body,String raw){
@@ -376,19 +410,21 @@ public final class MainActivity extends Activity {
         if(visual("portraits")){
             java.util.LinkedHashSet<String> speakers=new java.util.LinkedHashSet<>();
             java.util.regex.Matcher names=java.util.regex.Pattern.compile("(?m)^\\s*(?:\\*\\*)?([^:\\n*]{2,48}):(?:\\*\\*)?\\s*$").matcher(raw);
-            while(names.find()&&speakers.size()<4){
+            while(names.find()&&speakers.size()<8){
                 String name=names.group(1).trim();
                 if(!name.isEmpty()&&!name.equalsIgnoreCase("ты")&&!name.equalsIgnoreCase(game.name))speakers.add(name);
             }
             if(!speakers.isEmpty()){
-                LinearLayout avatars=row();
+                HorizontalScrollView strip=new HorizontalScrollView(this);strip.setHorizontalScrollBarEnabled(false);
+                LinearLayout avatars=row();strip.addView(avatars);
                 for(String name:speakers){
                     LinearLayout person=column();person.setGravity(Gravity.CENTER);
-                    person.addView(new SkyrimIconView(this,"hero",accent()),lp(34,37));
+                    person.setPadding(dp(5),dp(4),dp(5),dp(8));person.addView(npcPortrait(name),lp(68,-2));
                     TextView label=text(name,10,MUTED,false);label.setGravity(Gravity.CENTER);label.setMaxLines(2);
-                    person.addView(label,lp(-1,-2));avatars.addView(person,new LinearLayout.LayoutParams(0,-2,1));
+                    person.addView(label,lp(-1,-2));TextView relation=text(npcStatusLabel(game.sceneState.npcStatusByName(name)),10,accent(),false);relation.setGravity(Gravity.CENTER);person.addView(relation,lp(-1,-2));
+                    avatars.addView(person,lp(94,-2));person.setOnClickListener(view->npcDetails(name));
                 }
-                host.addView(avatars,0,lp(-1,-2));
+                host.addView(strip,0,lp(-1,-2));
             }
         }
         if(visual("reveal")&&animations&&!raw.equals(lastNarrative)){
@@ -408,25 +444,32 @@ public final class MainActivity extends Activity {
         if(!cost.isEmpty())addText(host,cost,12,ITEM_GOLD,true,3);
     }
     private static final class VisualSnapshot {
-        final String location,mode,enemy;final int hp,enemyHp,victories,gold,xp,level,day;
-        VisualSnapshot(GameEngine g){location=g.progress.location;mode=g.mode;enemy=g.enemyName;hp=g.hp;enemyHp=g.enemyHp;victories=g.victories;gold=g.gold;xp=g.xp;level=g.level;day=g.day;}
+        final String location,mode,enemy;final int hp,enemyHp,victories,gold,xp,level,day,region,reputation;final java.util.List<String> stops;
+        VisualSnapshot(GameEngine g){this(g,null);}
+        VisualSnapshot(GameEngine g,String action){location=g.progress.location;mode=g.mode;enemy=g.enemyName;hp=g.hp;enemyHp=g.enemyHp;victories=g.victories;gold=g.gold;xp=g.xp;level=g.level;day=g.day;region=g.region;reputation=g.reputation;
+            WorldAtlas.Place place=null;if(action!=null&&action.startsWith("LOC:"))place=WorldAtlas.find(action.substring(4));
+            if(action!=null&&action.startsWith("REGION:"))try{int i=Integer.parseInt(action.substring(7));if(i>=0&&i<TravelPlanner.HUBS.length)place=WorldAtlas.find(TravelPlanner.HUBS[i]);}catch(NumberFormatException ignored){}
+            stops=place==null?java.util.Collections.emptyList():TravelPlanner.plan(g,place).stops;
+        }
     }
     private String combatVisual="",victoryVisual="",travelVisual="";
+    private java.util.List<String> travelStops=java.util.Collections.emptyList();private boolean animateTravelOnce;
     private void recordVisual(VisualSnapshot before,GameEngine after,String action){
         combatVisual="";victoryVisual="";travelVisual="";
         after.visitedVisual.add(after.progress.location);
         boolean moved=!before.location.equals(after.progress.location);
-        if(moved)travelVisual=before.location+" → "+after.progress.location+" | "+Math.max(0,after.day-before.day)+" дн.";
+        if(moved){travelVisual=before.location+" → "+after.progress.location+" | "+Math.max(0,after.day-before.day)+" дн.";travelStops=before.stops.isEmpty()?java.util.Arrays.asList(before.location,after.progress.location):before.stops;animateTravelOnce=true;}
+        int delta=after.reputation-before.reputation;if(delta!=0)after.holdReputation[before.region]=Math.max(-100,Math.min(100,after.holdReputation[before.region]+delta));
         if("COMBAT".equals(before.mode)){
             int hit=Math.max(0,before.enemyHp-after.enemyHp);
             if(!before.enemy.equals(after.enemyName)&&after.victories==before.victories)hit=0;
             int received=Math.max(0,before.hp-after.hp);
-            if(!"DEFEAT".equals(after.mode)&&(hit>0||received>0))
-                combatVisual=(hit>0?"−"+hit+" врагу":"")+(received>0?(hit>0?"  |  ":"")+"−"+received+" герою":"");
+            if(after.lastDealt>0)hit=after.lastDealt;if(after.lastTaken>0)received=after.lastTaken;
+            if(hit>0||received>0||after.lastHealing>0)combatVisual=(hit>0?"−"+hit+" врагу  ":"")+(received>0?"−"+received+" герою  ":"")+(after.lastHealing>0?"+"+after.lastHealing+" здоровья":"");
             if(after.victories>before.victories){
                 long earned=after.xp-before.xp;
                 for(int i=before.level;i<after.level;i++)earned+=i*80L;
-                victoryVisual=before.enemy+"\n+"+Math.max(0,after.gold-before.gold)+" септимов  |  +"+Math.max(0,earned)+" опыта";
+                victoryVisual=before.enemy+"\n+"+Math.max(0,after.gold-before.gold)+" септимов  |  +"+Math.max(0,earned)+" опыта\nХодов: "+after.battleTurns+" | Урон: "+after.battleDealt+" | Получено: "+after.battleTaken;
             }
         }
         String event=moved?travelVisual:!victoryVisual.isEmpty()?("Победа: "+before.enemy):
@@ -443,7 +486,7 @@ public final class MainActivity extends Activity {
             LinearLayout box=card();addText(box,"◇  ПОБЕДА",23,ITEM_GOLD,true,10);addText(box,victoryVisual,16,TEXT,false,4);
         }
         if(visual("travel")&&!travelVisual.isEmpty()){
-            LinearLayout box=card();addText(box,"ПУТЕШЕСТВИЕ ЗАВЕРШЕНО",12,accent(),true,8);addText(box,travelVisual,15,TEXT,false,0);
+            LinearLayout box=card();addText(box,"ПУТЕШЕСТВИЕ ЗАВЕРШЕНО",12,accent(),true,8);addText(box,travelVisual,15,TEXT,false,7);if(travelStops.size()>1){box.addView(new VisualEffectsView.RouteLine(this,travelStops.size(),accent(),animations&&animateTravelOnce),lp(-1,42));addText(box,String.join(" → ",travelStops),12,MUTED,false,0);animateTravelOnce=false;}
         }
         if(visual("defeat")&&"DEFEAT".equals(game.mode)){
             LinearLayout box=card();box.setBackground(new RuneFrameDrawable(0xff190c0d,ITEM_DOWN,false));
@@ -455,6 +498,7 @@ public final class MainActivity extends Activity {
     private void routePreview(LinearLayout host,TravelPlanner.Route route){
         if(!visual("travel")||!route.allowed||route.days==0)return;
         addText(host,"МАРШРУТ | "+route.days+" дн. | "+route.fare+" септимов",12,ITEM_GOLD,true,9);
+        if(route.stops.size()>1)host.addView(new VisualEffectsView.RouteLine(this,route.stops.size(),accent(),false),lp(-1,34));
         for(int i=0;i<route.stops.size();i++){
             LinearLayout line=row();line.addView(new SkyrimIconView(this,"map",accent()),lp(23,25));
             addText(line,(i==0?"Отправление: ":i==route.stops.size()-1?"Прибытие: ":"Переход: ")+route.stops.get(i),13,TEXT,false,0);
@@ -479,9 +523,21 @@ public final class MainActivity extends Activity {
         android.widget.ProgressBar bar=new android.widget.ProgressBar(this,null,android.R.attr.progressBarStyleHorizontal);
         bar.setMax(200);bar.setProgress(100+Math.max(-100,Math.min(100,rep)));
         bar.setProgressTintList(ColorStateList.valueOf(rep>=0?ITEM_UP:ITEM_DOWN));c.addView(bar,lp(-1,5));
-        String facts=game.sceneState.confirmedContext();
-        if(!facts.isEmpty())addText(c,facts,12,MUTED,false,0);
+        addText(c,"ВЛАДЕНИЯ И СОЛСТЕЙМ",11,accent(),true,10);
+        for(int i=0;i<TravelPlanner.HUBS.length;i++){int score=game.holdReputation[i];reputationRow(c,TravelPlanner.HUBS[i],score,score==0?"Нет записанных изменений":score>0?"Благосклонность":"Недоверие");}
+        addText(c,"ФРАКЦИИ | ПОДТВЕРЖДЁННЫЕ СВЯЗИ",11,accent(),true,10);
+        factionRow(c,"Защитники Вайтрана",game.progress.dragonStage>=4?"Помог в битве с драконом":game.progress.dragonStage>=3?"Принято поручение":"Нет подтверждённых связей");
+        factionRow(c,"Седобородые",game.progress.dragonStage>=DragonArc.FINAL_STAGE?"Первое испытание пройдено":game.progress.dragonStage>=5?"Достигнут Высокий Хротгар":"Нет подтверждённых связей");
+        factionRow(c,"Хранители печатей",game.questStage==4?"Печати восстановлены":game.questStage>0?"Поручение принято":"Нет подтверждённых связей");
+        for(String name:new String[]{"Соратники","Коллегия Винтерхолда","Гильдия воров","Тёмное Братство","Имперский легион","Братья Бури","Стража Рассвета"})factionRow(c,name,"Членство не подтверждено");
+        org.json.JSONArray npcs=game.sceneState.npcFacts();if(npcs.length()>0)addText(c,"ЗНАКОМСТВА",11,accent(),true,9);
+        for(int i=0;i<npcs.length();i++){JSONObject n=npcs.optJSONObject(i);if(n!=null)factionRow(c,n.optString("title"),npcStatusLabel(n.optString("status")));}
     }
+    private void reputationRow(LinearLayout host,String name,int score,String status){
+        LinearLayout line=row();line.addView(new SkyrimIconView(this,"shield",accent()),lp(27,30));LinearLayout detail=column();line.addView(detail,new LinearLayout.LayoutParams(0,-2,1));addText(detail,name,13,TEXT,true,3);
+        ProgressBar meter=new ProgressBar(this,null,android.R.attr.progressBarStyleHorizontal);meter.setMax(200);meter.setProgress(100+score);meter.setProgressTintList(ColorStateList.valueOf(score<0?ITEM_DOWN:ITEM_UP));detail.addView(meter,lp(-1,4));addText(detail,status,10,MUTED,false,4);addText(line,(score>0?"+":"")+score,13,score<0?ITEM_DOWN:accent(),true,0);host.addView(line,lp(-1,-2));space(host,5);
+    }
+    private void factionRow(LinearLayout host,String name,String status){LinearLayout line=row();line.addView(new SkyrimIconView(this,"shield",accent()),lp(27,30));LinearLayout detail=column();line.addView(detail,new LinearLayout.LayoutParams(0,-2,1));addText(detail,name,13,TEXT,true,2);addText(detail,status,11,MUTED,false,5);host.addView(line,lp(-1,-2));}
     private void gearVisual(LinearLayout items){
         if(!visual("gear"))return;
         LinearLayout layout=row();layout.setGravity(Gravity.CENTER_VERTICAL);
@@ -503,21 +559,60 @@ public final class MainActivity extends Activity {
             LinearLayout r=row();c.addView(r,lp(-1,-2));
             for(int k=i;k<Math.min(i+3,RpgContent.SKILLS.length);k++){
                 final int index=k;LinearLayout node=column();node.setGravity(Gravity.CENTER);
-                node.addView(new VisualEffectsView.SkillStars(this,game.progress.skillLevel(k),accent()),lp(-1,49));
-                TextView label=text(RpgContent.SKILLS[k]+"\n"+game.progress.skillLevel(k),11,TEXT,true);
+                node.addView(new VisualEffectsView.SkillStars(this,game.progress.talentRank(k)*20,accent()),lp(-1,49));
+                TextView label=text(RpgContent.SKILLS[k]+"\n"+game.progress.skillLevel(k)+" | "+game.progress.talentRank(k)+"/5",11,TEXT,true);
                 label.setGravity(Gravity.CENTER);node.addView(label,lp(-1,-2));
                 r.addView(node,new LinearLayout.LayoutParams(0,-2,1));node.setOnClickListener(v->showSkill(index));
             }
         }
     }
     private void tradeVisual(){
-        if(!visual("trade")||!"SHOP".equals(game.mode))return;
-        LinearLayout c=card();addText(c,"ТОРГОВЕЦ  ◇  ПОКУПАТЕЛЬ",12,ITEM_GOLD,true,10);
-        LinearLayout r=row();c.addView(r,lp(-1,-2));
-        LinearLayout a=column(),b=column();r.addView(a,new LinearLayout.LayoutParams(0,-2,1));r.addView(b,new LinearLayout.LayoutParams(0,-2,1));
-        addText(a,"Ассортимент",13,accent(),true,5);addText(a,"Зелья | оружие | броня",12,TEXT,false,0);
-        addText(b,"Твой кошелёк",13,accent(),true,5);addText(b,game.gold+" септимов",16,ITEM_GOLD,true,0);
-        addText(b,itemNumber(game.progress.carryWeight())+" / 50 кг",12,MUTED,false,0);
+        if(!"SHOP".equals(game.mode))return;
+        if(!visual("trade")){actionButton("ПРОДАТЬ ПРЕДМЕТ","Продажа неэкипированных вещей",false,this::sellDialog);return;}
+        LinearLayout c=card();addText(c,"ТОРГОВЛЯ | "+game.gold+" септимов",14,ITEM_GOLD,true,10);
+        LinearLayout r=row();c.addView(r,lp(-1,-2));LinearLayout a=column(),b=column();a.setPadding(0,0,dp(4),0);b.setPadding(dp(4),0,0,0);
+        r.addView(a,new LinearLayout.LayoutParams(0,-2,1));r.addView(b,new LinearLayout.LayoutParams(0,-2,1));
+        addText(a,"КУПИТЬ",13,accent(),true,8);addText(b,"ПРОДАТЬ",13,accent(),true,8);
+        String[][] stock={{"BUY_HP","Лечебное зелье","35"},{"BUY_MP","Зелье магии","30"},{"BUY_SWORD","Стальной меч","180"},{"BUY_ARMOR","Стальная кираса","160"}};
+        for(String[] entry:stock){
+            if(("BUY_SWORD".equals(entry[0])&&game.swordUpgraded)||("BUY_ARMOR".equals(entry[0])&&game.armorUpgraded))continue;
+            int price=Integer.parseInt(entry[2]);ItemCatalog.Item item=ItemCatalog.find(entry[1]);if(item!=null)tradeTile(a,item,price,()->buyFromTrade(entry[0],item,price));
+        }
+        int shown=0;for(ItemCatalog.Item item:game.progress.owned("Все","Название"))if(game.canSell(item)){
+            if(shown++>=6)break;tradeTile(b,item,game.salePrice(item),()->confirmSale(item));
+        }
+        if(shown==0)addText(b,"Нет доступных предметов",12,MUTED,false,6);
+        actionButton("ВЕСЬ ИНВЕНТАРЬ ДЛЯ ПРОДАЖИ","Экипированные и защищённые предметы недоступны",false,this::sellDialog);
+    }
+    private void tradeTile(LinearLayout host,ItemCatalog.Item item,int price,Runnable click){
+        LinearLayout tile=column();tile.setPadding(dp(7),dp(8),dp(7),dp(8));tile.setBackground(new RuneFrameDrawable(PANEL,BORDER,false));
+        tile.addView(new SkyrimIconView(this,SkyrimIconView.iconForItem(item.name,item.category),accent()),lp(28,30));
+        addText(tile,item.name,12,TEXT,true,4);addText(tile,price+" септимов | "+itemNumber(item.weight)+" кг",11,ITEM_GOLD,false,4);
+        addText(tile,"В наличии у героя: "+game.progress.quantity(item.id),10,MUTED,false,0);
+        host.addView(tile,lp(-1,-2));space(host,5);tile.setOnClickListener(view->click.run());
+    }
+    private void buyFromTrade(String action,ItemCatalog.Item item,int price){
+        if(!"SHOP".equals(game.mode))return;
+        new RuneDialogBuilder(this,accent()).setTitle(item.name).setMessage("Купить за "+price+" септимов?\n"+item.description)
+            .setNegativeButton("Отмена",null).setPositiveButton("Купить",(d,w)->{
+                if(!"SHOP".equals(game.mode))return;
+                java.util.Map<String,Integer> before=itemSnapshot(game);VisualSnapshot visualBefore=new VisualSnapshot(game,action);
+                game.choose(action);game.progress.sync(game);captureItemGains(before,game,false);recordVisual(visualBefore,game,item.name);
+                String feedback=game.message;game.mode="SHOP";save();render();toast(feedback);
+            }).show();
+    }
+    private void confirmSale(ItemCatalog.Item item){
+        if(!game.canSell(item))return;
+        new RuneDialogBuilder(this,accent()).setTitle(item.name).setMessage("Продать 1 шт. за "+game.salePrice(item)+" септимов?")
+            .setNegativeButton("Отмена",null).setPositiveButton("Продать",(d,w)->{if(game.sellOne(item.id)){recentItemGains.clear();save();render();toast(game.message);}}).show();
+    }
+    private void sellDialog(){
+        if(!"SHOP".equals(game.mode))return;
+        java.util.ArrayList<ItemCatalog.Item> items=new java.util.ArrayList<>();java.util.ArrayList<String> labels=new java.util.ArrayList<>();
+        for(ItemCatalog.Item item:game.progress.owned("Все","Название"))if(game.canSell(item)){items.add(item);labels.add(item.name+" ×"+game.progress.quantity(item.id)+" | "+game.salePrice(item)+" септимов");}
+        AlertDialog.Builder dialog=new RuneDialogBuilder(this,accent()).setTitle("Продажа").setNegativeButton("Закрыть",null);
+        if(items.isEmpty())dialog.setMessage("Нет доступных для продажи предметов.");else dialog.setItems(labels.toArray(new String[0]),(d,i)->confirmSale(items.get(i)));
+        dialog.show();
     }
     private void themedNotice(String message){
         if(!visual("notice")||root==null||!root.isAttachedToWindow()){Toast.makeText(this,message,Toast.LENGTH_SHORT).show();return;}
@@ -624,7 +719,7 @@ public final class MainActivity extends Activity {
             catch(NumberFormatException ex){return;}
             if(oldLevel>0&&game.progress.skillLevel(i)>oldLevel&&raised<0)raised=i;
         }
-        if(raised<0)return;
+        if(raised<0||!visual("notice"))return;
         int i=raised;
         LinearLayout panel=column();
         panel.setPadding(dp(13),dp(11),dp(13),dp(11));
@@ -1043,7 +1138,7 @@ public final class MainActivity extends Activity {
                 if(aiClient!=null)aiClient.cancel();if(localAiClient!=null)localAiClient.cancel();
                 int old=game.questStage;
                 java.util.Map<String,Integer> before=itemSnapshot(game);
-                VisualSnapshot visualBefore=new VisualSnapshot(game);
+                VisualSnapshot visualBefore=new VisualSnapshot(game,c.action);
                 game.choose(c.action);
                 if(!c.action.startsWith("ACT:"))game.progress.observe(game,c.action,old);
                 game.progress.sync(game);
@@ -2257,7 +2352,7 @@ public final class MainActivity extends Activity {
         }
         if(route.allowed&&route.days>0){
             dialog.setPositiveButton("Начать переход",(d,w)->{
-                java.util.Map<String,Integer> before=itemSnapshot(game);VisualSnapshot visualBefore=new VisualSnapshot(game);game.choose("LOC:"+place.name);game.progress.sync(game);captureItemGains(before,game,false);recordVisual(visualBefore,game,place.name);save();tab=0;render();
+                java.util.Map<String,Integer> before=itemSnapshot(game);VisualSnapshot visualBefore=new VisualSnapshot(game,"LOC:"+place.name);game.choose("LOC:"+place.name);game.progress.sync(game);captureItemGains(before,game,false);recordVisual(visualBefore,game,place.name);save();tab=0;render();
             });
         }
         dialog.show();
@@ -2807,26 +2902,25 @@ public final class MainActivity extends Activity {
         }
     }
     private void showSkill(int index){
-        int lvl=game.progress.skillLevel(index);
-        String details=RpgContent.SKILL_DESCRIPTIONS[index]+"\n\nУровень: "+lvl+
-            "\nОпыт навыка: "+game.progress.skillXp[index]+" / "+game.progress.skillNeed(index)+
-            "\n\nВетка талантов: ученик → адепт → мастер.";
-        boolean combat=RpgProgress.isCombatPerk(index);
-        int rank=game.progress.combatPerkRank(index);
-        if(combat)details+="\n\n"+game.progress.combatPerkName(index)+": "+rank+" / 5"
-            +"\nБонус: +"+(rank*20)+"%"+(rank<5?"\nСледующий ранг: навык "+game.progress.nextCombatPerkLevel(index):"");
-        AlertDialog.Builder builder=new RuneDialogBuilder(this,accent()).setTitle(RpgContent.SKILLS[index])
-            .setMessage(details).setNegativeButton("Закрыть",null);
-        if(combat){
-            if(game.progress.perkPoints>0&&rank<5&&lvl>=game.progress.nextCombatPerkLevel(index))
-                builder.setPositiveButton("Повысить ранг",(d,w)->{
-                    if(game.progress.buyCombatPerk(index)){save();render();toast("Талант развит");}
-                });
-        }else if(game.progress.perkPoints>0&&lvl>=20)
-            builder.setPositiveButton("Развить талант",(d,w)->{
-                game.progress.perkPoints--;game.progress.skillExperience(game,index,70);
-                save();render();toast("Очко таланта применено");
-            });
+        int lvl=game.progress.skillLevel(index),rank=game.progress.talentRank(index);boolean combat=RpgProgress.isCombatPerk(index);
+        String title=combat?game.progress.combatPerkName(index):RpgContent.SKILLS[index]+" | освоение";
+        String details=RpgContent.SKILL_DESCRIPTIONS[index]+"\nУровень: "+lvl+" | Опыт: "+game.progress.skillXp[index]+" / "+game.progress.skillNeed(index)+"\nОчки талантов: "+game.progress.perkPoints;
+        AlertDialog.Builder builder=new RuneDialogBuilder(this,accent()).setTitle(RpgContent.SKILLS[index]).setNegativeButton("Закрыть",null);
+        if(visual("stars")){
+            LinearLayout box=column();box.setPadding(dp(14),dp(8),dp(14),dp(12));addText(box,details,13,TEXT,false,12);addText(box,title,16,accent(),true,6);
+            box.addView(new VisualEffectsView.SkillStars(this,rank*20,accent()),lp(-1,70));
+            for(int i=1;i<=5;i++){
+                int need=game.progress.talentNeed(index,i);boolean acquired=i<=rank,available=i==rank+1&&game.progress.canBuyTalent(index);
+                LinearLayout node=row();node.addView(new SkyrimIconView(this,acquired?"skills":available?"dragon":"lock",acquired?ITEM_GOLD:available?accent():MUTED),lp(32,35));
+                LinearLayout words=column();node.addView(words,new LinearLayout.LayoutParams(0,-2,1));
+                addText(words,"Ранг "+i+" | "+(acquired?"Изучен":available?"Доступен":"Закрыт"),14,acquired?ITEM_GOLD:TEXT,true,3);
+                addText(words,"Навык "+need+" | "+(combat?"+20% за ранг":"+70 опыта при изучении"),11,MUTED,false,6);box.addView(node,lp(-1,-2));
+            }
+            ScrollView scroller=new ScrollView(this);scroller.addView(box);builder.setView(scroller);
+        }else builder.setMessage(details+"\n"+title+" "+rank+"/5");
+        if(game.progress.canBuyTalent(index))builder.setPositiveButton("Изучить следующий ранг",(d,w)->{
+            if(combat?game.progress.buyCombatPerk(index):game.progress.buyTalent(game,index)){save();render();toast("Талант развит");}
+        });
         builder.show();
     }
 

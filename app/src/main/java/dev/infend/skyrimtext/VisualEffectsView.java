@@ -29,16 +29,30 @@ final class VisualEffectsView extends View {
         if(animate&&isShown())postInvalidateDelayed(40);
     }
     static final class EdgeDrawable extends Drawable {
-        private final Paint p=new Paint();private final int color;
+        private final Paint p=new Paint();private final int color;private int opacity=255;
         EdgeDrawable(int color){this.color=color;}
         @Override public void draw(Canvas c){
             Rect b=getBounds();float w=b.width(),h=b.height();if(w<=0||h<=0)return;
-            p.setShader(new LinearGradient(0,0,w*.14f,0,color,Color.TRANSPARENT,Shader.TileMode.CLAMP));c.drawRect(0,0,w*.14f,h,p);
-            p.setShader(new LinearGradient(w,0,w*.86f,0,color,Color.TRANSPARENT,Shader.TileMode.CLAMP));c.drawRect(w*.86f,0,w,h,p);p.setShader(null);
+            int tinted=(color&0x00ffffff)|((Color.alpha(color)*opacity/255)<<24);
+            p.setShader(new LinearGradient(0,0,w*.14f,0,tinted,Color.TRANSPARENT,Shader.TileMode.CLAMP));c.drawRect(0,0,w*.14f,h,p);
+            p.setShader(new LinearGradient(w,0,w*.86f,0,tinted,Color.TRANSPARENT,Shader.TileMode.CLAMP));c.drawRect(w*.86f,0,w,h,p);p.setShader(null);
         }
-        @Override public void setAlpha(int a){p.setAlpha(a);}
+        @Override public void setAlpha(int a){opacity=a;}
         @Override public void setColorFilter(ColorFilter f){p.setColorFilter(f);}
         @Override public int getOpacity(){return PixelFormat.TRANSLUCENT;}
+    }
+    static final class RouteLine extends View {
+        private final Paint p=new Paint(Paint.ANTI_ALIAS_FLAG);private final int stops,color;private final boolean animate;private long start;
+        RouteLine(Context c,int stops,int color,boolean animate){super(c);this.stops=Math.max(2,stops);this.color=color;this.animate=animate;setContentDescription("Схема маршрута");}
+        @Override protected void onDraw(Canvas c){
+            float left=12,right=getWidth()-12,y=getHeight()/2f;if(right<=left)return;
+            if(start==0)start=android.os.SystemClock.uptimeMillis();
+            float fraction=animate?Math.min(1f,(android.os.SystemClock.uptimeMillis()-start)/850f):1f;
+            p.setColor(0xff50585e);p.setStrokeWidth(3);c.drawLine(left,y,right,y,p);p.setColor(color);c.drawLine(left,y,left+(right-left)*fraction,y,p);
+            for(int i=0;i<stops;i++){float x=left+(right-left)*i/(stops-1);p.setColor(i/(float)(stops-1)<=fraction?color:0xff50585e);c.drawCircle(x,y,5,p);}
+            p.setColor(0xffe8d29c);c.drawCircle(left+(right-left)*fraction,y,8,p);
+            if(fraction<1&&isShown())postInvalidateOnAnimation();
+        }
     }
     static final class HeroSilhouette extends View {
         private final Paint p=new Paint(Paint.ANTI_ALIAS_FLAG);private final int color;

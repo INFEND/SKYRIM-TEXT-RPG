@@ -21,6 +21,11 @@ public final class RpgProgress {
     public final int[] skillLevels = new int[RpgContent.SKILLS.length];
     public final int[] skillXp = new int[RpgContent.SKILLS.length];
     private final int[] combatPerks=new int[6];
+    private final int[] studyPerks=new int[RpgContent.SKILLS.length];
+    public int talentRank(int skill){return skill<0||skill>=studyPerks.length?0:isCombatPerk(skill)?combatPerkRank(skill):studyPerks[skill];}
+    public int talentNeed(int skill,int rank){return isCombatPerk(skill)?Math.max(0,(rank-1)*20):rank*20;}
+    public boolean canBuyTalent(int skill){int rank=talentRank(skill);return skill>=0&&skill<studyPerks.length&&rank<5&&perkPoints>0&&skillLevel(skill)>=talentNeed(skill,rank+1);}
+    public boolean buyTalent(GameEngine g,int skill){if(!canBuyTalent(skill))return false;if(isCombatPerk(skill))return buyCombatPerk(skill);studyPerks[skill]++;perkPoints--;skillExperience(g,skill,70);return true;}
     private final LinkedHashMap<String,String> equipped=new LinkedHashMap<>();
     private boolean equipmentInitialized;
     // One improved exemplar per item ID until the inventory supports individual instances.
@@ -350,7 +355,7 @@ public final class RpgProgress {
              .put("skillXp",new JSONArray(skillXp)).put("inventory",inventory)
              .put("completed",new JSONArray(completed)).put("failed",new JSONArray(failed))
              .put("questOutcomes",new JSONObject(questOutcomes))
-             .put("perks",perkPoints).put("combatPerks",new JSONArray(combatPerks))
+             .put("perks",perkPoints).put("combatPerks",new JSONArray(combatPerks)).put("studyPerks",new JSONArray(studyPerks))
              .put("equipmentInitialized",equipmentInitialized).put("equipped",new JSONObject(equipped))
              .put("tempered",new JSONObject(tempered))
              .put("activePowerDay",activePowerDay).put("difficulty",difficulty)
@@ -408,6 +413,7 @@ public final class RpgProgress {
             p.quantity("Стальная кираса",Math.max(legacyArmor,p.quantity("Стальная кираса")));
             p.inventory.remove("Стальной кираса");
         }
+        JSONArray study=obj.optJSONArray("studyPerks");if(study!=null)for(int i=0;i<p.studyPerks.length;i++)if(!isCombatPerk(i))p.studyPerks[i]=Math.max(0,Math.min(5,study.optInt(i,0)));
         JSONArray perkRanks=obj.optJSONArray("combatPerks");
         if(perkRanks!=null)for(int i=0;i<p.combatPerks.length;i++)
             if(isCombatPerk(i))p.combatPerks[i]=Math.max(0,Math.min(5,perkRanks.optInt(i,0)));

@@ -94,6 +94,8 @@ public final class SceneState {
         JSONObject entry=collection(this,kind).get(id(key));
         return entry==null ? "" : entry.optString("status");
     }
+    public String npcStatusByName(String name){for(JSONObject npc:npcs.values())if(npc.optString("title").equalsIgnoreCase(name))return npc.optString("status");return "";}
+    public JSONArray npcFacts(){JSONArray result=new JSONArray();for(JSONObject npc:npcs.values())try{result.put(new JSONObject(npc.toString()));}catch(JSONException ignored){}return result;}
     /** Bounded, read-only context of facts confirmed by the engine. */
     public String confirmedContext() {
         StringBuilder out = new StringBuilder();

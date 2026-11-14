@@ -57,6 +57,22 @@ public final class GameEngine {
     public AiGameTurn aiTurn;
     public SceneState sceneState = new SceneState();
     public String aiJournal = "";
+    public int poisonTurns,frostTurns,battleTurns,battleDealt,battleTaken,lastDealt,lastTaken,lastHealing;
+    public final int[] holdReputation=new int[10];
+    public void resetBattleVisuals(){poisonTurns=frostTurns=battleTurns=battleDealt=battleTaken=lastDealt=lastTaken=lastHealing=0;}
+    public boolean canSell(ItemCatalog.Item item){
+        return started&&"SHOP".equals(mode)&&item!=null&&item.value>0&&progress.quantity(item.id)>0
+            &&!progress.equipped(item.id)&&!"Квестовые предметы".equals(item.category)&&!"Ключи".equals(item.category)
+            &&!"Септимы".equals(item.id)&&!"Лечебное зелье".equals(item.id)&&!"Зелье магии".equals(item.id)
+            &&!"Походный клинок".equals(item.id)&&!"Дорожная одежда".equals(item.id)
+            &&!(swordUpgraded&&"Стальной меч".equals(item.id))&&!(armorUpgraded&&"Стальная кираса".equals(item.id));
+    }
+    public int salePrice(ItemCatalog.Item item){return item==null||item.value<=0?0:Math.max(1,(int)((long)item.value*(30+progress.skillLevel(12)/5)/100));}
+    public boolean sellOne(String id){
+        ItemCatalog.Item item=ItemCatalog.find(id);if(!canSell(item))return false;
+        int price=salePrice(item);if((long)gold+price>Integer.MAX_VALUE||!progress.removeItem(id,1))return false;
+        gold+=price;progress.sync(this);message="Продано: "+item.name+" | +"+price+" септимов.";recordVisualEvent(message);return true;
+    }
     public final java.util.LinkedHashSet<String> visitedVisual=new java.util.LinkedHashSet<>();
     public org.json.JSONArray visualChronicle=new org.json.JSONArray();
     public void recordVisualEvent(String event){
@@ -114,7 +130,7 @@ public final class GameEngine {
         progress=RpgProgress.newHero(this,origin,points);
         String[] back=RpgContent.startParts(origin);
         region=Integer.parseInt(back[2]);
-        mode="INTRO";message="";visitedVisual.clear();visualChronicle=new org.json.JSONArray();visitedVisual.add(progress.location);
+        mode="INTRO";message="";resetBattleVisuals();java.util.Arrays.fill(holdReputation,0);visitedVisual.clear();visualChronicle=new org.json.JSONArray();visitedVisual.add(progress.location);
     }
 
     public Scene scene() {
@@ -410,7 +426,7 @@ public final class GameEngine {
         explored++;stamina=Math.max(0,stamina-5);
         int roll=random.nextInt(100);
         if(roll<49){
-            String[] enemies={"Лесной разбойник","Снежный волк","Изгой","Пещерный охотник","Наёмник с дороги"};
+            String[] enemies={"Лесной разбойник","Снежный волк","Изгой","Пещерный охотник","Наёмник с дороги","Морозный паук","Ледяной призрак"};
             String foe=enemies[(region+random.nextInt(enemies.length))%enemies.length];
             startBattle(foe,40+level*13+random.nextInt(20),6+level*3,"WILD","На тропе появляется враг. Отступать уже поздно.");
         } else if(roll<79) {
@@ -465,7 +481,7 @@ public final class GameEngine {
         else {message="Заказ активен. Побеждено противников: "+sideKills+"/3.";mode="RESULT";}
     }
     private void startBattle(String name,int health,int dmg,String kind,String intro) {
-        enemyName=name;enemyHp=health;enemyMaxHp=health;enemyDamage=dmg;battleKind=kind;enemyIntro=intro;
+        resetBattleVisuals();enemyName=name;enemyHp=health;enemyMaxHp=health;enemyDamage=dmg;battleKind=kind;enemyIntro=intro;
         battleLog="В бою важна тактика. Следи за запасом сил и магии.";mode="COMBAT";
     }
     // Retain class/quest/AI bonuses in old saves without counting the legacy
@@ -479,6 +495,7 @@ public final class GameEngine {
     }
     private void combatTurn(String action) {
         if(!mode.equals("COMBAT"))return;
+        lastDealt=lastTaken=lastHealing=0;
         int damage=0;boolean defending=false;String actionText="";
         switch(action){
             case "ATTACK": damage=Math.max(1,effectiveAttack()+random.nextInt(9)-3);actionText="Ты наносишь удар: −"+damage+" здоровья врагу.";break;
@@ -487,19 +504,26 @@ public final class GameEngine {
                 if(random.nextInt(100)<hitChance){damage=Math.max(1,effectiveAttack()*2+random.nextInt(9));actionText="Сильный удар! −"+damage+" здоровья врагу.";}else actionText="Сильный удар проходит мимо.";break;
             case "MAGIC":if(magicka<12){battleLog="Недостаточно магии. Нужны 12 единиц.";return;}magicka-=12;damage=18+level*4+random.nextInt(8);actionText="Магическая вспышка обжигает врага: −"+damage+".";break;
             case "DEFEND": defending=true;stamina=Math.min(maxStamina,stamina+12);magicka=Math.min(maxMagicka,magicka+5);actionText="Ты встаёшь в оборону, восстанавливая силы.";break;
-            case "POTION":if(potions==0){battleLog="Лечебных зелий больше нет.";return;}potions--;int restored=Math.min(45,maxHp-hp);hp+=restored;actionText="Ты восстанавливаешь "+restored+" здоровья.";break;
-            case "FLEE":if(battleKind.equals("WILD")&&random.nextInt(100)<progress.chance(this,"FLEE")){mode="RESULT";message="Ты уходишь от противника. Трофеев нет.";return;}actionText="Попытка отступить не удалась.";break;
+            case "POTION":if(potions==0){battleLog="Лечебных зелий больше нет.";return;}potions--;int restored=Math.min(45,maxHp-hp);hp+=restored;lastHealing=restored;actionText="Ты восстанавливаешь "+restored+" здоровья.";break;
+            case "FLEE":if(battleKind.equals("WILD")&&random.nextInt(100)<progress.chance(this,"FLEE")){mode="RESULT";poisonTurns=frostTurns=0;message="Ты уходишь от противника. Трофеев нет.";return;}actionText="Попытка отступить не удалась.";break;
             default:return;
         }
+        lastDealt=Math.min(enemyHp,damage);battleDealt+=lastDealt;battleTurns++;
         enemyHp=Math.max(0,enemyHp-damage);
-        if(enemyHp==0) {winBattle(actionText);return;}
+        if(enemyHp==0) {poisonTurns=frostTurns=0;winBattle(actionText);return;}
         int rawIncoming=Math.max(1,enemyDamage+random.nextInt(8)-Math.max(0,armor-(armorUpgraded?4:0))-(defending?enemyDamage/2+3:0));
         int incoming=Math.max(1,(int)Math.round(rawIncoming*(1-progress.damageReduction())));
-        hp=Math.max(0,hp-incoming);stamina=Math.min(maxStamina,stamina+3);
-        battleLog=actionText+"\n"+enemyName+" отвечает: −"+incoming+" здоровья.";
+        int poisoned=poisonTurns>0?Math.max(1,maxHp/40):0;
+        if(poisonTurns>0)poisonTurns--;if(frostTurns>0){frostTurns--;stamina=Math.max(0,stamina-4);}
+        String foe=enemyName.toLowerCase(java.util.Locale.ROOT);
+        if(!defending&&foe.contains("морозный паук"))poisonTurns=2;
+        if(!defending&&foe.contains("ледяной призрак"))frostTurns=2;
+        lastTaken=Math.min(hp,incoming+poisoned);battleTaken+=lastTaken;
+        hp=Math.max(0,hp-incoming-poisoned);stamina=Math.min(maxStamina,stamina+3);
+        battleLog=actionText+"\n"+enemyName+" отвечает: −"+incoming+" здоровья."+(poisoned>0?"\nЯд: −"+poisoned+" здоровья.":"")+(poisonTurns>0?"\nОтравление: "+poisonTurns+" хода.":"")+(frostTurns>0?"\nОбморожение: "+frostTurns+" хода.":"");
         if(hp==0) {
             int penalty=gold/3;gold-=penalty;hp=Math.max(1,maxHp/2);stamina=Math.max(1,maxStamina/2);
-            mode="DEFEAT";message="Ты приходишь в себя у дороги. Прохожие спасли тебя, но потеряно "+penalty+" септимов. Теперь можно подготовиться и вернуться.";
+            poisonTurns=frostTurns=0;mode="DEFEAT";message="Ты приходишь в себя у дороги. Прохожие спасли тебя, но потеряно "+penalty+" септимов. Теперь можно подготовиться и вернуться.";
         }
     }
     private void winBattle(String lastHit) {
@@ -555,7 +579,8 @@ public final class GameEngine {
          .put("enemyHp",enemyHp).put("enemyMaxHp",enemyMaxHp).put("enemyDamage",enemyDamage).put("progress",progress.toJson())
          .put("aiJournal",aiJournal).put("aiTurn",aiTurn==null?JSONObject.NULL:aiTurn.save())
          .put("sceneState",sceneState.toJson())
-         .put("visitedVisual",new org.json.JSONArray(visitedVisual)).put("visualChronicle",visualChronicle);
+         .put("visitedVisual",new org.json.JSONArray(visitedVisual)).put("visualChronicle",visualChronicle)
+         .put("holdReputation",new org.json.JSONArray(holdReputation)).put("poisonTurns",poisonTurns).put("frostTurns",frostTurns).put("battleTurns",battleTurns).put("battleDealt",battleDealt).put("battleTaken",battleTaken);
         return j;
     }
     public static GameEngine fromJson(String json) {
@@ -584,6 +609,9 @@ public final class GameEngine {
             g.battleKind=j.optString("battleKind","");g.enemyIntro=j.optString("enemyIntro","");
             g.enemyHp=Math.max(0,j.optInt("enemyHp",0));g.enemyMaxHp=Math.max(0,j.optInt("enemyMaxHp",0));g.enemyDamage=Math.max(0,j.optInt("enemyDamage",0));
             g.progress=RpgProgress.fromJson(j.optJSONObject("progress"));
+            org.json.JSONArray holds=j.optJSONArray("holdReputation");if(holds!=null)for(int i=0;i<g.holdReputation.length;i++)g.holdReputation[i]=Math.max(-100,Math.min(100,holds.optInt(i,0)));
+            if("COMBAT".equals(g.mode)){g.poisonTurns=Math.max(0,Math.min(2,j.optInt("poisonTurns")));g.frostTurns=Math.max(0,Math.min(2,j.optInt("frostTurns")));}
+            g.battleTurns=Math.max(0,j.optInt("battleTurns"));g.battleDealt=Math.max(0,j.optInt("battleDealt"));g.battleTaken=Math.max(0,j.optInt("battleTaken"));
             org.json.JSONArray visited=j.optJSONArray("visitedVisual");
             if(visited!=null)for(int i=0;i<Math.min(visited.length(),2000);i++){String v=visited.optString(i);if(!v.isEmpty())g.visitedVisual.add(v);}
             if(g.started)g.visitedVisual.add(g.progress.location);

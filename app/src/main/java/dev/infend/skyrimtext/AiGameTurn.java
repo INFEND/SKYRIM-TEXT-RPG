@@ -282,6 +282,8 @@ public final class AiGameTurn {
             g.progress.quantity(name,g.progress.quantity(name)+inventoryChanges.get(name));
         if(enemy!=null){
             int health=cap(enemy.optInt("hp",0),0,50000);
+            if(health>0&&(!"COMBAT".equals(g.mode)||g.enemyHp<=0))g.resetBattleVisuals();
+            if(health<=0){g.poisonTurns=g.frostTurns=0;}
             g.enemyName=health>0?limited(enemy.optString("name",""),70):"";g.enemyHp=health;
             g.enemyMaxHp=health>0?requiredEnemyInt(enemy,"maxHp",health,50000):0;
             g.enemyDamage=health>0?requiredEnemyInt(enemy,"damage",0,1000):0;
