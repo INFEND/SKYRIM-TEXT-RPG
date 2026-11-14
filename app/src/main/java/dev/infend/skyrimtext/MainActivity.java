@@ -114,6 +114,7 @@ public final class MainActivity extends Activity {
         localAiClient=new LocalAiClient(this);
         chatGptOAuth=new ChatGptOAuth(this);
         ResourceStore.start(this);
+        new Thread(()->{CanonicalCampaign.loadLocal(getApplicationContext());runOnUiThread(()->{if(!isDestroyed()&&!titleOpen&&tab==0&&"CANON".equals(game.mode))render();});},"canonical-dialogues").start();
         ItemCatalog.initialize(this);
         SovngardeTypeface.preload(this);
         game=GameEngine.fromJson(prefs.getString("save",null));
@@ -1135,7 +1136,10 @@ public final class MainActivity extends Activity {
             if(!game.started){toast("Сохранённого героя пока нет");return;}
             titleOpen=false;tab=0;render();
         });
-        titleButton("Сюжет Skyrim",false,this::openStoryPack);
+        titleButton("Главная история",false,()->{
+            if(game.started){game.choose("CANON_OPEN");titleOpen=false;tab=0;save();render();}
+            else{selectedStart=0;titleOpen=false;tab=0;render();}
+        });
         titleButton("Настройки",false,()->{titleOpen=false;tab=5;render();});
         titleButton("О игре",false,()->new RuneDialogBuilder(this,accent())
             .setTitle("СКАЙРИМ | ТЕКСТОВАЯ RPG")
@@ -1222,6 +1226,7 @@ public final class MainActivity extends Activity {
             if(n!=5){toast("Распредели все 5 свободных очков");return;}
             newAiSession();game.start(nameField.getText().toString(),selectedRace,selectedClass,selectedStart,
                 initialPoints,selectedGender,selectedPortrait);
+            if(selectedStart==0)game.choose("CANON_OPEN");
             tab=0;save();render();
         });
         addText(content,"Неофициальная самостоятельная история в знакомом северном мире.",12,MUTED,false,0);
@@ -1301,8 +1306,8 @@ public final class MainActivity extends Activity {
         }
     }
     private void renderStory(){
-        actionButton("Сюжет Skyrim","Отдельная сюжетная история из импортированной базы",false,this::openStoryPack);
-        if(prefs.getBoolean("ai_enabled",false)){renderAiGame();return;}
+        boolean canonical="CANON".equals(game.mode)||("COMBAT".equals(game.mode)&&"CANONICAL".equals(game.battleKind));
+        if(prefs.getBoolean("ai_enabled",false)&&!canonical){renderAiGame();return;}
         GameEngine.Scene s=game.scene();section(s.kicker,s.title,"");
         if(LocationGalleryView.hasGallery(game.progress.location)){
             addText(content,"ᛟ  ВИДЫ ЛОКАЦИИ",11,accent(),true,9);
@@ -1469,10 +1474,11 @@ public final class MainActivity extends Activity {
 
     private void renderStoryJournal(){
         if(!game.started)return;
-        if(!"QUEST".equals(game.mode)&&!"DRAGON".equals(game.mode)
+        if(!"CANON".equals(game.mode)&&!"QUEST".equals(game.mode)&&!"DRAGON".equals(game.mode)
             &&!"EVENT".equals(game.mode)&&!"RESULT".equals(game.mode))return;
         LinearLayout journal=card();
         addText(journal,"ᚱ  ЖУРНАЛ ПРИКЛЮЧЕНИЙ",11,accent(),true,10);
+        if(game.canonicalStage>0)addText(journal,"◉  Путь Довакина | "+CanonicalCampaign.objective(game),13,TEXT,false,7);
         if(game.questStage>0&&game.questStage<4)
             addText(journal,"◉  Пепельные печати | "+game.questStatus(),13,TEXT,false,7);
         if(game.progress.dragonStage>=0&&game.progress.dragonStage<DragonArc.FINAL_STAGE)
@@ -3384,8 +3390,8 @@ public final class MainActivity extends Activity {
         section("ЛЕТОПИСЬ СЕВЕРА","Журнал","Выбирай задание, чтобы увидеть описание и текущую цель.");
         renderChronicle();
         String[] entries=game.aiJournal.isEmpty()?
-            new String[]{"Драконий след","Пепельные печати","Опасные дороги"}:
-            new String[]{"Драконий след","Пепельные печати","Опасные дороги","Задание ИИ"};
+            new String[]{"Путь Довакина","Драконий след","Пепельные печати","Опасные дороги"}:
+            new String[]{"Путь Довакина","Драконий след","Пепельные печати","Опасные дороги","Задание ИИ"};
         boolean present=false;for(String e:entries)if(e.equals(selectedJournalEntry))present=true;
         if(!present)selectedJournalEntry=entries[0];
         LinearLayout list=card();
@@ -3403,7 +3409,10 @@ public final class MainActivity extends Activity {
         }
         LinearLayout focus=card();
         String objective="",description="",title=selectedJournalEntry;
-        if("Драконий след".equals(title)){
+        if("Путь Довакина".equals(title)){
+            description="Главная кампания от Хелгена до Совнгарда. Изученные Крики: "+CanonicalCampaign.shouts(game);
+            objective=CanonicalCampaign.objective(game);
+        }else if("Драконий след".equals(title)){
             description="Свидетельства о возвращении драконов ведут тебя от южных поселений к северным горам. Каждая глава открывает новые тайны.";
             objective=DragonArc.status(game);
             if(game.progress.dragonStage>=DragonArc.FINAL_STAGE)
@@ -3422,7 +3431,9 @@ public final class MainActivity extends Activity {
         TextView target=text("ЦЕЛИ",15,accent(),true);
         target.setGravity(Gravity.CENTER);focus.addView(target,lp(-1,35));
         addText(focus,"◇  "+objective,15,TEXT,false,11);
-        if("Драконий след".equals(title)){
+        if("Путь Довакина".equals(title)){
+            actionButton("Продолжить главную историю","Перейти к текущему заданию",true,()->{game.choose("CANON_OPEN");save();tab=0;render();});
+        }else if("Драконий след".equals(title)){
             actionButton("Продолжить историю","Следующее доступное сюжетное решение",true,()->{
                 game.mode="DRAGON";save();tab=0;render();
             });
@@ -3439,6 +3450,7 @@ public final class MainActivity extends Activity {
         }
         LinearLayout completed=card();
         addText(completed,"ЗАВЕРШЁННЫЕ ЗАДАНИЯ",12,accent(),true,9);
+        for(int i=1;i<game.canonicalStage&&i<=CanonicalCampaign.COUNT;i++)addText(completed,"◇ "+CanonicalCampaign.title(i),14,TEXT,false,6);
         if(game.progress.dragonStage>=DragonArc.FINAL_STAGE)
             addText(completed,"◇ Драконий след | первое испытание",14,TEXT,false,7);
         if(game.progress.dragonStage>=DragonArc.FINAL_STAGE){

@@ -239,6 +239,7 @@ public final class RpgProgress {
     }
     public int chance(GameEngine g,String action){
         if(action==null)return -1;
+        if(action.startsWith("CANON:"))return CanonicalCampaign.chance(g,action);
         if(action.startsWith("DRAGON_NEXT:"))return DragonContinuation.chance(g,action);
         if(action.startsWith("DRAGON:"))return DragonArc.chance(g,action);
         if(action.matches("ACT:[0-9]")){

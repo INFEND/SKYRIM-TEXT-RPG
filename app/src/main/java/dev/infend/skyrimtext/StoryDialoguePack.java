@@ -14,11 +14,11 @@ public final class StoryDialoguePack {
     public static final int MAX_BYTES=4*1024*1024;
     public static final int PAGE_SIZE=8;
     public static final class Line {
-        public final int id;
+        public final int id,sourceLine;
         public final String speaker, text;
         public final boolean uncertain;
-        Line(int id,String speaker,String text,boolean uncertain){
-            this.id=id;this.speaker=speaker;this.text=text;this.uncertain=uncertain;
+        Line(int id,int sourceLine,String speaker,String text,boolean uncertain){
+            this.id=id;this.sourceLine=sourceLine;this.speaker=speaker;this.text=text;this.uncertain=uncertain;
         }
     }
     public static final class Chapter {
@@ -71,10 +71,10 @@ public final class StoryDialoguePack {
                 if(turns.length()>32)throw new JSONException("Слишком много реплик в записи");
                 for(int j=0;j<turns.length();j++){
                     JSONObject u=turns.getJSONObject(j);
-                    c.lines.add(new Line(id,required(u,"speaker",250),required(u,"text",8192),review));
+                    c.lines.add(new Line(id,s.optInt("line_start",0),required(u,"speaker",250),required(u,"text",8192),review));
                 }
             }else{
-                c.lines.add(new Line(id,required(s,"speaker",250),required(s,"reading_text",8192),review));
+                c.lines.add(new Line(id,s.optInt("line_start",0),required(s,"speaker",250),required(s,"reading_text",8192),review));
             }
             count++;if(review)uncertain++;
         }
