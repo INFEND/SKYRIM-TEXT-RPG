@@ -81,14 +81,25 @@ public final class GameEngine {
     }
     public final java.util.LinkedHashSet<String> visitedVisual=new java.util.LinkedHashSet<>();
     public org.json.JSONArray visualChronicle=new org.json.JSONArray();
-    public void recordVisualEvent(String event){
+    public void recordVisualEvent(String event){recordVisualEvent(event,null);}
+    public void recordVisualEvent(String event,JSONObject details){
         if(event==null||event.trim().isEmpty())return;
         String value=event.trim();if(value.length()>360)value=value.substring(0,360);
-        try{org.json.JSONObject entry=new org.json.JSONObject().put("day",day).put("location",progress.location).put("event",value);
+        try{org.json.JSONObject entry=new org.json.JSONObject().put("day",day).put("hour",hour).put("location",progress.location).put("event",value);
+            if(details!=null)entry.put("details",details);
             org.json.JSONObject last=visualChronicle.optJSONObject(visualChronicle.length()-1);
             if(last!=null&&last.toString().equals(entry.toString()))return;
             if(visualChronicle.length()>=80)visualChronicle.remove(0);visualChronicle.put(entry);
         }catch(org.json.JSONException ignored){}
+    }
+    public java.util.List<String> latestVisualRoute(){
+        for(int i=visualChronicle.length()-1;i>=0;i--){
+            JSONObject entry=visualChronicle.optJSONObject(i);JSONObject d=entry==null?null:entry.optJSONObject("details");
+            org.json.JSONArray a=d==null?null:d.optJSONArray("route");if(a==null||a.length()<2)continue;
+            java.util.ArrayList<String> out=new java.util.ArrayList<>();
+            for(int j=0;j<Math.min(32,a.length());j++){String name=a.optString(j);if(!name.isEmpty())out.add(name);}
+            if(out.size()>=2)return out;
+        }return java.util.Collections.emptyList();
     }
     private final Random random = new Random();
 

@@ -530,7 +530,15 @@ public final class MainActivity extends Activity {
         String event=moved?travelVisual:!victoryVisual.isEmpty()?("Победа: "+before.enemy):
             "DEFEAT".equals(after.mode)?"Поражение":after.mode.equals("COMBAT")?after.battleLog:after.message;
         if(event==null||event.trim().isEmpty())event=action;
-        after.recordVisualEvent(event);
+        try{
+            JSONObject detail=new JSONObject().put("choice",action==null?"":action).put("from",before.location)
+                .put("goldDelta",(long)after.gold-before.gold).put("hpDelta",after.hp-before.hp)
+                .put("reputationDelta",delta).put("days",Math.max(0,after.day-before.day));
+            long xpDelta=(long)after.xp-before.xp;for(int l=before.level;l<after.level;l++)xpDelta+=l*80L;
+            detail.put("xpDelta",xpDelta).put("levelDelta",after.level-before.level);
+            if(moved&&!before.stops.isEmpty()&&after.progress.location.equals(before.stops.get(before.stops.size()-1)))detail.put("route",new org.json.JSONArray(before.stops));
+            after.recordVisualEvent(event,detail);
+        }catch(org.json.JSONException ignored){after.recordVisualEvent(event);}
     }
     private void renderVisualResults(){
         if(visual("damage")&&!combatLabels.isEmpty()){
@@ -587,7 +595,7 @@ public final class MainActivity extends Activity {
     private void routePreview(LinearLayout host,TravelPlanner.Route route){
         if(!visual("travel")||!route.allowed||route.days==0)return;
         addText(host,"МАРШРУТ | "+route.days+" дн. | "+route.fare+" септимов",12,ITEM_GOLD,true,9);
-        if(route.stops.size()>1)host.addView(new VisualEffectsView.RouteLine(this,route.stops.size(),accent(),false),lp(-1,34));
+        if(route.stops.size()>1){host.addView(new VisualEffectsView.RouteLine(this,route.stops.size(),accent(),false),lp(-1,34));visualSummaryLink(host,"МАРШРУТ НА КАРТЕ",()->showRouteMap(route.stops));}
         for(int i=0;i<route.stops.size();i++){
             LinearLayout line=row();line.addView(new SkyrimIconView(this,"map",accent()),lp(23,25));
             addText(line,(i==0?"Отправление: ":i==route.stops.size()-1?"Прибытие: ":"Переход: ")+route.stops.get(i),13,TEXT,false,0);
@@ -614,11 +622,45 @@ public final class MainActivity extends Activity {
             String event=entry.optString("event");int kind=chronicleKind(event);if(chronicleFilter!=0&&kind!=chronicleFilter)continue;
             LinearLayout line=row();line.addView(new SkyrimIconView(this,kind==1?"map":kind==2?"weapon":kind==3?"gold":"journal",accent()),lp(26,29));
             LinearLayout details=column();line.addView(details,new LinearLayout.LayoutParams(0,-2,1));
-            addText(details,labels[kind]+" | День "+entry.optInt("day")+" | "+entry.optString("location"),12,ITEM_GOLD,true,4);addText(details,event,14,TEXT,false,11);c.addView(line,lp(-1,-2));shown++;
+            addText(details,labels[kind]+" | День "+entry.optInt("day")+" | "+entry.optString("location"),12,ITEM_GOLD,true,4);addText(details,event,14,TEXT,false,5);addText(details,"Подробнее  ›",11,accent(),true,9);line.setOnClickListener(view->chronicleDetails(entry));c.addView(line,lp(-1,-2));shown++;
         }
         if(shown==0)addText(c,"В этой категории пока нет событий.",13,MUTED,false,0);
     }
 
+    private void chronicleDetails(JSONObject entry){
+        String location=entry.optString("location");
+        LinearLayout panel=column();panel.setPadding(dp(12),dp(10),dp(12),dp(14));
+        if(LocationGalleryView.hasGallery(location))panel.addView(new LocationGalleryView(this,location,accent(),false),lp(-1,-2));
+        addText(panel,"День "+entry.optInt("day")+(entry.has("hour")?String.format(java.util.Locale.ROOT," | %02d:00",entry.optInt("hour")):"")+" | "+location,13,ITEM_GOLD,true,9);
+        addText(panel,entry.optString("event"),16,TEXT,false,12);
+        JSONObject d=entry.optJSONObject("details");
+        if(d!=null){
+            String choice=d.optString("choice");if(!choice.isEmpty())addText(panel,"Решение: "+choice,14,accent(),true,8);
+            addText(panel,"ПОДТВЕРЖДЁННЫЕ ИЗМЕНЕНИЯ",11,accent(),true,7);
+            String[][] values={{"goldDelta","Септимы"},{"xpDelta","Опыт"},{"hpDelta","Здоровье"},{"levelDelta","Уровень"},{"reputationDelta","Репутация"},{"days","Дни"}};
+            boolean any=false;for(String[] pair:values){long change=d.optLong(pair[0]);if(change!=0){addText(panel,pair[1]+": "+(change>0?"+":"")+change,14,TEXT,false,6);any=true;}}
+            if(!any)addText(panel,"Числовых изменений не зарегистрировано.",12,MUTED,false,5);
+            org.json.JSONArray route=d.optJSONArray("route");if(route!=null&&route.length()>1){
+                java.util.ArrayList<String> stops=new java.util.ArrayList<>();for(int i=0;i<Math.min(32,route.length());i++)stops.add(route.optString(i));
+                addText(panel,String.join(" → ",stops),12,MUTED,false,8);
+                if(visual("travel"))visualSummaryLink(panel,"ПОКАЗАТЬ МАРШРУТ",()->showRouteMap(stops));
+            }
+        }
+        ScrollView scroller=new ScrollView(this);scroller.addView(panel);
+        new RuneDialogBuilder(this,accent()).setTitle("Хроника приключений").setView(scroller).setNegativeButton("Закрыть",null).show();
+    }
+    private void showRouteMap(java.util.List<String> stops){
+        if(stops.size()<2)return;
+        android.app.Dialog dialog=new android.app.Dialog(this);dialog.requestWindowFeature(android.view.Window.FEATURE_NO_TITLE);
+        LinearLayout layout=column();layout.setBackgroundColor(0xff080a0b);layout.setPadding(dp(8),dp(8),dp(8),dp(8));
+        addText(layout,"МАРШРУТ НА КАРТЕ",16,accent(),true,7);
+        SkyrimTerrainMapView terrain=new SkyrimTerrainMapView(this,game,place->{},hiddenMapTypes);
+        terrain.setVisualRoute(stops,animations);terrain.setMapRegion(-1);SkyrimMapCatalog.Site first=SkyrimMapCatalog.find(stops.get(0));if(first!=null)terrain.setSheet(first.sheet);
+        LinearLayout sheets=row();layout.addView(sheets,lp(-1,46));mapControl(sheets,"Скайрим",()->{terrain.setSheet(0);terrain.showWholeProvince();});mapControl(sheets,"Солстейм",()->{terrain.setSheet(1);terrain.showWholeProvince();});
+        layout.addView(terrain,new LinearLayout.LayoutParams(-1,0,1));terrain.post(terrain::showWholeProvince);
+        addText(layout,"Схема игровой сети переходов; морская переправа показана на отдельных листах.",11,MUTED,false,8);
+        visualSummaryLink(layout,"ЗАКРЫТЬ",dialog::dismiss);dialog.setContentView(layout);dialog.show();android.view.Window window=dialog.getWindow();if(window!=null)window.setLayout(-1,-1);
+    }
     private void reputationPanel(){
         if(!visual("reputation"))return;
         LinearLayout c=card();addText(c,"РЕПУТАЦИЯ И ОТНОШЕНИЯ",12,accent(),true,10);
@@ -2283,6 +2325,7 @@ public final class MainActivity extends Activity {
         activeTerrainMap=terrainMap;
         terrainMap.setMapRegion(selectedMapRegion);
         terrainMap.setOnCatalog(this::atlasSitesDialog);
+        if(visual("travel"))terrainMap.setVisualRoute(game.latestVisualRoute(),animations);
         LinearLayout sheets=row();overview.addView(sheets,lp(-1,47));
         mapControl(sheets,"Скайрим",()->{terrainMap.setMapRegion(-1);terrainMap.setSheet(0);});
         mapControl(sheets,"Солстейм",()->{terrainMap.setMapRegion(-1);terrainMap.setSheet(1);});
@@ -2386,6 +2429,7 @@ public final class MainActivity extends Activity {
         SkyrimTerrainMapView map=new SkyrimTerrainMapView(
             this,game,this::locationDialog,hiddenMapTypes);
         map.setOnCatalog(this::atlasSitesDialog);
+        if(visual("travel"))map.setVisualRoute(game.latestVisualRoute(),animations);
         map.setMapRegion(selectedMapRegion);
         scene.addView(map,new FrameLayout.LayoutParams(-1,-1));
         LinearLayout sheets=row();

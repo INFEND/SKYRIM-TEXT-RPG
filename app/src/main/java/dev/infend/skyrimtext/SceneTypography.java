@@ -80,8 +80,9 @@ public final class SceneTypography {
             boolean quoted=line.startsWith(">");
             if(quoted)line=line.substring(1).trim(); // Old saves, no QuoteSpan.
             String plain=line.replace("**","").trim();
+            boolean thought=plain.startsWith("[Мысли]"),event=plain.startsWith("[Событие]"),action=plain.startsWith("[Действие]");
             boolean spoken=quoted||plain.startsWith("— ")||plain.startsWith("- ");
-            boolean speaker=!spoken&&plain.endsWith(":")&&plain.length()>1
+            boolean speaker=!spoken&&!thought&&!event&&!action&&plain.endsWith(":")&&plain.length()>1
                 &&plain.length()<62&&plain.indexOf('.')<0;
             boolean heroSpeaker=speaker&&plain.matches("(?iu)ты\\s*:")
                 &&heroName!=null&&!heroName.trim().isEmpty();
@@ -101,7 +102,10 @@ public final class SceneTypography {
                 if(spoken&&!lines[i+1].trim().isEmpty())result.append("\n");
             }
             if(end<=start)continue;
-            if(spoken){
+            if(thought||event||action){
+                result.setSpan(new StyleSpan(thought?Typeface.ITALIC:Typeface.BOLD),start,end,Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                result.setSpan(new ForegroundColorSpan(thought?0xffaab8ca:event?0xffdbc18b:accent),start,end,Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            }else if(spoken){
                 result.setSpan(new StyleSpan(Typeface.BOLD),start,end,Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
                 result.setSpan(new ForegroundColorSpan(0xfff0f0ef),start,end,Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
             }else if(speaker){

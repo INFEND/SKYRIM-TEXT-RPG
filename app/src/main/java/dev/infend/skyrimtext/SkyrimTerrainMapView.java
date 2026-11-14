@@ -49,6 +49,8 @@ public final class SkyrimTerrainMapView extends View {
     private volatile boolean loading,failed;
     private final float density;
     private final ArrayList<RectF> labels=new ArrayList<>();
+    private java.util.List<String> visualRoute=java.util.Collections.emptyList();
+    private long routeStart;private boolean animateRoute;
 
     public SkyrimTerrainMapView(Context context,GameEngine game,OnPlace callback,Set<String> hiddenTypes){
         super(context);this.game=game;this.callback=callback;
@@ -96,6 +98,28 @@ public final class SkyrimTerrainMapView extends View {
             }
         });
         loadTerrain();
+    }
+    public void setVisualRoute(java.util.List<String> route,boolean animate){
+        visualRoute=route==null?java.util.Collections.emptyList():new ArrayList<>(route);
+        animateRoute=animate;routeStart=android.os.SystemClock.uptimeMillis();invalidate();
+    }
+    private void drawVisualRoute(Canvas canvas){
+        if(!prefs.getBoolean("visual_travel",true)||visualRoute.size()<2)return;
+        float progress=animateRoute?Math.min(1f,(android.os.SystemClock.uptimeMillis()-routeStart)/1100f):1f;
+        float step=progress*(visualRoute.size()-1);ink.setStyle(Paint.Style.FILL);
+        for(int i=1;i<visualRoute.size();i++){
+            SkyrimMapCatalog.Site a=SkyrimMapCatalog.find(visualRoute.get(i-1)),b=SkyrimMapCatalog.find(visualRoute.get(i));
+            if(a==null||b==null||a.sheet!=sheet||b.sheet!=sheet)continue;
+            float x=left+a.x*scale,y=top+a.y*scale,ex=left+b.x*scale,ey=top+b.y*scale;
+            ink.setColor(0xaa101213);ink.setStrokeWidth(5*density);canvas.drawLine(x,y,ex,ey,ink);
+            float f=Math.max(0,Math.min(1,step-(i-1)));ink.setColor(0xffd8b66d);ink.setStrokeWidth(2.4f*density);
+            if(f>0)canvas.drawLine(x,y,x+(ex-x)*f,y+(ey-y)*f,ink);
+        }
+        for(int i=0;i<visualRoute.size();i++){
+            SkyrimMapCatalog.Site site=SkyrimMapCatalog.find(visualRoute.get(i));if(site==null||site.sheet!=sheet)continue;
+            ink.setColor(i<=step?0xffefd18f:0xff6e624a);canvas.drawCircle(left+site.x*scale,top+site.y*scale,4*density,ink);
+        }
+        if(progress<1&&isShown())postInvalidateOnAnimation();
     }
     private void loadTerrain(){
         final int requested=sheet;
@@ -269,6 +293,7 @@ public final class SkyrimTerrainMapView extends View {
                     if(r>0){ink.setShader(new android.graphics.RadialGradient(x,y,r,new int[]{0x00000000,0x00000000,0x66000000},new float[]{0f,.72f,1f},android.graphics.Shader.TileMode.CLAMP));canvas.drawCircle(x,y,r,ink);ink.setShader(null);}
                 }}canvas.restoreToCount(feather);
         }
+        drawVisualRoute(canvas);
         ArrayList<MapPinLayout.Pin> shown=renderedPins();labels.clear();
         // Markers never collapse into moving numeric clusters: each icon has
         // one immutable location ID and world coordinate. Size changes only
