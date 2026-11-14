@@ -50,6 +50,7 @@ payload = {
     "apkUrl": f"{base}v{version}/SKYRIM-TEXT-RPG.apk",
     "sha256": digest,
     "sizeBytes": apk.stat().st_size,
+    "coreOnly": True,
     "notes": current["notes"],
     "history": history,
     "publishedAt": datetime.datetime.now(datetime.timezone.utc).isoformat(),
@@ -57,14 +58,9 @@ payload = {
 dist = ROOT / "dist"
 dist.mkdir(exist_ok=True)
 thin = dist / "SKYRIM-TEXT-RPG-thin.apk"
-if thin.is_file():
-    if not 0 < thin.stat().st_size < apk.stat().st_size:
-        raise ValueError("Thin APK must be smaller than full")
-    payload["thinApk"] = {
-        "url": f"{base}v{version}/SKYRIM-TEXT-RPG-thin.apk",
-        "sha256": hashlib.sha256(thin.read_bytes()).hexdigest(),
-        "sizeBytes": thin.stat().st_size,
-    }
+if not thin.is_file() or hashlib.sha256(thin.read_bytes()).hexdigest()!=digest:
+    raise ValueError("Canonical APK and thin alias must be identical")
+# Legacy clients read apkUrl; it now points to the lightweight APK.
 (dist / "update.json").write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 (dist / "release_notes.md").write_text(current["notes"], encoding="utf-8")
 print(f"OTA v{version}, code {code}, hash {digest}, history entries {len(history)}")

@@ -678,6 +678,10 @@ public final class MainActivity extends Activity {
         }
         updatePortraitChoices(choices);
         addText(content,"Выбери один из трёх образов. Он будет отображаться в личном деле.",12,MUTED,false,15);
+        String portraitGroup=ResourceStore.portraitGroup(CharacterIdentity.portraitPath(selectedRace,selectedGender,1));
+        if(ResourceStore.groupMissing(this,portraitGroup))
+            actionButton("Загрузить портреты","Отдельный пакет выбранной расы | выбор образа доступен и без фото",false,
+                ()->new ResourceManagerDialog(this,accent(),this::render,portraitGroup).show());
     }
     private void updatePortraitChoices(LinearLayout choices){
         for(int i=0;i<choices.getChildCount();i++){
@@ -2312,6 +2316,10 @@ public final class MainActivity extends Activity {
         CharacterPortraitView portrait=new CharacterPortraitView(this,game.race,game.gender,game.portrait);
         LinearLayout.LayoutParams portraitParams=lp(150,-2);portraitParams.gravity=Gravity.CENTER_HORIZONTAL;
         content.addView(portrait,portraitParams);space(content,12);
+        String portraitPath=CharacterIdentity.portraitPath(game.race,game.gender,game.portrait);
+        if(!ResourceStore.has(this,portraitPath))
+            actionButton("Загрузить портрет героя","Изображения хранятся отдельно от приложения",false,
+                ()->new ResourceManagerDialog(this,accent(),this::render,ResourceStore.portraitGroup(portraitPath)).show());
         if(!prefs.getBoolean("ai_enabled",false))
             actionButton("Ожидать","Выбрать от 1 до 24 часов отдыха",false,this::showWaitDialog);
         LinearLayout c=card();addText(c,"ХАРАКТЕРИСТИКИ",11,accent(),true,9);

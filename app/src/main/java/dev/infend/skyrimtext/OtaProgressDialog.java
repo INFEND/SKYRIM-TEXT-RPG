@@ -323,7 +323,7 @@ public final class OtaProgressDialog {
         primary.setVisibility(View.GONE);secondary.setText("ЗАКРЫТЬ");
     }
     public void downloadSize(long size,boolean thin){
-        if(size>0)details.setText((thin?"Облегчённое обновление":"Полное обновление")+" | "+
+        if(size>0)details.setText((thin?"Облегчённое обновление":"Обновление")+" | "+
             String.format(java.util.Locale.ROOT,"%.1f МиБ",size/1048576.0));
     }
     public void offer(String version,Runnable install){offer(version,"",install);}

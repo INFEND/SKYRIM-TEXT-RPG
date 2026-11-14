@@ -58,24 +58,27 @@ public final class UpdateManager {
         private final String thinUrl,thinHash;
         private final long thinSize;
         private final Release fullRelease;
+        private final boolean coreOnly;
         private final String rawManifest;
         String manifestJson(){return rawManifest;}
         static Release restore(String json,boolean thin)throws Exception{
             Release full=new Release(new JSONObject(json));
+            if(full.coreOnly)return full;
             if(thin){if(full.thinUrl.isEmpty())throw new IOException("Нет облегчённого пакета");return new Release(full);}
             return full;
         }
-        public boolean isThin(){return fullRelease!=null;}
+        public boolean isThin(){return coreOnly||fullRelease!=null;}
         public Release fullVersion(){return fullRelease==null?this:fullRelease;}
-        Release preferThin(Context context){
-            if(thinUrl.isEmpty()||!ResourceStore.canUseThin(context))return this;
+        Release preferThin(Context context)throws IOException{
+            if(coreOnly)return this;
+            if(thinUrl.isEmpty())throw new IOException("Облегчённый пакет не опубликован. Повторите проверку позже.");
             return new Release(this);
         }
         private Release(Release full){
             versionCode=full.versionCode;versionName=full.versionName;notes=full.notes;
             packageName=full.packageName;history=full.history;
             apkUrl=full.thinUrl;sha256=full.thinHash;sizeBytes=full.thinSize;
-            thinUrl="";thinHash="";thinSize=-1;fullRelease=full;rawManifest=full.rawManifest;
+            thinUrl="";thinHash="";thinSize=-1;fullRelease=full;rawManifest=full.rawManifest;coreOnly=false;
         }
         public String notesFor(long installedVersionCode){
             return OtaHistory.merge(history,installedVersionCode,versionCode,notes);
@@ -125,7 +128,7 @@ public final class UpdateManager {
             boolean usable=OtaUrlPolicy.trustedThinApk(url,versionName)&&
                 hash.matches("[0-9a-f]{64}")&&size>0&&sizeBytes>size&&size<=MAX_APK;
             thinUrl=usable?url:"";thinHash=usable?hash:"";thinSize=usable?size:-1;
-            fullRelease=null;rawManifest=j.toString();
+            fullRelease=null;rawManifest=j.toString();coreOnly=j.optBoolean("coreOnly",false);
         }
     }
     private static void checkHttps(String url)throws IOException{

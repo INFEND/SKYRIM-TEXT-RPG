@@ -34,7 +34,7 @@ final class ResourceStore {
         Entry(JSONObject j,String commit)throws Exception{
             path=j.getString("path");group=j.getString("group");label=j.getString("label");
             sha=j.getString("sha256");size=j.getLong("size");
-            if(!path.matches("(gallery/[a-z_]+\\.zip|maps/[a-z_]+\\.webp|icons/skyrim_icons_358_exact\\.(webp|json))")
+            if(!path.matches("(gallery/[a-z0-9_-]+\\.zip|maps/[a-z0-9_-]+\\.webp|icons/skyrim_icons_358_exact\\.(webp|json)|portraits/[a-z]+_(male|female)_[1-3]\\.webp|media/[a-z0-9_-]+/[a-z0-9_-]+\\.(webp|png|jpg|jpeg|zip|ogg|mp3|mp4|json))")
                 ||!sha.matches("[0-9a-f]{64}")||size<=0||size>100_000_000L)
                 throw new IOException("Некорректный каталог ресурсов");
             url=BASE+commit+"/app/src/main/assets/"+path;
@@ -64,6 +64,16 @@ final class ResourceStore {
     }
     static List<Entry> entries(Context c)throws Exception{return new ArrayList<>(catalog(c).entries.values());}
     static int generation(){return generation;}
+    static String portraitGroup(String path){
+        String name=path.substring(path.lastIndexOf('/')+1);
+        int split=name.indexOf('_');
+        return split>0?"portraits:"+name.substring(0,split):"";
+    }
+    static boolean groupMissing(Context c,String group){
+        try{for(Entry e:entries(c))if(group.equals(e.group)&&!has(c,e.path))return true;}
+        catch(Exception ignored){}
+        return false;
+    }
     private static void changed(){generation++;}
     private static SharedPreferences prefs(Context c){return c.getSharedPreferences(PREF,Context.MODE_PRIVATE);}
     static boolean wifiOnly(Context c){return prefs(c).getBoolean("wifi_only",false);}

@@ -75,10 +75,7 @@ public final class SkyrimOtaController {
         }else{
             screen.controls(this::hide,null);
             UpdateManager.Release release=s.release;
-            screen.paused(s.message,s.received,s.total,()->download(release),
-                release.isThin()?()->new RuneDialogBuilder(activity,activity.currentAccent()).setTitle("Загрузить полный APK?")
-                    .setMessage("Незавершённая облегчённая загрузка будет заменена.").setNegativeButton("Отмена",null)
-                    .setPositiveButton("Загрузить",(d,w)->download(release.fullVersion())).show():null);
+            screen.paused(s.message,s.received,s.total,()->download(release),null);
         }
     }
     private void showOffer(UpdateManager.Release info){

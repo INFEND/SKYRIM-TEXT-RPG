@@ -24,11 +24,9 @@ assert manifest["apkUrl"]==f"https://github.com/INFEND/SKYRIM-TEXT-RPG/releases/
 assert manifest["sha256"]==hashlib.sha256(apk.read_bytes()).hexdigest()
 assert manifest["sizeBytes"]==apk.stat().st_size
 thin=ROOT/"dist/SKYRIM-TEXT-RPG-thin.apk"
-if thin.is_file():
-    entry=manifest["thinApk"]
-    assert entry["url"]==f"https://github.com/INFEND/SKYRIM-TEXT-RPG/releases/download/v{version}/SKYRIM-TEXT-RPG-thin.apk"
-    assert entry["sha256"]==hashlib.sha256(thin.read_bytes()).hexdigest()
-    assert entry["sizeBytes"]==thin.stat().st_size < apk.stat().st_size
+assert manifest["coreOnly"] is True
+assert "thinApk" not in manifest
+assert thin.is_file() and hashlib.sha256(thin.read_bytes()).hexdigest()==manifest["sha256"]
 assert len(manifest["history"])>=2
 assert manifest["history"][-1]["versionCode"]==code
 print("OTA compatibility regression PASS (legacy metadata, current package, SHA-256, versions, history)")

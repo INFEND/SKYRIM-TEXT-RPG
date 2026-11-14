@@ -9,7 +9,7 @@ import java.io.InputStream;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-/** Bundled portraits are decoded off the UI thread, with a bounded cache. */
+/** Optional verified portraits, decoded off the UI thread with generation-aware cache. */
 public final class CharacterPortraitView extends ImageView {
     private static final ExecutorService DECODER=Executors.newFixedThreadPool(2);
     private static final LruCache<String,Bitmap> CACHE=new LruCache<String,Bitmap>(8*1024){
@@ -34,21 +34,23 @@ public final class CharacterPortraitView extends ImageView {
     }
     @Override protected void onAttachedToWindow(){
         super.onAttachedToWindow();
-        Bitmap cached=CACHE.get(assetPath);
+        if(!ResourceStore.has(getContext(),assetPath)){setImageDrawable(null);setContentDescription("Портрет не загружен");return;}
+        final String key=assetPath+":"+ResourceStore.generation();
+        Bitmap cached=CACHE.get(key);
         if(cached!=null){setImageBitmap(cached);return;}
         final int request=++generation;
         final Context app=getContext().getApplicationContext();
         DECODER.execute(()->{
-            Bitmap bitmap=CACHE.get(assetPath);
+            Bitmap bitmap=CACHE.get(key);
             if(bitmap==null){
-                try(InputStream input=app.getAssets().open(assetPath)){
+                try(InputStream input=ResourceStore.open(app,assetPath)){
                     bitmap=BitmapFactory.decodeStream(input);
-                    if(bitmap!=null)CACHE.put(assetPath,bitmap);
+                    if(bitmap!=null)CACHE.put(key,bitmap);
                 }catch(java.io.IOException ignored){}
             }
             final Bitmap result=bitmap;
             if(result!=null)post(()->{
-                if(request==generation&&isAttachedToWindow())setImageBitmap(result);
+                if(request==generation&&isAttachedToWindow()&&key.equals(assetPath+":"+ResourceStore.generation())&&ResourceStore.has(app,assetPath))setImageBitmap(result);
             });
         });
     }

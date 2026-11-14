@@ -9,8 +9,11 @@ class ResourceStoreTest(unittest.TestCase):
         bridge=catalog.build("a"*40);thin=catalog.build("a"*40,True)
         self.assertTrue(bridge["bundled"]);self.assertFalse(thin["bundled"])
         self.assertEqual(bridge["files"],thin["files"])
-        self.assertEqual(len(bridge["files"]),29)
-        self.assertEqual(len({e["path"] for e in bridge["files"]}),29)
+        self.assertGreaterEqual(len(bridge["files"]),89)
+        self.assertEqual(len({e["path"] for e in bridge["files"]}),len(bridge["files"]))
+        portraits=[e for e in bridge["files"] if e["path"].startswith("portraits/")]
+        self.assertEqual(len(portraits),60)
+        self.assertEqual(len({e["group"] for e in portraits}),10)
         self.assertTrue(all(len(e["sha256"])==64 and e["size"]>0 for e in bridge["files"]))
         self.assertNotIn("lore_bundle.zip",{e["path"] for e in bridge["files"]})
     def test_store_and_ota(self):
@@ -28,4 +31,9 @@ class ResourceStoreTest(unittest.TestCase):
         self.assertLess(ota.index("ResourceStore.migrate(a"),ota.index("launchVerifiedInstaller(a);"))
         self.assertIn("ResourceStore.open(context,IMAGE)",(JAVA/"SkyrimIconAtlas.java").read_text())
         self.assertIn("ResourceStore.open(app,TEXTURES[requested])",(JAVA/"SkyrimTerrainMapView.java").read_text())
+        p=(JAVA/"CharacterPortraitView.java").read_text()
+        self.assertIn("ResourceStore.open(app,assetPath)",p)
+        self.assertNotIn("app.getAssets().open(assetPath)",p)
+        self.assertIn("ResourceStore.generation()",p)
+        self.assertIn("ResourceStore.portraitGroup",ui)
 if __name__=="__main__":unittest.main()
