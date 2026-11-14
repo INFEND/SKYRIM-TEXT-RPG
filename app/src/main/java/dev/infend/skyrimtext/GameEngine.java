@@ -590,7 +590,7 @@ public final class GameEngine {
             case "FLEE":if(battleKind.equals("WILD")&&random.nextInt(100)<progress.chance(this,"FLEE")){mode="RESULT";poisonTurns=frostTurns=0;message="Ты уходишь от противника. Трофеев нет.";return;}actionText="Попытка отступить не удалась.";break;
             default:return;
         }
-        if(("ATTACK".equals(action)||"HEAVY".equals(action))&&progress.equippedWeaponSkill()==2&&progress.advanced.has(AdvancedPerks.POWER_SHOT))damage=(int)Math.round(damage*1.10);
+        if(damage>0&&("ATTACK".equals(action)||"HEAVY".equals(action))&&progress.equippedWeaponSkill()==2&&progress.advanced.has(AdvancedPerks.POWER_SHOT)){damage=(int)Math.round(damage*1.10);actionText="Мощный выстрел: −"+damage+" здоровья врагу.";}
         if("ATTACK".equals(action)&&damage>0&&random.nextInt(100)<criticalChance()){
             lastCritical=true;damage=Math.max(1,(int)Math.round(damage*1.5));actionText="Критический удар! −"+damage+" здоровья врагу.";
         }

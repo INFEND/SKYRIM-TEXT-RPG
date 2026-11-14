@@ -87,7 +87,8 @@ final class FactionStories {
     String dialogue(int f){return FactionDialogue.scene(f,index[f]);}
     int skill(int f){return approach[f]==2?12:chapter(f).skill;}
     int cost(int f){return approach[f]==1?12:8;}
-    boolean setApproach(GameEngine g,int f,int choice){if(phase[f]!=1||choice<0||choice>2||!block(g,f).isEmpty()||(choice==2&&!chapter(f).enemy.isEmpty()))return false;approach[f]=choice;return true;}
+    boolean canChooseApproach(GameEngine g,int f){return !completed(f)&&phase[f]==1&&g.started&&("WORLD".equals(g.mode)||"RESULT".equals(g.mode))&&chapter(f).place.equalsIgnoreCase(g.progress.location)&&attemptDay[f]!=g.day;}
+    boolean setApproach(GameEngine g,int f,int choice){if(!canChooseApproach(g,f)||choice<0||choice>2||(choice==2&&!chapter(f).enemy.isEmpty()))return false;approach[f]=choice;return true;}
     String block(GameEngine g,int f){
         if(!g.started||!("WORLD".equals(g.mode)||"RESULT".equals(g.mode)))return "Сначала заверши текущую сцену.";
         if(completed(f))return "Кампания завершена.";

@@ -710,7 +710,7 @@ public final class MainActivity extends Activity {
             addText(panel,c.title,20,ITEM_GOLD,true,8);addText(panel,c.story,16,TEXT,false,10);
             TextView lines=text("",16,TEXT,false);lines.setText(SceneTypography.render(stories.dialogue(f),accent(),game.name,heroColor()));lines.setLineSpacing(dp(4),1.12f);panel.addView(lines,lp(-1,-2));space(panel,10);
             addText(panel,"Точка входа на карте: "+c.place,12,MUTED,false,8);
-            if(stories.phase(f)==1){addText(panel,(c.enemy.isEmpty()?"Проверка навыка":"Противник: "+c.enemy)+" | −"+stories.cost(f)+" выносливости",14,TEXT,true,8);int chance=stories.chance(game,f);if(chance>=0){addText(panel,"Шанс успеха: "+chance+"%",13,SceneChoiceMeta.chanceColor(chance),true,8);if(stories.preparation(f)>0)addText(panel,"Подготовка: +"+stories.preparation(f)+" к шансу",12,MUTED,false,8);}}
+            if(stories.phase(f)==1){addText(panel,"Подход: "+(stories.approach(f)==1?"Подготовка":stories.approach(f)==2?"Переговоры":"Прямое действие"),13,accent(),true,5);addText(panel,(c.enemy.isEmpty()?RpgContent.SKILLS[stories.skill(f)]:"Противник: "+c.enemy)+" | −"+stories.cost(f)+" выносливости",14,TEXT,true,8);int chance=stories.chance(game,f);if(chance>=0){addText(panel,"Шанс успеха: "+chance+"%",13,SceneChoiceMeta.chanceColor(chance),true,8);if(stories.preparation(f)>0)addText(panel,"Подготовка: +"+stories.preparation(f)+" к шансу",12,MUTED,false,8);}}
             String block=stories.block(game,f);if(!block.isEmpty())addText(panel,block,12,ITEM_DOWN,false,8);
             WorldAtlas.Place destination=WorldAtlas.find(c.place);
             if(destination!=null&&!c.place.equals(game.progress.location)&&!"COMBAT".equals(game.mode))visualSummaryLink(panel,"МАРШРУТ",()->locationDialog(destination));
@@ -721,7 +721,7 @@ public final class MainActivity extends Activity {
         if(c!=null&&stories.block(game,f).isEmpty())dialog.setPositiveButton(stories.phase(f)==0?"Начать главу":stories.phase(f)==2?"Завершить главу":c.enemy.isEmpty()?"Пройти испытание":"Вступить в бой",(d,w)->{
             if(stories.advance(game,f)){save();if("COMBAT".equals(game.mode)){tab=0;render();}else{render();toast(game.message);factionStoryDialog(f);}}
         });
-        if(c!=null&&stories.phase(f)==1&&stories.block(game,f).isEmpty())dialog.setNeutralButton("Подход",(d,w)->{
+        if(c!=null&&stories.canChooseApproach(game,f))dialog.setNeutralButton("Подход",(d,w)->{
             String[] options=c.enemy.isEmpty()?new String[]{"Профильный навык | 8 сил","Тщательная подготовка | 12 сил, +12 к шансу","Переговоры | Красноречие, 8 сил"}:new String[]{"Прямой бой | 8 сил","Подготовить позицию | 12 сил, враг слабее на 15 здоровья"};
             new RuneDialogBuilder(this,accent()).setTitle("Способ действий").setSingleChoiceItems(options,Math.min(stories.approach(f),options.length-1),(dd,i)->{if(stories.setApproach(game,f,i)){save();dd.dismiss();factionStoryDialog(f);}}).setNegativeButton("Отмена",(dd,i)->factionStoryDialog(f)).show();
         });dialog.show();
