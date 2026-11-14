@@ -2647,8 +2647,9 @@ public final class MainActivity extends Activity {
     }
     private boolean itemEnchanted(ItemCatalog.Item item){
         String e=item.effect==null?"":item.effect.toLowerCase(java.util.Locale.ROOT);
-        return e.contains("зачар")||e.contains("поглощ")||e.contains("урон огн")||
-            e.contains("урон холод")||e.contains("урон мороз");
+        if(!item.weapon()&&!item.wearable())return false;
+        return e.contains("зачар")||e.contains("поглощ")||e.contains("захват душ")||
+            ItemEffectStyle.damageEnchantment(e);
     }
     private View itemPicture(ItemCatalog.Item item,int size){
         android.widget.FrameLayout tile=new android.widget.FrameLayout(this);
@@ -2765,21 +2766,29 @@ public final class MainActivity extends Activity {
     }
     private void itemEffect(LinearLayout host,ItemCatalog.Item item){
         if(item.effect==null||item.effect.trim().isEmpty()||item.effect.equals(itemType(item)+"."))return;
-        String e=item.effect.toLowerCase(java.util.Locale.ROOT);
-        boolean magic=itemEnchanted(item);
         boolean potion="Зелья".equals(item.category)||"Яды".equals(item.category);
         int restoration=potionRestore(item);
         boolean healing="Лечебное зелье".equals(item.id);
-        String effect=item.effect;
         if(restoration>0){
-            int missing=healing?game.maxHp-game.hp:"Зелье запаса сил".equals(item.id)?game.maxStamina-game.stamina:game.maxMagicka-game.magicka;
-            effect="Восстанавливает до "+restoration+(healing?" ед. здоровья":"Зелье запаса сил".equals(item.id)?" ед. выносливости":" ед. магии")+". Сейчас: +"+Math.max(0,Math.min(restoration,missing))+".";
-        }else if(potion){effect="Справочный эффект: "+effect;}
+            boolean staminaPotion="Зелье запаса сил".equals(item.id);
+            int missing=healing?game.maxHp-game.hp:staminaPotion?game.maxStamina-game.stamina:game.maxMagicka-game.magicka;
+            String effect="Восстанавливает до "+restoration+(healing?" ед. здоровья":staminaPotion?" ед. выносливости":" ед. магии")+". Сейчас: +"+Math.max(0,Math.min(restoration,missing))+".";
+            itemEffectLine(host,effect,healing?ItemEffectStyle.HEALTH:staminaPotion?ItemEffectStyle.STAMINA:ItemEffectStyle.MAGIC);return;
+        }
+        // Each independently documented effect gets its own icon, including resistances.
+        // The wording and numeric values remain exactly those recorded in the catalog.
+        if(potion||"Ингредиенты".equals(item.category)){
+            TextView note=itemText("Справочный эффект:",11,MUTED,false);host.addView(note,lp(-1,-2));space(host,4);
+        }
+        for(String part:item.effect.split("\\s*\\|\\s*")){
+            String effect=part.trim();if(effect.isEmpty())continue;
+            itemEffectLine(host,effect,ItemEffectStyle.classify(effect,item.name));
+        }
+    }
+    private void itemEffectLine(LinearLayout host,String effect,ItemEffectStyle style){
         LinearLayout line=row();
-        boolean staminaPotion="Зелье запаса сил".equals(item.id);
-        int color=restoration>0?(healing?0xffe16c72:staminaPotion?0xff79bc86:ITEM_MAGIC):e.contains("огн")?0xffe69b56:magic?ITEM_MAGIC:0xffa3a3a3;
-        line.addView(new ItemStatGlyph(this,restoration>0?(healing?"health":staminaPotion?"stamina":"magic"):e.contains("огн")?"fire":magic?"magic":"info",color),lp(19,19));
-        TextView value=itemText(effect,14,color,false);
+        line.addView(new ItemStatGlyph(this,style.glyph,style.color),lp(19,19));
+        TextView value=itemText(effect,14,style.color,false);
         LinearLayout.LayoutParams vp=new LinearLayout.LayoutParams(0,-2,1);vp.leftMargin=dp(8);
         line.addView(value,vp);host.addView(line,lp(-1,-2));space(host,5);
     }
