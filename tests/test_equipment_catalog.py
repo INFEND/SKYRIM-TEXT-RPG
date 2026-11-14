@@ -19,7 +19,7 @@ class EquipmentCatalog(unittest.TestCase):
         self.assertIn('(baseStat+progress.temperBonus(this))*(1+progress.skillLevel(statSkill)',CAT)
         self.assertIn('progress.combatPerkRank(statSkill)',CAT)
         self.assertIn('baseStat<0',CAT)
-        self.assertIn('itemSummary(focused,game.progress.quantity(focused.id),true,false,focused.value)',UI)
+        self.assertIn('itemSummary(item,game.progress.quantity(item.id),active,true,item.value)',UI)
         self.assertIn('item.currentStat(game.progress)',UI)
         self.assertIn('itemDetailMetrics(view,item)',UI)
         self.assertIn('itemMetric("ВЕС","bag",itemNumber(item.weight)',UI)

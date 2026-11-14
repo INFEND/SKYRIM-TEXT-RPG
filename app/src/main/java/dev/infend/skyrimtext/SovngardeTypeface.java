@@ -12,6 +12,7 @@ import android.widget.TextView;
  * user-provided ZIP (the pinned CI mirror is verified by SHA-256).
  */
 public final class SovngardeTypeface {
+    public static final String NATIVE_ITEM_FONT="native_item_font";
     private static Typeface regular,bold;
     private SovngardeTypeface(){}
 
@@ -33,7 +34,7 @@ public final class SovngardeTypeface {
     }
     public static void applyTree(View root){
         if(root==null)return;
-        if(root instanceof TextView){
+        if(root instanceof TextView && !NATIVE_ITEM_FONT.equals(root.getTag())){
             TextView text=(TextView)root;
             Typeface current=text.getTypeface();
             int style=current==null?Typeface.NORMAL:current.getStyle();

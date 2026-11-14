@@ -37,8 +37,8 @@ class UserIconAtlasContracts(unittest.TestCase):
         activity=(SRC/"MainActivity.java").read_text(encoding="utf-8")
         self.assertIn("SkyrimIconView.iconForLabel(title)",activity)
         self.assertIn("SkyrimIconView.iconForItem(item.name,item.category)",activity)
-        self.assertIn("itemSummary(focused,game.progress.quantity(focused.id),true,false,focused.value)",activity)
-        summary=activity.split("private LinearLayout itemSummary(",1)[1].split("private void itemDetailMetrics(",1)[0]
+        self.assertIn("itemSummary(item,game.progress.quantity(item.id),active,true,item.value)",activity)
+        summary=activity.split("private View itemPicture(",1)[1].split("private LinearLayout itemMetric(",1)[0]
         self.assertIn("SkyrimIconView.iconForItem(item.name,item.category)",summary)
         self.assertIn('SkyrimIconView.iconForCategory(group)',activity)
         for name in ('"story"','"map"','"bag"','"codex"','"hero"','"journal"','"settings"'):

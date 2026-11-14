@@ -47,7 +47,7 @@ class CatalogUiOverhaul(unittest.TestCase):
         self.assertIn('header.setOnClickListener(v->{',catalog)
         self.assertIn('android.transition.AutoTransition().setDuration(200)',catalog)
         self.assertIn('itemSummary(item,0,false,false,item.value)',catalog)
-        self.assertIn('itemRow.setMinimumHeight(dp(62))',UI)
+        self.assertIn('itemRow.setMinimumHeight(dp(96))',UI)
         self.assertIn('name.setMaxLines(3)',UI)
         self.assertIn('SkyrimIconView.iconForItem(item.name,item.category)',UI)
         self.assertNotIn('item.icon',catalog)
