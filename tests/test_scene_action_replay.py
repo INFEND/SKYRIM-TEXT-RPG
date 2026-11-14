@@ -23,7 +23,13 @@ class SceneActionReplayTest(unittest.TestCase):
         self.assertIn('if ("COMBAT".equals(mode)', SRC)
         guard=SRC.split('if ("COMBAT".equals(mode)',1)[1].split('return;',1)[0]
         self.assertIn('"FLEE".equals(action)',guard)
-        self.assertIn('"CANON_SHOUT".equals(action)',guard)
+        # Shouts are handled by a narrower early guard, never as a general
+        # escape from combat or an action available outside canonical combat.
+        choose=SRC.split("public void choose(String action)",1)[1]
+        shout='if("CANON_SHOUT".equals(action)){if("COMBAT".equals(mode)&&"CANONICAL".equals(battleKind))combatTurn(action);return;}'
+        self.assertIn(shout,choose)
+        self.assertLess(choose.index(shout),choose.index('if ("COMBAT".equals(mode)'))
+        self.assertIn('case "CANON_SHOUT":if(!"CANONICAL".equals(battleKind)||canonicalShouts==0||canonicalShoutCooldown>0)return;',SRC)
         for forbidden in ('GO_WORLD','LOC:','SHOP','CANON_OPEN'):
             self.assertNotIn(forbidden,guard)
 
