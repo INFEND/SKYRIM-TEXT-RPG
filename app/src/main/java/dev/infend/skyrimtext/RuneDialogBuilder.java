@@ -18,6 +18,9 @@ import android.widget.TextView;
 public final class RuneDialogBuilder extends AlertDialog.Builder {
     private final Context context;
     private final int accent;
+    private boolean customPanel;
+
+    public RuneDialogBuilder customPanel(){customPanel=true;return this;}
 
     public RuneDialogBuilder(Context context, int accent) {
         super(context, R.style.RunicDialogTheme);
@@ -34,7 +37,7 @@ public final class RuneDialogBuilder extends AlertDialog.Builder {
         dialog.setOnShowListener(ignored->{
             Window window=dialog.getWindow();
             if(window!=null){
-                window.setBackgroundDrawable(new RuneFrameDrawable(0xf0060809,accent,true));
+                window.setBackgroundDrawable(customPanel?new android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT):new RuneFrameDrawable(0xf0060809,accent,true));
                 window.addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
                 WindowManager.LayoutParams attributes=window.getAttributes();
                 attributes.dimAmount=.72f;

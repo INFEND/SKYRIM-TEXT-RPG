@@ -2689,13 +2689,13 @@ public final class MainActivity extends Activity {
     }
     private LinearLayout itemMetric(String label,String glyph,String value,int color,double delta,boolean large){
         LinearLayout metric=column();metric.setGravity(Gravity.CENTER);
-        TextView caption=itemText(label,large?12:11,0xffa3a3a3,false);caption.setGravity(Gravity.CENTER);
-        TextView number=itemText(value,large?29:27,("bag".equals(glyph)||"septims".equals(glyph))?TEXT:color,true);
+        TextView caption=itemText(label,large?11:11,0xffa3a3a3,false);caption.setGravity(Gravity.CENTER);
+        TextView number=itemText(value,large?23:27,("bag".equals(glyph)||"septims".equals(glyph))?TEXT:color,true);
         number.setGravity(Gravity.CENTER);number.setSingleLine(true);
-        number.setAutoSizeTextTypeUniformWithConfiguration(16,large?29:27,1,android.util.TypedValue.COMPLEX_UNIT_SP);
+        number.setAutoSizeTextTypeUniformWithConfiguration(13,large?23:27,1,android.util.TypedValue.COMPLEX_UNIT_SP);
         if(large){
-            metric.addView(new ItemStatGlyph(this,glyph,color),lp(25,25));space(metric,6);
-            metric.addView(number,lp(-1,37));space(metric,5);metric.addView(caption,lp(-1,-2));
+            metric.addView(new ItemStatGlyph(this,glyph,color),lp(21,21));space(metric,3);
+            metric.addView(number,lp(-1,29));space(metric,3);metric.addView(caption,lp(-1,-2));
         }else{
             metric.addView(caption,lp(-1,-2));space(metric,6);
             LinearLayout line=row();line.setGravity(Gravity.CENTER);
@@ -2706,7 +2706,7 @@ public final class MainActivity extends Activity {
         boolean changed=!Double.isNaN(delta)&&Math.abs(delta)>=0.05;
         boolean favorable="bag".equals(glyph)?delta<0:delta>0;
         TextView change=itemText(changed?(delta>0?"▲ ":"▼ ")+itemNumber(Math.abs(delta))+("bag".equals(glyph)?" кг":""):"",12,favorable?ITEM_UP:ITEM_DOWN,false);
-        change.setGravity(Gravity.CENTER);space(metric,5);metric.addView(change,lp(-1,20));
+        if(changed){change.setGravity(Gravity.CENTER);space(metric,3);metric.addView(change,lp(-1,-2));}
         metric.setContentDescription(label+" "+value+(changed?", изменение "+(delta>0?"+":"−")+itemNumber(Math.abs(delta)):""));
         return metric;
     }
@@ -2737,6 +2737,11 @@ public final class MainActivity extends Activity {
         }
         return itemRow;
     }
+    private int potionRestore(ItemCatalog.Item item){
+        if("Лечебное зелье".equals(item.id))return 45+5*game.progress.branches.rank(14);
+        if("Зелье магии".equals(item.id))return 35;
+        return -1;
+    }
     private void itemDetailMetrics(LinearLayout host,ItemCatalog.Item item){
         LinearLayout metrics=row();metrics.setGravity(Gravity.CENTER);
         ItemCatalog.Item worn=comparedItem(item);
@@ -2744,6 +2749,11 @@ public final class MainActivity extends Activity {
             boolean weapon=item.weapon();
             metrics.addView(itemMetric(weapon?"УРОН":"БРОНЯ",weapon?"weapon":"shield",
                 itemNumber(item.currentStat(game.progress)),weapon?ITEM_DAMAGE:ITEM_ARMOR,itemDelta(item),true),new LinearLayout.LayoutParams(0,-2,1));
+        }
+        int restoration=potionRestore(item);
+        if(restoration>0){
+            boolean healing="Лечебное зелье".equals(item.id);
+            metrics.addView(itemMetric(healing?"ЗДОРОВЬЕ":"МАГИЯ",healing?"health":"magic","+"+restoration,healing?0xffe16c72:ITEM_MAGIC,Double.NaN,true),new LinearLayout.LayoutParams(0,-2,1));
         }
         metrics.addView(itemMetric("ВЕС","bag",itemNumber(item.weight),0xffb5b5b5,worn==null?Double.NaN:item.weight-worn.weight,true),new LinearLayout.LayoutParams(0,-2,1));
         metrics.addView(itemMetric("ЦЕНА","septims",String.valueOf(item.value),ITEM_GOLD,worn==null?Double.NaN:item.value-worn.value,true),new LinearLayout.LayoutParams(0,-2,1));
@@ -2753,10 +2763,18 @@ public final class MainActivity extends Activity {
         if(item.effect==null||item.effect.trim().isEmpty()||item.effect.equals(itemType(item)+"."))return;
         String e=item.effect.toLowerCase(java.util.Locale.ROOT);
         boolean magic=itemEnchanted(item);
+        boolean potion="Зелья".equals(item.category)||"Яды".equals(item.category);
+        int restoration=potionRestore(item);
+        boolean healing="Лечебное зелье".equals(item.id);
+        String effect=item.effect;
+        if(restoration>0){
+            int missing=healing?game.maxHp-game.hp:game.maxMagicka-game.magicka;
+            effect="Восстанавливает до "+restoration+(healing?" ед. здоровья":" ед. магии")+". Сейчас: +"+Math.max(0,Math.min(restoration,missing))+".";
+        }else if(potion){effect="Справочный эффект: "+effect;}
         LinearLayout line=row();
-        int color=e.contains("огн")?0xffe69b56:magic?ITEM_MAGIC:0xffa3a3a3;
-        line.addView(new ItemStatGlyph(this,e.contains("огн")?"fire":magic?"magic":"info",color),lp(22,22));
-        TextView value=itemText(item.effect,15,color,false);
+        int color=restoration>0?(healing?0xffe16c72:ITEM_MAGIC):e.contains("огн")?0xffe69b56:magic?ITEM_MAGIC:0xffa3a3a3;
+        line.addView(new ItemStatGlyph(this,restoration>0?(healing?"health":"magic"):e.contains("огн")?"fire":magic?"magic":"info",color),lp(19,19));
+        TextView value=itemText(effect,14,color,false);
         LinearLayout.LayoutParams vp=new LinearLayout.LayoutParams(0,-2,1);vp.leftMargin=dp(8);
         line.addView(value,vp);host.addView(line,lp(-1,-2));space(host,5);
     }
@@ -2897,26 +2915,30 @@ public final class MainActivity extends Activity {
     }
     private void itemDialog(ItemCatalog.Item item){
         LinearLayout view=column();
-        view.setPadding(dp(16),dp(16),dp(16),dp(16));
-        view.setBackground(itemBackground(0xff0a0a0a,0xff303030,15));
-        LinearLayout heading=row();heading.setGravity(Gravity.TOP);
-        view.addView(heading,lp(-1,-2));heading.addView(itemPicture(item,94),lp(94,94));
+        view.setPadding(dp(12),dp(12),dp(12),dp(12));
+        view.setBackground(itemBackground(0xff0a0a0a,0xff626262,0));
+        LinearLayout heading=row();heading.setGravity(Gravity.CENTER_VERTICAL);
+        view.addView(heading,lp(-1,-2));
+        if(hasItemStat(item))heading.addView(itemPicture(item,94),lp(94,94));
+        else heading.addView(itemPicture(item,64),lp(64,64));
         LinearLayout words=column();
         LinearLayout.LayoutParams wordsParams=new LinearLayout.LayoutParams(0,-2,1);
         wordsParams.leftMargin=dp(10);heading.addView(words,wordsParams);
-        words.addView(itemText(item.name,21,TEXT,true),lp(-1,-2));space(words,9);
-        words.addView(itemText(itemType(item),14,0xffa3a3a3,false),lp(-1,-2));
+        words.addView(itemText(item.name,18,TEXT,true),lp(-1,-2));space(words,4);
+        words.addView(itemText(itemType(item),13,0xffa3a3a3,false),lp(-1,-2));
+        int quantity=game.progress.quantity(item.id);
+        if(quantity>0){space(words,3);words.addView(itemText("В наличии: "+quantity,12,MUTED,false),lp(-1,-2));}
         if(itemEnchanted(item)){
             space(words,5);LinearLayout enchanted=row();
             enchanted.addView(new ItemStatGlyph(this,"magic",ITEM_GOLD),lp(16,16));
             TextView label=itemText("Зачарованный",13,ITEM_GOLD,false);
             LinearLayout.LayoutParams tag=lp(-2,-2);tag.leftMargin=dp(4);enchanted.addView(label,tag);words.addView(enchanted,lp(-1,-2));
         }
-        itemDivider(view,16);itemDetailMetrics(view,item);itemDivider(view,16);
+        itemDivider(view,9);itemDetailMetrics(view,item);itemDivider(view,9);
         itemEffect(view,item);
-        TextView description=itemText(item.description,15,0xffa3a3a3,false);
+        TextView description=itemText(item.description,14,0xffa3a3a3,false);
         description.setTypeface(Typeface.create("sans-serif",Typeface.ITALIC));
-        description.setLineSpacing(dp(4),1.08f);space(view,8);view.addView(description,lp(-1,-2));
+        description.setLineSpacing(dp(2),1.05f);space(view,4);view.addView(description,lp(-1,-2));
         if(item.twoHanded()&&!"Не надето".equals(game.progress.equippedName("shield"))){
             space(view,8);view.addView(itemText("Двуручное оружие снимает экипированный щит.",12,ITEM_DOWN,false));
         }
@@ -2935,14 +2957,14 @@ public final class MainActivity extends Activity {
             }
         }
         ScrollView itemScroll=new ScrollView(this);itemScroll.setFillViewport(false);itemScroll.addView(view);
-        AlertDialog dialog=new RuneDialogBuilder(this,accent()).setView(itemScroll).create();
-        LinearLayout actions=row();space(view,14);view.addView(actions,lp(-1,-2));
+        AlertDialog dialog=new RuneDialogBuilder(this,accent()).customPanel().setView(itemScroll).create();
+        LinearLayout actions=row();space(view,9);view.addView(actions,lp(-1,-2));
         boolean owned=game.progress.quantity(item.id)>0;
         boolean worn=game.progress.equipped(item.id);
         String primary=owned&&!"COMBAT".equals(game.mode)&&!item.slot().isEmpty()?(worn?"СНЯТЬ":"ЭКИПИРОВАТЬ"):
             owned&&("Лечебное зелье".equals(item.id)||"Зелье магии".equals(item.id))?"ИСПОЛЬЗОВАТЬ":"ЗАКРЫТЬ";
         TextView equip=itemAction(primary);
-        actions.addView(equip,new LinearLayout.LayoutParams(0,dp(48),1));
+        actions.addView(equip,new LinearLayout.LayoutParams(0,dp(44),1));
         equip.setOnClickListener(v->{
             if("ЗАКРЫТЬ".equals(primary)){dialog.dismiss();return;}
             if("ИСПОЛЬЗОВАТЬ".equals(primary)){
@@ -2956,7 +2978,7 @@ public final class MainActivity extends Activity {
             save();dialog.dismiss();render();
         });
         TextView discard=itemAction(canDiscardItem(item)?"ВЫБРОСИТЬ":"ЗАКРЫТЬ");
-        LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(0,dp(48),1);p.leftMargin=dp(8);
+        LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(0,dp(44),1);p.leftMargin=dp(8);
         if(!"ЗАКРЫТЬ".equals(primary)||canDiscardItem(item))actions.addView(discard,p);
         discard.setOnClickListener(v->{
             if(!canDiscardItem(item)){dialog.dismiss();return;}

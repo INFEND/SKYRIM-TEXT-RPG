@@ -7,6 +7,8 @@ final class ApparelAndPotionCatalog {
         String desc="Одежда".equals(group)?"Одежда жителей Тамриэля.":
             "Украшения".equals(group)?"Ювелирное изделие.":"Инструменты".equals(group)?"Инструмент или предмет ремесла.":"Алхимический состав.";
         String icon="Одежда".equals(group)?"♟":"Украшения".equals(group)?"✧":"Инструменты".equals(group)?"⚒":"◉";
+        // Preserve the playable mana potion price and effect from the core catalog.
+        if("Зелье магии".equals(name))return;
         ItemCatalog.registerSupplement(name,group,icon,weight,value,desc,effect.isEmpty()?"Без дополнительных чар.":effect,stat,skill);
     }
     static void register(){
