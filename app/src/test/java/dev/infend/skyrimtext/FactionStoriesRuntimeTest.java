@@ -18,9 +18,10 @@ public class FactionStoriesRuntimeTest {
                     assertTrue(h.factionStories.advance(h,f));assertEquals("COMBAT",h.mode);
                     h=GameEngine.fromJson(h.toJson().toString());assertEquals("FACTION",h.battleKind);
                     assertEquals(f,h.factionBattle);h.choose("GO_WORLD");assertEquals("COMBAT",h.mode);
-                    h.enemyHp=1;h.choose("ATTACK");assertEquals(2,h.factionStories.phase(f));
+                    h.enemyHp=1;h.choose("ATTACK");assertEquals(chapter.title,2,h.factionStories.phase(f));
                 }else{
-                    // Unlucky checks may be retried on a later day, never the same day.
+                    // Story-only mentor assistance prevents impossible checks; retries accumulate preparation.
+                    assertTrue(chapter.title,h.factionStories.chance(h,f)>=15);
                     for(int attempt=0;attempt<1000&&h.factionStories.phase(f)==1;attempt++){
                         h.day++;h.stamina=h.maxStamina;assertTrue(h.factionStories.advance(h,f));
                     }

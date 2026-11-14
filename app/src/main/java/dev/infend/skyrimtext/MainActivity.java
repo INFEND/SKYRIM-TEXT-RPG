@@ -709,7 +709,7 @@ public final class MainActivity extends Activity {
         else{
             addText(panel,c.title,20,ITEM_GOLD,true,8);addText(panel,c.story,16,TEXT,false,10);
             addText(panel,"Точка входа на карте: "+c.place,12,MUTED,false,8);
-            if(stories.phase(f)==1){addText(panel,(c.enemy.isEmpty()?"Проверка навыка":"Противник: "+c.enemy)+" | −8 выносливости",14,TEXT,true,8);int chance=stories.chance(game,f);if(chance>=0)addText(panel,"Шанс успеха: "+chance+"%",13,SceneChoiceMeta.chanceColor(chance),true,8);}
+            if(stories.phase(f)==1){addText(panel,(c.enemy.isEmpty()?"Проверка навыка":"Противник: "+c.enemy)+" | −8 выносливости",14,TEXT,true,8);int chance=stories.chance(game,f);if(chance>=0){addText(panel,"Шанс успеха: "+chance+"%",13,SceneChoiceMeta.chanceColor(chance),true,8);if(stories.preparation(f)>0)addText(panel,"Подготовка: +"+stories.preparation(f)+" к шансу",12,MUTED,false,8);}}
             String block=stories.block(game,f);if(!block.isEmpty())addText(panel,block,12,ITEM_DOWN,false,8);
             WorldAtlas.Place destination=WorldAtlas.find(c.place);
             if(destination!=null&&!c.place.equals(game.progress.location)&&!"COMBAT".equals(game.mode))visualSummaryLink(panel,"МАРШРУТ",()->locationDialog(destination));
