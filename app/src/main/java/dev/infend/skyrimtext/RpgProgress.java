@@ -134,13 +134,14 @@ public final class RpgProgress {
             if(item!=null&&quantity(item.id)>0&&item.wearable()&&item.baseStat>0)count++;}
         return count;
     }
+    public boolean hasArmorType(int skill){for(String slot:SLOTS){ItemCatalog.Item item=ItemCatalog.find(equipped.get(slot));if(item!=null&&item.wearable()&&item.baseStat>0&&item.statSkill==skill)return true;}return false;}
     public double damageReduction(){
         boolean heavy=false,light=false;for(String slot:SLOTS){ItemCatalog.Item item=ItemCatalog.find(equipped.get(slot));if(item!=null&&item.wearable()&&item.baseStat>0){heavy|=item.statSkill==4;light|=item.statSkill==5;}}
         double base=Math.min(0.8,(equippedArmor()+25*armorPieces())*0.0012);
         int heavyPieces=0,lightPieces=0;
         for(String slot:new String[]{"head","body","hands","feet"}){ItemCatalog.Item item=ItemCatalog.find(equipped.get(slot));if(item!=null&&item.baseStat>0){if(item.statSkill==4)heavyPieces++;if(item.statSkill==5)lightPieces++;}}
         double fit=heavyPieces==4&&advanced.has(AdvancedPerks.WELL_FITTED)?.05:lightPieces==4&&advanced.has(AdvancedPerks.CUSTOM_FIT)?.05:0;
-        return Math.min(0.8,base+(heavy?.02*branches.rank(4):0)+(light?.02*branches.rank(5):0)+fit+(armorPieces()==0&&advanced.has(AdvancedPerks.MAGE_ARMOR)?.05:0));
+        return Math.min(0.8,base+(heavy?.02*branches.rank(4):0)+(light?.02*branches.rank(5):0)+fit+(heavy&&advanced.has(AdvancedPerks.TOWER)?.03:0)+(armorPieces()==0&&advanced.has(AdvancedPerks.MAGE_ARMOR)?.05:0));
     }
     public void shopEquip(String id){equip(id);}
 
@@ -227,7 +228,7 @@ public final class RpgProgress {
     public void skillExperience(GameEngine g,int index,int amount){
         if(index<0||index>=skillLevels.length||amount<=0)return;
         if(skillLevels[index]<100){
-            skillXp[index]+=amount+branches.experienceBonus(index,amount)+(index==8&&advanced.has(AdvancedPerks.ENCHANTER)?amount/5:0);
+            skillXp[index]+=amount+branches.experienceBonus(index,amount)+(index==8&&advanced.has(AdvancedPerks.ENCHANTER)?amount/5:0)+(index==6&&advanced.has(AdvancedPerks.ARCANE_SMITH)?amount/5:0);
             while(skillLevels[index]<100&&skillXp[index]>=skillNeed(index)){
                 skillXp[index]-=skillNeed(index);skillLevels[index]++;
                 if(skillLevels[index]==100)skillXp[index]=0;

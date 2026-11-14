@@ -74,7 +74,7 @@ final class FactionStories {
 {"Невидимые видения","Фолкрит","Свитки нужно прочитать в святилище Предка.","-","15"},
 {"Прикосновение к небу","Маркарт","На западе Скайрима начинается путь в Забытую долину; лук Ауриэля скрыт среди святилищ снежных эльфов.","Виртур","2"},
 {"Семейный суд","Солитьюд","Стража выступает против Харкона в замке Волкихар.","Харкон","2"}}};
-    private final int[] index=new int[DATA.length],phase=new int[DATA.length],attemptDay=new int[DATA.length],preparation=new int[DATA.length];
+    private final int[] index=new int[DATA.length],phase=new int[DATA.length],attemptDay=new int[DATA.length],preparation=new int[DATA.length],approach=new int[DATA.length];
     FactionStories(){java.util.Arrays.fill(attemptDay,-1);}
     int count(int f){return DATA[f].length;}
     int done(int f){return index[f];}
@@ -83,31 +83,37 @@ final class FactionStories {
     Chapter chapter(int f){return completed(f)?null:new Chapter(DATA[f][index[f]]);}
     int phase(int f){return phase[f];}
     int preparation(int f){return preparation[f];}
+    int approach(int f){return approach[f];}
+    String dialogue(int f){return FactionDialogue.scene(f,index[f]);}
+    int skill(int f){return approach[f]==2?12:chapter(f).skill;}
+    int cost(int f){return approach[f]==1?12:8;}
+    boolean setApproach(GameEngine g,int f,int choice){if(phase[f]!=1||choice<0||choice>2||!block(g,f).isEmpty()||(choice==2&&!chapter(f).enemy.isEmpty()))return false;approach[f]=choice;return true;}
     String block(GameEngine g,int f){
         if(!g.started||!("WORLD".equals(g.mode)||"RESULT".equals(g.mode)))return "Сначала заверши текущую сцену.";
         if(completed(f))return "Кампания завершена.";
         if(f==4&&(started(5)||g.factions.stage(5)>0)||f==5&&(started(4)||g.factions.stage(4)>0))return "Ты выбрал другую сторону гражданской войны.";
         if(!chapter(f).place.equalsIgnoreCase(g.progress.location))return "Прибудь: "+chapter(f).place;
         if(phase[f]==1&&attemptDay[f]==g.day)return "Следующая попытка в другой игровой день.";
-        if(phase[f]==1&&g.stamina<8)return "Нужно 8 выносливости.";
+        if(phase[f]==1&&g.stamina<cost(f))return "Нужно "+cost(f)+" выносливости.";
         return "";
     }
     int chance(GameEngine g,int f){
         Chapter c=chapter(f);if(c==null||phase[f]!=1||!c.enemy.isEmpty())return -1;
         // сюжетная проверка: наставники обеспечивают минимальную доступность,
         // повторная подготовка после неудачи улучшает следующую попытку.
-        return Math.min(100,Math.max(15,g.progress.chance(g,2,c.skill,20+Math.min(30,index[f]*3)))+preparation[f]);
+        return Math.min(100,Math.max(15,g.progress.chance(g,2,skill(f),20+Math.min(30,index[f]*3)))+preparation[f]+(approach[f]==1?12:0));
     }
+    private int skillForReward(Chapter c,int f){return approach[f]==2?12:c.skill;}
     boolean advance(GameEngine g,int f){
         if(!block(g,f).isEmpty())return false;Chapter c=chapter(f);
         if(phase[f]==0){phase[f]=1;g.progress.setQuestOutcome("faction_story_"+f,"ACTIVE");g.message=c.story;return true;}
-        if(phase[f]==2){index[f]++;phase[f]=0;attemptDay[f]=-1;preparation[f]=0;g.progress.skillExperience(g,c.skill,35);g.addXp(30+index[f]*5);g.gold=(int)Math.min(Integer.MAX_VALUE,(long)g.gold+25+index[f]*5);g.progress.sync(g);g.message="Завершено: "+c.title;if(completed(f))g.progress.setQuestOutcome("faction_story_"+f,"COMPLETED");g.recordVisualEvent(g.message);return true;}
-        int chance=chance(g,f);g.stamina-=8;attemptDay[f]=g.day;
-        if(!c.enemy.isEmpty()){g.beginFactionBattle(f,c.enemy,45+g.level*10+index[f]*7,6+g.level*2,c.story);return true;}
+        if(phase[f]==2){index[f]++;phase[f]=0;attemptDay[f]=-1;preparation[f]=0;int used=skillForReward(c,f);approach[f]=0;g.progress.skillExperience(g,used,35);g.addXp(30+index[f]*5);g.gold=(int)Math.min(Integer.MAX_VALUE,(long)g.gold+25+index[f]*5);g.progress.sync(g);g.message="Завершено: "+c.title;if(completed(f))g.progress.setQuestOutcome("faction_story_"+f,"COMPLETED");g.recordVisualEvent(g.message);return true;}
+        int chance=chance(g,f);g.stamina-=cost(f);attemptDay[f]=g.day;
+        if(!c.enemy.isEmpty()){g.beginFactionBattle(f,c.enemy,45+g.level*10+index[f]*7-(approach[f]==1?15:0),6+g.level*2,c.story);return true;}
         if(new java.util.Random().nextInt(100)<chance){phase[f]=2;g.message="Испытание пройдено. Заверши главу.";}else{preparation[f]=Math.min(50,preparation[f]+10);g.message="Попытка не удалась. Ты разобрал ошибки с наставником. Подготовка: +"+preparation[f]+" к следующей проверке. Повтори в другой день.";}
         return true;
     }
     void victory(int f){if(f>=0&&f<DATA.length&&!completed(f)&&phase[f]==1&&!chapter(f).enemy.isEmpty())phase[f]=2;}
-    JSONObject toJson(){JSONObject o=new JSONObject();try{o.put("index",new JSONArray(index)).put("phase",new JSONArray(phase)).put("attemptDay",new JSONArray(attemptDay)).put("preparation",new JSONArray(preparation));}catch(Exception ignored){}return o;}
-    static FactionStories fromJson(JSONObject o){FactionStories s=new FactionStories();if(o==null)return s;JSONArray a=o.optJSONArray("index"),b=o.optJSONArray("phase"),d=o.optJSONArray("attemptDay"),p=o.optJSONArray("preparation");for(int f=0;f<DATA.length;f++){s.index[f]=a==null?0:Math.max(0,Math.min(s.count(f),a.optInt(f)));s.phase[f]=b==null?0:Math.max(0,Math.min(2,b.optInt(f)));s.attemptDay[f]=d==null?-1:d.optInt(f,-1);s.preparation[f]=p==null?0:Math.max(0,Math.min(50,p.optInt(f,0)));}return s;}
+    JSONObject toJson(){JSONObject o=new JSONObject();try{o.put("index",new JSONArray(index)).put("phase",new JSONArray(phase)).put("attemptDay",new JSONArray(attemptDay)).put("preparation",new JSONArray(preparation)).put("approach",new JSONArray(approach));}catch(Exception ignored){}return o;}
+    static FactionStories fromJson(JSONObject o){FactionStories s=new FactionStories();if(o==null)return s;JSONArray a=o.optJSONArray("index"),b=o.optJSONArray("phase"),d=o.optJSONArray("attemptDay"),p=o.optJSONArray("preparation"),r=o.optJSONArray("approach");for(int f=0;f<DATA.length;f++){s.index[f]=a==null?0:Math.max(0,Math.min(s.count(f),a.optInt(f)));s.phase[f]=b==null?0:Math.max(0,Math.min(2,b.optInt(f)));s.attemptDay[f]=d==null?-1:d.optInt(f,-1);s.preparation[f]=p==null?0:Math.max(0,Math.min(50,p.optInt(f,0)));s.approach[f]=r==null?0:Math.max(0,Math.min(2,r.optInt(f,0)));}return s;}
 }
