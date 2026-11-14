@@ -15,6 +15,11 @@ final class VisualEffectsView extends View {
         float t=animate?(android.os.SystemClock.uptimeMillis()%12000L)/12000f:0;
         if("fog".equals(weather)){
             for(int i=0;i<4;i++){float y=(i*.25f+.12f)*h;float x=w*(.5f+.15f*(float)Math.sin(t*Math.PI*2+i));p.setColor(0x18d6e4e9);c.drawOval(x-w*.75f,y-h*.08f,x+w*.75f,y+h*.08f,p);}
+         }else if("ash".equals(weather)||"dust".equals(weather)||"embers".equals(weather)){
+            boolean ember="embers".equals(weather);int count=ember?24:32;float density=getResources().getDisplayMetrics().density;
+            for(int i=0;i<count;i++){float x=((i*.6180339f+t*.7f)%1f)*w;float y=((i*.381966f+(ember?1-t:t))%1f)*h;
+                float a=.5f+.5f*(float)Math.sin(i+t*Math.PI*2);p.setColor(ember?Color.argb(90+(int)(100*a),255,138,45):"ash".equals(weather)?0x909da3a5:0x66d3b887);
+                c.drawCircle(x,y,density*(.65f+i%3*.45f),p);}
         }else{
             boolean rain="rain".equals(weather)||"storm".equals(weather);
             int count="blizzard".equals(weather)?46:28;

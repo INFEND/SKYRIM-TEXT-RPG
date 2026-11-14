@@ -358,10 +358,16 @@ public final class MainActivity extends Activity {
         if(!visual("weather"))return gallery;
         WorldWeather weather=WorldWeather.at(game.region,location,game.day,game.hour);
         if(!location.equalsIgnoreCase(game.progress.location))return gallery;
-        if(!java.util.Arrays.asList("snow","blizzard","rain","storm","fog").contains(weather.glyph))return gallery;
+        String effect=weather.glyph;
+        String place=location.toLowerCase(java.util.Locale.ROOT);
+        if(place.contains("хелген")&&game.progress.dragonStage==0)effect="embers";
+        else if(place.contains("солстейм")||place.contains("воронья скала")||place.contains("тель-мифрин"))effect="ash";
+        else if("cave".equals(effect))effect="dust";
+        else if("sun".equals(effect)&&weather.temperature>=10)effect="dust";
+        if(!java.util.Arrays.asList("snow","blizzard","rain","storm","fog","embers","ash","dust").contains(effect))return gallery;
         FrameLayout frame=new FrameLayout(this);
         frame.addView(gallery,new FrameLayout.LayoutParams(-1,-2));
-        VisualEffectsView particles=new VisualEffectsView(this,weather.glyph,animations);
+        VisualEffectsView particles=new VisualEffectsView(this,effect,animations);
         frame.addView(particles,new FrameLayout.LayoutParams(-1,-1));
         return frame;
     }
@@ -427,11 +433,32 @@ public final class MainActivity extends Activity {
                 host.addView(strip,0,lp(-1,-2));
             }
         }
-        if(visual("reveal")&&animations&&!raw.equals(lastNarrative)){
-            lastNarrative=raw;body.setAlpha(.15f);
-            body.animate().alpha(1f).setDuration(360).start();
-            body.setOnLongClickListener(v->{body.animate().cancel();body.setAlpha(1f);return false;});
+    }
+    private void revealNarrative(LinearLayout host,TextView body,String raw){
+        if(!visual("reveal")||!animations||raw.equals(lastNarrative))return;
+        lastNarrative=raw;
+        final android.text.SpannableString styled=new android.text.SpannableString(body.getText());
+        java.util.ArrayList<android.text.style.CharacterStyle> masks=new java.util.ArrayList<>();
+        java.util.regex.Matcher parts=java.util.regex.Pattern.compile("(?s)\\S.*?(?=\\n\\s*\\n|\\z)").matcher(styled);
+        while(parts.find()){
+            if(masks.size()>=16)break;
+            android.text.style.CharacterStyle mask=new android.text.style.CharacterStyle(){
+                @Override public void updateDrawState(android.text.TextPaint paint){paint.setAlpha(0);}
+            };
+            styled.setSpan(mask,parts.start(),parts.end(),android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            masks.add(mask);
         }
+        if(masks.size()<2)return;
+        styled.removeSpan(masks.remove(0));
+        body.setText(styled,TextView.BufferType.SPANNABLE);
+        TextView skip=text("ПОКАЗАТЬ ВЕСЬ ТЕКСТ",11,accent(),true);skip.setGravity(Gravity.CENTER);skip.setPadding(dp(8),dp(10),dp(8),dp(10));host.addView(skip,lp(-1,-2));
+        final Runnable revealAll=()->{for(android.text.style.CharacterStyle mask:masks)styled.removeSpan(mask);masks.clear();body.setText(styled,TextView.BufferType.SPANNABLE);skip.setVisibility(View.GONE);};
+        skip.setOnClickListener(x->revealAll.run());
+        body.postDelayed(new Runnable(){public void run(){
+            if(!body.isAttachedToWindow()||masks.isEmpty())return;
+            styled.removeSpan(masks.remove(0));body.setText(styled,TextView.BufferType.SPANNABLE);
+            if(masks.isEmpty())skip.setVisibility(View.GONE);else body.postDelayed(this,100);
+        }},100);
     }
     private void choiceExtras(LinearLayout host,String action){
         if(!visual("choices"))return;
@@ -441,6 +468,13 @@ public final class MainActivity extends Activity {
         else if("POTION".equals(action))cost="−1 лечебное зелье";
         else if("DEFEND".equals(action))cost="Восстановление сил | снижение урона";
         else if("FLEE".equals(action))cost="Риск неудачного отступления";
+        else if("REST".equals(action))cost="−20 септимов | +1 день | восстановление";
+        else if("TALK_GIVE".equals(action))cost="−10 септимов при первой помощи";
+        else if("EXPLORE".equals(action))cost="−5 выносливости | возможна встреча с врагом";
+        else if("BUY_HP".equals(action))cost="−35 септимов";
+        else if("BUY_MP".equals(action))cost="−30 септимов";
+        else if("BUY_SWORD".equals(action))cost="−180 септимов";
+        else if("BUY_ARMOR".equals(action))cost="−160 септимов";
         if(!cost.isEmpty())addText(host,cost,12,ITEM_GOLD,true,3);
     }
     private static final class VisualSnapshot {
@@ -505,16 +539,31 @@ public final class MainActivity extends Activity {
             host.addView(line,lp(-1,-2));
         }
     }
+    private int chronicleFilter=0;
+    private static int chronicleKind(String event){
+        String value=event.toLowerCase(java.util.Locale.ROOT);
+        if(value.contains("→"))return 1;
+        if(value.startsWith("победа:")||value.startsWith("поражение")||value.contains("здоровья врагу")||value.contains("получаешь удар"))return 2;
+        if(value.startsWith("продано:")||value.contains("куплен")||value.contains("септимов"))return 3;
+        return 4;
+    }
     private void renderChronicle(){
         if(!visual("chronicle"))return;
         LinearLayout c=card();addText(c,"ХРОНИКА ПРИКЛЮЧЕНИЙ",12,accent(),true,12);
+        String[] labels={"Все","Путь","Бой","Добыча и сделки","События"};
+        HorizontalScrollView strip=new HorizontalScrollView(this);strip.setHorizontalScrollBarEnabled(false);LinearLayout filters=row();strip.addView(filters);
+        for(int i=0;i<labels.length;i++){final int index=i;TextView choice=text(labels[i],12,i==chronicleFilter?accent():MUTED,true);choice.setPadding(dp(8),dp(8),dp(8),dp(8));filters.addView(choice,lp(-2,-2));choice.setOnClickListener(view->{chronicleFilter=index;render();});}c.addView(strip,lp(-1,-2));
+        int shown=0;
         for(int i=game.visualChronicle.length()-1;i>=0;i--){
             JSONObject entry=game.visualChronicle.optJSONObject(i);if(entry==null)continue;
-            addText(c,"◇  День "+entry.optInt("day")+" | "+entry.optString("location"),12,ITEM_GOLD,true,4);
-            addText(c,entry.optString("event"),14,TEXT,false,11);
+            String event=entry.optString("event");int kind=chronicleKind(event);if(chronicleFilter!=0&&kind!=chronicleFilter)continue;
+            LinearLayout line=row();line.addView(new SkyrimIconView(this,kind==1?"map":kind==2?"weapon":kind==3?"gold":"journal",accent()),lp(26,29));
+            LinearLayout details=column();line.addView(details,new LinearLayout.LayoutParams(0,-2,1));
+            addText(details,labels[kind]+" | День "+entry.optInt("day")+" | "+entry.optString("location"),12,ITEM_GOLD,true,4);addText(details,event,14,TEXT,false,11);c.addView(line,lp(-1,-2));shown++;
         }
-        if(game.visualChronicle.length()==0)addText(c,"Новые события появятся после совершённых действий.",13,MUTED,false,0);
+        if(shown==0)addText(c,"В этой категории пока нет событий.",13,MUTED,false,0);
     }
+
     private void reputationPanel(){
         if(!visual("reputation"))return;
         LinearLayout c=card();addText(c,"РЕПУТАЦИЯ И ОТНОШЕНИЯ",12,accent(),true,10);
@@ -543,14 +592,27 @@ public final class MainActivity extends Activity {
         LinearLayout layout=row();layout.setGravity(Gravity.CENTER_VERTICAL);
         LinearLayout slots=column();layout.addView(slots,new LinearLayout.LayoutParams(0,-2,1));
         for(String[] slot:new String[][]{{"head","Голова"},{"body","Доспех"},{"hands","Руки"},{"feet","Ноги"}}){
-            addText(slots,slot[1],10,MUTED,true,2);addText(slots,game.progress.equippedName(slot[0]),12,TEXT,false,7);
+            gearSlot(slots,slot[0],slot[1]);
         }
         layout.addView(new VisualEffectsView.HeroSilhouette(this,accent()),lp(80,172));
         LinearLayout right=column();right.setPadding(dp(6),0,0,0);layout.addView(right,new LinearLayout.LayoutParams(0,-2,1));
         for(String[] slot:new String[][]{{"weapon","Оружие"},{"shield","Щит"},{"ring","Кольцо"},{"neck","Амулет"}}){
-            addText(right,slot[1],10,MUTED,true,2);addText(right,game.progress.equippedName(slot[0]),12,TEXT,false,7);
+            gearSlot(right,slot[0],slot[1]);
         }
         items.addView(layout,lp(-1,-2));
+    }
+    private void gearSlot(LinearLayout host,String slot,String label){
+        LinearLayout tile=column();tile.setPadding(dp(3),dp(5),dp(3),dp(5));
+        String equipped=game.progress.equippedName(slot);boolean active=!"Не надето".equals(equipped);
+        addText(tile,label,10,active?accent():MUTED,true,2);addText(tile,equipped,12,TEXT,false,3);
+        tile.setBackground(new RuneFrameDrawable(PANEL,active?accent():BORDER,false));host.addView(tile,lp(-1,-2));space(host,4);
+        tile.setOnClickListener(view->{
+            java.util.ArrayList<ItemCatalog.Item> list=new java.util.ArrayList<>();
+            for(ItemCatalog.Item item:game.progress.owned("Все","Название"))if(slot.equals(item.slot()))list.add(item);
+            if(list.isEmpty()){toast("Нет подходящих предметов");return;}
+            String[] names=new String[list.size()];for(int i=0;i<names.length;i++){ItemCatalog.Item item=list.get(i);names[i]=(game.progress.equipped(item.id)?"✓ ":"")+item.name;}
+            new RuneDialogBuilder(this,accent()).setTitle(label).setItems(names,(d,i)->itemDialog(list.get(i))).setNegativeButton("Закрыть",null).show();
+        });
     }
     private void starSkills(){
         if(!visual("stars"))return;
@@ -614,16 +676,28 @@ public final class MainActivity extends Activity {
         if(items.isEmpty())dialog.setMessage("Нет доступных для продажи предметов.");else dialog.setItems(labels.toArray(new String[0]),(d,i)->confirmSale(items.get(i)));
         dialog.show();
     }
+    private final java.util.ArrayDeque<String> noticeQueue=new java.util.ArrayDeque<>();
+    private boolean noticeShowing;
     private void themedNotice(String message){
         if(!visual("notice")||root==null||!root.isAttachedToWindow()){Toast.makeText(this,message,Toast.LENGTH_SHORT).show();return;}
+        if(noticeQueue.size()>=8)noticeQueue.removeFirst();
+        noticeQueue.addLast(message);showNextNotice();
+    }
+    private void showNextNotice(){
+        if(noticeShowing||noticeQueue.isEmpty()||isFinishing()||isDestroyed())return;
+        if(!visual("notice")){noticeQueue.clear();return;}
         android.view.ViewGroup decor=findViewById(android.R.id.content);
+        String message=noticeQueue.removeFirst();
         if(!(decor instanceof FrameLayout)){Toast.makeText(this,message,Toast.LENGTH_SHORT).show();return;}
+        noticeShowing=true;
         TextView notice=text(message,14,TEXT,true);notice.setGravity(Gravity.CENTER);notice.setPadding(dp(16),dp(12),dp(16),dp(12));
         notice.setBackground(new RuneFrameDrawable(0xff101315,accent(),false));
         FrameLayout.LayoutParams p=new FrameLayout.LayoutParams(-1,-2,Gravity.TOP);
         p.setMargins(dp(15),dp(12),dp(15),0);decor.addView(notice,p);
-        if(animations){notice.setAlpha(0f);notice.animate().alpha(1f).setDuration(160).start();}
-        notice.postDelayed(()->{if(notice.getParent()==decor)decor.removeView(notice);},2400);
+        if(animations){notice.setTranslationY(-dp(12));notice.setAlpha(0f);notice.animate().translationY(0).alpha(1f).setDuration(180).start();}
+        new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(()->{
+            if(notice.getParent()==decor)decor.removeView(notice);noticeShowing=false;showNextNotice();
+        },2400);
     }
 
     private void render(){
@@ -1123,6 +1197,7 @@ public final class MainActivity extends Activity {
         narrative.addView(body);
         decorateNarrative(narrative,body,s.body);
         makeItemsClickable(body,body.getText().toString());
+        revealNarrative(narrative,body,s.body);
         renderVisualResults();tradeVisual();
         renderItemGains();
         renderStoryJournal();
@@ -1375,6 +1450,7 @@ public final class MainActivity extends Activity {
         narrative.addView(aiTurnText,lp(-1,-2));
         decorateNarrative(narrative,aiTurnText,game.aiTurn.scene);
         makeItemsClickable(aiTurnText,aiTurnText.getText().toString());
+        revealNarrative(narrative,aiTurnText,game.aiTurn.scene);
         renderItemGains();
         space(content,16);
         addText(content,"ВЫБЕРИ ОДИН ИЛИ НЕСКОЛЬКО ВАРИАНТОВ. ОТПРАВКА ТОЛЬКО ПО КНОПКЕ НИЖЕ.",12,MUTED,false,11);
