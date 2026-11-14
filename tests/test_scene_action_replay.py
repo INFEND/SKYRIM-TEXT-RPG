@@ -21,7 +21,11 @@ class SceneActionReplayTest(unittest.TestCase):
 
     def test_battle_escape_guard_still_present(self):
         self.assertIn('if ("COMBAT".equals(mode)', SRC)
-        self.assertIn('"FLEE".equals(action))) return;', SRC)
+        guard=SRC.split('if ("COMBAT".equals(mode)',1)[1].split('return;',1)[0]
+        self.assertIn('"FLEE".equals(action)',guard)
+        self.assertIn('"CANON_SHOUT".equals(action)',guard)
+        for forbidden in ('GO_WORLD','LOC:','SHOP','CANON_OPEN'):
+            self.assertNotIn(forbidden,guard)
 
 if __name__ == "__main__":
     unittest.main()
