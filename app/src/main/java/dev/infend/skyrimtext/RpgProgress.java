@@ -23,6 +23,7 @@ public final class RpgProgress {
     private final int[] combatPerks=new int[6];
     private final int[] studyPerks=new int[RpgContent.SKILLS.length];
     TalentBranches branches=new TalentBranches();
+    AdvancedPerks advanced=new AdvancedPerks();
     public int talentRank(int skill){return skill<0||skill>=studyPerks.length?0:isCombatPerk(skill)?combatPerkRank(skill):studyPerks[skill];}
     public int talentNeed(int skill,int rank){return isCombatPerk(skill)?Math.max(0,(rank-1)*20):rank*20;}
     public boolean canBuyTalent(int skill){int rank=talentRank(skill);return skill>=0&&skill<studyPerks.length&&rank<5&&perkPoints>0&&skillLevel(skill)>=talentNeed(skill,rank+1);}
@@ -40,6 +41,7 @@ public final class RpgProgress {
         return tier;
     }
     public String smithingQualityName(){return QUALITY[smithingQuality()];}
+    private int temperTarget(ItemCatalog.Item item){int tier=smithingQuality();return advanced.has(AdvancedPerks.STEEL)&&item.id.toLowerCase(java.util.Locale.ROOT).startsWith("стальн")?Math.min(QUALITY.length-1,tier+1):tier;}
     public double temperBonus(ItemCatalog.Item item){
         int tier=temperQuality(item.id);
         if(tier==0)return 0;
@@ -56,13 +58,13 @@ public final class RpgProgress {
         if(material.isEmpty())return "Улучшение этого предмета пока недоступно";
         if(quantity(item.id)!=1)return "Для улучшения нужен одиночный экземпляр";
         if("COMBAT".equals(g.mode)||!atForge())return "Нужна кузница в поселении, вне боя";
-        if(smithingQuality()<=temperQuality(item.id))return "Нужен более высокий навык кузнечного дела";
+        if(temperTarget(item)<=temperQuality(item.id))return "Нужен более высокий навык кузнечного дела";
         if(quantity(material)<1)return "Не хватает материала: "+material;
         return "";
     }
     public boolean temper(ItemCatalog.Item item,GameEngine g){
         if(!temperBlock(item,g).isEmpty())return false;
-        int next=smithingQuality();
+        int next=temperTarget(item);
         if(!removeItem(item.temperMaterial(),1))return false;
         tempered.put(item.id,next);
         skillExperience(g,6,Math.max(1,30+next*15));
@@ -134,7 +136,10 @@ public final class RpgProgress {
     public double damageReduction(){
         boolean heavy=false,light=false;for(String slot:SLOTS){ItemCatalog.Item item=ItemCatalog.find(equipped.get(slot));if(item!=null&&item.wearable()&&item.baseStat>0){heavy|=item.statSkill==4;light|=item.statSkill==5;}}
         double base=Math.min(0.8,(equippedArmor()+25*armorPieces())*0.0012);
-        return Math.min(0.8,base+(heavy?.02*branches.rank(4):0)+(light?.02*branches.rank(5):0));
+        int heavyPieces=0,lightPieces=0;
+        for(String slot:new String[]{"head","body","hands","feet"}){ItemCatalog.Item item=ItemCatalog.find(equipped.get(slot));if(item!=null&&item.baseStat>0){if(item.statSkill==4)heavyPieces++;if(item.statSkill==5)lightPieces++;}}
+        double fit=heavyPieces==4&&advanced.has(AdvancedPerks.WELL_FITTED)?.05:lightPieces==4&&advanced.has(AdvancedPerks.CUSTOM_FIT)?.05:0;
+        return Math.min(0.8,base+(heavy?.02*branches.rank(4):0)+(light?.02*branches.rank(5):0)+fit);
     }
     public void shopEquip(String id){equip(id);}
 
@@ -235,7 +240,7 @@ public final class RpgProgress {
         int difficulty=baseDifficulty+Math.max(0,15-g.level)*2;
         int danger=Math.max(0,g.region/2)+difficulty/10;
         int skill=skillIndex<0?0:(skillLevel(skillIndex)-15)/2;
-        int context=Math.min(18,g.reputation/3)+skill+branches.chanceBonus(skillIndex)-((int)carryWeight()>45?8:0);
+        int context=Math.min(18,g.reputation/3)+skill+branches.chanceBonus(skillIndex)+(skillIndex==12&&advanced.has(AdvancedPerks.PERSUASION)?5:0)-((int)carryWeight()>45?8:0);
         return RpgContent.successChance(g,stat,difficulty,danger,exhaustion,context);
     }
     public int chance(GameEngine g,String action){
@@ -249,7 +254,7 @@ public final class RpgProgress {
             return chance(g,which,skillFor(which),12+(which*5)%34);
         }
         switch(action){
-            case "HEAVY":return g.stamina>=10?chance(g,2,1,30):-1;
+            case "HEAVY":return g.stamina>=g.heavyCost()?chance(g,2,equippedWeaponSkill(),30):-1;
             case "FLEE":return "WILD".equals(g.battleKind)?chance(g,2,9,38):-1;
             case "EVENT_HELP":return chance(g,0,14,15);
             case "EVENT_SEARCH":return chance(g,2,9,25);
@@ -361,7 +366,7 @@ public final class RpgProgress {
              .put("skillXp",new JSONArray(skillXp)).put("inventory",inventory)
              .put("completed",new JSONArray(completed)).put("failed",new JSONArray(failed))
              .put("questOutcomes",new JSONObject(questOutcomes))
-             .put("perks",perkPoints).put("combatPerks",new JSONArray(combatPerks)).put("studyPerks",new JSONArray(studyPerks)).put("talentBranches",branches.toJson())
+             .put("perks",perkPoints).put("combatPerks",new JSONArray(combatPerks)).put("studyPerks",new JSONArray(studyPerks)).put("talentBranches",branches.toJson()).put("advancedPerks",advanced.toJson())
              .put("equipmentInitialized",equipmentInitialized).put("equipped",new JSONObject(equipped))
              .put("tempered",new JSONObject(tempered))
              .put("activePowerDay",activePowerDay).put("difficulty",difficulty)
@@ -376,7 +381,7 @@ public final class RpgProgress {
     }
     public static RpgProgress fromJson(JSONObject obj){
         RpgProgress p=new RpgProgress();if(obj==null)return p;
-        p.branches=TalentBranches.fromJson(obj.optJSONArray("talentBranches"));
+        p.branches=TalentBranches.fromJson(obj.optJSONArray("talentBranches"));p.advanced=AdvancedPerks.fromJson(obj.optJSONArray("advancedPerks"));
         p.startId=obj.optString("startId","Хелген");p.location=obj.optString("location","Хелген");
         p.recent=obj.optString("recent","");p.perkPoints=Math.max(0,obj.optInt("perks",0));
         p.activePowerDay=obj.optInt("activePowerDay",-1);p.difficulty=obj.optInt("difficulty",0);

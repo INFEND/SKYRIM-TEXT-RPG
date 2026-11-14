@@ -480,8 +480,8 @@ public final class MainActivity extends Activity {
     private void choiceExtras(LinearLayout host,String action){
         if(!visual("choices"))return;
         String cost="";
-        if("HEAVY".equals(action))cost="−10 выносливости";
-        else if("MAGIC".equals(action))cost="−12 магии";
+        if("HEAVY".equals(action))cost="−"+game.heavyCost()+" выносливости";
+        else if("MAGIC".equals(action))cost="−"+game.magicCost()+" магии";
         else if("POTION".equals(action))cost="−1 лечебное зелье";
         else if("DEFEND".equals(action))cost="Восстановление сил | снижение урона";
         else if("FLEE".equals(action))cost="Риск неудачного отступления";
@@ -691,6 +691,15 @@ public final class MainActivity extends Activity {
         for(int i=0;i<labels.length;i++)labels[i]=FactionCampaign.NAMES[i]+" | "+game.factions.rank(i);
         new RuneDialogBuilder(this,accent()).setTitle("Фракции").setItems(labels,(d,i)->factionDetails(i)).setNegativeButton("Закрыть",null).show();
     }
+    private void renderFactionJournal(){
+        boolean any=false;for(int i=0;i<FactionCampaign.NAMES.length;i++)if(game.factions.stage(i)>0)any=true;
+        if(!any)return;LinearLayout panel=card();addText(panel,"ПОРУЧЕНИЯ ФРАКЦИЙ",12,accent(),true,10);
+        for(int i=0;i<FactionCampaign.NAMES.length;i++)if(game.factions.stage(i)>0){
+            final int f=i;addText(panel,FactionCampaign.NAMES[i]+" | "+game.factions.rank(i),14,TEXT,true,5);
+            addText(panel,game.factions.task(i)+" | "+game.factions.place(i),12,MUTED,false,6);
+            visualSummaryLink(panel,"ОТКРЫТЬ ПОРУЧЕНИЕ",()->factionDetails(f));space(panel,8);
+        }
+    }
     private void factionDetails(int f){
         LinearLayout panel=column();panel.setPadding(dp(14),dp(12),dp(14),dp(12));
         panel.addView(new SkyrimIconView(this,FactionCampaign.ICONS[f],accent()),lp(48,52));
@@ -701,7 +710,8 @@ public final class MainActivity extends Activity {
         addText(panel,"Место: "+game.factions.place(f),13,MUTED,false,8);
         int chance=game.factions.chance(game,f);if(chance>=0){addText(panel,"Шанс успеха: "+chance+"% | −10 выносливости",13,SceneChoiceMeta.chanceColor(chance),true,8);addText(panel,"Переговоры: "+game.factions.chance(game,f,true)+"% | −10 выносливости",12,MUTED,false,8);}
         String blocked=game.factions.block(game,f);if(!blocked.isEmpty())addText(panel,blocked,13,ITEM_DOWN,false,6);
-        addText(panel,"Авторская цепочка поручений текстовой игры.",11,MUTED,false,0);
+        addText(panel,"Авторская цепочка поручений текстовой игры.",11,MUTED,false,8);
+        WorldAtlas.Place destination=WorldAtlas.find(game.factions.place(f));if(destination!=null&&!destination.name.equals(game.progress.location)&&!"COMBAT".equals(game.mode))visualSummaryLink(panel,"МАРШРУТ К ЦЕЛИ",()->locationDialog(destination));
         AlertDialog.Builder dialog=new RuneDialogBuilder(this,accent()).setTitle(FactionCampaign.NAMES[f]).setView(panel).setNegativeButton("Закрыть",null);
         if(blocked.isEmpty())dialog.setPositiveButton(game.factions.stage(f)==0?"Вступить":"Выполнить",(d,w)->{
             if(game.factions.perform(game,f)){save();render();toast(game.message);factionDetails(f);}
@@ -798,16 +808,27 @@ public final class MainActivity extends Activity {
         String[] labels=new String[ids.size()];for(int i=0;i<labels.length;i++){String id=ids.get(i);labels[i]=id+" | "+game.merchantExtraPrice(id)+" септимов | "+game.merchantStock(id)+" шт.";}
         new RuneDialogBuilder(this,accent()).setTitle("Припасы и материалы").setItems(labels,(d,i)->{
             String id=ids.get(i);ItemCatalog.Item item=ItemCatalog.find(id);if(item==null)return;
-            new RuneDialogBuilder(this,accent()).setTitle(id).setMessage(item.description+"\nЦена: "+game.merchantExtraPrice(id)+" септимов.").setNegativeButton("Отмена",null).setPositiveButton("Купить",(dd,w)->{
-                if(game.buyExtra(id)){save();render();toast(game.message);}else toast("Покупка недоступна: проверь запас, деньги и вес.");extraShopDialog();
-            }).show();
+            tradeQuantity(item,true);
         }).setNegativeButton("Закрыть",null).show();
     }
-    private void confirmSale(ItemCatalog.Item item){
-        if(!game.canSell(item))return;
-        if(game.merchantGold()<game.salePrice(item)){toast("У торговца недостаточно септимов");return;}
-        new RuneDialogBuilder(this,accent()).setTitle(item.name).setMessage("Продать 1 шт. за "+game.salePrice(item)+" септимов?")
-            .setNegativeButton("Отмена",null).setPositiveButton("Продать",(d,w)->{if(game.sellOne(item.id)){recentItemGains.clear();save();render();toast(game.message);}else toast("Продажа недоступна");}).show();
+    private void confirmSale(ItemCatalog.Item item){tradeQuantity(item,false);}
+    private void tradeQuantity(ItemCatalog.Item item,boolean buying){
+        int max=buying?game.maxExtraPurchase(item.id):game.maxSale(item);
+        if(max<1){toast("Сделка недоступна: проверь запас, деньги и вес.");return;}
+        int price=buying?game.merchantExtraPrice(item.id):game.salePrice(item);
+        LinearLayout panel=column();panel.setPadding(dp(14),dp(10),dp(14),dp(10));
+        addText(panel,item.description,13,MUTED,false,10);
+        TextView total=text("",17,ITEM_GOLD,true);panel.addView(total,lp(-1,-2));
+        android.widget.SeekBar amount=new android.widget.SeekBar(this);amount.setMax(max-1);amount.setProgressTintList(ColorStateList.valueOf(accent()));panel.addView(amount,lp(-1,44));
+        final int[] count={1};Runnable refresh=()->total.setText(count[0]+" / "+max+" шт. | "+((long)price*count[0])+" септимов");
+        amount.setOnSeekBarChangeListener(new android.widget.SeekBar.OnSeekBarChangeListener(){
+            public void onStartTrackingTouch(android.widget.SeekBar b){}public void onStopTrackingTouch(android.widget.SeekBar b){}
+            public void onProgressChanged(android.widget.SeekBar b,int value,boolean fromUser){count[0]=value+1;refresh.run();}
+        });refresh.run();
+        new RuneDialogBuilder(this,accent()).setTitle(item.name).setView(panel).setNegativeButton("Отмена",null).setPositiveButton(buying?"Купить":"Продать",(d,w)->{
+            boolean success=buying?game.buyExtraMany(item.id,count[0]):game.sellMany(item.id,count[0]);
+            if(success){recentItemGains.clear();save();render();toast(game.message);}else toast("Условия сделки изменились.");
+        }).show();
     }
     private void sellDialog(){
         if(!"SHOP".equals(game.mode))return;
@@ -3221,17 +3242,33 @@ public final class MainActivity extends Activity {
                 addText(box,TalentBranches.NAMES[index][i]+" | "+(owned?"Изучен":requirement),14,owned?ITEM_GOLD:TEXT,true,4);
                 addText(box,TalentBranches.effect(index),11,MUTED,false,8);
             }
+            for(int k=0;k<AdvancedPerks.NAMES.length;k++)if(AdvancedPerks.SKILL[k]==index){final int perk=k;boolean owned=game.progress.advanced.has(k);
+                addText(box,AdvancedPerks.NAMES[k]+" | "+(owned?"Изучен":"Навык "+AdvancedPerks.NEED[k]),14,owned?ITEM_GOLD:TEXT,true,4);
+                addText(box,AdvancedPerks.EFFECT[k],11,MUTED,false,5);
+                if(game.progress.advanced.canBuy(game.progress,k))visualSummaryLink(box,"ИЗУЧИТЬ | 1 ОЧКО",()->advancedPerkDialog(index));
+            }
             ScrollView scroller=new ScrollView(this);scroller.addView(box);builder.setView(scroller);
         }else builder.setMessage(details+"\n"+title+" "+rank+"/5"+"\nСпециализации: "+game.progress.branches.rank(index)+"/3");
         if(game.progress.canBuyTalent(index))builder.setPositiveButton("Изучить следующий ранг",(d,w)->{
             if(combat?game.progress.buyCombatPerk(index):game.progress.buyTalent(game,index)){save();render();toast("Талант развит");}
         });
+        if(!visual("stars")){for(int k=0;k<AdvancedPerks.NAMES.length;k++)if(AdvancedPerks.SKILL[k]==index){builder.setNeutralButton("Таланты", (d,w)->advancedPerkDialog(index));break;}}
         if(game.progress.branches.canBuy(game.progress,index))builder.setNeutralButton("Специализация",(d,w)->{
             int r=game.progress.branches.rank(index);new RuneDialogBuilder(this,accent()).setTitle(TalentBranches.NAMES[index][r]).setMessage(TalentBranches.effect(index)+"\nЦена: 1 очко таланта.").setNegativeButton("Отмена",null).setPositiveButton("Изучить",(dd,ww)->{
                 if(game.progress.branches.buy(game.progress,index)){save();render();toast("Специализация изучена");showSkill(index);}
             }).show();
         });
         builder.show();
+    }
+
+    private void advancedPerkDialog(int index){
+        java.util.ArrayList<Integer> ids=new java.util.ArrayList<>();java.util.ArrayList<String> labels=new java.util.ArrayList<>();
+        for(int k=0;k<AdvancedPerks.NAMES.length;k++)if(AdvancedPerks.SKILL[k]==index){ids.add(k);labels.add(AdvancedPerks.NAMES[k]+" | "+(game.progress.advanced.has(k)?"Изучен":"Навык "+AdvancedPerks.NEED[k])+"\n"+AdvancedPerks.EFFECT[k]);}
+        if(ids.isEmpty())return;
+        new RuneDialogBuilder(this,accent()).setTitle("Особые таланты").setItems(labels.toArray(new String[0]),(d,i)->{
+            int k=ids.get(i);if(!game.progress.advanced.canBuy(game.progress,k)){toast("Талант изучен или условия не выполнены");return;}
+            new RuneDialogBuilder(this,accent()).setTitle(AdvancedPerks.NAMES[k]).setMessage(AdvancedPerks.EFFECT[k]+"\nЦена: 1 очко таланта.").setNegativeButton("Отмена",null).setPositiveButton("Изучить",(dd,w)->{if(game.progress.advanced.buy(game.progress,k)){save();render();toast("Талант изучен");}}).show();
+        }).setNegativeButton("Закрыть",null).show();
     }
 
     private static final String[][] CODEX_CREATURES={
@@ -3292,6 +3329,7 @@ public final class MainActivity extends Activity {
         skyrimTopTabs(4);
         section("ЛЕТОПИСЬ СЕВЕРА","Журнал","Выбирай задание, чтобы увидеть описание и текущую цель.");
         renderChronicle();
+        renderFactionJournal();
         String[] entries=game.aiJournal.isEmpty()?
             new String[]{"Путь Довакина","Драконий след","Пепельные печати","Опасные дороги"}:
             new String[]{"Путь Довакина","Драконий след","Пепельные печати","Опасные дороги","Задание ИИ"};

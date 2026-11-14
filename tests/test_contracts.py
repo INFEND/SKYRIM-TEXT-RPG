@@ -48,7 +48,7 @@ class GameContracts(unittest.TestCase):
     def test_honest_chances_and_no_combat_farming(self):
         engine=text("GameEngine.java")
         progress=text("RpgProgress.java")
-        self.assertIn('int hitChance=progress.chance(this,"HEAVY");stamina-=10',engine)
+        self.assertIn('int hitChance=progress.chance(this,"HEAVY");stamina-=heavyCost()',engine)
         self.assertIn('random.nextInt(100)<hitChance',engine)
         self.assertIn('int successChance=progress.chance(this,action)',engine)
         self.assertIn('random.nextInt(100)<successChance',engine)

@@ -75,7 +75,7 @@ public final class GameEngine {
         for(int i=4;i<MerchantLedger.KEYS.length;i++)if(ItemCatalog.find(MerchantLedger.KEYS[i])!=null&&MerchantLedger.capacity(region,(Math.max(1,day)-1)/MerchantLedger.RESTOCK_DAYS,i)>0)result.add(MerchantLedger.KEYS[i]);
         return result;
     }
-    public int merchantExtraPrice(String id){ItemCatalog.Item item=ItemCatalog.find(id);if(item==null||item.value<=0)return 0;return Math.max(1,(int)Math.min(Integer.MAX_VALUE,((long)item.value*(120-5*progress.branches.rank(12))+99)/100));}
+    public int merchantExtraPrice(String id){ItemCatalog.Item item=ItemCatalog.find(id);if(item==null||item.value<=0)return 0;return Math.max(1,(int)Math.min(Integer.MAX_VALUE,((long)item.value*(120-5*progress.branches.rank(12)-(progress.advanced.has(AdvancedPerks.HAGGLING)?5:0))+99)/100));}
     public boolean buyExtra(String id){
         if(!started||!"SHOP".equals(mode)||!merchantExtras().contains(id))return false;
         int price=merchantExtraPrice(id);ItemCatalog.Item item=ItemCatalog.find(id);
@@ -84,9 +84,33 @@ public final class GameEngine {
         if(!merchants.purchase(region,day,id,price)){progress.removeItem(id,1);return false;}
         gold-=price;progress.sync(this);message="Куплено: "+id+" | −"+price+" септимов.";recordVisualEvent(message);return true;
     }
+    public int maxExtraPurchase(String id){
+        ItemCatalog.Item item=ItemCatalog.find(id);int price=merchantExtraPrice(id);
+        if(!"SHOP".equals(mode)||item==null||price<=0||!merchantExtras().contains(id))return 0;
+        int weight=item.weight<=0?99:(int)Math.floor((50.00001-progress.carryWeight())/item.weight);
+        return Math.max(0,Math.min(99,Math.min(merchantStock(id),Math.min(gold/price,weight))));
+    }
+    public boolean buyExtraMany(String id,int amount){
+        if(amount<1||amount>maxExtraPurchase(id))return false;
+        int total=merchantExtraPrice(id)*amount;
+        if(!progress.addItem(id,amount))return false;
+        if(!merchants.purchaseMany(region,day,id,total,amount)){progress.removeItem(id,amount);return false;}
+        gold-=total;progress.sync(this);message="Куплено: "+id+" ×"+amount+" | −"+total+" септимов.";recordVisualEvent(message);return true;
+    }
+    public int maxSale(ItemCatalog.Item item){
+        if(!canSell(item))return 0;int price=salePrice(item);if(price<=0)return 0;
+        return Math.max(0,Math.min(99,Math.min(progress.quantity(item.id),Math.min(merchantGold()/price,(Integer.MAX_VALUE-gold)/price))));
+    }
+    public boolean sellMany(String id,int amount){
+        ItemCatalog.Item item=ItemCatalog.find(id);if(amount<1||amount>maxSale(item))return false;
+        int total=salePrice(item)*amount;
+        if(!progress.removeItem(id,amount))return false;
+        if(!merchants.pay(region,day,total)){progress.addItem(id,amount);return false;}
+        gold+=total;progress.sync(this);message="Продано: "+id+" ×"+amount+" | +"+total+" септимов.";recordVisualEvent(message);return true;
+    }
     public boolean canSell(ItemCatalog.Item item){
         return started&&"SHOP".equals(mode)&&item!=null&&item.value>0&&progress.quantity(item.id)>0
-            &&!progress.equipped(item.id)&&!"Квестовые предметы".equals(item.category)&&!"Ключи".equals(item.category)
+            &&!progress.equipped(item.id)&&progress.temperQuality(item.id)==0&&!"Квестовые предметы".equals(item.category)&&!"Ключи".equals(item.category)
             &&!"Септимы".equals(item.id)&&!"Лечебное зелье".equals(item.id)&&!"Зелье магии".equals(item.id)
             &&!"Походный клинок".equals(item.id)&&!"Дорожная одежда".equals(item.id)
             &&!(swordUpgraded&&"Стальной меч".equals(item.id))&&!(armorUpgraded&&"Стальная кираса".equals(item.id));
@@ -274,8 +298,8 @@ public final class GameEngine {
         Scene s=new Scene("БОЙ | " + REGIONS[region], enemyName, enemyIntro + "\n\n" + battleLog +
             "\n\nПротивник: " + enemyHp + "/" + enemyMaxHp + " здоровья.\nТы: " + hp + "/" + maxHp + " здоровья.")
             .primary("ATTACK","Обычный удар","Стабильный урон, без затрат")
-            .add("HEAVY","Сильный удар","−10 выносливости | риск промаха")
-            .add("MAGIC","Магическая вспышка","−12 магии | усиленный урон")
+            .add("HEAVY","Сильный удар","−"+heavyCost()+" выносливости | риск промаха")
+            .add("MAGIC","Магическая вспышка","−"+magicCost()+" магии | усиленный урон")
             .add("DEFEND","Защититься","Уменьшить ответный урон")
             .add("POTION","Выпить лечебное зелье","Осталось: " + potions);
         if("WILD".equals(battleKind))s.add("FLEE","Отступить","Шанс выйти из боя без награды");
@@ -543,24 +567,27 @@ public final class GameEngine {
     public int effectiveArmor(){
         return Math.max(0,armor-(armorUpgraded?4:0))+(int)Math.round(progress.equippedArmor());
     }
+    public int heavyCost(){int skill=progress.equippedWeaponSkill();return skill==0&&progress.advanced.has(AdvancedPerks.FIGHTING)||skill==1&&progress.advanced.has(AdvancedPerks.CHAMPION)?7:10;}
+    public int magicCost(){return progress.advanced.has(AdvancedPerks.NOVICE_DESTRUCTION)?9:12;}
+    public int criticalChance(){return 8+(progress.equippedWeaponSkill()==2&&progress.advanced.has(AdvancedPerks.CRITICAL_SHOT)?10:0);}
     private void combatTurn(String action) {
         if(!mode.equals("COMBAT"))return;
         lastDealt=lastTaken=lastHealing=lastBlocked=0;lastHeavyHit=lastMiss=lastCritical=false;
         int damage=0;boolean defending=false;String actionText="";
         switch(action){
             case "ATTACK": damage=Math.max(1,effectiveAttack()+random.nextInt(9)-3);actionText="Ты наносишь удар: −"+damage+" здоровья врагу.";break;
-            case "HEAVY":if(stamina<10){battleLog="Недостаточно выносливости для сильного удара.";return;}
-                int hitChance=progress.chance(this,"HEAVY");stamina-=10;
+            case "HEAVY":if(stamina<heavyCost()){battleLog="Недостаточно выносливости для сильного удара.";return;}
+                int hitChance=progress.chance(this,"HEAVY");stamina-=heavyCost();
                 if(random.nextInt(100)<hitChance){damage=Math.max(1,effectiveAttack()*2+random.nextInt(9));actionText="Сильный удар! −"+damage+" здоровья врагу.";}else actionText="Сильный удар проходит мимо.";break;
-            case "MAGIC":if(magicka<12){battleLog="Недостаточно магии. Нужны 12 единиц.";return;}magicka-=12;damage=(int)Math.round((18+level*4+random.nextInt(8))*(1+.05*progress.branches.rank(13)));actionText="Магическая вспышка обжигает врага: −"+damage+".";break;
+            case "MAGIC":if(magicka<magicCost()){battleLog="Недостаточно магии. Нужны "+magicCost()+" единиц.";return;}magicka-=magicCost();damage=(int)Math.round((18+level*4+random.nextInt(8))*(1+.05*progress.branches.rank(13)));actionText="Магическая вспышка обжигает врага: −"+damage+".";break;
             case "CANON_SHOUT":if(!"CANONICAL".equals(battleKind)||canonicalShouts==0||canonicalShoutCooldown>0)return;
                 damage=24+level*3+((canonicalShouts&4)!=0?12:0);defending=true;canonicalShoutCooldown=3;actionText=CanonicalCampaign.combatShout(this)+": −"+damage+" здоровья врагу.";break;
-            case "DEFEND": defending=true;stamina=Math.min(maxStamina,stamina+12);magicka=Math.min(maxMagicka,magicka+5);actionText="Ты встаёшь в оборону, восстанавливая силы.";break;
+            case "DEFEND": defending=true;stamina=Math.min(maxStamina,stamina+12);magicka=Math.min(maxMagicka,magicka+5+(progress.advanced.has(AdvancedPerks.RECOVERY)?3:0));actionText="Ты встаёшь в оборону, восстанавливая силы.";break;
             case "POTION":if(potions==0){battleLog="Лечебных зелий больше нет.";return;}potions--;int restored=Math.min(45+5*progress.branches.rank(14),maxHp-hp);hp+=restored;lastHealing=restored;actionText="Ты восстанавливаешь "+restored+" здоровья.";break;
             case "FLEE":if(battleKind.equals("WILD")&&random.nextInt(100)<progress.chance(this,"FLEE")){mode="RESULT";poisonTurns=frostTurns=0;message="Ты уходишь от противника. Трофеев нет.";return;}actionText="Попытка отступить не удалась.";break;
             default:return;
         }
-        if("ATTACK".equals(action)&&damage>0&&random.nextInt(100)<8){
+        if("ATTACK".equals(action)&&damage>0&&random.nextInt(100)<criticalChance()){
             lastCritical=true;damage=Math.max(1,(int)Math.round(damage*1.5));actionText="Критический удар! −"+damage+" здоровья врагу.";
         }
         if(!"CANON_SHOUT".equals(action)&&canonicalShoutCooldown>0)canonicalShoutCooldown--;
@@ -568,7 +595,7 @@ public final class GameEngine {
         enemyHp=Math.max(0,enemyHp-damage);
         if(enemyHp==0) {poisonTurns=frostTurns=0;winBattle(actionText);return;}
         int baseIncoming=enemyDamage+random.nextInt(8)-Math.max(0,armor-(armorUpgraded?4:0));
-        int rawIncoming=Math.max(1,baseIncoming-(defending?enemyDamage/2+3+2*progress.branches.rank(3):0));
+        int rawIncoming=Math.max(1,baseIncoming-(defending?enemyDamage/2+3+2*progress.branches.rank(3)+(progress.advanced.has(AdvancedPerks.SHIELD_WALL)&&!"Не надето".equals(progress.equippedName("shield"))?3:0):0));
         int incoming=Math.max(1,(int)Math.round(rawIncoming*(1-progress.damageReduction())));
         if(defending)lastBlocked=Math.max(0,Math.max(1,(int)Math.round(Math.max(1,baseIncoming)*(1-progress.damageReduction())))-incoming);
         int poisoned=poisonTurns>0?Math.max(1,maxHp/40):0;

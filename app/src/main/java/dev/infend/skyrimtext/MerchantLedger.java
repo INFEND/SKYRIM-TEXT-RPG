@@ -33,6 +33,10 @@ final class MerchantLedger {
         int i=index(key);Shop s=at(region,day);if(i<0||price<=0||s.stock[i]<=0)return false;
         s.stock[i]--;s.gold=(int)Math.min(MAX_GOLD,(long)s.gold+price);return true;
     }
+    boolean purchaseMany(int region,int day,String key,int total,int count){
+        int i=index(key);Shop s=at(region,day);if(i<0||total<=0||count<1||s.stock[i]<count)return false;
+        s.stock[i]-=count;s.gold=(int)Math.min(MAX_GOLD,(long)s.gold+total);return true;
+    }
     boolean pay(int region,int day,int price){
         Shop s=at(region,day);if(price<=0||s.gold<price)return false;s.gold-=price;return true;
     }

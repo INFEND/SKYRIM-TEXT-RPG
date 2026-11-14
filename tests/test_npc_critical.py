@@ -10,6 +10,6 @@ class NpcCritical(unittest.TestCase):
         self.assertIn('ResourceStore.has(this,path)',ui)
     def test_critical_is_real_damage(self):
         s=(ROOT/"GameEngine.java").read_text()
-        self.assertIn('random.nextInt(100)<8',s)
+        self.assertIn('random.nextInt(100)<criticalChance()',s)
         self.assertIn('damage*1.5',s)
         self.assertIn('lastHeavyHit=lastMiss=lastCritical=false',s)
