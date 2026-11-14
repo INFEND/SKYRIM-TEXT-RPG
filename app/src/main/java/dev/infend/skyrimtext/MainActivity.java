@@ -2740,8 +2740,9 @@ public final class MainActivity extends Activity {
         return itemRow;
     }
     private int potionRestore(ItemCatalog.Item item){
-        if("Лечебное зелье".equals(item.id))return 45+5*game.progress.branches.rank(14);
+        if("Лечебное зелье".equals(item.id))return game.healingAmount();
         if("Зелье магии".equals(item.id))return 35;
+        if("Зелье запаса сил".equals(item.id))return game.staminaPotionAmount();
         return -1;
     }
     private void itemDetailMetrics(LinearLayout host,ItemCatalog.Item item){
@@ -2755,7 +2756,8 @@ public final class MainActivity extends Activity {
         int restoration=potionRestore(item);
         if(restoration>0){
             boolean healing="Лечебное зелье".equals(item.id);
-            metrics.addView(itemMetric(healing?"ЗДОРОВЬЕ":"МАГИЯ",healing?"health":"magic","+"+restoration,healing?0xffe16c72:ITEM_MAGIC,Double.NaN,true),new LinearLayout.LayoutParams(0,-2,1));
+            boolean stamina="Зелье запаса сил".equals(item.id);
+            metrics.addView(itemMetric(healing?"ЗДОРОВЬЕ":stamina?"СИЛЫ":"МАГИЯ",healing?"health":stamina?"stamina":"magic","+"+restoration,healing?0xffe16c72:stamina?0xff79bc86:ITEM_MAGIC,Double.NaN,true),new LinearLayout.LayoutParams(0,-2,1));
         }
         metrics.addView(itemMetric("ВЕС","bag",itemNumber(item.weight),0xffb5b5b5,worn==null?Double.NaN:item.weight-worn.weight,true),new LinearLayout.LayoutParams(0,-2,1));
         metrics.addView(itemMetric("ЦЕНА","septims",String.valueOf(item.value),ITEM_GOLD,worn==null?Double.NaN:item.value-worn.value,true),new LinearLayout.LayoutParams(0,-2,1));
@@ -2770,12 +2772,13 @@ public final class MainActivity extends Activity {
         boolean healing="Лечебное зелье".equals(item.id);
         String effect=item.effect;
         if(restoration>0){
-            int missing=healing?game.maxHp-game.hp:game.maxMagicka-game.magicka;
-            effect="Восстанавливает до "+restoration+(healing?" ед. здоровья":" ед. магии")+". Сейчас: +"+Math.max(0,Math.min(restoration,missing))+".";
+            int missing=healing?game.maxHp-game.hp:"Зелье запаса сил".equals(item.id)?game.maxStamina-game.stamina:game.maxMagicka-game.magicka;
+            effect="Восстанавливает до "+restoration+(healing?" ед. здоровья":"Зелье запаса сил".equals(item.id)?" ед. выносливости":" ед. магии")+". Сейчас: +"+Math.max(0,Math.min(restoration,missing))+".";
         }else if(potion){effect="Справочный эффект: "+effect;}
         LinearLayout line=row();
-        int color=restoration>0?(healing?0xffe16c72:ITEM_MAGIC):e.contains("огн")?0xffe69b56:magic?ITEM_MAGIC:0xffa3a3a3;
-        line.addView(new ItemStatGlyph(this,restoration>0?(healing?"health":"magic"):e.contains("огн")?"fire":magic?"magic":"info",color),lp(19,19));
+        boolean staminaPotion="Зелье запаса сил".equals(item.id);
+        int color=restoration>0?(healing?0xffe16c72:staminaPotion?0xff79bc86:ITEM_MAGIC):e.contains("огн")?0xffe69b56:magic?ITEM_MAGIC:0xffa3a3a3;
+        line.addView(new ItemStatGlyph(this,restoration>0?(healing?"health":staminaPotion?"stamina":"magic"):e.contains("огн")?"fire":magic?"magic":"info",color),lp(19,19));
         TextView value=itemText(effect,14,color,false);
         LinearLayout.LayoutParams vp=new LinearLayout.LayoutParams(0,-2,1);vp.leftMargin=dp(8);
         line.addView(value,vp);host.addView(line,lp(-1,-2));space(host,5);

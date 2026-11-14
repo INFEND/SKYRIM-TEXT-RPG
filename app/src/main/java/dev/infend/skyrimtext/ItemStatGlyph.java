@@ -21,6 +21,7 @@ final class ItemStatGlyph extends View {
             case "bag":path(c,7,8,17,8,21,21,3,21,7,8);c.drawCircle(12,5,3,p);break;
             case "septims":c.drawCircle(9,9,6,p);c.drawArc(10,10,23,23,-92,270,false,p);path(c,9,6,9,12);break;
             case "health":{Path q=new Path();q.moveTo(12,21);q.cubicTo(9,18,2,13,2,8);q.cubicTo(2,2,9,1,12,7);q.cubicTo(15,1,22,2,22,8);q.cubicTo(22,13,15,18,12,21);q.close();c.drawPath(q,p);break;}
+            case "stamina":path(c,14,2,5,13,11,13,9,22,19,10,13,10,14,2);break;
             case "magic":path(c,12,2,15,9,22,12,15,15,12,22,9,15,2,12,9,9,12,2);break;
             case "fire":{Path q=new Path();q.moveTo(12,2);q.cubicTo(19,10,22,14,18,20);q.cubicTo(11,26,3,20,5,13);q.cubicTo(6,10,9,10,9,7);q.cubicTo(11,11,13,10,12,2);q.close();c.drawPath(q,p);break;}
             default:c.drawCircle(12,12,9,p);path(c,12,11,12,17);c.drawCircle(12,7,.5f,p);
