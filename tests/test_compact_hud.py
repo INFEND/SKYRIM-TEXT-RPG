@@ -10,6 +10,12 @@ class CompactHud(unittest.TestCase):
                       'game.level*80-game.xp','game.progress.carryWeight()','String.valueOf(game.gold)',
                       'game.level>=100','hudBar(stats,"xp"','bar.setProgress(target,true)'):
             self.assertIn(token,UI)
+    def test_no_duplicate_story_snapshot_and_short_experience_label(self):
+        self.assertNotIn("renderStorySnapshot",UI)
+        self.assertNotIn('"Опыт / осталось"',UI)
+        self.assertIn('hudMetric(details,"Опыт","experience",game.xp+" / "',UI)
+        self.assertIn('game.level*80-game.xp',UI)
+        self.assertIn('ВИДЫ ЛОКАЦИИ',UI)
     def test_gallery_weather_is_current_location_and_offline(self):
         self.assertEqual(UI.count('renderLocationWeather(content);'),2)
         self.assertIn('renderLocationWeather(overview);',UI)

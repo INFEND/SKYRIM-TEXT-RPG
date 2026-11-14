@@ -778,7 +778,7 @@ public final class MainActivity extends Activity {
         double weight=game.progress.carryWeight();
         LinearLayout details=row();stats.addView(details,lp(-1,-2));
         hudMetric(details,"Уровень","level",String.valueOf(game.level),ITEM_GOLD,1f,()->{tab=3;render();});
-        hudMetric(details,"Опыт / осталось","experience",game.xp+" / "+(game.level>=100?"MAX":String.valueOf(next)),ITEM_GOLD,1.65f,()->{tab=3;render();});
+        hudMetric(details,"Опыт","experience",game.xp+" / "+(game.level>=100?"MAX":String.valueOf(next)),ITEM_GOLD,1.65f,()->{tab=3;render();});
         hudMetric(details,"Вес, кг","bag",itemNumber(weight)+"/50",weight>50?ITEM_DOWN:weight>=45?0xffe1ac70:TEXT,1.2f,()->{tab=2;render();});
         hudMetric(details,"Септимы","septims",String.valueOf(game.gold),ITEM_GOLD,1f,()->{tab=2;render();});
         hudBar(stats,"xp",game.level>=100?1:game.xp,game.level>=100?1:game.level*80,ITEM_GOLD,3);
@@ -1106,7 +1106,6 @@ public final class MainActivity extends Activity {
     private void renderStory(){
         if(prefs.getBoolean("ai_enabled",false)){renderAiGame();return;}
         GameEngine.Scene s=game.scene();section(s.kicker,s.title,"");
-        renderStorySnapshot();
         if(LocationGalleryView.hasGallery(game.progress.location)){
             addText(content,"ᛟ  ВИДЫ ЛОКАЦИИ",11,accent(),true,9);
             content.addView(sceneGallery(game.progress.location),lp(-1,-2));
@@ -1151,14 +1150,6 @@ public final class MainActivity extends Activity {
         }
         space(content,5);
         addText(content,"Каждое действие сохраняется автоматически",11,MUTED,false,0);
-    }
-
-    private void renderStorySnapshot(){
-        addText(content,game.name+" | "+game.race+" | Уровень "+game.level,17,TEXT,true,7);
-        addText(content,"⌖ "+game.progress.location+"  |  День "+game.day+"  |  Опыт "+game.xp,13,MUTED,false,7);
-        addText(content,"Вес: "+
-            String.format(java.util.Locale.forLanguageTag("ru"),"%.1f",game.progress.carryWeight())+
-            "/50 кг  |  "+game.gold+" септимов",13,accent(),false,12);
     }
 
     private void renderStoryJournal(){
