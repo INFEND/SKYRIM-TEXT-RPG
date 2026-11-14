@@ -467,22 +467,95 @@ public final class MainActivity extends Activity {
         },3400);
     }
 
+    // One compact HUD, shared by every started-game tab and both story modes.
+    private String hudOwner="";
+    private final java.util.Map<String,Integer> hudPrevious=new java.util.HashMap<>();
     private void renderBars(){
-        LinearLayout stats=row();stats.setPadding(dp(19),dp(11),dp(19),dp(11));
-        stats.setBackgroundColor(PANEL);topChrome.addView(stats,lp(-1,-2));
-        stat(stats,"ЗДОРОВЬЕ",game.hp,game.maxHp,0xFFE47B7B);
-        stat(stats,"ЗАПАС СИЛ",game.stamina,game.maxStamina,0xFF79CC9C);
-        stat(stats,"МАГИЯ",game.magicka,game.maxMagicka,0xFF7DABF4);
-        View line=new View(this);line.setBackgroundColor(BORDER);topChrome.addView(line,lp(-1,1));
+        String owner=aiSession+"|"+game.name+"|"+game.race;
+        if(!owner.equals(hudOwner)){hudOwner=owner;hudPrevious.clear();}
+        LinearLayout stats=column();stats.setPadding(dp(12),dp(7),dp(12),dp(7));
+        stats.setBackgroundColor(0xff050505);topChrome.addView(stats,lp(-1,-2));
+        LinearLayout resources=row();stats.addView(resources,lp(-1,-2));
+        stat(resources,"Здоровье","health",game.hp,game.maxHp,0xffd76060);
+        stat(resources,"Выносливость","stamina",game.stamina,game.maxStamina,0xff83b779);
+        stat(resources,"Магия","magic",game.magicka,game.maxMagicka,0xff75a2dd);
+        View separator=new View(this);separator.setBackgroundColor(0xff303030);
+        LinearLayout.LayoutParams rule=lp(-1,1);rule.topMargin=dp(5);rule.bottomMargin=dp(4);
+        stats.addView(separator,rule);
+        int next=game.level>=100?0:Math.max(0,game.level*80-game.xp);
+        double weight=game.progress.carryWeight();
+        LinearLayout details=row();stats.addView(details,lp(-1,-2));
+        hudMetric(details,"Уровень","level",String.valueOf(game.level),ITEM_GOLD,1f,()->{tab=3;render();});
+        hudMetric(details,"Опыт / осталось","experience",game.xp+" / "+(game.level>=100?"MAX":String.valueOf(next)),ITEM_GOLD,1.65f,()->{tab=3;render();});
+        hudMetric(details,"Вес, кг","bag",itemNumber(weight)+"/50",weight>50?ITEM_DOWN:weight>=45?0xffe1ac70:TEXT,1.2f,()->{tab=2;render();});
+        hudMetric(details,"Септимы","septims",String.valueOf(game.gold),ITEM_GOLD,1f,()->{tab=2;render();});
+        hudBar(stats,"xp",game.level>=100?1:game.xp,game.level>=100?1:game.level*80,ITEM_GOLD,3);
     }
-    private void stat(LinearLayout host,String name,int value,int max,int color){
-        LinearLayout col=column();LinearLayout.LayoutParams ww=new LinearLayout.LayoutParams(0,-2,1);ww.setMargins(dp(3),0,dp(6),0);host.addView(col,ww);
-        TextView cap=text(name,9,MUTED,true);col.addView(cap);
-        TextView num=text(value+"/"+max,11,TEXT,true);col.addView(num);
+    private void stat(LinearLayout host,String name,String glyph,int value,int max,int color){
+        LinearLayout col=column();col.setPadding(dp(3),0,dp(3),0);
+        host.addView(col,new LinearLayout.LayoutParams(0,-2,1));
+        LinearLayout line=row();line.setGravity(Gravity.CENTER);
+        line.addView(new HudGlyphView(this,glyph,color),lp(16,16));
+        TextView num=hudText(value+"/"+max,13,color,true);
+        LinearLayout.LayoutParams np=lp(-2,-2);np.leftMargin=dp(3);line.addView(num,np);
+        col.addView(line,lp(-1,-2));
+        hudBar(col,glyph,value,max,color,6);
+        col.addView(hudText(name,10,MUTED,false),lp(-1,-2));
+        col.setContentDescription(name+": "+value+" из "+max);
+        col.setOnClickListener(v->{tab=3;render();});
+    }
+    private TextView hudText(String value,int size,int color,boolean bold){
+        TextView t=text(value,size,color,bold);
+        t.setGravity(Gravity.CENTER);t.setSingleLine(true);
+        t.setAutoSizeTextTypeUniformWithConfiguration(9,Math.max(10,sp(size)),1,android.util.TypedValue.COMPLEX_UNIT_SP);
+        t.setIncludeFontPadding(false);
+        return t;
+    }
+    private void hudMetric(LinearLayout host,String label,String glyph,String value,int color,float weight,Runnable action){
+        LinearLayout col=column();col.setPadding(dp(1),dp(3),dp(1),dp(3));
+        host.addView(col,new LinearLayout.LayoutParams(0,-2,weight));
+        LinearLayout line=row();line.setGravity(Gravity.CENTER);
+        line.addView(new HudGlyphView(this,glyph,color),lp(14,14));
+        TextView number=hudText(value,12,color,true);
+        LinearLayout.LayoutParams np=lp(-2,-2);np.leftMargin=dp(2);
+        number.setMaxWidth(dp(glyph.equals("experience")?104:72));
+        line.addView(number,np);col.addView(line,lp(-1,-2));
+        col.addView(hudText(label,10,MUTED,false),lp(-1,-2));
+        col.setContentDescription(label+": "+value);col.setOnClickListener(v->action.run());
+    }
+    private void hudBar(LinearLayout host,String key,int value,int max,int color,int height){
+        int limit=Math.max(1,max),target=Math.max(0,Math.min(limit,value));
+        int previous=hudPrevious.getOrDefault(key,target);hudPrevious.put(key,target);
         ProgressBar bar=new ProgressBar(this,null,android.R.attr.progressBarStyleHorizontal);
-        bar.setMax(Math.max(1,max));bar.setProgress(Math.max(0,value));bar.setProgressTintList(ColorStateList.valueOf(color));
-        bar.setProgressBackgroundTintList(ColorStateList.valueOf(BORDER));
-        LinearLayout.LayoutParams b=lp(-1,3);b.topMargin=dp(6);col.addView(bar,b);
+        GradientDrawable track=new GradientDrawable();track.setColor(0xff242424);
+        GradientDrawable fill=new GradientDrawable();fill.setColor(color);
+        android.graphics.drawable.ClipDrawable clipped=new android.graphics.drawable.ClipDrawable(fill,Gravity.LEFT,android.graphics.drawable.ClipDrawable.HORIZONTAL);
+        android.graphics.drawable.LayerDrawable layers=new android.graphics.drawable.LayerDrawable(new android.graphics.drawable.Drawable[]{track,clipped});
+        layers.setId(0,android.R.id.background);layers.setId(1,android.R.id.progress);
+        bar.setProgressDrawable(layers);bar.setMax(limit);bar.setPadding(0,0,0,0);
+        bar.setProgress(Math.max(0,Math.min(limit,previous)));
+        LinearLayout.LayoutParams bp=lp(-1,height);bp.topMargin=dp(4);bp.bottomMargin=dp(3);host.addView(bar,bp);
+        if(animations&&previous!=target)bar.setProgress(target,true);else bar.setProgress(target);
+        bar.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO);
+    }
+    private void renderLocationWeather(LinearLayout host){
+        WorldWeather w=WorldWeather.at(game.region,game.progress.location,game.day,game.hour);
+        LinearLayout strip=row();strip.setPadding(dp(4),dp(7),dp(4),dp(6));
+        strip.setBackgroundColor(0xff050505);host.addView(strip,lp(-1,-2));
+        int tempColor=w.temperature<=0?0xff82b9dc:w.temperature>=25?0xffe7a470:0xffd4c19f;
+        weatherMetric(strip,w.timeGlyph(),w.time(),"Время",ITEM_GOLD);
+        weatherMetric(strip,w.glyph,w.weather,"Погода",0xffb8c2ce);
+        weatherMetric(strip,"temperature",w.formattedTemperature(),"Температура",tempColor);
+        strip.setContentDescription("Игровая погода и температура: "+w.weather+", "+w.formattedTemperature()+", "+w.time());
+    }
+    private void weatherMetric(LinearLayout host,String glyph,String value,String label,int color){
+        LinearLayout col=column();col.setGravity(Gravity.CENTER);col.setPadding(dp(2),0,dp(2),0);
+        host.addView(col,new LinearLayout.LayoutParams(0,-2,1));
+        col.addView(new HudGlyphView(this,glyph,color),lp(25,25));
+        TextView number=hudText(value,15,color,true);
+        LinearLayout.LayoutParams np=lp(-1,-2);np.topMargin=dp(3);col.addView(number,np);
+        TextView caption=hudText(label,10,MUTED,false);
+        LinearLayout.LayoutParams cp=lp(-1,-2);cp.topMargin=dp(3);col.addView(caption,cp);
     }
     private void section(String eyebrow,String heading,String subtitle){
         TextView over=text(eyebrow.toUpperCase(java.util.Locale.ROOT),10,MUTED,true);
@@ -745,6 +818,7 @@ public final class MainActivity extends Activity {
         if(LocationGalleryView.hasGallery(game.progress.location)){
             addText(content,"ᛟ  ВИДЫ ЛОКАЦИИ",11,accent(),true,9);
             content.addView(new LocationGalleryView(this,game.progress.location,accent(),false),lp(-1,-2));
+            renderLocationWeather(content);
         }else{
             content.addView(new NordicArtView(this,NordicArtView.STORY),lp(-1,188));
         }
@@ -927,6 +1001,7 @@ public final class MainActivity extends Activity {
         if(LocationGalleryView.hasGallery(game.progress.location)){
             addText(content,"ᛟ  "+game.progress.location.toUpperCase(java.util.Locale.ROOT),12,accent(),true,10);
             content.addView(new LocationGalleryView(this,game.progress.location,accent(),false),lp(-1,-2));
+            renderLocationWeather(content);
             space(content,13);
         }
         if(!ready){
@@ -1675,6 +1750,7 @@ public final class MainActivity extends Activity {
         if(LocationGalleryView.hasGallery(game.progress.location)){
             addText(overview,"ᛟ  ГАЛЕРЕЯ ТЕКУЩЕГО МЕСТА",11,accent(),true,12);
             overview.addView(new LocationGalleryView(this,game.progress.location,accent(),false),lp(-1,-2));
+            renderLocationWeather(overview);
         }
         addText(content,"МЕСТА И ПЕРЕХОДЫ",11,accent(),true,10);
         actionButton("ПОИСК ПО ВСЕМ ТОЧКАМ АТЛАСА",SkyrimMapCatalog.size()+" локаций материка и Солстейма",false,()->searchSkyrimAtlas(terrainMap));
@@ -1951,6 +2027,7 @@ public final class MainActivity extends Activity {
             wrapper.setPadding(dp(9),dp(9),dp(9),dp(12));
             scroller.addView(wrapper);
             wrapper.addView(new LocationGalleryView(this,place.name,accent(),false),lp(-1,-2));
+            if(place.name.equalsIgnoreCase(game.progress.location))renderLocationWeather(wrapper);
             TextView description=text(body,14,TEXT,false);
             description.setLineSpacing(dp(4),1.05f);
             description.setPadding(dp(8),dp(13),dp(8),dp(5));

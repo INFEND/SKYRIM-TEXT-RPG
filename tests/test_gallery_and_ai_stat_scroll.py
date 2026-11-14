@@ -52,7 +52,7 @@ class GalleryAndAiStats(unittest.TestCase):
         self.assertNotIn("handleVerticalScroll",UI)
         self.assertNotIn("topChrome.setTranslationY",UI)
         self.assertNotIn("scroll.setClipBounds",UI)
-        for name in ('"ЗДОРОВЬЕ"','"ЗАПАС СИЛ"','"МАГИЯ"'):
+        for name in ('"Здоровье"','"Выносливость"','"Магия"'):
             self.assertIn(name,UI)
 
 if __name__=="__main__":
