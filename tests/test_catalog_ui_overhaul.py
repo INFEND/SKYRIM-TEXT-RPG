@@ -13,7 +13,7 @@ class CatalogUiOverhaul(unittest.TestCase):
         self.assertIn('String display=label+": "+value;',UI)
         self.assertIn('int start=display.length()-value.length()',UI)
         self.assertIn("new android.text.style.StyleSpan(Typeface.BOLD),start,display.length()",UI)
-        self.assertIn('addChoiceStat(prose,"НАВЫК",SceneChoiceMeta.skillName(c.action)',UI)
+        self.assertIn('addChoiceStat(prose,"НАВЫК",choiceSkillName(c.action)',UI)
         self.assertIn('addChoiceStat(prose,"ШАНС УСПЕХА",chance+"%"',UI)
         self.assertIn('addChoiceStat(detail,"НАВЫК",option.skill.isEmpty()',UI)
         choice=UI.split("private void renderAiChoice(",1)[1].split("private void requestAiTurn(",1)[0]
