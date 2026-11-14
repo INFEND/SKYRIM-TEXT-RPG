@@ -4,8 +4,12 @@ ROOT=pathlib.Path(__file__).resolve().parents[1]/"app/src/main/java/dev/infend/s
 class Tempering(unittest.TestCase):
     def test_quality_and_resources(self):
         p=(ROOT/"RpgProgress.java").read_text()
-        for token in ("TEMPER_LEVELS={0,14,31,65,100,134,168}",'quantity(item.id)!=1','!atForge()','smithingQuality()<=temperQuality(item.id)','removeItem(item.temperMaterial(),1)','tempered.put(item.id,next)','new JSONObject(tempered)','optJSONObject("tempered")','if(n<=0)tempered.remove(id)'):
+        for token in ("TEMPER_LEVELS={0,14,31,65,100,134,168}",'quantity(item.id)!=1','!atForge()','temperTarget(item)<=temperQuality(item.id)','removeItem(item.temperMaterial(),1)','tempered.put(item.id,next)','new JSONObject(tempered)','optJSONObject("tempered")','if(n<=0)tempered.remove(id)'):
             self.assertIn(token,p)
+        self.assertIn('int next=temperTarget(item)',p)
+        self.assertIn('advanced.has(AdvancedPerks.STEEL)',p)
+        self.assertIn('Math.min(QUALITY.length-1,tier+1)',p)
+        self.assertIn('game.progress.temperTargetName(item)',(ROOT/"MainActivity.java").read_text())
         self.assertIn('progress.temperBonus(this)',(ROOT/"ItemCatalog.java").read_text())
         self.assertIn('game.progress.temper(item,game)',(ROOT/"MainActivity.java").read_text())
     def test_fixed_stats(self):

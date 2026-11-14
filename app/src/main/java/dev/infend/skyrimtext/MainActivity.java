@@ -2949,7 +2949,7 @@ public final class MainActivity extends Activity {
             if(blocked.isEmpty()){
                 TextView improve=itemAction("УЛУЧШИТЬ");space(view,8);view.addView(improve,lp(-1,43));
                 improve.setOnClickListener(v->new RuneDialogBuilder(this,accent()).setTitle("Улучшить "+item.name+"?")
-                    .setMessage("Расход: 1 × "+item.temperMaterial()+"\nКачество: "+game.progress.smithingQualityName())
+                    .setMessage("Расход: 1 × "+item.temperMaterial()+"\nКачество: "+game.progress.temperTargetName(item))
                     .setNegativeButton("Отмена",null).setPositiveButton("Улучшить",(a,b)->{
                         if(game.progress.temper(item,game)){save();render();toast("Предмет улучшен");}
                         else toast(game.progress.temperBlock(item,game));

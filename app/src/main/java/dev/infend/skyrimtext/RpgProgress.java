@@ -41,6 +41,7 @@ public final class RpgProgress {
         return tier;
     }
     public String smithingQualityName(){return QUALITY[smithingQuality()];}
+    public String temperTargetName(ItemCatalog.Item item){return QUALITY[temperTarget(item)];}
     private int temperTarget(ItemCatalog.Item item){int tier=smithingQuality();return advanced.has(AdvancedPerks.STEEL)&&item.id.toLowerCase(java.util.Locale.ROOT).startsWith("стальн")?Math.min(QUALITY.length-1,tier+1):tier;}
     public double temperBonus(ItemCatalog.Item item){
         int tier=temperQuality(item.id);
