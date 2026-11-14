@@ -259,7 +259,15 @@ public final class SkyrimTerrainMapView extends View {
                 if(discovered!=null&&discovered.sheet==sheet)clear.addCircle(left+discovered.x*scale,top+discovered.y*scale,145f*scale,android.graphics.Path.Direction.CW);}
             int layer=canvas.save();canvas.clipOutPath(clear);
             ink.setStyle(Paint.Style.FILL);ink.setColor(0x99000000);
-            canvas.drawRect(left,top,left+WIDTH[sheet]*scale,top+HEIGHT[sheet]*scale,ink);canvas.restoreToCount(layer);
+            canvas.drawRect(left,top,left+WIDTH[sheet]*scale,top+HEIGHT[sheet]*scale,ink);
+            // Feather the boundary on the explored side, without obscuring location pins.
+            canvas.restoreToCount(layer);
+            int feather=canvas.save();canvas.clipPath(clear);
+            for(String visited:game.visitedVisual){SkyrimMapCatalog.Site discovered=SkyrimMapCatalog.find(visited);
+                if(discovered!=null&&discovered.sheet==sheet){
+                    float x=left+discovered.x*scale,y=top+discovered.y*scale,r=145f*scale;
+                    if(r>0){ink.setShader(new android.graphics.RadialGradient(x,y,r,new int[]{0x00000000,0x00000000,0x66000000},new float[]{0f,.72f,1f},android.graphics.Shader.TileMode.CLAMP));canvas.drawCircle(x,y,r,ink);ink.setShader(null);}
+                }}canvas.restoreToCount(feather);
         }
         ArrayList<MapPinLayout.Pin> shown=renderedPins();labels.clear();
         // Markers never collapse into moving numeric clusters: each icon has

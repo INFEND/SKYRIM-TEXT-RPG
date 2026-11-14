@@ -57,9 +57,10 @@ public final class GameEngine {
     public AiGameTurn aiTurn;
     public SceneState sceneState = new SceneState();
     public String aiJournal = "";
-    public int poisonTurns,frostTurns,battleTurns,battleDealt,battleTaken,lastDealt,lastTaken,lastHealing;
+    public int poisonTurns,frostTurns,battleTurns,battleDealt,battleTaken,lastDealt,lastTaken,lastHealing,lastBlocked;
+    public boolean lastHeavyHit,lastMiss;
     public final int[] holdReputation=new int[10];
-    public void resetBattleVisuals(){poisonTurns=frostTurns=battleTurns=battleDealt=battleTaken=lastDealt=lastTaken=lastHealing=0;}
+    public void resetBattleVisuals(){poisonTurns=frostTurns=battleTurns=battleDealt=battleTaken=lastDealt=lastTaken=lastHealing=lastBlocked=0;lastHeavyHit=lastMiss=false;}
     public boolean canSell(ItemCatalog.Item item){
         return started&&"SHOP".equals(mode)&&item!=null&&item.value>0&&progress.quantity(item.id)>0
             &&!progress.equipped(item.id)&&!"Квестовые предметы".equals(item.category)&&!"Ключи".equals(item.category)
@@ -495,7 +496,7 @@ public final class GameEngine {
     }
     private void combatTurn(String action) {
         if(!mode.equals("COMBAT"))return;
-        lastDealt=lastTaken=lastHealing=0;
+        lastDealt=lastTaken=lastHealing=lastBlocked=0;lastHeavyHit=lastMiss=false;
         int damage=0;boolean defending=false;String actionText="";
         switch(action){
             case "ATTACK": damage=Math.max(1,effectiveAttack()+random.nextInt(9)-3);actionText="Ты наносишь удар: −"+damage+" здоровья врагу.";break;
@@ -508,11 +509,13 @@ public final class GameEngine {
             case "FLEE":if(battleKind.equals("WILD")&&random.nextInt(100)<progress.chance(this,"FLEE")){mode="RESULT";poisonTurns=frostTurns=0;message="Ты уходишь от противника. Трофеев нет.";return;}actionText="Попытка отступить не удалась.";break;
             default:return;
         }
-        lastDealt=Math.min(enemyHp,damage);battleDealt+=lastDealt;battleTurns++;
+        lastDealt=Math.min(enemyHp,damage);lastHeavyHit="HEAVY".equals(action)&&lastDealt>0;lastMiss="HEAVY".equals(action)&&lastDealt==0;battleDealt+=lastDealt;battleTurns++;
         enemyHp=Math.max(0,enemyHp-damage);
         if(enemyHp==0) {poisonTurns=frostTurns=0;winBattle(actionText);return;}
-        int rawIncoming=Math.max(1,enemyDamage+random.nextInt(8)-Math.max(0,armor-(armorUpgraded?4:0))-(defending?enemyDamage/2+3:0));
+        int baseIncoming=enemyDamage+random.nextInt(8)-Math.max(0,armor-(armorUpgraded?4:0));
+        int rawIncoming=Math.max(1,baseIncoming-(defending?enemyDamage/2+3:0));
         int incoming=Math.max(1,(int)Math.round(rawIncoming*(1-progress.damageReduction())));
+        if(defending)lastBlocked=Math.max(0,Math.max(1,(int)Math.round(Math.max(1,baseIncoming)*(1-progress.damageReduction())))-incoming);
         int poisoned=poisonTurns>0?Math.max(1,maxHp/40):0;
         if(poisonTurns>0)poisonTurns--;if(frostTurns>0){frostTurns--;stamina=Math.max(0,stamina-4);}
         String foe=enemyName.toLowerCase(java.util.Locale.ROOT);

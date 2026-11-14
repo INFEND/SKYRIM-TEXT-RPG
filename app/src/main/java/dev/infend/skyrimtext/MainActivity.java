@@ -160,7 +160,7 @@ public final class MainActivity extends Activity {
         super.onDestroy();
     }
     private void newAiSession(){
-        combatVisual="";victoryVisual="";travelVisual="";travelStops=java.util.Collections.emptyList();lastNarrative="";
+        combatVisual="";victoryVisual="";travelVisual="";combatLabels.clear();combatColors.clear();battleSummaryPending=false;travelStops=java.util.Collections.emptyList();lastNarrative="";
         recentItemGains.clear();
         selectedAiChoices.clear();aiOwnDraft="";clearAiDraft();
         if(aiClient!=null)aiClient.cancel();if(localAiClient!=null)localAiClient.cancel();
@@ -375,10 +375,14 @@ public final class MainActivity extends Activity {
         if(!visual("status")||!game.started||titleOpen)return;
         float fraction=game.hp/(float)Math.max(1,game.maxHp);
         WorldWeather w=WorldWeather.at(game.region,game.progress.location,game.day,game.hour);
-        int color=game.poisonTurns>0?0x9954b76a:game.frostTurns>0?0x997cc9ef:fraction<.25f?0x99b51c27:
-            fraction<.65f?0x55b51c27:w.temperature<=-10?0x447cc9ef:game.stamina*4<game.maxStamina?0x55799357:game.magicka*4<game.maxMagicka?0x556b78cc:0;
-        if(color!=0){
-            VisualEffectsView.EdgeDrawable edge=new VisualEffectsView.EdgeDrawable(color);root.setForeground(edge);
+        java.util.ArrayList<Integer> colors=new java.util.ArrayList<>();
+        if(fraction<.65f)colors.add(fraction<.25f?0x99b51c27:0x55b51c27);
+        if(game.poisonTurns>0)colors.add(0x9954b76a);
+        if(game.frostTurns>0||w.temperature<=-10)colors.add(0x997cc9ef);
+        if(game.stamina*4<game.maxStamina)colors.add(0x55799357);
+        if(game.magicka*4<game.maxMagicka)colors.add(0x556b78cc);
+        if(!colors.isEmpty()){
+            VisualEffectsView.EdgeDrawable edge=new VisualEffectsView.EdgeDrawable(colors);root.setForeground(edge);
             if(animations&&fraction<.25f){
                 android.animation.ValueAnimator pulse=android.animation.ValueAnimator.ofInt(140,255);
                 pulse.setDuration(650);pulse.setRepeatMode(android.animation.ValueAnimator.REVERSE);pulse.setRepeatCount(3);
@@ -487,9 +491,13 @@ public final class MainActivity extends Activity {
         }
     }
     private String combatVisual="",victoryVisual="",travelVisual="";
+    private final java.util.ArrayList<String> combatLabels=new java.util.ArrayList<>();
+    private final java.util.ArrayList<Integer> combatColors=new java.util.ArrayList<>();
+    private boolean battleSummaryPending;
+    private void combatLabel(String label,int color){combatLabels.add(label);combatColors.add(color);}
     private java.util.List<String> travelStops=java.util.Collections.emptyList();private boolean animateTravelOnce;
     private void recordVisual(VisualSnapshot before,GameEngine after,String action){
-        combatVisual="";victoryVisual="";travelVisual="";
+        combatVisual="";victoryVisual="";travelVisual="";combatLabels.clear();combatColors.clear();battleSummaryPending=false;
         after.visitedVisual.add(after.progress.location);
         boolean moved=!before.location.equals(after.progress.location);
         if(moved){travelVisual=before.location+" → "+after.progress.location+" | "+Math.max(0,after.day-before.day)+" дн.";travelStops=before.stops.isEmpty()?java.util.Arrays.asList(before.location,after.progress.location):before.stops;animateTravelOnce=true;}
@@ -499,8 +507,15 @@ public final class MainActivity extends Activity {
             if(!before.enemy.equals(after.enemyName)&&after.victories==before.victories)hit=0;
             int received=Math.max(0,before.hp-after.hp);
             if(after.lastDealt>0)hit=after.lastDealt;if(after.lastTaken>0)received=after.lastTaken;
+            if(hit>0)combatLabel((after.lastHeavyHit?"СИЛЬНЫЙ УДАР":"УРОН ВРАГУ")+"\n−"+hit,ITEM_GOLD);
+            if(received>0)combatLabel("ПОЛУЧЕН УРОН\n−"+received,ITEM_DOWN);
+            if(after.lastHealing>0)combatLabel("ЛЕЧЕНИЕ\n+"+after.lastHealing,ITEM_UP);
+            if(after.lastBlocked>0)combatLabel("ЗАБЛОКИРОВАНО\n"+after.lastBlocked,accent());
+            if(after.lastMiss)combatLabel("ПРОМАХ",MUTED);
+            if("DEFEAT".equals(after.mode))battleSummaryPending=true;
             if(hit>0||received>0||after.lastHealing>0)combatVisual=(hit>0?"−"+hit+" врагу  ":"")+(received>0?"−"+received+" герою  ":"")+(after.lastHealing>0?"+"+after.lastHealing+" здоровья":"");
             if(after.victories>before.victories){
+                battleSummaryPending=true;
                 long earned=after.xp-before.xp;
                 for(int i=before.level;i<after.level;i++)earned+=i*80L;
                 victoryVisual=before.enemy+"\n+"+Math.max(0,after.gold-before.gold)+" септимов  |  +"+Math.max(0,earned)+" опыта\nХодов: "+after.battleTurns+" | Урон: "+after.battleDealt+" | Получено: "+after.battleTaken;
@@ -512,12 +527,15 @@ public final class MainActivity extends Activity {
         after.recordVisualEvent(event);
     }
     private void renderVisualResults(){
-        if(visual("damage")&&!combatVisual.isEmpty()){
-            LinearLayout box=card();TextView t=text(combatVisual,21,ITEM_DOWN,true);t.setGravity(Gravity.CENTER);box.addView(t);
-            if(animations){t.setTranslationY(dp(8));t.setAlpha(.2f);t.animate().translationY(0).alpha(1).setDuration(300).start();}
+        if(visual("damage")&&!combatLabels.isEmpty()){
+            LinearLayout box=card();
+            for(int i=0;i<combatLabels.size();i++){
+                TextView t=text(combatLabels.get(i),18,combatColors.get(i),true);t.setGravity(Gravity.CENTER);t.setPadding(dp(4),dp(6),dp(4),dp(6));box.addView(t,lp(-1,-2));
+                if(animations){t.setTranslationY(dp(10));t.setAlpha(.2f);t.animate().translationY(0).alpha(1).setStartDelay(i*80L).setDuration(340).start();}
+            }
         }
         if(visual("victory")&&!victoryVisual.isEmpty()){
-            LinearLayout box=card();addText(box,"◇  ПОБЕДА",23,ITEM_GOLD,true,10);addText(box,victoryVisual,16,TEXT,false,4);
+            LinearLayout box=card();addText(box,"◇  ПОБЕДА",23,ITEM_GOLD,true,10);addText(box,victoryVisual,16,TEXT,false,4);visualSummaryLink(box,"ПОДРОБНЫЕ ИТОГИ",()->showBattleSummary(false));
         }
         if(visual("travel")&&!travelVisual.isEmpty()){
             LinearLayout box=card();addText(box,"ПУТЕШЕСТВИЕ ЗАВЕРШЕНО",12,accent(),true,8);addText(box,travelVisual,15,TEXT,false,7);if(travelStops.size()>1){box.addView(new VisualEffectsView.RouteLine(this,travelStops.size(),accent(),animations&&animateTravelOnce),lp(-1,42));addText(box,String.join(" → ",travelStops),12,MUTED,false,0);animateTravelOnce=false;}
@@ -525,9 +543,40 @@ public final class MainActivity extends Activity {
         if(visual("defeat")&&"DEFEAT".equals(game.mode)){
             LinearLayout box=card();box.setBackground(new RuneFrameDrawable(0xff190c0d,ITEM_DOWN,false));
             TextView t=text("ПОРАЖЕНИЕ",26,ITEM_DOWN,true);t.setGravity(Gravity.CENTER);box.addView(t);
-            addText(box,game.message,15,TEXT,false,0);
+            addText(box,game.message,15,TEXT,false,0);visualSummaryLink(box,"ПОСМОТРЕТЬ ИТОГИ",()->showBattleSummary(true));
             if(animations){box.setAlpha(.2f);box.animate().alpha(1).setDuration(600).start();}
         }
+    }
+    private void visualSummaryLink(LinearLayout host,String label,Runnable action){
+        TextView link=text(label,13,accent(),true);link.setGravity(Gravity.CENTER);link.setPadding(dp(8),dp(13),dp(8),dp(13));
+        link.setBackground(new RuneFrameDrawable(PANEL,accent(),false));host.addView(link,lp(-1,-2));link.setOnClickListener(view->action.run());
+    }
+    private void showBattleSummary(boolean defeat){
+        if(isFinishing()||isDestroyed())return;
+        showResultWindow(defeat?"ПОРАЖЕНИЕ":"ПОБЕДА",defeat?game.message:victoryVisual,defeat?"ash":"embers",defeat?ITEM_DOWN:ITEM_GOLD,false);
+    }
+    private void showResultWindow(String title,String details,String particles,int color,boolean loot){
+        android.app.Dialog dialog=new android.app.Dialog(this);
+        FrameLayout stage=new FrameLayout(this);stage.setBackgroundColor(0xff080a0b);
+        stage.addView(new VisualEffectsView(this,particles,animations),new FrameLayout.LayoutParams(-1,-1));
+        ScrollView scroller=new ScrollView(this);scroller.setFillViewport(true);stage.addView(scroller,new FrameLayout.LayoutParams(-1,-1));
+        LinearLayout panel=column();panel.setGravity(Gravity.CENTER);panel.setPadding(dp(24),dp(36),dp(24),dp(36));scroller.addView(panel,new ScrollView.LayoutParams(-1,-2));
+        panel.addView(new SkyrimIconView(this,loot?"inventory":"dragon",color),lp(76,82));
+        TextView heading=text(title,30,color,true);heading.setGravity(Gravity.CENTER);panel.addView(heading,lp(-1,-2));space(panel,18);
+        if(!details.isEmpty()){TextView description=text(details,17,TEXT,false);description.setGravity(Gravity.CENTER);panel.addView(description,lp(-1,-2));space(panel,16);}
+        if(loot){
+            int i=0;
+            for(java.util.Map.Entry<String,Integer> gain:recentItemGains.entrySet()){
+                ItemCatalog.Item item=ItemCatalog.find(gain.getKey());if(item==null)continue;
+                LinearLayout entry=itemSummary(item,gain.getValue(),false,true,item.value);panel.addView(entry,lp(-1,-2));entry.setOnClickListener(view->itemDialog(item));
+                if(animations){entry.setAlpha(0);entry.setTranslationY(dp(12));entry.animate().alpha(1).translationY(0).setStartDelay(Math.min(i++,12)*90L).setDuration(300).start();}
+            }
+        }else{
+            addText(panel,"Ходов: "+game.battleTurns+" | Урон: "+game.battleDealt+" | Получено: "+game.battleTaken,14,MUTED,false,16);
+        }
+        visualSummaryLink(panel,"ПРОДОЛЖИТЬ",dialog::dismiss);
+        dialog.setContentView(stage);dialog.show();
+        android.view.Window window=dialog.getWindow();if(window!=null){window.setBackgroundDrawableResource(android.R.color.transparent);window.setLayout(-1,-1);}
     }
     private void routePreview(LinearLayout host,TravelPlanner.Route route){
         if(!visual("travel")||!route.allowed||route.days==0)return;
@@ -1199,6 +1248,7 @@ public final class MainActivity extends Activity {
         makeItemsClickable(body,body.getText().toString());
         revealNarrative(narrative,body,s.body);
         renderVisualResults();tradeVisual();
+        if(battleSummaryPending){battleSummaryPending=false;boolean defeated="DEFEAT".equals(game.mode);if(visual(defeated?"defeat":"victory"))showBattleSummary(defeated);}
         renderItemGains();
         renderStoryJournal();
         if(prefs.getBoolean("ai_enabled",false)) renderAiStoryPanel();
@@ -2545,7 +2595,8 @@ public final class MainActivity extends Activity {
             if(animations){entry.setAlpha(.25f);entry.animate().alpha(1).setDuration(260).start();}
             itemEffect(rewards,item);
         }
-        addText(rewards,"Добавлено в инвентарь",12,ITEM_UP,false,0);
+        addText(rewards,"Добавлено в инвентарь",12,ITEM_UP,false,8);
+        visualSummaryLink(rewards,"ОТКРЫТЬ ОКНО НАГРАД",()->showResultWindow("ПОЛУЧЕНЫ ПРЕДМЕТЫ","Уже добавлено в инвентарь","embers",ITEM_GOLD,true));
     }
     private void renderShopItem(String action){
         String id;int price;

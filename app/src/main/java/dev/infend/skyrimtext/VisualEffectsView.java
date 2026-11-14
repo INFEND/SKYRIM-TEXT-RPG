@@ -34,13 +34,18 @@ final class VisualEffectsView extends View {
         if(animate&&isShown())postInvalidateDelayed(40);
     }
     static final class EdgeDrawable extends Drawable {
-        private final Paint p=new Paint();private final int color;private int opacity=255;
-        EdgeDrawable(int color){this.color=color;}
+        private final Paint p=new Paint();private final java.util.List<Integer> colors;private int opacity=255;
+        EdgeDrawable(int color){this(java.util.Collections.singletonList(color));}
+        EdgeDrawable(java.util.List<Integer> colors){this.colors=new java.util.ArrayList<>(colors);}
         @Override public void draw(Canvas c){
             Rect b=getBounds();float w=b.width(),h=b.height();if(w<=0||h<=0)return;
-            int tinted=(color&0x00ffffff)|((Color.alpha(color)*opacity/255)<<24);
-            p.setShader(new LinearGradient(0,0,w*.14f,0,tinted,Color.TRANSPARENT,Shader.TileMode.CLAMP));c.drawRect(0,0,w*.14f,h,p);
-            p.setShader(new LinearGradient(w,0,w*.86f,0,tinted,Color.TRANSPARENT,Shader.TileMode.CLAMP));c.drawRect(w*.86f,0,w,h,p);p.setShader(null);
+            c.save();c.translate(b.left,b.top);
+            for(int i=0;i<colors.size();i++){
+                int color=colors.get(i);int tinted=(color&0x00ffffff)|((Color.alpha(color)*opacity/255)<<24);
+                float top=h*i/colors.size(),bottom=h*(i+1)/colors.size();
+                p.setShader(new LinearGradient(0,0,w*.14f,0,tinted,Color.TRANSPARENT,Shader.TileMode.CLAMP));c.drawRect(0,top,w*.14f,bottom,p);
+                p.setShader(new LinearGradient(w,0,w*.86f,0,tinted,Color.TRANSPARENT,Shader.TileMode.CLAMP));c.drawRect(w*.86f,top,w,bottom,p);
+            }p.setShader(null);c.restore();
         }
         @Override public void setAlpha(int a){opacity=a;}
         @Override public void setColorFilter(ColorFilter f){p.setColorFilter(f);}
