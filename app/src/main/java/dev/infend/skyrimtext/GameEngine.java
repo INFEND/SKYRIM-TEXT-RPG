@@ -70,6 +70,20 @@ public final class GameEngine {
     public int merchantGold(){return merchants.budget(region,day);}
     public int merchantStock(String action){return merchants.stock(region,day,action.startsWith("BUY_")?action.substring(4):action);}
     public int merchantRestockDay(){return merchants.restockDay(day);}
+    public java.util.List<String> merchantExtras(){
+        java.util.ArrayList<String> result=new java.util.ArrayList<>();
+        for(int i=4;i<MerchantLedger.KEYS.length;i++)if(ItemCatalog.find(MerchantLedger.KEYS[i])!=null&&MerchantLedger.capacity(region,(Math.max(1,day)-1)/MerchantLedger.RESTOCK_DAYS,i)>0)result.add(MerchantLedger.KEYS[i]);
+        return result;
+    }
+    public int merchantExtraPrice(String id){ItemCatalog.Item item=ItemCatalog.find(id);if(item==null||item.value<=0)return 0;return Math.max(1,(int)Math.min(Integer.MAX_VALUE,((long)item.value*(120-5*progress.branches.rank(12))+99)/100));}
+    public boolean buyExtra(String id){
+        if(!started||!"SHOP".equals(mode)||!merchantExtras().contains(id))return false;
+        int price=merchantExtraPrice(id);ItemCatalog.Item item=ItemCatalog.find(id);
+        if(price<=0||merchantStock(id)<=0||gold<price||item==null||progress.carryWeight()+item.weight>50.00001)return false;
+        if(!progress.addItem(id,1))return false;
+        if(!merchants.purchase(region,day,id,price)){progress.removeItem(id,1);return false;}
+        gold-=price;progress.sync(this);message="Куплено: "+id+" | −"+price+" септимов.";recordVisualEvent(message);return true;
+    }
     public boolean canSell(ItemCatalog.Item item){
         return started&&"SHOP".equals(mode)&&item!=null&&item.value>0&&progress.quantity(item.id)>0
             &&!progress.equipped(item.id)&&!"Квестовые предметы".equals(item.category)&&!"Ключи".equals(item.category)
@@ -357,8 +371,10 @@ public final class GameEngine {
             }
             stamina=Math.max(1,stamina-Math.min(Math.max(0,stamina-1),route.days*6));
             magicka=Math.max(1,magicka-Math.min(Math.max(0,magicka-1),route.days*2));
+            String roadEvent=RoadEvents.resolve(this,route);
             message="Ты преодолеваешь дорогу, постепенно оставляя за спиной стоянки, перевалы и чужие костры. "+
-                route.summary()+"\n\nМесто назначения: "+target.name+". "+target.description;
+                route.summary()+"\n\nМесто назначения: "+target.name+". "+target.description+
+                (roadEvent.isEmpty()?"":"\n\nВ дороге: "+roadEvent);
             mode="RESULT";return;
         }
         if(action.startsWith("REGION:")){

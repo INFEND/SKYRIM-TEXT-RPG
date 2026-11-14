@@ -695,16 +695,18 @@ public final class MainActivity extends Activity {
         LinearLayout panel=column();panel.setPadding(dp(14),dp(12),dp(14),dp(12));
         panel.addView(new SkyrimIconView(this,FactionCampaign.ICONS[f],accent()),lp(48,52));
         addText(panel,game.factions.rank(f),20,ITEM_GOLD,true,10);
-        addText(panel,"Поручения: "+Math.max(0,game.factions.stage(f)-1)+" / 3",13,MUTED,false,8);
+        addText(panel,"Поручения: "+Math.max(0,game.factions.stage(f)-1)+" / "+FactionCampaign.TASK_COUNT,13,MUTED,false,8);
         addText(panel,game.factions.task(f),16,TEXT,true,9);
+        addText(panel,game.factions.description(f),14,MUTED,false,8);
         addText(panel,"Место: "+game.factions.place(f),13,MUTED,false,8);
-        int chance=game.factions.chance(game,f);if(chance>=0){addText(panel,"Шанс успеха: "+chance+"% | −10 выносливости",13,SceneChoiceMeta.chanceColor(chance),true,8);}
+        int chance=game.factions.chance(game,f);if(chance>=0){addText(panel,"Шанс успеха: "+chance+"% | −10 выносливости",13,SceneChoiceMeta.chanceColor(chance),true,8);addText(panel,"Переговоры: "+game.factions.chance(game,f,true)+"% | −10 выносливости",12,MUTED,false,8);}
         String blocked=game.factions.block(game,f);if(!blocked.isEmpty())addText(panel,blocked,13,ITEM_DOWN,false,6);
         addText(panel,"Авторская цепочка поручений текстовой игры.",11,MUTED,false,0);
         AlertDialog.Builder dialog=new RuneDialogBuilder(this,accent()).setTitle(FactionCampaign.NAMES[f]).setView(panel).setNegativeButton("Закрыть",null);
         if(blocked.isEmpty())dialog.setPositiveButton(game.factions.stage(f)==0?"Вступить":"Выполнить",(d,w)->{
             if(game.factions.perform(game,f)){save();render();toast(game.message);factionDetails(f);}
         });
+        if(blocked.isEmpty()&&game.factions.stage(f)>0)dialog.setNeutralButton("Переговоры",(d,w)->{if(game.factions.perform(game,f,true)){save();render();toast(game.message);factionDetails(f);}});
         dialog.show();
     }
     private void reputationRow(LinearLayout host,String name,int score,String status){
@@ -755,7 +757,7 @@ public final class MainActivity extends Activity {
     }
     private void tradeVisual(){
         if(!"SHOP".equals(game.mode))return;
-        if(!visual("trade")){actionButton("ПРОДАТЬ ПРЕДМЕТ","Продажа неэкипированных вещей",false,this::sellDialog);return;}
+        if(!visual("trade")){actionButton("ДОПОЛНИТЕЛЬНЫЙ АССОРТИМЕНТ","Припасы и материалы",false,this::extraShopDialog);actionButton("ПРОДАТЬ ПРЕДМЕТ","Продажа неэкипированных вещей",false,this::sellDialog);return;}
         LinearLayout c=card();addText(c,"ТОРГОВЛЯ | "+game.gold+" септимов",14,ITEM_GOLD,true,7);
         addText(c,"Кошелёк торговца: "+game.merchantGold()+" | Поставка: день "+game.merchantRestockDay(),12,MUTED,false,10);
         LinearLayout r=column();c.addView(r,lp(-1,-2));LinearLayout a=column(),b=column();
@@ -766,6 +768,7 @@ public final class MainActivity extends Activity {
             if(("BUY_SWORD".equals(entry[0])&&game.swordUpgraded)||("BUY_ARMOR".equals(entry[0])&&game.armorUpgraded))continue;
             int price=Integer.parseInt(entry[2]);ItemCatalog.Item item=ItemCatalog.find(entry[1]);if(item!=null)tradeTile(a,item,price,"У торговца: "+game.merchantStock(entry[0]),()->buyFromTrade(entry[0],item,price));
         }
+        visualSummaryLink(a,"ПРИПАСЫ И МАТЕРИАЛЫ ("+game.merchantExtras().size()+")",this::extraShopDialog);
         int shown=0;for(ItemCatalog.Item item:game.progress.owned("Все","Название"))if(game.canSell(item)){
             if(shown++>=6)break;tradeTile(b,item,game.salePrice(item),"У героя: "+game.progress.quantity(item.id),()->confirmSale(item));
         }
@@ -788,6 +791,17 @@ public final class MainActivity extends Activity {
                 game.choose(action);game.progress.sync(game);captureItemGains(before,game,false);recordVisual(visualBefore,game,item.name);
                 String feedback=game.message;game.mode="SHOP";save();render();toast(feedback);
             }).show();
+    }
+    private void extraShopDialog(){
+        if(!"SHOP".equals(game.mode))return;
+        java.util.List<String> ids=game.merchantExtras();
+        String[] labels=new String[ids.size()];for(int i=0;i<labels.length;i++){String id=ids.get(i);labels[i]=id+" | "+game.merchantExtraPrice(id)+" септимов | "+game.merchantStock(id)+" шт.";}
+        new RuneDialogBuilder(this,accent()).setTitle("Припасы и материалы").setItems(labels,(d,i)->{
+            String id=ids.get(i);ItemCatalog.Item item=ItemCatalog.find(id);if(item==null)return;
+            new RuneDialogBuilder(this,accent()).setTitle(id).setMessage(item.description+"\nЦена: "+game.merchantExtraPrice(id)+" септимов.").setNegativeButton("Отмена",null).setPositiveButton("Купить",(dd,w)->{
+                if(game.buyExtra(id)){save();render();toast(game.message);}else toast("Покупка недоступна: проверь запас, деньги и вес.");extraShopDialog();
+            }).show();
+        }).setNegativeButton("Закрыть",null).show();
     }
     private void confirmSale(ItemCatalog.Item item){
         if(!game.canSell(item))return;
@@ -3202,13 +3216,13 @@ public final class MainActivity extends Activity {
                 addText(words,"Навык "+need+" | "+(combat?"+20% за ранг":"+70 опыта при изучении"),11,MUTED,false,6);box.addView(node,lp(-1,-2));
             }
             addText(box,"СПЕЦИАЛИЗАЦИИ",12,accent(),true,8);
-            for(int i=0;i<2;i++){int nodeIndex=i;boolean owned=game.progress.branches.rank(index)>i;
-                String requirement="Навык "+(i==0?30:60)+" | Основной ранг "+(i+1);
+            for(int i=0;i<TalentBranches.NAMES[index].length;i++){boolean owned=game.progress.branches.rank(index)>i;
+                String requirement="Навык "+(i==0?30:i==1?60:90)+" | Основной ранг "+(i+1);
                 addText(box,TalentBranches.NAMES[index][i]+" | "+(owned?"Изучен":requirement),14,owned?ITEM_GOLD:TEXT,true,4);
                 addText(box,TalentBranches.effect(index),11,MUTED,false,8);
             }
             ScrollView scroller=new ScrollView(this);scroller.addView(box);builder.setView(scroller);
-        }else builder.setMessage(details+"\n"+title+" "+rank+"/5"+"\nСпециализации: "+game.progress.branches.rank(index)+"/2");
+        }else builder.setMessage(details+"\n"+title+" "+rank+"/5"+"\nСпециализации: "+game.progress.branches.rank(index)+"/3");
         if(game.progress.canBuyTalent(index))builder.setPositiveButton("Изучить следующий ранг",(d,w)->{
             if(combat?game.progress.buyCombatPerk(index):game.progress.buyTalent(game,index)){save();render();toast("Талант развит");}
         });
