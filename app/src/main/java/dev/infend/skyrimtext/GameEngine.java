@@ -67,6 +67,8 @@ public final class GameEngine {
     public void resetBattleVisuals(){poisonTurns=frostTurns=battleTurns=battleDealt=battleTaken=lastDealt=lastTaken=lastHealing=lastBlocked=0;lastHeavyHit=lastMiss=lastCritical=false;}
     private MerchantLedger merchants=new MerchantLedger();
     FactionCampaign factions=new FactionCampaign();
+    FactionStories factionStories=new FactionStories();
+    int factionBattle=-1;
     public int merchantGold(){return merchants.budget(region,day);}
     public int merchantStock(String action){return merchants.stock(region,day,action.startsWith("BUY_")?action.substring(4):action);}
     public int merchantRestockDay(){return merchants.restockDay(day);}
@@ -191,7 +193,7 @@ public final class GameEngine {
         String[] back=RpgContent.startParts(origin);
         region=Integer.parseInt(back[2]);
         canonicalStage=canonicalPhase=canonicalPage=canonicalShouts=canonicalTreaty=canonicalPaarthurnax=canonicalShoutCooldown=0;canonicalPrepared=false;canonicalRecent="";
-        mode="INTRO";message="";merchants=new MerchantLedger();factions=new FactionCampaign();resetBattleVisuals();java.util.Arrays.fill(holdReputation,0);visitedVisual.clear();visualChronicle=new org.json.JSONArray();visitedVisual.add(progress.location);
+        mode="INTRO";message="";merchants=new MerchantLedger();factions=new FactionCampaign();factionStories=new FactionStories();factionBattle=-1;resetBattleVisuals();java.util.Arrays.fill(holdReputation,0);visitedVisual.clear();visualChronicle=new org.json.JSONArray();visitedVisual.add(progress.location);
     }
 
     public Scene scene() {
@@ -553,6 +555,7 @@ public final class GameEngine {
         else if(sideKills>=3){sideQuest=0;sideKills=0;gold+=120;addXp(65);message="Заказ выполнен. +120 септимов, +65 опыта.";mode="RESULT";}
         else {message="Заказ активен. Побеждено противников: "+sideKills+"/3.";mode="RESULT";}
     }
+    void beginFactionBattle(int f,String name,int health,int damage,String intro){factionBattle=f;startBattle(name,health,damage,"FACTION",intro);}
     void beginCanonicalBattle(String name,int health,int damage,String intro){canonicalShoutCooldown=0;startBattle(name,health,damage,"CANONICAL",intro);}
     private void startBattle(String name,int health,int dmg,String kind,String intro) {
         resetBattleVisuals();enemyName=name;enemyHp=health;enemyMaxHp=health;enemyDamage=dmg;battleKind=kind;enemyIntro=intro;
@@ -628,6 +631,7 @@ public final class GameEngine {
         if("QUEST".equals(battleKind))message+="\n\nЗа стражем ты находишь журнал хранителя. Следующая цель: Солитьюд.";
         if("DRAGON".equals(battleKind))message+="\n\n"+progress.dragonRecent;
         if(sideQuest==1)message+="\nЗаказ доски: "+sideKills+"/3.";
+        if("FACTION".equals(battleKind)){factionStories.victory(factionBattle);factionBattle=-1;message+="\n\nОткрой сюжет фракции, чтобы завершить главу.";}
         if("CANONICAL".equals(battleKind)){
             if(canonicalStage==27)message="Ловушка сомкнулась. Одавинг жив и готов к разговору.";
             if(canonicalStage==30)message="Тсун признаёт твоё мастерство и пропускает к Залу доблести.";
@@ -677,7 +681,7 @@ public final class GameEngine {
          .put("battleLog",battleLog).put("battleKind",battleKind).put("enemyIntro",enemyIntro)
          .put("enemyHp",enemyHp).put("enemyMaxHp",enemyMaxHp).put("enemyDamage",enemyDamage).put("progress",progress.toJson())
          .put("aiJournal",aiJournal).put("aiTurn",aiTurn==null?JSONObject.NULL:aiTurn.save())
-         .put("sceneState",sceneState.toJson()).put("merchants",merchants.toJson()).put("factions",factions.toJson())
+         .put("sceneState",sceneState.toJson()).put("merchants",merchants.toJson()).put("factions",factions.toJson()).put("factionStories",factionStories.toJson()).put("factionBattle",factionBattle)
          .put("visitedVisual",new org.json.JSONArray(visitedVisual)).put("visualChronicle",visualChronicle)
          .put("holdReputation",new org.json.JSONArray(holdReputation)).put("poisonTurns",poisonTurns).put("frostTurns",frostTurns).put("battleTurns",battleTurns).put("battleDealt",battleDealt).put("battleTaken",battleTaken);
         return j;
@@ -714,7 +718,7 @@ public final class GameEngine {
             g.battleKind=j.optString("battleKind","");g.enemyIntro=j.optString("enemyIntro","");
             g.enemyHp=Math.max(0,j.optInt("enemyHp",0));g.enemyMaxHp=Math.max(0,j.optInt("enemyMaxHp",0));g.enemyDamage=Math.max(0,j.optInt("enemyDamage",0));
             g.progress=RpgProgress.fromJson(j.optJSONObject("progress"));
-            g.merchants=MerchantLedger.fromJson(j.optJSONObject("merchants"));g.factions=FactionCampaign.fromJson(j.optJSONObject("factions"));
+            g.merchants=MerchantLedger.fromJson(j.optJSONObject("merchants"));g.factions=FactionCampaign.fromJson(j.optJSONObject("factions"));g.factionStories=FactionStories.fromJson(j.optJSONObject("factionStories"));g.factionBattle=Math.max(-1,Math.min(6,j.optInt("factionBattle",-1)));
             org.json.JSONArray holds=j.optJSONArray("holdReputation");if(holds!=null)for(int i=0;i<g.holdReputation.length;i++)g.holdReputation[i]=Math.max(-100,Math.min(100,holds.optInt(i,0)));
             if("COMBAT".equals(g.mode)){g.poisonTurns=Math.max(0,Math.min(2,j.optInt("poisonTurns")));g.frostTurns=Math.max(0,Math.min(2,j.optInt("frostTurns")));}
             g.battleTurns=Math.max(0,j.optInt("battleTurns"));g.battleDealt=Math.max(0,j.optInt("battleDealt"));g.battleTaken=Math.max(0,j.optInt("battleTaken"));

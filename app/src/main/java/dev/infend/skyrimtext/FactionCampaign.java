@@ -46,7 +46,7 @@ final class FactionCampaign {
         if(!valid(f)||!g.started)return "Нет доступного поручения";
         if("COMBAT".equals(g.mode))return "Сначала заверши бой";
         if(stage[f]>TASK_COUNT)return "Все поручения завершены";
-        if(stage[f]==0&&((f==4&&stage[5]>0)||(f==5&&stage[4]>0)))return "Ты уже присягнул противоположной стороне";
+        if(stage[f]==0&&((f==4&&stage[5]>0)||(f==5&&stage[4]>0)||(f==4&&g.factionStories.started(5))||(f==5&&g.factionStories.started(4))))return "Ты уже присягнул противоположной стороне";
         if(!place(f).equalsIgnoreCase(g.progress.location))return "Нужно прибыть: "+place(f);
         if(stage[f]>0&&attemptDay[f]==g.day)return "Следующая попытка в другой игровой день";
         if(stage[f]>0&&g.stamina<10)return "Нужно 10 выносливости";

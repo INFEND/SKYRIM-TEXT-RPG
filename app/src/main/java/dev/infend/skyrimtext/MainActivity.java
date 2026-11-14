@@ -692,13 +692,34 @@ public final class MainActivity extends Activity {
         new RuneDialogBuilder(this,accent()).setTitle("Фракции").setItems(labels,(d,i)->factionDetails(i)).setNegativeButton("Закрыть",null).show();
     }
     private void renderFactionJournal(){
-        boolean any=false;for(int i=0;i<FactionCampaign.NAMES.length;i++)if(game.factions.stage(i)>0)any=true;
+        boolean any=false;for(int i=0;i<FactionCampaign.NAMES.length;i++)if(game.factions.stage(i)>0||game.factionStories.started(i))any=true;
         if(!any)return;LinearLayout panel=card();addText(panel,"ПОРУЧЕНИЯ ФРАКЦИЙ",12,accent(),true,10);
-        for(int i=0;i<FactionCampaign.NAMES.length;i++)if(game.factions.stage(i)>0){
+        for(int i=0;i<FactionCampaign.NAMES.length;i++)if(game.factions.stage(i)>0||game.factionStories.started(i)){
             final int f=i;addText(panel,FactionCampaign.NAMES[i]+" | "+game.factions.rank(i),14,TEXT,true,5);
             addText(panel,game.factions.task(i)+" | "+game.factions.place(i),12,MUTED,false,6);
-            visualSummaryLink(panel,"ОТКРЫТЬ ПОРУЧЕНИЕ",()->factionDetails(f));space(panel,8);
+            visualSummaryLink(panel,"ОТКРЫТЬ ПОРУЧЕНИЕ",()->factionDetails(f));
+            if(game.factionStories.started(f))visualSummaryLink(panel,"СЮЖЕТ | "+game.factionStories.done(f)+"/"+game.factionStories.count(f),()->factionStoryDialog(f));space(panel,8);
         }
+    }
+    private void factionStoryDialog(int f){
+        FactionStories stories=game.factionStories;FactionStories.Chapter c=stories.chapter(f);
+        LinearLayout panel=column();panel.setPadding(dp(14),dp(10),dp(14),dp(14));
+        addText(panel,"СЮЖЕТ | "+stories.done(f)+" / "+stories.count(f),13,accent(),true,8);
+        if(c==null)addText(panel,"Основная сюжетная адаптация завершена.",17,ITEM_GOLD,true,8);
+        else{
+            addText(panel,c.title,20,ITEM_GOLD,true,8);addText(panel,c.story,16,TEXT,false,10);
+            addText(panel,"Точка входа на карте: "+c.place,12,MUTED,false,8);
+            if(stories.phase(f)==1){addText(panel,(c.enemy.isEmpty()?"Проверка навыка":"Противник: "+c.enemy)+" | −8 выносливости",14,TEXT,true,8);int chance=stories.chance(game,f);if(chance>=0)addText(panel,"Шанс успеха: "+chance+"%",13,SceneChoiceMeta.chanceColor(chance),true,8);}
+            String block=stories.block(game,f);if(!block.isEmpty())addText(panel,block,12,ITEM_DOWN,false,8);
+            WorldAtlas.Place destination=WorldAtlas.find(c.place);
+            if(destination!=null&&!c.place.equals(game.progress.location)&&!"COMBAT".equals(game.mode))visualSummaryLink(panel,"МАРШРУТ",()->locationDialog(destination));
+        }
+        addText(panel,"Сокращённая адаптация событий оригинала; часть переходов начинается в ближайшем доступном поселении.",11,MUTED,false,8);
+        ScrollView scroller=new ScrollView(this);scroller.addView(panel);
+        AlertDialog.Builder dialog=new RuneDialogBuilder(this,accent()).setTitle(FactionCampaign.NAMES[f]).setView(scroller).setNegativeButton("Закрыть",null);
+        if(c!=null&&stories.block(game,f).isEmpty())dialog.setPositiveButton(stories.phase(f)==0?"Начать главу":stories.phase(f)==2?"Завершить главу":c.enemy.isEmpty()?"Пройти испытание":"Вступить в бой",(d,w)->{
+            if(stories.advance(game,f)){save();if("COMBAT".equals(game.mode)){tab=0;render();}else{render();toast(game.message);factionStoryDialog(f);}}
+        });dialog.show();
     }
     private void factionDetails(int f){
         LinearLayout panel=column();panel.setPadding(dp(14),dp(12),dp(14),dp(12));
@@ -712,6 +733,7 @@ public final class MainActivity extends Activity {
         int chance=game.factions.chance(game,f);if(chance>=0){addText(panel,"Шанс успеха: "+chance+"% | −10 выносливости",13,SceneChoiceMeta.chanceColor(chance),true,8);addText(panel,"Переговоры: "+game.factions.chance(game,f,true)+"% | −10 выносливости",12,MUTED,false,8);}
         String blocked=game.factions.block(game,f);if(!blocked.isEmpty())addText(panel,blocked,13,ITEM_DOWN,false,6);
         addText(panel,"Авторская цепочка поручений текстовой игры.",11,MUTED,false,8);
+        visualSummaryLink(panel,"ОСНОВНОЙ СЮЖЕТ ФРАКЦИИ",()->factionStoryDialog(f));
         WorldAtlas.Place destination=WorldAtlas.find(game.factions.place(f));if(destination!=null&&!destination.name.equals(game.progress.location)&&!"COMBAT".equals(game.mode))visualSummaryLink(panel,"МАРШРУТ К ЦЕЛИ",()->locationDialog(destination));
         AlertDialog.Builder dialog=new RuneDialogBuilder(this,accent()).setTitle(FactionCampaign.NAMES[f]).setView(panel).setNegativeButton("Закрыть",null);
         if(blocked.isEmpty())dialog.setPositiveButton(game.factions.stage(f)==0?"Вступить":"Выполнить",(d,w)->{
@@ -1346,7 +1368,7 @@ public final class MainActivity extends Activity {
         }
     }
     private void renderStory(){
-        boolean canonical="CANON".equals(game.mode)||("COMBAT".equals(game.mode)&&"CANONICAL".equals(game.battleKind));
+        boolean canonical="CANON".equals(game.mode)||("COMBAT".equals(game.mode)&&("CANONICAL".equals(game.battleKind)||"FACTION".equals(game.battleKind)));
         if(prefs.getBoolean("ai_enabled",false)&&!canonical){renderAiGame();return;}
         GameEngine.Scene s=game.scene();section(s.kicker,s.title,"");
         if(LocationGalleryView.hasGallery(game.progress.location)){
