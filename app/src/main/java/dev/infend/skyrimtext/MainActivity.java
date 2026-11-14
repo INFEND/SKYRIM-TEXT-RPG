@@ -2776,43 +2776,71 @@ public final class MainActivity extends Activity {
             metrics.addView(itemMetric(weapon?"УРОН":"БРОНЯ",weapon?"weapon":"shield",
                 itemNumber(item.currentStat(game.progress)),weapon?ITEM_DAMAGE:ITEM_ARMOR,itemDelta(item),true),new LinearLayout.LayoutParams(0,-2,1));
         }
-        int restoration=potionRestore(item);
-        if(restoration>0){
-            boolean healing="Лечебное зелье".equals(item.id);
-            boolean stamina="Зелье запаса сил".equals(item.id);
-            metrics.addView(itemMetric(healing?"ЗДОРОВЬЕ":stamina?"СИЛЫ":"МАГИЯ",healing?"health":stamina?"stamina":"magic","+"+restoration,healing?0xffe16c72:stamina?0xff79bc86:ITEM_MAGIC,Double.NaN,true),new LinearLayout.LayoutParams(0,-2,1));
-        }
         metrics.addView(itemMetric("ВЕС","bag",itemNumber(item.weight),0xffb5b5b5,worn==null?Double.NaN:item.weight-worn.weight,true),new LinearLayout.LayoutParams(0,-2,1));
         metrics.addView(itemMetric("ЦЕНА","septims",String.valueOf(item.value),ITEM_GOLD,worn==null?Double.NaN:item.value-worn.value,true),new LinearLayout.LayoutParams(0,-2,1));
         host.addView(metrics,lp(-1,-2));
     }
     private void itemEffect(LinearLayout host,ItemCatalog.Item item){
-        if(item.effect==null||item.effect.trim().isEmpty()||item.effect.equals(itemType(item)+"."))return;
-        boolean potion="Зелья".equals(item.category)||"Яды".equals(item.category);
         int restoration=potionRestore(item);
+        java.util.ArrayList<ItemEffectRow> effects=new java.util.ArrayList<>();
         boolean healing="Лечебное зелье".equals(item.id);
+        boolean staminaPotion="Зелье запаса сил".equals(item.id);
         if(restoration>0){
-            boolean staminaPotion="Зелье запаса сил".equals(item.id);
-            int missing=healing?game.maxHp-game.hp:staminaPotion?game.maxStamina-game.stamina:game.maxMagicka-game.magicka;
-            String effect="Восстанавливает до "+restoration+(healing?" ед. здоровья":staminaPotion?" ед. выносливости":" ед. магии")+". Сейчас: +"+Math.max(0,Math.min(restoration,missing))+".";
-            itemEffectLine(host,effect,healing?ItemEffectStyle.HEALTH:staminaPotion?ItemEffectStyle.STAMINA:ItemEffectStyle.MAGIC);return;
+            effects.add(new ItemEffectRow("Восстановление "+(healing?"здоровья":staminaPotion?"выносливости":"магии"),"+"+restoration,"Мгновенно",1));
+        }else{
+            if(item.effect==null||item.effect.trim().isEmpty()||item.effect.equals(itemType(item)+".")||"Без дополнительных чар.".equals(item.effect))return;
+            effects=ItemEffectRow.parse(item.effect);
         }
-        // Each independently documented effect gets its own icon, including resistances.
-        // The wording and numeric values remain exactly those recorded in the catalog.
-        if(potion||"Ингредиенты".equals(item.category)){
-            TextView note=itemText("Справочный эффект:",11,MUTED,false);host.addView(note,lp(-1,-2));space(host,4);
+        if(effects.isEmpty())return;
+        host.addView(itemText("ЭФФЕКТЫ · "+effects.size(),11,MUTED,true),lp(-1,-2));space(host,7);
+        if(restoration<=0&&("Зелья".equals(item.category)||"Яды".equals(item.category)||"Ингредиенты".equals(item.category))){
+            host.addView(itemText("Справочный эффект:",11,MUTED,false),lp(-1,-2));space(host,4);
         }
-        for(String part:item.effect.split("\\s*\\|\\s*")){
-            String effect=part.trim();if(effect.isEmpty())continue;
-            itemEffectLine(host,effect,ItemEffectStyle.classify(effect,item.name));
+        for(ItemEffectRow entry:effects){
+            String effect=entry.label;
+            itemEffectLine(host,entry,ItemEffectStyle.classify(effect,item.name));
         }
     }
-    private void itemEffectLine(LinearLayout host,String effect,ItemEffectStyle style){
-        LinearLayout line=row();
-        line.addView(new ItemStatGlyph(this,style.glyph,style.color),lp(19,19));
-        TextView value=itemText(effect,14,style.color,false);
-        LinearLayout.LayoutParams vp=new LinearLayout.LayoutParams(0,-2,1);vp.leftMargin=dp(8);
-        line.addView(value,vp);host.addView(line,lp(-1,-2));space(host,5);
+    private void itemEffectLine(LinearLayout host,ItemEffectRow effect,ItemEffectStyle style){
+        LinearLayout line=row();line.setGravity(Gravity.CENTER_VERTICAL);
+        line.addView(new ItemStatGlyph(this,style.glyph,style.color),lp(20,20));
+        LinearLayout words=column();
+        LinearLayout.LayoutParams vp=new LinearLayout.LayoutParams(0,-2,1);vp.leftMargin=dp(8);vp.rightMargin=dp(6);
+        line.addView(words,vp);
+        words.addView(itemText(effect.label,14,TEXT,false),lp(-1,-2));
+        if(!effect.duration.isEmpty()){space(words,2);words.addView(itemText(effect.duration,11,MUTED,false),lp(-1,-2));}
+        if(!effect.value.isEmpty()){
+            TextView value=itemText(effect.value,17,style.color,true);value.setGravity(Gravity.END);
+            line.addView(value,lp(-2,-2));
+        }
+        if(effect.direction!=0){
+            TextView direction=itemText(effect.direction>0?"▲":"▼",11,effect.direction>0?ITEM_UP:ITEM_DOWN,true);
+            LinearLayout.LayoutParams p=lp(-2,-2);p.leftMargin=dp(5);line.addView(direction,p);
+        }
+        host.addView(line,lp(-1,-2));space(host,9);
+    }
+    private void itemEffectPreview(LinearLayout host,ItemCatalog.Item item){
+        int restoration=potionRestore(item);
+        if(restoration<=0||game.progress.quantity(item.id)<=0)return;
+        boolean healing="Лечебное зелье".equals(item.id);
+        boolean stamina="Зелье запаса сил".equals(item.id);
+        int current=healing?game.hp:stamina?game.stamina:game.magicka;
+        int max=healing?game.maxHp:stamina?game.maxStamina:game.maxMagicka;
+        if(max<=0)return;
+        int missing=Math.max(0,max-current);
+        int after=Math.min(max,current+Math.min(restoration,missing));
+        int color=healing?ItemEffectStyle.HEALTH.color:stamina?ItemEffectStyle.STAMINA.color:ItemEffectStyle.MAGIC.color;
+        itemDivider(host,6);
+        host.addView(itemText("ПРЕДПРОСМОТР ДЕЙСТВИЯ",11,MUTED,true),lp(-1,-2));space(host,7);
+        LinearLayout line=row();line.setGravity(Gravity.CENTER_VERTICAL);
+        line.addView(itemText(healing?"Здоровье":stamina?"Выносливость":"Магия",12,TEXT,false),new LinearLayout.LayoutParams(0,-2,1));
+        line.addView(itemText(current+" → "+after+" / "+max,12,color,true),lp(-2,-2));host.addView(line,lp(-1,-2));space(host,5);
+        android.widget.ProgressBar bar=new android.widget.ProgressBar(this,null,android.R.attr.progressBarStyleHorizontal);
+        bar.setMax(max);bar.setProgress(Math.max(0,current));bar.setSecondaryProgress(Math.max(0,after));
+        bar.setProgressTintList(ColorStateList.valueOf(color));
+        bar.setSecondaryProgressTintList(ColorStateList.valueOf((color&0x00ffffff)|0x66000000));
+        bar.setProgressBackgroundTintList(ColorStateList.valueOf(0xff303030));
+        host.addView(bar,lp(-1,6));space(host,7);
     }
     private java.util.Map<String,Integer> itemSnapshot(GameEngine state){
         java.util.Map<String,Integer> result=new java.util.HashMap<>();
@@ -2952,7 +2980,7 @@ public final class MainActivity extends Activity {
     private void itemDialog(ItemCatalog.Item item){
         LinearLayout view=column();
         view.setPadding(dp(12),dp(12),dp(12),dp(12));
-        view.setBackground(itemBackground(0xff0a0a0a,0xff626262,0));
+        view.setBackground(itemBackground(0xff000000,0xff858585,0));
         LinearLayout heading=row();heading.setGravity(Gravity.CENTER_VERTICAL);
         view.addView(heading,lp(-1,-2));
         if(hasItemStat(item))heading.addView(itemPicture(item,94),lp(94,94));
@@ -2960,8 +2988,8 @@ public final class MainActivity extends Activity {
         LinearLayout words=column();
         LinearLayout.LayoutParams wordsParams=new LinearLayout.LayoutParams(0,-2,1);
         wordsParams.leftMargin=dp(10);heading.addView(words,wordsParams);
-        words.addView(itemText(item.name,18,TEXT,true),lp(-1,-2));space(words,4);
-        words.addView(itemText(itemType(item),13,0xffa3a3a3,false),lp(-1,-2));
+        words.addView(itemText(item.name,18,TEXT,true),lp(-1,-2));
+        if(game.progress.equipped(item.id)){space(words,4);words.addView(itemText("◆ Экипировано",12,ITEM_UP,false),lp(-1,-2));}
         int quantity=game.progress.quantity(item.id);
         if(quantity>0){space(words,3);words.addView(itemText("В наличии: "+quantity,12,MUTED,false),lp(-1,-2));}
         if(itemEnchanted(item)){
@@ -2970,8 +2998,10 @@ public final class MainActivity extends Activity {
             TextView label=itemText("Зачарованный",13,ITEM_GOLD,false);
             LinearLayout.LayoutParams tag=lp(-2,-2);tag.leftMargin=dp(4);enchanted.addView(label,tag);words.addView(enchanted,lp(-1,-2));
         }
-        itemDivider(view,9);itemDetailMetrics(view,item);itemDivider(view,9);
+        space(view,6);view.addView(new SkyrimRuleView(this,0xff888888),lp(-1,12));space(view,6);
+        itemDetailMetrics(view,item);itemDivider(view,9);
         itemEffect(view,item);
+        itemEffectPreview(view,item);
         TextView description=itemText(item.description,14,0xffa3a3a3,false);
         description.setTypeface(Typeface.create("sans-serif",Typeface.ITALIC));
         description.setLineSpacing(dp(2),1.05f);space(view,4);view.addView(description,lp(-1,-2));
