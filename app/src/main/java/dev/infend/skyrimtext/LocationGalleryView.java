@@ -136,7 +136,7 @@ public final class LocationGalleryView extends LinearLayout {
     }
     private GradientDrawable panel(int color,float corners,int outline){
         GradientDrawable d=new GradientDrawable();
-        d.setColor(color);d.setCornerRadius(dp(AmoledAppearance.radius(AmoledAppearance.buttons(),false,corners)));d.setStroke(dp(1),outline);
+        d.setColor(color);d.setCornerRadius(dp(AmoledAppearance.radius(AmoledAppearance.buttons(),false,Math.round(corners))));d.setStroke(dp(1),outline);
         return d;
     }
     private static String archive(String slug,int number){
