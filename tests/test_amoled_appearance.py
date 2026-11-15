@@ -26,3 +26,20 @@ class AmoledAppearanceTest(unittest.TestCase):
         self.assertNotIn("setOnTouchListener",a)
         self.assertNotIn("setOnClickListener",a)
         self.assertIn("AmoledAppearance.applyTree(root)",code("SovngardeTypeface.java"))
+
+    def test_navigation_has_no_outlines_and_fixed_icon_colors(self):
+        ui=code("MainActivity.java")
+        nav=ui.split("private void renderNav(){",1)[1].split("public void toast",1)[0]
+        self.assertNotIn("RuneFrameDrawable",nav)
+        self.assertNotIn("SkyrimRuleView",nav)
+        self.assertIn("nav.setBackground(bg(0xff090909,Color.TRANSPARENT,24))",nav)
+        self.assertIn("area.setBackground(bg(selected?0xff202020:Color.TRANSPARENT,Color.TRANSPARENT,16))",nav)
+        self.assertIn("selected?NAV_ICON_ACTIVE:NAV_ICON_INACTIVE",nav)
+        self.assertNotIn("selected?accent():0xff969da0",nav)
+        self.assertIn("NAV_ICON_ACTIVE=0xfff2f2f2, NAV_ICON_INACTIVE=0xff969da0",ui)
+    def test_story_icon_tint_does_not_depend_on_button_style(self):
+        ui=code("MainActivity.java")
+        self.assertNotIn("AmoledAppearance.buttons()==5?actionTint:accent()",ui)
+        self.assertIn('chance>=0?skillGlyph(choiceSkillName(c.action)):"skills",accent());',ui)
+        self.assertIn("new SkyrimIconView(this,skillGlyph(option.skill),accent());",ui)
+        self.assertIn("box.setBackground(new RuneFrameDrawable(PANEL,actionTint",ui)

@@ -1467,7 +1467,7 @@ public final class MainActivity extends Activity {
             box.addView(ordinal,ordinalSize);
         }
         SkyrimIconView glyph=new SkyrimIconView(this,
-            chance>=0?skillGlyph(choiceSkillName(c.action)):"skills",AmoledAppearance.buttons()==5?actionTint:accent());
+            chance>=0?skillGlyph(choiceSkillName(c.action)):"skills",accent());
         if(visual("choices"))box.addView(glyph,lp(31,34));
         LinearLayout prose=column();
         LinearLayout.LayoutParams size=new LinearLayout.LayoutParams(0,-2,1);
@@ -1839,7 +1839,7 @@ public final class MainActivity extends Activity {
             ordinalSize.rightMargin=dp(8);
             row.addView(ordinal,ordinalSize);
         }
-        SkyrimIconView glyph=new SkyrimIconView(this,skillGlyph(option.skill),AmoledAppearance.buttons()==5?actionTint:accent());
+        SkyrimIconView glyph=new SkyrimIconView(this,skillGlyph(option.skill),accent());
         if(visual("choices"))row.addView(glyph,lp(31,34));
         LinearLayout detail=column();
         LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(0,-2,1);
@@ -3913,10 +3913,11 @@ public final class MainActivity extends Activity {
             .setNegativeButton("Отмена",null).setPositiveButton("Новая игра",(d,w)->{
                 newAiSession();game=new GameEngine();tab=0;draftName="";selectedStart=0;java.util.Arrays.fill(initialPoints,0);save();render();}).show();
     }
+    private static final int NAV_ICON_ACTIVE=0xfff2f2f2, NAV_ICON_INACTIVE=0xff969da0;
     private void renderNav(){
-        root.addView(new SkyrimRuleView(this,0xff929b9d),lp(-1,12));
+        // Navigation deliberately has no frame, including the separator above it.
         LinearLayout nav=row();nav.setPadding(dp(10),dp(7),dp(10),dp(8));
-        nav.setBackground(new RuneFrameDrawable(0xff090909,BORDER,false));
+        nav.setBackground(bg(0xff090909,Color.TRANSPARENT,24));
         LinearLayout.LayoutParams navSize=lp(-1,66);navSize.setMargins(dp(10),0,dp(10),dp(8));root.addView(nav,navSize);
         String[] labels={"ИСТОРИЯ","КАРТА","СУМКА","ГЕРОЙ","ЖУРНАЛ","ТЕМА"};
         String[] glyphs={"story","map","bag","hero","journal","settings"};
@@ -3926,9 +3927,9 @@ public final class MainActivity extends Activity {
             LinearLayout area=column();area.setGravity(Gravity.CENTER);
             LinearLayout.LayoutParams tileSize=new LinearLayout.LayoutParams(0,-1,1);tileSize.setMargins(dp(2),0,dp(2),0);nav.addView(area,tileSize);
             boolean selected=tab==id||(id==4&&tab==6);
-            area.setBackground(new RuneFrameDrawable(selected?0xff211b12:0xff080808,selected?accent():0xff282828,selected));
+            area.setBackground(bg(selected?0xff202020:Color.TRANSPARENT,Color.TRANSPARENT,16));
             area.setClipChildren(true);
-            area.addView(new SkyrimIconView(this,glyphs[i],selected?accent():0xff969da0),lp(-1,31));
+            area.addView(new SkyrimIconView(this,glyphs[i],selected?NAV_ICON_ACTIVE:NAV_ICON_INACTIVE),lp(-1,31));
             TextView label=text(labels[i],8,selected?accent():MUTED,selected);
             label.setGravity(Gravity.CENTER);label.setSingleLine(true);
             label.setEllipsize(android.text.TextUtils.TruncateAt.END);
