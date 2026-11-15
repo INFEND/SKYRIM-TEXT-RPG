@@ -21,6 +21,12 @@ with zipfile.ZipFile(apk) as z:
         assert external[entry["asset"]]["size"]==entry["size"]
         assert len(external[entry["asset"]]["sha256"])==64
     assert core<=names
+    engine=ROOT/"dist/SKYRIM-LOCAL-AI.apk"
+    module=json.loads(z.read("assets/engine_module.json"))
+    assert module["size"]==engine.stat().st_size and module["sha256"]==hashlib.sha256(engine.read_bytes()).hexdigest()
+    assert not any(n.startswith("lib/") and n.endswith(".so") for n in names), "Native libraries leaked into Ultra Lite"
+    with zipfile.ZipFile(engine) as native:
+        assert any(n.startswith("lib/arm64-v8a/") and n.endswith(".so") for n in native.namelist())
     for info in z.infolist():
         if info.is_dir() or not info.filename.startswith("assets/") or info.filename in core:continue
         assert info.file_size<=64*1024 and not info.filename.lower().endswith((".webp",".png",".jpg",".jpeg",".zip",".mp4",".ogg",".mp3",".gguf")),info.filename

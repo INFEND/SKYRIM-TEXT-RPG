@@ -9,7 +9,7 @@ class LocalAiProgressContract(unittest.TestCase):
     def test_progress_and_short_test(self):
         api=(J/"AiStoryClient.java").read_text(encoding="utf-8")
         client=(J/"LocalAiClient.kt").read_text(encoding="utf-8")
-        worker=(J/"LocalAiInferenceService.kt").read_text(encoding="utf-8")
+        worker=(ROOT/"engine/src/main/java/dev/infend/skyrimtext/LocalAiInferenceService.kt").read_text(encoding="utf-8")
         ui=(J/"MainActivity.java").read_text(encoding="utf-8")
         self.assertIn("default void onLocalStatus(String status)",api)
         self.assertIn("default void onLocalMetrics(int tokens,float tokensPerSecond,long elapsedMs)",api)
@@ -33,14 +33,14 @@ class LocalAiProgressContract(unittest.TestCase):
         self.assertIn("if(!game.toJson().toString().equals(saved))",ui)
         self.assertIn("game.choose(c.action)",ui)
     def test_native_model_not_in_ui_process(self):
-        service=(J/"LocalAiInferenceService.kt").read_text(encoding="utf-8")
+        service=(ROOT/"engine/src/main/java/dev/infend/skyrimtext/LocalAiInferenceService.kt").read_text(encoding="utf-8")
         self.assertIn("engine.startEngine(",service)
         self.assertIn("engine.launchCompletion(",service)
         self.assertIn("status(",service)
         self.assertIn("count = tokenCount",service)
         self.assertIn("speed = if (elapsed > 0)",service)
         self.assertIn("Process.killProcess(Process.myPid())",service)
-        manifest=(ROOT/"app/src/main/AndroidManifest.xml").read_text(encoding="utf-8")
+        manifest=(ROOT/"engine/src/main/AndroidManifest.xml").read_text(encoding="utf-8")
         self.assertIn('android:process=":llm"',manifest)
 if __name__=="__main__":
     unittest.main()

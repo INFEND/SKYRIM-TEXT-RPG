@@ -17,7 +17,7 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import org.nehuatl.llamacpp.LlamaAndroid
-import java.io.File
+import android.content.pm.PackageManager
 
 /**
  * The streaming GGUF engine lives in its own :llm process.
@@ -38,6 +38,7 @@ class LocalAiInferenceService : Service() {
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     private val handler = Handler(Looper.getMainLooper()) { message ->
+        if(packageManager.checkSignatures(message.sendingUid,Process.myUid())!=PackageManager.SIGNATURE_MATCH) return@Handler true
         when (message.what) {
             MSG_GENERATE -> handleGenerate(message)
             MSG_CANCEL -> Process.killProcess(Process.myPid())
@@ -73,7 +74,8 @@ class LocalAiInferenceService : Service() {
             finish(receiver, id, null, "Предыдущая локальная генерация ещё выполняется.", 0, 0f, 0L)
             return
         }
-        if (!File(path).isFile || !path.endsWith(".gguf", true)) {
+        val modelUri=Uri.parse(path)
+        if (modelUri.scheme!="content" || modelUri.authority!="dev.infend.skyrimtext.models" || !path.endsWith("/model.gguf")) {
             finish(receiver, id, null, "Импортированный GGUF не найден.", 0, 0f, 0L)
             return
         }
@@ -162,7 +164,7 @@ class LocalAiInferenceService : Service() {
         loadedPath = ""
         loadedContext = null
         status(receiver, id, "Загрузка модели Qwen из памяти телефона…")
-        val uri = Uri.fromFile(File(path))
+        val uri = Uri.parse(path)
         val descriptor = contentResolver.openFileDescriptor(uri, "r")
             ?: error("Не удалось открыть GGUF для нативного движка.")
         val fd = descriptor.detachFd()

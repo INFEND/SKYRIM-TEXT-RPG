@@ -7,9 +7,9 @@ SRC=ROOT/"app/src/main/java/dev/infend/skyrimtext"
 
 class StreamingLocalAi(unittest.TestCase):
     def test_modern_backend_streams_in_isolated_process(self):
-        service=(SRC/"LocalAiInferenceService.kt").read_text(encoding="utf-8")
+        service=(ROOT/"engine/src/main/java/dev/infend/skyrimtext/LocalAiInferenceService.kt").read_text(encoding="utf-8")
         client=(SRC/"LocalAiClient.kt").read_text(encoding="utf-8")
-        build=(ROOT/"app/build.gradle").read_text(encoding="utf-8")
+        build=(ROOT/"engine/build.gradle").read_text(encoding="utf-8")
         self.assertIn("org.nehuatl.llamacpp.LlamaAndroid",service)
         self.assertIn("engine.startEngine(config)",service)
         self.assertIn("engine.getFormattedChat(context, messages,",service)
@@ -36,7 +36,7 @@ class StreamingLocalAi(unittest.TestCase):
         self.assertIn('content.addView(c,p);return c;',ui)
         self.assertIn('aiElapsedText=text("",12,MUTED,false)',ui)
         self.assertNotIn('revealNarrative(narrative,aiTurnText',ui)
-        self.assertNotIn('tokenCount > 1 && now - lastUiUpdate < 250', (SRC/"LocalAiInferenceService.kt").read_text())
+        self.assertNotIn('tokenCount > 1 && now - lastUiUpdate < 250', (ROOT/"engine/src/main/java/dev/infend/skyrimtext/LocalAiInferenceService.kt").read_text())
         self.assertNotIn('now - lastDraw >= 160',(SRC/"AiStoryClient.java").read_text())
         self.assertIn("AiGameTurn.previewScene(accumulated)",ui)
         self.assertIn("aiTurnText.setText(SceneTypography.render(visible",ui)

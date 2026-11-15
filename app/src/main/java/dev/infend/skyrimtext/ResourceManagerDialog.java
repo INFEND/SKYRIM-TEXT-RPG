@@ -53,6 +53,8 @@ final class ResourceManagerDialog {
         updates.setChecked(ResourceStore.autoUpdate(activity));updates.setOnCheckedChangeListener((v,on)->ResourceStore.autoUpdate(activity,on));controls.addView(updates);
         button(controls,"Проверить целостность",()->run("check",false));
         button(controls,"Скачать все ресурсы",()->run("download",false));
+        button(controls,"Движок локального ИИ | "+(LocalAiEngineModule.installed(activity)?"установлен":LocalAiEngineModule.sizeLabel(activity)),()->LocalAiEngineModule.show(activity,accent,refreshed));
+        if(activity instanceof MainActivity)button(controls,"Локальные модели GGUF | по выбору",()->((MainActivity)activity).selectLocalModel());
         button(controls,"Выбрать всё / снять выбор",()->{if(selected.size()==groups.size())selected.clear();else selected.addAll(groups.keySet());draw();});
         button(controls,"Докачать выбранные",()->run("download",true));
         button(controls,"Перекачать выбранные",()->run("force",true));

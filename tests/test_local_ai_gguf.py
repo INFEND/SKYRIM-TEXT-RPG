@@ -17,8 +17,8 @@ class LocalAiContract(unittest.TestCase):
 
     def test_offline_mode_has_no_network_dependency(self):
         client = (SRC / 'LocalAiClient.kt').read_text(encoding='utf-8')
-        worker = (SRC / 'LocalAiInferenceService.kt').read_text(encoding='utf-8')
-        manifest = (ROOT / 'app/src/main/AndroidManifest.xml').read_text(encoding='utf-8')
+        worker = (ROOT / 'engine/src/main/java/dev/infend/skyrimtext/LocalAiInferenceService.kt').read_text(encoding='utf-8')
+        manifest = (ROOT / 'engine/src/main/AndroidManifest.xml').read_text(encoding='utf-8')
         self.assertIn('LlamaAndroid(', worker)
         self.assertIn('engine.launchCompletion(', worker)
         self.assertIn('engine.releaseContext(', worker)
@@ -48,7 +48,7 @@ class LocalAiContract(unittest.TestCase):
         self.assertIn('aiClient.generateTurn(key,model,false',main)
         self.assertIn('completed.apply(next,actionResolved)',main)
         self.assertIn('next.aiTurn=completed',main)
-        build=(ROOT/'app/build.gradle').read_text()
+        build=(ROOT/'engine/build.gradle').read_text()
         self.assertIn('llamacpp-kotlin:0.4.0',build)
 
 if __name__=='__main__':

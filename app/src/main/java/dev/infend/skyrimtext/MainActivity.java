@@ -178,7 +178,7 @@ public final class MainActivity extends Activity {
         if(requestCode==REQUEST_LOCAL_GGUF&&resultCode==RESULT_OK&&data!=null&&data.getData()!=null)
             importLocalModel(data.getData());
     }
-    private void selectLocalModel(){
+    void selectLocalModel(){
         if(localAiClient!=null&&localAiClient.isRunning()){toast("Заверши текущую генерацию");return;}
         Intent picker=new Intent(Intent.ACTION_OPEN_DOCUMENT);
         picker.addCategory(Intent.CATEGORY_OPENABLE);
@@ -187,6 +187,7 @@ public final class MainActivity extends Activity {
         catch(Exception ex){toast("Не удалось открыть выбор файлов");}
     }
     private void testLocalModel(){
+        if(!LocalAiEngineModule.installed(this)){LocalAiEngineModule.show(this,accent(),this::render);return;}
         if(!localModelReady()){toast("Сначала импортируй файл GGUF");return;}
         if(localAiClient.isRunning()){toast("Модель уже выполняет запрос");return;}
         final TextView result=text("Проверка запуска GGUF…",14,TEXT,false);
@@ -268,7 +269,7 @@ public final class MainActivity extends Activity {
         if(!"auto".equals(mode))return mode;
         if(chatGptOAuth.hasAuthorizedPlan())return "chatgpt";
         if(AiKeyVault.configured(this))return "api";
-        return localModelReady()?"local":"none";
+        return localModelReady()&&LocalAiEngineModule.installed(this)?"local":"none";
     }
     private void save(){try{prefs.edit().putString("save",game.toJson().toString()).apply();}catch(Exception ignored){}}
     private int dp(float dp){return (int)(dp*getResources().getDisplayMetrics().density+0.5f);}
@@ -3759,6 +3760,7 @@ public final class MainActivity extends Activity {
                 12,MUTED,false,10);
         }
         if("local".equals(effectiveProvider)){
+            actionButton("Движок локального ИИ",LocalAiEngineModule.installed(this)?"Установлен | отдельный компонент":LocalAiEngineModule.sizeLabel(this)+" | скачать",true,()->LocalAiEngineModule.show(this,accent(),this::render));
             actionButton("Локальная модель | GGUF",
                 localModelReady()?"Готово | "+new java.io.File(LocalAiModelStore.path(prefs)).getName()+
                     " | без интернета":"Не выбрана | импорт из Download",

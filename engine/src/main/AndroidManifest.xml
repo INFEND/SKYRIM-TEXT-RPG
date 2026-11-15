@@ -1,0 +1,8 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <uses-permission android:name="dev.infend.skyrimtext.permission.LOCAL_ENGINE" />
+    <queries><package android:name="dev.infend.skyrimtext" /></queries>
+    <application android:label="SKYRIM Local AI Engine" android:allowBackup="false" android:usesCleartextTraffic="false">
+        <service android:name="dev.infend.skyrimtext.LocalAiInferenceService" android:exported="true"
+            android:permission="dev.infend.skyrimtext.permission.LOCAL_ENGINE" android:process=":llm" />
+    </application>
+</manifest>

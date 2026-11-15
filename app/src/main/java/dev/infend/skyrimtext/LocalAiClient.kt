@@ -30,13 +30,13 @@ class LocalAiClient(private val context: Context) {
     private var binding: ServiceConnection?=null
     private var watchdog: Runnable?=null
     private val incoming=Messenger(Handler(Looper.getMainLooper()) { reply ->
-        if(reply.what==LocalAiInferenceService.MSG_STATUS) {
+        if(reply.what==LocalAiProtocol.MSG_STATUS) {
             val id=reply.data.getLong("id",-1L)
             val listener=synchronized(guard) {
                 if(!closed&&busy&&id==generation)activeListener else null
             }
             listener?.onLocalStatus(reply.data.getString("status").orEmpty())
-        }else if(reply.what==LocalAiInferenceService.MSG_TEXT) {
+        }else if(reply.what==LocalAiProtocol.MSG_TEXT) {
             val id=reply.data.getLong("id",-1L)
             val listener=synchronized(guard) {
                 if(!closed&&busy&&id==generation)activeListener else null
@@ -47,7 +47,7 @@ class LocalAiClient(private val context: Context) {
                 if(partial.isNotEmpty())listener.onText(partial)
                 if(tokens>0)listener.onLocalStatus("Генерация: "+tokens+" токенов")
             }
-        }else if(reply.what==LocalAiInferenceService.MSG_RESULT) {
+        }else if(reply.what==LocalAiProtocol.MSG_RESULT) {
             val id=reply.data.getLong("id",-1L)
             val listener: AiStoryClient.Listener?
             synchronized(guard) {
@@ -93,6 +93,11 @@ class LocalAiClient(private val context: Context) {
                       listener:AiStoryClient.Listener,scene:Boolean=false):Boolean {
         val model=File(modelPath)
         if(!model.isFile||model.length()<64L*1024L*1024L)return false
+        if(!LocalAiEngineModule.installed(context)) {
+            ui.post { listener.onError("Установи движок локального ИИ в управлении ресурсами.") }
+            return true
+        }
+        val modelUri=LocalAiModelProvider.uri(context,modelPath) ?: return false
         var fail:String?=null
         try {
             val manager=context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
@@ -114,10 +119,10 @@ class LocalAiClient(private val context: Context) {
             failGeneration(id,fail)
             return true
         }
-        val request=Message.obtain(null,LocalAiInferenceService.MSG_GENERATE)
+        val request=Message.obtain(null,LocalAiProtocol.MSG_GENERATE)
         val data=Bundle()
         data.putLong("id",id)
-        data.putString("path",modelPath)
+        data.putString("path",modelUri.toString())
         data.putString("system",system)
         data.putString("prompt",prompt)
         data.putInt("maxTokens",maxTokens)
@@ -131,7 +136,7 @@ class LocalAiClient(private val context: Context) {
             val timedOut=synchronized(guard){busy&&generation==id&&!closed}
             if(timedOut){
                 failGeneration(id,"Локальная модель слишком долго не отвечает. Это может быть медленный CPU-инференс или зависание GGUF. Проверь коротким тестом в настройках.")
-                try{messenger?.send(Message.obtain(null,LocalAiInferenceService.MSG_CANCEL))}catch(_:Exception){}
+                try{messenger?.send(Message.obtain(null,LocalAiProtocol.MSG_CANCEL))}catch(_:Exception){}
                 releaseBinding()
             }
         }
@@ -169,7 +174,7 @@ class LocalAiClient(private val context: Context) {
                     }
                 }
                 binding=connection
-                if(!context.bindService(Intent(context,LocalAiInferenceService::class.java),
+                if(!context.bindService(Intent().setComponent(ComponentName(LocalAiEngineModule.PACKAGE,"dev.infend.skyrimtext.LocalAiInferenceService")),
                        connection,Context.BIND_AUTO_CREATE)) {
                     binding=null
                     failGeneration(id,"Android не запустил процесс локальной модели.")
@@ -211,7 +216,7 @@ class LocalAiClient(private val context: Context) {
         }
         // The native completion is not cooperatively cancellable. Its own process
         // can be terminated without crashing the foreground game.
-        try{messenger?.send(Message.obtain(null,LocalAiInferenceService.MSG_CANCEL))}
+        try{messenger?.send(Message.obtain(null,LocalAiProtocol.MSG_CANCEL))}
         catch(_:Exception){}
         releaseBinding()
     }
