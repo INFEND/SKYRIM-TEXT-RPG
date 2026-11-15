@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Build the catalog embedded in the signed APK. Optional assets stay in Git."""
-import argparse, hashlib, json, pathlib, re, subprocess
+import argparse, hashlib, json, pathlib, re, subprocess, urllib.parse, urllib.request, time
 ROOT=pathlib.Path(__file__).resolve().parents[1]
 ASSETS=ROOT/"app/src/main/assets"
 CITIES=dict(zip("whiterun windhelm winterhold dawnstar markarth morthal riverwood riften solitude falkreath helgen ivarstead rorikstead dragonbridge karthwasten shorsstone kynesgrove darkwater stonehills ravenrock telmithryn skaal highhrothgar bleakfallsbarrow blackreach labyrinthian collegewinterhold throatoftheworld ustengrav".split(),
@@ -10,6 +10,28 @@ RACES=dict(zip("nord breton dunmer khajiit imperial orc redguard altmer bosmer a
     "Норды|Бретонцы|Данмеры|Каджиты|Имперцы|Орки|Редгарды|Альтмеры|Босмеры|Аргониане".split("|")))
 CORE={"lore_bundle.zip","icons/skyrim_icons_48.webp","fonts/Sovngarde Light.ttf","fonts/Sovngarde Bold.ttf","fonts/OFL.txt"}
 MEDIA_RE=re.compile(r"media/[a-z0-9_-]+/[a-z0-9_-]+\.(?:webp|png|jpg|jpeg|zip|ogg|mp3|mp4|json)")
+def font_records():
+    spec=json.loads((ROOT/"app/font-choices.json").read_text(encoding="utf-8"))
+    revision=spec["revision"]
+    if not re.fullmatch(r"[0-9a-f]{40}",revision):raise ValueError("Invalid font revision")
+    result=[]
+    for family in spec["families"]:
+        for entry in family["files"]:
+            source=entry["path"]
+            url="https://raw.githubusercontent.com/google/fonts/"+revision+"/"+urllib.parse.quote(source,safe="/")
+            for attempt in range(3):
+                try:
+                    with urllib.request.urlopen(url,timeout=30) as response:
+                        raw=response.read(entry["size"]+1)
+                    if len(raw)!=entry["size"] or hashlib.sha1(("blob "+str(len(raw))+"\0").encode()+raw).hexdigest()!=entry["gitSha"]:
+                        raise ValueError("Invalid pinned font: "+source)
+                    break
+                except Exception:
+                    if attempt==2:raise
+                    time.sleep(attempt+1)
+            result.append(dict(path=entry["asset"],group="font:"+family["id"],label="Шрифт: "+family["name"],size=len(raw),sha256=hashlib.sha256(raw).hexdigest(),url=url))
+    return result
+
 def build(commit, thin=False):
     if not re.fullmatch(r"[0-9a-f]{40}",commit):raise ValueError("Invalid commit")
     records=[]
@@ -51,8 +73,11 @@ def main():
     args=parser.parse_args()
     commit=args.commit or subprocess.check_output(["git","rev-parse","HEAD"],cwd=ROOT,text=True).strip()
     data=build(commit,args.thin)
+    if args.thin:
+        data["files"].extend(font_records())
     (ASSETS/"resource_manifest.json").write_text(json.dumps(data,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
     if args.thin:
-        for e in data["files"]:(ASSETS/e["path"]).unlink()
+        for e in data["files"]:
+            if "url" not in e:(ASSETS/e["path"]).unlink()
     print("Resource catalog:",len(data["files"]),"files;",sum(e["size"] for e in data["files"]),"bytes; bundled=",data["bundled"])
 if __name__=="__main__":main()

@@ -19,6 +19,7 @@ public final class SovngardeTypeface {
     private static final HashMap<String,Typeface> cache=new HashMap<>();
     private static final WeakHashMap<View,Boolean> watched=new WeakHashMap<>();
     private static String selected="sovngarde";
+    private static int cacheGeneration=-1;
     private SovngardeTypeface(){}
 
     public static String normalize(String id){
@@ -46,10 +47,16 @@ public final class SovngardeTypeface {
         return forFamily(context,selected,style);
     }
     private static boolean hasAsset(Context context,String path){
+        if(ResourceStore.localFile(context,path)!=null)return true;
         try(java.io.InputStream ignored=context.getAssets().open(path)){return true;}
         catch(java.io.IOException ignored){return false;}
     }
+    public static boolean available(Context context,String family){
+        return "sovngarde".equals(family)||"system".equals(family)||hasAsset(context,"fonts/choices/"+family+"/regular.ttf");
+    }
     public static synchronized Typeface forFamily(Context context,String family,int style){
+        int generation=ResourceStore.generation();
+        if(cacheGeneration!=generation){cache.clear();cacheGeneration=generation;}
         family=normalize(family);
         style=style&Typeface.BOLD_ITALIC;
         String key=family+":"+style;
@@ -72,15 +79,16 @@ public final class SovngardeTypeface {
                 boolean realItalic=italic&&hasAsset(context,dir+"italic.ttf");
                 String path=hasSpecific?specific:realItalic?dir+"italic.ttf":dir+"regular.ttf";
                 boolean realBold=variable||(bold&&hasSpecific);
-                Typeface.Builder builder=new Typeface.Builder(context.getAssets(),path)
+                java.io.File downloaded=ResourceStore.localFile(context,path);
+                Typeface.Builder builder=(downloaded==null?new Typeface.Builder(context.getAssets(),path):new Typeface.Builder(downloaded))
                     .setWeight(bold&&realBold?700:400).setItalic(realItalic);
                 if(variable)builder.setFontVariationSettings("'wght' "+(bold?700:400));
                 value=builder.build();
-                if(value==null)value=Typeface.createFromAsset(context.getAssets(),path);
+                if(value==null)value=downloaded==null?Typeface.createFromAsset(context.getAssets(),path):Typeface.createFromFile(downloaded);
                 if((bold&&!realBold)||(italic&&!realItalic))value=Typeface.create(value,style);
             }
         }catch(Exception ignored){
-            value=Typeface.create(Typeface.SERIF,style);
+            value="sovngarde".equals(family)?Typeface.create(Typeface.SERIF,style):forFamily(context,"sovngarde",style);
         }
         cache.put(key,value);
         return value;

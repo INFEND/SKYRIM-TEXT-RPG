@@ -3603,14 +3603,25 @@ public final class MainActivity extends Activity {
         for(int i=0;i<SovngardeTypeface.IDS.length;i++){
             final String id=SovngardeTypeface.IDS[i];
             boolean active=id.equals(SovngardeTypeface.selected());
+            boolean available=SovngardeTypeface.available(this,id);
             LinearLayout option=column();option.setPadding(dp(12),dp(9),dp(12),dp(9));
             option.setBackground(new RuneFrameDrawable(PANEL_2,active?accent():BORDER,active));
-            TextView name=text((active?"●  ":"○  ")+SovngardeTypeface.NAMES[i],17,active?accent():TEXT,true);
+            TextView name=text((active?"●  ":"○  ")+SovngardeTypeface.NAMES[i]+(available?"":"  ↓"),17,active?accent():TEXT,true);
             SovngardeTypeface.preview(name,id,Typeface.BOLD);option.addView(name);
             TextView sample=text("Вайтран | Древние свитки\nСеверный ветер шепчет среди гор. 123 / 456",15,TEXT,false);
             SovngardeTypeface.preview(sample,id,Typeface.NORMAL);option.addView(sample);
             LinearLayout.LayoutParams p=lp(-1,-2);p.bottomMargin=dp(6);list.addView(option,p);
-            option.setOnClickListener(v->{SovngardeTypeface.select(this,id);picker.dismiss();render();});
+            option.setOnClickListener(v->{
+                if(!SovngardeTypeface.available(this,id)){
+                    picker.dismiss();
+                    new ResourceManagerDialog(this,accent(),()->{
+                        if(SovngardeTypeface.available(this,id)&&!ResourceStore.groupMissing(this,"font:"+id))SovngardeTypeface.select(this,id);
+                        render();
+                    },"font:"+id).show();
+                    return;
+                }
+                SovngardeTypeface.select(this,id);picker.dismiss();render();
+            });
         }
         picker.show();
     }

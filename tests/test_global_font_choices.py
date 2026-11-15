@@ -18,12 +18,14 @@ class GlobalFontChoices(unittest.TestCase):
             for entry in family["files"]:
                 self.assertRegex(entry["gitSha"],r"^[0-9a-f]{40}$")
                 self.assertGreater(entry["size"],0)
-        self.assertIn("dependsOn(fetchChoiceFonts)",(ROOT/"app/font-assets.gradle").read_text())
+        self.assertIn("data[\"files\"].extend(font_records())",(ROOT/"scripts/build_resource_catalog.py").read_text())
+        self.assertIn("ResourceStore.localFile(context,path)",font)
     def test_settings_and_global_surfaces(self):
         main=(JAVA/"MainActivity.java").read_text()
         font=(JAVA/"SovngardeTypeface.java").read_text()
         self.assertIn("chooseGameFont()",main)
         self.assertIn("SovngardeTypeface.select(this,id);picker.dismiss();render();",main)
+        self.assertIn('"font:"+id',main)
         self.assertIn("SovngardeTypeface.preview(sample,id",main)
         self.assertNotIn("NATIVE_ITEM_FONT",main)
         self.assertIn("putString(PREF,selected)",font)

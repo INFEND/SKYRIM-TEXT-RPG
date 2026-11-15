@@ -34,10 +34,15 @@ final class ResourceStore {
         Entry(JSONObject j,String commit)throws Exception{
             path=j.getString("path");group=j.getString("group");label=j.getString("label");
             sha=j.getString("sha256");size=j.getLong("size");
-            if(!path.matches("(gallery/[a-z0-9_-]+\\.zip|maps/[a-z0-9_-]+\\.webp|icons/skyrim_icons_358_exact\\.(webp|json)|portraits/[a-z]+_(male|female)_[1-3]\\.webp|media/[a-z0-9_-]+/[a-z0-9_-]+\\.(webp|png|jpg|jpeg|zip|ogg|mp3|mp4|json))")
+            if(!path.matches("(gallery/[a-z0-9_-]+\\.zip|maps/[a-z0-9_-]+\\.webp|icons/skyrim_icons_358_exact\\.(webp|json)|portraits/[a-z]+_(male|female)_[1-3]\\.webp|fonts/choices/[a-z0-9_-]+/(regular|bold|italic|bolditalic)\\.ttf|fonts/choices/[a-z0-9_-]+/OFL\\.txt|media/[a-z0-9_-]+/[a-z0-9_-]+\\.(webp|png|jpg|jpeg|zip|ogg|mp3|mp4|json))")
                 ||!sha.matches("[0-9a-f]{64}")||size<=0||size>100_000_000L)
                 throw new IOException("Некорректный каталог ресурсов");
-            url=BASE+commit+"/app/src/main/assets/"+path;
+            if(path.startsWith("fonts/choices/")){
+                String source=j.getString("url");
+                if(!source.matches("https://raw\\.githubusercontent\\.com/google/fonts/[0-9a-f]{40}/ofl/[A-Za-z0-9_./%+,-]+")
+                    ||source.contains(".."))throw new IOException("Недопустимый источник шрифта");
+                url=source;
+            }else url=BASE+commit+"/app/src/main/assets/"+path;
         }
     }
     static final class Catalog {
@@ -106,6 +111,10 @@ final class ResourceStore {
         try{Catalog a=catalog(c);Entry e=a.entries.get(path);
             return e!=null&&!removed(c,e)&&(local(c,e)||a.bundled);
         }catch(Exception ex){try(InputStream in=c.getAssets().open(path)){return true;}catch(IOException ignored){return false;}}
+    }
+    static File localFile(Context c,String path){
+        try{Entry e=catalog(c).entries.get(path);return e!=null&&!removed(c,e)&&local(c,e)?file(c,e):null;}
+        catch(Exception ignored){return null;}
     }
     static InputStream open(Context c,String path)throws IOException{
         Catalog a;try{a=catalog(c);}catch(Exception ex){return c.getAssets().open(path);}

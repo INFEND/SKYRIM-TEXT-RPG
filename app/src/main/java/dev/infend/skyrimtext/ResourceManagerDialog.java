@@ -52,7 +52,7 @@ final class ResourceManagerDialog {
         Switch updates=new Switch(activity);updates.setText("Автообновлять установленные ресурсы");updates.setTextColor(Color.WHITE);
         updates.setChecked(ResourceStore.autoUpdate(activity));updates.setOnCheckedChangeListener((v,on)->ResourceStore.autoUpdate(activity,on));controls.addView(updates);
         button(controls,"Проверить целостность",()->run("check",false));
-        button(controls,"Докачать отсутствующие / повреждённые",()->run("download",false));
+        button(controls,"Скачать все ресурсы",()->run("download",false));
         button(controls,"Выбрать всё / снять выбор",()->{if(selected.size()==groups.size())selected.clear();else selected.addAll(groups.keySet());draw();});
         button(controls,"Докачать выбранные",()->run("download",true));
         button(controls,"Перекачать выбранные",()->run("force",true));
@@ -86,7 +86,14 @@ final class ResourceManagerDialog {
             box.setTextColor(0xffe0e5e7);box.setButtonTintList(android.content.res.ColorStateList.valueOf(accent));
             box.setChecked(selected.contains(g.getKey()));box.setEnabled(!busy);
             box.setOnCheckedChangeListener((v,on)->{if(on)selected.add(g.getKey());else selected.remove(g.getKey());});
-            list.addView(box);
+            LinearLayout row=new LinearLayout(activity);row.setGravity(android.view.Gravity.CENTER_VERTICAL);
+            row.addView(box,new LinearLayout.LayoutParams(0,-2,1f));
+            Button action=new Button(activity);action.setText(complete?"✓":"↓");action.setAllCaps(false);action.setTextColor(accent);
+            action.setContentDescription("Скачать: "+g.getValue().get(0).label);
+            action.setBackground(new RuneFrameDrawable(0xff000000,accent,false));action.setEnabled(!busy&&!complete);
+            row.addView(action,new LinearLayout.LayoutParams(dp(48),dp(48)));
+            action.setOnClickListener(v->{selected.clear();selected.add(g.getKey());run("download",true);});
+            list.addView(row);
         }
         summary.setText("Пакеты: "+goodGroups+" / "+groups.size()+" | "+size(ready)+" / "+size(total)+
             "\nПостоянное хранилище: "+size(local)+" | незавершённые: "+size(partial));
@@ -101,7 +108,7 @@ final class ResourceManagerDialog {
     private void confirmDelete(){
         if(selected.isEmpty()){status.setText("Выбери пакеты");return;}
         new RuneDialogBuilder(activity,accent).setTitle("Удалить выбранные ресурсы?")
-            .setMessage("Сохранения и модели ИИ не затрагиваются. В переходной версии встроенные копии скрываются, а занимаемое APK место освободится после облегчённого обновления.")
+            .setMessage("Сохранения и модели ИИ не затрагиваются. Встроенный шрифт Sovngarde останется доступен.")
             .setNegativeButton("Отмена",null).setPositiveButton("Удалить",(d,w)->run("delete",true)).show();
     }
     private void run(String operation,boolean onlySelected){

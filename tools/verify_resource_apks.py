@@ -8,18 +8,18 @@ assert hashlib.sha256(apk.read_bytes()).digest()==hashlib.sha256(alias.read_byte
 core={"assets/icons/skyrim_icons_48.webp","assets/lore_bundle.zip","assets/fonts/Sovngarde Light.ttf","assets/fonts/Sovngarde Bold.ttf","assets/fonts/OFL.txt","assets/resource_manifest.json"}
 font_spec=json.loads((ROOT/"app/font-choices.json").read_text(encoding="utf-8"))
 font_entries=[entry for family in font_spec["families"] for entry in family["files"]]
-core.update("assets/"+entry["asset"] for entry in font_entries)
 with zipfile.ZipFile(apk) as z:
-    for entry in font_entries:
-        raw=z.read("assets/"+entry["asset"])
-        assert len(raw)==entry["size"],entry["asset"]
-        assert hashlib.sha1(("blob "+str(len(raw))+"\0").encode()+raw).hexdigest()==entry["gitSha"],entry["asset"]
     names=set(z.namelist())
     manifest=json.loads(z.read("assets/resource_manifest.json"))
     assert manifest["bundled"] is False
     assert len(manifest["files"])>=89
     for item in manifest["files"]:
         assert "assets/"+item["path"] not in names,item["path"]
+    external={e["path"]:e for e in manifest["files"]}
+    for entry in font_entries:
+        assert "assets/"+entry["asset"] not in names
+        assert external[entry["asset"]]["size"]==entry["size"]
+        assert len(external[entry["asset"]]["sha256"])==64
     assert core<=names
     for info in z.infolist():
         if info.is_dir() or not info.filename.startswith("assets/") or info.filename in core:continue
