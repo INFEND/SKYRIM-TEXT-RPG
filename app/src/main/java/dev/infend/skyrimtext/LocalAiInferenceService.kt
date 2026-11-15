@@ -67,6 +67,7 @@ class LocalAiInferenceService : Service() {
         val system = data.getString("system").orEmpty()
         val prompt = data.getString("prompt").orEmpty()
         val limit = data.getInt("maxTokens", 1024).coerceIn(24, 3072)
+        val scene = data.getBoolean("scene", false)
 
         if (busy) {
             finish(receiver, id, null, "Предыдущая локальная генерация ещё выполняется.", 0, 0f, 0L)
@@ -109,10 +110,16 @@ class LocalAiInferenceService : Service() {
                     ?: ("<|im_start|>system\n" + system + "<|im_end|>\n" +
                         "<|im_start|>user\n" + prompt + "<|im_end|>\n<|im_start|>assistant\n")
                 status(receiver, id, "Генерация ответа, токены появятся по мере готовности…")
-                synchronized(stateLock) { generatedAt = SystemClock.elapsedRealtime() }
+                val direct = AiScenePreview.directPrompt(formatted)
+                val prefix = AiScenePreview.scenePrefix(direct, scene)
+                // Prefill is part of the response, not a generated token.
+                synchronized(stateLock) {
+                    textBuffer.append(prefix)
+                    generatedAt = SystemClock.elapsedRealtime()
+                }
                 val started = SystemClock.elapsedRealtime()
                 val result = engine.launchCompletion(context, mapOf(
-                    "prompt" to formatted,
+                    "prompt" to (direct + prefix),
                     "emit_partial_completion" to true,
                     "n_predict" to limit,
                     "temperature" to 0.7,
@@ -126,10 +133,11 @@ class LocalAiInferenceService : Service() {
                     textBuffer.toString()
                 }
                 if (result == null) error("Нативный движок не завершил генерацию.")
-                answer = streamed.ifBlank {
-                    (result["text"] as? String)
+                answer = if (count > 0 && streamed.length > prefix.length) streamed else {
+                    val completion = (result["text"] as? String)
                         ?: (result["content"] as? String)
                         ?: ""
+                    if (completion.isBlank()) "" else prefix + completion
                 }
                 if (answer.isBlank()) error("Модель не вернула текст. Проверь GGUF и шаблон диалога.")
                 speed = if (elapsed > 0) (count * 1000f / elapsed) else 0f

@@ -17,6 +17,19 @@ public class AiScenePreviewTest {
         assertEquals("А",AiScenePreview.read("{\"scene\":\"А\\uD83D"));
         assertEquals("А😀",AiScenePreview.read("{\"scene\":\"А\\uD83D\\uDE00"));
     }
+    @Test public void qwenAssistantPrefillStartsSceneImmediately(){
+        String open="<|im_start|>assistant\n<think>\n";
+        String direct=AiScenePreview.directPrompt(open);
+        assertTrue(direct.endsWith("</think>\n\n"));
+        String prefix=AiScenePreview.scenePrefix(direct,true);
+        assertEquals("{\"scene\":\"",prefix);
+        assertEquals("С",AiScenePreview.read(prefix+"С"));
+        assertEquals("Снег",AiScenePreview.read(prefix+"Снег"));
+        assertEquals("",AiScenePreview.scenePrefix(direct,false));
+        assertEquals("",AiScenePreview.scenePrefix("[INST]x[/INST]",true));
+        assertEquals(direct,AiScenePreview.directPrompt(direct));
+        assertEquals("Текст",AiScenePreview.read("Ответ: \"JSON\"\n"+prefix+"Текст"));
+    }
     @Test public void neverShowsNestedMetadataOrThinking(){
         assertEquals("",AiScenePreview.read("{\"effects\":{\"scene\":\"секрет\"}}"));
         assertEquals("",AiScenePreview.read("<think>{\"scene\":\"мысль"));

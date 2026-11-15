@@ -19,6 +19,11 @@ class StreamingLocalAi(unittest.TestCase):
         self.assertIn("receiver.send(msg)",service)
         self.assertIn("onNativeToken(",service)
         self.assertIn("onText(partial)",client)
+        self.assertIn("AiScenePreview.directPrompt(formatted)",service)
+        self.assertIn("AiScenePreview.scenePrefix(direct, scene)",service)
+        self.assertIn("textBuffer.append(prefix)",service)
+        self.assertIn('"prompt" to (direct + prefix)',service)
+        self.assertIn('data.putBoolean("scene",scene)',client)
         self.assertIn('llamacpp-kotlin:0.4.0',build)
         self.assertNotIn('llama-android:0.1.1',build)
 

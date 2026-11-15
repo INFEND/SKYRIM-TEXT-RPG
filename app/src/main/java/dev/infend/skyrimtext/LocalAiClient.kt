@@ -81,7 +81,7 @@ class LocalAiClient(private val context: Context) {
         // Full scenes require a structured JSON with ten choices. CPU-only 9B
         // inference is slow: keep the budget finite rather than waiting on 2048 tokens.
         val maxTokens=if(chanceOnly)128 else if(controlled)2304 else 768
-        return start(modelPath,system,prompt,maxTokens,listener)
+        return start(modelPath,system,prompt,maxTokens,listener,controlled&&!chanceOnly)
     }
 
     /** A tiny smoke-test with no RPG state changes, available in AI settings. */
@@ -90,7 +90,7 @@ class LocalAiClient(private val context: Context) {
             "Напиши только слово: ГОТОВО",24,listener)
 
     private fun start(modelPath:String,system:String,prompt:String,maxTokens:Int,
-                      listener:AiStoryClient.Listener):Boolean {
+                      listener:AiStoryClient.Listener,scene:Boolean=false):Boolean {
         val model=File(modelPath)
         if(!model.isFile||model.length()<64L*1024L*1024L)return false
         var fail:String?=null
@@ -121,6 +121,7 @@ class LocalAiClient(private val context: Context) {
         data.putString("system",system)
         data.putString("prompt",prompt)
         data.putInt("maxTokens",maxTokens)
+        data.putBoolean("scene",scene)
         request.data=data
         request.replyTo=incoming
         pending=request

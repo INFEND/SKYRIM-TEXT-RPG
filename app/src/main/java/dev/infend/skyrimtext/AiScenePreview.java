@@ -4,6 +4,20 @@ package dev.infend.skyrimtext;
 final class AiScenePreview {
     private AiScenePreview(){}
     private static final int LIMIT=30000;
+    // Completion begins after the assistant prefix, which can open Qwen thinking.
+    static String directPrompt(String formatted){
+        int open=formatted.lastIndexOf("<think>");
+        if(open>=0&&formatted.substring(open+7).trim().isEmpty())
+            return formatted+"\n</think>\n\n";
+        return formatted;
+    }
+    static String scenePrefix(String formatted,boolean scene){
+        if(!scene)return "";
+        String tail=formatted.trim();
+        if(tail.endsWith("<|im_start|>assistant")||tail.endsWith("</think>"))
+            return "{\"scene\":\"";
+        return "";
+    }
     static String read(String partial){
         if(partial==null||partial.isEmpty())return "";
         int start=0;
@@ -12,6 +26,8 @@ final class AiScenePreview {
         int close=partial.indexOf("</think>",Math.max(0,thought));
         if(thought>=0&&close<0)return "";
         if(close>=0)start=close+8;
+        start=partial.indexOf('{',start);
+        if(start<0)return "";
         int depth=0;
         char previous=0;
         for(int i=start;i<partial.length();i++){
