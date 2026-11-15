@@ -1373,7 +1373,6 @@ public final class MainActivity extends Activity {
         if(prefs.getBoolean("ai_enabled",false)&&!canonical){renderAiGame();return;}
         GameEngine.Scene s=game.scene();section(s.kicker,s.title,"");
         if(LocationGalleryView.hasGallery(game.progress.location)){
-            addText(content,"ᛟ  ВИДЫ ЛОКАЦИИ",11,accent(),true,9);
             content.addView(sceneGallery(game.progress.location),lp(-1,-2));
             renderLocationWeather(content);
         }else{
@@ -1570,7 +1569,6 @@ public final class MainActivity extends Activity {
             "chatgpt".equals(source)?chatGptOAuth.hasAuthorizedPlan():
             "api".equals(source)&&AiKeyVault.configured(this);
         if(LocationGalleryView.hasGallery(game.progress.location)){
-            addText(content,"ᛟ  "+game.progress.location.toUpperCase(java.util.Locale.ROOT),12,accent(),true,10);
             content.addView(sceneGallery(game.progress.location),lp(-1,-2));
             renderLocationWeather(content);
             space(content,13);
@@ -2347,7 +2345,6 @@ public final class MainActivity extends Activity {
         addText(overview,"Масштаб — двумя пальцами или кнопками. Группы меток раскрываются при увеличении. Поиск работает по русским и оригинальным названиям.",12,MUTED,false,6);
         addText(overview,"Два полных листа рельефа работают без интернета. Масштаб и положение каждого листа сохраняются отдельно.",11,MUTED,false,7);
         if(LocationGalleryView.hasGallery(game.progress.location)){
-            addText(overview,"ᛟ  ГАЛЕРЕЯ ТЕКУЩЕГО МЕСТА",11,accent(),true,12);
             overview.addView(sceneGallery(game.progress.location),lp(-1,-2));
             renderLocationWeather(overview);
         }
