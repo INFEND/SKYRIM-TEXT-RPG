@@ -25,7 +25,10 @@ class StreamingLocalAi(unittest.TestCase):
     def test_partial_scene_is_visible_and_never_committed(self):
         ui=(SRC/"MainActivity.java").read_text(encoding="utf-8")
         self.assertIn('if(!aiTurnProposal){',ui)
-        self.assertIn('content.addView(live,lp(-1,-2))',ui)
+        self.assertIn('LinearLayout live=card();',ui)
+        self.assertIn('live.addView(aiTurnText,lp(-1,-2))',ui)
+        self.assertNotIn('content.addView(live,lp(-1,-2))',ui)
+        self.assertIn('content.addView(c,p);return c;',ui)
         self.assertIn('aiElapsedText=text("",12,MUTED,false)',ui)
         self.assertNotIn('revealNarrative(narrative,aiTurnText',ui)
         self.assertNotIn('tokenCount > 1 && now - lastUiUpdate < 250', (SRC/"LocalAiInferenceService.kt").read_text())

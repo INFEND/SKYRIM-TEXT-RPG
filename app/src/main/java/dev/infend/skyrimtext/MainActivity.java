@@ -1636,7 +1636,7 @@ public final class MainActivity extends Activity {
                 if(aiTurnPreview.isEmpty())aiTurnText.setText("Ожидание текста сцены…");
                 else aiTurnText.setText(SceneTypography.render(aiTurnPreview,accent(),game.name,heroColor()));
                 live.addView(aiTurnText,lp(-1,-2));
-                content.addView(live,lp(-1,-2));
+                // card() already attaches the panel to content.
             }
             space(content,7);
             actionButton("ОСТАНОВИТЬ","Прервать генерацию без изменения сохранения",false,()->{
@@ -1931,6 +1931,7 @@ public final class MainActivity extends Activity {
             private boolean active(){return aiTurnBusy&&requestId==aiRequestSerial&&!isDestroyed()&&!isFinishing();}
             @Override public void onLocalStatus(String status){
                 if(!active())return;
+                if(status.equals(aiLocalPhase))return;
                 aiLocalPhase=status;
                 if(tab==0&&aiProgressInfo!=null)aiProgressInfo.setText(status);
             }
@@ -1943,9 +1944,12 @@ public final class MainActivity extends Activity {
                 if(proposalOnly)return;
                 String visible=AiGameTurn.previewScene(accumulated);
                 if(visible.isEmpty()||visible.equals(aiTurnPreview))return;
+                boolean first=aiTurnPreview.isEmpty();
                 aiTurnPreview=visible;
-                aiLocalPhase="Генерация сцены";
-                if(tab==0&&aiProgressInfo!=null)aiProgressInfo.setText(aiLocalPhase);
+                if(first&&!local){
+                    aiLocalPhase="Генерация сцены";
+                    if(tab==0&&aiProgressInfo!=null)aiProgressInfo.setText(aiLocalPhase);
+                }
                 // Display the first decoded narrative character and every later fragment.
                 // JSON syntax, internal chance proposals and effects stay private.
                 if(tab==0&&aiTurnText!=null&&prefs.getBoolean("ai_enabled",false)){
