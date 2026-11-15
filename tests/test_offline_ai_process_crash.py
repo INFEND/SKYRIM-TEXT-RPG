@@ -4,13 +4,15 @@ import unittest
 
 ROOT=pathlib.Path(__file__).resolve().parents[1]
 JAVA=ROOT / "app/src/main/java/dev/infend/skyrimtext"
-MANIFEST=ROOT / "app/src/main/AndroidManifest.xml"
+ENGINE=ROOT / "engine/src/main/java/dev/infend/skyrimtext"
+MANIFEST=ROOT / "engine/src/main/AndroidManifest.xml"
 
 class OfflineCrashGuard(unittest.TestCase):
     def test_remote_process_survives_native_failures_without_game_state_loss(self):
         xml=MANIFEST.read_text(encoding="utf-8")
-        self.assertIn('android:name=".LocalAiInferenceService"',xml)
-        self.assertIn('android:exported="false" android:process=":llm"',xml)
+        self.assertIn('android:name="dev.infend.skyrimtext.LocalAiInferenceService"',xml)
+        self.assertIn('android:exported="true"',xml)
+        self.assertIn('android:permission="dev.infend.skyrimtext.permission.LOCAL_ENGINE" android:process=":llm"',xml)
         ui=(JAVA/"MainActivity.java").read_text(encoding="utf-8")
         self.assertIn("new LocalAiClient(this)",ui)
         self.assertIn("aiTurnStatus=\"Ошибка генерации:",ui)
@@ -26,7 +28,7 @@ class OfflineCrashGuard(unittest.TestCase):
         self.assertIn("localSystemPrompt",source)
         self.assertIn("localUserPrompt",source)
         self.assertIn("crop(b.toString(),1300)",source)
-        worker=(JAVA/"LocalAiInferenceService.kt").read_text(encoding="utf-8")
+        worker=(ENGINE/"LocalAiInferenceService.kt").read_text(encoding="utf-8")
         self.assertIn('"n_ctx" to 4096',worker)
         self.assertIn('"n_predict" to limit',worker)
         self.assertIn("if (system.isBlank()",worker)
