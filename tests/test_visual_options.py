@@ -8,9 +8,11 @@ MAP=(ROOT/"SkyrimTerrainMapView.java").read_text(encoding="utf-8")
 
 class VisualOptions(unittest.TestCase):
     def test_every_toggle_controls_rendering(self):
-        for key in ("weather","status","portraits","narrative","choices","reveal","stars","gear","damage","victory","travel","chronicle","reputation","loot","trade","defeat","notice"):
+        for key in ("status","portraits","narrative","choices","reveal","stars","gear","damage","victory","travel","chronicle","reputation","loot","trade","defeat","notice"):
             self.assertIn('{"'+key+'",',UI)
             self.assertIn('visual("'+key+'")',UI)
+        self.assertNotIn('"Живая погода"',UI)
+        self.assertNotIn('visual("weather")',UI)
         self.assertIn('{"fog",',UI)
         self.assertIn('prefs.getBoolean("visual_fog",true)',MAP)
 

@@ -34,7 +34,7 @@ class SkyrimReferenceRedesign(unittest.TestCase):
         self.assertIn("canvas.drawBitmap(b,crop,dest,paint)",icon)
         self.assertIn("BitmapFactory.decodeStream(input)",icon)
         self.assertIn('INDEX.put("shield",20)',icon)
-        self.assertIn('String[] glyphs={"story","map","bag","codex","hero","journal","settings"}',ui)
+        self.assertIn('String[] glyphs={"story","map","bag","hero","journal","settings"}',ui)
         self.assertIn('No background path',app)
         self.assertNotIn('M0,0h108v108',app)
 
@@ -46,7 +46,8 @@ class SkyrimReferenceRedesign(unittest.TestCase):
         self.assertIn('focusedInventoryId=item.id',ui)
         self.assertIn('skyrimTopTabs(4)',ui)
         self.assertIn('skyrimTopTabs(3)',ui)
-        self.assertIn('skyrimTopTabs(5)',ui)
+        self.assertIn('skyrimTopTabs(6)',ui)
+        self.assertNotIn('skyrimTopTabs(5)',ui)
         self.assertIn('"ЗАВЕРШЁННЫЕ ЗАДАНИЯ"',ui)
         self.assertIn('"ПРОВАЛЕННЫЕ ЗАДАНИЯ"',ui)
         self.assertIn('ProgressBar progress=new ProgressBar',ui)

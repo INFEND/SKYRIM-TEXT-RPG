@@ -348,7 +348,7 @@ public final class MainActivity extends Activity {
         int start=content.getChildCount();
         LinearLayout panel=card();
         addText(panel,"Каждый эффект можно отключить отдельно. Игровые правила не меняются.",13,MUTED,false,12);
-        String[][] options={{"weather","Живая погода"},{"status","Эффекты состояния"},{"portraits","Собеседники и аватары"},{"narrative","Оформление повествования"},{"choices","Расширенные карточки действий"},{"reveal","Плавное раскрытие текста"},{"stars","Созвездия навыков"},{"gear","Силуэт и экипировка"},{"damage","Показатели урона"},{"victory","Итоги победы"},{"fog","Туман войны"},{"travel","Маршрут путешествия"},{"chronicle","Хроника приключений"},{"reputation","Репутация и отношения"},{"loot","Карточки добычи"},{"trade","Панель торговли"},{"defeat","Экран поражения"},{"notice","Тематические уведомления"}};
+        String[][] options={{"status","Эффекты состояния"},{"portraits","Собеседники и аватары"},{"narrative","Оформление повествования"},{"choices","Расширенные карточки действий"},{"reveal","Плавное раскрытие текста"},{"stars","Созвездия навыков"},{"gear","Силуэт и экипировка"},{"damage","Показатели урона"},{"victory","Итоги победы"},{"fog","Туман войны"},{"travel","Маршрут путешествия"},{"chronicle","Хроника приключений"},{"reputation","Репутация и отношения"},{"loot","Карточки добычи"},{"trade","Панель торговли"},{"defeat","Экран поражения"},{"notice","Тематические уведомления"}};
         for(String[] option:options){
             Switch toggle=new Switch(this);
             toggle.setText(option[1]);toggle.setTextColor(TEXT);toggle.setTextSize(sp(14));
@@ -359,31 +359,15 @@ public final class MainActivity extends Activity {
         foldSettingsSection("visual","ВИЗУАЛЬНЫЕ ЭФФЕКТЫ",start);
     }
     private View sceneGallery(String location){
-        LocationGalleryView gallery=new LocationGalleryView(this,location,accent(),false);
-        if(!visual("weather"))return gallery;
-        WorldWeather weather=WorldWeather.at(game.region,location,game.day,game.hour);
-        if(!location.equalsIgnoreCase(game.progress.location))return gallery;
-        String effect=weather.glyph;
-        String place=location.toLowerCase(java.util.Locale.ROOT);
-        if(place.contains("хелген")&&game.progress.dragonStage==0)effect="embers";
-        else if(place.contains("солстейм")||place.contains("воронья скала")||place.contains("тель-мифрин"))effect="ash";
-        else if("cave".equals(effect))effect="dust";
-        else if("sun".equals(effect)&&weather.temperature>=10)effect="dust";
-        if(!java.util.Arrays.asList("snow","blizzard","rain","storm","fog","embers","ash","dust").contains(effect))return gallery;
-        FrameLayout frame=new FrameLayout(this);
-        frame.addView(gallery,new FrameLayout.LayoutParams(-1,-2));
-        VisualEffectsView particles=new VisualEffectsView(this,effect,animations);
-        frame.addView(particles,new FrameLayout.LayoutParams(-1,-1));
-        return frame;
+        return new LocationGalleryView(this,location,accent(),false);
     }
     private void stateEffects(){
         if(!visual("status")||!game.started||titleOpen)return;
         float fraction=game.hp/(float)Math.max(1,game.maxHp);
-        WorldWeather w=WorldWeather.at(game.region,game.progress.location,game.day,game.hour);
         java.util.ArrayList<Integer> colors=new java.util.ArrayList<>();
         if(fraction<.65f)colors.add(fraction<.25f?0x99b51c27:0x55b51c27);
         if(game.poisonTurns>0)colors.add(0x9954b76a);
-        if(game.frostTurns>0||w.temperature<=-10)colors.add(0x997cc9ef);
+        if(game.frostTurns>0)colors.add(0x997cc9ef);
         if(game.stamina*4<game.maxStamina)colors.add(0x55799357);
         if(game.magicka*4<game.maxMagicka)colors.add(0x556b78cc);
         if(!colors.isEmpty()){
@@ -400,7 +384,6 @@ public final class MainActivity extends Activity {
         if(fraction<.25f)status.append("Критическое здоровье  ");
         if(game.stamina*4<game.maxStamina)status.append("Истощение  ");
         if(game.magicka*4<game.maxMagicka)status.append("Мало магии  ");
-        if(w.temperature<=-10)status.append("Сильный холод");
         if(status.length()>0){TextView label=text(status.toString().trim(),12,TEXT,true);label.setGravity(Gravity.CENTER);label.setPadding(dp(6),dp(5),dp(6),dp(5));label.setBackgroundColor(0xff151719);topChrome.addView(label,lp(-1,-2));}
     }
     private static String npcStatusLabel(String status){
@@ -534,7 +517,7 @@ public final class MainActivity extends Activity {
             if(after.victories>before.victories){
                 battleSummaryPending=true;
                 long earned=after.xp-before.xp;
-                for(int i=before.level;i<after.level;i++)earned+=i*80L;
+                for(int i=before.level;i<after.level;i++)earned+=GameEngine.experienceRequired(i);
                 victoryVisual=before.enemy+"\n+"+Math.max(0,after.gold-before.gold)+" септимов  |  +"+Math.max(0,earned)+" опыта\nХодов: "+after.battleTurns+" | Урон: "+after.battleDealt+" | Получено: "+after.battleTaken;
             }
         }
@@ -1049,14 +1032,14 @@ public final class MainActivity extends Activity {
         View separator=new View(this);separator.setBackgroundColor(0xff303030);
         LinearLayout.LayoutParams rule=lp(-1,1);rule.topMargin=dp(5);rule.bottomMargin=dp(4);
         stats.addView(separator,rule);
-        int next=game.level>=100?0:Math.max(0,game.level*80-game.xp);
+        int next=game.experienceRequired();
         double weight=game.progress.carryWeight();
         LinearLayout details=row();stats.addView(details,lp(-1,-2));
         hudMetric(details,"Уровень","level",String.valueOf(game.level),ITEM_GOLD,1f,()->{tab=3;render();});
         hudMetric(details,"Опыт","experience",game.xp+" / "+(game.level>=100?"MAX":String.valueOf(next)),ITEM_GOLD,1.65f,()->{tab=3;render();});
         hudMetric(details,"Вес, кг","bag",itemNumber(weight)+"/50",weight>50?ITEM_DOWN:weight>=45?0xffe1ac70:TEXT,1.2f,()->{tab=2;render();});
         hudMetric(details,"Септимы","septims",String.valueOf(game.gold),ITEM_GOLD,1f,()->{tab=2;render();});
-        hudBar(stats,"xp",game.level>=100?1:game.xp,game.level>=100?1:game.level*80,ITEM_GOLD,3);
+        hudBar(stats,"xp",game.level>=100?1:game.xp,game.level>=100?1:next,ITEM_GOLD,3);
     }
     private void stat(LinearLayout host,String name,String glyph,int value,int max,int color){
         LinearLayout col=column();col.setPadding(dp(3),0,dp(3),0);
@@ -1171,8 +1154,8 @@ public final class MainActivity extends Activity {
     }
     private void titleRule(){content.addView(new SkyrimRuleView(this,accent()),lp(-1,29));}
     private void skyrimTopTabs(int current){
-        final int[] screens={4,3,5};
-        final String[] names={"ЗАДАНИЯ","СТАТИСТИКА","СИСТЕМА"};
+        final int[] screens={4,3,6};
+        final String[] names={"ЗАДАНИЯ","СТАТИСТИКА","КОДЕКС"};
         LinearLayout bar=row();bar.setPadding(dp(3),dp(5),dp(3),dp(5));
         bar.setBackground(new RuneFrameDrawable(PANEL,BORDER,false));
         content.addView(bar,lp(-1,-2));
@@ -3299,7 +3282,7 @@ public final class MainActivity extends Activity {
         actionButton("ФРАКЦИИ","Членство, ранги и поручения",false,this::factionDialog);
         LinearLayout c=card();addText(c,"ХАРАКТЕРИСТИКИ",11,accent(),true,9);
         heroEntry(c,"Пол",game.gender);
-        heroEntry(c,"Опыт",game.xp+" / "+(game.level*80));
+        heroEntry(c,"Опыт",game.xp+" / "+(game.level>=100?"MAX":String.valueOf(game.experienceRequired())));
         heroEntry(c,"Атака",String.valueOf(game.effectiveAttack()));heroEntry(c,"Защита",String.valueOf(game.effectiveArmor()));
         heroEntry(c,"Септимы",game.gold+" септимов");heroEntry(c,"Репутация",String.valueOf(game.reputation));
         heroEntry(c,"Победы",String.valueOf(game.victories));heroEntry(c,"Исследований",String.valueOf(game.explored));
@@ -3428,6 +3411,7 @@ public final class MainActivity extends Activity {
         {"Фалмер","Скрытный житель глубин и старых двемерских построек. Использует яды, ловушки и боевых существ."}
     };
     private void renderCodex(){
+        skyrimTopTabs(6);
         section("ДРЕВНИЕ ЛЕТОПИСИ","Кодекс","Бестиарий, народы, места и истории, которые открывают мир северных земель.");
         content.addView(new NordicArtView(this,NordicArtView.CODEX),lp(-1,190));
         space(content,15);
@@ -3629,7 +3613,6 @@ public final class MainActivity extends Activity {
     }
 
     private void renderSettings(){
-        skyrimTopTabs(5);
         section("ПАРАМЕТРЫ","Настройки","Твоя история, твои правила.");
         content.addView(new NordicArtView(this,NordicArtView.STORY),lp(-1,105));space(content,12);
         int appearanceStart=content.getChildCount();
@@ -3877,18 +3860,22 @@ public final class MainActivity extends Activity {
     }
     private void renderNav(){
         root.addView(new SkyrimRuleView(this,0xff929b9d),lp(-1,12));
-        LinearLayout nav=row();nav.setPadding(dp(2),dp(7),dp(2),dp(8));
+        LinearLayout nav=row();nav.setPadding(dp(10),dp(7),dp(10),dp(8));
         nav.setBackgroundColor(0xf8050809);root.addView(nav,lp(-1,66));
-        String[] labels={"ИСТОРИЯ","КАРТА","СУМКА","КОДЕКС","ГЕРОЙ","ЖУРНАЛ","ТЕМА"};
-        String[] glyphs={"story","map","bag","codex","hero","journal","settings"};
-        int[] screens={0,1,2,6,3,4,5};
+        String[] labels={"ИСТОРИЯ","КАРТА","СУМКА","ГЕРОЙ","ЖУРНАЛ","ТЕМА"};
+        String[] glyphs={"story","map","bag","hero","journal","settings"};
+        int[] screens={0,1,2,3,4,5};
         for(int i=0;i<labels.length;i++){
             final int id=screens[i];
             LinearLayout area=column();area.setGravity(Gravity.CENTER);
             nav.addView(area,new LinearLayout.LayoutParams(0,-1,1));
-            area.addView(new SkyrimIconView(this,glyphs[i],tab==id?accent():0xff969da0),lp(28,31));
-            TextView label=text(labels[i],8,tab==id?accent():MUTED,tab==id);
-            label.setGravity(Gravity.CENTER);area.addView(label);
+            boolean selected=tab==id||(id==4&&tab==6);
+            area.setClipChildren(true);
+            area.addView(new SkyrimIconView(this,glyphs[i],selected?accent():0xff969da0),lp(-1,31));
+            TextView label=text(labels[i],8,selected?accent():MUTED,selected);
+            label.setGravity(Gravity.CENTER);label.setSingleLine(true);
+            label.setEllipsize(android.text.TextUtils.TruncateAt.END);
+            area.addView(label,lp(-1,-2));
             area.setContentDescription(labels[i]);
             area.setOnClickListener(v->{if(tab!=id){tab=id;render();}});
         }
@@ -3896,7 +3883,8 @@ public final class MainActivity extends Activity {
     public void toast(String message){themedNotice(message);}
     int currentAccent(){return accent();}
     @Override public void onBackPressed(){if(titleOpen){super.onBackPressed();return;}
-        if(!game.started||tab==5||tab==6){titleOpen=true;render();return;}
+        if(!game.started||tab==5){titleOpen=true;render();return;}
+        if(tab==6){tab=4;render();return;}
         if(game.started&&tab!=0){tab=0;render();return;}
         if(game.started&&!game.mode.equals("WORLD")&&!game.mode.equals("COMBAT")){recentItemGains.clear();game.choose("GO_WORLD");save();render();return;}
         super.onBackPressed();}

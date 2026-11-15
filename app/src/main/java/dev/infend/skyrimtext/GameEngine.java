@@ -640,9 +640,11 @@ public final class GameEngine {
             CanonicalCampaign.victory(this);
         }
     }
+    public static int experienceRequired(int level){return Math.max(1,Math.min(100,level))*100;}
+    public int experienceRequired(){return experienceRequired(level);}
     public void addXp(int amount) {
         xp+=amount;
-        while(xp>=level*80 && level<100){xp-=level*80;level++;maxHp+=10;maxStamina+=10;maxMagicka+=10;progress.perkPoints++;hp=maxHp;stamina=maxStamina;magicka=maxMagicka;}
+        while(level<100 && xp>=experienceRequired()){xp-=experienceRequired();level++;maxHp+=10;maxStamina+=10;maxMagicka+=10;progress.perkPoints++;hp=maxHp;stamina=maxStamina;magicka=maxMagicka;}
     }
     /** Time-limited rest available outside combat, tracked in the old save schema. */
     public boolean waitHours(int hours){
