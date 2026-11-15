@@ -2719,52 +2719,63 @@ public final class MainActivity extends Activity {
     }
     private LinearLayout itemMetric(String label,String glyph,String value,int color,double delta,boolean large){
         LinearLayout metric=column();metric.setGravity(Gravity.CENTER);
-        TextView caption=itemText(label,large?11:11,0xffa3a3a3,false);caption.setGravity(Gravity.CENTER);
-        TextView number=itemText(value,large?23:27,("bag".equals(glyph)||"septims".equals(glyph))?TEXT:color,true);
+        TextView caption=itemText(label,large?11:10,0xffa3a3a3,false);caption.setGravity(Gravity.CENTER);
+        TextView number=itemText(value,large?23:19,("bag".equals(glyph)||"septims".equals(glyph))?TEXT:color,true);
         number.setGravity(Gravity.CENTER);number.setSingleLine(true);
-        number.setAutoSizeTextTypeUniformWithConfiguration(13,large?23:27,1,android.util.TypedValue.COMPLEX_UNIT_SP);
+        number.setAutoSizeTextTypeUniformWithConfiguration(13,large?23:19,1,android.util.TypedValue.COMPLEX_UNIT_SP);
         if(large){
             metric.addView(new ItemStatGlyph(this,glyph,color),lp(21,21));space(metric,3);
             metric.addView(number,lp(-1,29));space(metric,3);metric.addView(caption,lp(-1,-2));
         }else{
-            metric.addView(caption,lp(-1,-2));space(metric,6);
+            metric.addView(caption,lp(-1,-2));space(metric,2);
             LinearLayout line=row();line.setGravity(Gravity.CENTER);
-            line.addView(new ItemStatGlyph(this,glyph,color),lp(20,20));
-            line.addView(number,new LinearLayout.LayoutParams(0,dp(35),1));
+            line.addView(new ItemStatGlyph(this,glyph,color),lp(15,15));
+            line.addView(number,new LinearLayout.LayoutParams(0,dp(23),1));
             metric.addView(line,lp(-1,-2));
         }
         boolean changed=!Double.isNaN(delta)&&Math.abs(delta)>=0.05;
         boolean favorable="bag".equals(glyph)?delta<0:delta>0;
-        TextView change=itemText(changed?(delta>0?"▲ ":"▼ ")+itemNumber(Math.abs(delta))+("bag".equals(glyph)?" кг":""):"",12,favorable?ITEM_UP:ITEM_DOWN,false);
+        TextView change=itemText(changed?(delta>0?"▲ ":"▼ ")+itemNumber(Math.abs(delta))+("bag".equals(glyph)?" кг":""):"",large?12:10,favorable?ITEM_UP:ITEM_DOWN,false);
         if(changed){change.setGravity(Gravity.CENTER);space(metric,3);metric.addView(change,lp(-1,-2));}
         metric.setContentDescription(label+" "+value+(changed?", изменение "+(delta>0?"+":"−")+itemNumber(Math.abs(delta)):""));
         return metric;
     }
     private void itemSmallMetric(LinearLayout host,String glyph,String value,int color){
         LinearLayout metric=row();
-        metric.addView(new ItemStatGlyph(this,glyph,color),lp(17,17));
-        TextView v=itemText(value,14,TEXT,false);
-        LinearLayout.LayoutParams p=lp(-2,-2);p.leftMargin=dp(4);metric.addView(v,p);
-        LinearLayout.LayoutParams m=lp(-2,-2);m.rightMargin=dp(10);host.addView(metric,m);
+        metric.setGravity(Gravity.CENTER_VERTICAL);
+        metric.addView(new ItemStatGlyph(this,glyph,color),lp(14,14));
+        TextView v=itemText(value,12,TEXT,false);
+        v.setSingleLine(true);
+        LinearLayout.LayoutParams p=lp(-2,-2);p.leftMargin=dp(3);metric.addView(v,p);
+        host.addView(metric,lp(-2,-2));
     }
     private LinearLayout itemSummary(ItemCatalog.Item item,int quantity,boolean active,boolean showWeight,int price){
-        LinearLayout itemRow=row();itemRow.setMinimumHeight(dp(96));
-        itemRow.setPadding(dp(10),dp(12),dp(10),dp(12));
+        // One compact row for inventory, catalog, trade and item rewards.
+        LinearLayout itemRow=row();itemRow.setMinimumHeight(dp(68));
+        itemRow.setPadding(dp(8),dp(6),dp(8),dp(6));
         itemRow.setBackgroundColor(0xff0a0a0a);
-        itemRow.addView(itemPicture(item,72),lp(72,72));
+        itemRow.addView(itemPicture(item,54),lp(54,54));
         LinearLayout words=column();LinearLayout.LayoutParams wp=new LinearLayout.LayoutParams(0,-2,1);
-        wp.leftMargin=dp(10);itemRow.addView(words,wp);
-        TextView name=itemText((game.progress.equipped(item.id)?"◆ ":"")+item.name+(quantity>1?" ×"+quantity:""),17,TEXT,true);
-        name.setMaxLines(3);words.addView(name,lp(-1,-2));space(words,7);
-        words.addView(itemText(itemType(item),13,0xffa3a3a3,false),lp(-1,-2));space(words,7);
-        LinearLayout small=row();words.addView(small,lp(-1,-2));
-        if(showWeight)itemSmallMetric(small,"bag",itemNumber(item.weight)+" кг",0xffb5b5b5);
-        itemSmallMetric(small,"septims",String.valueOf(price),ITEM_GOLD);
+        wp.leftMargin=dp(8);itemRow.addView(words,wp);
+        LinearLayout upper=row();words.addView(upper,lp(-1,-2));
+        LinearLayout identity=column();
+        upper.addView(identity,new LinearLayout.LayoutParams(0,-2,1));
+        TextView name=itemText((game.progress.equipped(item.id)?"◆ ":"")+item.name+(quantity>1?" ×"+quantity:""),15,TEXT,true);
+        name.setMaxLines(3);identity.addView(name,lp(-1,-2));space(identity,3);
+        identity.addView(itemText(itemType(item),12,0xffa3a3a3,false),lp(-1,-2));
         if(hasItemStat(item)){
             boolean weapon=item.weapon();
-            itemRow.addView(itemMetric(weapon?"УРОН":"БРОНЯ",weapon?"weapon":"shield",
-                itemNumber(item.currentStat(game.progress)),weapon?ITEM_DAMAGE:ITEM_ARMOR,itemDelta(item),false),lp(72,-2));
+            LinearLayout.LayoutParams statParams=lp(58,-2);statParams.leftMargin=dp(5);
+            upper.addView(itemMetric(weapon?"УРОН":"БРОНЯ",weapon?"weapon":"shield",
+                itemNumber(item.currentStat(game.progress)),weapon?ITEM_DAMAGE:ITEM_ARMOR,itemDelta(item),false),statParams);
         }
+        // Bottom row spans the whole card text area, including under damage/armor.
+        // A weighted spacer pins the icon AND price to the same right edge for every row.
+        space(words,4);
+        LinearLayout small=row();words.addView(small,lp(-1,-2));
+        if(showWeight)itemSmallMetric(small,"bag",itemNumber(item.weight)+" кг",0xffb5b5b5);
+        small.addView(new View(this),new LinearLayout.LayoutParams(0,1,1));
+        itemSmallMetric(small,"septims",String.valueOf(price),ITEM_GOLD);
         return itemRow;
     }
     private int potionRestore(ItemCatalog.Item item){
@@ -2951,7 +2962,7 @@ public final class MainActivity extends Activity {
                 final boolean active=item.id.equals(focusedInventoryId);
                 if(items.getChildCount()>0){
                     View divider=new View(this);divider.setBackgroundColor(0xff343434);
-                    LinearLayout.LayoutParams sep=lp(-1,1);sep.setMargins(dp(10),dp(4),dp(10),dp(4));items.addView(divider,sep);
+                    LinearLayout.LayoutParams sep=lp(-1,1);sep.setMargins(dp(8),dp(2),dp(8),dp(2));items.addView(divider,sep);
                 }
                 LinearLayout itemRow=itemSummary(item,game.progress.quantity(item.id),active,true,item.value);
                 items.addView(itemRow,lp(-1,-2));
