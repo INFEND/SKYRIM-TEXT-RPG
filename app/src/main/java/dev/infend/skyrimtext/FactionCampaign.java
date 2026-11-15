@@ -38,15 +38,15 @@ final class FactionCampaign {
     String task(int f){int s=stage(f);return s==0?"Вступить в "+NAMES[f]:s>TASK_COUNT?"Цепочка поручений завершена":TASKS[f][s-1];}
     String place(int f){int s=stage(f);return s==0?HOME[f]:s>TASK_COUNT?HOME[f]:PLACES[f][s-1];}
     int chance(GameEngine g,int f){return chance(g,f,false);}
-    int chance(GameEngine g,int f,boolean talk){int s=stage(f);return s<1||s>TASK_COUNT?-1:g.progress.chance(g,2,talk?12:SKILLS[f][s-1],18+s*5+(talk?5:0)-Math.max(-5,Math.min(5,trust[f]/10)));}
+    int chance(GameEngine g,int f,boolean talk){int s=stage(f);return s<1||s>TASK_COUNT||!block(g,f).isEmpty()?-1:g.progress.chance(g,2,talk?12:SKILLS[f][s-1],18+s*5+(talk?5:0)-Math.max(-5,Math.min(5,trust[f]/10)));}
     String description(int f){int s=stage(f);if(s==0)return "Представься местному представителю и согласись на поручения.";if(s>TASK_COUNT)return "Все поручения выполнены. Твои заслуги записаны в журнале.";
         return SCENES[f][s-1]+"\n\nВыбери профильный навык или переговоры.";}
 
     String block(GameEngine g,int f){
         if(!valid(f)||!g.started)return "Нет доступного поручения";
-        if("COMBAT".equals(g.mode))return "Сначала заверши бой";
+        if(!("WORLD".equals(g.mode)||"RESULT".equals(g.mode)))return "Сначала заверши текущую сцену";
         if(stage[f]>TASK_COUNT)return "Все поручения завершены";
-        if(stage[f]==0&&((f==4&&stage[5]>0)||(f==5&&stage[4]>0)||(f==4&&g.factionStories.started(5))||(f==5&&g.factionStories.started(4))))return "Ты уже присягнул противоположной стороне";
+        if((f==4&&stage[5]>0)||(f==5&&stage[4]>0)||(f==4&&g.factionStories.started(5))||(f==5&&g.factionStories.started(4)))return "Ты уже присягнул противоположной стороне";
         if(!place(f).equalsIgnoreCase(g.progress.location))return "Нужно прибыть: "+place(f);
         if(stage[f]>0&&attemptDay[f]==g.day)return "Следующая попытка в другой игровой день";
         if(stage[f]>0&&g.stamina<10)return "Нужно 10 выносливости";
