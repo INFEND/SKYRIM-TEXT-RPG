@@ -43,18 +43,23 @@ class PlayerScreens134(unittest.TestCase):
         self.assertIn("row.setGravity(Gravity.CENTER_VERTICAL)",UI)
         self.assertIn('row.setContentDescription("Вариант "+number',UI)
 
-    def test_ai_loading_has_only_spinner_live_dots_and_stop_action(self):
+    def test_ai_loading_has_stable_elapsed_timer_live_scene_and_stop_action(self):
         busy=UI.split("if(aiTurnBusy) {",1)[1].split('if(!aiTurnStatus.isEmpty())addText(content,aiTurnStatus',1)[0]
         self.assertIn("spinner.setIndeterminate(true)",busy)
-        self.assertIn('private final String[] frames={"",".","..","..."}',busy)
-        self.assertIn('aiProgressInfo.setText("Генерация ответа"+frames[phase++%frames.length])',busy)
-        self.assertIn("aiProgressInfo.postDelayed(this,430L)",busy)
+        self.assertIn("aiProgressInfo.setMinLines(2)",busy)
+        self.assertIn("aiProgressInfo.setMaxLines(2)",busy)
+        self.assertIn("labels.addView(aiElapsedText",busy)
+        self.assertIn("timer.postDelayed(this,250L)",busy)
+        self.assertIn('Прошло %02d:%02d',UI)
+        self.assertIn("if(!aiTurnProposal){",busy)
+        self.assertIn("live.addView(aiTurnText",busy)
+        self.assertNotIn("frames[phase",busy)
         self.assertIn('actionButton("ОСТАНОВИТЬ"',busy)
         self.assertNotIn('Резюме рассуждений',busy)
         self.assertNotIn('Точный процент недоступен',busy)
         self.assertNotIn('Создано символов сцены',busy)
         self.assertNotIn('ИИ СОЗДАЁТ ПРОДОЛЖЕНИЕ',busy)
-        self.assertIn("aiProgressInfo.removeCallbacks(aiDotsTicker)",UI)
+        self.assertIn("aiElapsedText.removeCallbacks(aiDotsTicker)",UI)
 
 
 if __name__=="__main__":
