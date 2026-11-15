@@ -2,65 +2,67 @@ package dev.infend.skyrimtext;
 
 import android.content.res.Resources;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.ColorFilter;
+import android.graphics.LinearGradient;
+import android.graphics.Outline;
 import android.graphics.Paint;
 import android.graphics.PixelFormat;
 import android.graphics.Rect;
+import android.graphics.RectF;
+import android.graphics.Shader;
 import android.graphics.drawable.Drawable;
 
-/**
- * Classic Skyrim-inspired menu glass: inky, square, thin pewter rules,
- * transparent corner knots. Preserves all original call sites.
- */
+/** Rounded AMOLED frame; shared by cards, controls and themed dialog windows. */
 public final class RuneFrameDrawable extends Drawable {
     private final Paint p=new Paint(Paint.ANTI_ALIAS_FLAG);
-    private final int fill,ink;
-    private final boolean selected;
+    private final int fill,ink,style;
+    private final boolean selected,window;
+    private int opacity=255;
     public RuneFrameDrawable(int fillColor,int accentColor,boolean active){
-        fill=fillColor;ink=accentColor;selected=active;
+        this(fillColor,accentColor,active,AmoledAppearance.buttons(),false);
     }
-    private void line(Canvas c,float x,float y,float x2,float y2){
-        c.drawLine(x,y,x2,y2,p);
+    public RuneFrameDrawable(int fillColor,int accentColor,boolean active,int variant,boolean isWindow){
+        fill=fillColor;ink=accentColor;selected=active;style=AmoledAppearance.normalize(variant);window=isWindow;
     }
-    private void corner(Canvas c,float x,float y,float mirrorX,float mirrorY,float size){
-        c.save();c.translate(x,y);c.scale(mirrorX,mirrorY);
-        // Double meander and broken-angle terminals, isolated from the panel fill.
-        line(c,0,size,0,0);line(c,0,0,size,0);
-        line(c,3,size*.73f,3,3);line(c,3,3,size*.73f,3);
-        line(c,6,size*.72f,6,6);line(c,6,6,size*.72f,6);
-        line(c,0,size*.36f,size*.36f,size*.36f);
-        line(c,size*.36f,0,size*.36f,size*.36f);
-        line(c,size*.36f,size*.36f,size*.18f,size*.36f);
-        line(c,size*.36f,size*.36f,size*.36f,size*.18f);
-        line(c,size*.66f,0,size*.66f,size*.15f);
-        line(c,0,size*.66f,size*.15f,size*.66f);
-        c.restore();
+    private float radius(Rect r,float d){
+        return Math.min(Math.min(r.width(),r.height())/2f,AmoledAppearance.radius(style,window,0)*d);
+    }
+    private static int blend(int a,int b,float ratio){
+        return android.graphics.Color.rgb((int)(android.graphics.Color.red(a)*(1-ratio)+android.graphics.Color.red(b)*ratio),
+            (int)(android.graphics.Color.green(a)*(1-ratio)+android.graphics.Color.green(b)*ratio),
+            (int)(android.graphics.Color.blue(a)*(1-ratio)+android.graphics.Color.blue(b)*ratio));
     }
     @Override public void draw(Canvas c){
-        Rect r=getBounds();if(r.width()<4||r.height()<4)return;
+        Rect r=getBounds();if(r.width()<2||r.height()<2)return;
         float d=Resources.getSystem().getDisplayMetrics().density;
-        float x=r.left+1*d,y=r.top+1*d,right=r.right-1*d,bottom=r.bottom-1*d;
-        p.setShader(null);p.setStyle(Paint.Style.FILL);p.setColor(fill);
-        c.drawRect(r,p);
-        float corner=Math.min(18*d,Math.min(r.width(),r.height())*.32f);
-        int outline=selected?0xffced7dc:0xff81878a;
-        p.setStyle(Paint.Style.STROKE);p.setStrokeWidth(Math.max(.8f,selected?1.1f*d:.75f*d));
-        p.setColor(outline);
-        // Very light perimeter and brighter selection rule.
-        p.setAlpha(selected?180:70);c.drawRect(x,y,right,bottom,p);
-        p.setColor(ink);p.setAlpha(selected?240:190);
-        corner(c,x,y,1,1,corner);
-        corner(c,right,y,-1,1,corner);
-        corner(c,x,bottom,1,-1,corner);
-        corner(c,right,bottom,-1,-1,corner);
-        if(selected&&r.width()>95*d){
-            p.setColor(0xffc3c9cc);p.setAlpha(152);
-            line(c,x+corner+5*d,y+2*d,right-corner-5*d,y+2*d);
+        float rad=radius(r,d);
+        RectF bounds=new RectF(r.left+d*.65f,r.top+d*.65f,r.right-d*.65f,r.bottom-d*.65f);
+        int surface=blend(0xff000000,fill,window?.6f:.75f);
+        int edge=selected?ink:blend(0xff303030,ink,.35f);
+        if(style==1){surface=blend(surface,0xff22190d,.55f);edge=selected?ink:blend(0xff5b492e,ink,.35f);}
+        if(style==2){surface=blend(surface,0xff0d0d0d,.65f);}
+        if(style==4&&selected){surface=blend(0xff17120b,ink,.22f);edge=ink;}
+        if(style==5){edge=ink;surface=blend(surface,ink,.055f);}
+        if(style==6){surface=selected?blend(surface,ink,.11f):blend(surface,0xff0b0b0b,.75f);}
+        p.setShader(null);p.setStyle(Paint.Style.FILL);p.setColor(surface);p.setAlpha(opacity);
+        if(style==3)p.setShader(new LinearGradient(r.left,r.top,r.right,r.bottom,
+            blend(surface,ink,selected?.17f:.085f),surface,Shader.TileMode.CLAMP));
+        c.drawRoundRect(bounds,rad,rad,p);p.setShader(null);
+        p.setStyle(Paint.Style.STROKE);p.setStrokeWidth(d*(selected?1.5f:1f));p.setColor(edge);p.setAlpha(opacity);
+        c.drawRoundRect(bounds,rad,rad,p);
+        if(style==2&&r.width()>72*d&&r.height()>28*d){
+            p.setColor(ink);p.setAlpha(opacity*2/3);p.setStrokeWidth(d);
+            float mid=bounds.centerX(),top=bounds.top+3*d;
+            android.graphics.Path diamond=new android.graphics.Path();
+            diamond.moveTo(mid-4*d,top);diamond.lineTo(mid,top+2*d);diamond.lineTo(mid+4*d,top);diamond.lineTo(mid,top-2*d);diamond.close();
+            c.drawPath(diamond,p);
         }
         p.setStyle(Paint.Style.FILL);
     }
-    @Override public void setAlpha(int alpha){p.setAlpha(alpha);invalidateSelf();}
+    @Override public void getOutline(Outline outline){
+        Rect r=getBounds();outline.setRoundRect(r,radius(r,Resources.getSystem().getDisplayMetrics().density));
+    }
+    @Override public void setAlpha(int alpha){opacity=alpha;invalidateSelf();}
     @Override public void setColorFilter(ColorFilter f){p.setColorFilter(f);invalidateSelf();}
-    @SuppressWarnings("deprecation")@Override public int getOpacity(){return PixelFormat.TRANSLUCENT;}
+    @SuppressWarnings("deprecation") @Override public int getOpacity(){return PixelFormat.TRANSLUCENT;}
 }

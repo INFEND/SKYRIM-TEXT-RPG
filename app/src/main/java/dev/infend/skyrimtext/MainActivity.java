@@ -33,7 +33,7 @@ import org.json.JSONObject;
 
 public final class MainActivity extends Activity {
     // Monochrome translucent menus, following the six provided Skyrim references.
-    private static final int BG=0xff06090a, PANEL=0xe806090b, PANEL_2=0xf30b0e10;
+    private static final int BG=0xff000000, PANEL=0xff0b0b0b, PANEL_2=0xff101010;
     private static final int TEXT=0xfff0f1ef, MUTED=0xffaab0b3, BORDER=0xff666d72;
     private static final int[] ACCENTS={0xffe1e3e3,0xffa4b9bf,0xffb9c9dc,0xffceb48c,0xffc79a97,0xffeeece8};
     private static final String[] ACCENT_NAMES={"Серебро", "Север", "Лёд", "Древнее золото", "Рубин", "Снег"};
@@ -114,6 +114,7 @@ public final class MainActivity extends Activity {
         ResourceStore.start(this);
         new Thread(()->{CanonicalCampaign.loadLocal(getApplicationContext());runOnUiThread(()->{if(!isDestroyed()&&!titleOpen&&tab==0&&"CANON".equals(game.mode))render();});},"canonical-dialogues").start();
         ItemCatalog.initialize(this);
+        AmoledAppearance.load(this);
         SovngardeTypeface.preload(this);
         game=GameEngine.fromJson(prefs.getString("save",null));
         if(bundle!=null){
@@ -285,8 +286,7 @@ public final class MainActivity extends Activity {
         return exact==null?"skills":exact;
     }
     private GradientDrawable bg(int fill,int border,int radius){
-        GradientDrawable gd=new GradientDrawable();gd.setColor(fill);gd.setCornerRadius(dp(Math.min(radius,3)));
-        if(border!=Color.TRANSPARENT)gd.setStroke(dp(1),border);return gd;
+        return AmoledAppearance.shape(this,fill,border,radius);
     }
     private LinearLayout column(){LinearLayout l=new LinearLayout(this);l.setOrientation(LinearLayout.VERTICAL);return l;}
     private LinearLayout row(){LinearLayout l=new LinearLayout(this);l.setOrientation(LinearLayout.HORIZONTAL);l.setGravity(Gravity.CENTER_VERTICAL);return l;}
@@ -888,7 +888,7 @@ public final class MainActivity extends Activity {
         if(game.started&&game.visitedVisual.add(game.progress.location))save();
         String thisPage=viewportKey();
         PageScroll oldScroll=scrollCache.get(thisPage);
-        root=column();root.setBackground(new SkyrimBackdropDrawable());root.setFitsSystemWindows(true);
+        root=column();root.setBackgroundColor(BG);root.setFitsSystemWindows(true);
         setContentView(root);
         activeTerrainMap=null;
         // Header and health belong to the scroll document, not a floating overlay.
@@ -1077,8 +1077,8 @@ public final class MainActivity extends Activity {
         int limit=Math.max(1,max),target=Math.max(0,Math.min(limit,value));
         int previous=hudPrevious.getOrDefault(key,target);hudPrevious.put(key,target);
         ProgressBar bar=new ProgressBar(this,null,android.R.attr.progressBarStyleHorizontal);
-        GradientDrawable track=new GradientDrawable();track.setColor(0xff242424);
-        GradientDrawable fill=new GradientDrawable();fill.setColor(color);
+        GradientDrawable track=new GradientDrawable();track.setColor(0xff242424);track.setCornerRadius(dp(height/2f));
+        GradientDrawable fill=new GradientDrawable();fill.setColor(color);fill.setCornerRadius(dp(height/2f));
         android.graphics.drawable.ClipDrawable clipped=new android.graphics.drawable.ClipDrawable(fill,Gravity.LEFT,android.graphics.drawable.ClipDrawable.HORIZONTAL);
         android.graphics.drawable.LayerDrawable layers=new android.graphics.drawable.LayerDrawable(new android.graphics.drawable.Drawable[]{track,clipped});
         layers.setId(0,android.R.id.background);layers.setId(1,android.R.id.progress);
@@ -1148,6 +1148,7 @@ public final class MainActivity extends Activity {
         TextView item=text(caption.toUpperCase(java.util.Locale.ROOT),19,active?accent():TEXT,true);
         item.setGravity(Gravity.CENTER);item.setLetterSpacing(.12f);
         item.setBackground(new RuneFrameDrawable(active?0xf0121516:PANEL,active?accent():BORDER,active));
+        if(active&&AmoledAppearance.buttons()==4){item.setBackground(bg(0xffd0b583,0xffd0b583,16));item.setTextColor(0xff15110a);}
         LinearLayout.LayoutParams p=lp(-1,50);p.setMargins(dp(28),0,dp(28),dp(9));
         content.addView(item,p);item.setClickable(true);item.setFocusable(true);
         item.setOnClickListener(v->callback.run());
@@ -1455,7 +1456,8 @@ public final class MainActivity extends Activity {
         int chance=game.progress.chance(game,c.action);
         LinearLayout box=row();box.setGravity(Gravity.CENTER_VERTICAL);
         box.setPadding(dp(14),dp(14),dp(14),dp(14));
-        box.setBackground(new RuneFrameDrawable(PANEL,c.special?accent():BORDER,c.special));
+        int actionTint=AmoledAppearance.storyTint(c.action,c.title,c.special?accent():BORDER);
+        box.setBackground(new RuneFrameDrawable(PANEL,actionTint,c.special||AmoledAppearance.buttons()==5));
         if(showChoiceNumbers()){
             TextView ordinal=text(String.valueOf(position),17,c.special?accent():MUTED,true);
             ordinal.setGravity(Gravity.CENTER);
@@ -1464,7 +1466,7 @@ public final class MainActivity extends Activity {
             box.addView(ordinal,ordinalSize);
         }
         SkyrimIconView glyph=new SkyrimIconView(this,
-            chance>=0?skillGlyph(choiceSkillName(c.action)):"skills",accent());
+            chance>=0?skillGlyph(choiceSkillName(c.action)):"skills",AmoledAppearance.buttons()==5?actionTint:accent());
         if(visual("choices"))box.addView(glyph,lp(31,34));
         LinearLayout prose=column();
         LinearLayout.LayoutParams size=new LinearLayout.LayoutParams(0,-2,1);
@@ -2453,7 +2455,7 @@ public final class MainActivity extends Activity {
         mapControl(toolbar,"Поиск",()->searchSkyrimAtlas(map));
         TextView close=text("×",33,TEXT,true);
         close.setGravity(Gravity.CENTER);
-        close.setBackgroundColor(0xc506090b);
+        close.setBackground(bg(0xc506090b,BORDER,16));
         FrameLayout.LayoutParams closeSize=new FrameLayout.LayoutParams(
             dp(52),dp(52),Gravity.TOP|Gravity.END);
         closeSize.setMargins(0,dp(14),dp(14),0);
@@ -2677,7 +2679,7 @@ public final class MainActivity extends Activity {
     }
     private android.graphics.drawable.GradientDrawable itemBackground(int color,int stroke,int radius){
         android.graphics.drawable.GradientDrawable bg=new android.graphics.drawable.GradientDrawable();
-        bg.setColor(color);bg.setCornerRadius(dp(radius));
+        bg.setColor(color);bg.setCornerRadius(dp(AmoledAppearance.radius(AmoledAppearance.buttons(),false,radius)));
         if(stroke!=0)bg.setStroke(dp(1),stroke);return bg;
     }
     private void itemDivider(LinearLayout host,int spacing){
@@ -2770,7 +2772,7 @@ public final class MainActivity extends Activity {
         // One compact row for inventory, catalog, trade and item rewards.
         LinearLayout itemRow=row();itemRow.setMinimumHeight(dp(68));
         itemRow.setPadding(dp(8),dp(6),dp(8),dp(6));
-        itemRow.setBackgroundColor(0xff0a0a0a);
+        itemRow.setBackground(bg(0xff0a0a0a,Color.TRANSPARENT,16));
         itemRow.addView(itemPicture(item,54),lp(54,54));
         LinearLayout words=column();LinearLayout.LayoutParams wp=new LinearLayout.LayoutParams(0,-2,1);
         wp.leftMargin=dp(8);itemRow.addView(words,wp);
@@ -3013,7 +3015,7 @@ public final class MainActivity extends Activity {
     private void itemDialog(ItemCatalog.Item item){
         LinearLayout view=column();
         view.setPadding(dp(12),dp(12),dp(12),dp(12));
-        view.setBackground(itemBackground(0xff000000,0xff858585,0));
+        view.setBackground(AmoledAppearance.window(0xff080808,accent()));
         LinearLayout heading=row();heading.setGravity(Gravity.CENTER_VERTICAL);
         view.addView(heading,lp(-1,-2));
         if(hasItemStat(item))heading.addView(itemPicture(item,94),lp(94,94));
@@ -3470,7 +3472,7 @@ public final class MainActivity extends Activity {
         for(String entry:entries){
             boolean chosen=entry.equals(selectedJournalEntry);
             LinearLayout slot=row();slot.setPadding(dp(9),dp(11),dp(7),dp(11));
-            slot.setBackgroundColor(chosen?0x99363b3d:0x22000000);
+            slot.setBackground(bg(chosen?0x99363b3d:0x22000000,Color.TRANSPARENT,14));
             TextView pointer=text(chosen?"◇":"◦",20,chosen?accent():MUTED,true);
             slot.addView(pointer,lp(27,26));
             TextView name=text(entry,17,chosen?TEXT:MUTED,chosen);
@@ -3612,6 +3614,44 @@ public final class MainActivity extends Activity {
         picker.show();
     }
 
+    private void amoledSettings(){
+        int start=content.getChildCount();
+        LinearLayout panel=card();
+        addText(panel,"СТИЛЬ КНОПОК",11,accent(),true,8);
+        addText(panel,"Выбери оформление. Все стили используют чёрный AMOLED-фон.",13,MUTED,false,10);
+        for(int i=0;i<AmoledAppearance.NAMES.length;i++){
+            final int choice=i;boolean selected=AmoledAppearance.buttons()==i;
+            TextView preview=text(String.format(java.util.Locale.ROOT,"%02d  |  %s",i+1,AmoledAppearance.NAMES[i])+(selected?"  ✓":""),15,selected?accent():TEXT,true);
+            preview.setGravity(Gravity.CENTER);preview.setMinHeight(dp(48));preview.setPadding(dp(8),dp(6),dp(8),dp(6));
+            preview.setBackground(new RuneFrameDrawable(PANEL_2,selected?accent():BORDER,selected,i,false));
+            LinearLayout.LayoutParams size=lp(-1,-2);size.bottomMargin=dp(7);panel.addView(preview,size);
+            preview.setOnClickListener(v->{AmoledAppearance.choose(this,AmoledAppearance.BUTTON_PREF,choice);render();});
+        }
+        addText(panel,"СТИЛЬ ВСЕХ ОКОН",11,accent(),true,8);
+        TextView windows=text(AmoledAppearance.windowChoice()<0?"Как у кнопок":AmoledAppearance.NAMES[AmoledAppearance.windowChoice()],15,TEXT,true);
+        windows.setGravity(Gravity.CENTER);windows.setMinHeight(dp(48));windows.setBackground(AmoledAppearance.window(PANEL_2,accent()));panel.addView(windows,lp(-1,-2));
+        windows.setOnClickListener(v->{
+            String[] options=new String[AmoledAppearance.NAMES.length+1];options[0]="Как у кнопок";
+            System.arraycopy(AmoledAppearance.NAMES,0,options,1,AmoledAppearance.NAMES.length);
+            new RuneDialogBuilder(this,accent()).setTitle("Оформление окон")
+                .setSingleChoiceItems(options,AmoledAppearance.windowChoice()+1,(d,i)->{
+                    AmoledAppearance.choose(this,AmoledAppearance.WINDOW_PREF,i-1);d.dismiss();render();
+                }).setNegativeButton("Отмена",null).show();
+        });
+        space(panel,12);addText(panel,"АНИМАЦИИ КНОПОК",11,accent(),true,8);
+        TextView motion=text(AmoledAppearance.MOTIONS[AmoledAppearance.motion()],15,TEXT,true);
+        motion.setGravity(Gravity.CENTER);motion.setMinHeight(dp(48));motion.setBackground(new RuneFrameDrawable(PANEL_2,accent(),false));panel.addView(motion,lp(-1,-2));
+        motion.setOnClickListener(v->new RuneDialogBuilder(this,accent()).setTitle("Анимация кнопок")
+            .setSingleChoiceItems(AmoledAppearance.MOTIONS,AmoledAppearance.motion(),(d,i)->{
+                AmoledAppearance.choose(this,AmoledAppearance.MOTION_PREF,i);d.dismiss();render();
+            }).setNegativeButton("Отмена",null).show());
+        space(panel,8);
+        TextView demo=text("Нажми для проверки анимации",14,accent(),true);demo.setGravity(Gravity.CENTER);demo.setMinHeight(dp(52));demo.setBackground(new RuneFrameDrawable(PANEL_2,accent(),true));panel.addView(demo,lp(-1,-2));demo.setOnClickListener(v->{});
+        Switch vibration=new Switch(this);vibration.setText("Вибрация при нажатии");vibration.setTextColor(TEXT);vibration.setTextSize(sp(14));vibration.setThumbTintList(ColorStateList.valueOf(accent()));vibration.setChecked(AmoledAppearance.haptic());panel.addView(vibration,lp(-1,48));
+        vibration.setOnCheckedChangeListener((v,on)->{AmoledAppearance.haptic(this,on);render();});
+        foldSettingsSection("amoled","AMOLED | КНОПКИ И ОКНА",start);
+    }
+
     private void renderSettings(){
         section("ПАРАМЕТРЫ","Настройки","Твоя история, твои правила.");
         content.addView(new NordicArtView(this,NordicArtView.STORY),lp(-1,105));space(content,12);
@@ -3670,6 +3710,7 @@ public final class MainActivity extends Activity {
             nameColors.addView(line,lp(-1,44));
         }
         foldSettingsSection("appearance","ОФОРМЛЕНИЕ И ЧИТАЕМОСТЬ",appearanceStart);
+        amoledSettings();
         visualSettings();
         int aiStart=content.getChildCount();
         space(content,6);addText(content,"ИИ-ПРИКЛЮЧЕНИЕ",11,accent(),true,11);
@@ -3861,15 +3902,17 @@ public final class MainActivity extends Activity {
     private void renderNav(){
         root.addView(new SkyrimRuleView(this,0xff929b9d),lp(-1,12));
         LinearLayout nav=row();nav.setPadding(dp(10),dp(7),dp(10),dp(8));
-        nav.setBackgroundColor(0xf8050809);root.addView(nav,lp(-1,66));
+        nav.setBackground(new RuneFrameDrawable(0xff090909,BORDER,false));
+        LinearLayout.LayoutParams navSize=lp(-1,66);navSize.setMargins(dp(10),0,dp(10),dp(8));root.addView(nav,navSize);
         String[] labels={"ИСТОРИЯ","КАРТА","СУМКА","ГЕРОЙ","ЖУРНАЛ","ТЕМА"};
         String[] glyphs={"story","map","bag","hero","journal","settings"};
         int[] screens={0,1,2,3,4,5};
         for(int i=0;i<labels.length;i++){
             final int id=screens[i];
             LinearLayout area=column();area.setGravity(Gravity.CENTER);
-            nav.addView(area,new LinearLayout.LayoutParams(0,-1,1));
+            LinearLayout.LayoutParams tileSize=new LinearLayout.LayoutParams(0,-1,1);tileSize.setMargins(dp(2),0,dp(2),0);nav.addView(area,tileSize);
             boolean selected=tab==id||(id==4&&tab==6);
+            area.setBackground(new RuneFrameDrawable(selected?0xff211b12:0xff080808,selected?accent():0xff282828,selected));
             area.setClipChildren(true);
             area.addView(new SkyrimIconView(this,glyphs[i],selected?accent():0xff969da0),lp(-1,31));
             TextView label=text(labels[i],8,selected?accent():MUTED,selected);

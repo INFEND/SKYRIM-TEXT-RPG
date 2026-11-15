@@ -68,7 +68,7 @@ public final class OtaProgressDialog {
     }
     private int dp(float x){ return (int)(activity.getResources().getDisplayMetrics().density*x+.5f); }
     private GradientDrawable shape(int color,int border,int radius){
-        GradientDrawable d=new GradientDrawable();d.setColor(color);d.setCornerRadius(0);
+        GradientDrawable d=new GradientDrawable();d.setColor(color);d.setCornerRadius(dp(AmoledAppearance.radius(AmoledAppearance.buttons(),false,radius)));
         if(border!=0)d.setStroke(dp(2),border);
         return d;
     }
@@ -99,7 +99,7 @@ public final class OtaProgressDialog {
         animate=p.getBoolean("animations",true);
         dialog=new Dialog(a);dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         LinearLayout root=new LinearLayout(a);root.setOrientation(LinearLayout.VERTICAL);
-        root.setPadding(dp(22),dp(22),dp(22),dp(19));root.setBackground(new RuneFrameDrawable(panel,accent,true));
+        root.setPadding(dp(22),dp(22),dp(22),dp(19));root.setBackground(AmoledAppearance.window(panel,accent));
         LinearLayout top=new LinearLayout(a);top.setOrientation(LinearLayout.HORIZONTAL);top.setGravity(Gravity.CENTER_VERTICAL);
         FrameLayout symbolBox=new FrameLayout(a);symbolBox.setBackground(new RuneFrameDrawable(0xff161d21,accent,false));
         LinearLayout.LayoutParams sb=new LinearLayout.LayoutParams(dp(53),dp(53));sb.rightMargin=dp(14);top.addView(symbolBox,sb);

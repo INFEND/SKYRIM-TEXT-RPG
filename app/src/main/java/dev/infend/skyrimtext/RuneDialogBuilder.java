@@ -37,7 +37,7 @@ public final class RuneDialogBuilder extends AlertDialog.Builder {
         dialog.setOnShowListener(ignored->{
             Window window=dialog.getWindow();
             if(window!=null){
-                window.setBackgroundDrawable(customPanel?new android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT):new RuneFrameDrawable(0xf0060809,accent,true));
+                window.setBackgroundDrawable(customPanel?new android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT):AmoledAppearance.window(0xff090909,accent));
                 window.addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
                 WindowManager.LayoutParams attributes=window.getAttributes();
                 attributes.dimAmount=.72f;
@@ -77,6 +77,7 @@ public final class RuneDialogBuilder extends AlertDialog.Builder {
         button.setTextColor(primary?accent:0xffc4cbcd);
         button.setBackground(new RuneFrameDrawable(primary?0xff202426:0xff0b0f11,
             primary?accent:0xff70797d,primary));
+        if(primary&&AmoledAppearance.buttons()==4){button.setBackground(AmoledAppearance.shape(context,0xffd0b583,0xffd0b583,16));button.setTextColor(0xff15110a);}
         button.setMinHeight(dp(44));
         button.setPadding(dp(12),dp(6),dp(12),dp(6));
     }

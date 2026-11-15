@@ -107,10 +107,11 @@ public final class SovngardeTypeface {
     public static void watchTree(View root){
         if(root==null)return;
         applyTree(root);
+        AmoledAppearance.applyTree(root);
         if(watched.containsKey(root))return;
         watched.put(root,true);
         final ViewTreeObserver observer=root.getViewTreeObserver();
-        final ViewTreeObserver.OnGlobalLayoutListener listener=()->applyTree(root);
+        final ViewTreeObserver.OnGlobalLayoutListener listener=()->{applyTree(root);AmoledAppearance.applyTree(root);};
         observer.addOnGlobalLayoutListener(listener);
         root.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener(){
             @Override public void onViewAttachedToWindow(View v){}
