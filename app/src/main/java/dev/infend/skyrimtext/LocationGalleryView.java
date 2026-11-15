@@ -123,6 +123,9 @@ public final class LocationGalleryView extends LinearLayout {
     private final boolean fullscreen;
     private final ImageView photo;
     private final TextView page,missingPhoto;
+    private final LinearLayout galleryBody,indicators;
+    private final View collapseArrow;
+    private boolean collapsed=false;
     private int current=0,requested=0;
 
     private int dp(float value){return Math.round(value*getResources().getDisplayMetrics().density);}
@@ -136,7 +139,8 @@ public final class LocationGalleryView extends LinearLayout {
     }
     private GradientDrawable panel(int color,float corners,int outline){
         GradientDrawable d=new GradientDrawable();
-        d.setColor(color);d.setCornerRadius(dp(AmoledAppearance.radius(AmoledAppearance.buttons(),false,Math.round(corners))));d.setStroke(dp(1),outline);
+        d.setColor(color);d.setCornerRadius(dp(corners));
+        if(outline!=Color.TRANSPARENT)d.setStroke(dp(1),outline);
         return d;
     }
     private static String archive(String slug,int number){
@@ -173,24 +177,47 @@ public final class LocationGalleryView extends LinearLayout {
         this.location=location;this.slug=ID_BY_CITY.get(locationKey(location));
         this.accent=accent;this.fullscreen=fullscreen;
         setOrientation(VERTICAL);
-        setPadding(dp(10),dp(10),dp(10),dp(12));
-        setBackground(new RuneFrameDrawable(0xff11181d,accent,true));
+        setPadding(dp(2),dp(4),dp(2),dp(8));
+        setBackgroundColor(Color.BLACK);
 
         LinearLayout header=new LinearLayout(context);
         header.setGravity(Gravity.CENTER_VERTICAL);
-        header.setPadding(dp(5),dp(2),dp(5),dp(10));
-        addView(header,new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,dp(31)));
-        TextView heading=text("ᛟ  "+location.toUpperCase(new Locale("ru")),12,accent);
+        addView(header,new LayoutParams(-1,dp(48)));
+        View pin=galleryGlyph(0,0xffc5aa80);
+        header.addView(pin,new LayoutParams(dp(26),dp(26)));
+        TextView heading=text(location.toUpperCase(new Locale("ru")),18,Color.WHITE);
         heading.setTypeface(SovngardeTypeface.face(context,true));
-        header.addView(heading,new LayoutParams(0,ViewGroup.LayoutParams.WRAP_CONTENT,1));
-        page=text("",12,0xffddd4c4);
-        header.addView(page,new LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,dp(24)));
+        heading.setMaxLines(2);
+        LayoutParams headingParams=new LayoutParams(0,-2,1);
+        headingParams.leftMargin=dp(8);
+        header.addView(heading,headingParams);
+        collapseArrow=galleryGlyph(3,0xffa5a5a5);
+        header.addView(collapseArrow,new LayoutParams(dp(44),dp(44)));
 
-        FrameLayout viewport=new FrameLayout(context);
-        viewport.setBackground(panel(0xff080d10,9,0xff3f3931));
+        galleryBody=new LinearLayout(context);
+        galleryBody.setOrientation(VERTICAL);
+        addView(galleryBody,new LayoutParams(-1,-2));
+        header.setContentDescription("Свернуть галерею "+location);
+        header.setOnClickListener(v->{
+            collapsed=!collapsed;
+            galleryBody.setVisibility(collapsed?View.GONE:View.VISIBLE);
+            collapseArrow.animate().rotation(collapsed?180f:0f).setDuration(160).start();
+            header.setContentDescription((collapsed?"Развернуть":"Свернуть")+" галерею "+location);
+        });
+
+        FrameLayout viewport=new FrameLayout(context){
+            @Override protected void onMeasure(int widthSpec,int heightSpec){
+                if(!fullscreen&&MeasureSpec.getMode(widthSpec)!=MeasureSpec.UNSPECIFIED){
+                    int width=MeasureSpec.getSize(widthSpec);
+                    if(width>0)heightSpec=MeasureSpec.makeMeasureSpec(Math.round(width*9f/16f),MeasureSpec.EXACTLY);
+                }
+                super.onMeasure(widthSpec,heightSpec);
+            }
+        };
+        viewport.setBackground(panel(Color.BLACK,18,Color.TRANSPARENT));
         viewport.setClipToOutline(true);
-        int height=fullscreen?Math.min(dp(470),(int)(getResources().getDisplayMetrics().heightPixels*0.61f)):dp(205);
-        addView(viewport,new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,height));
+        int height=fullscreen?Math.min(dp(470),(int)(getResources().getDisplayMetrics().heightPixels*0.61f)):-2;
+        galleryBody.addView(viewport,new LayoutParams(-1,height));
 
         photo=new ImageView(context);
         photo.setScaleType(fullscreen?ImageView.ScaleType.FIT_CENTER:ImageView.ScaleType.CENTER_CROP);
@@ -248,9 +275,85 @@ public final class LocationGalleryView extends LinearLayout {
             }else if(!fullscreen)openFullscreen();
         });
 
-        // No redundant instructions, page counter or arrow overlays.
+        LinearLayout controls=new LinearLayout(context);
+        controls.setGravity(Gravity.CENTER_VERTICAL);
+        galleryBody.addView(controls,new LayoutParams(-1,dp(56)));
+        View previous=galleryGlyph(1,Color.WHITE);
+        previous.setContentDescription("Предыдущий вид");
+        previous.setOnClickListener(v->move(-1));
+        controls.addView(previous,new LayoutParams(dp(48),dp(48)));
+        page=text("",16,Color.WHITE);
+        page.setGravity(Gravity.CENTER);
+        page.setMaxLines(2);
+        page.setTypeface(SovngardeTypeface.face(context,true));
+        controls.addView(page,new LayoutParams(0,-1,1));
+        View next=galleryGlyph(2,Color.WHITE);
+        next.setContentDescription("Следующий вид");
+        next.setOnClickListener(v->move(1));
+        controls.addView(next,new LayoutParams(dp(48),dp(48)));
+        if(imageCount(location)==1){previous.setVisibility(View.INVISIBLE);next.setVisibility(View.INVISIBLE);}
+
+        indicators=new LinearLayout(context);
+        indicators.setGravity(Gravity.CENTER);
+        LayoutParams dotsParams=new LayoutParams(-1,dp(28));
+        galleryBody.addView(indicators,dotsParams);
+        for(int i=0;i<imageCount(location);i++){
+            final int index=i;
+            FrameLayout hit=new FrameLayout(context);
+            View dot=new View(context);
+            hit.addView(dot,new FrameLayout.LayoutParams(dp(7),dp(7),Gravity.CENTER));
+            hit.setContentDescription(captionFor(location,index));
+            hit.setOnClickListener(v->show(index));
+            indicators.addView(hit,new LayoutParams(dp(16),dp(28)));
+        }
+        if(imageCount(location)==1)indicators.setVisibility(View.GONE);
         show(0);
         prefetch();
+    }
+    /** Small borderless vector glyphs, independent of global icon tint and button style. */
+    private View galleryGlyph(int kind,int color){
+        return new View(getContext()){
+            private final android.graphics.Paint paint=new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
+            @Override protected void onDraw(android.graphics.Canvas canvas){
+                super.onDraw(canvas);
+                canvas.save();
+                canvas.translate(getWidth()/2f,getHeight()/2f);
+                canvas.scale(dp(20)/24f,dp(20)/24f);
+                paint.setColor(color);
+                paint.setStyle(android.graphics.Paint.Style.STROKE);
+                paint.setStrokeWidth(2.2f);
+                paint.setStrokeCap(android.graphics.Paint.Cap.ROUND);
+                paint.setStrokeJoin(android.graphics.Paint.Join.ROUND);
+                android.graphics.Path path=new android.graphics.Path();
+                if(kind==0){
+                    path.moveTo(0,10);path.cubicTo(-4,6,-9,1,-9,-3);
+                    path.cubicTo(-9,-15,9,-15,9,-3);
+                    path.cubicTo(9,1,4,6,0,10);path.close();
+                    canvas.drawPath(path,paint);canvas.drawCircle(0,-3,3,paint);
+                }else{
+                    if(kind==1){path.moveTo(3,-7);path.lineTo(-4,0);path.lineTo(3,7);}
+                    else if(kind==2){path.moveTo(-3,-7);path.lineTo(4,0);path.lineTo(-3,7);}
+                    else{path.moveTo(-7,3);path.lineTo(0,-4);path.lineTo(7,3);}
+                    canvas.drawPath(path,paint);
+                }
+                canvas.restore();
+            }
+        };
+    }
+    private void updateIndicators(){
+        for(int i=0;i<indicators.getChildCount();i++){
+            FrameLayout hit=(FrameLayout)indicators.getChildAt(i);
+            View dot=hit.getChildAt(0);
+            boolean active=i==current;
+            hit.setSelected(active);
+            LayoutParams hitSize=(LayoutParams)hit.getLayoutParams();
+            hitSize.width=dp(active?30:16);
+            hit.setLayoutParams(hitSize);
+            FrameLayout.LayoutParams dotSize=(FrameLayout.LayoutParams)dot.getLayoutParams();
+            dotSize.width=dp(active?24:7);
+            dot.setLayoutParams(dotSize);
+            dot.setBackground(panel(active?0xffc5aa80:0xff363636,12,Color.TRANSPARENT));
+        }
     }
     private void openResourceManager(){
         if(getContext() instanceof android.app.Activity){
@@ -266,9 +369,10 @@ public final class LocationGalleryView extends LinearLayout {
         current=index;
         final int target=++requested;
         page.setText(captionFor(location,index));
+        updateIndicators();
         String resourcePath="gallery/"+archive(slug,index+1);
         if(!ResourceStore.has(getContext(),resourcePath)){
-            photo.setImageDrawable(null);page.setText("Изображения отсутствуют");
+            photo.setImageDrawable(null);
             missingPhoto.setVisibility(View.VISIBLE);
             photo.setContentDescription("Изображения отсутствуют. Нажми для загрузки.");
             ResourceStore.requestGallery(getContext(),resourcePath,()->{
@@ -277,7 +381,7 @@ public final class LocationGalleryView extends LinearLayout {
             return;
         }
         missingPhoto.setVisibility(View.GONE);
-        photo.setContentDescription("Изображение локации "+location);
+        photo.setContentDescription(location+": "+captionFor(location,index));
         photo.animate().cancel();
         // Keep the previous picture visible while the next cached preview resolves.
         // Never show a "loading" banner during manual swiping.
