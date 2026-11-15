@@ -89,7 +89,9 @@ public final class MainActivity extends Activity {
     private String aiTurnPreview="",aiTurnStatus="";
     private String aiLocalPhase="Локальная генерация…";
     private long aiLocalStartedAt=0L;
-    private TextView aiTurnText,aiProgressInfo,aiReasoningText;
+    private long aiRequestSerial;
+    private boolean aiTurnProposal;
+    private TextView aiTurnText,aiProgressInfo,aiElapsedText,aiReasoningText;
     private Runnable aiDotsTicker;
     private String aiReasoningPreview="";
     private final java.util.LinkedHashSet<Integer> selectedAiChoices=new java.util.LinkedHashSet<>();
@@ -153,6 +155,8 @@ public final class MainActivity extends Activity {
     @Override protected void onPause(){if(updater!=null)updater.onHostPause();save();super.onPause();}
     @Override protected void onNewIntent(Intent intent){super.onNewIntent(intent);setIntent(intent);if(updater!=null&&intent.getBooleanExtra("ota_open_from_notification",false))updater.onNotificationIntent();}
     @Override protected void onDestroy(){
+        clearAiLiveViews();
+        aiRequestSerial++;
         if(updater!=null)updater.onHostDestroy();
         if(aiClient!=null)aiClient.shutdown();
         if(localAiClient!=null)localAiClient.shutdown();
@@ -164,7 +168,7 @@ public final class MainActivity extends Activity {
         combatVisual="";victoryVisual="";travelVisual="";combatLabels.clear();combatColors.clear();battleSummaryPending=false;travelStops=java.util.Collections.emptyList();lastNarrative="";
         recentItemGains.clear();
         selectedAiChoices.clear();aiOwnDraft="";clearAiDraft();
-        if(aiClient!=null)aiClient.cancel();if(localAiClient!=null)localAiClient.cancel();
+        cancelAiForSourceChange();
         aiSession=java.util.UUID.randomUUID().toString();
         prefs.edit().putString("ai_session",aiSession).apply();
     }
@@ -896,6 +900,7 @@ public final class MainActivity extends Activity {
     }
 
     private void render(){
+        clearAiLiveViews();
         rememberViewport();
         if(game.started&&game.visitedVisual.add(game.progress.location))save();
         String thisPage=viewportKey();
@@ -1560,23 +1565,31 @@ public final class MainActivity extends Activity {
             ", опиши только этот установленный результат, effects и 10 новых вариантов.";
     }
 
+    private void clearAiLiveViews(){
+        if(aiElapsedText!=null&&aiDotsTicker!=null)aiElapsedText.removeCallbacks(aiDotsTicker);
+        aiDotsTicker=null;
+        aiTurnText=null;aiProgressInfo=null;aiElapsedText=null;aiReasoningText=null;
+    }
+    private void updateAiElapsed(){
+        if(aiElapsedText==null||aiLocalStartedAt<=0)return;
+        long seconds=Math.max(0L,(android.os.SystemClock.elapsedRealtime()-aiLocalStartedAt)/1000L);
+        String label=String.format(java.util.Locale.ROOT,"Прошло %02d:%02d",seconds/60,seconds%60);
+        if(!label.contentEquals(aiElapsedText.getText()))aiElapsedText.setText(label);
+    }
+
     /** AI mode replaces the entire offline story, not just its dialogue panel. */
     private void renderAiGame(){
         String source=resolvedAiProvider();
         boolean ready="local".equals(source)?localModelReady():
             "chatgpt".equals(source)?chatGptOAuth.hasAuthorizedPlan():
             "api".equals(source)&&AiKeyVault.configured(this);
-        if(aiProgressInfo!=null&&aiDotsTicker!=null)
-            aiProgressInfo.removeCallbacks(aiDotsTicker);
-        aiDotsTicker=null;
-        aiTurnText=null;aiProgressInfo=null;aiReasoningText=null;
         if(LocationGalleryView.hasGallery(game.progress.location)){
             addText(content,"ᛟ  "+game.progress.location.toUpperCase(java.util.Locale.ROOT),12,accent(),true,10);
             content.addView(sceneGallery(game.progress.location),lp(-1,-2));
             renderLocationWeather(content);
             space(content,13);
         }
-        if(!ready){
+        if(!ready&&!aiTurnBusy){
             LinearLayout card=card();
             addText(card,"ИИ-ИГРА НЕ ПОДКЛЮЧЕНА",14,accent(),true,11);
             addText(card,"Подключи выбранный источник в настройках. Обычный текст игры скрыт, поскольку выбран режим ИИ.",14,TEXT,false,13);
@@ -1586,44 +1599,48 @@ public final class MainActivity extends Activity {
         if(aiTurnBusy) {
             LinearLayout activity=row();
             activity.setGravity(Gravity.CENTER_VERTICAL);
-            activity.setPadding(dp(11),dp(16),dp(11),dp(16));
+            activity.setPadding(dp(11),dp(12),dp(11),dp(12));
             ProgressBar spinner=new ProgressBar(this);
             spinner.setIndeterminate(true);
             spinner.setIndeterminateTintList(ColorStateList.valueOf(accent()));
-            activity.addView(spinner,lp(35,35));
-            aiProgressInfo=text("Генерация ответа",16,TEXT,true);
+            activity.addView(spinner,lp(32,32));
+            LinearLayout labels=column();
             LinearLayout.LayoutParams statusLayout=new LinearLayout.LayoutParams(0,-2,1);
-            statusLayout.leftMargin=dp(13);
-            activity.addView(aiProgressInfo,statusLayout);
+            statusLayout.leftMargin=dp(12);activity.addView(labels,statusLayout);
+            aiProgressInfo=text(aiLocalPhase,14,TEXT,true);
+            aiProgressInfo.setMinLines(2);aiProgressInfo.setMaxLines(2);
+            aiProgressInfo.setEllipsize(android.text.TextUtils.TruncateAt.END);
+            labels.addView(aiProgressInfo,lp(-1,-2));
+            // The timer is independent of changing status and token count.
+            aiElapsedText=text("",12,MUTED,false);
+            aiElapsedText.setSingleLine(true);
+            labels.addView(aiElapsedText,lp(-1,-2));
             content.addView(activity,lp(-1,-2));
-            final TextView progressLabel=aiProgressInfo;
+            updateAiElapsed();
+            final TextView timer=aiElapsedText;
             aiDotsTicker=new Runnable(){
-                private int phase=0;
-                private final String[] frames={"",".","..","..."};
                 @Override public void run(){
-                    if(!aiTurnBusy||tab!=0||aiProgressInfo!=progressLabel)return;
-                    String label="local".equals(resolvedAiProvider())?aiLocalPhase:"Генерация ответа";
-                    if("local".equals(resolvedAiProvider())&&aiLocalStartedAt>0){
-                        long elapsed=(android.os.SystemClock.elapsedRealtime()-aiLocalStartedAt)/1000L;
-                        aiProgressInfo.setText(label+"\nПрошло "+elapsed+" с"+frames[phase++%frames.length]);
-                    }else aiProgressInfo.setText("Генерация ответа"+frames[phase++%frames.length]);
-                    aiProgressInfo.postDelayed(this,430L);
+                    if(!aiTurnBusy||tab!=0||aiElapsedText!=timer)return;
+                    updateAiElapsed();
+                    timer.postDelayed(this,250L);
                 }
             };
-            aiProgressInfo.post(aiDotsTicker);
-            if("local".equals(source)){
+            timer.postDelayed(aiDotsTicker,250L);
+            // The same real-time scene panel is used by local, ChatGPT and API.
+            // A probability-only request has no story, so never create an empty panel.
+            if(!aiTurnProposal){
                 LinearLayout live=card();
-                addText(live,"ТЕКСТ ЛОКАЛЬНОЙ МОДЕЛИ | ПРЕДПРОСМОТР",11,accent(),true,9);
-                aiTurnText=text(aiTurnPreview.isEmpty()?"Ожидание первых токенов…" : aiTurnPreview,17,TEXT,false);
+                aiTurnText=text("",18,TEXT,false);
                 aiTurnText.setTypeface(SovngardeTypeface.face(this,false));
-                aiTurnText.setLineSpacing(dp(5),1.12f);
+                aiTurnText.setLineSpacing(dp(7),1.16f);
+                if(aiTurnPreview.isEmpty())aiTurnText.setText("Ожидание текста сцены…");
+                else aiTurnText.setText(SceneTypography.render(aiTurnPreview,accent(),game.name,heroColor()));
                 live.addView(aiTurnText,lp(-1,-2));
-                addText(live,"Пока сцена генерируется, сохранение и игровые характеристики не изменяются.",12,MUTED,false,4);
+                content.addView(live,lp(-1,-2));
             }
             space(content,7);
             actionButton("ОСТАНОВИТЬ","Прервать генерацию без изменения сохранения",false,()->{
-                if(aiClient!=null)aiClient.cancel();if(localAiClient!=null)localAiClient.cancel();
-                awaitingAiToken=false;aiTurnBusy=false;aiTurnPreview="";
+                cancelAiForSourceChange();
                 aiTurnStatus="Генерация остановлена, изменения не сохранены";
                 render();
             });
@@ -1655,7 +1672,7 @@ public final class MainActivity extends Activity {
         narrative.addView(aiTurnText,lp(-1,-2));
         decorateNarrative(narrative,aiTurnText,game.aiTurn.scene);
         makeItemsClickable(aiTurnText,aiTurnText.getText().toString());
-        revealNarrative(narrative,aiTurnText,game.aiTurn.scene);
+        // Already streamed; do not mask the completed AI scene or show a redundant reveal button.
         renderItemGains();
         space(content,16);
         addText(content,"ВЫБЕРИ ОДИН ИЛИ НЕСКОЛЬКО ВАРИАНТОВ. ОТПРАВКА ТОЛЬКО ПО КНОПКЕ НИЖЕ.",12,MUTED,false,11);
@@ -1902,42 +1919,47 @@ public final class MainActivity extends Activity {
         try{saved=game.toJson().toString();}
         catch(Exception ex){aiTurnStatus="Не удалось прочитать состояние героя";render();return;}
         aiTurnBusy=true;aiTurnPreview="";aiReasoningPreview="";
-        if(local){
-            aiLocalStartedAt=android.os.SystemClock.elapsedRealtime();
-            aiLocalPhase="Запуск модели…";
-        }
+        final long requestId=++aiRequestSerial;
+        aiTurnProposal=proposalOnly;
+        aiLocalStartedAt=android.os.SystemClock.elapsedRealtime();
+        aiLocalPhase=proposalOnly?"Определение вероятности действия…":
+            local?"Запуск модели…":chat?"Подключение к ChatGPT…":"Подключение к API…";
         aiTurnStatus=proposalOnly?"Определение вероятности действия…":
             local?"Локальная генерация без интернета…":chat?"Подключение к ChatGPT…":"Создание игровой сцены…";
         render();
         final AiStoryClient.Listener listener=new AiStoryClient.Listener(){
+            private boolean active(){return aiTurnBusy&&requestId==aiRequestSerial&&!isDestroyed()&&!isFinishing();}
             @Override public void onLocalStatus(String status){
-                if(!aiTurnBusy)return;
+                if(!active())return;
                 aiLocalPhase=status;
-                if(aiProgressInfo!=null)aiProgressInfo.setText(status);
+                if(tab==0&&aiProgressInfo!=null)aiProgressInfo.setText(status);
             }
             @Override public void onLocalMetrics(int tokens,float speed,long elapsed){
+                if(!active())return;
                 prefs.edit().putFloat("ai_local_last_tps",speed).putInt("ai_local_last_tokens",tokens).apply();
             }
             @Override public void onText(String accumulated){
-                if(!aiTurnBusy)return;
+                if(!active())return;
                 if(proposalOnly)return;
                 String visible=AiGameTurn.previewScene(accumulated);
                 if(visible.isEmpty()||visible.equals(aiTurnPreview))return;
                 aiTurnPreview=visible;
-                // Keep streaming text buffered; the waiting screen shows only the
-                // animated generation label, without distracting counters.
+                aiLocalPhase="Генерация сцены";
+                if(tab==0&&aiProgressInfo!=null)aiProgressInfo.setText(aiLocalPhase);
+                // Display the first decoded narrative character and every later fragment.
+                // JSON syntax, internal chance proposals and effects stay private.
                 if(tab==0&&aiTurnText!=null&&prefs.getBoolean("ai_enabled",false)){
                     aiTurnText.setText(SceneTypography.render(visible,accent(),game.name,heroColor()));
                 }
             }
             @Override public void onReasoningSummary(String summary){
-                if(!aiTurnBusy)return;
+                if(!active())return;
                 aiReasoningPreview=summary;
                 // Reasoning summaries remain internal to the live request UI.
                 // Do not replace the compact generation status with debug text.
             }
             @Override public void onComplete(String answer){
-                if(!aiTurnBusy)return;
+                if(!active())return;
                 try{
                     // Never overwrite a save changed during the network request.
                     if(!game.toJson().toString().equals(saved))
@@ -1965,6 +1987,7 @@ public final class MainActivity extends Activity {
                     else next.recordVisualEvent(completed.journal.isEmpty()?"Продолжение истории":completed.journal);
                     next.aiTurn=completed;
                     game=next;
+                    lastNarrative=completed.scene;
                     selectedAiChoices.clear();aiOwnDraft="";clearAiDraft();
                     save();
                     clearAiPending();
@@ -1979,7 +2002,7 @@ public final class MainActivity extends Activity {
                 if(tab==0)render();
             }
             @Override public void onError(String error){
-                if(!aiTurnBusy)return;
+                if(!active())return;
                 aiTurnBusy=false;aiTurnPreview="";
                 aiTurnStatus="Ошибка генерации: "+error+". Сохранение не изменено.";
                 if(tab==0)render();
@@ -1997,7 +2020,7 @@ public final class MainActivity extends Activity {
         }else if(chat){
             awaitingAiToken=true;
             chatGptOAuth.getToken((token,error)->{
-                if(!awaitingAiToken||!aiTurnBusy)return;
+                if(!awaitingAiToken||!aiTurnBusy||requestId!=aiRequestSerial||isDestroyed()||isFinishing())return;
                 awaitingAiToken=false;
                 if(error!=null){aiTurnBusy=false;aiTurnStatus=error;render();return;}
                 boolean started=proposalOnly?
@@ -2044,6 +2067,9 @@ public final class MainActivity extends Activity {
             }).setNegativeButton("Закрыть",null).show();
     }
     private void cancelAiForSourceChange(){
+        aiRequestSerial++;
+        aiTurnProposal=false;
+        clearAiLiveViews();
         awaitingAiToken=false;
         aiTurnBusy=false;
         aiTurnPreview="";
@@ -3670,9 +3696,7 @@ public final class MainActivity extends Activity {
         aiToggle.setOnCheckedChangeListener((v,on)->{
             prefs.edit().putBoolean("ai_enabled",on).apply();
             if(!on){
-                if(aiClient!=null)aiClient.cancel();
-                if(localAiClient!=null)localAiClient.cancel();
-                aiTurnBusy=false;awaitingAiToken=false;
+                cancelAiForSourceChange();
             }
         });
         aiCard.addView(aiToggle,lp(-1,48));

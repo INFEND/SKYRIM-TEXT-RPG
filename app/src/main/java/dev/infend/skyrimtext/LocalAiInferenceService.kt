@@ -55,7 +55,6 @@ class LocalAiInferenceService : Service() {
     private var activeId: Long = -1L
     private var textBuffer = StringBuilder()
     private var tokenCount = 0
-    private var lastUiUpdate = 0L
     private var generatedAt = 0L
 
     override fun onBind(intent: Intent?): IBinder = binder.binder
@@ -87,7 +86,6 @@ class LocalAiInferenceService : Service() {
             activeId = id
             textBuffer = StringBuilder()
             tokenCount = 0
-            lastUiUpdate = 0L
             generatedAt = 0L
         }
         status(receiver, id, "Запуск локального ИИ…")
@@ -194,8 +192,6 @@ class LocalAiInferenceService : Service() {
             if (textBuffer.length < 100000) textBuffer.append(token)
             tokenCount++
             val now = SystemClock.elapsedRealtime()
-            if (tokenCount > 1 && now - lastUiUpdate < 250) return
-            lastUiUpdate = now
             receiver = activeReply!!
             id = activeId
             snapshot = textBuffer.toString()

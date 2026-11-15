@@ -177,7 +177,6 @@ public final class AiStoryClient {
             StringBuilder answer = new StringBuilder();
             StringBuilder reasoningSummary = new StringBuilder();
             boolean completed = false;
-            long lastDraw = 0;
             String complete=null;
             String terminalError=null;
             try {
@@ -250,12 +249,11 @@ public final class AiStoryClient {
                             }
                         }
                         if ("response.output_text.delta".equals(type)) {
-                            answer.append(event.optString("delta", ""));
-                            long now = System.currentTimeMillis();
-                            if (now - lastDraw >= 160) {
-                                String snapshot = answer.toString();
+                            String delta=event.optString("delta","");
+                            if(!delta.isEmpty()){
+                                answer.append(delta);
+                                String snapshot=answer.toString();
                                 main.post(() -> { if (!cancelled && sequence == id) listener.onText(snapshot); });
-                                lastDraw = now;
                             }
                         }
                     }

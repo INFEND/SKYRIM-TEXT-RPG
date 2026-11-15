@@ -112,28 +112,9 @@ public final class AiGameTurn {
         if(json==null)return null;
         try{return parse(json.toString());}catch(Exception e){return null;}
     }
-    /** Render only the scene string as it arrives; never show raw JSON to player. */
+    /** Decode only the top-level scene string, including incomplete JSON fragments. */
     public static String previewScene(String partial){
-        if(partial==null)return "";
-        int pos=partial.indexOf("\"scene\"");
-        if(pos<0)return "";
-        pos=partial.indexOf(':',pos+7);if(pos<0)return "";
-        pos=partial.indexOf('"',pos+1);if(pos<0)return "";
-        StringBuilder out=new StringBuilder();boolean esc=false;
-        for(int i=pos+1;i<partial.length()&&out.length()<30000;i++){
-            char c=partial.charAt(i);
-            if(esc){
-                if(c=='n')out.append('\n');else if(c=='t')out.append(' ');
-                else if(c=='"')out.append('"');else if(c=='\\')out.append('\\');
-                else if(c=='u'&&i+4<partial.length()){
-                    try{out.append((char)Integer.parseInt(partial.substring(i+1,i+5),16));i+=4;}
-                    catch(Exception ignored){break;}
-                }esc=false;
-            }else if(c=='\\')esc=true;
-            else if(c=='"')break;
-            else out.append(c);
-        }
-        return out.toString();
+        return AiScenePreview.read(partial);
     }
     private static int change(JSONObject e,String name,int limit)throws JSONException{
         if(!e.has(name))return 0;
