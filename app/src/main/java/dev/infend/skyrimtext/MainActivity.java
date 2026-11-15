@@ -3590,7 +3590,7 @@ public final class MainActivity extends Activity {
             option.setBackground(new RuneFrameDrawable(PANEL_2,active?accent():BORDER,active));
             TextView name=text((active?"●  ":"○  ")+SovngardeTypeface.NAMES[i],17,active?accent():TEXT,true);
             SovngardeTypeface.preview(name,id,Typeface.BOLD);option.addView(name);
-            TextView sample=text("Вайтран • Древние свитки\nСеверный ветер шепчет среди гор. 123 / 456",15,TEXT,false);
+            TextView sample=text("Вайтран | Древние свитки\nСеверный ветер шепчет среди гор. 123 / 456",15,TEXT,false);
             SovngardeTypeface.preview(sample,id,Typeface.NORMAL);option.addView(sample);
             LinearLayout.LayoutParams p=lp(-1,-2);p.bottomMargin=dp(6);list.addView(option,p);
             option.setOnClickListener(v->{SovngardeTypeface.select(this,id);picker.dismiss();render();});
@@ -3613,7 +3613,7 @@ public final class MainActivity extends Activity {
         LinearLayout fontChoice=column();fontChoice.setPadding(dp(12),dp(10),dp(12),dp(10));
         fontChoice.setBackground(new RuneFrameDrawable(PANEL_2,BORDER,false));
         addText(fontChoice,"Шрифт игры  |  "+SovngardeTypeface.label(),16,TEXT,true,3);
-        addText(fontChoice,"Применяется ко всему тексту • выбрать и сравнить",12,MUTED,false,0);
+        addText(fontChoice,"Применяется ко всему тексту | выбрать и сравнить",12,MUTED,false,0);
         readability.addView(fontChoice,lp(-1,-2));space(readability,8);
         fontChoice.setOnClickListener(v->chooseGameFont());
         LinearLayout r=row();readability.addView(r,lp(-1,45));
