@@ -64,7 +64,7 @@ public final class AmoledAppearance {
     public static RuneFrameDrawable window(int color,int accent){return new RuneFrameDrawable(color,accent,true,windows(),true);}
     public static int storyTint(String action,String title,int fallback){
         if(buttons!=5)return fallback;
-        String key=(action+" "+title).toLowerCase(java.util.Locale.ROOT);
+        String key=(action+" "+title).toLowerCase(java.util.Locale.ROOT).replace('\n',' ');
         if(key.matches(".*(attack|heavy|fight|kill|атак|удар|убить|бой).*"))return 0xffe07171;
         if(key.matches(".*(heal|potion|леч|здоров|восстанов).*"))return 0xff79b98a;
         if(key.matches(".*(spell|magic|cast|заклин|магия|колдов).*"))return 0xff81a9e2;

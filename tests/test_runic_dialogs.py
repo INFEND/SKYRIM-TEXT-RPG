@@ -1,4 +1,4 @@
-"""Regressions for the shared Nordic dialog and square frame presentation."""
+"""Regressions for the shared Nordic dialog and rounded AMOLED frame presentation."""
 from pathlib import Path
 import re
 import unittest
@@ -15,14 +15,14 @@ class RunicDialogContract(unittest.TestCase):
         self.assertGreaterEqual(main.count("new RuneDialogBuilder(this,accent())"),12)
         self.assertIn("super(context, R.style.RunicDialogTheme)",(SRC/"RuneDialogBuilder.java").read_text(encoding="utf-8"))
 
-    def test_rectangle_not_hexagonal_notch(self):
+    def test_rounded_frame_not_hexagonal_notch(self):
         frame=(SRC/"RuneFrameDrawable.java").read_text(encoding="utf-8")
-        self.assertIn("c.drawRect(r,p)",frame)
-        self.assertIn("corner(c,x,y,1,1,corner)",frame)
-        self.assertIn("corner(c,right,bottom,-1,-1,corner)",frame)
+        self.assertIn("c.drawRoundRect(bounds,rad,rad,p)",frame)
+        self.assertIn("AmoledAppearance.radius",frame)
+        self.assertNotIn("c.drawRect(r,p)",frame)
         self.assertNotIn("notch=",frame)
         self.assertIn("Paint.Style.STROKE",frame)
-        self.assertIn("0xffced7dc",frame)
+        self.assertIn("selected?ink",frame)
 
     def test_system_alert_theme_is_dark_and_legible(self):
         styles=(RES/"values/styles.xml").read_text(encoding="utf-8")
@@ -32,10 +32,11 @@ class RunicDialogContract(unittest.TestCase):
         self.assertIn('#F0F1EF',styles)
         self.assertIn('android:shape="rectangle"',drawable)
         self.assertIn('android:width="2dp"',drawable)
+        self.assertIn('android:radius="24dp"',drawable)
 
     def test_ota_dialog_has_matching_frame_but_unchanged_install_flow(self):
         source=(SRC/"OtaProgressDialog.java").read_text(encoding="utf-8")
-        self.assertIn("new RuneFrameDrawable(panel,accent,true)",source)
+        self.assertIn("AmoledAppearance.window(panel,accent)",source)
         self.assertIn("notesScroll.setBackground(new RuneFrameDrawable(",source)
         self.assertIn("primary.setOnClickListener",source)
         self.assertIn("dialog.setOnDismissListener",source)

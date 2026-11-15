@@ -1828,7 +1828,8 @@ public final class MainActivity extends Activity {
         LinearLayout row=row();row.setGravity(Gravity.CENTER_VERTICAL);
         row.setPadding(dp(14),dp(14),dp(14),dp(14));
         boolean selected=selectedAiChoices.contains(number);
-        row.setBackground(new RuneFrameDrawable(PANEL,selected?accent():BORDER,selected));
+        int actionTint=AmoledAppearance.storyTint(option.combatAction,option.title,selected?accent():BORDER);
+        row.setBackground(new RuneFrameDrawable(PANEL,actionTint,selected||AmoledAppearance.buttons()==5));
         TextView ordinal=showChoiceNumbers()?text(String.valueOf(number),17,
             selected?accent():MUTED,true):null;
         if(ordinal!=null){
@@ -1837,7 +1838,7 @@ public final class MainActivity extends Activity {
             ordinalSize.rightMargin=dp(8);
             row.addView(ordinal,ordinalSize);
         }
-        SkyrimIconView glyph=new SkyrimIconView(this,skillGlyph(option.skill),accent());
+        SkyrimIconView glyph=new SkyrimIconView(this,skillGlyph(option.skill),AmoledAppearance.buttons()==5?actionTint:accent());
         if(visual("choices"))row.addView(glyph,lp(31,34));
         LinearLayout detail=column();
         LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(0,-2,1);
@@ -1873,7 +1874,7 @@ public final class MainActivity extends Activity {
             if(!selectedAiChoices.add(number))selectedAiChoices.remove(number);
             persistAiDraft();
             boolean active=selectedAiChoices.contains(number);
-            row.setBackground(new RuneFrameDrawable(PANEL,active?accent():BORDER,active));
+            row.setBackground(new RuneFrameDrawable(PANEL,AmoledAppearance.storyTint(option.combatAction,option.title,active?accent():BORDER),active||AmoledAppearance.buttons()==5));
             if(ordinal!=null)ordinal.setTextColor(active?accent():MUTED);
             row.setContentDescription("Вариант "+number+". "+option.title+". "+(active?"Выбран":"Не выбран"));
         });

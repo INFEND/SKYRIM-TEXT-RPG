@@ -13,12 +13,12 @@ class SkyrimReferenceRedesign(unittest.TestCase):
         border=code("RuneFrameDrawable.java")
         back=code("SkyrimBackdropDrawable.java")
         rule=code("SkyrimRuleView.java")
-        for text in ("PANEL=0xe806090b","TEXT=0xfff0f1ef",
-                     "new SkyrimBackdropDrawable()","new SkyrimRuleView(",
+        for text in ("PANEL=0xff0b0b0b","TEXT=0xfff0f1ef",
+                     "root.setBackgroundColor(BG)","new SkyrimRuleView(",
                      "new RuneFrameDrawable("):
             self.assertIn(text,ui)
-        self.assertIn("corner(c,x,y,1,1,corner)",border)
-        self.assertIn("corner(c,right,bottom,-1,-1,corner)",border)
+        self.assertIn("c.drawRoundRect(bounds,rad,rad,p)",border)
+        self.assertIn("AmoledAppearance.radius",border)
         self.assertIn("new LinearGradient(",back)
         self.assertIn("onDraw(Canvas",rule)
 
@@ -69,8 +69,8 @@ class SkyrimReferenceRedesign(unittest.TestCase):
         self.assertIn("AiGameTurn.success(option.chance,die)",ui)
         self.assertIn("game.progress.chance(game,c.action)",ui)
         self.assertIn('СВОЙ ВАРИАНТ ОТВЕТА',ui)
-        self.assertIn('new RuneFrameDrawable(PANEL,c.special?accent():BORDER,c.special)',ui)
-        self.assertIn('new RuneFrameDrawable(PANEL,selected?accent():BORDER,selected)',ui)
+        self.assertIn('AmoledAppearance.storyTint(c.action,c.title',ui)
+        self.assertIn('AmoledAppearance.storyTint(option.combatAction,option.title',ui)
         self.assertIn('selectedAiChoices.contains(number)',ui)
         self.assertNotIn('number==1?accent():BORDER',ui)
 
