@@ -715,11 +715,16 @@ public final class MainActivity extends Activity {
             WorldAtlas.Place destination=WorldAtlas.find(c.place);
             if(destination!=null&&!c.place.equals(game.progress.location)&&!"COMBAT".equals(game.mode))visualSummaryLink(panel,"МАРШРУТ",()->locationDialog(destination));
         }
+        if(f==0&&stories.beast()>0)addText(panel,stories.beast()==1?"Дар зверя: −1 к расходу сил на мощный удар (адаптация).":"Ликантропия исцелена.",12,accent(),true,8);
+        if(f==3&&stories.cicero()>0)addText(panel,stories.cicero()==1?"Цицерон пощажён.":"Цицерон погиб.",12,accent(),true,8);
         addText(panel,"Сокращённая адаптация событий оригинала; часть переходов начинается в ближайшем доступном поселении.",11,MUTED,false,8);
         ScrollView scroller=new ScrollView(this);scroller.addView(panel);
         AlertDialog.Builder dialog=new RuneDialogBuilder(this,accent()).setTitle(FactionCampaign.NAMES[f]).setView(scroller).setNegativeButton("Закрыть",null);
         if(c!=null&&stories.block(game,f).isEmpty())dialog.setPositiveButton(stories.phase(f)==0?"Начать главу":stories.phase(f)==2?"Завершить главу":c.enemy.isEmpty()?"Пройти испытание":"Вступить в бой",(d,w)->{
             if(stories.advance(game,f)){save();if("COMBAT".equals(game.mode)){tab=0;render();}else{render();toast(game.message);factionStoryDialog(f);}}
+        });
+        if(c!=null&&stories.hasDecision(f)&&stories.block(game,f).isEmpty())dialog.setNeutralButton("Решение",(d,w)->{
+            new RuneDialogBuilder(this,accent()).setTitle("Решение героя").setItems(stories.decisionOptions(f),(dd,i)->{if(stories.decide(game,f,i)){save();render();factionStoryDialog(f);}}).setNegativeButton("Отмена",(dd,i)->factionStoryDialog(f)).show();
         });
         if(c!=null&&stories.canChooseApproach(game,f))dialog.setNeutralButton("Подход",(d,w)->{
             String[] options=c.enemy.isEmpty()?new String[]{"Профильный навык | 8 сил","Тщательная подготовка | 12 сил, +12 к шансу","Переговоры | Красноречие, 8 сил"}:new String[]{"Прямой бой | 8 сил","Подготовить позицию | 12 сил, враг слабее на 15 здоровья"};

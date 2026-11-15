@@ -117,7 +117,7 @@ public final class GameEngine {
             &&!"Походный клинок".equals(item.id)&&!"Дорожная одежда".equals(item.id)
             &&!(swordUpgraded&&"Стальной меч".equals(item.id))&&!(armorUpgraded&&"Стальная кираса".equals(item.id));
     }
-    public int salePrice(ItemCatalog.Item item){return item==null||item.value<=0?0:Math.max(1,(int)((long)item.value*(30+progress.skillLevel(12)/5+5*progress.branches.rank(12))/100));}
+    public int salePrice(ItemCatalog.Item item){return item==null||item.value<=0?0:Math.max(1,(int)((long)item.value*(30+progress.skillLevel(12)/5+5*progress.branches.rank(12)+(progress.advanced.has(AdvancedPerks.MASTER_TRADER)?8:0))/100));}
     public boolean sellOne(String id){
         ItemCatalog.Item item=ItemCatalog.find(id);if(!canSell(item))return false;
         int price=salePrice(item);if((long)gold+price>Integer.MAX_VALUE||merchantGold()<price||!progress.removeItem(id,1))return false;
@@ -570,9 +570,9 @@ public final class GameEngine {
     public int effectiveArmor(){
         return Math.max(0,armor-(armorUpgraded?4:0))+(int)Math.round(progress.equippedArmor());
     }
-    public int heavyCost(){int skill=progress.equippedWeaponSkill();return skill==0&&progress.advanced.has(AdvancedPerks.FIGHTING)||skill==1&&progress.advanced.has(AdvancedPerks.CHAMPION)?7:10;}
-    public int magicCost(){return progress.advanced.has(AdvancedPerks.NOVICE_DESTRUCTION)?9:12;}
-    public int criticalChance(){int skill=progress.equippedWeaponSkill();return 8+(skill==2&&progress.advanced.has(AdvancedPerks.CRITICAL_SHOT)?10:0)+(skill==0&&progress.advanced.has(AdvancedPerks.BLADESMAN)||skill==1&&progress.advanced.has(AdvancedPerks.GREAT_CRITICAL)?8:0);}
+    public int heavyCost(){int skill=progress.equippedWeaponSkill();return (skill==0&&progress.advanced.has(AdvancedPerks.FIGHTING)||skill==1&&progress.advanced.has(AdvancedPerks.CHAMPION)?7:10)-(factionStories.beast()==1?1:0);}
+    public int magicCost(){return (progress.advanced.has(AdvancedPerks.NOVICE_DESTRUCTION)?9:12)-(progress.advanced.has(AdvancedPerks.MASTER_DESTRUCTION)?3:0);}
+    public int criticalChance(){int skill=progress.equippedWeaponSkill();return 8+(skill==2&&progress.advanced.has(AdvancedPerks.CRITICAL_SHOT)?10:0)+(skill==0&&progress.advanced.has(AdvancedPerks.BLADESMAN)||skill==1&&progress.advanced.has(AdvancedPerks.GREAT_CRITICAL)?8:0)+(skill==2&&progress.advanced.has(AdvancedPerks.BULLSEYE)?12:0);}
     private void combatTurn(String action) {
         if(!mode.equals("COMBAT"))return;
         lastDealt=lastTaken=lastHealing=lastBlocked=0;lastHeavyHit=lastMiss=lastCritical=false;
@@ -581,11 +581,11 @@ public final class GameEngine {
             case "ATTACK": damage=Math.max(1,effectiveAttack()+random.nextInt(9)-3);actionText="Ты наносишь удар: −"+damage+" здоровья врагу.";break;
             case "HEAVY":if(stamina<heavyCost()){battleLog="Недостаточно выносливости для сильного удара.";return;}
                 int hitChance=progress.chance(this,"HEAVY");stamina-=heavyCost();
-                if(random.nextInt(100)<hitChance){damage=Math.max(1,effectiveAttack()*2+random.nextInt(9));actionText="Сильный удар! −"+damage+" здоровья врагу.";}else actionText="Сильный удар проходит мимо.";break;
+                if(random.nextInt(100)<hitChance){damage=Math.max(1,(int)Math.round((effectiveAttack()*2+random.nextInt(9))*(1+(progress.equippedWeaponSkill()==0&&progress.advanced.has(AdvancedPerks.PARALYZING)||progress.equippedWeaponSkill()==1&&progress.advanced.has(AdvancedPerks.SWEEP)?.15:0))));actionText="Сильный удар! −"+damage+" здоровья врагу.";}else actionText="Сильный удар проходит мимо.";break;
             case "MAGIC":if(magicka<magicCost()){battleLog="Недостаточно магии. Нужны "+magicCost()+" единиц.";return;}magicka-=magicCost();damage=(int)Math.round((18+level*4+random.nextInt(8))*(1+.05*progress.branches.rank(13)+(progress.advanced.has(AdvancedPerks.DUAL_CAST)?.10:0)));actionText="Магическая вспышка обжигает врага: −"+damage+".";break;
             case "CANON_SHOUT":if(!"CANONICAL".equals(battleKind)||canonicalShouts==0||canonicalShoutCooldown>0)return;
                 damage=24+level*3+((canonicalShouts&4)!=0?12:0);defending=true;canonicalShoutCooldown=3;actionText=CanonicalCampaign.combatShout(this)+": −"+damage+" здоровья врагу.";break;
-            case "DEFEND": defending=true;stamina=Math.min(maxStamina,stamina+12);magicka=Math.min(maxMagicka,magicka+5+(progress.advanced.has(AdvancedPerks.RECOVERY)?3:0));actionText="Ты встаёшь в оборону, восстанавливая силы.";break;
+            case "DEFEND": defending=true;stamina=Math.min(maxStamina,stamina+12);magicka=Math.min(maxMagicka,magicka+5+(progress.advanced.has(AdvancedPerks.RECOVERY)?3:0)+(progress.advanced.has(AdvancedPerks.REGENERATION)?5:0));actionText="Ты встаёшь в оборону, восстанавливая силы.";break;
             case "POTION":if(potions==0){battleLog="Лечебных зелий больше нет.";return;}potions--;int restored=Math.min(healingAmount(),maxHp-hp);hp+=restored;restoreRespite();lastHealing=restored;actionText="Ты восстанавливаешь "+restored+" здоровья.";break;
             case "FLEE":if(battleKind.equals("WILD")&&random.nextInt(100)<progress.chance(this,"FLEE")){mode="RESULT";poisonTurns=frostTurns=0;message="Ты уходишь от противника. Трофеев нет.";return;}actionText="Попытка отступить не удалась.";break;
             default:return;
@@ -599,7 +599,7 @@ public final class GameEngine {
         enemyHp=Math.max(0,enemyHp-damage);
         if(enemyHp==0) {poisonTurns=frostTurns=0;winBattle(actionText);return;}
         int baseIncoming=enemyDamage+random.nextInt(8)-Math.max(0,armor-(armorUpgraded?4:0));
-        int rawIncoming=Math.max(1,baseIncoming-(defending?enemyDamage/2+3+2*progress.branches.rank(3)+(progress.advanced.has(AdvancedPerks.QUICK_REFLEXES)?2:0)+(progress.advanced.has(AdvancedPerks.SHIELD_WALL)&&!"Не надето".equals(progress.equippedName("shield"))?3:0):0));
+        int rawIncoming=Math.max(1,baseIncoming-(defending?enemyDamage/2+3+2*progress.branches.rank(3)+(progress.advanced.has(AdvancedPerks.QUICK_REFLEXES)?2:0)+(progress.advanced.has(AdvancedPerks.SHIELD_WALL)&&!"Не надето".equals(progress.equippedName("shield"))?3:0)+(progress.advanced.has(AdvancedPerks.SHIELD_CHARGE)&&!"Не надето".equals(progress.equippedName("shield"))?4:0):0));
         int incoming=Math.max(1,(int)Math.round(rawIncoming*(1-progress.damageReduction())));
         if(defending)lastBlocked=Math.max(0,Math.max(1,(int)Math.round(Math.max(1,baseIncoming)*(1-progress.damageReduction())))-incoming);
         int poisoned=poisonTurns>0?Math.max(1,maxHp/40):0;
@@ -658,9 +658,9 @@ public final class GameEngine {
         progress.sync(this);
         return true;
     }
-    public int healingAmount(){return 45+5*progress.branches.rank(14)+(progress.advanced.has(AdvancedPerks.PHYSICIAN)?10:0)+(progress.advanced.has(AdvancedPerks.BENEFACTOR)?10:0);}
+    public int healingAmount(){return 45+5*progress.branches.rank(14)+(progress.advanced.has(AdvancedPerks.PHYSICIAN)?10:0)+(progress.advanced.has(AdvancedPerks.BENEFACTOR)?10:0)+(progress.advanced.has(AdvancedPerks.PURE_MIXTURE)?10:0)+(progress.advanced.has(AdvancedPerks.REGENERATION)?10:0);}
     private void restoreRespite(){if(progress.advanced.has(AdvancedPerks.RESPITE))stamina=Math.min(maxStamina,stamina+10);}
-    public int staminaPotionAmount(){return 50+(progress.advanced.has(AdvancedPerks.PHYSICIAN)?10:0)+(progress.advanced.has(AdvancedPerks.BENEFACTOR)?10:0);}
+    public int staminaPotionAmount(){return 50+(progress.advanced.has(AdvancedPerks.PHYSICIAN)?10:0)+(progress.advanced.has(AdvancedPerks.BENEFACTOR)?10:0)+(progress.advanced.has(AdvancedPerks.PURE_MIXTURE)?10:0);}
     public boolean drinkHealing() {if(!started||"COMBAT".equals(mode)||potions<=0||hp>=maxHp)return false;potions--;hp=Math.min(maxHp,hp+healingAmount());restoreRespite();progress.sync(this);return true;}
     public boolean drinkStamina(){if(!started||"COMBAT".equals(mode)||stamina>=maxStamina||!progress.removeItem("Зелье запаса сил",1))return false;stamina=Math.min(maxStamina,stamina+staminaPotionAmount());progress.sync(this);return true;}
     public boolean drinkMana() {if(!started||"COMBAT".equals(mode)||manaPotions<=0||magicka>=maxMagicka)return false;manaPotions--;magicka=Math.min(maxMagicka,magicka+35);return true;}

@@ -75,6 +75,7 @@ final class FactionStories {
 {"Прикосновение к небу","Маркарт","На западе Скайрима начинается путь в Забытую долину; лук Ауриэля скрыт среди святилищ снежных эльфов.","Виртур","2"},
 {"Семейный суд","Солитьюд","Стража выступает против Харкона в замке Волкихар.","Харкон","2"}}};
     private final int[] index=new int[DATA.length],phase=new int[DATA.length],attemptDay=new int[DATA.length],preparation=new int[DATA.length],approach=new int[DATA.length];
+    private int cicero=0,beast=0;
     FactionStories(){java.util.Arrays.fill(attemptDay,-1);}
     int count(int f){return DATA[f].length;}
     int done(int f){return index[f];}
@@ -84,7 +85,22 @@ final class FactionStories {
     int phase(int f){return phase[f];}
     int preparation(int f){return preparation[f];}
     int approach(int f){return approach[f];}
-    String dialogue(int f){return FactionDialogue.scene(f,index[f]);}
+    String dialogue(int f){
+        if(completed(f))return "";
+        String line=FactionDialogue.scene(f,index[f]);
+        if(f==3&&index[f]>8&&cicero!=0)line+="\n\n"+(cicero==1?"[Событие] Цицерон остался в живых. Твоя милость сохранена в летописи.":"[Событие] Цицерон не пережил встречу. Это решение уже не изменить.");
+        return line;
+    }
+    int cicero(){return cicero;}
+    int beast(){return beast;}
+    boolean hasDecision(int f){return !completed(f)&&phase[f]==2&&((f==3&&index[f]==8&&cicero==0)||(f==0&&index[f]==5&&beast==1));}
+    String[] decisionOptions(int f){return f==3?new String[]{"Пощадить Цицерона","Убить Цицерона"}:new String[]{"Сохранить дар зверя","Исцелиться от ликантропии"};}
+    boolean decide(GameEngine g,int f,int choice){
+        if(!hasDecision(f)||!block(g,f).isEmpty()||choice<0||choice>1)return false;
+        if(f==3){cicero=choice+1;g.progress.setQuestOutcome("cicero_"+(choice==0?"spared":"slain"),"COMPLETED");g.message=choice==0?"Цицерон пощажён.":"Цицерон погиб.";}
+        else{beast=choice+1;g.progress.setQuestOutcome(choice==0?"werewolf_retained":"werewolf_cured","COMPLETED");g.message=choice==0?"Ты сохранил дар зверя.":"Ты отказался от дара зверя.";}
+        g.recordVisualEvent(g.message);return true;
+    }
     int skill(int f){return approach[f]==2?12:chapter(f).skill;}
     int cost(int f){return approach[f]==1?12:8;}
     boolean canChooseApproach(GameEngine g,int f){return !completed(f)&&phase[f]==1&&g.started&&("WORLD".equals(g.mode)||"RESULT".equals(g.mode))&&chapter(f).place.equalsIgnoreCase(g.progress.location)&&attemptDay[f]!=g.day;}
@@ -108,13 +124,13 @@ final class FactionStories {
     boolean advance(GameEngine g,int f){
         if(!block(g,f).isEmpty())return false;Chapter c=chapter(f);
         if(phase[f]==0){phase[f]=1;g.progress.setQuestOutcome("faction_story_"+f,"ACTIVE");g.message=c.story;return true;}
-        if(phase[f]==2){index[f]++;phase[f]=0;attemptDay[f]=-1;preparation[f]=0;int used=skillForReward(c,f);approach[f]=0;g.progress.skillExperience(g,used,35);g.addXp(30+index[f]*5);g.gold=(int)Math.min(Integer.MAX_VALUE,(long)g.gold+25+index[f]*5);g.progress.sync(g);g.message="Завершено: "+c.title;if(completed(f))g.progress.setQuestOutcome("faction_story_"+f,"COMPLETED");g.recordVisualEvent(g.message);return true;}
+        if(phase[f]==2){if(f==3&&index[f]==8&&cicero==0)decide(g,f,0);if(f==0&&index[f]==2&&beast==0)beast=1;index[f]++;phase[f]=0;attemptDay[f]=-1;preparation[f]=0;int used=skillForReward(c,f);approach[f]=0;g.progress.skillExperience(g,used,35);g.addXp(30+index[f]*5);g.gold=(int)Math.min(Integer.MAX_VALUE,(long)g.gold+25+index[f]*5);g.progress.sync(g);g.message="Завершено: "+c.title;if(completed(f))g.progress.setQuestOutcome("faction_story_"+f,"COMPLETED");g.recordVisualEvent(g.message);return true;}
         int chance=chance(g,f);g.stamina-=cost(f);attemptDay[f]=g.day;
         if(!c.enemy.isEmpty()){g.beginFactionBattle(f,c.enemy,45+g.level*10+index[f]*7-(approach[f]==1?15:0),6+g.level*2,c.story);return true;}
         if(new java.util.Random().nextInt(100)<chance){phase[f]=2;g.message="Испытание пройдено. Заверши главу.";}else{preparation[f]=Math.min(50,preparation[f]+10);g.message="Попытка не удалась. Ты разобрал ошибки с наставником. Подготовка: +"+preparation[f]+" к следующей проверке. Повтори в другой день.";}
         return true;
     }
     void victory(int f){if(f>=0&&f<DATA.length&&!completed(f)&&phase[f]==1&&!chapter(f).enemy.isEmpty())phase[f]=2;}
-    JSONObject toJson(){JSONObject o=new JSONObject();try{o.put("index",new JSONArray(index)).put("phase",new JSONArray(phase)).put("attemptDay",new JSONArray(attemptDay)).put("preparation",new JSONArray(preparation)).put("approach",new JSONArray(approach));}catch(Exception ignored){}return o;}
-    static FactionStories fromJson(JSONObject o){FactionStories s=new FactionStories();if(o==null)return s;JSONArray a=o.optJSONArray("index"),b=o.optJSONArray("phase"),d=o.optJSONArray("attemptDay"),p=o.optJSONArray("preparation"),r=o.optJSONArray("approach");for(int f=0;f<DATA.length;f++){s.index[f]=a==null?0:Math.max(0,Math.min(s.count(f),a.optInt(f)));s.phase[f]=b==null?0:Math.max(0,Math.min(2,b.optInt(f)));s.attemptDay[f]=d==null?-1:d.optInt(f,-1);s.preparation[f]=p==null?0:Math.max(0,Math.min(50,p.optInt(f,0)));s.approach[f]=r==null?0:Math.max(0,Math.min(2,r.optInt(f,0)));}return s;}
+    JSONObject toJson(){JSONObject o=new JSONObject();try{o.put("index",new JSONArray(index)).put("phase",new JSONArray(phase)).put("attemptDay",new JSONArray(attemptDay)).put("preparation",new JSONArray(preparation)).put("approach",new JSONArray(approach)).put("cicero",cicero).put("beast",beast);}catch(Exception ignored){}return o;}
+    static FactionStories fromJson(JSONObject o){FactionStories s=new FactionStories();if(o==null)return s;JSONArray a=o.optJSONArray("index"),b=o.optJSONArray("phase"),d=o.optJSONArray("attemptDay"),p=o.optJSONArray("preparation"),r=o.optJSONArray("approach");for(int f=0;f<DATA.length;f++){s.index[f]=a==null?0:Math.max(0,Math.min(s.count(f),a.optInt(f)));s.phase[f]=b==null?0:Math.max(0,Math.min(2,b.optInt(f)));s.attemptDay[f]=d==null?-1:d.optInt(f,-1);s.preparation[f]=p==null?0:Math.max(0,Math.min(50,p.optInt(f,0)));s.approach[f]=r==null?0:Math.max(0,Math.min(2,r.optInt(f,0)));}s.cicero=Math.max(0,Math.min(2,o.optInt("cicero",0)));s.beast=Math.max(0,Math.min(2,o.optInt("beast",s.index[0]>=3?1:0)));return s;}
 }
