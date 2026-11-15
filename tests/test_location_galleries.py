@@ -89,8 +89,8 @@ class LocationGalleryContracts(unittest.TestCase):
         self.assertIn('LocationGalleryView.hasGallery(place.name)',ui)
         self.assertIn('new LocationGalleryView(this,place.name,accent(),false)',ui)
         self.assertIn('overview.addView(sceneGallery(game.progress.location)',ui)
-        self.assertIn('LocationGalleryView gallery=new LocationGalleryView(this,location,accent(),false)',ui)
-        self.assertIn('if(!visual("weather"))return gallery;',ui)
+        self.assertIn('return new LocationGalleryView(this,location,accent(),false)',ui)
+        self.assertNotIn('visual("weather")',ui)
         self.assertIn('String[] CITIES={',viewer)
         self.assertIn('return PHOTO_LABELS[PHOTO_INDEX_BY_CITY.get(locationKey(location))].length',viewer)
 

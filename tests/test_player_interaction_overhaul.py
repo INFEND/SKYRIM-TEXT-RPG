@@ -26,7 +26,7 @@ class PlayerInteractionOverhaul(unittest.TestCase):
         ai = UI.split("private void renderAiGame()", 1)[1].split("private void renderAiChoice(", 1)[0]
         self.assertIn("LocationGalleryView.hasGallery(game.progress.location)", ai)
         self.assertIn("sceneGallery(game.progress.location)", ai)
-        self.assertIn("LocationGalleryView gallery=new LocationGalleryView(this,location,accent(),false)", UI)
+        self.assertIn("return new LocationGalleryView(this,location,accent(),false)", UI)
         self.assertLess(ai.index("LocationGalleryView.hasGallery("), ai.index("if(aiTurnBusy)"))
 
     def test_map_filter_hides_labels_and_click_targets(self):

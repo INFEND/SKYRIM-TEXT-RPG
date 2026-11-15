@@ -41,8 +41,11 @@ class UserIconAtlasContracts(unittest.TestCase):
         summary=activity.split("private View itemPicture(",1)[1].split("private LinearLayout itemMetric(",1)[0]
         self.assertIn("SkyrimIconView.iconForItem(item.name,item.category)",summary)
         self.assertIn('SkyrimIconView.iconForCategory(group)',activity)
-        for name in ('"story"','"map"','"bag"','"codex"','"hero"','"journal"','"settings"'):
-            self.assertIn(name,activity)
+        nav=activity.split("private void renderNav(){",1)[1]
+        for name in ('"story"','"map"','"bag"','"hero"','"journal"','"settings"'):
+            self.assertIn(name,nav)
+        self.assertNotIn('"codex"',nav)
+        self.assertIn('skyrimTopTabs(6)',activity)
 
 if __name__=="__main__":
     unittest.main()

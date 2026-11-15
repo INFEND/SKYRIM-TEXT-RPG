@@ -10,8 +10,11 @@ class VisualPolish(unittest.TestCase):
     def test_effects_queue_and_gear(self):
         s=(ROOT/"MainActivity.java").read_text()
         v=(ROOT/"VisualEffectsView.java").read_text()
-        for effect in ('ash','dust','embers'):
+        for effect in ('ash','embers'):
             self.assertIn('"'+effect+'"',s);self.assertIn('"'+effect+'"',v)
+        gallery=s.split('private View sceneGallery(',1)[1].split('private void stateEffects()',1)[0]
+        self.assertNotIn('VisualEffectsView',gallery)
+        self.assertNotIn('"dust"',gallery)
         self.assertIn('noticeQueue.addLast(message)',s)
         self.assertIn('if(noticeShowing||noticeQueue.isEmpty()',s)
         self.assertIn('slot.equals(item.slot())',s)
