@@ -25,6 +25,10 @@ FLOOR = {"full_resolution_luma_ssim": .985, "worst_128px_luma_ssim": .965,
 def digest(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
+def historical_archive(name):
+    path = ROOT / "artwork_history/gallery" / name
+    return path if path.is_file() else ASSETS / name
+
 def ssim_map(left, right):
     left, right = left.astype(np.float32), right.astype(np.float32)
     a = gaussian_filter(left, 1.5, truncate=3.5)
@@ -95,7 +99,7 @@ def main():
     baseline = report.get("previous_archives_sha256",before)
     completed = {}
     for pack in report["packs"]:
-        assert digest(ASSETS/pack["archive"]) == pack["archive_sha256"]
+        assert digest(historical_archive(pack["archive"])) == pack["archive_sha256"]
         for photo in pack["photos"]:
             completed[(pack["slug"],photo["number"])] = photo["source_git_sha"]
     pending = []

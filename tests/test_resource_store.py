@@ -16,6 +16,9 @@ class ResourceStoreTest(unittest.TestCase):
         self.assertEqual(len({e["group"] for e in portraits}),10)
         self.assertTrue(all(len(e["sha256"])==64 and e["size"]>0 for e in bridge["files"]))
         self.assertNotIn("lore_bundle.zip",{e["path"] for e in bridge["files"]})
+        riverwood=[e for e in thin["files"] if e["group"]=="gallery:riverwood"]
+        self.assertEqual([e["path"] for e in riverwood],["gallery/riverwood.zip"])
+        self.assertNotIn("gallery/riverwood_extra.zip",{e["path"] for e in thin["files"]})
     def test_store_and_ota(self):
         s=(JAVA/"ResourceStore.java").read_text()
         for token in ("getFilesDir()","MessageDigest.getInstance","ATOMIC_MOVE","removed:","Content-Range","TRANSPORT_WIFI","copyBundled"):

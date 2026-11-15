@@ -1,0 +1,323 @@
+{
+  "schema": 1,
+  "location": "Ривервуд",
+  "slug": "riverwood",
+  "version": "1.0.101",
+  "image_count": 5,
+  "format": "WebP",
+  "max_dimensions": [
+    1920,
+    1080
+  ],
+  "archive": "gallery/riverwood.zip",
+  "archive_bytes": 2802808,
+  "archive_sha256": "658f27bca11ea7fdfdcb53e79383f82b8eed5efecbd879f6221f139e5e1d89b2",
+  "original_bytes": 18445939,
+  "reduction_percent": 84.81,
+  "quality_floor": {
+    "full_resolution_luma_ssim": 0.985,
+    "worst_128px_luma_ssim": 0.965,
+    "maximum_chroma_mean_absolute_error": 2.5,
+    "maximum_chroma_95th_percentile_error": 7
+  },
+  "previous_archives": {
+    "riverwood.zip": {
+      "path": "artwork_history/gallery/riverwood.zip",
+      "bytes": 2630498,
+      "sha256": "153f21b0eb883cde9381eb1b69911028718cdcfbf737bec4c392beec19b9ae30"
+    },
+    "riverwood_extra.zip": {
+      "path": "artwork_history/gallery/riverwood_extra.zip",
+      "bytes": 481076,
+      "sha256": "4e5b5890d9b19783bffd8623cbf59d24af8918a704c04e68e02a632904053839"
+    }
+  },
+  "photos": [
+    {
+      "number": 1,
+      "caption": "Главный вход",
+      "source_git_sha": "785dd3660dd796af5c637523662106a19bc79d83",
+      "original_sha256": "7bc619cccfea2c08302186ebdc96825e5aacb8604c376cff86fcdb2bc5c6b8fd",
+      "original_bytes": 3798257,
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "dimensions": [
+        1672,
+        941
+      ],
+      "encoded_bytes": 589550,
+      "quality": 88,
+      "sha256": "1acb2463b5d453cd24030f9c81fc8a7c793c734317c60e31d02510d57f643b99",
+      "full_resolution_luma_ssim": 0.9883399605751038,
+      "worst_128px_luma_ssim": 0.9828796982765198,
+      "chroma_mean_absolute_error": 1.663045523188708,
+      "chroma_95th_percentile_error": 5.0,
+      "trials": [
+        {
+          "quality": 76,
+          "bytes": 358886,
+          "full_resolution_luma_ssim": 0.9622578620910645,
+          "worst_128px_luma_ssim": 0.9451835751533508,
+          "chroma_mean_absolute_error": 2.068601304730283,
+          "chroma_95th_percentile_error": 6.0
+        },
+        {
+          "quality": 80,
+          "bytes": 420476,
+          "full_resolution_luma_ssim": 0.9727447628974915,
+          "worst_128px_luma_ssim": 0.9610490202903748,
+          "chroma_mean_absolute_error": 1.9363432340633246,
+          "chroma_95th_percentile_error": 6.0
+        },
+        {
+          "quality": 84,
+          "bytes": 486492,
+          "full_resolution_luma_ssim": 0.980722963809967,
+          "worst_128px_luma_ssim": 0.9730055332183838,
+          "chroma_mean_absolute_error": 1.8255298242224245,
+          "chroma_95th_percentile_error": 5.0
+        },
+        {
+          "quality": 88,
+          "bytes": 589550,
+          "full_resolution_luma_ssim": 0.9883399605751038,
+          "worst_128px_luma_ssim": 0.9828796982765198,
+          "chroma_mean_absolute_error": 1.663045523188708,
+          "chroma_95th_percentile_error": 5.0
+        }
+      ],
+      "source_library_file_id": "libfile_639e5beb3bfc8191b95955fbaa54fd09"
+    },
+    {
+      "number": 2,
+      "caption": "Главная улица / центр поселения",
+      "source_git_sha": "3acb3167ff9b7a183df19b644b6e368f1ffe5066",
+      "original_sha256": "d42423dc39f6b2743b4175a0def24c25ddc941cc470eb8d2ab997ce3d90fce5f",
+      "original_bytes": 3677679,
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "dimensions": [
+        1672,
+        941
+      ],
+      "encoded_bytes": 554740,
+      "quality": 88,
+      "sha256": "f21d51e31d878c57456141d0c7021c2f67b222f326d042b8a849bbc2100d1ee5",
+      "full_resolution_luma_ssim": 0.9865887761116028,
+      "worst_128px_luma_ssim": 0.9803586602210999,
+      "chroma_mean_absolute_error": 1.6675648551627353,
+      "chroma_95th_percentile_error": 5.0,
+      "trials": [
+        {
+          "quality": 76,
+          "bytes": 341736,
+          "full_resolution_luma_ssim": 0.9601882100105286,
+          "worst_128px_luma_ssim": 0.9440373182296753,
+          "chroma_mean_absolute_error": 2.0500828803726057,
+          "chroma_95th_percentile_error": 6.0
+        },
+        {
+          "quality": 80,
+          "bytes": 398952,
+          "full_resolution_luma_ssim": 0.9709533452987671,
+          "worst_128px_luma_ssim": 0.9599246978759766,
+          "chroma_mean_absolute_error": 1.9374809324296152,
+          "chroma_95th_percentile_error": 6.0
+        },
+        {
+          "quality": 84,
+          "bytes": 464668,
+          "full_resolution_luma_ssim": 0.9791516065597534,
+          "worst_128px_luma_ssim": 0.970147967338562,
+          "chroma_mean_absolute_error": 1.8189343516263365,
+          "chroma_95th_percentile_error": 5.0
+        },
+        {
+          "quality": 88,
+          "bytes": 554740,
+          "full_resolution_luma_ssim": 0.9865887761116028,
+          "worst_128px_luma_ssim": 0.9803586602210999,
+          "chroma_mean_absolute_error": 1.6675648551627353,
+          "chroma_95th_percentile_error": 5.0
+        }
+      ],
+      "source_library_file_id": "libfile_c964fe2ba2f48191be2f557e1a5d96cc"
+    },
+    {
+      "number": 3,
+      "caption": "Лесопилка",
+      "source_git_sha": "cf536896658651673a26a0180926a70e73dec16c",
+      "original_sha256": "ac53e9d193fcb049b8bc1706ce539b9f5faa34fc18345bce0b4275ca6b80e0d5",
+      "original_bytes": 3644047,
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "dimensions": [
+        1672,
+        941
+      ],
+      "encoded_bytes": 551134,
+      "quality": 88,
+      "sha256": "93f6be10aa54fd180c5b317c08a37db0552bfe4c6a0cb5dcff7711091ed1bbe8",
+      "full_resolution_luma_ssim": 0.9871446490287781,
+      "worst_128px_luma_ssim": 0.9798060655593872,
+      "chroma_mean_absolute_error": 1.6628481738352257,
+      "chroma_95th_percentile_error": 5.0,
+      "trials": [
+        {
+          "quality": 76,
+          "bytes": 337722,
+          "full_resolution_luma_ssim": 0.9633114337921143,
+          "worst_128px_luma_ssim": 0.9451637268066406,
+          "chroma_mean_absolute_error": 2.0984611199528143,
+          "chroma_95th_percentile_error": 6.0
+        },
+        {
+          "quality": 80,
+          "bytes": 395862,
+          "full_resolution_luma_ssim": 0.9727526903152466,
+          "worst_128px_luma_ssim": 0.960638701915741,
+          "chroma_mean_absolute_error": 1.9638227809161586,
+          "chroma_95th_percentile_error": 6.0
+        },
+        {
+          "quality": 84,
+          "bytes": 465376,
+          "full_resolution_luma_ssim": 0.9807561039924622,
+          "worst_128px_luma_ssim": 0.9718735218048096,
+          "chroma_mean_absolute_error": 1.8270727084593912,
+          "chroma_95th_percentile_error": 5.0
+        },
+        {
+          "quality": 88,
+          "bytes": 551134,
+          "full_resolution_luma_ssim": 0.9871446490287781,
+          "worst_128px_luma_ssim": 0.9798060655593872,
+          "chroma_mean_absolute_error": 1.6628481738352257,
+          "chroma_95th_percentile_error": 5.0
+        }
+      ],
+      "source_library_file_id": "libfile_5fea97ddaa748191913debb42ad7c319"
+    },
+    {
+      "number": 4,
+      "caption": "Таверна «Спящий великан»",
+      "source_git_sha": "43ed958194972d4066ab9a215f75f74619c6d346",
+      "original_sha256": "14c2262856ae2561761012ed85a54e1a46441247e6a7c9d73a2c520b5664556d",
+      "original_bytes": 3739898,
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "dimensions": [
+        1672,
+        941
+      ],
+      "encoded_bytes": 575200,
+      "quality": 88,
+      "sha256": "c89429620f0e93c61610b7e2a8e75e5d9df49e31e1725e9df6b9810fd055139a",
+      "full_resolution_luma_ssim": 0.9885416626930237,
+      "worst_128px_luma_ssim": 0.9773570895195007,
+      "chroma_mean_absolute_error": 1.7337315489477243,
+      "chroma_95th_percentile_error": 5.0,
+      "trials": [
+        {
+          "quality": 76,
+          "bytes": 351298,
+          "full_resolution_luma_ssim": 0.9642423987388611,
+          "worst_128px_luma_ssim": 0.9426570534706116,
+          "chroma_mean_absolute_error": 2.1149860298267646,
+          "chroma_95th_percentile_error": 6.0
+        },
+        {
+          "quality": 80,
+          "bytes": 408144,
+          "full_resolution_luma_ssim": 0.9736695289611816,
+          "worst_128px_luma_ssim": 0.9553289413452148,
+          "chroma_mean_absolute_error": 2.011319145366072,
+          "chroma_95th_percentile_error": 6.0
+        },
+        {
+          "quality": 84,
+          "bytes": 478570,
+          "full_resolution_luma_ssim": 0.9817954301834106,
+          "worst_128px_luma_ssim": 0.9676902890205383,
+          "chroma_mean_absolute_error": 1.8901879553971395,
+          "chroma_95th_percentile_error": 6.0
+        },
+        {
+          "quality": 88,
+          "bytes": 575200,
+          "full_resolution_luma_ssim": 0.9885416626930237,
+          "worst_128px_luma_ssim": 0.9773570895195007,
+          "chroma_mean_absolute_error": 1.7337315489477243,
+          "chroma_95th_percentile_error": 5.0
+        }
+      ],
+      "source_library_file_id": "libfile_7ec3792e994c819199970ef354521105"
+    },
+    {
+      "number": 5,
+      "caption": "Река и мост к Ветреному пику",
+      "source_git_sha": "add93afee20dc51baa6dd4c7e7f53d1090a503c7",
+      "original_sha256": "2a0a44bfdab36454ea34012309b26b405529f1fe3384303b927a9aa454651c02",
+      "original_bytes": 3586058,
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "dimensions": [
+        1672,
+        941
+      ],
+      "encoded_bytes": 531712,
+      "quality": 88,
+      "sha256": "a5257747074f3e2ef0d1dfb948b32b2bd2d245b9c51ce46735ad166d3009d6dc",
+      "full_resolution_luma_ssim": 0.9865729808807373,
+      "worst_128px_luma_ssim": 0.9800602197647095,
+      "chroma_mean_absolute_error": 1.5033612948659931,
+      "chroma_95th_percentile_error": 4.0,
+      "trials": [
+        {
+          "quality": 76,
+          "bytes": 320506,
+          "full_resolution_luma_ssim": 0.9598726630210876,
+          "worst_128px_luma_ssim": 0.9416341781616211,
+          "chroma_mean_absolute_error": 1.8723537390234353,
+          "chroma_95th_percentile_error": 6.0
+        },
+        {
+          "quality": 80,
+          "bytes": 376822,
+          "full_resolution_luma_ssim": 0.9705399870872498,
+          "worst_128px_luma_ssim": 0.9554173946380615,
+          "chroma_mean_absolute_error": 1.7528915970488486,
+          "chroma_95th_percentile_error": 5.0
+        },
+        {
+          "quality": 84,
+          "bytes": 445610,
+          "full_resolution_luma_ssim": 0.9792734384536743,
+          "worst_128px_luma_ssim": 0.9695065021514893,
+          "chroma_mean_absolute_error": 1.6291564125510376,
+          "chroma_95th_percentile_error": 5.0
+        },
+        {
+          "quality": 88,
+          "bytes": 531712,
+          "full_resolution_luma_ssim": 0.9865729808807373,
+          "worst_128px_luma_ssim": 0.9800602197647095,
+          "chroma_mean_absolute_error": 1.5033612948659931,
+          "chroma_95th_percentile_error": 4.0
+        }
+      ],
+      "source_library_file_id": "libfile_4969afa23a40819188da898a9adf13a7"
+    }
+  ],
+  "note": "Five replacement illustrations approved in chat. No upscaling, crop or stretch. Only the signed resource catalog is bundled; artwork is downloaded separately. Prior Riverwood archives are retained outside Android assets for historical integrity checks. SSIM and color error compare encoded pixels with the PNG originals; encoding is lossy."
+}

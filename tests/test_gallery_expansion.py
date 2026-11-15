@@ -13,6 +13,13 @@ ROOT = pathlib.Path(__file__).resolve().parents[1]
 ASSETS = ROOT / "app/src/main/assets/gallery"
 JAVA = ROOT / "app/src/main/java/dev/infend/skyrimtext/LocationGalleryView.java"
 
+def historical_archive(name):
+    # Riverwood was explicitly replaced in v1.0.101. Preserve and verify the
+    # original bytes outside Android assets; all other archives remain active.
+    if name in ("riverwood.zip","riverwood_extra.zip"):
+        return ROOT/"artwork_history/gallery"/name
+    return ASSETS/name
+
 def webp_dimensions(data):
     if data[:4] != b"RIFF" or data[8:12] != b"WEBP":
         raise ValueError("Not WebP")
@@ -43,7 +50,7 @@ class GalleryExpansion(unittest.TestCase):
         baseline = report["previous_archives_sha256"]
         self.assertEqual(len(baseline), 11)
         for name, expected in baseline.items():
-            self.assertEqual(hashlib.sha256((ASSETS/name).read_bytes()).hexdigest(), expected, name)
+            self.assertEqual(hashlib.sha256(historical_archive(name).read_bytes()).hexdigest(), expected, name)
 
     def test_all_new_images_match_measured_report(self):
         report = json.loads((ROOT/"docs/gallery_expansion_compression.json").read_text())
@@ -54,7 +61,7 @@ class GalleryExpansion(unittest.TestCase):
         archive_bytes = 0
         digests = set()
         for pack in report["packs"]:
-            path = ASSETS/pack["archive"]
+            path = historical_archive(pack["archive"])
             archive_bytes += path.stat().st_size
             self.assertEqual(path.stat().st_size, pack["archive_bytes"])
             self.assertEqual(hashlib.sha256(path.read_bytes()).hexdigest(), pack["archive_sha256"])
@@ -102,7 +109,7 @@ class GalleryExpansion(unittest.TestCase):
     public static void main(String[] args){
         if(locations().length!=29)throw new AssertionError("location count");
         for(String name:locations()){
-            int expected=switch(name){case "Высокий Хротгар"->11; case "Чёрный Предел"->5; case "Коллегия Винтерхолда"->4; case "Глотка Мира"->2; case "Устенгрев"->1; default->6;};
+            int expected=switch(name){case "Высокий Хротгар"->11; case "Чёрный Предел","Ривервуд"->5; case "Коллегия Винтерхолда"->4; case "Глотка Мира"->2; case "Устенгрев"->1; default->6;};
             if(!hasGallery(name)||imageCount(name)!=expected)throw new AssertionError(name);
             for(int n=0;n<expected;n++){
                 if(captionFor(name,n).trim().isEmpty())throw new AssertionError(name);
@@ -122,11 +129,15 @@ class GalleryExpansion(unittest.TestCase):
         if(hasGallery(null)||imageCount(null)!=0||hasGallery("Несуществующее место"))
             throw new AssertionError("unknown location");
         if(!archive("riverwood",5).equals("riverwood.zip")
-            ||!archive("riverwood",6).equals("riverwood_extra.zip")
             ||!archive("riften",4).equals("riften_extra.zip")
             ||!archive("highhrothgar",6).equals("highhrothgar.zip")
             ||!archive("highhrothgar",7).equals("highhrothgar_extra.zip"))
             throw new AssertionError("archive routing");
+        String[] riverwood={"Главный вход в Ривервуд","Главная улица / центр поселения","Лесопилка","Таверна «Спящий великан»","Река и мост к Ветреному пику"};
+        for(int n=0;n<riverwood.length;n++){
+            if(!captionFor("Ривервуд",n).equals(riverwood[n]))throw new AssertionError("Riverwood view order");
+            if(!archive("riverwood",n+1).equals("riverwood.zip"))throw new AssertionError("Riverwood pack");
+        }
     }
 '''
         source = "import java.util.*;\npublic final class GalleryProbe {\n"+catalog+static+"\n".join(methods)+probe+"\n}"
