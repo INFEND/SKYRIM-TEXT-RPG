@@ -596,7 +596,7 @@ public final class MainActivity extends Activity {
             addText(panel,"Ходов: "+game.battleTurns+" | Урон: "+game.battleDealt+" | Получено: "+game.battleTaken,14,MUTED,false,16);
         }
         visualSummaryLink(panel,"ПРОДОЛЖИТЬ",dialog::dismiss);
-        dialog.setContentView(stage);dialog.show();
+        dialog.setContentView(stage);dialog.show();SovngardeTypeface.watchDialog(dialog);
         android.view.Window window=dialog.getWindow();if(window!=null){window.setBackgroundDrawableResource(android.R.color.transparent);window.setLayout(-1,-1);}
     }
     private void routePreview(LinearLayout host,TravelPlanner.Route route){
@@ -666,7 +666,7 @@ public final class MainActivity extends Activity {
         LinearLayout sheets=row();layout.addView(sheets,lp(-1,46));mapControl(sheets,"Скайрим",()->{terrain.setSheet(0);terrain.showWholeProvince();});mapControl(sheets,"Солстейм",()->{terrain.setSheet(1);terrain.showWholeProvince();});
         layout.addView(terrain,new LinearLayout.LayoutParams(-1,0,1));terrain.post(terrain::showWholeProvince);
         addText(layout,"Схема игровой сети переходов; морская переправа показана на отдельных листах.",11,MUTED,false,8);
-        visualSummaryLink(layout,"ЗАКРЫТЬ",dialog::dismiss);dialog.setContentView(layout);dialog.show();android.view.Window window=dialog.getWindow();if(window!=null)window.setLayout(-1,-1);
+        visualSummaryLink(layout,"ЗАКРЫТЬ",dialog::dismiss);dialog.setContentView(layout);dialog.show();SovngardeTypeface.watchDialog(dialog);android.view.Window window=dialog.getWindow();if(window!=null)window.setLayout(-1,-1);
     }
     private void reputationPanel(){
         if(!visual("reputation"))return;
@@ -933,6 +933,7 @@ public final class MainActivity extends Activity {
         if(!titleOpen&&game.started)renderNav();
         stateEffects();
         SovngardeTypeface.applyTree(root);
+        SovngardeTypeface.watchTree(root);
         renderedPage=thisPage;
         resumeViewport(oldScroll,scroll,thisPage);
         if(animations){content.setAlpha(0.8f);content.animate().alpha(1f).setDuration(210).setInterpolator(new DecelerateInterpolator()).start();}
@@ -2451,7 +2452,7 @@ public final class MainActivity extends Activity {
             if(activeTerrainMap!=null)activeTerrainMap.restoreCamera();
         });
         popup.setContentView(scene);
-        popup.show();
+        popup.show();SovngardeTypeface.watchDialog(popup);
         android.view.Window window=popup.getWindow();
         if(window!=null){
             window.setBackgroundDrawableResource(android.R.color.transparent);
@@ -2658,8 +2659,6 @@ public final class MainActivity extends Activity {
 
     private TextView itemText(String value,int size,int color,boolean bold){
         TextView t=text(value,size,color,bold);
-        t.setTag(SovngardeTypeface.NATIVE_ITEM_FONT);
-        t.setTypeface(Typeface.create("sans-serif",bold?Typeface.BOLD:Typeface.NORMAL));
         t.setIncludeFontPadding(false);
         return t;
     }
@@ -3024,7 +3023,7 @@ public final class MainActivity extends Activity {
         itemEffect(view,item);
         itemEffectPreview(view,item);
         TextView description=itemText(item.description,14,0xffa3a3a3,false);
-        description.setTypeface(Typeface.create("sans-serif",Typeface.ITALIC));
+        description.setTypeface(SovngardeTypeface.styled(this,Typeface.ITALIC));
         description.setLineSpacing(dp(2),1.05f);space(view,4);view.addView(description,lp(-1,-2));
         if(item.twoHanded()&&!"Не надето".equals(game.progress.equippedName("shield"))){
             space(view,8);view.addView(itemText("Двуручное оружие снимает экипированный щит.",12,ITEM_DOWN,false));
@@ -3579,6 +3578,26 @@ public final class MainActivity extends Activity {
         content.addView(panel,from,p);
     }
 
+    private void chooseGameFont(){
+        ScrollView scroller=new ScrollView(this);
+        LinearLayout list=column();list.setPadding(dp(10),dp(4),dp(10),dp(12));scroller.addView(list);
+        AlertDialog picker=new RuneDialogBuilder(this,accent()).setTitle("ШРИФТ ИГРЫ")
+            .setView(scroller).setNegativeButton("Закрыть",null).create();
+        for(int i=0;i<SovngardeTypeface.IDS.length;i++){
+            final String id=SovngardeTypeface.IDS[i];
+            boolean active=id.equals(SovngardeTypeface.selected());
+            LinearLayout option=column();option.setPadding(dp(12),dp(9),dp(12),dp(9));
+            option.setBackground(new RuneFrameDrawable(PANEL_2,active?accent():BORDER,active));
+            TextView name=text((active?"●  ":"○  ")+SovngardeTypeface.NAMES[i],17,active?accent():TEXT,true);
+            SovngardeTypeface.preview(name,id,Typeface.BOLD);option.addView(name);
+            TextView sample=text("Вайтран • Древние свитки\nСеверный ветер шепчет среди гор. 123 / 456",15,TEXT,false);
+            SovngardeTypeface.preview(sample,id,Typeface.NORMAL);option.addView(sample);
+            LinearLayout.LayoutParams p=lp(-1,-2);p.bottomMargin=dp(6);list.addView(option,p);
+            option.setOnClickListener(v->{SovngardeTypeface.select(this,id);picker.dismiss();render();});
+        }
+        picker.show();
+    }
+
     private void renderSettings(){
         skyrimTopTabs(5);
         section("ПАРАМЕТРЫ","Настройки","Твоя история, твои правила.");
@@ -3591,6 +3610,12 @@ public final class MainActivity extends Activity {
             item.addView(text(ACCENT_NAMES[i],15,TEXT,accentIndex==i));item.setOnClickListener(v->{accentIndex=value;prefs.edit().putInt("accent",value).apply();render();});
         }
         LinearLayout readability=card();addText(readability,"ЧИТАЕМОСТЬ",11,accent(),true,12);
+        LinearLayout fontChoice=column();fontChoice.setPadding(dp(12),dp(10),dp(12),dp(10));
+        fontChoice.setBackground(new RuneFrameDrawable(PANEL_2,BORDER,false));
+        addText(fontChoice,"Шрифт игры  |  "+SovngardeTypeface.label(),16,TEXT,true,3);
+        addText(fontChoice,"Применяется ко всему тексту • выбрать и сравнить",12,MUTED,false,0);
+        readability.addView(fontChoice,lp(-1,-2));space(readability,8);
+        fontChoice.setOnClickListener(v->chooseGameFont());
         LinearLayout r=row();readability.addView(r,lp(-1,45));
         r.addView(text("Размер текста",15,TEXT,false),new LinearLayout.LayoutParams(0,-2,1));
         TextView smaller=text("−",24,accent(),true);smaller.setGravity(Gravity.CENTER);smaller.setBackground(bg(PANEL_2,BORDER,10));r.addView(smaller,lp(44,42));

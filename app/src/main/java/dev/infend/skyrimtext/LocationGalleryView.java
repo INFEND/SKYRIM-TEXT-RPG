@@ -384,7 +384,7 @@ public final class LocationGalleryView extends LinearLayout {
         });
 
         TextView close=text("×",33,Color.WHITE);
-        close.setTypeface(android.graphics.Typeface.DEFAULT_BOLD);
+        close.setTypeface(SovngardeTypeface.face(getContext(),true));
         close.setGravity(Gravity.CENTER);
         close.setContentDescription("Закрыть полноэкранное фото");
         close.setOnClickListener(v->viewer.dismiss());
@@ -395,7 +395,7 @@ public final class LocationGalleryView extends LinearLayout {
         backdrop.addView(close,closeParams);
         viewer.setContentView(backdrop);
         viewer.setOnDismissListener(d->generation[0]++);
-        viewer.show();
+        viewer.show();SovngardeTypeface.watchDialog(viewer);
         Window window=viewer.getWindow();
         if(window!=null){
             window.setBackgroundDrawableResource(android.R.color.transparent);

@@ -352,7 +352,7 @@ public final class SkyrimTerrainMapView extends View {
             ink.setStyle(Paint.Style.FILL);ink.setColor(pin.player?0xfff2dc98:0xfff0f1eb);
             canvas.drawText(title,tx,ty,ink);
         }
-        ink.setTypeface(android.graphics.Typeface.DEFAULT);ink.setTextSize(11*density);
+        ink.setTypeface(SovngardeTypeface.face(getContext(),false));ink.setTextSize(11*density);
         ink.setStyle(Paint.Style.FILL);ink.setColor(0xe6081115);
         canvas.drawRect(0,getHeight()-27*density,getWidth(),getHeight(),ink);
         ink.setColor(0xffe1e7e7);

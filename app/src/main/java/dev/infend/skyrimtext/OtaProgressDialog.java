@@ -162,7 +162,7 @@ public final class OtaProgressDialog {
     }
     public void show(){
         if(shown)return;
-        dialog.show();shown=true;
+        dialog.show();SovngardeTypeface.watchDialog(dialog);shown=true;
         Window window=dialog.getWindow();
         if(window!=null){
             window.setBackgroundDrawableResource(android.R.color.transparent);
