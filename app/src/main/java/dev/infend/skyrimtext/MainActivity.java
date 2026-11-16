@@ -186,6 +186,7 @@ public final class MainActivity extends Activity {
     }
     @Override protected void onActivityResult(int requestCode,int resultCode,Intent data){
         super.onActivityResult(requestCode,resultCode,data);
+        if(requestCode==REQUEST_KATHERINE_GALLERY){if(resultCode==RESULT_OK&&data!=null&&data.getData()!=null){try{KatherineGallery.install(this,data.getData());katherineGallery(1);}catch(Exception e){toast("Не удалось импортировать галерею: "+e.getMessage());}}return;}
         if(requestCode==LocalAiEngineModule.REQUEST_ACTIVATE){if(localAiClient!=null)localAiClient.onEngineActivationResult(resultCode==RESULT_OK);return;}
         if(requestCode==REQUEST_LOCAL_GGUF&&resultCode==RESULT_OK&&data!=null&&data.getData()!=null)
             importLocalModel(data.getData());
@@ -440,11 +441,25 @@ public final class MainActivity extends Activity {
         panel.addView(npcPortrait(name),lp(112,-2));
         NpcProfiles.Profile profile=NpcProfiles.find(name);
         if(profile!=null){addText(panel,profile.race+" | "+profile.role,14,TEXT,true,8);}
-        if(KatherineStory.NAME.equals(name)){addText(panel,"18 лет | Носитель Нулевого Предела",14,TEXT,true,8);addText(panel,"Доверие: "+game.katherine.trust+"/100",14,accent(),true,8);}
+        if(KatherineStory.NAME.equals(name)){TextView galleryButton=text("Галерея Кэтрин",15,accent(),true);galleryButton.setPadding(dp(12),dp(12),dp(12),dp(12));galleryButton.setOnClickListener(v->katherineGallery(1));panel.addView(galleryButton,lp(-1,-2));addText(panel,"18 лет | Носитель Нулевого Предела",14,TEXT,true,8);addText(panel,"Доверие: "+game.katherine.trust+"/100",14,accent(),true,8);addText(panel,"Уважение: "+game.katherine.respect+"/100 | Симпатия: "+game.katherine.affection+"/100",13,TEXT,false,8);addText(panel,"Ревность: "+game.katherine.jealousy+"/100 | Магический ранг: "+game.katherine.magicRank+"/3",13,TEXT,false,8);addText(panel,"Тактика: "+game.katherine.stanceLabel()+" | "+game.katherine.status(),13,TEXT,false,8);}
         if(AlmaStory.NAME.equals(name)){addText(panel,"437 лет | Маг крови, бывшая убийца",14,TEXT,true,8);addText(panel,game.alma.relationship()+" | Доверие: "+game.alma.trust+"/100 | Любовь: "+game.alma.love+"/100",14,accent(),true,8);}
         if(!KatherineStory.NAME.equals(name))addText(panel,"Иллюстративный образ или эмблема, не индивидуальный портрет",11,MUTED,false,10);
         addText(panel,npcStatusLabel(game.sceneState.npcStatusByName(name)),15,TEXT,true,8);
         new RuneDialogBuilder(this,accent()).setTitle(name).setView(panel).setNegativeButton("Закрыть",null).show();
+    }
+    private static final int REQUEST_KATHERINE_GALLERY=7218;
+    private void chooseKatherineGallery(){Intent picker=new Intent(Intent.ACTION_OPEN_DOCUMENT);picker.addCategory(Intent.CATEGORY_OPENABLE);picker.setType("application/zip");try{startActivityForResult(picker,REQUEST_KATHERINE_GALLERY);}catch(Exception e){toast("Не удалось открыть выбор файла");}}
+    private void katherineGallery(int index){
+        LinearLayout panel=column();panel.setPadding(dp(12),dp(8),dp(12),dp(8));
+        if(!KatherineGallery.available(this)){
+            addText(panel,"Галерея пока не загружена. Выбери архив Katherine_gallery.zip или скачай пакет в управлении ресурсами, когда он появится на сервере.",14,TEXT,false,8);
+            new RuneDialogBuilder(this,accent()).setTitle("Кэтрин | Галерея").setView(panel).setPositiveButton("Импорт ZIP",(d,w)->chooseKatherineGallery()).setNegativeButton("Закрыть",null).show();return;
+        }
+        try{
+            android.widget.ImageView image=new android.widget.ImageView(this);image.setImageBitmap(KatherineGallery.photo(this,index));image.setAdjustViewBounds(true);image.setScaleType(android.widget.ImageView.ScaleType.FIT_CENTER);panel.addView(image,lp(-1,440));
+            TextView count=text(index+" / "+KatherineGallery.COUNT,14,accent(),true);count.setGravity(Gravity.CENTER);panel.addView(count,lp(-1,34));
+            AlertDialog dialog=new RuneDialogBuilder(this,accent()).setTitle("Кэтрин | Галерея").setView(panel).setNegativeButton("Закрыть",null).setNeutralButton("Назад",(d,w)->katherineGallery(index==1?KatherineGallery.COUNT:index-1)).setPositiveButton("Вперёд",(d,w)->katherineGallery(index==KatherineGallery.COUNT?1:index+1)).create();dialog.show();
+        }catch(Exception e){toast("Не удалось прочитать фото");}
     }
     private String lastNarrative="";
     private void decorateNarrative(LinearLayout host,TextView body,String raw){
@@ -1654,7 +1669,7 @@ public final class MainActivity extends Activity {
     /** AI mode replaces the entire offline story, not just its dialogue panel. */
     private void renderAiGame(){
         if(game.alma.available(game)&&!aiTurnBusy)actionButton("Альма","Алая Бессмертная | "+game.alma.status(),false,()->{game.choose("ALMA:open");save();render();});
-        if(game.katherine.available(game)&&!aiTurnBusy)actionButton("Кэтрин","Нулевой Предел | "+game.katherine.status(),false,()->{game.choose("KATH:open");save();render();});
+        if(game.katherine.available(game)&&!livingBusy())actionButton("Кэтрин","Нулевой Предел | "+game.katherine.status(),false,()->{game.choose("KATH:open");save();render();});
         String source=resolvedAiProvider();
         boolean ready="local".equals(source)?localModelReady():
             "chatgpt".equals(source)?chatGptOAuth.hasAuthorizedPlan():
@@ -2002,7 +2017,7 @@ public final class MainActivity extends Activity {
         final String model=local?"Qwen3.5-9B":prefs.getString(chat?"ai_chatgpt_model":"ai_api_model",
                 chat?"":AiModelCatalog.DEFAULT_API);
         if(model.isEmpty()){aiTurnStatus="Сначала выбери модель в настройках";render();return;}
-        final String effort=selectedReasoningEffort(),history=aiMemory.context(aiSession);
+        final String effort=selectedReasoningEffort(),history=aiMemory.context(aiSession)+"\n"+game.katherine.aiContext();
         final String saved;
         try{saved=game.toJson().toString();}
         catch(Exception ex){aiTurnStatus="Не удалось прочитать состояние героя";render();return;}
@@ -2074,6 +2089,7 @@ public final class MainActivity extends Activity {
                     VisualSnapshot visualBefore=new VisualSnapshot(next);
                     completed.apply(next,actionResolved);
                     next.progress.sync(next);
+                    next.katherine.observeTravel(next);
                     captureItemGains(before,next,!actionResolved);
                     if(actionResolved){if(expectedChance>=0){next.lastCheckChance=expectedChance;next.lastCheckRoll=prefs.getInt(AI_PENDING_DIE,-1);}recordVisual(visualBefore,next,completed.journal.isEmpty()?"Продолжение истории":completed.journal);LockedChecks lockedChecks=LockedChecks.restore(prefs.getString(AI_PENDING_CHECKS,""));if(lockedChecks!=null)next.lastLivingResult.put("checks",lockedChecks.snapshot());}
                     else next.recordVisualEvent(completed.journal.isEmpty()?"Продолжение истории":completed.journal);
@@ -3772,16 +3788,21 @@ public final class MainActivity extends Activity {
     }
     private void renderLivingRelations(){
         section("ЖУРНАЛ","Отношения","Только подтверждённые знакомства и события.");
+        if(game.katherine.enabled&&game.katherine.stage>0)renderKatherineRelations();
         if(game.alma.stage>0)actionButton("Альма | "+game.alma.relationship(),"Доверие "+game.alma.trust+"/100 · Любовь "+game.alma.love+"/100",false,this::almaRelationshipDetails);
         org.json.JSONArray npcs=game.sceneState.npcFacts();
-        if(npcs.length()==0){addText(content,"Пока нет подтверждённых знакомств.",15,MUTED,false,8);return;}
-        for(int i=0;i<npcs.length();i++){JSONObject n=npcs.optJSONObject(i);if(n==null)continue;String name=n.optString("title"),status=n.optString("status");if(AlmaStory.NAME.equals(name))continue;int score;String relation;
+        if(npcs.length()==0){if(game.alma.stage==0&&(!game.katherine.enabled||game.katherine.stage==0))addText(content,"Пока нет подтверждённых знакомств.",15,MUTED,false,8);return;}
+        for(int i=0;i<npcs.length();i++){JSONObject n=npcs.optJSONObject(i);if(n==null)continue;String name=n.optString("title"),status=n.optString("status");if(AlmaStory.NAME.equals(name)||KatherineStory.NAME.equals(name))continue;int score;String relation;
             switch(status){case "HELPED":score=78;relation="Благодарность";break;case "INFORMED":score=60;relation="Обмен сведениями";break;case "MET":score=50;relation="Знакомый";break;case "HOSTILE":score=15;relation="Враждебность";break;default:score=-1;relation=npcStatusLabel(status);}
             if(score>=0)score=n.optInt("relation",score);int color=score<0?MUTED:score>=65?ITEM_UP:score>=40?ITEM_GOLD:ITEM_DOWN;LinearLayout tile=livingTile(content);LinearLayout line=row();line.setGravity(Gravity.CENTER_VERTICAL);
             line.addView(new SkyrimIconView(this,"hero",color),lp(38,42));LinearLayout words=column();words.setPadding(dp(10),0,0,0);line.addView(words,new LinearLayout.LayoutParams(0,-2,1));addText(words,name,18,TEXT,true,3);addText(words,relation,13,color,false,0);
             if(score>=0)line.addView(text(score+" / 100",16,color,true));tile.addView(line);space(tile,10);if(score>=0)livingBar(tile,score,100,color);
             int change=n.optInt("delta",0);addText(tile,"Последнее событие: "+npcStatusLabel(status)+(change==0?"":change>0?" | +"+change:" | "+change),12,MUTED,false,0);if(n.optInt("lastDay")>0)addText(tile,"День "+n.optInt("lastDay")+" · "+n.optString("lastLocation"),11,MUTED,false,0);tile.setOnClickListener(v->livingRelationDetails(n));}
         addText(content,"Отношения меняются после подтверждённых событий. Скрытые намерения не раскрываются.",11,MUTED,false,4);
+    }
+    private void renderKatherineRelations(){
+        KatherineStory k=game.katherine;LinearLayout tile=livingTile(content);LinearLayout head=row();head.addView(npcPortrait(KatherineStory.NAME),lp(76,-2));LinearLayout words=column();words.setPadding(dp(10),0,0,0);head.addView(words,new LinearLayout.LayoutParams(0,-2,1));addText(words,KatherineStory.NAME,20,TEXT,true,4);addText(words,k.status(),14,accent(),true,4);addText(words,"Нулевой Предел | "+k.magicRank+"/3",12,MUTED,false,4);tile.addView(head);space(tile,8);
+        String[] names={"Доверие","Уважение","Симпатия","Ревность"};int[] scores={k.trust,k.respect,k.affection,k.jealousy};for(int i=0;i<names.length;i++){livingLine(tile,names[i],scores[i]+" / 100",accent());livingBar(tile,scores[i],100,accent());space(tile,5);}if(!k.lastRemark.isEmpty())addText(tile,k.lastRemark,13,MUTED,false,8);tile.setOnClickListener(v->npcDetails(KatherineStory.NAME));
     }
     private void livingRelationDetails(JSONObject n){LinearLayout panel=column();String status=n.optString("status");addText(panel,npcStatusLabel(status),16,TEXT,true,8);if(!"DEAD".equals(status)&&!"MISSING".equals(status))livingLine(panel,"Отношение",n.optInt("relation",50)+" / 100",accent());if(n.optInt("lastDay")>0){livingLine(panel,"Последняя встреча","День "+n.optInt("lastDay")+" | "+String.format(java.util.Locale.ROOT,"%02d:00",n.optInt("lastHour")),MUTED);addText(panel,n.optString("lastLocation"),13,MUTED,false,8);}org.json.JSONArray events=n.optJSONArray("history");addText(panel,"История взаимодействий",13,accent(),true,8);if(events!=null)for(int i=events.length()-1;i>=0;i--){JSONObject e=events.optJSONObject(i);if(e==null)continue;int change=e.optInt("delta");livingLine(panel,npcStatusLabel(e.optString("status")),change==0?"":change>0?"+"+change:String.valueOf(change),change<0?ITEM_DOWN:ITEM_UP);if(e.optInt("day")>0)addText(panel,"День "+e.optInt("day")+" | "+String.format(java.util.Locale.ROOT,"%02d:00",e.optInt("hour"))+" · "+e.optString("location"),12,MUTED,false,7);}livingDialog(n.optString("title"),panel);}
     private void renderJournal(){
@@ -3802,6 +3823,7 @@ public final class MainActivity extends Activity {
         if(journalRelations){renderLivingRelations();return;}
         section("ЛЕТОПИСЬ СЕВЕРА","Журнал","Выбирай задание, чтобы увидеть описание и текущую цель.");
         renderFactionJournal();
+        if(game.katherine.enabled&&game.katherine.stage>0){LinearLayout k=card();addText(k,"НУЛЕВОЙ ПРЕДЕЛ | КРУГ ТРЁХ КОГТЕЙ",13,accent(),true,8);addText(k,game.katherine.objective(),15,TEXT,false,8);if(game.katherine.available(game))actionButton("Поговорить с Кэтрин","Продолжить расследование",false,()->{if(livingBusy())return;game.choose("KATH:open");save();tab=0;render();});}
         if(game.alma.stage>0)actionButton("Алая Бессмертная",game.alma.status()+" | "+game.alma.stage+"/12",false,()->new RuneDialogBuilder(this,accent()).setTitle("Алая Бессмертная").setMessage(game.alma.status()+"\n\n"+(game.alma.companion?"Альма путешествует с тобой.":game.alma.terminalLoss()?"История завершена.":"Ищи Альму в Рифтене.")).setPositiveButton("Закрыть",null).show());
         String[] entries=game.aiJournal.isEmpty()?
             new String[]{"Путь Довакина","Драконий след","Пепельные печати","Опасные дороги"}:
