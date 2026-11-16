@@ -638,7 +638,7 @@ public final class GameEngine {
         compensation.tick();
         if(!"CANON_SHOUT".equals(action)&&canonicalShoutCooldown>0)canonicalShoutCooldown--;
         int kathDamage=katherine.assist(this,battleTurns+1,Math.max(0,enemyHp-damage));
-        if(kathDamage>0){damage+=kathDamage;actionText+="\nКэтрин: магический импульс, −"+kathDamage+" здоровья врагу.";}
+        if(kathDamage>0){damage+=kathDamage;actionText+="\nКэтрин: "+katherine.companion.lastSpell+", −"+kathDamage+" здоровья врагу.";}
         int almaDamage=alma.assist(this,battleTurns+1,Math.max(0,enemyHp-damage));if(almaDamage>0){damage+=almaDamage;actionText+="\nАльма: "+(alma.mortal()?"удар кинжалом":"багровое пламя")+", −"+almaDamage+" здоровья врагу.";}
         lastDealt=Math.min(enemyHp,damage);lastHeavyHit="HEAVY".equals(action)&&lastDealt>0;lastMiss="HEAVY".equals(action)&&lastDealt==0;battleDealt+=lastDealt;battleTurns++;
         enemyHp=Math.max(0,enemyHp-damage);
