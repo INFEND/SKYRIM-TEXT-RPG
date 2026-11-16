@@ -323,13 +323,13 @@ final class RoadEvents {
             case "beast_night":return night&&g.factionStories.done(0)>=2;
             case "louis":return region==1&&RoadQuests.done(g,"louis_revenge".equals(e.id)?"frost_keep":"frost_maven");
             case "sanguine":return RoadQuests.done(g,"sanguine_final")&&g.progress.questOutcome("road_deep_in_cups")==null;
-            case "peryite":return region==4;
+            case "peryite":return region==4&&RoadQuests.done(g,"peryite_reward");
             case "bounty":return g.road.bounty(region)>=1000;
             case "riverwood":return region==0&&(RoadQuests.done(g,"riverwood_sven")||RoadQuests.done(g,"riverwood_faendal"));
             case "azura":return RoadQuests.done(g,"azura_aranea")||RoadQuests.done(g,"azura_black");
             case "septimus":return g.canonicalStage>=19;
             case "db_letter":return g.factionStories.done(3)==1;
-            case "aetherium":return region==4||region==3;
+            case "aetherium":return (region==4||region==3)&&(RoadQuests.done(g,"aether_crown")||RoadQuests.done(g,"aether_shield")||RoadQuests.done(g,"aether_staff"));
             case "city":return true;
             case "city_night":return night&&!g.factionStories.completed(6);
             case "city_dg":return g.factionStories.done(6)>=3&&!g.factionStories.completed(6);

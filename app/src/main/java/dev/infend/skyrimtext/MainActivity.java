@@ -3910,8 +3910,8 @@ public final class MainActivity extends Activity {
         if(game.road.hasDog(game))addText(panel,"Спутник: бродячий пёс | помощь в бою",13,TEXT,false,6);
         if(game.road.hasMount(game))addText(panel,"Верховая лошадь / Арвак | меньший расход сил в пути",13,TEXT,false,6);
         for(int i=0;i<10;i++)if(game.road.bounty(i)>0)addText(panel,"Дорожный штраф | "+GameEngine.REGIONS[i]+": "+game.road.bounty(i)+" септимов",13,ITEM_DOWN,false,6);
-        for(RoadQuests.Task task:tasks){boolean active=RoadQuests.active(game,task);addText(panel,task.title+" | "+(active?"Активно":"Завершено"),14,TEXT,true,5);addText(panel,task.place,12,MUTED,false,6);if(!active)continue;final RoadQuests.Task t=task;
-            if(RoadQuests.here(game,t))visualSummaryLink(panel,"ПРОДОЛЖИТЬ",()->{if(livingBusy())return;VisualSnapshot before=new VisualSnapshot(game);game.choose("ROADQUEST:"+t.id);game.progress.sync(game);recordVisual(before,game,t.title);save();tab=0;render();});
+        for(RoadQuests.Task task:tasks){boolean active=RoadQuests.active(game,task),choice=RoadQuests.availableStart(game,task);addText(panel,task.title+" | "+(active?"Активно":choice?"Выбор":"Завершено"),14,TEXT,true,5);addText(panel,task.place,12,MUTED,false,6);if(!active&&!choice)continue;final RoadQuests.Task t=task;
+            if(RoadQuests.here(game,t))visualSummaryLink(panel,choice?"ВЫБРАТЬ":"ПРОДОЛЖИТЬ",()->{if(livingBusy())return;VisualSnapshot before=new VisualSnapshot(game);game.choose((choice?"ROADSTART:":"ROADQUEST:")+t.id);game.progress.sync(game);recordVisual(before,game,t.title);save();tab=0;render();});
             else{WorldAtlas.Place p=WorldAtlas.find(t.place);if(p!=null)visualSummaryLink(panel,"МАРШРУТ К ЦЕЛИ",()->locationDialog(p));}space(panel,5);
         }
     }
