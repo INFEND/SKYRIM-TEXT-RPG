@@ -85,7 +85,36 @@ final class RoadEvents {
         new Event("vampire","Вампир на дороге","Под покровом ночи путник внезапно обнажает клыки.","Вампир",5,4,"night"),
         new Event("cultists","Культисты Мирака","Люди в костяных масках спрашивают, действительно ли ты Довакин.","Культист Мирака",1,2,"cult"),
         new Event("solstheim_reavers","Пепельные разбойники","На пепельной тропе Солстейма разбойники выходят из укрытия.","Разбойник Солстейма",1,6,"island"),
-        new Event("solstheim_ash","Порождения пепла","Из серой земли поднимаются пепельные существа.","Порождение пепла",1,5,"island")
+        new Event("solstheim_ash","Порождения пепла","Из серой земли поднимаются пепельные существа.","Порождение пепла",1,5,"island"),
+        new Event("headless","Всадник без головы","Беззвучный призрачный всадник в мерцающих доспехах скачет по дороге. Головы у него нет. Он исчезает вдали, направляясь к месту последнего упокоения.","",1,2,"night"),
+        new Event("witch_attack","Ведьма на тракте","Одинокая ведьма замечает тебя и начинает читать заклинание.","Ведьма",1,4,""),
+        new Event("necromancers","Некроманты","Двое некромантов поднимают оружие и готовят заклинания.","Некроманты",1,4,""),
+        new Event("ice_wraiths","Ледяные привидения","В снегу змеятся полупрозрачные ледяные существа. Они замечают движение.","Ледяной призрак",10,4,"ice"),
+        new Event("ice_bandits","Бандиты против ледяных привидений","Несколько разбойников пытаются отбиться от ледяных привидений.","Ледяной призрак",10,3,"ice"),
+        new Event("spriggan_hagraven","Спригган и ворожейка","Ворожея отбивается от сприггана среди сломанных ветвей.","Ворожея",20,3,"forest"),
+        new Event("disturbed_spriggan","Разгневанный спригган","Рядом с телом охотника из дерева выходит спригган.","Спригган",8,3,"forest"),
+        new Event("hunter_dog","Охотник с псом","Охотник с верным псом выслеживает зверя и здоровается с тобой.","",1,4,"talk"),
+        new Event("dog_wolves","Пёс против волков","Одинокий пёс отбивается от двух волков, прижавшись к камню.","Волки",1,4,"rescue"),
+        new Event("horse","Оставшаяся без хозяина лошадь","На обочине лежит погибший разбойник; рядом бродит осёдланная лошадь.","",1,4,"talk"),
+        new Event("dueling_mages","Дуэль магов","Маг огня и маг мороза обмениваются заклинаниями, не замечая путника.","Маг огня",1,4,""),
+        new Event("dwemer_children","Сонд и Боттар","Двое детей торгуют двемерскими безделушками и предлагают за монету рассказать о руинах.","",1,3,"reach"),
+        new Event("vampire_trick","Ложная жертва","Путник зовёт на помощь, пока вампир будто бы пытается схватить его. Когда ты приближаешься, оба поворачиваются к тебе.","Вампир и прислужник",1,4,"night"),
+        new Event("companion_vilkas","Охота Вилкаса и Рии","Вилкас и Рия преследуют саблезубов вдали от Вайтрана.","Саблезуб",1,3,"companions"),
+        new Event("companion_aela","Охота Эйлы","Скьор, Эйла и Ньяда выслеживают мамонта вдали от Вайтрана.","",1,3,"companions"),
+        new Event("companion_farkas","Охота Фаркаса","Фаркас, Атис и Торвар выслеживают медведя.","Медведь",1,3,"companions"),
+        new Event("wolf_escape","Сбежавшие бойцовые волки","Возле тела погибшего дрессировщика рыщут сбежавшие волки. Вещи указывают на Крегслейн.","Бойцовые волки",1,3,"east"),
+        new Event("burned_crops","Разорённые фермеры","Двое фермеров покинули сожжённое драконом хозяйство. Они просят помочь деньгами.","",4,3,"dragon"),
+        new Event("dragon_aftermath","Следы драконьего нападения","Обугленная телега и останки путников лежат на обочине; земля ещё хранит следы огня.","",1,3,"dragon"),
+        new Event("nobles","Знатные путники","Двое богато одетых людей путешествуют в сопровождении вооружённых охранников.","",1,3,"talk"),
+        new Event("thalmor_patrol","Талморский патруль","Трое талморцев направляются к посольству, соблюдая строй.","",1,4,"talk"),
+        new Event("taunting_adventurer","Задиристый искатель приключений","Самоуверенный путник насмехается над твоим снаряжением и предлагает выяснить, кто сильнее.","Искатель приключений",1,4,"duel"),
+        new Event("other_courier","Чужой гонец","Курьер спешит к таверне с чужим письмом, держа сумку у груди.","",1,3,"talk"),
+        new Event("skooma_dealer","Торговец скумой","У дороги стоит подозрительный торговец. Он тихо предлагает запрещённый товар.","",1,3,"talk"),
+        new Event("giant_painted_cow","Великан с раскрашенной коровой","Великан спокойно ведёт раскрашенную корову к своему лагерю.","",1,3,"plains"),
+        new Event("false_vigilants","Лжедозорные Стендарра","Люди в одеждах дозорных стоят над телами и зовут ближе. На самом деле это вампиры.","Вампиры",1,3,"night"),
+        new Event("babette","Ночная встреча с Бабеттой","Бабетта стоит у дороги возле погибшего путника. Узнав члена Братства, она спокойно объясняет, что делает здесь.","",1,2,"babette"),
+        new Event("bounty_hunters","Наёмные головорезы","Трое вооружённых незнакомцев преграждают путь и предъявляют приказ напасть на тебя.","Наёмные головорезы",1,3,""),
+        new Event("thalmor_order","Приказ Талмора","Талморский отряд узнаёт тебя и достаёт оружие. Среди бумаг виднеется приказ об устранении.","Талморский юстициар",1,3,"thalmor_order")
     };
     String id="",destination="",outcome="",last="";
     int serial;
@@ -118,8 +147,13 @@ final class RoadEvents {
             case "dragon":return dragons;
             case "cult":return g.canonicalStage>=9;
             case "night":return night;
-            case "wedding":return g.progress.questOutcome("db_wedding")==null;
-            case "afterwedding":return "COMPLETED".equals(g.progress.questOutcome("db_wedding"));
+            case "wedding":return g.factionStories.done(3)<7;
+            case "afterwedding":return g.factionStories.done(3)>=7;
+            case "ice":return region==3||region==7||region==6;
+            case "east":return region==2;
+            case "companions":return region!=0&&(!g.factionStories.started(0)||g.factionStories.completed(0));
+            case "babette":return night&&g.factionStories.done(3)>=2;
+            case "thalmor_order":return g.canonicalStage>12;
             default:return !"assassin".equals(e.id)||(!g.factionStories.started(3)&&g.factions.stage(3)==0);
         }
     }
@@ -152,6 +186,9 @@ final class RoadEvents {
         GameEngine.Scene s=new GameEngine.Scene("СЛУЧАЙНАЯ ВСТРЕЧА | В ДОРОГЕ",e.title,e.body+"\n\nМаршрут: "+g.progress.location+" → "+destination+".");
         if("giant".equals(id))return s.primary(action("fight"),"Помочь Соратникам","Вступить в бой с великаном").add(action("watch"),"Наблюдать за боем","Поговорить с Эйлой после схватки").add(action("leave"),"Пройти мимо","Не вмешиваться");
         if("cicero".equals(id))return s.primary(action("help"),"Убедить Ванту Лорея","Помочь Цицерону починить повозку").add(action("report"),"Доложить страже","Поддержать фермера").add(action("leave"),"Пройти мимо","Вернуться к этому позже");
+        if("headless".equals(id))return s.primary(action("leave"),"Проводить всадника взглядом","Призрак не останавливается и не отвечает");
+        if("burned_crops".equals(id))return s.primary(action("donate"),"Пожертвовать 10 септимов","Помочь лишившимся дома").add(action("talk"),"Расспросить о нападении","").add(action("leave"),"Продолжить путь","");
+        if("bard".equals(id))return s.primary(action("song"),"Попросить исполнить песню","Послушать барда").add(action("talk"),"Поговорить","").add(action("leave"),"Продолжить путь","");
         if("escort".equals(e.rule))return s.primary(action("leave"),"Пропустить конвой","Не вмешиваться").add(action("talk"),"Расспросить о пленнике","Узнать причину задержания").add(action("free"),"Освободить пленника","Вступить в бой с охраной");
         if("civil".equals(e.rule))return s.primary(action("leave"),"Обойти сражение","Не вмешиваться").add(action("empire"),"Помочь имперцам","Сразиться с Братьями Бури").add(action("storm"),"Помочь Братьям Бури","Сразиться с имперцами");
         if("fugitive".equals(e.rule))return s.primary(action("return"),"Вернуть вещь охотнику","Рассказать о беглеце").add(action("keep"),"Оставить вещь себе","Скрыть беглеца").add(action("leave"),"Не вмешиваться","");
@@ -190,13 +227,16 @@ final class RoadEvents {
             finish(g,"Стражник задерживает Цицерона. Лорей платит 50 септимов. Шут запомнил твой выбор.");return;
         }
         switch(verb){
+            case "donate":if(g.gold>=10){g.gold-=10;g.reputation++;finish(g,"Ты отдаёшь фермерам 10 септимов. Они благодарят тебя.");}else finish(g,"У тебя недостаточно септимов, но ты указываешь путь к ближайшему поселению.");return;
+            case "song":g.stamina=Math.min(g.maxStamina,g.stamina+5);finish(g,"Талсгар исполняет песню о северных героях. Короткий привал возвращает немного сил.");return;
             case "fight":fight(g,e.enemy);return;
             case "free":fight(g,e.enemy);return;
             case "empire":fight(g,"Братья Бури");return;
             case "storm":fight(g,"Имперские солдаты");return;
             case "pay":if(g.gold<25){fight(g,e.enemy);return;}g.gold-=25;finish(g,"Ты отдаёшь 25 септимов и получаешь возможность пройти.");return;
             case "talk":
-                if("escort".equals(e.rule)){finish(g,"Охрана сообщает, что пленник задержан по приказу начальства. Конвой продолжает путь.");return;}
+                if("escort".equals(e.rule)){finish(g,"thalmor_prisoner".equals(id)?"Юстициар говорит, что пленника обвиняют в поклонении Талосу, и требует не вмешиваться.":"Охрана сообщает, что пленник задержан по приказу начальства. Конвой продолжает путь.");return;}
+                if("thief".equals(id)&&(g.factions.stage(2)>0||g.factionStories.done(2)>=2)){finish(g,"Вор узнаёт своего товарища по Гильдии воров и пропускает тебя.");return;}
                 if(!e.enemy.isEmpty()&&!"assassin_other".equals(id)){
                     if(g.rollCheck(g.progress.chance(g,2,12,25))){g.progress.skillExperience(g,12,15);finish(g,"Твои доводы убеждают собеседника. Удаётся избежать столкновения.");}
                     else fight(g,e.enemy);return;
@@ -216,7 +256,8 @@ final class RoadEvents {
         if(outcome.startsWith("Встреча: ")&&"WILD".equals(g.battleKind)&&"RESULT".equals(g.mode)&&g.enemyHp==0){
             outcome=g.message;
             if("giant".equals(previous)){fact(g,"road_aela","Эйла Охотница","HELPED");outcome+="\nЭйла приглашает тебя в Йоррваскр, к Кодлаку Белой Гриве.";}
-            else if("escort".equals(find(previous).rule))outcome+="\nПленник освобождён.";
+            else if("escort".equals(find(previous).rule)){outcome+="\nПленник освобождён.";g.reputation++;}
+            else if("assassin".equals(previous))outcome+="\nСреди вещей нападавшего обнаружен приказ Тёмного Братства устранить тебя.";
         }else if(outcome.startsWith("Встреча: "))outcome=g.message;
         destination="";id="";last=previous;resuming=true;
         boolean canonical=canonicalResume;canonicalResume=false;

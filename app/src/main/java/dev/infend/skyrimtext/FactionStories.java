@@ -123,7 +123,8 @@ final class FactionStories {
     private int skillForReward(Chapter c,int f){return approach[f]==2?12:c.skill;}
     boolean advance(GameEngine g,int f){
         if(!block(g,f).isEmpty())return false;g.lastCheckChance=g.lastCheckRoll=-1;Chapter c=chapter(f);
-        if(phase[f]==0){phase[f]=1;g.progress.setQuestOutcome("faction_story_"+f,"ACTIVE");g.message=c.story;return true;}
+        if(phase[f]==0){phase[f]=1;g.progress.setQuestOutcome("faction_story_"+f,"ACTIVE");g.message=c.story;
+            if(f==3&&index[f]==2){String prior=g.progress.questOutcome("road_cicero");if("COMPLETED".equals(prior))g.message+="\nЦицерон узнаёт тебя и вспоминает помощь у фермы Лорея.";else if("FAILED".equals(prior))g.message+="\nЦицерон узнаёт тебя и с неприязнью вспоминает, как ты сообщил о нём страже.";}return true;}
         if(phase[f]==2){if(f==3&&index[f]==8&&cicero==0)decide(g,f,0);if(f==0&&index[f]==2&&beast==0)beast=1;if(f==0&&index[f]==5&&hasDecision(f))decide(g,f,0);index[f]++;phase[f]=0;attemptDay[f]=-1;preparation[f]=0;int used=skillForReward(c,f);approach[f]=0;g.progress.skillExperience(g,used,35);g.addXp(30+index[f]*5);g.gold=(int)Math.min(Integer.MAX_VALUE,(long)g.gold+25+index[f]*5);g.progress.sync(g);g.message="Завершено: "+c.title;if(completed(f))g.progress.setQuestOutcome("faction_story_"+f,"COMPLETED");g.recordVisualEvent(g.message);return true;}
         int chance=chance(g,f);g.stamina-=cost(f);attemptDay[f]=g.day;
         if(!c.enemy.isEmpty()){g.beginFactionBattle(f,c.enemy,45+g.level*10+index[f]*7-(approach[f]==1?15:0),6+g.level*2,c.story);return true;}
