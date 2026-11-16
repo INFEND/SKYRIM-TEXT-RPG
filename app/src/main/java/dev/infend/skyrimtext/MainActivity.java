@@ -123,6 +123,7 @@ public final class MainActivity extends Activity {
         SovngardeTypeface.preload(this);
         game=GameEngine.fromJson(prefs.getString("save",null));
         if(bundle!=null){
+            itachiReplaceTarget=bundle.getString("itachi_replace_target","");
             draftName=bundle.getString("hero_name","");
             selectedRace=bundle.getString("hero_race","Норд");
             selectedClass=bundle.getString("hero_class","Без класса");
@@ -164,7 +165,7 @@ public final class MainActivity extends Activity {
         state.putString("hero_name",draftName);state.putString("hero_race",selectedRace);
         state.putString("hero_class",selectedClass);state.putString("hero_gender",selectedGender);
         state.putInt("hero_portrait",selectedPortrait);state.putInt("hero_start",selectedStart);
-        state.putIntArray("hero_points",initialPoints.clone());
+        state.putIntArray("hero_points",initialPoints.clone());state.putString("itachi_replace_target",itachiReplaceTarget);
         super.onSaveInstanceState(state);
     }
     @Override protected void onPause(){ResourceStore.UI.removeCallbacks(resourceRefreshTick);if(updater!=null)updater.onHostPause();save();super.onPause();}
@@ -190,6 +191,13 @@ public final class MainActivity extends Activity {
     }
     @Override protected void onActivityResult(int requestCode,int resultCode,Intent data){
         super.onActivityResult(requestCode,resultCode,data);
+        if(requestCode==REQUEST_ITACHI_REPLACE_ART){
+            String target=itachiReplaceTarget;itachiReplaceTarget="";
+            if(resultCode==RESULT_OK&&data!=null&&data.getData()!=null&&!target.isEmpty()){
+                final android.net.Uri uri=data.getData();
+                new Thread(()->{try{java.io.File changed=LocalCharacterGallery.replace(this,target,uri);runOnUiThread(()->{if(isFinishing()||isDestroyed())return;toast("Изображение заменено");render();itachiLocalGallery(itachiArtIndex(changed));});}catch(Exception e){runOnUiThread(()->{if(!isFinishing()&&!isDestroyed()){toast("Не удалось заменить: "+e.getMessage());itachiLocalGallery(0);}});}},"itachi-replace").start();
+            }return;
+        }
         if(requestCode==REQUEST_ITACHI_LOCAL_ART){
             if(resultCode==RESULT_OK&&data!=null){
                 java.util.ArrayList<android.net.Uri> uris=new java.util.ArrayList<>();
@@ -432,6 +440,8 @@ public final class MainActivity extends Activity {
     }
     private View npcPortrait(String name){
         if(ItachiProfile.matches(name)){
+            java.io.File chosen=LocalCharacterGallery.selected(this);
+            if(chosen!=null){try{android.widget.ImageView portrait=new android.widget.ImageView(this);portrait.setImageBitmap(LocalCharacterGallery.photo(chosen));portrait.setAdjustViewBounds(true);portrait.setScaleType(android.widget.ImageView.ScaleType.FIT_CENTER);portrait.setContentDescription("Итачи");portrait.setOnClickListener(v->itachiLocalGallery(itachiArtIndex(chosen)));return portrait;}catch(java.io.IOException ignored){}}
             try(java.io.InputStream in=ResourceStore.open(this,"media/itachi/portrait.webp")){
                 android.graphics.Bitmap bitmap=android.graphics.BitmapFactory.decodeStream(in);
                 if(bitmap!=null){android.widget.ImageView image=new android.widget.ImageView(this);image.setImageBitmap(bitmap);image.setAdjustViewBounds(true);image.setScaleType(android.widget.ImageView.ScaleType.FIT_CENTER);image.setContentDescription("Итачи");return image;}
@@ -505,7 +515,10 @@ public final class MainActivity extends Activity {
         addText(panel,npcStatusLabel(game.sceneState.npcStatusByName(name)),15,TEXT,true,8);
         new RuneDialogBuilder(this,accent()).setTitle(name).setView(panel).setNegativeButton("Закрыть",null).show();
     }
-    private static final int REQUEST_ITACHI_LOCAL_ART=7431;
+    private static final int REQUEST_ITACHI_LOCAL_ART=7431, REQUEST_ITACHI_REPLACE_ART=7432;
+    private String itachiReplaceTarget="";
+    private int itachiArtIndex(java.io.File file){java.io.File[] all=LocalCharacterGallery.files(this);for(int i=0;i<all.length;i++)if(all[i].equals(file))return i;return 0;}
+    private void chooseItachiReplacement(java.io.File file){itachiReplaceTarget=file.getName();Intent picker=new Intent(Intent.ACTION_OPEN_DOCUMENT);picker.addCategory(Intent.CATEGORY_OPENABLE);picker.setType("image/*");try{startActivityForResult(picker,REQUEST_ITACHI_REPLACE_ART);}catch(Exception e){itachiReplaceTarget="";toast("Не удалось открыть выбор файла");}}
     private void chooseItachiLocalArt(){Intent picker=new Intent(Intent.ACTION_OPEN_DOCUMENT);picker.addCategory(Intent.CATEGORY_OPENABLE);picker.setType("image/*");picker.putExtra(Intent.EXTRA_ALLOW_MULTIPLE,true);try{startActivityForResult(picker,REQUEST_ITACHI_LOCAL_ART);}catch(Exception e){toast("Не удалось открыть выбор файлов");}}
     private void itachiLocalGallery(int requested){
         java.io.File[] files=LocalCharacterGallery.files(this);LinearLayout panel=column();panel.setPadding(dp(12),dp(8),dp(12),dp(8));
@@ -514,9 +527,12 @@ public final class MainActivity extends Activity {
         try{android.widget.ImageView image=new android.widget.ImageView(this);image.setImageBitmap(LocalCharacterGallery.photo(files[index]));image.setAdjustViewBounds(true);image.setScaleType(android.widget.ImageView.ScaleType.FIT_CENTER);panel.addView(image,lp(-1,380));}catch(java.io.IOException e){addText(panel,"Не удалось открыть изображение",14,MUTED,false,8);}
         TextView count=text((index+1)+" / "+files.length,14,accent(),true);count.setGravity(Gravity.CENTER);panel.addView(count,lp(-1,34));
         TextView add=text("Добавить изображения",14,accent(),true);add.setPadding(dp(12),dp(12),dp(12),dp(12));panel.addView(add,lp(-1,-2));
+        TextView replace=text("Заменить это изображение",14,accent(),true);replace.setPadding(dp(12),dp(12),dp(12),dp(12));panel.addView(replace,lp(-1,-2));
+        boolean isPrimary=files[index].equals(LocalCharacterGallery.selected(this));
+        TextView primary=text(isPrimary?"Вернуть стандартный портрет":"Сделать основным портретом",14,accent(),true);primary.setPadding(dp(12),dp(12),dp(12),dp(12));panel.addView(primary,lp(-1,-2));
         TextView remove=text("Удалить из личной галереи",14,MUTED,false);remove.setPadding(dp(12),dp(12),dp(12),dp(12));panel.addView(remove,lp(-1,-2));
         AlertDialog dialog=new RuneDialogBuilder(this,accent()).setTitle("Итачи | Личная галерея").setView(panel).setNegativeButton("Закрыть",null).setNeutralButton("Назад",(d,w)->itachiLocalGallery(index-1)).setPositiveButton("Вперёд",(d,w)->itachiLocalGallery(index+1)).create();
-        add.setOnClickListener(v->{dialog.dismiss();chooseItachiLocalArt();});remove.setOnClickListener(v->new RuneDialogBuilder(this,accent()).setTitle("Удалить изображение?").setMessage("Исходный файл на телефоне останется без изменений.").setPositiveButton("Удалить",(d,w)->{if(LocalCharacterGallery.remove(this,files[index])){dialog.dismiss();itachiLocalGallery(index);}else toast("Не удалось удалить");}).setNegativeButton("Отмена",null).show());dialog.show();
+        add.setOnClickListener(v->{dialog.dismiss();chooseItachiLocalArt();});replace.setOnClickListener(v->{dialog.dismiss();chooseItachiReplacement(files[index]);});primary.setOnClickListener(v->{if(LocalCharacterGallery.select(this,isPrimary?null:files[index])){dialog.dismiss();render();itachiLocalGallery(index);}else toast("Не удалось изменить портрет");});remove.setOnClickListener(v->new RuneDialogBuilder(this,accent()).setTitle("Удалить изображение?").setMessage("Исходный файл на телефоне останется без изменений.").setPositiveButton("Удалить",(d,w)->{if(LocalCharacterGallery.remove(this,files[index])){dialog.dismiss();itachiLocalGallery(index);}else toast("Не удалось удалить");}).setNegativeButton("Отмена",null).show());dialog.show();
     }
     private static final int REQUEST_LIVIA_PORTRAIT=7227;
     private void chooseLiviaPortrait(){Intent picker=new Intent(Intent.ACTION_OPEN_DOCUMENT);picker.addCategory(Intent.CATEGORY_OPENABLE);picker.setType("image/webp");try{startActivityForResult(picker,REQUEST_LIVIA_PORTRAIT);}catch(Exception e){toast("Не удалось открыть выбор файла");}}
@@ -4301,6 +4317,7 @@ public final class MainActivity extends Activity {
         TextView kathProfile=text("Начальное состояние Кэтрин | "+game.katherine.companion.profileName(),14,accent(),true);kathProfile.setPadding(dp(10),dp(12),dp(10),dp(12));expansion.addView(kathProfile,lp(-1,-2));kathProfile.setOnClickListener(v->{if(livingBusy()||game.katherine.stage>0){toast("Начальное состояние доступно до первой встречи с Кэтрин");return;}game.katherine.companion.profile=(game.katherine.companion.profile+1)%3;prefs.edit().putInt("katherine_profile",game.katherine.companion.profile).apply();save();render();});
         addText(expansion,"Влияет на стартовую магию спутницы, а не на создание героя.",11,MUTED,false,6);
         Switch itachiToggle=new Switch(this);itachiToggle.setText("Итачи | Алая Ворона");itachiToggle.setTextColor(TEXT);itachiToggle.setThumbTintList(ColorStateList.valueOf(accent()));itachiToggle.setChecked(game.itachi.enabled);itachiToggle.setOnCheckedChangeListener((v,on)->{if(livingBusy()||!game.itachi.setEnabled(game,on)){v.setChecked(game.itachi.enabled);return;}prefs.edit().putBoolean("itachi_enabled",on).apply();save();});expansion.addView(itachiToggle,lp(-1,47));addText(expansion,"Итачи: авторская история, спутница, духовные техники и отношения.",12,MUTED,false,8);
+        TextView itachiArt=text("Управление фотографиями Итачи",14,accent(),true);itachiArt.setPadding(dp(10),dp(12),dp(10),dp(12));itachiArt.setOnClickListener(v->itachiLocalGallery(0));expansion.addView(itachiArt,lp(-1,-2));
         Switch liviaToggle=new Switch(this);liviaToggle.setText("Ливия | Пепел Хелгена");liviaToggle.setTextColor(TEXT);liviaToggle.setThumbTintList(ColorStateList.valueOf(accent()));liviaToggle.setChecked(game.livia.enabled);liviaToggle.setOnCheckedChangeListener((v,on)->{if(livingBusy()||!game.livia.setEnabled(game,on)){v.setChecked(game.livia.enabled);return;}prefs.edit().putBoolean("livia_enabled",on).apply();save();});expansion.addView(liviaToggle,lp(-1,47));addText(expansion,"Ливия: авторское выживание после Хелгена, месть, прощение, искупление и отношения.",12,MUTED,false,8);
         actionButton("Портрет Ливии","Импорт оригинального WebP без генерации",false,this::liviaPortrait);
         Switch almaToggle=new Switch(this);almaToggle.setText("Альма | Алая Бессмертная");almaToggle.setTextColor(TEXT);almaToggle.setThumbTintList(ColorStateList.valueOf(accent()));almaToggle.setChecked(game.alma.enabled);
