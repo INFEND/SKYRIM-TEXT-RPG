@@ -2,6 +2,10 @@ package dev.infend.skyrimtext;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Dialog;
+import android.graphics.drawable.ColorDrawable;
+import android.view.Window;
+import android.view.WindowManager;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
@@ -21,20 +25,22 @@ final class ResourceManagerDialog {
     private final LinkedHashMap<String,Category> categories=new LinkedHashMap<>();
     private final Map<String,ResourceStore.State> verified=new HashMap<>();
     private final AtomicBoolean stop=new AtomicBoolean();
-    private AlertDialog dialog;
-    private LinearLayout root, list, controls;
+    private Dialog dialog;
+    private LinearLayout root, list, controls, settings;
     private TextView summary,status;
     private Button allButton, stopButton;
+    private ImageButton closeButton;
+    private boolean lastAllReady;
     private boolean busy;
     private String activePath="", operation="";
     private static final int MUTED=0xffaaaaaa;
     private static final String[] KEYS={"gallery","portraits","map","icons","font","media"};
     private static final String[] LABELS={"Галереи локаций","Портреты персонажей","Карты мира","Расширенные иконки","Дополнительные шрифты","Дополнительные ресурсы"};
-    private static final int[] ICONS={android.R.drawable.ic_menu_gallery,android.R.drawable.ic_menu_myplaces,android.R.drawable.ic_menu_mapmode,android.R.drawable.ic_menu_sort_by_size,android.R.drawable.ic_menu_edit,android.R.drawable.ic_menu_add};
     private static final class Category {
-        final String key,label;final int icon;final List<String> packages=new ArrayList<>();
-        TextView amount;ProgressBar progress;ImageButton action;View body;
-        Category(String k,String l,int i){key=k;label=l;icon=i;}
+        final String key,label;final List<String> packages=new ArrayList<>();
+        TextView amount, percent;ResourceMeter progress;ImageButton action;View body;
+        String actionIcon="";
+        Category(String k,String l){key=k;label=l;}
     }
     private static final class Count {long done,total;boolean ready=true;}
     ResourceManagerDialog(Activity a,int color,Runnable refresh){this(a,color,refresh,"");}
@@ -51,14 +57,26 @@ final class ResourceManagerDialog {
     }
     private Button button(String label,boolean filled,Runnable click){
         Button v=new Button(activity);v.setText(label);v.setTextSize(14);v.setAllCaps(false);
-        v.setTextColor(filled?Color.BLACK:accent);v.setTypeface(SovngardeTypeface.face(activity,false));
-        v.setBackground(shape(filled?accent:0xff000000,0,16));v.setOnClickListener(w->click.run());return v;
+        v.setTextColor(filled?onAccent():0xffeeeeee);v.setTypeface(SovngardeTypeface.face(activity,false));
+        v.setMinHeight(0);v.setMinimumHeight(0);v.setMinWidth(0);v.setMinimumWidth(0);
+        v.setPadding(dp(5),0,dp(5),0);v.setBackgroundTintList(null);
+        v.setBackground(shape(filled?accent:0xff151515,0,14));v.setOnClickListener(w->click.run());return v;
     }
-    private ProgressBar progress(){
-        ProgressBar p=new ProgressBar(activity,null,android.R.attr.progressBarStyleHorizontal);
-        p.setMax(1000);p.setProgressTintList(ColorStateList.valueOf(accent));
-        p.setProgressBackgroundTintList(ColorStateList.valueOf(0xff292929));
-        p.setIndeterminateTintList(ColorStateList.valueOf(accent));return p;
+    private int onAccent(){return Color.luminance(accent)>.42?Color.BLACK:Color.WHITE;}
+    private int accentSurface(){return android.graphics.Color.rgb(
+        16+Color.red(accent)/12,16+Color.green(accent)/12,16+Color.blue(accent)/12);}
+    private ImageButton iconButton(String key,int color,int background){
+        ImageButton b=new ImageButton(activity);
+        b.setBackgroundTintList(null);b.setBackground(shape(background,0,14));
+        b.setImageDrawable(new ResourceGlyph(key,color));b.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
+        b.setPadding(dp(10),dp(10),dp(10),dp(10));return b;
+    }
+    private void addTool(LinearLayout line,String label,Runnable action){
+        LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(0,dp(42),1);
+        if(line.getChildCount()>0)p.leftMargin=dp(7);line.addView(button(label,false,action),p);
+    }
+    private void showStatus(String value){
+        status.setText(value);status.setVisibility(value.isEmpty()||"Готово".equals(value)?View.GONE:View.VISIBLE);
     }
     private void divider(LinearLayout p){
         View line=new View(activity);line.setBackgroundColor(0xff202020);
@@ -66,48 +84,69 @@ final class ResourceManagerDialog {
     }
     private void addSwitch(String label,boolean checked,android.widget.CompoundButton.OnCheckedChangeListener change){
         Switch s=new Switch(activity);s.setText(label);s.setTextColor(Color.WHITE);s.setTextSize(13);
-        s.setTypeface(SovngardeTypeface.face(activity,false));s.setChecked(checked);s.setOnCheckedChangeListener(change);controls.addView(s);
+        s.setTypeface(SovngardeTypeface.face(activity,false));
+        int[][] states={{android.R.attr.state_checked},{}};
+        s.setThumbTintList(new ColorStateList(states,new int[]{accent,0xff888888}));
+        s.setTrackTintList(new ColorStateList(states,new int[]{accentSurface(),0xff292929}));
+        s.setMinHeight(dp(42));s.setChecked(checked);s.setOnCheckedChangeListener(change);settings.addView(s);
     }
     void show(){
-        root=column();root.setPadding(dp(14),dp(8),dp(14),dp(8));root.setBackgroundColor(Color.BLACK);
-        summary=text("Проверка каталога…",13,MUTED);root.addView(summary);
-        ScrollView scroll=new ScrollView(activity);LinearLayout scrolling=column();scroll.addView(scrolling);
-        int maxHeight=Math.min(dp(590),Math.round(activity.getResources().getDisplayMetrics().heightPixels*.65f));
-        root.addView(scroll,new LinearLayout.LayoutParams(-1,maxHeight));
+        root=column();root.setPadding(dp(16),dp(13),dp(16),dp(14));
+        root.setBackground(shape(Color.BLACK,0,24));root.setClipToOutline(true);
+        LinearLayout header=new LinearLayout(activity);header.setGravity(Gravity.CENTER_VERTICAL);
+        TextView title=text("Управление ресурсами",20,Color.WHITE);
+        title.setTypeface(SovngardeTypeface.face(activity,true));
+        header.addView(title,new LinearLayout.LayoutParams(0,-2,1));
+        closeButton=iconButton("close",0xffc4c4c4,0xff161616);closeButton.setContentDescription("Закрыть");
+        closeButton.setOnClickListener(v->{if(!busy)dialog.dismiss();});
+        header.addView(closeButton,new LinearLayout.LayoutParams(dp(42),dp(42)));root.addView(header);
+        summary=text("Проверка каталога…",13,MUTED);summary.setPadding(dp(2),dp(3),0,dp(8));root.addView(summary);
+        ScrollView scroll=new ScrollView(activity);scroll.setFillViewport(false);scroll.setVerticalScrollBarEnabled(false);
+        LinearLayout scrolling=column();scroll.addView(scrolling);
+        root.addView(scroll,new LinearLayout.LayoutParams(-1,0,1));
         list=column();scrolling.addView(list);
-        controls=column();scrolling.addView(controls);
-        divider(controls);
-        allButton=button("Скачать все ресурсы",true,()->run("download",new LinkedHashSet<>(groups.keySet())));
-        controls.addView(allButton,new LinearLayout.LayoutParams(-1,dp(52)));
-        LinearLayout tools=new LinearLayout(activity);
-        tools.addView(button("Проверить",false,()->run("check",new LinkedHashSet<>(groups.keySet()))),new LinearLayout.LayoutParams(0,dp(48),1));
-        tools.addView(button("Перекачать",false,()->choose("force",new LinkedHashSet<>(groups.keySet()))),new LinearLayout.LayoutParams(0,dp(48),1));
-        tools.addView(button("Удалить",false,()->choose("delete",new LinkedHashSet<>(groups.keySet()))),new LinearLayout.LayoutParams(0,dp(48),1));
-        controls.addView(tools);divider(controls);
+        settings=column();scrolling.addView(settings);
+        divider(settings);
+        TextView section=text("Настройки загрузки",14,0xffd0d0d0);settings.addView(section);
         addSwitch("Загрузка только через Wi-Fi",ResourceStore.wifiOnly(activity),(v,on)->ResourceStore.wifiOnly(activity,on));
         addSwitch("Докачивать фото при посещении локации",ResourceStore.autoGallery(activity),(v,on)->ResourceStore.autoGallery(activity,on));
         addSwitch("Автообновлять установленные ресурсы",ResourceStore.autoUpdate(activity),(v,on)->ResourceStore.autoUpdate(activity,on));
-        status=text("",12,MUTED);root.addView(status);
-        stopButton=button("Остановить / продолжить позже",false,()->{stop.set(true);status.setText("Останавливаю операцию…");});
-        stopButton.setVisibility(View.GONE);root.addView(stopButton,new LinearLayout.LayoutParams(-1,dp(46)));
-        dialog=new RuneDialogBuilder(activity,accent).setTitle("УПРАВЛЕНИЕ РЕСУРСАМИ").setView(root).setNegativeButton("Закрыть",null).create();
+        controls=column();root.addView(controls);divider(controls);
+        allButton=button("Скачать все ресурсы",true,()->run("download",new LinkedHashSet<>(groups.keySet())));
+        controls.addView(allButton,new LinearLayout.LayoutParams(-1,dp(48)));
+        LinearLayout tools=new LinearLayout(activity);
+        addTool(tools,"Проверить",()->run("check",new LinkedHashSet<>(groups.keySet())));
+        addTool(tools,"Перекачать",()->choose("force",new LinkedHashSet<>(groups.keySet())));
+        addTool(tools,"Удалить",()->choose("delete",new LinkedHashSet<>(groups.keySet())));
+        LinearLayout.LayoutParams tp=new LinearLayout.LayoutParams(-1,dp(42));tp.topMargin=dp(8);controls.addView(tools,tp);
+        status=text("",12,MUTED);status.setPadding(0,dp(6),0,0);root.addView(status);status.setVisibility(View.GONE);
+        stopButton=button("Остановить / продолжить позже",false,()->{stop.set(true);showStatus("Останавливаю операцию…");});
+        stopButton.setVisibility(View.GONE);root.addView(stopButton,new LinearLayout.LayoutParams(-1,dp(44)));
+        dialog=new Dialog(activity);dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);dialog.setContentView(root);
         dialog.setOnDismissListener(d->{stop.set(true);ResourceStore.UI.removeCallbacks(tick);if(!activity.isFinishing()&&!activity.isDestroyed())refreshed.run();});
+        Window window=dialog.getWindow();
+        if(window!=null){window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));window.addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);window.setDimAmount(.74f);}
         dialog.show();
+        if(window!=null){
+            android.util.DisplayMetrics metrics=activity.getResources().getDisplayMetrics();
+            window.setLayout(Math.min(dp(480),metrics.widthPixels-dp(24)),Math.min(dp(820),Math.round(metrics.heightPixels*.90f)));
+        }
+        SovngardeTypeface.watchDialog(dialog);
         try{for(ResourceStore.Entry e:ResourceStore.entries(activity))groups.computeIfAbsent(e.group,k->new ArrayList<>()).add(e);}
-        catch(Exception e){status.setText("Каталог ресурсов отсутствует: "+e.getMessage());}
+        catch(Exception e){showStatus("Каталог ресурсов отсутствует: "+e.getMessage());}
         for(int i=0;i<KEYS.length;i++){
-            Category c=new Category(KEYS[i],LABELS[i],ICONS[i]);
+            Category c=new Category(KEYS[i],LABELS[i]);
             for(String g:groups.keySet())if(g.startsWith(c.key+":"))c.packages.add(g);
             if(!c.packages.isEmpty())categories.put(c.key,c);
         }
-        Category other=new Category("other","Прочие ресурсы",android.R.drawable.ic_menu_add);
+        Category other=new Category("other","Прочие ресурсы");
         for(String g:groups.keySet()){
             boolean found=false;for(Category c:categories.values())if(c.packages.contains(g)){found=true;break;}
             if(!found)other.packages.add(g);
         }
         if(!other.packages.isEmpty())categories.put(other.key,other);
-        categories.put("engine",new Category("engine","Движок локального ИИ",android.R.drawable.ic_menu_manage));
-        categories.put("gguf",new Category("gguf","Локальные модели GGUF",android.R.drawable.ic_menu_save));
+        categories.put("engine",new Category("engine","Движок локального ИИ"));
+        categories.put("gguf",new Category("gguf","Локальные модели GGUF"));
         for(Category c:categories.values())addRow(c);
         updateRows();ResourceStore.UI.post(tick);
         if(!groups.isEmpty())run("check",new LinkedHashSet<>(groups.keySet()));
@@ -119,26 +158,28 @@ final class ResourceManagerDialog {
     }
     private void addRow(Category c){
         LinearLayout row=new LinearLayout(activity);row.setGravity(Gravity.CENTER_VERTICAL);
-        row.setPadding(0,dp(9),0,dp(9));c.body=row;
-        ImageView icon=new ImageView(activity);icon.setImageResource(c.icon);icon.setColorFilter(accent);
-        LinearLayout.LayoutParams ip=new LinearLayout.LayoutParams(dp(24),dp(24));ip.rightMargin=dp(12);row.addView(icon,ip);
+        row.setPadding(dp(9),dp(9),dp(9),dp(9));row.setBackground(shape(0xff101010,0,16));c.body=row;
+        ImageView icon=new ImageView(activity);icon.setImageDrawable(new ResourceGlyph(c.key,accent));
+        LinearLayout.LayoutParams ip=new LinearLayout.LayoutParams(dp(24),dp(24));ip.rightMargin=dp(10);row.addView(icon,ip);
         LinearLayout body=column();body.setGravity(Gravity.CENTER_VERTICAL);
-        TextView title=text(c.label,16,Color.WHITE);body.addView(title);
-        c.amount=text("",13,MUTED);LinearLayout.LayoutParams ap=new LinearLayout.LayoutParams(-1,-2);ap.topMargin=dp(4);body.addView(c.amount,ap);
-        c.progress=progress();LinearLayout.LayoutParams pp=new LinearLayout.LayoutParams(-1,dp(5));pp.topMargin=dp(7);body.addView(c.progress,pp);
-        LinearLayout.LayoutParams bp=new LinearLayout.LayoutParams(0,-2,1);bp.rightMargin=dp(12);row.addView(body,bp);
-        c.action=new ImageButton(activity);c.action.setImageResource(android.R.drawable.stat_sys_download);
-        c.action.setColorFilter(accent);c.action.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
-        c.action.setPadding(dp(12),dp(12),dp(12),dp(12));c.action.setBackground(shape(Color.BLACK,0xff655b49,22));
-        c.action.setContentDescription("Скачать: "+c.label);row.addView(c.action,new LinearLayout.LayoutParams(dp(44),dp(52)));
+        TextView title=text(c.label,15,Color.WHITE);body.addView(title);
+        LinearLayout info=new LinearLayout(activity);info.setGravity(Gravity.CENTER_VERTICAL);
+        c.amount=text("",12,MUTED);info.addView(c.amount,new LinearLayout.LayoutParams(0,-2,1));
+        c.percent=text("",11,accent);c.percent.setGravity(Gravity.END);info.addView(c.percent,new LinearLayout.LayoutParams(-2,-2));
+        LinearLayout.LayoutParams ap=new LinearLayout.LayoutParams(-1,-2);ap.topMargin=dp(3);body.addView(info,ap);
+        c.progress=new ResourceMeter(activity,accent);LinearLayout.LayoutParams pp=new LinearLayout.LayoutParams(-1,dp(4));pp.topMargin=dp(6);body.addView(c.progress,pp);
+        LinearLayout.LayoutParams bp=new LinearLayout.LayoutParams(0,-2,1);bp.rightMargin=dp(10);row.addView(body,bp);
+        c.action=iconButton("download",accent,accentSurface());c.action.setContentDescription("Скачать: "+c.label);
+        row.addView(c.action,new LinearLayout.LayoutParams(dp(42),dp(42)));
         c.action.setOnClickListener(v->categoryAction(c));
         body.setOnClickListener(v->{if(!busy){if(c.packages.isEmpty())categoryAction(c);else details(c);}});
-        list.addView(row,new LinearLayout.LayoutParams(-1,-2));
+        LinearLayout.LayoutParams rp=new LinearLayout.LayoutParams(-1,-2);rp.bottomMargin=dp(6);list.addView(row,rp);
     }
     private void categoryAction(Category c){
         if(busy)return;
         if("engine".equals(c.key))LocalAiEngineModule.show(activity,accent,()->{updateRows();refreshed.run();});
         else if("gguf".equals(c.key)){if(activity instanceof MainActivity)((MainActivity)activity).selectLocalModel();}
+        else if(count(c.packages).ready)details(c);
         else run("download",new LinkedHashSet<>(c.packages));
     }
     private String number(long n,long unit){
@@ -167,13 +208,18 @@ final class ResourceManagerDialog {
         return count;
     }
     private void setRow(Category c,long done,long total,boolean ready,boolean active,String suffix){
-        c.amount.setText(sizePair(done,total)+(suffix.isEmpty()?"":"  ·  "+suffix));
-        boolean unknown=total<=0&&active;
-        if(c.progress.isIndeterminate()!=unknown)c.progress.setIndeterminate(unknown);
-        if(!unknown)c.progress.setProgress(total>0?(int)Math.min(1000,done*1000.0/total):0,true);
-        c.action.setImageResource(ready?android.R.drawable.checkbox_on_background:android.R.drawable.stat_sys_download);
-        c.action.setEnabled(!busy&&!active&&(!ready||c.packages.isEmpty()));
-        c.action.setAlpha(c.action.isEnabled()||ready?1f:.45f);
+        c.amount.setText(total<=0&&!active?("engine".equals(c.key)?"Размер неизвестен":"По выбору"):sizePair(done,total));
+        c.amount.setContentDescription(sizePair(done,total)+(suffix.isEmpty()?"":" · "+suffix));
+        int percent=total>0?(int)Math.min(100,done*100.0/total):0;
+        c.percent.setText(total>0?percent+"%":active?"…":"");
+        c.progress.update(total>0?Math.min(1f,done/(float)total):0f,total<=0&&active);
+        String glyph=ready?"check":active?"clock":"download";
+        if(!glyph.equals(c.actionIcon)){
+            c.actionIcon=glyph;c.action.setImageDrawable(new ResourceGlyph(glyph,ready?0xffa9b8ac:accent));
+            c.action.setBackground(shape(ready?0xff1a211c:accentSurface(),0,14));
+        }
+        c.action.setEnabled(!busy&&!active);
+        c.action.setAlpha(c.action.isEnabled()||ready?1f:.48f);
         c.action.setContentDescription((ready?"Управление: ":"Скачать: ")+c.label);
     }
     private void updateRows(){
@@ -198,7 +244,11 @@ final class ResourceManagerDialog {
         }
         summary.setText("Ресурсы игры: "+sizePair(allDone,allTotal));
         allButton.setEnabled(!busy&&!groups.isEmpty()&&!allReady);
-        allButton.setText(allReady&&!groups.isEmpty()?"Все ресурсы загружены":"Скачать все ресурсы");
+        boolean complete=allReady&&!groups.isEmpty();
+        allButton.setText(complete?"✓  Все ресурсы загружены":"Скачать все ресурсы");
+        allButton.setTextColor(complete?0xffb9c6bb:onAccent());
+        if(lastAllReady!=complete){allButton.setBackground(shape(complete?0xff151d17:accent,0,14));lastAllReady=complete;}
+        allButton.setAlpha(busy&&!complete?.55f:1f);
     }
     private final Runnable tick=new Runnable(){@Override public void run(){
         if(dialog!=null&&dialog.isShowing()){updateRows();ResourceStore.UI.postDelayed(this,500);}
@@ -249,13 +299,14 @@ final class ResourceManagerDialog {
             if(child instanceof LinearLayout){LinearLayout line=(LinearLayout)child;for(int j=0;j<line.getChildCount();j++)line.getChildAt(j).setEnabled(!on);}
         }
         stopButton.setVisibility(on?View.VISIBLE:View.GONE);
-        dialog.setCancelable(!on);dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setEnabled(!on);updateRows();
+        for(int i=0;i<settings.getChildCount();i++)settings.getChildAt(i).setEnabled(!on);
+        dialog.setCancelable(!on);dialog.setCanceledOnTouchOutside(!on);closeButton.setEnabled(!on);closeButton.setAlpha(on?.4f:1f);updateRows();
     }
     private void run(String op,Set<String> picked){
         if(busy||picked.isEmpty())return;
         final ArrayList<ResourceStore.Entry> work=new ArrayList<>();
         for(String key:picked)work.addAll(groups.get(key));
-        operation=op;stop.set(false);setBusy(true);status.setText("Выполняется…");
+        operation=op;stop.set(false);setBusy(true);showStatus("Выполняется…");
         ResourceStore.IO.execute(()->{
             String message="Готово",last="";int errors=0,done=0;
             Map<String,ResourceStore.State> result=new HashMap<>();
@@ -272,10 +323,10 @@ final class ResourceManagerDialog {
                     result.put(e.path,ResourceStore.state(activity,e,true));
                 }catch(Exception ex){if(stop.get()){message="Остановлено. Прогресс сохранён.";break;}errors++;last=ex.getMessage();}
                 final int step=++done;final ResourceStore.State state=result.get(e.path);
-                ResourceStore.UI.post(()->{if(!dialog.isShowing())return;activePath="";if(state!=null)verified.put(e.path,state);status.setText(step+" / "+work.size()+" | "+e.label);updateRows();});
+                ResourceStore.UI.post(()->{if(!dialog.isShowing())return;activePath="";if(state!=null)verified.put(e.path,state);showStatus(step+" / "+work.size()+" | "+e.label);updateRows();});
             }
             final String report=errors==0?message:message+" | ошибок: "+errors+" | "+last;
-            ResourceStore.UI.post(()->{if(!dialog.isShowing())return;verified.putAll(result);activePath="";operation="";setBusy(false);status.setText(report);});
+            ResourceStore.UI.post(()->{if(!dialog.isShowing())return;verified.putAll(result);activePath="";operation="";setBusy(false);showStatus(report);});
         });
     }
 }
