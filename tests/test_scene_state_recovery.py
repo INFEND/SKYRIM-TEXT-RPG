@@ -11,7 +11,7 @@ class SceneStateRecoveryTest(unittest.TestCase):
         self.assertIn("if(data==null)return state", SOURCE)
 
     def test_one_bad_record_does_not_reset_all_facts(self):
-        self.assertIn("for(int i=0;i<limit && collectionSize(state,kind)<MAX_ENTRIES;i++)", SOURCE)
+        self.assertIn("for(int i=0;i<limit && collectionSize(state,kind)<limitFor(kind);i++)", SOURCE)
         self.assertIn("JSONObject entry=arr.optJSONObject(i)", SOURCE)
         self.assertIn("catch(JSONException invalid)", SOURCE)
         self.assertNotIn("return new SceneState();", SOURCE)
@@ -19,12 +19,12 @@ class SceneStateRecoveryTest(unittest.TestCase):
     def test_restore_is_bounded_and_duplicate_safe(self):
         self.assertIn("MAX_ENTRIES = 32", SOURCE)
         self.assertIn("Math.min(arr.length(),4096)", SOURCE)
-        self.assertIn("collectionSize(state,kind)<MAX_ENTRIES", SOURCE)
+        self.assertIn("collectionSize(state,kind)<limitFor(kind)", SOURCE)
         self.assertIn("private static int collectionSize", SOURCE)
         self.assertIn("if(state.contains(kind,key))continue", SOURCE)
 
     def test_malformed_first_32_slots_do_not_discard_later_valid_facts(self):
-        self.assertIn("i<limit && collectionSize(state,kind)<MAX_ENTRIES", SOURCE)
+        self.assertIn("i<limit && collectionSize(state,kind)<limitFor(kind)", SOURCE)
         self.assertIn("if(entry==null)continue", SOURCE)
         self.assertIn("if(state.contains(kind,key))continue", SOURCE)
         self.assertIn("state.confirm(kind,key", SOURCE)

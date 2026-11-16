@@ -235,6 +235,7 @@ public final class AiGameTurn {
             JSONArray facts=e.getJSONArray("sceneFacts");
             if(facts.length()>12)throw new JSONException("Слишком много фактов сцены");
             nextSceneState=SceneState.fromJson(g.sceneState.toJson());
+            nextSceneState.setContext(day,nextHour,g.progress.location);
             java.util.HashSet<String> factIds=new java.util.HashSet<>();
             for(int i=0;i<facts.length();i++){
                 JSONObject fact=facts.optJSONObject(i);

@@ -12,6 +12,12 @@ import java.util.LinkedHashMap;
  */
 public final class SceneState {
     private static final int MAX_ENTRIES = 32;
+    private static final int MAX_NPCS = 256, MAX_NPC_HISTORY = 64;
+    private int contextDay,contextHour;private String contextLocation="";
+    private static int limitFor(String kind){return "npc".equals(kind)?MAX_NPCS:MAX_ENTRIES;}
+    private static String cleanLocation(String value){if(value==null)return "";return value.length()>120?value.substring(0,120):value;}
+    public void setContext(int day,int hour,String location){contextDay=Math.max(0,day);contextHour=Math.max(0,Math.min(23,hour));contextLocation=cleanLocation(location);}
+    public void revisitNpc(String key) throws JSONException {JSONObject entry=npcs.get(id(key));if(entry!=null&&contextDay>0){entry.put("lastDay",contextDay).put("lastHour",contextHour).put("lastLocation",contextLocation);}}
     private final LinkedHashMap<String,JSONObject> npcs = new LinkedHashMap<>();
     private final LinkedHashMap<String,JSONObject> clues = new LinkedHashMap<>();
     private final LinkedHashMap<String,JSONObject> sublocations = new LinkedHashMap<>();
@@ -40,7 +46,7 @@ public final class SceneState {
         String safeId=id(key), safeTitle=label(title);
         if(!allowedStatus(kind,status))
             throw new JSONException("Недопустимое состояние факта");
-        if(!entries.containsKey(safeId) && entries.size()>=MAX_ENTRIES)
+        if(!entries.containsKey(safeId) && entries.size()>=limitFor(kind))
             throw new JSONException("Переполнен журнал сцены");
         if(entries.containsKey(safeId)) {
             String previous=entries.get(safeId).optString("status");
@@ -64,8 +70,8 @@ public final class SceneState {
             int change=previous.equals(status)?0:status.equals("HELPED")?20:status.equals("INFORMED")?10:status.equals("HOSTILE")?-40:0;
             int score=prior==null?initialRelation(status):Math.max(0,Math.min(100,old+change));
             JSONArray history=prior==null?new JSONArray():prior.optJSONArray("history");if(history==null)history=new JSONArray();
-            if(!previous.equals(status)){JSONArray bounded=new JSONArray();for(int i=Math.max(0,history.length()-15);i<history.length();i++)bounded.put(history.opt(i));bounded.put(new JSONObject().put("status",status).put("delta",prior==null?0:score-old));history=bounded;}
-            next.put("relation",score).put("history",history).put("delta",previous.equals(status)&&prior!=null?prior.optInt("delta",0):prior==null?0:score-old);
+            if(!previous.equals(status)){JSONArray bounded=new JSONArray();for(int i=Math.max(0,history.length()-(MAX_NPC_HISTORY-1));i<history.length();i++)bounded.put(history.opt(i));bounded.put(new JSONObject().put("status",status).put("delta",prior==null?0:score-old).put("day",contextDay).put("hour",contextHour).put("location",contextLocation));history=bounded;}
+            next.put("relation",score).put("history",history).put("delta",previous.equals(status)&&prior!=null?prior.optInt("delta",0):prior==null?0:score-old).put("lastDay",contextDay>0?contextDay:prior==null?0:prior.optInt("lastDay")).put("lastHour",contextDay>0?contextHour:prior==null?0:prior.optInt("lastHour")).put("lastLocation",contextLocation.isEmpty()&&prior!=null?prior.optString("lastLocation"):contextLocation);
         }
         entries.put(safeId,next);
     }
@@ -107,7 +113,8 @@ public final class SceneState {
         return entry==null ? "" : entry.optString("status");
     }
     public String npcStatusByName(String name){for(JSONObject npc:npcs.values())if(npc.optString("title").equalsIgnoreCase(name))return npc.optString("status");return "";}
-    public JSONArray npcFacts(){JSONArray result=new JSONArray();for(JSONObject npc:npcs.values())try{result.put(new JSONObject(npc.toString()));}catch(JSONException ignored){}return result;}
+    private java.util.ArrayList<JSONObject> orderedNpcs(){java.util.ArrayList<JSONObject> ordered=new java.util.ArrayList<>(npcs.values());ordered.sort((a,b)->Long.compare((long)b.optInt("lastDay")*24+b.optInt("lastHour"),(long)a.optInt("lastDay")*24+a.optInt("lastHour")));return ordered;}
+    public JSONArray npcFacts(){JSONArray result=new JSONArray();for(JSONObject npc:orderedNpcs())try{result.put(new JSONObject(npc.toString()));}catch(JSONException ignored){}return result;}
     /** Bounded, read-only context of facts confirmed by the engine. */
     public String confirmedContext() {
         StringBuilder out = new StringBuilder();
@@ -115,11 +122,12 @@ public final class SceneState {
             LinkedHashMap<String,JSONObject> entries;
             try { entries = collection(this,kind); }
             catch(JSONException impossible) { continue; }
-            for(JSONObject entry : entries.values()) {
+            int shown=0;for(JSONObject entry : ("npc".equals(kind)?orderedNpcs():entries.values())) {if("npc".equals(kind)&&shown++>=32)break;
                 if(out.length()>0)out.append('\n');
                 out.append(kind).append(" [").append(entry.optString("id")).append("]: ")
                    .append(entry.optString("title")).append(" (")
                    .append(entry.optString("status")).append(')');
+                if("npc".equals(kind)){out.append(" | отношение ").append(entry.optInt("relation",50)).append("/100");if(entry.optInt("lastDay")>0)out.append(" | день ").append(entry.optInt("lastDay")).append(" | ").append(entry.optString("lastLocation"));JSONArray events=entry.optJSONArray("history");if(events!=null&&events.length()>0){out.append(" | память: ");for(int h=Math.max(0,events.length()-3);h<events.length();h++){JSONObject event=events.optJSONObject(h);if(event!=null)out.append(event.optString("status")).append(' ');}}}
             }
         }
         return out.toString();
@@ -147,7 +155,7 @@ public final class SceneState {
             JSONArray arr=data.optJSONArray(kind);
             if(arr==null)continue;
             int limit=Math.min(arr.length(),4096);
-            for(int i=0;i<limit && collectionSize(state,kind)<MAX_ENTRIES;i++){
+            for(int i=0;i<limit && collectionSize(state,kind)<limitFor(kind);i++){
                 JSONObject entry=arr.optJSONObject(i);
                 if(entry==null)continue;
                 try {
@@ -155,8 +163,8 @@ public final class SceneState {
                     // Duplicate IDs in corrupted saves cannot overwrite the first valid fact.
                     if(state.contains(kind,key))continue;
                     state.confirm(kind,key,entry.getString("title"),entry.getString("status"));
-                    if("npc".equals(kind)){JSONObject restored=state.npcs.get(key);restored.put("relation",Math.max(0,Math.min(100,entry.optInt("relation",restored.optInt("relation",50)))));restored.put("delta",Math.max(-100,Math.min(100,entry.optInt("delta",0))));
-                        JSONArray old=entry.optJSONArray("history");if(old!=null){JSONArray safe=new JSONArray();for(int k=Math.max(0,old.length()-16);k<old.length();k++){JSONObject e=old.optJSONObject(k);if(e!=null&&allowedStatus("npc",e.optString("status")))safe.put(new JSONObject().put("status",e.optString("status")).put("delta",Math.max(-100,Math.min(100,e.optInt("delta",0)))));}restored.put("history",safe);}}
+                    if("npc".equals(kind)){JSONObject restored=state.npcs.get(key);restored.put("relation",Math.max(0,Math.min(100,entry.optInt("relation",restored.optInt("relation",50)))));restored.put("delta",Math.max(-100,Math.min(100,entry.optInt("delta",0))));restored.put("lastDay",Math.max(0,entry.optInt("lastDay"))).put("lastHour",Math.max(0,Math.min(23,entry.optInt("lastHour")))).put("lastLocation",cleanLocation(entry.optString("lastLocation")));
+                        JSONArray old=entry.optJSONArray("history");if(old!=null){JSONArray safe=new JSONArray();for(int k=Math.max(0,old.length()-MAX_NPC_HISTORY);k<old.length();k++){JSONObject e=old.optJSONObject(k);if(e!=null&&allowedStatus("npc",e.optString("status")))safe.put(new JSONObject().put("status",e.optString("status")).put("delta",Math.max(-100,Math.min(100,e.optInt("delta",0)))).put("day",Math.max(0,e.optInt("day"))).put("hour",Math.max(0,Math.min(23,e.optInt("hour")))).put("location",cleanLocation(e.optString("location"))));}restored.put("history",safe);}}
 
                 }catch(JSONException invalid){
                     // Skip only this invalid optional record; preserve the character.

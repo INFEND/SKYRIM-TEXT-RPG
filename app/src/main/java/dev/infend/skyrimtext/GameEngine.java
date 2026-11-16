@@ -324,7 +324,7 @@ public final class GameEngine {
 
     /** Record only facts produced by successful, engine-authorized actions. */
     private void confirmSceneFact(String kind, String key, String title, String status) {
-        try { sceneState.confirm(kind, key, title, status); }
+        try { sceneState.setContext(day,hour,progress.location);sceneState.confirm(kind, key, title, status); }
         catch (JSONException ignored) {
             // Optional scene memory must never cancel an already committed game action.
         }
@@ -340,8 +340,10 @@ public final class GameEngine {
     private void confirmCurrentConversation() {
         try {
             // Reopening a conversation must not erase an already earned NPC status.
+            sceneState.setContext(day,hour,progress.location);
             if (!sceneState.contains("npc", currentConversationId()))
                 sceneState.confirm("npc", currentConversationId(), currentConversationName(), "MET");
+            else sceneState.revisitNpc(currentConversationId());
         } catch (JSONException ignored) {
             // Scene memory is optional and cannot block dialogue.
         }
@@ -455,6 +457,7 @@ public final class GameEngine {
                     // Commit the one-time achievement BEFORE paying or awarding anything.
                     // A full optional ledger must never turn charity into an XP farm.
                     try {
+                        sceneState.setContext(day,hour,progress.location);
                         sceneState.confirm("npc", currentConversationId(), currentConversationName(), "HELPED");
                         gold-=10;reputation++;addXp(8);
                         message="Собеседник благодарит тебя. Репутация +1, опыт +8.";
@@ -670,6 +673,7 @@ public final class GameEngine {
     public boolean waitHours(int hours){return restHours(hours,hours>=6);}
     public boolean restHours(int hours,boolean sleep){
         if(!started||"COMBAT".equals(mode)||hours<1||hours>24)return false;
+        lastCheckChance=lastCheckRoll=-1;
         int total=hour+hours;
         day+=total/24;hour=total%24;
         syncLivingSystems();needs.recover(hours,sleep);
@@ -683,7 +687,7 @@ public final class GameEngine {
         return true;
     }
     public static boolean needItem(ItemCatalog.Item item,boolean water){if(item==null)return false;String cat=item.category.toLowerCase(java.util.Locale.ROOT);boolean drink=cat.contains("напит")||cat.contains("вода");return water?drink:cat.equals("еда")||cat.contains("пища");}
-    public boolean consumeNeed(String id,boolean water){if(!started||"COMBAT".equals(mode)||!needItem(ItemCatalog.find(id),water))return false;syncLivingSystems();if((water?needs.water:needs.food)>=100)return false;if(!progress.removeItem(id,1))return false;if(water)needs.drink();else needs.eat();return true;}
+    public boolean consumeNeed(String id,boolean water){if(!started||"COMBAT".equals(mode)||!needItem(ItemCatalog.find(id),water))return false;syncLivingSystems();if((water?needs.water:needs.food)>=100)return false;if(!progress.removeItem(id,1))return false;lastCheckChance=lastCheckRoll=-1;if(water)needs.drink();else needs.eat();return true;}
     public int healingAmount(){return 45+5*progress.branches.rank(14)+(progress.advanced.has(AdvancedPerks.PHYSICIAN)?10:0)+(progress.advanced.has(AdvancedPerks.BENEFACTOR)?10:0)+(progress.advanced.has(AdvancedPerks.PURE_MIXTURE)?10:0)+(progress.advanced.has(AdvancedPerks.REGENERATION)?10:0);}
     private void restoreRespite(){if(progress.advanced.has(AdvancedPerks.RESPITE))stamina=Math.min(maxStamina,stamina+10);}
     public int staminaPotionAmount(){return 50+(progress.advanced.has(AdvancedPerks.PHYSICIAN)?10:0)+(progress.advanced.has(AdvancedPerks.BENEFACTOR)?10:0)+(progress.advanced.has(AdvancedPerks.PURE_MIXTURE)?10:0);}
