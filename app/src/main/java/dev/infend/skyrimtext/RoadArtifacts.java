@@ -17,7 +17,8 @@ final class RoadArtifacts {
     double reduction(RpgProgress p){return has(p,6)?.10:0;}
     int regen(RpgProgress p,int i){return (has(p,7)&&i!=1?1:0)+(i==1&&has(p,8)?2:0)-(i==1&&has(p,9)?1:0);}
     int magicAdjust(RpgProgress p,int incoming){int n=incoming;if(has(p,8))n+=incoming/2;if(has(p,9))n-=incoming/2;return Math.max(0,n);}
-    private boolean at(GameEngine g,int id){String place=g.progress.location;if(id>=1&&id<=3)return "Камень Хранитель".equals(place);return ("Камень "+NAMES[id]).equals(place);}
+    private static final String[] MAP_NAMES={"","Камень Хранитель","Камень Хранитель","Камень Хранитель","Камень Любовника","Камень Коня","Камень Лорда","Камень Леди","Камень Ученика","Камень Атронаха","Камень Ритуала","Камень Змея","Камень Тени","Камень Башни"};
+    private boolean at(GameEngine g,int id){if(id<1||id>=NAMES.length)return false;String place=g.progress.location;return MAP_NAMES[id].equalsIgnoreCase(place)||(id>=4&&("Камень "+NAMES[id]).equalsIgnoreCase(place))||(id<=3&&"Камни-хранители".equalsIgnoreCase(place));}
     void choices(GameEngine g,GameEngine.Scene s){for(int i=1;i<NAMES.length;i++)if(at(g,i)&&stone!=i)s.add("ROADSTONE:"+i,"Активировать: "+NAMES[i],DETAILS[i]);if(has(g.progress,13)&&towerDay!=g.day)s.add("ROADSTONE_TOWER","Сила Башни","Следующая проверка взлома сегодня получает +35%");
         if(whiteSoul>0&&g.progress.quantity("Звезда Азуры")>0)s.add("ROADSTAR:release:1","Высвободить душу из Звезды Азуры","Восстановление "+whiteSoul+" магии");
         if(blackSoul>0&&g.progress.quantity("Звезда Чёрной Азуры")>0)s.add("ROADSTAR:release:2","Высвободить душу из Чёрной звезды","Восстановление "+blackSoul+" магии");}
