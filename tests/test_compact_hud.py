@@ -4,6 +4,7 @@ import unittest
 ROOT=Path(__file__).resolve().parents[1]/"app/src/main/java/dev/infend/skyrimtext"
 UI=(ROOT/"MainActivity.java").read_text()
 WEATHER=(ROOT/"WorldWeather.java").read_text()
+GALLERY=(ROOT/"LocationGalleryView.java").read_text()
 class CompactHud(unittest.TestCase):
     def test_stats_and_experience(self):
         for token in ('game.hp,game.maxHp','game.stamina,game.maxStamina','game.magicka,game.maxMagicka',
@@ -15,7 +16,18 @@ class CompactHud(unittest.TestCase):
         self.assertNotIn('"Опыт / осталось"',UI)
         self.assertIn('hudMetric(details,"Опыт","experience",game.xp+" / "',UI)
         self.assertIn('game.experienceRequired()',UI)
-        self.assertIn('ВИДЫ ЛОКАЦИИ',UI)
+        self.assertNotIn('ВИДЫ ЛОКАЦИИ',UI)
+        self.assertIn('content.addView(sceneGallery(game.progress.location)',UI)
+        self.assertIn('overview.addView(sceneGallery(game.progress.location)',UI)
+    def test_borderless_gallery_without_counter(self):
+        for token in ('setBackgroundColor(Color.BLACK)', 'header.addView(heading,headingParams)',
+                      'controls.addView(page', 'page.setText(captionFor(location,index))',
+                      'v->move(-1)', 'v->move(1)', 'v->show(index)',
+                      'updateIndicators();', 'galleryBody.setVisibility(collapsed?View.GONE:View.VISIBLE)',
+                      'viewport.setClipToOutline(true)'):
+            self.assertIn(token,GALLERY)
+        for token in ('new RuneFrameDrawable', 'header.addView(page', 'String.format("%02d / %02d"'):
+            self.assertNotIn(token,GALLERY)
     def test_gallery_weather_is_current_location_and_offline(self):
         self.assertEqual(UI.count('renderLocationWeather(content);'),2)
         self.assertIn('renderLocationWeather(overview);',UI)
