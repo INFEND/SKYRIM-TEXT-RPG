@@ -76,7 +76,7 @@ final class AlmaStory {
             if(weapon==0&&g.gold>=150)s.add("ALMA:weapon","Улучшить кинжал","150 септимов");
             if(armor==0&&g.gold>=120)s.add("ALMA:armor","Укрепить доспех","120 септимов");
             if(lastGiftDay!=g.day&&g.gold>=30)s.add("ALMA:gift","Подарить серебряное украшение","30 септимов | один раз в день");
-            if(g.katherine.enabled&&g.katherine.stage>=3&&g.katherine.companion&&lastTalkDay!=g.day)s.add("ALMA:katherine","Поговорить с Кэтрин вместе","Обсудить доверие и магию");
+            if(g.katherine.enabled&&g.katherine.stage>=3&&g.katherine.following&&lastTalkDay!=g.day)s.add("ALMA:katherine","Поговорить с Кэтрин вместе","Обсудить доверие и магию");
         }
         if(canRomance()&&!romance&&hurt<15)s.add("ALMA:romance","Признаться в чувствах","Только при взаимной симпатии");
         if(!romance&&hurt>=15&&lastTalkDay!=g.day&&!terminalLoss())s.add("ALMA:reconcile","Поговорить о прошлом","Не обещает возобновления романа");
@@ -100,7 +100,7 @@ final class AlmaStory {
         else if("ALMA:weapon".equals(action)&&stage>=3&&!terminalLoss()&&weapon==0&&g.gold>=150){g.gold-=150;weapon=1;remember("Кинжал Альмы зачарован.");}
         else if("ALMA:armor".equals(action)&&stage>=3&&!terminalLoss()&&armor==0&&g.gold>=120){g.gold-=120;armor=1;remember("Доспех Альмы укреплён.");}
         else if("ALMA:gift".equals(action)&&stage>=3&&!terminalLoss()&&lastGiftDay!=g.day&&g.gold>=30){g.gold-=30;lastGiftDay=g.day;affection=clamp(affection+5);if(romance)love=clamp(love+4);remember("Альма приняла серебряное украшение.");}
-        else if("ALMA:katherine".equals(action)&&stage>=3&&!terminalLoss()&&g.katherine.enabled&&g.katherine.stage>=3&&g.katherine.companion&&lastTalkDay!=g.day){lastTalkDay=g.day;respect=clamp(respect+3);jealousy=clamp(jealousy-5);remember("Альма: Мы с Кэтрин знаем цену чужой власти. Не стоит мериться силами.");}
+        else if("ALMA:katherine".equals(action)&&stage>=3&&!terminalLoss()&&g.katherine.enabled&&g.katherine.stage>=3&&g.katherine.following&&lastTalkDay!=g.day){lastTalkDay=g.day;respect=clamp(respect+3);jealousy=clamp(jealousy-5);remember("Альма: Мы с Кэтрин знаем цену чужой власти. Не стоит мериться силами.");}
         else if("ALMA:romance".equals(action)&&canRomance()&&!romance&&hurt<15){romance=true;love=Math.max(love,45);}
         else if("ALMA:date".equals(action)&&romance&&!terminalLoss()&&lastTalkDay!=g.day){lastTalkDay=g.day;love=clamp(love+8);trust=clamp(trust+3);affection=clamp(affection+4);hurt=clamp(hurt-5);}
         else if("ALMA:marry".equals(action)&&romance&&!married&&love>=85&&trust>=75&&stage>=10&&!terminalLoss())married=true;
