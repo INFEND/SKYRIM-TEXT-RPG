@@ -32,7 +32,9 @@ final class AlmaGallery {
     static InputStream open(Context c)throws IOException{return local(c).isFile()?new FileInputStream(local(c)):ResourceStore.open(c,REMOTE);}
     static boolean available(Context c){return local(c).isFile()||ResourceStore.has(c,REMOTE);}
     static Bitmap photo(Context c,int index)throws IOException{
-        byte[] bytes=readEntry(open(c),index);verify(bytes,index);
+        byte[] bytes;
+        try{bytes=readEntry(open(c),index);verify(bytes,index);}
+        catch(IOException e){if(!local(c).isFile()||!ResourceStore.has(c,REMOTE))throw e;bytes=readEntry(ResourceStore.open(c,REMOTE),index);verify(bytes,index);}
         BitmapFactory.Options o=new BitmapFactory.Options();o.inJustDecodeBounds=true;BitmapFactory.decodeByteArray(bytes,0,bytes.length,o);
         if(o.outWidth<=0||o.outHeight<=0||o.outWidth>4096||o.outHeight>4096)throw new IOException("Неверные размеры изображения");
         o.inJustDecodeBounds=false;o.inSampleSize=Math.max(1,Math.max(o.outWidth,o.outHeight)/1400);
