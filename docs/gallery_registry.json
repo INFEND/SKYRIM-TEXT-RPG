@@ -11,5 +11,235 @@
     "captions": [
       "Общий зал и центральный очаг"
     ]
+  },
+  {
+    "name": "Деревня Анга",
+    "slug": "angasmill",
+    "aliases": [
+      "Anga's Mill"
+    ],
+    "captions": [
+      "Деревня Анга на реке Йоргрим"
+    ]
+  },
+  {
+    "name": "Полулунная лесопилка",
+    "slug": "halfmoonmill",
+    "aliases": [
+      "Half-Moon Mill"
+    ],
+    "captions": [
+      "Полулунная лесопилка у озера Илиналта"
+    ]
+  },
+  {
+    "name": "Деревня Лесная",
+    "slug": "heartwoodmill",
+    "aliases": [
+      "Heartwood Mill"
+    ],
+    "captions": [
+      "Лесная деревня на берегу Хонрик"
+    ]
+  },
+  {
+    "name": "Лесопилка Пирожок",
+    "slug": "mixwatermill",
+    "aliases": [
+      "Mixwater Mill"
+    ],
+    "captions": [
+      "Лесопилка у слияния рек"
+    ]
+  },
+  {
+    "name": "Солитьюд - Лесопилка",
+    "slug": "solitudesawmill",
+    "aliases": [
+      "Solitude Sawmill"
+    ],
+    "captions": [
+      "Лесопилка под скалами Солитьюда"
+    ]
+  },
+  {
+    "name": "Душник-Йал",
+    "slug": "dushnikhyal",
+    "aliases": [
+      "Dushnikh Yal"
+    ],
+    "captions": [
+      "Ворота Душник-Йала"
+    ]
+  },
+  {
+    "name": "Ларгашбур",
+    "slug": "largashbur",
+    "aliases": [
+      "Largashbur"
+    ],
+    "captions": [
+      "Ларгашбур у подножия гор"
+    ]
+  },
+  {
+    "name": "Мор Казгур",
+    "slug": "morkhazgur",
+    "aliases": [
+      "Mor Khazgur"
+    ],
+    "captions": [
+      "Мор Казгур среди скал Предела"
+    ]
+  },
+  {
+    "name": "Нарзулбур",
+    "slug": "narzulbur",
+    "aliases": [
+      "Narzulbur"
+    ],
+    "captions": [
+      "Нарзулбур и Сумрачная шахта"
+    ]
+  },
+  {
+    "name": "Старый Хролдан",
+    "slug": "oldhroldan",
+    "aliases": [
+      "Old Hroldan"
+    ],
+    "captions": [
+      "Старый Хролдан в долине Карта"
+    ]
+  },
+  {
+    "name": "Таверна Ночные ворота",
+    "slug": "nightgateinn",
+    "aliases": [
+      "Nightgate Inn"
+    ],
+    "captions": [
+      "Ночные ворота у замёрзшего пруда"
+    ]
+  },
+  {
+    "name": "Медовый зал Тирск",
+    "slug": "thirsk",
+    "aliases": [
+      "Thirsk Mead Hall"
+    ],
+    "captions": [
+      "Медовый зал Тирск на Солстейме"
+    ]
+  },
+  {
+    "name": "Резиденция Черный Вереск",
+    "slug": "blackbriarlodge",
+    "aliases": [
+      "Black-Briar Lodge"
+    ],
+    "captions": [
+      "Резиденция Чёрный Вереск среди осин"
+    ]
+  },
+  {
+    "name": "Ферма Кружка Бренди",
+    "slug": "brandymugfarm",
+    "aliases": [
+      "Brandy-Mug Farm"
+    ],
+    "captions": [
+      "Ферма Кружка Бренди перед Виндхельмом"
+    ]
+  },
+  {
+    "name": "Святилище Тёмного Братства",
+    "slug": "darkbrotherhoodsanctuary",
+    "aliases": [
+      "Dark Brotherhood Sanctuary"
+    ],
+    "captions": [
+      "Скрытый вход в Фолкритское убежище"
+    ]
+  },
+  {
+    "name": "Данстарское убежище",
+    "slug": "dawnstarsanctuary",
+    "aliases": [
+      "Dawnstar Sanctuary"
+    ],
+    "captions": [
+      "Скрытая дверь на берегу Данстара"
+    ]
+  },
+  {
+    "name": "Золотое поместье",
+    "slug": "goldenglow",
+    "aliases": [
+      "Goldenglow Estate"
+    ],
+    "captions": [
+      "Острова Золотого поместья на Хонрик"
+    ]
+  },
+  {
+    "name": "Медоварня Хоннинга",
+    "slug": "honningbrew",
+    "aliases": [
+      "Honningbrew Meadery"
+    ],
+    "captions": [
+      "Медоварня Хоннинга под Вайтраном"
+    ]
+  },
+  {
+    "name": "Талморское посольство",
+    "slug": "thalmor",
+    "aliases": [
+      "Thalmor Embassy"
+    ],
+    "captions": [
+      "Талморское посольство в Хаафингаре"
+    ]
+  },
+  {
+    "name": "Хельяркен-холл",
+    "slug": "heljarchenhall",
+    "aliases": [
+      "Heljarchen Hall"
+    ],
+    "captions": [
+      "Хельяркен-холл на границе тундры"
+    ]
+  },
+  {
+    "name": "Поместье Озёрное",
+    "slug": "lakeviewmanor",
+    "aliases": [
+      "Lakeview Manor"
+    ],
+    "captions": [
+      "Поместье Озёрное над Илиналтой"
+    ]
+  },
+  {
+    "name": "Усадьба Тундры",
+    "slug": "tundrahomestead",
+    "aliases": [
+      "Tundra Homestead"
+    ],
+    "captions": [
+      "Усадьба Тундры у стен Вайтрана"
+    ]
+  },
+  {
+    "name": "Поместье Уиндстад",
+    "slug": "windstadmanor",
+    "aliases": [
+      "Windstad Manor"
+    ],
+    "captions": [
+      "Поместье Уиндстад среди болот"
+    ]
   }
 ]
