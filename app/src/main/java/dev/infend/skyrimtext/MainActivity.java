@@ -190,6 +190,16 @@ public final class MainActivity extends Activity {
     }
     @Override protected void onActivityResult(int requestCode,int resultCode,Intent data){
         super.onActivityResult(requestCode,resultCode,data);
+        if(requestCode==REQUEST_ITACHI_LOCAL_ART){
+            if(resultCode==RESULT_OK&&data!=null){
+                java.util.ArrayList<android.net.Uri> uris=new java.util.ArrayList<>();
+                android.content.ClipData clip=data.getClipData();
+                if(clip!=null){for(int i=0;i<clip.getItemCount()&&i<LocalCharacterGallery.LIMIT;i++){android.net.Uri uri=clip.getItemAt(i).getUri();if(uri!=null)uris.add(uri);}}
+                else if(data.getData()!=null)uris.add(data.getData());
+                final java.util.ArrayList<android.net.Uri> selected=uris;
+                new Thread(()->{try{int count=LocalCharacterGallery.install(this,selected);runOnUiThread(()->{if(isFinishing()||isDestroyed())return;toast("Добавлено: "+count+" из "+selected.size());itachiLocalGallery(0);});}catch(Exception e){runOnUiThread(()->{if(!isFinishing()&&!isDestroyed())toast("Не удалось импортировать изображения");});}}).start();
+            }return;
+        }
         if(requestCode==REQUEST_NPC_APPEARANCES){
             if(resultCode==RESULT_OK&&data!=null){
                 java.util.ArrayList<android.net.Uri> files=new java.util.ArrayList<>();
@@ -473,6 +483,7 @@ public final class MainActivity extends Activity {
         if(ItachiProfile.matches(name)){
             if(!ResourceStore.has(this,"media/itachi/portrait.webp")){TextView load=text("Загрузить портрет Итачи",14,accent(),true);load.setPadding(dp(12),dp(12),dp(12),dp(12));load.setOnClickListener(v->new ResourceManagerDialog(this,accent(),this::render,"media:itachi").show());panel.addView(load,lp(-1,-2));}
             if(game.itachi.enabled&&game.itachi.stage>0){addText(panel,game.itachi.relation()+" | "+game.itachi.objective(game),14,TEXT,true,8);addText(panel,"Доверие "+game.itachi.trust+"/100 | Уважение "+game.itachi.respect+"/100 | Симпатия "+game.itachi.affection+"/100 | Энергия "+game.itachi.energy+"/100",13,TEXT,false,8);}
+            TextView localGallery=text("Личная галерея | "+LocalCharacterGallery.files(this).length,15,accent(),true);localGallery.setPadding(dp(12),dp(12),dp(12),dp(12));localGallery.setOnClickListener(v->itachiLocalGallery(0));panel.addView(localGallery,lp(-1,-2));
             addText(panel,"Внешность",15,accent(),true,10);addText(panel,ItachiProfile.APPEARANCE,13,TEXT,false,4);
             addText(panel,"Характер",15,accent(),true,10);addText(panel,ItachiProfile.CHARACTER,13,TEXT,false,4);
             addText(panel,"Происхождение",15,accent(),true,10);addText(panel,ItachiProfile.BACKGROUND,13,TEXT,false,4);
@@ -493,6 +504,19 @@ public final class MainActivity extends Activity {
         if(!ItachiProfile.matches(name)&&!NpcAppearance.has(this,name)&&!("Серана".equalsIgnoreCase(name)&&SeranaGallery.available(this))&&!KatherineStory.NAME.equals(name)&&!AlmaStory.NAME.equals(name)&&!LiviaStory.NAME.equalsIgnoreCase(name)&&!"Имперский капитан".equalsIgnoreCase(name))addText(panel,"Иллюстративный образ или эмблема, не индивидуальный портрет",11,MUTED,false,10);
         addText(panel,npcStatusLabel(game.sceneState.npcStatusByName(name)),15,TEXT,true,8);
         new RuneDialogBuilder(this,accent()).setTitle(name).setView(panel).setNegativeButton("Закрыть",null).show();
+    }
+    private static final int REQUEST_ITACHI_LOCAL_ART=7431;
+    private void chooseItachiLocalArt(){Intent picker=new Intent(Intent.ACTION_OPEN_DOCUMENT);picker.addCategory(Intent.CATEGORY_OPENABLE);picker.setType("image/*");picker.putExtra(Intent.EXTRA_ALLOW_MULTIPLE,true);try{startActivityForResult(picker,REQUEST_ITACHI_LOCAL_ART);}catch(Exception e){toast("Не удалось открыть выбор файлов");}}
+    private void itachiLocalGallery(int requested){
+        java.io.File[] files=LocalCharacterGallery.files(this);LinearLayout panel=column();panel.setPadding(dp(12),dp(8),dp(12),dp(8));
+        if(files.length==0){new RuneDialogBuilder(this,accent()).setTitle("Итачи | Личная галерея").setMessage("Добавь подходящие иллюстрации персонажа. Файлы хранятся локально, без изменения оригиналов.").setPositiveButton("Добавить",(d,w)->chooseItachiLocalArt()).setNegativeButton("Закрыть",null).show();return;}
+        final int index=Math.floorMod(requested,files.length);
+        try{android.widget.ImageView image=new android.widget.ImageView(this);image.setImageBitmap(LocalCharacterGallery.photo(files[index]));image.setAdjustViewBounds(true);image.setScaleType(android.widget.ImageView.ScaleType.FIT_CENTER);panel.addView(image,lp(-1,380));}catch(java.io.IOException e){addText(panel,"Не удалось открыть изображение",14,MUTED,false,8);}
+        TextView count=text((index+1)+" / "+files.length,14,accent(),true);count.setGravity(Gravity.CENTER);panel.addView(count,lp(-1,34));
+        TextView add=text("Добавить изображения",14,accent(),true);add.setPadding(dp(12),dp(12),dp(12),dp(12));panel.addView(add,lp(-1,-2));
+        TextView remove=text("Удалить из личной галереи",14,MUTED,false);remove.setPadding(dp(12),dp(12),dp(12),dp(12));panel.addView(remove,lp(-1,-2));
+        AlertDialog dialog=new RuneDialogBuilder(this,accent()).setTitle("Итачи | Личная галерея").setView(panel).setNegativeButton("Закрыть",null).setNeutralButton("Назад",(d,w)->itachiLocalGallery(index-1)).setPositiveButton("Вперёд",(d,w)->itachiLocalGallery(index+1)).create();
+        add.setOnClickListener(v->{dialog.dismiss();chooseItachiLocalArt();});remove.setOnClickListener(v->new RuneDialogBuilder(this,accent()).setTitle("Удалить изображение?").setMessage("Исходный файл на телефоне останется без изменений.").setPositiveButton("Удалить",(d,w)->{if(LocalCharacterGallery.remove(this,files[index])){dialog.dismiss();itachiLocalGallery(index);}else toast("Не удалось удалить");}).setNegativeButton("Отмена",null).show());dialog.show();
     }
     private static final int REQUEST_LIVIA_PORTRAIT=7227;
     private void chooseLiviaPortrait(){Intent picker=new Intent(Intent.ACTION_OPEN_DOCUMENT);picker.addCategory(Intent.CATEGORY_OPENABLE);picker.setType("image/webp");try{startActivityForResult(picker,REQUEST_LIVIA_PORTRAIT);}catch(Exception e){toast("Не удалось открыть выбор файла");}}
