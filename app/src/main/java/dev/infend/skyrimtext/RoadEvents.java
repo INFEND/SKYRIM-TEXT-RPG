@@ -206,6 +206,7 @@ final class RoadEvents {
     private final LinkedHashMap<String,Integer> recentDays=new LinkedHashMap<>();
     private final int[] roadBounties=new int[10];
     private String decision="";
+    private int dialogueStep=0;
     private String[] combatGroup=new String[0];
     private int combatIndex=0, encounterRegion=-1;
     private int[] groupHp=new int[0],groupMax=new int[0],groupDamage=new int[0];
@@ -272,7 +273,7 @@ final class RoadEvents {
     private static boolean member(GameEngine g,int faction){return g.factions.stage(faction)>0||g.factionStories.started(faction);}
     private void remember(GameEngine g){recentDays.put(id,g.day);while(recentDays.size()>188)recentDays.remove(recentDays.keySet().iterator().next());}
     private boolean cooled(GameEngine g,Event e){Integer day=recentDays.get(e.id);return day==null||g.day-day>=3||g.day<day;}
-    private void prepare(int region){encounterRegion=region;decision="";clearGroup();victoryApplied=false;}
+    private void prepare(int region){encounterRegion=region;decision="";dialogueStep=0;clearGroup();victoryApplied=false;}
     private static Event find(String id){for(Event e:EVENTS)if(e.id.equals(id))return e;return null;}
     boolean pending(){return !destination.isEmpty()&&find(id)!=null;}
     static boolean pair(String a,String b,String x,String y){return (a.equals(x)&&b.equals(y))||(a.equals(y)&&b.equals(x));}
@@ -386,10 +387,13 @@ final class RoadEvents {
     }
     boolean beginArvak(GameEngine g){if(pending()||g.progress.questOutcome("road_arvak")!=null)return false;prepare(g.region);id="arvak";destination=g.progress.location;segmentFrom="Каирн Душ";segmentTo="Каирн Душ";outcome="";canonicalResume=false;serial=serial==Integer.MAX_VALUE?1:serial+1;g.mode=MODE;g.message=find(id).body;return true;}
     private String action(String verb){return "ROAD:"+serial+":"+id+":"+verb;}
-    GameEngine.Scene scene(GameEngine g){
+    GameEngine.Scene scene(GameEngine g){GameEngine.Scene s=baseScene(g);RoadDialogue.Profile p=RoadDialogue.find(id);if(p!=null&&dialogueStep==0)s.add(action("ask"),p.question,"Выслушать ответ, не завершая встречу");return s;}
+    private GameEngine.Scene baseScene(GameEngine g){
         Event e=find(id);
         if(e==null)return new GameEngine.Scene("В ДОРОГЕ","Переход","Событие недоступно.").primary("GO_WORLD","Продолжить путь","");
+        RoadDialogue.Profile profile=RoadDialogue.find(id);
         String body="arvak".equals(id)&&"ACTIVE".equals(g.progress.questOutcome("road_arvak_skull"))?"Душа рассказывает о потерянном коне. Вдалеке мерцает алтарь, на котором лежит череп Арвака. Рядом движутся тени Каирна Душ.":e.body;
+        if(profile!=null){body+="\n\n"+RoadDialogue.line(profile,profile.opening);if(dialogueStep>0)body+="\n\nТы: «"+profile.question+"»\n"+RoadDialogue.line(profile,profile.answer);}
         GameEngine.Scene s=new GameEngine.Scene("СЛУЧАЙНАЯ ВСТРЕЧА | В ДОРОГЕ",e.title,body+("arvak".equals(id)?"\n\nМесто встречи: Каирн Душ.":"\n\nУчасток: "+(segmentFrom.isEmpty()?g.progress.location:segmentFrom)+" → "+(segmentTo.isEmpty()?destination:segmentTo)+".\nКонечная точка: "+destination+"."));
         if("giant".equals(id))return s.primary(action("fight"),"Помочь Соратникам","Вступить в бой с великаном").add(action("watch"),"Наблюдать за боем","Поговорить с Эйлой после схватки").add(action("leave"),"Пройти мимо","Не вмешиваться");
         if("cicero".equals(id))return s.primary(action("help"),"Убедить Ванту Лорея","Помочь Цицерону починить повозку").add(action("report"),"Доложить страже","Поддержать фермера").add(action("leave"),"Пройти мимо","Вернуться к этому позже");
@@ -455,7 +459,7 @@ final class RoadEvents {
         if(!pending()||!MODE.equals(g.mode))return;
         Event e=find(id);String verb=null;
         for(GameEngine.Choice c:scene(g).choices)if(c.action.equals(action)){verb=action.substring(action.lastIndexOf(':')+1);break;}
-        if(verb==null)return;decision=verb;
+        if(verb==null)return;if("ask".equals(verb)){RoadDialogue.Profile p=RoadDialogue.find(id);if(p!=null&&dialogueStep==0){dialogueStep=1;g.message=RoadDialogue.line(p,p.answer);g.progress.skillExperience(g,12,3);g.progress.sync(g);}return;}decision=verb;
         if("giant".equals(id)){
             uniqueOutcome(g,"COMPLETED");
             if("fight".equals(verb)){fact(g,"road_aela","Эйла Охотница","MET");fight(g,e.enemy);}
@@ -507,7 +511,7 @@ final class RoadEvents {
                     if(g.rollCheck(g.progress.chance(g,2,12,25))){g.progress.skillExperience(g,12,15);finish(g,"Твои доводы убеждают собеседника. Удаётся избежать столкновения.");}
                     else fight(g,e.enemy);return;
                 }
-                g.progress.skillExperience(g,12,8);finish(g,"Ты беседуешь с путником и прощаешься. Новые сведения останутся в хронике.");return;
+                g.progress.skillExperience(g,12,8);RoadDialogue.Profile p=RoadDialogue.find(id);finish(g,p==null?"Ты беседуешь с путником и прощаешься. Новые сведения останутся в хронике.":RoadDialogue.line(p,p.answer)+"\nВы прощаетесь и продолжаете путь.");return;
             case "sneak":if(g.rollCheck(g.progress.chance(g,2,9,25))){g.progress.skillExperience(g,9,15);finish(g,"Ты скрываешься и обходишь опасность.");}else fight(g,e.enemy);return;
             case "help":if(g.potions>0){g.potions--;g.reputation++;finish(g,"Ты делишься лечебным зельем. Охотник благодарит за помощь; лечение болезни требует особого средства.");}else finish(g,"У тебя нет лечебного зелья, но охотник получает совет обратиться за помощью.");return;
             case "return":g.reputation++;finish(g,"Ты передаёшь охотнику вещь, оставленную беглецом, и объясняешь, куда тот ушёл.");return;
@@ -535,10 +539,10 @@ final class RoadEvents {
         if(!pending())return;
         String target=destination,previous=id;
         if(outcome.startsWith("Встреча: ")&&"WILD".equals(g.battleKind)&&"RESULT".equals(g.mode)&&g.enemyHp==0){applyVictory(g);outcome=g.message;}else if(outcome.startsWith("Встреча: "))outcome=g.message;
-        destination="";id="";segmentFrom="";segmentTo="";last=previous;clearGroup();decision="";victoryApplied=false;resuming=true;
+        destination="";id="";segmentFrom="";segmentTo="";last=previous;clearGroup();dialogueStep=0;decision="";victoryApplied=false;resuming=true;
         boolean canonical=canonicalResume;canonicalResume=false;
         try{if("arvak".equals(previous)){g.mode="WORLD";g.message=outcome;}else if(canonical){CanonicalCampaign.open(g);g.canonicalRecent=outcome;g.recordVisualEvent(outcome);}else g.choose("LOC:"+target);}finally{resuming=false;outcome="";}
     }
-    JSONObject save(){JSONObject j=new JSONObject();try{j.put("id",id).put("destination",destination).put("outcome",outcome).put("last",last).put("serial",serial).put("canonicalResume",canonicalResume).put("segmentFrom",segmentFrom).put("segmentTo",segmentTo).put("decision",decision).put("group",new JSONArray(Arrays.asList(combatGroup))).put("groupIndex",combatIndex).put("groupHp",new JSONArray(groupHp)).put("groupMax",new JSONArray(groupMax)).put("groupDamage",new JSONArray(groupDamage)).put("encounterRegion",encounterRegion).put("victoryApplied",victoryApplied).put("recentDays",new JSONObject(recentDays)).put("roadBounties",new JSONArray(roadBounties));}catch(Exception ignored){}return j;}
-    static RoadEvents restore(JSONObject j){RoadEvents r=new RoadEvents();if(j!=null){r.id=j.optString("id","");r.destination=j.optString("destination","");r.outcome=j.optString("outcome","");r.last=j.optString("last","");r.serial=Math.max(0,j.optInt("serial"));r.canonicalResume=j.optBoolean("canonicalResume");r.segmentFrom=j.optString("segmentFrom","");r.segmentTo=j.optString("segmentTo","");r.decision=j.optString("decision","");r.encounterRegion=Math.max(-1,Math.min(9,j.optInt("encounterRegion",-1)));r.victoryApplied=j.optBoolean("victoryApplied");JSONArray group=j.optJSONArray("group");if(group!=null&&group.length()>0&&group.length()<=8){ArrayList<String> names=new ArrayList<>();for(int i=0;i<group.length();i++){String n=group.optString(i);if(!n.isEmpty()&&n.length()<=100)names.add(n);}r.combatGroup=names.toArray(new String[0]);}r.combatIndex=Math.max(0,Math.min(Math.max(0,r.combatGroup.length-1),j.optInt("groupIndex")));JSONArray hp=j.optJSONArray("groupHp"),max=j.optJSONArray("groupMax"),dmg=j.optJSONArray("groupDamage");int n=r.combatGroup.length;if(n>0&&hp!=null&&max!=null&&dmg!=null&&hp.length()==n&&max.length()==n&&dmg.length()==n){r.groupHp=new int[n];r.groupMax=new int[n];r.groupDamage=new int[n];for(int i=0;i<n;i++){r.groupMax[i]=Math.max(1,Math.min(100000,max.optInt(i)));r.groupHp[i]=Math.max(0,Math.min(r.groupMax[i],hp.optInt(i)));r.groupDamage[i]=Math.max(1,Math.min(100000,dmg.optInt(i)));}}JSONObject recent=j.optJSONObject("recentDays");if(recent!=null)for(Event e:EVENTS)if(recent.has(e.id))r.recentDays.put(e.id,Math.max(0,recent.optInt(e.id)));JSONArray fines=j.optJSONArray("roadBounties");if(fines!=null)for(int i=0;i<10;i++)r.roadBounties[i]=Math.max(0,fines.optInt(i));if(!r.pending()){r.id="";r.destination="";}}return r;}
+    JSONObject save(){JSONObject j=new JSONObject();try{j.put("id",id).put("destination",destination).put("outcome",outcome).put("last",last).put("serial",serial).put("canonicalResume",canonicalResume).put("segmentFrom",segmentFrom).put("segmentTo",segmentTo).put("decision",decision).put("dialogueStep",dialogueStep).put("group",new JSONArray(Arrays.asList(combatGroup))).put("groupIndex",combatIndex).put("groupHp",new JSONArray(groupHp)).put("groupMax",new JSONArray(groupMax)).put("groupDamage",new JSONArray(groupDamage)).put("encounterRegion",encounterRegion).put("victoryApplied",victoryApplied).put("recentDays",new JSONObject(recentDays)).put("roadBounties",new JSONArray(roadBounties));}catch(Exception ignored){}return j;}
+    static RoadEvents restore(JSONObject j){RoadEvents r=new RoadEvents();if(j!=null){r.id=j.optString("id","");r.destination=j.optString("destination","");r.outcome=j.optString("outcome","");r.last=j.optString("last","");r.serial=Math.max(0,j.optInt("serial"));r.canonicalResume=j.optBoolean("canonicalResume");r.segmentFrom=j.optString("segmentFrom","");r.segmentTo=j.optString("segmentTo","");r.decision=j.optString("decision","");r.dialogueStep=Math.max(0,Math.min(1,j.optInt("dialogueStep")));r.encounterRegion=Math.max(-1,Math.min(9,j.optInt("encounterRegion",-1)));r.victoryApplied=j.optBoolean("victoryApplied");JSONArray group=j.optJSONArray("group");if(group!=null&&group.length()>0&&group.length()<=8){ArrayList<String> names=new ArrayList<>();for(int i=0;i<group.length();i++){String n=group.optString(i);if(!n.isEmpty()&&n.length()<=100)names.add(n);}r.combatGroup=names.toArray(new String[0]);}r.combatIndex=Math.max(0,Math.min(Math.max(0,r.combatGroup.length-1),j.optInt("groupIndex")));JSONArray hp=j.optJSONArray("groupHp"),max=j.optJSONArray("groupMax"),dmg=j.optJSONArray("groupDamage");int n=r.combatGroup.length;if(n>0&&hp!=null&&max!=null&&dmg!=null&&hp.length()==n&&max.length()==n&&dmg.length()==n){r.groupHp=new int[n];r.groupMax=new int[n];r.groupDamage=new int[n];for(int i=0;i<n;i++){r.groupMax[i]=Math.max(1,Math.min(100000,max.optInt(i)));r.groupHp[i]=Math.max(0,Math.min(r.groupMax[i],hp.optInt(i)));r.groupDamage[i]=Math.max(1,Math.min(100000,dmg.optInt(i)));}}JSONObject recent=j.optJSONObject("recentDays");if(recent!=null)for(Event e:EVENTS)if(recent.has(e.id))r.recentDays.put(e.id,Math.max(0,recent.optInt(e.id)));JSONArray fines=j.optJSONArray("roadBounties");if(fines!=null)for(int i=0;i<10;i++)r.roadBounties[i]=Math.max(0,fines.optInt(i));if(!r.pending()){r.id="";r.destination="";}}return r;}
 }
