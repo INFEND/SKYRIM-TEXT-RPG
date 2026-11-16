@@ -36,6 +36,15 @@ public class AlmaStoryTest {
         g.choose("ALMA:open");g.progress.location="Винтерхолд";g.choose("ALMA:archive:0");g.choose("ALMA:archive:1");assertEquals(2,g.alma.archiveStep);
         g.progress.location="Рифтен";g.choose("ALMA:seal:0");g.choose("ALMA:seal:1");assertEquals(1,g.alma.talisman);
     }
+    @Test public void inventoryWeddingAndIndependentLife() throws Exception{
+        GameEngine g=start();g.choose("ALMA:open");for(int i=0;i<11;i++)g.choose("ALMA:good:"+i);
+        g.choose("ALMA:join");g.choose("ALMA:romance");g.alma.love=90;g.alma.trust=90;
+        g.choose("ALMA:engage");assertTrue(g.alma.engaged);g.choose("ALMA:marry");assertFalse(g.alma.married);g.day++;g.choose("ALMA:marry");assertTrue(g.alma.married);
+        g.gold=500;g.choose("ALMA:home");assertTrue(g.alma.sharedHome);assertEquals(0,g.gold);
+        int before=g.progress.quantity("Факел");assertTrue(g.alma.transfer(g,"Факел",true));assertEquals(before-1,g.progress.quantity("Факел"));assertTrue(g.alma.transfer(g,"Факел",false));assertEquals(before,g.progress.quantity("Факел"));
+        g.choose("ALMA:finish:mortal");g.choose("ALMA:dismiss");g.day++;g.alma.independent(g);assertEquals(1,g.alma.daysIndependent);g.alma.independent(g);assertEquals(1,g.alma.daysIndependent);
+        g=GameEngine.fromJson(g.toJson().toString());assertTrue(g.alma.married);assertTrue(g.alma.sharedHome);assertEquals(1,g.alma.daysIndependent);
+    }
     @Test public void romanceNotRequiredAndLossIsFinal(){
         GameEngine g=start();g.choose("ALMA:open");for(int i=0;i<11;i++)g.choose("ALMA:cool:"+i);
         g.choose("ALMA:finish:eternal");assertEquals(11,g.alma.stage);

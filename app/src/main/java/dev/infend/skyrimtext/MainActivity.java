@@ -3793,11 +3793,19 @@ public final class MainActivity extends Activity {
         }
     }
     private String selectedJournalEntry="Путь Довакина";
+    private void almaInventory(boolean give){
+        AlmaStory a=game.alma;if(livingBusy()||!a.enabled||a.terminalLoss()||a.stage<3||!a.present(game)){toast("Альма сейчас недоступна");return;}
+        java.util.ArrayList<String> ids=new java.util.ArrayList<>(),labels=new java.util.ArrayList<>();java.util.Iterator<String> it=(give?game.progress.inventory:a.pack).keys();
+        while(it.hasNext()){String id=it.next();int n=give?game.progress.quantity(id):a.pack.optInt(id);if(n>0&&a.transferable(game,id)){ids.add(id);labels.add(ItemCatalog.find(id).name+" | "+n);}}
+        if(!give&&a.supplies>0){ids.add("Лечебное зелье");labels.add("Лечебное зелье | "+a.supplies);}
+        if(ids.isEmpty()){toast("Нет доступных предметов");return;}
+        new RuneDialogBuilder(this,accent()).setTitle(give?"Передать Альме":"Забрать у Альмы").setItems(labels.toArray(new String[0]),(d,i)->{if(livingBusy()||!game.alma.transfer(game,ids.get(i),give)){toast("Передача невозможна: проверь вес и наличие");return;}save();render();almaInventory(give);}).setNegativeButton("Закрыть",null).show();
+    }
     private void almaRelationshipDetails(){
         AlmaStory a=game.alma;LinearLayout panel=column();addText(panel,a.relationship()+" | "+a.status(),16,TEXT,true,10);
         String[] labels={"Доверие","Уважение","Симпатия","Любовь","Ревность","Обида","Преданность"};int[] scores={a.trust,a.respect,a.affection,a.love,a.jealousy,a.hurt,a.loyalty};
         for(int i=0;i<labels.length;i++){livingLine(panel,labels[i],scores[i]+" / 100",accent());livingBar(panel,scores[i],100,accent());space(panel,8);}
-        addText(panel,"Ранг "+a.rank+"/5 | Победы "+a.victories+" | Магия "+a.mana+"/"+a.maxMana()+" | Здоровье "+a.health+"/"+a.maxHealth(),13,TEXT,true,8);addText(panel,a.inventoryLabel()+" | "+a.stanceLabel(),13,MUTED,false,8);if(!a.lastRemark.isEmpty())addText(panel,a.lastRemark,13,TEXT,false,8);TextView gallery=text("Галерея Альмы",15,accent(),true);gallery.setOnClickListener(v->almaGallery(1));panel.addView(gallery,lp(-1,44));TextView memories=text("Личная память | "+a.memory.length()+" событий",14,accent(),true);memories.setOnClickListener(v->{LinearLayout hist=column();for(int i=a.memory.length()-1;i>=0;i--)addText(hist,a.memory.optString(i),13,TEXT,false,8);livingDialog("Альма | Память",hist);});panel.addView(memories,lp(-1,44));livingDialog("Альма | Отношения",panel);
+        addText(panel,"Ранг "+a.rank+"/5 | Победы "+a.victories+" | Магия "+a.mana+"/"+a.maxMana()+" | Здоровье "+a.health+"/"+a.maxHealth(),13,TEXT,true,8);addText(panel,a.inventoryLabel()+" | "+a.stanceLabel(),13,MUTED,false,8);addText(panel,"Уровень "+a.level+" | Опыт "+a.xp+"/"+a.needXp()+" | Свидания: "+a.dates,13,TEXT,true,8);addText(panel,"Место: "+a.location(game)+" | Цель: "+a.goal,13,TEXT,false,8);addText(panel,"Рюкзак: "+String.format(java.util.Locale.ROOT,"%.2f",a.packWeight())+"/35 кг",13,TEXT,false,8);livingLink(panel,"Передать предмет","", "inventory",()->almaInventory(true));livingLink(panel,"Забрать предмет","","inventory",()->almaInventory(false));if(!a.lastRemark.isEmpty())addText(panel,a.lastRemark,13,TEXT,false,8);TextView gallery=text("Галерея Альмы",15,accent(),true);gallery.setOnClickListener(v->almaGallery(1));panel.addView(gallery,lp(-1,44));TextView memories=text("Личная память | "+a.memory.length()+" событий",14,accent(),true);memories.setOnClickListener(v->{LinearLayout hist=column();for(int i=a.memory.length()-1;i>=0;i--)addText(hist,a.memory.optString(i),13,TEXT,false,8);livingDialog("Альма | Память",hist);});panel.addView(memories,lp(-1,44));livingDialog("Альма | Отношения",panel);
     }
     private void renderLivingRelations(){
         section("ЖУРНАЛ","Отношения","Только подтверждённые знакомства и события.");
@@ -3837,7 +3845,7 @@ public final class MainActivity extends Activity {
         section("ЛЕТОПИСЬ СЕВЕРА","Журнал","Выбирай задание, чтобы увидеть описание и текущую цель.");
         renderFactionJournal();
         if(game.katherine.enabled&&game.katherine.stage>0){LinearLayout k=card();addText(k,"НУЛЕВОЙ ПРЕДЕЛ | КРУГ ТРЁХ КОГТЕЙ",13,accent(),true,8);addText(k,game.katherine.objective(),15,TEXT,false,8);if(game.katherine.available(game))actionButton("Поговорить с Кэтрин","Продолжить расследование",false,()->{if(livingBusy())return;game.choose("KATH:open");save();tab=0;render();});}
-        if(game.alma.enabled&&game.alma.stage>0)actionButton("Алая Бессмертная",game.alma.objective()+" | "+game.alma.stage+"/12",false,()->new RuneDialogBuilder(this,accent()).setTitle("Алая Бессмертная").setMessage(game.alma.objective()+"\n\n"+(game.alma.companion?"Альма путешествует с тобой.":game.alma.terminalLoss()?"История завершена.":"Ищи Альму в Рифтене.")).setPositiveButton("Закрыть",null).show());
+        if(game.alma.enabled&&game.alma.stage>0)actionButton("Алая Бессмертная",game.alma.objective()+" | "+game.alma.stage+"/12",false,()->new RuneDialogBuilder(this,accent()).setTitle("Алая Бессмертная").setMessage(game.alma.objective()+"\n\n"+(game.alma.companion?"Альма путешествует с тобой.":game.alma.terminalLoss()?"История завершена.":"Ищи Альму: "+game.alma.location(game))).setPositiveButton("Закрыть",null).show());
         String[] entries=game.aiJournal.isEmpty()?
             new String[]{"Путь Довакина","Драконий след","Пепельные печати","Опасные дороги"}:
             new String[]{"Путь Довакина","Драконий след","Пепельные печати","Опасные дороги","Задание ИИ"};
