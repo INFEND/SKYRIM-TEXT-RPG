@@ -472,6 +472,7 @@ public final class MainActivity extends Activity {
         if(profile!=null){addText(panel,profile.race+" | "+profile.role,14,TEXT,true,8);}
         if(ItachiProfile.matches(name)){
             if(!ResourceStore.has(this,"media/itachi/portrait.webp")){TextView load=text("Загрузить портрет Итачи",14,accent(),true);load.setPadding(dp(12),dp(12),dp(12),dp(12));load.setOnClickListener(v->new ResourceManagerDialog(this,accent(),this::render,"media:itachi").show());panel.addView(load,lp(-1,-2));}
+            if(game.itachi.enabled&&game.itachi.stage>0){addText(panel,game.itachi.relation()+" | "+game.itachi.objective(game),14,TEXT,true,8);addText(panel,"Доверие "+game.itachi.trust+"/100 | Уважение "+game.itachi.respect+"/100 | Симпатия "+game.itachi.affection+"/100 | Энергия "+game.itachi.energy+"/100",13,TEXT,false,8);}
             addText(panel,"Внешность",15,accent(),true,10);addText(panel,ItachiProfile.APPEARANCE,13,TEXT,false,4);
             addText(panel,"Характер",15,accent(),true,10);addText(panel,ItachiProfile.CHARACTER,13,TEXT,false,4);
             addText(panel,"Происхождение",15,accent(),true,10);addText(panel,ItachiProfile.BACKGROUND,13,TEXT,false,4);
@@ -1446,6 +1447,7 @@ public final class MainActivity extends Activity {
             game.katherine.companion.aiInitiatives=prefs.getBoolean("katherine_ai_initiatives",true);
             game.alma.enabled=prefs.getBoolean("alma_enabled",true);
             game.livia.enabled=prefs.getBoolean("livia_enabled",true);
+            game.itachi.enabled=prefs.getBoolean("itachi_enabled",true);
             if(selectedStart==0)game.choose("CANON_OPEN");
             tab=0;save();render();
         });
@@ -1527,7 +1529,7 @@ public final class MainActivity extends Activity {
     }
     private void renderStory(){
         boolean canonical="CANON".equals(game.mode)||("COMBAT".equals(game.mode)&&("CANONICAL".equals(game.battleKind)||"FACTION".equals(game.battleKind)));
-        canonical=canonical||LiviaStory.MODE.equals(game.mode)||("COMBAT".equals(game.mode)&&"LIVIA_DUEL".equals(game.battleKind))||KatherineStory.MODE.equals(game.mode)||AlmaStory.MODE.equals(game.mode)||("COMBAT".equals(game.mode)&&("KATHERINE".equals(game.battleKind)||"ALMA".equals(game.battleKind)));
+        canonical=canonical||ItachiStory.MODE.equals(game.mode)||LiviaStory.MODE.equals(game.mode)||("COMBAT".equals(game.mode)&&"LIVIA_DUEL".equals(game.battleKind))||KatherineStory.MODE.equals(game.mode)||AlmaStory.MODE.equals(game.mode)||("COMBAT".equals(game.mode)&&("KATHERINE".equals(game.battleKind)||"ALMA".equals(game.battleKind)));
         canonical=canonical||game.road.pending()||RoadEvents.MODE.equals(game.mode)||("COMBAT".equals(game.mode)&&game.battleKind.startsWith("ROAD_QUEST:"));
         if(prefs.getBoolean("ai_enabled",false)&&!canonical){renderAiGame();return;}
         GameEngine.Scene s=game.scene();section(s.kicker,s.title,"");
@@ -1580,10 +1582,11 @@ public final class MainActivity extends Activity {
 
     private void renderStoryJournal(){
         if(!game.started)return;
-        if(!LiviaStory.MODE.equals(game.mode)&&!AlmaStory.MODE.equals(game.mode)&&!KatherineStory.MODE.equals(game.mode)&&!"CANON".equals(game.mode)&&!"QUEST".equals(game.mode)&&!"DRAGON".equals(game.mode)
+        if(!ItachiStory.MODE.equals(game.mode)&&!LiviaStory.MODE.equals(game.mode)&&!AlmaStory.MODE.equals(game.mode)&&!KatherineStory.MODE.equals(game.mode)&&!"CANON".equals(game.mode)&&!"QUEST".equals(game.mode)&&!"DRAGON".equals(game.mode)
             &&!"EVENT".equals(game.mode)&&!"RESULT".equals(game.mode))return;
         LinearLayout journal=card();
         addText(journal,"ᚱ  ЖУРНАЛ ПРИКЛЮЧЕНИЙ",11,accent(),true,10);
+        if(game.itachi.enabled&&game.itachi.stage>0)addText(journal,"◉  "+game.itachi.objective(game),13,TEXT,false,7);
         if(game.livia.enabled&&game.livia.stage>0)addText(journal,"◉  "+game.livia.objective(),13,TEXT,false,7);
         if(game.alma.enabled&&game.alma.stage>0)addText(journal,"◉  Алая Бессмертная | "+game.alma.status(),13,TEXT,false,7);
         if(game.katherine.enabled&&game.katherine.stage>0)addText(journal,"◉  Нулевой Предел | "+game.katherine.status(),13,TEXT,false,7);
@@ -1747,6 +1750,7 @@ public final class MainActivity extends Activity {
 
     /** AI mode replaces the entire offline story, not just its dialogue panel. */
     private void renderAiGame(){
+        if(game.itachi.available(game)&&!livingBusy())actionButton("Итачи",game.itachi.objective(game),false,()->{game.choose("ITACHI:open");save();render();});
         if(game.livia.available(game)&&!livingBusy())actionButton("Ливия",game.livia.objective(),false,()->{game.choose("LIVIA:open");save();render();});
         if(game.alma.available(game)&&!livingBusy())actionButton("Альма","Алая Бессмертная | "+game.alma.status(),false,()->{game.choose("ALMA:open");save();render();});
         if(game.katherine.available(game)&&!livingBusy())actionButton("Кэтрин","Нулевой Предел | "+game.katherine.status(),false,()->{game.choose("KATH:open");save();render();});
@@ -2139,7 +2143,7 @@ public final class MainActivity extends Activity {
         final String model=local?"Qwen3.5-9B":prefs.getString(chat?"ai_chatgpt_model":"ai_api_model",
                 chat?"":AiModelCatalog.DEFAULT_API);
         if(model.isEmpty()){aiTurnStatus="Сначала выбери модель в настройках";render();return;}
-        final String effort=selectedReasoningEffort(),history=aiMemory.context(aiSession)+(local?"":"\n"+game.katherine.aiContext(game)+"\n"+game.alma.aiContext())+"\n"+game.livia.aiContext(game);
+        final String effort=selectedReasoningEffort(),history=aiMemory.context(aiSession)+(local?"":"\n"+game.katherine.aiContext(game)+"\n"+game.alma.aiContext())+"\n"+game.livia.aiContext(game)+"\n"+game.itachi.aiContext(game);
         final String saved;
         try{saved=game.toJson().toString();}
         catch(Exception ex){aiTurnStatus="Не удалось прочитать состояние героя";render();return;}
@@ -3892,6 +3896,7 @@ public final class MainActivity extends Activity {
             java.util.ArrayList<String> docs=ItemCatalog.loreDocuments(this);
             addText(content,"ᛟ  ХРОНИКИ И РУКОПИСИ",11,accent(),false,10);
             if(game.katherine.enabled&&game.katherine.stage>0)actionButton("Кэтрин | Нулевой Предел","Авторская история · "+game.katherine.status(),false,()->npcDetails(KatherineStory.NAME));
+            if(game.itachi.enabled&&game.itachi.stage>0)actionButton("Итачи | "+game.itachi.relation(),game.itachi.objective(game),false,()->npcDetails(ItachiStory.NAME));
             if(game.livia.enabled&&game.livia.stage>0)actionButton("Ливия | Имперский капитан",game.livia.status(),false,()->npcDetails(LiviaStory.NAME));
             if(game.alma.enabled&&game.alma.stage>0)actionButton("Альма | Алая Бессмертная","Авторская история · "+game.alma.status(),false,()->npcDetails(AlmaStory.NAME));
             if(docs.isEmpty())addText(content,"Справочные рукописи пока не загружены.",14,MUTED,false,8);
@@ -3932,6 +3937,7 @@ public final class MainActivity extends Activity {
     private void renderLivingRelations(){
         section("ЖУРНАЛ","Отношения","Только подтверждённые знакомства и события.");
         if(game.katherine.enabled&&game.katherine.stage>0)renderKatherineRelations();
+        if(game.itachi.enabled&&game.itachi.stage>0)actionButton("Итачи | "+game.itachi.relation(),game.itachi.objective(game),false,()->npcDetails(ItachiStory.NAME));
         if(game.livia.enabled&&game.livia.stage>0)actionButton("Ливия | "+game.livia.relation(),"Доверие "+game.livia.trust+"/100",false,()->npcDetails(LiviaStory.NAME));
         if(game.alma.enabled&&game.alma.stage>0)actionButton("Альма | "+game.alma.relationship(),"Доверие "+game.alma.trust+"/100 · Любовь "+game.alma.love+"/100",false,this::almaRelationshipDetails);
         org.json.JSONArray npcs=game.sceneState.npcFacts();
@@ -3980,6 +3986,7 @@ public final class MainActivity extends Activity {
         renderFactionJournal();
         renderRoadQuestJournal();
         if(game.katherine.enabled&&game.katherine.stage>0){LinearLayout k=card();addText(k,"НУЛЕВОЙ ПРЕДЕЛ | КРУГ ТРЁХ КОГТЕЙ",13,accent(),true,8);addText(k,game.katherine.objective(),15,TEXT,false,8);if(game.katherine.available(game))actionButton("Поговорить с Кэтрин","Продолжить расследование",false,()->{if(livingBusy())return;game.choose("KATH:open");save();tab=0;render();});}
+        if(game.itachi.enabled&&game.itachi.stage>0)actionButton("Итачи | "+game.itachi.relation(),game.itachi.objective(game),false,()->npcDetails(ItachiStory.NAME));
         if(game.livia.enabled&&game.livia.stage>0)actionButton(LiviaStory.TITLE,game.livia.status(),false,()->npcDetails(LiviaStory.NAME));
         if(game.alma.enabled&&game.alma.stage>0)actionButton("Алая Бессмертная",game.alma.objective()+" | "+game.alma.stage+"/12",false,()->new RuneDialogBuilder(this,accent()).setTitle("Алая Бессмертная").setMessage(game.alma.objective()+"\n\n"+(game.alma.companion?"Альма путешествует с тобой.":game.alma.terminalLoss()?"История завершена.":"Ищи Альму: "+game.alma.location(game))).setPositiveButton("Закрыть",null).show());
         String[] entries=game.aiJournal.isEmpty()?
@@ -4269,6 +4276,7 @@ public final class MainActivity extends Activity {
         Switch kathAI=new Switch(this);kathAI.setText("Самостоятельные инициативы Кэтрин через ИИ");kathAI.setTextColor(TEXT);kathAI.setThumbTintList(ColorStateList.valueOf(accent()));kathAI.setChecked(game.katherine.companion.aiInitiatives);kathAI.setOnCheckedChangeListener((v,on)->{if(livingBusy()){v.setChecked(game.katherine.companion.aiInitiatives);return;}game.katherine.companion.aiInitiatives=on;prefs.edit().putBoolean("katherine_ai_initiatives",on).apply();save();});expansion.addView(kathAI,lp(-1,52));
         TextView kathProfile=text("Начальное состояние Кэтрин | "+game.katherine.companion.profileName(),14,accent(),true);kathProfile.setPadding(dp(10),dp(12),dp(10),dp(12));expansion.addView(kathProfile,lp(-1,-2));kathProfile.setOnClickListener(v->{if(livingBusy()||game.katherine.stage>0){toast("Начальное состояние доступно до первой встречи с Кэтрин");return;}game.katherine.companion.profile=(game.katherine.companion.profile+1)%3;prefs.edit().putInt("katherine_profile",game.katherine.companion.profile).apply();save();render();});
         addText(expansion,"Влияет на стартовую магию спутницы, а не на создание героя.",11,MUTED,false,6);
+        Switch itachiToggle=new Switch(this);itachiToggle.setText("Итачи | Алая Ворона");itachiToggle.setTextColor(TEXT);itachiToggle.setThumbTintList(ColorStateList.valueOf(accent()));itachiToggle.setChecked(game.itachi.enabled);itachiToggle.setOnCheckedChangeListener((v,on)->{if(livingBusy()||!game.itachi.setEnabled(game,on)){v.setChecked(game.itachi.enabled);return;}prefs.edit().putBoolean("itachi_enabled",on).apply();save();});expansion.addView(itachiToggle,lp(-1,47));addText(expansion,"Итачи: авторская история, спутница, духовные техники и отношения.",12,MUTED,false,8);
         Switch liviaToggle=new Switch(this);liviaToggle.setText("Ливия | Пепел Хелгена");liviaToggle.setTextColor(TEXT);liviaToggle.setThumbTintList(ColorStateList.valueOf(accent()));liviaToggle.setChecked(game.livia.enabled);liviaToggle.setOnCheckedChangeListener((v,on)->{if(livingBusy()||!game.livia.setEnabled(game,on)){v.setChecked(game.livia.enabled);return;}prefs.edit().putBoolean("livia_enabled",on).apply();save();});expansion.addView(liviaToggle,lp(-1,47));addText(expansion,"Ливия: авторское выживание после Хелгена, месть, прощение, искупление и отношения.",12,MUTED,false,8);
         actionButton("Портрет Ливии","Импорт оригинального WebP без генерации",false,this::liviaPortrait);
         Switch almaToggle=new Switch(this);almaToggle.setText("Альма | Алая Бессмертная");almaToggle.setTextColor(TEXT);almaToggle.setThumbTintList(ColorStateList.valueOf(accent()));almaToggle.setChecked(game.alma.enabled);
