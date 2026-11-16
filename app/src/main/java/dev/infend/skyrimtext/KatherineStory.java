@@ -50,8 +50,8 @@ final class KatherineStory {
         if(delta==0)return;
         trust=Math.min(100,trust+delta);stage++;
         g.progress.setQuestOutcome(ID,stage==4?"COMPLETED":"ACTIVE");
-        g.sceneState.setContext(g.day,g.hour,g.progress.location);
-        g.sceneState.confirm("npc",ID,NAME,stage>=3?"HELPED":"MET");
+        try { g.sceneState.setContext(g.day,g.hour,g.progress.location);
+        g.sceneState.confirm("npc",ID,NAME,stage>=3?"HELPED":"MET"); } catch (JSONException ignored) {}
         g.message="Кэтрин: "+status()+". Доверие "+trust+"/100.";
     }
 }
