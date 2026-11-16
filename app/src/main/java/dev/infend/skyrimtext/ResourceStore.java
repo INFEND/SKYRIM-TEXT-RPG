@@ -51,6 +51,17 @@ final class ResourceStore {
         final String commit;
         final long revision;
         final JSONArray galleries;
+        // APK-only commits may change the revision but not the actual downloadable content.
+        boolean sameResources(Catalog other){
+            if(bundled!=other.bundled||entries.size()!=other.entries.size()||galleries==null||other.galleries==null
+                ||!galleries.toString().equals(other.galleries.toString()))return false;
+            for(Entry e:entries.values()){
+                Entry b=other.entries.get(e.path);
+                if(b==null||e.size!=b.size||!e.sha.equals(b.sha)||!e.group.equals(b.group)||!e.label.equals(b.label)
+                    ||(e.path.startsWith("fonts/choices/")&&!e.url.equals(b.url)))return false;
+            }
+            return true;
+        }
         Catalog(Context c)throws Exception{this(readEmbedded(c));}
         private static JSONObject readEmbedded(Context c)throws Exception{
             try(InputStream in=c.getAssets().open(MANIFEST)){
@@ -89,6 +100,7 @@ final class ResourceStore {
         byte[] envelope=SignedResourceCatalog.fetch(c);
         Catalog remote=SignedResourceCatalog.verify(c,envelope);
         if(remote.bundled||remote.revision<=0||remote.galleries==null)throw new IOException("Неполный внешний каталог");
+        if(remote.revision<=before.revision&&remote.sameResources(before))return false;
         if(remote.revision<before.revision)throw new IOException("Серверный каталог старее установленного. Используется локальный каталог");
         if(remote.revision==before.revision&&!remote.commit.equals(before.commit))throw new IOException("Конфликт ревизий каталога");
         if(remote.commit.equals(before.commit))return false;

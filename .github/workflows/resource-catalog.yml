@@ -2,15 +2,6 @@ name: SKYRIM · Signed resource catalog
 on:
   push:
     branches: [main]
-    paths:
-      - 'app/src/main/assets/**'
-      - 'app/font-choices.json'
-      - 'app/build.gradle'
-      - 'app/src/main/java/dev/infend/skyrimtext/LocationGalleryView.java'
-      - 'docs/gallery_registry.json'
-      - 'scripts/build_resource_catalog.py'
-      - 'tools/SignResourceCatalog.java'
-      - '.github/workflows/resource-catalog.yml'
   workflow_dispatch:
 permissions:
   contents: write
@@ -24,6 +15,8 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: main
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
@@ -31,7 +24,9 @@ jobs:
       - name: Validate and build independent resource catalog
         run: |
           python3 -m unittest discover -s tests -p 'test_resource*.py' -v
-          python3 scripts/build_resource_catalog.py --commit "$GITHUB_SHA" --thin
+          CATALOG_SHA=$(git rev-parse HEAD)
+          echo "CATALOG_SHA=$CATALOG_SHA" >> "$GITHUB_ENV"
+          python3 scripts/build_resource_catalog.py --commit "$CATALOG_SHA" --thin
       - name: Sign and publish catalog atomically
         env:
           GH_TOKEN: ${{ github.token }}
@@ -47,7 +42,7 @@ jobs:
           unzip -qo "$work/signing.zip" -d "$work"
           java tools/SignResourceCatalog.java app/src/main/assets/resource_manifest.json "$work/resource-catalog.json" "$work"
           if ! gh api "repos/${GITHUB_REPOSITORY}/git/ref/heads/ota-manifest" >/dev/null 2>&1; then
-            gh api --method POST "repos/${GITHUB_REPOSITORY}/git/refs" -f ref=refs/heads/ota-manifest -f sha="$GITHUB_SHA" >/dev/null
+            gh api --method POST "repos/${GITHUB_REPOSITORY}/git/refs" -f ref=refs/heads/ota-manifest -f sha="$CATALOG_SHA" >/dev/null
           fi
           export WORK="$work"
           for attempt in 1 2 3 4 5; do
@@ -57,12 +52,12 @@ jobs:
           import base64,json,os,pathlib
           root=pathlib.Path(os.environ["WORK"])
           raw=(root/"resource-catalog.json").read_bytes()
-          request={"message":"Publish independently signed resource catalog "+os.environ["GITHUB_SHA"],"branch":"ota-manifest","content":base64.b64encode(raw).decode("ascii")}
+          request={"message":"Publish independently signed resource catalog "+os.environ["CATALOG_SHA"],"branch":"ota-manifest","content":base64.b64encode(raw).decode("ascii")}
           if os.environ["PREVIOUS"]:request["sha"]=os.environ["PREVIOUS"]
           (root/"request.json").write_text(json.dumps(request))
           PY
             if gh api --method PUT "repos/${GITHUB_REPOSITORY}/contents/resource-catalog.json" --input "$work/request.json" >/dev/null; then
-              echo "Signed resource catalog published: $GITHUB_SHA" >> "$GITHUB_STEP_SUMMARY"
+              echo "Signed resource catalog published: $CATALOG_SHA" >> "$GITHUB_STEP_SUMMARY"
               break
             fi
             if [[ "$attempt" == 5 ]]; then exit 1; fi

@@ -247,7 +247,7 @@ final class ResourceManagerDialog {
     private void setRow(Category c,long done,long total,boolean ready,boolean active,String suffix,int installedFiles,int serverFiles){
         String amount=total<=0&&!active?("engine".equals(c.key)?"Размер неизвестен":"По выбору"):sizePair(done,total);
         if(serverFiles>=0)amount+=" "+filePair(installedFiles,serverFiles);
-        if("engine".equals(c.key)&&total>0&&!ready&&done==total)amount+=" · Установить";
+        boolean installPending="engine".equals(c.key)&&total>0&&!ready&&done==total&&!active;
         if(!suffix.isEmpty())amount+="\n"+suffix;
         c.amount.setText(amount);
         c.amount.setContentDescription(amount);
@@ -255,14 +255,14 @@ final class ResourceManagerDialog {
         c.percent.setText(total>0?percent+"%":active?"…":"");
         c.percent.setContentDescription(suffix.isEmpty()?c.percent.getText():c.percent.getText()+" · "+suffix);
         c.progress.update(total>0?Math.min(1f,done/(float)total):0f,total<=0&&active);
-        String glyph=ready?"check":active?"clock":"download";
+        String glyph=ready?"check":active?"clock":installPending?"install":"download";
         if(!glyph.equals(c.actionIcon)){
             c.actionIcon=glyph;c.action.setImageDrawable(new ResourceGlyph(glyph,ready?0xffa9b8ac:accent));
             c.action.setBackground(shape(ready?0xff1a211c:accentSurface(),0,14));
         }
         c.action.setEnabled(!busy&&!active);
         c.action.setAlpha(c.action.isEnabled()||ready?1f:.48f);
-        c.action.setContentDescription((ready?"Управление: ":"Скачать: ")+c.label);
+        c.action.setContentDescription((ready?"Управление: ":installPending?"Установить: ":"Скачать: ")+c.label);
     }
     private void updateRows(){
         if(dialog==null||!dialog.isShowing())return;
@@ -271,7 +271,7 @@ final class ResourceManagerDialog {
             if("engine".equals(c.key)){
                 boolean ready=LocalAiEngineModule.installed(activity);long total=LocalAiEngineModule.totalBytes(activity);
                 long done=LocalAiEngineModule.downloadedBytes(activity);
-                setRow(c,done,total,ready,LocalAiEngineModule.downloading(),ready?"Установлен":done>0&&done==total?"Установить":"",ready?1:0,total>0?1:-1);continue;
+                setRow(c,done,total,ready,LocalAiEngineModule.downloading(),ready?"Установлен":done>0&&done==total?"Скачан · требуется установка":"",ready?1:0,total>0?1:-1);continue;
             }
             if("gguf".equals(c.key)){
                 java.io.File dir=activity.getExternalFilesDir("models");
@@ -372,7 +372,7 @@ final class ResourceManagerDialog {
             if("check".equals(op)&&!stop.get()){
                 int fresh=0,old=0,missing=0,damaged=0;
                 for(ResourceStore.State state:result.values())switch(state){case NEW:fresh++;break;case OLD:old++;break;case MISSING:missing++;break;case DAMAGED:damaged++;break;default:break;}
-                message=catalogReport+"\nНовые: "+fresh+" · Обновить: "+old+" · Не скачаны: "+missing+" · Повреждены: "+damaged;
+                message=catalogReport+(ResourceStore.catalogError(activity).isEmpty()?"":"\nПо локальному каталогу:")+"\nНовые: "+fresh+" · Обновить: "+old+" · Не скачаны: "+missing+" · Повреждены: "+damaged;
             }
             final String report=errors==0?message:message+" | ошибок: "+errors+" | "+last;
             ResourceStore.UI.post(()->{if(!dialog.isShowing())return;verified.putAll(result);activePath="";operation="";setBusy(false);showStatus(report);});

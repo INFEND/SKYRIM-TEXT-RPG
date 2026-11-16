@@ -43,3 +43,11 @@ class IndependentCatalog(unittest.TestCase):
         self.assertIn("Каталог актуален",ui)
         self.assertIn("catalogReport",ui)
         self.assertIn("case NEW:fresh++",ui)
+
+    def test_code_only_commits_do_not_make_catalog_stale(self):
+        store=(JAVA/"ResourceStore.java").read_text()
+        workflow=(ROOT/".github/workflows/resource-catalog.yml").read_text()
+        self.assertIn("remote.revision<=before.revision&&remote.sameResources(before)",store)
+        self.assertIn("!e.sha.equals(b.sha)",store)
+        self.assertNotIn("    paths:",workflow)
+        self.assertIn("CATALOG_SHA=$(git rev-parse HEAD)",workflow)

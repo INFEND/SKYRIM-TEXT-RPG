@@ -22,3 +22,9 @@ class ResourceManagerVisualContract(unittest.TestCase):
         s=(JAVA/"ResourceManagerDialog.java").read_text()
         for token in ('return "["+installed+"/"+server+"]"', 'count.serverFiles++', 'if(ready)count.installedFiles++', 'filePair(allInstalled,allServer)', 'filePair(n.installedFiles,n.serverFiles)', 'amount+=" "+filePair(installedFiles,serverFiles)'):
             self.assertIn(token,s)
+
+    def test_engine_install_status_is_not_duplicated(self):
+        s=(JAVA/"ResourceManagerDialog.java").read_text()
+        self.assertNotIn('amount+=" · Установить"',s)
+        self.assertIn('installPending?"install":"download"',s)
+        self.assertIn("Скачан · требуется установка",s)

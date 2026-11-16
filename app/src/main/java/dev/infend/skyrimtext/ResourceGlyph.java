@@ -40,6 +40,7 @@ final class ResourceGlyph extends Drawable {
             case "check":line(c,5,12,10,17,19,7);break;
             case "close":line(c,6,6,18,18);line(c,18,6,6,18);break;
             case "clock":circle(c,12,12,8);line(c,12,7,12,12,15,14);break;
+            case "install":rect(c,4,5,20,20,2);line(c,12,8,12,16);line(c,8,12,12,16,16,12);break;
             case "download":line(c,12,3,12,15);line(c,7,10,12,15,17,10);line(c,4,16,4,20,20,20,20,16);break;
             default:circle(c,12,12,8);line(c,8,12,16,12);line(c,12,8,12,16);break;
         }
