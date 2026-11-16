@@ -32,3 +32,14 @@ class IndependentCatalog(unittest.TestCase):
             name=stem+".webp"
             self.assertIn("media/mapicons/"+name,paths)
             self.assertEqual((catalog.ASSETS/"media/mapicons"/name).read_bytes(),(ROOT/"app/src/main/res/drawable-nodpi"/name).read_bytes())
+
+    def test_manual_check_reports_freshness_and_counts(self):
+        store=(JAVA/"ResourceStore.java").read_text()
+        signed=(JAVA/"SignedResourceCatalog.java").read_text()
+        ui=(JAVA/"ResourceManagerDialog.java").read_text()
+        self.assertIn("setUseCaches(false)",signed)
+        self.assertIn("?check=",signed)
+        self.assertIn("Серверный каталог старее установленного",store)
+        self.assertIn("Каталог актуален",ui)
+        self.assertIn("catalogReport",ui)
+        self.assertIn("case NEW:fresh++",ui)

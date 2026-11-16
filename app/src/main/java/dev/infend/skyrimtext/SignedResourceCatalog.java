@@ -29,9 +29,11 @@ final class SignedResourceCatalog {
     private static File file(Context c){return new File(c.getFilesDir(),"resource_catalog_verified.json");}
     static byte[] fetch(Context c)throws Exception{
         ResourceStore.checkNetwork(c);
-        HttpsURLConnection conn=(HttpsURLConnection)new URL(URL_STRING).openConnection();
+        HttpsURLConnection conn=(HttpsURLConnection)new URL(URL_STRING+"?check="+System.currentTimeMillis()).openConnection();
         conn.setInstanceFollowRedirects(false);conn.setConnectTimeout(6000);conn.setReadTimeout(8000);
-        conn.setRequestProperty("Cache-Control","no-cache");
+        conn.setUseCaches(false);
+        conn.setRequestProperty("Cache-Control","no-cache, no-store, max-age=0");
+        conn.setRequestProperty("Pragma","no-cache");
         try{
             int code=conn.getResponseCode();
             if(code!=200)throw new IOException("HTTP "+code);

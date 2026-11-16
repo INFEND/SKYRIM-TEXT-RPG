@@ -5,6 +5,7 @@ on:
     paths:
       - 'app/src/main/assets/**'
       - 'app/font-choices.json'
+      - 'app/build.gradle'
       - 'app/src/main/java/dev/infend/skyrimtext/LocationGalleryView.java'
       - 'docs/gallery_registry.json'
       - 'scripts/build_resource_catalog.py'

@@ -32,7 +32,7 @@ final class ResourceManagerDialog {
     private ImageButton closeButton;
     private boolean lastAllReady;
     private boolean busy;
-    private String activePath="", operation="";
+    private String activePath="", operation="", catalogReport="";
     private static final int MUTED=0xffaaaaaa;
     private static final String[] KEYS={"gallery","portraits","map","icons","font","media"};
     private static final String[] LABELS={"Галереи локаций","Портреты персонажей","Карты мира","Расширенные иконки","Дополнительные шрифты","Дополнительные ресурсы"};
@@ -176,11 +176,13 @@ final class ResourceManagerDialog {
         if(busy)return;
         stop.set(false);setBusy(true);showStatus("Проверка каталога в сети…");
         ResourceStore.IO.execute(()->{
-            ResourceStore.refreshCatalog(activity);
-            if(!stop.get())ResourceStore.autoSync(activity.getApplicationContext(),stop);
+            boolean changed=ResourceStore.refreshCatalog(activity);
+            String error=ResourceStore.catalogError(activity);
+            if(!stop.get()&&error.isEmpty())ResourceStore.autoSync(activity.getApplicationContext(),stop);
+            final String outcome=!error.isEmpty()?error:(changed?"Каталог обновлён":"Каталог актуален");
             ResourceStore.UI.post(()->{
                 if(!dialog.isShowing())return;
-                rebuildGroups();setBusy(false);
+                catalogReport=outcome;rebuildGroups();setBusy(false);
                 if(!stop.get()&&!groups.isEmpty())run("check",new LinkedHashSet<>(groups.keySet()));
                 else showStatus("Проверка остановлена");
             });
@@ -278,7 +280,8 @@ final class ResourceManagerDialog {
             setRow(c,n.done,n.total,n.ready,false,n.status());
         }
         String error=ResourceStore.catalogError(activity),auto=ResourceStore.automaticError(activity);
-        summary.setText("Ресурсы игры: "+sizePair(allDone,allTotal)+(error.isEmpty()?"":"\n"+error)+(auto.isEmpty()?"":"\n"+auto));
+        int fileCount=0;for(List<ResourceStore.Entry> entries:groups.values())fileCount+=entries.size();
+        summary.setText("Ресурсы игры: "+sizePair(allDone,allTotal)+" · "+fileCount+" файлов"+(error.isEmpty()?"":"\n"+error)+(auto.isEmpty()?"":"\n"+auto));
         allButton.setEnabled(!busy&&!groups.isEmpty()&&!allReady);
         boolean complete=allReady&&!groups.isEmpty();
         allButton.setText(complete?"✓  Все ресурсы загружены":"Скачать / обновить все ресурсы");
@@ -360,6 +363,11 @@ final class ResourceManagerDialog {
                 }catch(Exception ex){if(stop.get()){message="Остановлено. Прогресс сохранён.";break;}errors++;last=ex.getMessage();}
                 final int step=++done;final ResourceStore.State state=result.get(e.path);
                 ResourceStore.UI.post(()->{if(!dialog.isShowing())return;activePath="";if(state!=null)verified.put(e.path,state);showStatus(step+" / "+work.size()+" | "+e.label);updateRows();});
+            }
+            if("check".equals(op)&&!stop.get()){
+                int fresh=0,old=0,missing=0,damaged=0;
+                for(ResourceStore.State state:result.values())switch(state){case NEW:fresh++;break;case OLD:old++;break;case MISSING:missing++;break;case DAMAGED:damaged++;break;default:break;}
+                message=catalogReport+"\nНовые: "+fresh+" · Обновить: "+old+" · Не скачаны: "+missing+" · Повреждены: "+damaged;
             }
             final String report=errors==0?message:message+" | ошибок: "+errors+" | "+last;
             ResourceStore.UI.post(()->{if(!dialog.isShowing())return;verified.putAll(result);activePath="";operation="";setBusy(false);showStatus(report);});

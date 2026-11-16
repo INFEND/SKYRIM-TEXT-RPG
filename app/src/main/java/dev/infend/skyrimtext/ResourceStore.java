@@ -85,11 +85,11 @@ final class ResourceStore {
     // any file; offline clients retain the last verified catalog.
     static boolean refreshRemote(Context c)throws Exception{
         Catalog before=catalog(c);
-        if(before.bundled)return false;
+        if(before.bundled)throw new IOException("Установите облегчённое обновление игры для независимой докачки");
         byte[] envelope=SignedResourceCatalog.fetch(c);
         Catalog remote=SignedResourceCatalog.verify(c,envelope);
         if(remote.bundled||remote.revision<=0||remote.galleries==null)throw new IOException("Неполный внешний каталог");
-        if(remote.revision<before.revision)return false;
+        if(remote.revision<before.revision)throw new IOException("Серверный каталог старее установленного. Используется локальный каталог");
         if(remote.revision==before.revision&&!remote.commit.equals(before.commit))throw new IOException("Конфликт ревизий каталога");
         if(remote.commit.equals(before.commit))return false;
         SignedResourceCatalog.save(c,envelope);
