@@ -685,6 +685,7 @@ public final class GameEngine {
         if(kathBurn>0){damage+=kathBurn;actionText+="\nКэтрин: остаточное пламя, −"+kathBurn+" здоровья врагу.";}
         int kathDamage=katherine.assist(this,battleTurns+1,Math.max(0,enemyHp-damage));
         if(kathDamage>0){damage+=kathDamage;actionText+="\nКэтрин: "+katherine.companion.lastSpell+", −"+kathDamage+" здоровья врагу.";}
+        if(damage>0&&("ATTACK".equals(action)||"HEAVY".equals(action))&&progress.equipped("Бритва Мерунеса")&&"WILD".equals(battleKind)&&!enemyName.toLowerCase(java.util.Locale.ROOT).contains("карстааг")&&random.nextInt(10000)<198){damage=enemyHp;actionText+="\nБритва Мерунеса срабатывает: противник падает замертво.";}
         if(road.hasDog(this)&&enemyHp>damage&&(battleTurns+1)%3==0){damage+=3;actionText+="\nБродячий пёс помогает в бою: −3 здоровья врагу.";}
         int itachiDamage=itachi.assist(battleTurns+1,Math.max(0,enemyHp-damage));if(itachiDamage>0){damage+=itachiDamage;actionText+="\nИтачи: "+itachi.lastPower+", −"+itachiDamage+" здоровья врагу.";} 
         int liviaDamage=livia.assist(battleTurns+1,Math.max(0,enemyHp-damage));if(liviaDamage>0){damage+=liviaDamage;actionText+="\nЛивия: удар мечом, −"+liviaDamage+" здоровья врагу.";}
