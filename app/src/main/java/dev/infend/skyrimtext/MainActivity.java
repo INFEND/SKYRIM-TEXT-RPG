@@ -394,6 +394,7 @@ public final class MainActivity extends Activity {
         switch(status){case "MET":return "Знакомство";case "HELPED":return "Благодарность";case "INFORMED":return "Обмен сведениями";case "HOSTILE":return "Враждебность";case "DEAD":return "Погиб";case "MISSING":return "Пропал";default:return "Отношение неизвестно";}
     }
     private View npcPortrait(String name){
+        if(AlmaStory.NAME.equalsIgnoreCase(name))return npcEmblem(name,"hero");
         if(KatherineStory.NAME.equalsIgnoreCase(name)){
             String path="media/katherine/portrait.webp";
             try(java.io.InputStream in=ResourceStore.open(this,path)){
@@ -430,6 +431,7 @@ public final class MainActivity extends Activity {
         NpcProfiles.Profile profile=NpcProfiles.find(name);
         if(profile!=null){addText(panel,profile.race+" | "+profile.role,14,TEXT,true,8);}
         if(KatherineStory.NAME.equals(name)){addText(panel,"18 лет | Носитель Нулевого Предела",14,TEXT,true,8);addText(panel,"Доверие: "+game.katherine.trust+"/100",14,accent(),true,8);}
+        if(AlmaStory.NAME.equals(name)){addText(panel,"437 лет | Маг крови, бывшая убийца",14,TEXT,true,8);addText(panel,game.alma.relationship()+" | Доверие: "+game.alma.trust+"/100 | Любовь: "+game.alma.love+"/100",14,accent(),true,8);}
         if(!KatherineStory.NAME.equals(name))addText(panel,"Иллюстративный образ или эмблема, не индивидуальный портрет",11,MUTED,false,10);
         addText(panel,npcStatusLabel(game.sceneState.npcStatusByName(name)),15,TEXT,true,8);
         new RuneDialogBuilder(this,accent()).setTitle(name).setView(panel).setNegativeButton("Закрыть",null).show();
@@ -1342,6 +1344,7 @@ public final class MainActivity extends Activity {
             newAiSession();game.start(nameField.getText().toString(),selectedRace,selectedClass,selectedStart,
                 initialPoints,selectedGender,selectedPortrait);
             game.katherine.enabled=prefs.getBoolean("katherine_enabled",true);
+            game.alma.enabled=prefs.getBoolean("alma_enabled",true);
             if(selectedStart==0)game.choose("CANON_OPEN");
             tab=0;save();render();
         });
@@ -1423,7 +1426,7 @@ public final class MainActivity extends Activity {
     }
     private void renderStory(){
         boolean canonical="CANON".equals(game.mode)||("COMBAT".equals(game.mode)&&("CANONICAL".equals(game.battleKind)||"FACTION".equals(game.battleKind)));
-        if(prefs.getBoolean("ai_enabled",false)&&!canonical&&!KatherineStory.MODE.equals(game.mode)){renderAiGame();return;}
+        if(prefs.getBoolean("ai_enabled",false)&&!canonical&&!KatherineStory.MODE.equals(game.mode)&&!AlmaStory.MODE.equals(game.mode)){renderAiGame();return;}
         GameEngine.Scene s=game.scene();section(s.kicker,s.title,"");
         if(LocationGalleryView.hasGallery(game.progress.location)){
             content.addView(sceneGallery(game.progress.location),lp(-1,-2));
@@ -1474,10 +1477,11 @@ public final class MainActivity extends Activity {
 
     private void renderStoryJournal(){
         if(!game.started)return;
-        if(!KatherineStory.MODE.equals(game.mode)&&!"CANON".equals(game.mode)&&!"QUEST".equals(game.mode)&&!"DRAGON".equals(game.mode)
+        if(!AlmaStory.MODE.equals(game.mode)&&!KatherineStory.MODE.equals(game.mode)&&!"CANON".equals(game.mode)&&!"QUEST".equals(game.mode)&&!"DRAGON".equals(game.mode)
             &&!"EVENT".equals(game.mode)&&!"RESULT".equals(game.mode))return;
         LinearLayout journal=card();
         addText(journal,"ᚱ  ЖУРНАЛ ПРИКЛЮЧЕНИЙ",11,accent(),true,10);
+        if(game.alma.stage>0)addText(journal,"◉  Алая Бессмертная | "+game.alma.status(),13,TEXT,false,7);
         if(game.katherine.stage>0)addText(journal,"◉  Нулевой Предел | "+game.katherine.status(),13,TEXT,false,7);
         if(game.canonicalStage>0)addText(journal,"◉  Путь Довакина | "+CanonicalCampaign.objective(game),13,TEXT,false,7);
         if(game.questStage>0&&game.questStage<4)
@@ -1638,6 +1642,7 @@ public final class MainActivity extends Activity {
 
     /** AI mode replaces the entire offline story, not just its dialogue panel. */
     private void renderAiGame(){
+        if(game.alma.available(game)&&!aiTurnBusy)actionButton("Альма","Алая Бессмертная | "+game.alma.status(),false,()->{game.choose("ALMA:open");save();render();});
         if(game.katherine.available(game)&&!aiTurnBusy)actionButton("Кэтрин","Нулевой Предел | "+game.katherine.status(),false,()->{game.choose("KATH:open");save();render();});
         String source=resolvedAiProvider();
         boolean ready="local".equals(source)?localModelReady():
@@ -4063,6 +4068,8 @@ public final class MainActivity extends Activity {
             if(!on&&KatherineStory.MODE.equals(game.mode))game.mode="WORLD";
             prefs.edit().putBoolean("katherine_enabled",on).apply();save();
         });expansion.addView(katherineToggle,lp(-1,47));
+        Switch almaToggle=new Switch(this);almaToggle.setText("Альма | Алая Бессмертная");almaToggle.setTextColor(TEXT);almaToggle.setThumbTintList(ColorStateList.valueOf(accent()));almaToggle.setChecked(game.alma.enabled);
+        almaToggle.setOnCheckedChangeListener((v,on)->{if(livingBusy()){v.setChecked(game.alma.enabled);return;}game.alma.enabled=on;if(!on&&AlmaStory.MODE.equals(game.mode))game.mode="WORLD";prefs.edit().putBoolean("alma_enabled",on).apply();save();});expansion.addView(almaToggle,lp(-1,47));
         addText(expansion,"Необязательная авторская история вне канона TES.",12,MUTED,false,0);
         if(game.started)livingLink(content,"Магазин компенсаций","∞ F","skills",this::livingFixShop);
         content.addView(new NordicArtView(this,NordicArtView.STORY),lp(-1,105));space(content,12);

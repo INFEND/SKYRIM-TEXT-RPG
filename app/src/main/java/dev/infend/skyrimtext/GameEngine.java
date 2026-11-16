@@ -73,6 +73,7 @@ public final class GameEngine {
     public AiGameTurn aiTurn;
     public SceneState sceneState = new SceneState();
     public KatherineStory katherine = new KatherineStory();
+    public AlmaStory alma = new AlmaStory();
     public String aiJournal = "";
     public int poisonTurns,frostTurns,battleTurns,battleDealt,battleTaken,lastDealt,lastTaken,lastHealing,lastBlocked;
     public boolean lastHeavyHit,lastMiss,lastCritical;
@@ -175,7 +176,7 @@ public final class GameEngine {
         if(name.length()>28)name=name.substring(0,28);
         race=contains(RACES,desiredRace)?desiredRace:"Норд";
         heroClass=contains(CLASSES,desiredClass)?desiredClass:"Без класса";
-        started=true;compensation=new CompensationPowers();compensation.installCatalog();lastLivingResult=new JSONObject();lastCheckChance=lastCheckRoll=-1;needs=new LivingNeeds();economy=new LivingEconomy();java.util.Arrays.fill(regenBonus,0);regenIgnorePenalty=false;fixSpent=0;aiTurn=null;sceneState=new SceneState();katherine=new KatherineStory();aiJournal="";day=1;hour=8;level=1;xp=0;gold=85;potions=3;manaPotions=1;
+        started=true;compensation=new CompensationPowers();compensation.installCatalog();lastLivingResult=new JSONObject();lastCheckChance=lastCheckRoll=-1;needs=new LivingNeeds();economy=new LivingEconomy();java.util.Arrays.fill(regenBonus,0);regenIgnorePenalty=false;fixSpent=0;aiTurn=null;sceneState=new SceneState();katherine=new KatherineStory();alma=new AlmaStory();aiJournal="";day=1;hour=8;level=1;xp=0;gold=85;potions=3;manaPotions=1;
         questStage=0;sideQuest=0;sideKills=0;boardCompleted=0;explored=0;victories=0;reputation=0;
         swordUpgraded=false;armorUpgraded=false;
         maxHp=100;maxStamina=100;maxMagicka=100;attack=12;armor=2;
@@ -210,10 +211,12 @@ public final class GameEngine {
     }
 
     public Scene scene() {
+        if(started&&AlmaStory.MODE.equals(mode))return alma.scene(this);
         if(started&&KatherineStory.MODE.equals(mode))return katherine.scene();
         if(started&&"CANON".equals(mode))return CanonicalCampaign.scene(this);
         Scene s=baseScene();
         if(started)progress.fillChoices(this,s);
+        if(alma.available(this))s.add("ALMA:open","Поговорить с Альмой","Алая Бессмертная | "+alma.status());
         if(katherine.available(this))s.add("KATH:open","Поговорить с Кэтрин","Нулевой Предел | "+katherine.status());
         // Every offline scene follows the same long-form literary presentation.
         // SceneNarrative is text-only: action IDs, story flags and saves are unchanged.
@@ -378,6 +381,8 @@ public final class GameEngine {
         if (("Q_ACCEPT".equals(action) || "Q_ALTAR".equals(action)
                 || "Q_BOSS".equals(action) || "Q_FINISH".equals(action))
                 && !"QUEST".equals(mode)) return;
+        if(action.startsWith("ALMA:")){alma.choose(this,action);return;}
+        if(AlmaStory.MODE.equals(mode))return;
         if(action.startsWith("KATH:")){katherine.choose(this,action);return;}
         if(KatherineStory.MODE.equals(mode))return;
         if("CANON_OPEN".equals(action)){CanonicalCampaign.open(this);return;}
@@ -715,6 +720,7 @@ public final class GameEngine {
         JSONObject j=new JSONObject();
         j.put("needs",needs.toJson()).put("fixSpent",fixSpent).put("economy",economy.toJson()).put("regenBonus",new org.json.JSONArray(regenBonus)).put("regenIgnorePenalty",regenIgnorePenalty).put("compensation",compensation.toJson()).put("lastLivingResult",lastLivingResult);
         j.put("katherine",katherine.save());
+        j.put("alma",alma.save());
         j.put("schema",1).put("started",started).put("name",name).put("race",race).put("heroClass",heroClass)
          .put("gender",gender).put("portrait",portrait)
          .put("region",region).put("day",day).put("hour",hour).put("level",level).put("xp",xp).put("maxHp",maxHp).put("hp",hp)
@@ -781,6 +787,7 @@ public final class GameEngine {
             g.aiTurn=AiGameTurn.restore(j.optJSONObject("aiTurn"));
             g.sceneState=SceneState.fromJson(j.optJSONObject("sceneState"));
              g.katherine=KatherineStory.restore(j.optJSONObject("katherine"));
+             g.alma=AlmaStory.restore(j.optJSONObject("alma"));
             // Reconcile legacy schema-1 saves with the authoritative quest stage.
             if(g.questStage>=4)g.progress.setQuestOutcome("ash_seals","COMPLETED");
             else if(g.questStage>0)g.progress.setQuestOutcome("ash_seals","ACTIVE");

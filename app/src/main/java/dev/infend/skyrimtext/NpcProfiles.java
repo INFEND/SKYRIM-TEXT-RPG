@@ -14,6 +14,7 @@ final class NpcProfiles {
         Profile p=new Profile(n,r,g,role,v,"Дракон".equals(r));INDEX.put(key(n),p);for(String alias:aliases)INDEX.put(key(alias),p);
     }
     static {
+        add("Альма","Бретонец","Женский","Алая Бессмертная | маг крови",1);
         add("Кэтрин","Человек","Женский","Носитель Нулевого Предела",1);
         add("Ралоф","Норд","Мужской","Брат Бури",1);
         add("Хадвар","Норд","Мужской","Имперский солдат",2);
