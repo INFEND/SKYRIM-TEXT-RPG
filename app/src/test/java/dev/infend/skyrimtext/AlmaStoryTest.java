@@ -51,6 +51,13 @@ public class AlmaStoryTest {
         g=GameEngine.fromJson(g.toJson().toString());assertEquals(3,g.alma.markTurns);assertTrue(g.alma.weaken(20)>0);assertEquals(2,g.alma.markTurns);
         g.alma.setEnabled(g,false);assertEquals(0,g.alma.combo(100,true));assertEquals(0,g.alma.weaken(20));
     }
+    @Test public void lifeEventsPersistAndRespectToggle() throws Exception {
+        GameEngine g=start();g.choose("ALMA:open");for(int i=0;i<8;i++)g.choose("ALMA:good:"+i);
+        g.choose("ALMA:join");g.choose("ALMA:personal:"+g.day);g.choose("ALMA:personal:"+g.day);assertEquals(1,g.alma.personalTasks);
+        g.choose("ALMA:serana:0");g.choose("ALMA:serana:1");g.choose("ALMA:seranaTalk");assertEquals(35,g.alma.seranaTrust);
+        g=GameEngine.fromJson(g.toJson().toString());assertEquals(1,g.alma.personalTasks);assertEquals(35,g.alma.seranaTrust);
+        g.alma.setEnabled(g,false);int before=g.alma.memory.length();g.day++;g.alma.observeTravel(g);assertEquals(before,g.alma.memory.length());assertTrue(g.alma.compactContext(g).contains("отключена"));
+    }
     @Test public void romanceNotRequiredAndLossIsFinal(){
         GameEngine g=start();g.choose("ALMA:open");for(int i=0;i<11;i++)g.choose("ALMA:cool:"+i);
         g.choose("ALMA:finish:eternal");assertEquals(11,g.alma.stage);

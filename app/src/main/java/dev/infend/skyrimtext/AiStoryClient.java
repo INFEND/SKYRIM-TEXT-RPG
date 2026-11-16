@@ -183,7 +183,7 @@ public final class AiStoryClient {
         if(game.katherine.enabled&&game.katherine.stage>0)
             localSection(b,"Кэтрин: ",game.katherine.compactContext(game),220,budget);
         if(game.alma.enabled)
-            localSection(b,"Альма: ",game.alma.aiContext(),220,budget);
+            localSection(b,"Альма: ",game.alma.compactContext(game),220,budget);
         if(aiControlled)localSection(b,"Инициатива Кэтрин: ",KatherineInitiative.context(game),140,budget);
         String facts=game.sceneState==null?"":game.sceneState.confirmedContext();
         if(!game.alma.enabled){
