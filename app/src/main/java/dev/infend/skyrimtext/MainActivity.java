@@ -421,6 +421,12 @@ public final class MainActivity extends Activity {
         switch(status){case "MET":return "Знакомство";case "HELPED":return "Благодарность";case "INFORMED":return "Обмен сведениями";case "HOSTILE":return "Враждебность";case "DEAD":return "Погиб";case "MISSING":return "Пропал";default:return "Отношение неизвестно";}
     }
     private View npcPortrait(String name){
+        if(ItachiProfile.matches(name)){
+            try(java.io.InputStream in=ResourceStore.open(this,"media/itachi/portrait.webp")){
+                android.graphics.Bitmap bitmap=android.graphics.BitmapFactory.decodeStream(in);
+                if(bitmap!=null){android.widget.ImageView image=new android.widget.ImageView(this);image.setImageBitmap(bitmap);image.setAdjustViewBounds(true);image.setScaleType(android.widget.ImageView.ScaleType.FIT_CENTER);image.setContentDescription("Итачи");return image;}
+            }catch(java.io.IOException ignored){}return npcEmblem(name,"hero");
+        }
         android.graphics.Bitmap individual=NpcAppearance.photo(this,name);
         if(individual!=null){android.widget.ImageView portrait=new android.widget.ImageView(this);portrait.setImageBitmap(individual);portrait.setAdjustViewBounds(true);portrait.setScaleType(android.widget.ImageView.ScaleType.FIT_CENTER);portrait.setContentDescription(name);return portrait;}
         if(LiviaStory.NAME.equalsIgnoreCase(name)||"Имперский капитан".equalsIgnoreCase(name)){try{android.widget.ImageView portrait=new android.widget.ImageView(this);portrait.setImageBitmap(LiviaPortrait.photo(this));portrait.setAdjustViewBounds(true);portrait.setScaleType(android.widget.ImageView.ScaleType.FIT_CENTER);portrait.setContentDescription("Ливия");portrait.setOnClickListener(v->liviaPortrait());return portrait;}catch(java.io.IOException ignored){return npcEmblem(name,"hero");}}
@@ -465,6 +471,7 @@ public final class MainActivity extends Activity {
         NpcProfiles.Profile profile=NpcProfiles.find(name);
         if(profile!=null){addText(panel,profile.race+" | "+profile.role,14,TEXT,true,8);}
         if(ItachiProfile.matches(name)){
+            if(!ResourceStore.has(this,"media/itachi/portrait.webp")){TextView load=text("Загрузить портрет Итачи",14,accent(),true);load.setPadding(dp(12),dp(12),dp(12),dp(12));load.setOnClickListener(v->new ResourceManagerDialog(this,accent(),this::render,"media:itachi").show());panel.addView(load,lp(-1,-2));}
             addText(panel,"Внешность",15,accent(),true,10);addText(panel,ItachiProfile.APPEARANCE,13,TEXT,false,4);
             addText(panel,"Характер",15,accent(),true,10);addText(panel,ItachiProfile.CHARACTER,13,TEXT,false,4);
             addText(panel,"Происхождение",15,accent(),true,10);addText(panel,ItachiProfile.BACKGROUND,13,TEXT,false,4);
@@ -482,7 +489,7 @@ public final class MainActivity extends Activity {
             artwork.setOnClickListener(v->new ResourceManagerDialog(this,accent(),this::render,NpcAppearance.GROUP).show());panel.addView(artwork,lp(-1,-2));
             TextView importArt=text("Импорт оригинальных WebP",14,accent(),true);importArt.setPadding(dp(12),dp(12),dp(12),dp(12));importArt.setOnClickListener(v->chooseNpcAppearances());panel.addView(importArt,lp(-1,-2));
         }
-        if(!NpcAppearance.has(this,name)&&!("Серана".equalsIgnoreCase(name)&&SeranaGallery.available(this))&&!KatherineStory.NAME.equals(name)&&!AlmaStory.NAME.equals(name)&&!LiviaStory.NAME.equalsIgnoreCase(name)&&!"Имперский капитан".equalsIgnoreCase(name))addText(panel,"Иллюстративный образ или эмблема, не индивидуальный портрет",11,MUTED,false,10);
+        if(!ItachiProfile.matches(name)&&!NpcAppearance.has(this,name)&&!("Серана".equalsIgnoreCase(name)&&SeranaGallery.available(this))&&!KatherineStory.NAME.equals(name)&&!AlmaStory.NAME.equals(name)&&!LiviaStory.NAME.equalsIgnoreCase(name)&&!"Имперский капитан".equalsIgnoreCase(name))addText(panel,"Иллюстративный образ или эмблема, не индивидуальный портрет",11,MUTED,false,10);
         addText(panel,npcStatusLabel(game.sceneState.npcStatusByName(name)),15,TEXT,true,8);
         new RuneDialogBuilder(this,accent()).setTitle(name).setView(panel).setNegativeButton("Закрыть",null).show();
     }
