@@ -38,6 +38,20 @@ final class LocalAiEngineModule {
             return j;
         }
     }
+    static long totalBytes(Context c){
+        try{return metadata(c).getLong("size");}catch(Exception e){return 0;}
+    }
+    static long downloadedBytes(Context c){
+        try{
+            JSONObject j=metadata(c);long size=j.getLong("size");
+            if(installed(c))return size;
+            File target=apk(c),part=new File(target.getPath()+".part");
+            if(target.isFile()&&target.length()==size)return size;
+            return j.getString("sha256").equals(c.getSharedPreferences("skyrim_engine",0).getString("partial",""))
+                ?Math.min(size,part.length()):0;
+        }catch(Exception e){return 0;}
+    }
+    static boolean downloading(){return running.get();}
     static String sizeLabel(Context c){
         try{return String.format(Locale.ROOT,"%.1f МБ",metadata(c).getLong("size")/1_000_000.0);}
         catch(Exception e){return "Отдельный APK";}

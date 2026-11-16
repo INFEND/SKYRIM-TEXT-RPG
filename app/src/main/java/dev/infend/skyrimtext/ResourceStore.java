@@ -158,6 +158,11 @@ final class ResourceStore {
     }
     static long storedBytes(Context c,Entry e){return file(c,e).length()+part(c,e).length();}
     static long partialBytes(Context c,Entry e){return part(c,e).length();}
+    // Only partial bytes belonging to this exact catalog revision count toward progress.
+    static long currentPartialBytes(Context c,Entry e){
+        File f=part(c,e);
+        return e.sha.equals(prefs(c).getString("partial:"+e.path,""))&&f.length()<=e.size?f.length():0;
+    }
     interface Progress {void update(String label,long done,long total);}
     private static void publish(Context c,Entry e,File temp,boolean notify)throws Exception{
         if(!valid(temp,e)){temp.delete();throw new IOException("Контрольная сумма не совпадает: "+e.label);}

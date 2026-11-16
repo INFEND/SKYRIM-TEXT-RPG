@@ -19,6 +19,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 final class LocalAiModelStore {
     static final String PREF_MODEL_PATH="ai_local_model_path";
     private static final ExecutorService COPY=Executors.newSingleThreadExecutor();
+    static volatile long importingBytes=0, importingTotal=0;
+    static volatile boolean importing=false;
     interface Listener {
         void onProgress(long bytes,long total);
         void onImported(String path);
@@ -35,6 +37,7 @@ final class LocalAiModelStore {
         Handler main=new Handler(Looper.getMainLooper());
         COPY.execute(()->{
             File part=null;
+            importingBytes=0;importingTotal=0;importing=true;
             try{
                 File directory=host.getExternalFilesDir("models");
                 if(directory==null)throw new IllegalStateException("Хранилище модели недоступно");
@@ -43,6 +46,7 @@ final class LocalAiModelStore {
                 try(Cursor cursor=host.getContentResolver().query(uri,new String[]{OpenableColumns.SIZE},null,null,null)){
                     if(cursor!=null&&cursor.moveToFirst()&&!cursor.isNull(0))expected=cursor.getLong(0);
                 }
+                importingTotal=expected;
                 if(expected>0){
                     long available=new StatFs(directory.getAbsolutePath()).getAvailableBytes();
                     if(expected+134217728L>available)
@@ -63,7 +67,7 @@ final class LocalAiModelStore {
                                 throw new IOException("Файл не содержит заголовок GGUF");
                             header=true;
                         }
-                        output.write(buffer,0,n);copied+=n;
+                        output.write(buffer,0,n);copied+=n;importingBytes=copied;
                         long now=System.currentTimeMillis();
                         if(now-lastNotice>=400){
                             long current=copied,total=expected;
@@ -84,7 +88,7 @@ final class LocalAiModelStore {
             }catch(Exception ex){
                 String error=ex.getMessage()==null?"Ошибка импорта GGUF":ex.getMessage();
                 main.post(()->{if(!cancelled.get())listener.onFailure(error);});
-            }finally{if(part!=null&&part.exists())part.delete();}
+            }finally{if(part!=null&&part.exists())part.delete();importing=false;}
         });
     }
 }
