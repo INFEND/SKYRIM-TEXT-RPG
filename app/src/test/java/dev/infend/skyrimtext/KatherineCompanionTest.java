@@ -52,4 +52,16 @@ public class KatherineCompanionTest {
         assertFalse(KatherineInitiative.apply(g,"TALK",true));g.progress.location="Коллегия Винтерхолда";
         assertFalse(KatherineInitiative.apply(g,"GUARD",true));assertTrue(KatherineInitiative.apply(g,"TALK",true));
     }
+    @Test public void relationshipAndHomeConsistency() throws Exception {
+        GameEngine g=game();KatherineStory k=g.katherine;
+        k.companion.lastAiDay=g.day;k.lastAutonomyDay=g.day;k.trust=28;k.autonomous(g);assertFalse(k.active());
+        g.mode=KatherineStory.MODE;g.choose("KATH:join");assertFalse(k.active());
+        k.trust=90;g.choose("KATH:join");assertTrue(k.active());
+        k.romance=true;k.companion.engaged=true;k.companion.married=true;k.companion.sharedHome=true;
+        g.choose("KATH:leave");g.progress.location="Рифтен";assertTrue(k.present(g));assertEquals("Рифтен",k.location(g));
+        assertTrue(k.aiContext(g).contains("рядом=true"));g.progress.location="Вайтран";assertFalse(k.present(g));
+        assertTrue(k.aiContext(g).contains("рядом=false"));
+        GameEngine restored=GameEngine.fromJson(g.toJson().toString());assertEquals("Рифтен",restored.katherine.location(restored));
+        restored.katherine.setEnabled(restored,false);assertFalse(restored.katherine.present(restored));assertEquals("",restored.katherine.aiContext(restored));
+    }
 }

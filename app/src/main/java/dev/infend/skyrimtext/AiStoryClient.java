@@ -392,7 +392,7 @@ public final class AiStoryClient {
         GameEngine.Scene scene = g.scene();
         StringBuilder out = new StringBuilder();
         out.append(genderInstruction(g));
-        if(g.katherine.enabled&&g.katherine.stage>0)out.append(g.katherine.aiContext()).append('\n');
+        if(g.katherine.enabled&&g.katherine.stage>0)out.append(g.katherine.aiContext(g)).append('\n');
         out.append("ПРОВЕРЕННЫЕ ФАКТЫ ИГРОВОГО ДВИЖКА:\n");
         out.append("Герой: ").append(g.name).append("; пол: ").append(g.gender).append("; раса: ").append(g.race)
                 .append("; класс: ").append(g.heroClass).append("; уровень: ").append(g.level)
@@ -459,7 +459,7 @@ public final class AiStoryClient {
     private static String contextAi(GameEngine game,String memory,String command){
         StringBuilder out=new StringBuilder("ИИ-РЕЖИМ: обычные офлайн-сцены и кнопки выключены. Создай свои десять вариантов и управляй характеристиками через effects.\n");
         out.append(genderInstruction(game));
-        if(game.katherine.enabled&&game.katherine.stage>0)out.append("ПЕРСОНАЖ КЭТРИН — СОСТОЯНИЕ ДВИЖКА:\n").append(game.katherine.aiContext()).append('\n');
+        if(game.katherine.enabled&&game.katherine.stage>0)out.append("ПЕРСОНАЖ КЭТРИН — СОСТОЯНИЕ ДВИЖКА:\n").append(game.katherine.aiContext(game)).append('\n');
         String initiative=KatherineInitiative.context(game);if(!initiative.isEmpty())out.append(initiative).append('\n');
         out.append("Герой: ").append(game.name).append("; пол ").append(game.gender).append("; ").append(game.race).append("; класс ")
                 .append(game.heroClass).append("; уровень ").append(game.level).append("; опыт ").append(game.xp).append('\n');

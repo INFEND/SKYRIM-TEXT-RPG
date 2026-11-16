@@ -32,7 +32,7 @@ final class KatherineCompanion {
     String useSupplies(KatherineStory k){if(!k.active())return "";if(hp<maxHp()/3&&healthPotions>0){healthPotions--;hp=Math.min(maxHp(),hp+40);return "Кэтрин использует собственное лечебное зелье.";}if(k.mana<k.maxMana()/4&&magicPotions>0){magicPotions--;k.mana=Math.min(k.maxMana(),k.mana+45);return "Кэтрин восстанавливает магию своим зельем.";}return "";}
     static final String[] PROFILES={"Запечатанная магия","Опытная чародейка","Верховная чародейка"};
     String profileName(){return PROFILES[profile];}
-    String independentLocation(int day,int hour){if(!"Свободная дорога".equals(ending))return "Хижина Анис";if(hour<8||hour>=20)return "Хижина Анис";switch(Math.floorMod(day,3)){case 0:return "Коллегия Винтерхолда";case 1:return "Солитьюд";default:return "Ривервуд";}}
+    String independentLocation(int day,int hour){String home=sharedHome&&married?"Рифтен":"Хижина Анис";if(!"Свободная дорога".equals(ending))return home;if(hour<8||hour>=20)return home;switch(Math.floorMod(day,3)){case 0:return "Коллегия Винтерхолда";case 1:return "Солитьюд";default:return "Ривервуд";}}
     void beginBattle(){burn=slow=shock=0;}
     int ongoingDamage(int remaining){if(burn<=0||remaining<=0)return 0;burn--;return Math.min(remaining,3);}
     int weaken(int incoming){int reduction=0;if(slow>0){slow--;reduction+=3;}if(shock>0){shock--;reduction+=2;}return Math.min(Math.max(0,incoming-1),reduction);}

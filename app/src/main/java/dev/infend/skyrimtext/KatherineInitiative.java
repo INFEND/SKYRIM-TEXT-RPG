@@ -9,7 +9,7 @@ final class KatherineInitiative {
     static ArrayList<String> allowed(GameEngine g){
         ArrayList<String> out=new ArrayList<>();
         KatherineStory k=g.katherine;KatherineCompanion c=k.companion;
-        if(!g.started||!k.enabled||k.stage<5||!k.present(g)||!k.companion.aiInitiatives||g.enemyHp>0||"COMBAT".equals(g.mode)||c.lastAiDay==g.day)return out;
+        if(!g.started||!k.enabled||k.stage<5||!k.present(g)||!k.companion.aiInitiatives||g.enemyHp>0||"COMBAT".equals(g.mode)||c.lastAiDay==g.day||(k.active()&&k.trust<30))return out;
         out.add(TALK);if(k.active())out.add(BALANCE);
         if(k.trust<45||c.hurt>=25)out.add(BOUNDARIES);
         if(c.hp<c.maxHp()/2||k.mana<k.maxMana()/2||g.hp<g.maxHp/2)out.add(REST);
