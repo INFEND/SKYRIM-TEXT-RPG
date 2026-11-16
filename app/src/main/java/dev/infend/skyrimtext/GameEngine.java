@@ -210,7 +210,7 @@ public final class GameEngine {
     }
 
     public Scene scene() {
-        if(started&&KatherineStory.MODE.equals(mode))return katherine.scene();
+        if(started&&KatherineStory.MODE.equals(mode))return katherine.scene(this);
         if(started&&"CANON".equals(mode))return CanonicalCampaign.scene(this);
         Scene s=baseScene();
         if(started)progress.fillChoices(this,s);
@@ -410,6 +410,7 @@ public final class GameEngine {
             day+=route.days;
             region=target.region;
             progress.location=target.name;
+            katherine.observeTravel(this);
             // Register only locations reached through the validated atlas route.
             // A stable key keeps repeat visits idempotent across save/load.
             try {
@@ -628,6 +629,8 @@ public final class GameEngine {
         }
         compensation.tick();
         if(!"CANON_SHOUT".equals(action)&&canonicalShoutCooldown>0)canonicalShoutCooldown--;
+        int kathDamage=katherine.assist(this,battleTurns+1,Math.max(0,enemyHp-damage));
+        if(kathDamage>0){damage+=kathDamage;actionText+="\nКэтрин: магический импульс, −"+kathDamage+" здоровья врагу.";}
         lastDealt=Math.min(enemyHp,damage);lastHeavyHit="HEAVY".equals(action)&&lastDealt>0;lastMiss="HEAVY".equals(action)&&lastDealt==0;battleDealt+=lastDealt;battleTurns++;
         enemyHp=Math.max(0,enemyHp-damage);
         if(enemyHp==0) {poisonTurns=frostTurns=0;winBattle(actionText);return;}
@@ -636,6 +639,8 @@ public final class GameEngine {
         int rawIncoming=Math.max(1,baseIncoming-(defending?enemyDamage/2+3+2*progress.branches.rank(3)+(progress.advanced.has(AdvancedPerks.QUICK_REFLEXES)?2:0)+(progress.advanced.has(AdvancedPerks.SHIELD_WALL)&&!"Не надето".equals(progress.equippedName("shield"))?3:0)+(progress.advanced.has(AdvancedPerks.SHIELD_CHARGE)&&!"Не надето".equals(progress.equippedName("shield"))?4:0):0));
         int incoming=Math.max(1,(int)Math.round(rawIncoming*(1-progress.damageReduction())));
         if(defending)lastBlocked=Math.max(0,Math.max(1,(int)Math.round(Math.max(1,baseIncoming)*(1-progress.damageReduction())))-incoming);
+        int kathProtection=katherine.protect(incoming);incoming-=kathProtection;
+        if(kathProtection>0){lastBlocked+=kathProtection;actionText+="\nКэтрин: защитный барьер, −"+kathProtection+" входящего урона.";}
         int poisoned=poisonTurns>0?Math.max(1,maxHp/40):0;
         if(poisonTurns>0)poisonTurns--;if(frostTurns>0){frostTurns--;stamina=Math.max(0,stamina-4);}
         String foe=enemyName.toLowerCase(java.util.Locale.ROOT);
