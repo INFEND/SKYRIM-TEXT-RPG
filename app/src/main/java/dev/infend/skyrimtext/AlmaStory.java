@@ -29,7 +29,7 @@ final class AlmaStory {
     String ending="";
     static int clamp(int n){return Math.max(0,Math.min(100,n));}
     static boolean atRiften(GameEngine g){String l=g.progress.location.toLowerCase(Locale.ROOT).replace('ё','е');return l.contains("рифтен");}
-    boolean available(GameEngine g){return enabled&&g.started&&"WORLD".equals(g.mode)&&(atRiften(g)||(stage>0&&companion));}
+    boolean available(GameEngine g){return enabled&&g.started&&"WORLD".equals(g.mode)&&!terminalLoss()&&(atRiften(g)||(stage>0&&companion));}
     String status(){return stage==0?"Не встречена":stage<TITLES.length?TITLES[stage]:ending;}
     String relationship(){if(stage==0)return "Незнакомка";if("Разбитая клятва".equals(ending))return "Противник";if(married)return "Супруга";if(romance&&love>=70)return "Возлюбленная";if(romance)return "Влюблённость";if(trust>=45)return "Друг";return "Знакомая";}
     boolean canRomance(){return stage>=8&&trust>=45&&affection>=35&&!terminalLoss();}
@@ -49,7 +49,8 @@ final class AlmaStory {
             s.add("ALMA:finish:part","Разойтись и разрушить клятву","Разбитая клятва");
             if(trust>=65)s.add("ALMA:finish:sacrifice","Принять её решение о жертве","Последняя жертва");}
         if(stage>=3&&!terminalLoss())s.add(companion?"ALMA:dismiss":"ALMA:join",companion?"Попросить ждать в Рифтене":"Предложить путешествовать вместе","Союзница");
-        if(canRomance()&&!romance)s.add("ALMA:romance","Признаться в чувствах","Только при взаимной симпатии");
+        if(canRomance()&&!romance&&hurt<15)s.add("ALMA:romance","Признаться в чувствах","Только при взаимной симпатии");
+        if(!romance&&hurt>=15&&lastTalkDay!=g.day&&!terminalLoss())s.add("ALMA:reconcile","Поговорить о прошлом","Не обещает возобновления романа");
         if(romance&&!terminalLoss()){
             if(lastTalkDay!=g.day)s.add("ALMA:date","Провести время вместе","Один раз за игровой день");
             if(!married&&love>=85&&trust>=75&&stage>=10)s.add("ALMA:marry","Предложить брак","Взаимное согласие");
@@ -66,10 +67,11 @@ final class AlmaStory {
         if(advance){boolean good=action.startsWith("ALMA:good:");trust=clamp(trust+(good?9:4));respect=clamp(respect+(good?8:5));affection=clamp(affection+(good?7:2));loyalty=clamp(loyalty+(good?6:2));if(romance)love=clamp(love+(good?9:3));stage++;}
         else if("ALMA:join".equals(action)&&stage>=3&&!terminalLoss()&&!companion)companion=true;
         else if("ALMA:dismiss".equals(action)&&companion){companion=false;g.mode="WORLD";}
-        else if("ALMA:romance".equals(action)&&canRomance()&&!romance){romance=true;love=Math.max(love,45);}
+        else if("ALMA:romance".equals(action)&&canRomance()&&!romance&&hurt<15){romance=true;love=Math.max(love,45);}
         else if("ALMA:date".equals(action)&&romance&&!terminalLoss()&&lastTalkDay!=g.day){lastTalkDay=g.day;love=clamp(love+8);trust=clamp(trust+3);affection=clamp(affection+4);hurt=clamp(hurt-5);}
         else if("ALMA:marry".equals(action)&&romance&&!married&&love>=85&&trust>=75&&stage>=10&&!terminalLoss())married=true;
-        else if("ALMA:breakup".equals(action)&&romance){romance=false;married=false;love=0;hurt=clamp(hurt+15);}
+        else if("ALMA:breakup".equals(action)&&romance){romance=false;married=false;love=0;hurt=clamp(hurt+15);lastTalkDay=g.day;}
+        else if("ALMA:reconcile".equals(action)&&!romance&&hurt>=15&&lastTalkDay!=g.day&&!terminalLoss()){hurt=clamp(hurt-5);lastTalkDay=g.day;}
         else if(stage==11&&action.startsWith("ALMA:finish:")){
             switch(action.substring("ALMA:finish:".length())){
                 case "mortal":ending="Новая жизнь";break;

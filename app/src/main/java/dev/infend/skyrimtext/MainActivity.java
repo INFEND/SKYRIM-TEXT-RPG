@@ -3738,6 +3738,7 @@ public final class MainActivity extends Activity {
         }else if(codexCategory==2){
             java.util.ArrayList<String> docs=ItemCatalog.loreDocuments(this);
             addText(content,"ᛟ  ХРОНИКИ И РУКОПИСИ",11,accent(),false,10);
+            if(game.alma.stage>0)actionButton("Альма | Алая Бессмертная","Авторская история · "+game.alma.status(),false,()->npcDetails(AlmaStory.NAME));
             if(docs.isEmpty())addText(content,"Справочные рукописи пока не загружены.",14,MUTED,false,8);
             for(String file:docs)actionButton("◇  "+file.replace(".txt",""),"Читать рукопись",false,()->showDocument(file));
         }else{
@@ -3752,11 +3753,18 @@ public final class MainActivity extends Activity {
         }
     }
     private String selectedJournalEntry="Путь Довакина";
+    private void almaRelationshipDetails(){
+        AlmaStory a=game.alma;LinearLayout panel=column();addText(panel,a.relationship()+" | "+a.status(),16,TEXT,true,10);
+        String[] labels={"Доверие","Уважение","Симпатия","Любовь","Ревность","Обида","Преданность"};int[] scores={a.trust,a.respect,a.affection,a.love,a.jealousy,a.hurt,a.loyalty};
+        for(int i=0;i<labels.length;i++){livingLine(panel,labels[i],scores[i]+" / 100",accent());livingBar(panel,scores[i],100,accent());space(panel,8);}
+        livingDialog("Альма | Отношения",panel);
+    }
     private void renderLivingRelations(){
         section("ЖУРНАЛ","Отношения","Только подтверждённые знакомства и события.");
+        if(game.alma.stage>0)actionButton("Альма | "+game.alma.relationship(),"Доверие "+game.alma.trust+"/100 · Любовь "+game.alma.love+"/100",false,this::almaRelationshipDetails);
         org.json.JSONArray npcs=game.sceneState.npcFacts();
         if(npcs.length()==0){addText(content,"Пока нет подтверждённых знакомств.",15,MUTED,false,8);return;}
-        for(int i=0;i<npcs.length();i++){JSONObject n=npcs.optJSONObject(i);if(n==null)continue;String name=n.optString("title"),status=n.optString("status");int score;String relation;
+        for(int i=0;i<npcs.length();i++){JSONObject n=npcs.optJSONObject(i);if(n==null)continue;String name=n.optString("title"),status=n.optString("status");if(AlmaStory.NAME.equals(name))continue;int score;String relation;
             switch(status){case "HELPED":score=78;relation="Благодарность";break;case "INFORMED":score=60;relation="Обмен сведениями";break;case "MET":score=50;relation="Знакомый";break;case "HOSTILE":score=15;relation="Враждебность";break;default:score=-1;relation=npcStatusLabel(status);}
             if(score>=0)score=n.optInt("relation",score);int color=score<0?MUTED:score>=65?ITEM_UP:score>=40?ITEM_GOLD:ITEM_DOWN;LinearLayout tile=livingTile(content);LinearLayout line=row();line.setGravity(Gravity.CENTER_VERTICAL);
             line.addView(new SkyrimIconView(this,"hero",color),lp(38,42));LinearLayout words=column();words.setPadding(dp(10),0,0,0);line.addView(words,new LinearLayout.LayoutParams(0,-2,1));addText(words,name,18,TEXT,true,3);addText(words,relation,13,color,false,0);
@@ -3783,6 +3791,7 @@ public final class MainActivity extends Activity {
         if(journalRelations){renderLivingRelations();return;}
         section("ЛЕТОПИСЬ СЕВЕРА","Журнал","Выбирай задание, чтобы увидеть описание и текущую цель.");
         renderFactionJournal();
+        if(game.alma.stage>0)actionButton("Алая Бессмертная",game.alma.status()+" | "+game.alma.stage+"/12",false,()->new RuneDialogBuilder(this,accent()).setTitle("Алая Бессмертная").setMessage(game.alma.status()+"\n\n"+(game.alma.companion?"Альма путешествует с тобой.":game.alma.terminalLoss()?"История завершена.":"Ищи Альму в Рифтене.")).setPositiveButton("Закрыть",null).show());
         String[] entries=game.aiJournal.isEmpty()?
             new String[]{"Путь Довакина","Драконий след","Пепельные печати","Опасные дороги"}:
             new String[]{"Путь Довакина","Драконий след","Пепельные печати","Опасные дороги","Задание ИИ"};
