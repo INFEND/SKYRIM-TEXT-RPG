@@ -31,6 +31,7 @@ final class KatherineStory {
         k.enabled=j.optBoolean("enabled",true);k.stage=Math.max(0,Math.min(8,j.optInt("stage")));k.trust=clamp(j.optInt("trust"));k.respect=clamp(j.optInt("respect",k.trust/2));k.affection=clamp(j.optInt("affection"));k.jealousy=clamp(j.optInt("jealousy"));k.magicRank=Math.max(0,Math.min(3,j.optInt("magicRank")));k.following=j.optBoolean("following")&&k.stage>=5;k.romance=j.optBoolean("romance")&&k.stage>=4;k.stance=j.optString("stance","BALANCED");if(!"DEFENSE".equals(k.stance)&&!"ATTACK".equals(k.stance))k.stance="BALANCED";k.lastGiftDay=j.optInt("lastGiftDay",-1);k.lastTalkDay=j.optInt("lastTalkDay",-1);k.assists=Math.max(0,j.optInt("assists"));k.lastLocation=j.optString("lastLocation");k.lastRemark=j.optString("lastRemark");JSONArray m=j.optJSONArray("memory");if(m!=null)for(int i=Math.max(0,m.length()-40);i<m.length();i++)k.memory.put(m.optString(i));return k;}
     GameEngine.Scene scene(GameEngine g){
         GameEngine.Scene s;
+        if(!enabled||!present(g))return new GameEngine.Scene("НУЛЕВОЙ ПРЕДЕЛ","Разговор недоступен","Кэтрин сейчас не может продолжить разговор. Вернись к путешествию.").add("KATH:exit","Вернуться","Продолжить путешествие");
         switch(stage){
         case 0:s=new GameEngine.Scene("НАСЛЕДИЕ ДВУХ МИРОВ","Хижина Анис","В подвале пахнет сырой древесиной. У лестницы стоит девушка с серебристыми волосами и янтарными глазами. Рядом лежит бессознательный Деймон.\n\nКэтрин:\n— Стой там. Сначала скажи, кто ты и зачем пришёл.");
             s.add("KATH:help","Предложить помощь Деймону","Показать, что ты не угроза").add("KATH:intro","Представиться","Не приближаться без разрешения");break;
@@ -62,8 +63,10 @@ final class KatherineStory {
     }
     void choose(GameEngine g,String action){
         if("KATH:open".equals(action)){if(available(g))g.mode=MODE;return;}
-        if(!enabled||!MODE.equals(g.mode)||!present(g))return;
+        if(!MODE.equals(g.mode))return;
+        // Exit must remain available even if a restored scene lost its companion or was disabled.
         if("KATH:exit".equals(action)){g.mode="WORLD";return;}
+        if(!enabled||!present(g))return;
         if(stage>=4){
             switch(action){
             case "KATH:join":if(!following&&atHut(g)&&stage>=5&&trust>=25){following=true;remember(g,"Кэтрин согласилась сопровождать героя.");}return;
