@@ -179,8 +179,8 @@ class AiGameDirectorContracts(unittest.TestCase):
         body=ui[start:ui.index("private void renderAiChoice(",start)]
         self.assertIn('!"COMBAT".equals(game.mode)',body)
         self.assertIn("game.enemyHp<=0",body)
-        self.assertIn("game.stamina<10",body)
-        self.assertIn("game.magicka<12",body)
+        self.assertIn("game.stamina<game.heavyCost()",body)
+        self.assertIn("game.magicka<game.magicCost()",body)
         self.assertIn("game.potions<=0",body)
         self.assertLess(body.index("game.choose(action)"),body.index("game.aiTurn=null"))
         self.assertLess(body.index("save();"),body.index("requestAiTurn("))
@@ -192,7 +192,7 @@ class AiGameDirectorContracts(unittest.TestCase):
         ui=code("MainActivity.java")
         start=ui.index("private boolean nativeAiCombatAvailable(String action)")
         body=ui[start:ui.index("private void resolveNativeAiCombat",start)]
-        for rule in ('game.stamina>=10','game.magicka>=12','game.potions>0',
+        for rule in ('game.stamina>=game.heavyCost()','game.magicka>=game.magicCost()','game.potions>0',
                      '"WILD".equals(game.battleKind)','default:return false'):
             self.assertIn(rule,body)
         self.assertIn("if(!nativeAiCombatAvailable(action))return;",ui)
@@ -202,6 +202,12 @@ class AiGameDirectorContracts(unittest.TestCase):
         self.assertIn("if(!available)return;",ui)
         self.assertIn("if(!wasSelected)selectedAiChoices.add(number);",ui)
         self.assertIn('ДЕЙСТВИЕ НЕДОСТУПНО',ui)
+
+    def test_native_combat_costs_match_engine_debits(self):
+        engine=code("GameEngine.java")
+        for resource,cost in (("stamina","heavyCost"),("magicka","magicCost")):
+            self.assertIn("if("+resource+"<"+cost+"())",engine)
+            self.assertIn(resource+"-="+cost+"()",engine)
 
     def test_typed_combat_uses_only_explicit_native_commands(self):
         ui=code("MainActivity.java")
