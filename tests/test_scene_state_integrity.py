@@ -27,7 +27,7 @@ class SceneStateIntegrityContracts(unittest.TestCase):
         for status in ("FOUND","EXAMINED","USED","DISCOVERED","VISITED","CLEARED"):
             self.assertIn('case "'+status+'":return',SOURCE)
         self.assertLess(SOURCE.index('if(entries.containsKey(safeId)) {'),
-                        SOURCE.index('entries.put(safeId,new JSONObject()'))
+                        SOURCE.index('entries.put(safeId,next)'))
 
 if __name__=="__main__":
     unittest.main()
