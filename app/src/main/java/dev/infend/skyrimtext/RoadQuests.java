@@ -209,6 +209,7 @@ final class RoadQuests {
         default:return "";
     }}
     static String lead(GameEngine g,String id){
+        Task existing=find(id);if(existing!=null&&done(g,id))return "Это поручение уже завершено.";
         String name=evidenceFor(id);
         if(!name.isEmpty()&&!item(g,name))return "Не хватает места для "+name+".";
         offer(g,id);Task t=find(id);return (name.isEmpty()?"":"Получено: "+name+". ")+(t==null?"":"Цель в журнале: "+t.place+".");

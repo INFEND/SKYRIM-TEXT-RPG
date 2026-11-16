@@ -198,10 +198,11 @@ public final class RpgProgress {
         try{inventory.put(id,Math.max(0,n));if(n<=0)tempered.remove(id);}catch(Exception ignored){}
     }
     public int quantity(String id){return inventory.optInt(id,0);}
+    public double carryLimit(){return 50+(equipped("Зачарованное ожерелье")?25:0);}
     public boolean addItem(String id,int quantity){
         if(quantity<=0||ItemCatalog.find(id)==null||CompensationPowers.itemIndex(id)>=0||quantity(id)>Integer.MAX_VALUE-quantity)return false;
         ItemCatalog.Item item=ItemCatalog.find(id);
-        if(item.weight>0&&carryWeight()+item.weight*quantity>50.00001)return false;
+        if(item.weight>0&&carryWeight()+item.weight*quantity>carryLimit()+0.00001)return false;
         quantity(id,quantity(id)+quantity);return true;
     }
     public boolean removeItem(String id,int amount){
@@ -252,14 +253,14 @@ public final class RpgProgress {
         int difficulty=baseDifficulty+Math.max(0,15-g.level)*2;
         int danger=Math.max(0,g.region/2)+difficulty/10;
         int skill=skillIndex<0?0:(skillLevel(skillIndex)-15)/2;
-        int context=Math.min(18,g.reputation/3)+skill+branches.chanceBonus(skillIndex)+advanced.checkBonus(skillIndex)+(skillIndex==12&&advanced.has(AdvancedPerks.PERSUASION)?5:0)-((int)carryWeight()>45?8:0);
+        int context=Math.min(18,g.reputation/3)+skill+branches.chanceBonus(skillIndex)+advanced.checkBonus(skillIndex)+(skillIndex==12&&advanced.has(AdvancedPerks.PERSUASION)?5:0)-(carryWeight()>carryLimit()*0.9?8:0);
         g.needs.sync(g.day,g.hour);
         int base=RpgContent.successChance(g,stat,difficulty,danger,exhaustion,context);
         int result=Math.max(0,base-g.needs.penalty());
         int attribute=stat==0?g.maxHp:stat==1?g.maxMagicka:g.maxStamina;
         int charisma=Math.max(-10,Math.min(10,g.reputation/5));
         int raw=50+(attribute-100)/7+g.level*2-difficulty-danger*3-exhaustion/5+context+charisma;
-        chanceExplanation="Базовый шанс: 50%\nХарактеристика ("+(stat==0?"здоровье":stat==1?"магия":"выносливость")+"): "+signed((attribute-100)/7)+"\nУровень: "+signed(g.level*2)+"\nСложность: "+signed(-difficulty)+"\nОпасность: "+signed(-danger*3)+"\nУсталость: "+signed(-exhaustion/5)+"\nНавык: "+signed(skill)+"\nТаланты: "+signed(branches.chanceBonus(skillIndex)+advanced.checkBonus(skillIndex)+(skillIndex==12&&advanced.has(AdvancedPerks.PERSUASION)?5:0))+"\nРепутация: "+signed(Math.min(18,g.reputation/3)+charisma)+"\nВес рюкзака: "+signed((int)carryWeight()>45?-8:0)+"\nОграничение 0–100: "+raw+" → "+base+"\nПотребности: −"+g.needs.penalty()+"\nИтог: "+result+"%";
+        chanceExplanation="Базовый шанс: 50%\nХарактеристика ("+(stat==0?"здоровье":stat==1?"магия":"выносливость")+"): "+signed((attribute-100)/7)+"\nУровень: "+signed(g.level*2)+"\nСложность: "+signed(-difficulty)+"\nОпасность: "+signed(-danger*3)+"\nУсталость: "+signed(-exhaustion/5)+"\nНавык: "+signed(skill)+"\nТаланты: "+signed(branches.chanceBonus(skillIndex)+advanced.checkBonus(skillIndex)+(skillIndex==12&&advanced.has(AdvancedPerks.PERSUASION)?5:0))+"\nРепутация: "+signed(Math.min(18,g.reputation/3)+charisma)+"\nВес рюкзака: "+signed(carryWeight()>carryLimit()*0.9?-8:0)+"\nОграничение 0–100: "+raw+" → "+base+"\nПотребности: −"+g.needs.penalty()+"\nИтог: "+result+"%";
         return result;
     }
     public int chance(GameEngine g,String action){

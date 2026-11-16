@@ -77,10 +77,11 @@ public final class GameEngine {
     public AlmaStory alma = new AlmaStory();
     public LiviaStory livia = new LiviaStory();
     public String aiJournal = "";
+    public int roadSummonTurns,roadSummonKind;
     public int poisonTurns,frostTurns,battleTurns,battleDealt,battleTaken,lastDealt,lastTaken,lastHealing,lastBlocked;
     public boolean lastHeavyHit,lastMiss,lastCritical;
     public final int[] holdReputation=new int[10];
-    public void resetBattleVisuals(){java.util.Arrays.fill(compensation.cooldown,0);poisonTurns=frostTurns=battleTurns=battleDealt=battleTaken=lastDealt=lastTaken=lastHealing=lastBlocked=0;lastHeavyHit=lastMiss=lastCritical=false;}
+    public void resetBattleVisuals(){roadSummonTurns=roadSummonKind=0;java.util.Arrays.fill(compensation.cooldown,0);poisonTurns=frostTurns=battleTurns=battleDealt=battleTaken=lastDealt=lastTaken=lastHealing=lastBlocked=0;lastHeavyHit=lastMiss=lastCritical=false;}
     private MerchantLedger merchants=new MerchantLedger();
     FactionCampaign factions=new FactionCampaign();
     FactionStories factionStories=new FactionStories();
@@ -330,6 +331,8 @@ public final class GameEngine {
             .add("DEFEND","Защититься","Уменьшить ответный урон")
             .add("POTION","Выпить лечебное зелье","Осталось: " + potions);
         road.targetChoices(this,s);
+        if(roadSummonTurns==0&&progress.equipped("Роза Сангвина"))s.add("ROAD_SUMMON_ROSE","Призвать дремора","20 магии | три хода помощи");
+        if(roadSummonTurns==0&&progress.equipped("Этериевый посох"))s.add("ROAD_SUMMON_AETHER","Призвать автоматон","20 магии | три хода помощи");
         if("WILD".equals(battleKind))s.add("FLEE","Отступить","Шанс выйти из боя без награды");
         if("CANONICAL".equals(battleKind)&&canonicalShouts!=0&&canonicalShoutCooldown==0)s.add("CANON_SHOUT",CanonicalCampaign.combatShout(this),"Урон и ослабление врага | Восстановление 3 хода");
         for(int i=0;i<CompensationPowers.SLOTS;i++)if(compensation.available(this,i))s.add("FIX_POWER:"+i,compensation.powerName(i),compensation.detail(i));
@@ -375,6 +378,7 @@ public final class GameEngine {
         if(road.pending()&&!"COMBAT".equals(mode)){if("GO_WORLD".equals(action))road.resume(this);return;}
         if(action.startsWith("ROAD:"))return;
         if(action.startsWith("ROAD_TARGET:")){road.selectTarget(this,action);return;}
+        if("ROAD_SUMMON_ROSE".equals(action)||"ROAD_SUMMON_AETHER".equals(action)){combatTurn(action);return;}
         if(action.startsWith("ROADQUEST:")){RoadQuests.choose(this,action);return;}
         if(action.startsWith("ROADFINE:")){road.payFine(this,action);return;}
         if(action.startsWith("ROADSTART:")){RoadQuests.start(this,action.substring("ROADSTART:".length()));return;}
@@ -641,6 +645,7 @@ public final class GameEngine {
         if(custom>=0){if(!compensation.available(this,custom))return;magicka-=compensation.cost(custom);if(!compensation.safe[custom])hp-=2;compensation.cooldown[custom]=4;
             int power=compensation.strength(custom);if(compensation.powerType[custom]==1){lastHealing=Math.min(maxHp-hp,power);hp+=lastHealing;actionText=compensation.powerName(custom)+": +"+lastHealing+" здоровья.";}else{damage=power;defending=compensation.powerType[custom]==2;actionText=compensation.powerName(custom)+": −"+damage+" здоровья врагу.";}
         }else switch(action){
+            case "ROAD_SUMMON_ROSE":case "ROAD_SUMMON_AETHER":if(roadSummonTurns>0||magicka<20||!progress.equipped("ROAD_SUMMON_ROSE".equals(action)?"Роза Сангвина":"Этериевый посох"))return;magicka-=20;roadSummonKind="ROAD_SUMMON_ROSE".equals(action)?1:2;roadSummonTurns=3;actionText=roadSummonKind==1?"Роза Сангвина призывает дремора.":"Этериевый посох призывает автоматон.";break;
             case "ATTACK": damage=Math.max(1,effectiveAttack()+random.nextInt(9)-3);actionText="Ты наносишь удар: −"+damage+" здоровья врагу.";break;
             case "HEAVY":if(stamina<heavyCost()){battleLog="Недостаточно выносливости для сильного удара.";return;}
                 int hitChance=progress.chance(this,"HEAVY");stamina-=heavyCost();
@@ -668,6 +673,7 @@ public final class GameEngine {
         int liviaDamage=livia.assist(battleTurns+1,Math.max(0,enemyHp-damage));if(liviaDamage>0){damage+=liviaDamage;actionText+="\nЛивия: удар мечом, −"+liviaDamage+" здоровья врагу.";}
         int almaDamage=alma.assist(this,battleTurns+1,Math.max(0,enemyHp-damage));if(almaDamage>0){damage+=almaDamage;actionText+="\nАльма: "+alma.powerLabel()+", −"+almaDamage+" здоровья врагу.";}
         int almaCombo=alma.combo(Math.max(0,enemyHp-damage),"MAGIC".equals(action));if(almaCombo>0){damage+=almaCombo;actionText+="\nАльма: Кровавая связка, −"+almaCombo+" здоровья врагу.";}
+        if(roadSummonTurns>0){int summon=Math.min(Math.max(0,enemyHp-damage),roadSummonKind==1?10+level/2:7+level/3);if(summon>0){damage+=summon;actionText+="\n"+(roadSummonKind==1?"Дремора":"Двемерский автоматон")+" наносит "+summon+" урона.";}if(--roadSummonTurns==0){roadSummonKind=0;actionText+="\nПризыв рассеивается.";}}
         int roadAssist=road.allyDamage(this,damage);if(roadAssist>0){damage+=roadAssist;actionText+="\nСоратники атакуют великана: −"+roadAssist+" здоровья.";}
         lastDealt=Math.min(enemyHp,damage);lastHeavyHit="HEAVY".equals(action)&&lastDealt>0;lastMiss="HEAVY".equals(action)&&lastDealt==0;battleDealt+=lastDealt;battleTurns++;
         enemyHp=Math.max(0,enemyHp-damage);road.syncGroup(this);
@@ -679,6 +685,8 @@ public final class GameEngine {
         int incoming=Math.max(1,(int)Math.round(rawIncoming*(1-progress.damageReduction())));
         int flank=road.extraIncoming(this,defending,random);incoming+=flank;if(flank>0)actionText+="\nОстальные противники атакуют одновременно: −"+flank+" здоровья до защиты спутников.";
         if(defending)lastBlocked=Math.max(0,Math.max(1,(int)Math.round(Math.max(1,baseIncoming)*(1-progress.damageReduction())))-(incoming-flank));
+        if(defending&&progress.equipped("Разрушитель Заклинаний")&&road.magicalEnemy(enemyName)){int ward=Math.min(10,incoming);incoming-=ward;lastBlocked+=ward;actionText+="\nРазрушитель Заклинаний: оберег поглощает "+ward+" магического урона.";}
+        if(defending&&progress.equipped("Этериевый щит")&&battleTurns%3==0){int phase=Math.max(0,incoming-flank);incoming-=phase;lastBlocked+=phase;actionText+="\nЭтериевый щит: текущий враг становится бесплотным и пропускает ответную атаку.";}
         int kathWeakness=katherine.active()?katherine.companion.weaken(incoming):0;incoming-=kathWeakness;
         if(kathWeakness>0){lastBlocked+=kathWeakness;actionText+="\nКэтрин: ослабление противника, −"+kathWeakness+" входящего урона.";}
         int kathProtection=katherine.protect(incoming);incoming-=kathProtection;
@@ -788,7 +796,7 @@ public final class GameEngine {
          .put("aiJournal",aiJournal).put("aiTurn",aiTurn==null?JSONObject.NULL:aiTurn.save())
          .put("road",road.save()).put("sceneState",sceneState.toJson()).put("merchants",merchants.toJson()).put("factions",factions.toJson()).put("factionStories",factionStories.toJson()).put("factionBattle",factionBattle)
          .put("visitedVisual",new org.json.JSONArray(visitedVisual)).put("visualChronicle",visualChronicle)
-         .put("holdReputation",new org.json.JSONArray(holdReputation)).put("poisonTurns",poisonTurns).put("frostTurns",frostTurns).put("battleTurns",battleTurns).put("battleDealt",battleDealt).put("battleTaken",battleTaken);
+         .put("holdReputation",new org.json.JSONArray(holdReputation)).put("roadSummonTurns",roadSummonTurns).put("roadSummonKind",roadSummonKind).put("poisonTurns",poisonTurns).put("frostTurns",frostTurns).put("battleTurns",battleTurns).put("battleDealt",battleDealt).put("battleTaken",battleTaken);
         return j;
     }
     public static GameEngine fromJson(String json) {
@@ -828,7 +836,7 @@ public final class GameEngine {
             g.merchants=MerchantLedger.fromJson(j.optJSONObject("merchants"));g.factions=FactionCampaign.fromJson(j.optJSONObject("factions"));g.factionStories=FactionStories.fromJson(j.optJSONObject("factionStories"));g.factionBattle=Math.max(-1,Math.min(6,j.optInt("factionBattle",-1)));
             org.json.JSONArray holds=j.optJSONArray("holdReputation");if(holds!=null)for(int i=0;i<g.holdReputation.length;i++)g.holdReputation[i]=Math.max(-100,Math.min(100,holds.optInt(i,0)));
             if("COMBAT".equals(g.mode)){g.poisonTurns=Math.max(0,Math.min(2,j.optInt("poisonTurns")));g.frostTurns=Math.max(0,Math.min(2,j.optInt("frostTurns")));}
-            g.battleTurns=Math.max(0,j.optInt("battleTurns"));g.battleDealt=Math.max(0,j.optInt("battleDealt"));g.battleTaken=Math.max(0,j.optInt("battleTaken"));
+            g.roadSummonTurns=Math.max(0,Math.min(3,j.optInt("roadSummonTurns")));g.roadSummonKind=g.roadSummonTurns>0?Math.max(1,Math.min(2,j.optInt("roadSummonKind"))):0;g.battleTurns=Math.max(0,j.optInt("battleTurns"));g.battleDealt=Math.max(0,j.optInt("battleDealt"));g.battleTaken=Math.max(0,j.optInt("battleTaken"));
             org.json.JSONArray visited=j.optJSONArray("visitedVisual");
             if(visited!=null)for(int i=0;i<Math.min(visited.length(),2000);i++){String v=visited.optString(i);if(!v.isEmpty())g.visitedVisual.add(v);}
             if(g.started)g.visitedVisual.add(g.progress.location);

@@ -1173,7 +1173,7 @@ public final class MainActivity extends Activity {
         LinearLayout details=row();stats.addView(details,lp(-1,-2));
         hudMetric(details,"Уровень","level",String.valueOf(game.level),ITEM_GOLD,1f,()->{tab=3;render();});
         hudMetric(details,"Опыт","experience",game.xp+" / "+(game.level>=100?"MAX":String.valueOf(next)),ITEM_GOLD,1.65f,()->{tab=3;render();});
-        hudMetric(details,"Вес, кг","bag",itemNumber(weight)+"/50",weight>50?ITEM_DOWN:weight>=45?0xffe1ac70:TEXT,1.2f,()->{tab=2;render();});
+        hudMetric(details,"Вес, кг","bag",itemNumber(weight)+"/"+itemNumber(game.progress.carryLimit()),weight>game.progress.carryLimit()?ITEM_DOWN:weight>=game.progress.carryLimit()*0.9?0xffe1ac70:TEXT,1.2f,()->{tab=2;render();});
         hudMetric(details,"Септимы","septims",String.valueOf(game.gold),ITEM_GOLD,1f,()->{tab=2;render();});
         hudBar(stats,"xp",game.level>=100?1:game.xp,game.level>=100?1:next,ITEM_GOLD,3);
     }
@@ -3274,7 +3274,7 @@ public final class MainActivity extends Activity {
         double carried=game.progress.carryWeight();
         LinearLayout summary=card();
         TextView weight=text(String.format(java.util.Locale.forLanguageTag("ru"),
-                "ВЕС  %.2f / 50 кг     ◈  СЕПТИМЫ  %d",carried,game.gold),
+                "ВЕС  %.2f / %.0f кг     ◈  СЕПТИМЫ  %d",carried,game.progress.carryLimit(),game.gold),
                 15,carried>50?0xffd9a5a5:TEXT,true);
         weight.setGravity(Gravity.CENTER);summary.addView(weight);
         space(summary,6);
