@@ -10,6 +10,7 @@ final class LiviaStory {
     boolean enabled=true, following=false, romance=false;
     int stage=0, trust=0, respect=0, affection=0, lastTalkDay=-1, lastDateDay=-1, victories=0;
     String ending="", memory="";
+    static boolean matches(String name){return name!=null&&(NAME.equalsIgnoreCase(name)||"Имперский капитан".equalsIgnoreCase(name)||"Имперский капитан Хелгена".equalsIgnoreCase(name)||"Капитан Хелгена".equalsIgnoreCase(name));}
     static int clamp(int n){return Math.max(0,Math.min(100,n));}
     boolean survivor(){return !"Возмездие".equals(ending)&&!"Последний поединок".equals(ending);}
     boolean active(){return enabled&&following&&stage==4&&survivor();}
@@ -19,9 +20,9 @@ final class LiviaStory {
     boolean available(GameEngine g){return enabled&&g.started&&!g.road.pending()&&("WORLD".equals(g.mode)||"RESULT".equals(g.mode))&&present(g)&&(!witnessed(g)||g.canonicalStage>=3);}
     boolean setEnabled(GameEngine g,boolean on){if("COMBAT".equals(g.mode))return false;enabled=on;if(!on&&MODE.equals(g.mode))g.mode="WORLD";return true;}
     String status(){return stage==0?"Мрачный замок, Солитьюд":stage==1?"Допрос капитана":stage==2?"Свидетельства Хелгена":stage==3?"Цена приговора":ending+(following?" | Спутница":"")+(romance?" | Возлюбленная":"");}
-    String relation(){return romance?"Возлюбленная":active()?"Спутница":trust>=55?"Доверяет":trust>=25?"Уважает":"Держит дистанцию";}
+    String relation(){if(!survivor())return "Последний поединок".equals(ending)?"Погибла":"Под военным судом";return romance?"Возлюбленная":active()?"Спутница":trust>=55?"Доверяет":trust>=25?"Уважает":"Держит дистанцию";}
     String objective(){return TITLE+" | "+status();}
-    String aiContext(GameEngine g){if(!enabled)return "Ливия: дополнение отключено; не вводить её в сцену.";return "Ливия, имперский капитан, пережила нападение Алдуина. "+(witnessed(g)?"Приказала казнить героя в Хелгене.":"Герой не обязательно присутствовал на казни.")+" Этап "+stage+"/4, исход="+ending+", рядом="+active()+", роман="+romance+", доверие="+trust+", место="+(active()?g.progress.location:"Мрачный замок, Солитьюд")+". ИИ не вправе менять эти флаги.";}
+    String aiContext(GameEngine g){if(!enabled)return "Ливия: дополнение отключено; не вводить её в сцену.";if(!survivor())return "Ливия: "+ending+". "+memory+" Не возвращать в сцену, не восстанавливать спутницу или роман.";if(witnessed(g)&&g.canonicalStage<3)return "Ливия: имперский капитан Хелгена. Ещё не наступила повторная встреча; не раскрывать её дальнейшую судьбу.";return "Ливия, имперский капитан, пережила нападение Алдуина. "+(witnessed(g)?"Приказала казнить героя в Хелгене.":"Герой не обязательно присутствовал на казни.")+" Этап "+stage+"/4, исход="+ending+", рядом="+active()+", роман="+romance+", доверие="+trust+", место="+(active()?g.progress.location:"Мрачный замок, Солитьюд")+". ИИ не вправе менять эти флаги.";}
     GameEngine.Scene scene(GameEngine g){
         String body; GameEngine.Scene s;
         if(stage==0){
@@ -37,7 +38,7 @@ final class LiviaStory {
             s=new GameEngine.Scene(TITLE,"Ливия | "+relation(),"Ливия поправляет перевязь меча. "+(romance?"Она берёт тебя за руку.":"Она оставляет тебе пространство для решения.")+"\n\nЛивия:\n— "+(romance?"Я хочу быть рядом не из долга, а по собственному выбору.":"Моё прошлое не изменится. Но я могу выбирать, что делать дальше.")+"\n\n"+status()+"\nДоверие "+trust+"/100 | Уважение "+respect+"/100 | Симпатия "+affection+"/100"+(memory.isEmpty()?"":"\n\n"+memory));
             if(!following&&trust>=35)s.add("LIVIA:join","Пригласить в отряд","Меч и щит");
             if(following)s.add("LIVIA:leave","Отпустить спутницу","Вернётся в Мрачный замок");
-            if(lastTalkDay!=g.day)s.add("LIVIA:talk","Поговорить откровенно","Доверие и симпатия").add("LIVIA:aid","Помочь семьям пострадавших","25 септимов; один раз за день");
+            if(lastTalkDay!=g.day){s.add("LIVIA:talk","Поговорить откровенно","Доверие и симпатия");if(g.gold>=25)s.add("LIVIA:aid","Помочь семьям пострадавших","25 септимов; один раз за день");}
             if(!romance&&trust>=65&&respect>=50&&affection>=45)s.add("LIVIA:romance","Признаться в чувствах","Взаимное согласие");
             if(romance){if(lastDateDay!=g.day)s.add("LIVIA:date","Провести вечер вдвоём","Спокойный разговор о будущем");s.add("LIVIA:break","Прекратить роман","Сохранить уважение и возможность дружбы");}
         }
@@ -45,12 +46,12 @@ final class LiviaStory {
     }
     void choose(GameEngine g,String action){
         if("LIVIA:open".equals(action)){if(available(g))g.mode=MODE;return;}
-        if(!enabled||!MODE.equals(g.mode)||!present(g))return;
+        if(!enabled||!MODE.equals(g.mode)||!present(g)||g.road.pending()||(witnessed(g)&&g.canonicalStage<3))return;
         if("LIVIA:exit".equals(action)){g.mode="WORLD";return;}
         switch(stage){
             case 0: if("LIVIA:confront".equals(action)||"LIVIA:listen".equals(action)){trust="LIVIA:listen".equals(action)?12:5;respect=12;stage=1;}return;
-            case 1: if("LIVIA:records".equals(action)||"LIVIA:accuse".equals(action)){trust=clamp(trust+8);respect=clamp(respect+12);stage=2;}return;
-            case 2: if("LIVIA:hearing".equals(action)||"LIVIA:witnesses".equals(action)){trust=clamp(trust+10);respect=clamp(respect+15);affection=clamp(affection+8);stage=3;}return;
+            case 1: if("LIVIA:records".equals(action)||"LIVIA:accuse".equals(action)){boolean records="LIVIA:records".equals(action);trust=clamp(trust+(records?10:5));respect=clamp(respect+(records?10:15));memory=records?"Вы сохранили список как доказательство.":"Ливия признала ответственность за гибель невиновных.";stage=2;}return;
+            case 2: if("LIVIA:hearing".equals(action)||"LIVIA:witnesses".equals(action)){boolean hearing="LIVIA:hearing".equals(action);trust=clamp(trust+(hearing?8:12));respect=clamp(respect+(hearing?18:12));affection=clamp(affection+(hearing?4:10));memory=hearing?"Свидетельства переданы писарю.":"Вы выслушали обоих выживших и собрали показания.";stage=3;}return;
             case 3:
                 if("LIVIA:duel".equals(action)){g.beginLiviaDuel();return;}
                 if("LIVIA:revenge".equals(action)){finish(g,"Возмездие");return;}
@@ -74,6 +75,7 @@ final class LiviaStory {
         else {memory="Искупление".equals(result)?"Ливия сложила полномочия и обязалась помогать семьям погибших.":"Ливия приняла прощение и обязалась отвечать за свои приказы.";g.mode=MODE;}
         g.addXp(100);
     }
+    void defeatedInDuel(GameEngine g){if(stage==3&&"LIVIA_DUEL".equals(g.battleKind)){memory="Ливия остановила поединок, когда ты упал. Она не нанесла последнего удара. Ты можешь вернуться и принять решение.";g.message+="\n\n"+memory;}}
     int assist(int turn,int remaining){return active()&&turn%2==0?Math.min(Math.max(0,remaining),8+Math.min(12,victories/3)):0;}
     int protect(int incoming){return active()?Math.min(Math.max(0,incoming-1),3+Math.min(4,victories/5)):0;}
     void victory(GameEngine g){if("LIVIA_DUEL".equals(g.battleKind)){finish(g,"Последний поединок");return;}if(active())victories=Math.min(1000,victories+1);}

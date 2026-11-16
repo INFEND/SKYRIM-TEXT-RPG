@@ -123,8 +123,8 @@ public final class CanonicalCampaign {
             if(l.uncertain)body.append("\n(Частично восстановлено.)");
         }
         body.append("\n\nЦель: ").append(s.goal);
-        if(g.livia.enabled&&g.canonicalStage==1)body.append("\n\nЛивия:\n— Не в списке? Забудь список. На плаху.\n\nИмперский капитан отдаёт приказ, не подозревая о приближении Алдуина.");
-        if(g.livia.enabled&&g.canonicalStage==2)body.append("\n\nВ дыму ты замечаешь, как раненую Ливию вытаскивают из-под балки. Солдаты уводят капитана через служебный ход; её судьба остаётся неясной.");
+        if(g.livia.enabled&&g.canonicalStage==1&&g.canonicalPhase==0&&page==lastPage(lines))body.append("\n\nЛивия:\n— Не в списке? Забудь список. На плаху.\n\nИмперский капитан отдаёт приказ, не подозревая о приближении Алдуина.");
+        if(g.livia.enabled&&g.canonicalStage==2&&g.canonicalPhase==0&&page==lastPage(lines))body.append("\n\nВ дыму ты замечаешь, как раненую Ливию вытаскивают из-под балки. Солдаты уводят капитана через служебный ход; её судьба остаётся неясной.");
         GameEngine.Scene scene=new GameEngine.Scene("ГЛАВНАЯ ИСТОРИЯ | "+g.canonicalStage+"/"+COUNT,s.title,body.toString());
         if(page<lastPage(lines)){
             scene.primary(action(g,"NEXT"),"Ответить и продолжить разговор","Следующая часть текущей сцены");

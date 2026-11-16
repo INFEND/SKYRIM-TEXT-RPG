@@ -87,6 +87,7 @@ def build(commit, thin=False):
             add(path,"media:alma","Альма | Алая Бессмертная")
         elif group=="livia":
             if path!="media/livia/portrait.webp":raise ValueError("Invalid Livia portrait path")
+            if hashlib.sha256(f.read_bytes()).hexdigest()!="70941905be1882e6c050b0d93d65cbf0badb8a35879ac8ce2f565f37f5de849b":raise ValueError("Livia portrait differs from the prepared user image")
             add(path,"media:livia","Ливия | Имперский капитан")
         elif group=="npc":
             allowed={"astrid.webp","vex.webp","karliah.webp","nocturnal.webp","elisif.webp"}

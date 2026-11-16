@@ -727,7 +727,7 @@ public final class GameEngine {
         if(hp==0&&alma.rescue(this))battleLog+="\nАльма: Алая клятва спасла героя.";
         if(hp==0) {
             int penalty=gold/3;gold-=penalty;hp=Math.max(1,maxHp/2);stamina=Math.max(1,maxStamina/2);
-            poisonTurns=frostTurns=0;mode="DEFEAT";message="Ты приходишь в себя у дороги. Прохожие спасли тебя, но потеряно "+penalty+" септимов. Теперь можно подготовиться и вернуться.";
+            poisonTurns=frostTurns=0;mode="DEFEAT";message="Ты приходишь в себя у дороги. Прохожие спасли тебя, но потеряно "+penalty+" септимов. Теперь можно подготовиться и вернуться.";livia.defeatedInDuel(this);
         }else regenerateCombat();
     }
     private void winBattle(String lastHit) {
