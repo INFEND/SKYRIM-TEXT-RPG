@@ -394,6 +394,17 @@ public final class MainActivity extends Activity {
         switch(status){case "MET":return "Знакомство";case "HELPED":return "Благодарность";case "INFORMED":return "Обмен сведениями";case "HOSTILE":return "Враждебность";case "DEAD":return "Погиб";case "MISSING":return "Пропал";default:return "Отношение неизвестно";}
     }
     private View npcPortrait(String name){
+        if(KatherineStory.NAME.equalsIgnoreCase(name)){
+            String path="media/katherine/portrait.webp";
+            try(java.io.InputStream in=ResourceStore.open(this,path)){
+                android.graphics.Bitmap bitmap=android.graphics.BitmapFactory.decodeStream(in);
+                if(bitmap!=null){android.widget.ImageView portrait=new android.widget.ImageView(this);
+                    portrait.setImageBitmap(bitmap);portrait.setAdjustViewBounds(true);
+                    portrait.setScaleType(android.widget.ImageView.ScaleType.FIT_CENTER);
+                    portrait.setContentDescription("Кэтрин");return portrait;}
+            }catch(java.io.IOException ignored){}
+            return npcEmblem(name,"hero");
+        }
         NpcProfiles.Profile profile=NpcProfiles.find(name);
         if(profile!=null){
             if(profile.dragon)return npcEmblem(profile.name,"dragon");
@@ -419,7 +430,7 @@ public final class MainActivity extends Activity {
         NpcProfiles.Profile profile=NpcProfiles.find(name);
         if(profile!=null){addText(panel,profile.race+" | "+profile.role,14,TEXT,true,8);}
         if(KatherineStory.NAME.equals(name)){addText(panel,"18 лет | Носитель Нулевого Предела",14,TEXT,true,8);addText(panel,"Доверие: "+game.katherine.trust+"/100",14,accent(),true,8);}
-        addText(panel,"Иллюстративный образ или эмблема, не индивидуальный портрет",11,MUTED,false,10);
+        if(!KatherineStory.NAME.equals(name))addText(panel,"Иллюстративный образ или эмблема, не индивидуальный портрет",11,MUTED,false,10);
         addText(panel,npcStatusLabel(game.sceneState.npcStatusByName(name)),15,TEXT,true,8);
         new RuneDialogBuilder(this,accent()).setTitle(name).setView(panel).setNegativeButton("Закрыть",null).show();
     }
