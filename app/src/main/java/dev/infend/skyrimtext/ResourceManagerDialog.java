@@ -43,7 +43,7 @@ final class ResourceManagerDialog {
         Category(String k,String l){key=k;label=l;}
     }
     private static final class Count {
-        long done,total;boolean ready=true;int fresh,old,damaged,missing;
+        long done,total;boolean ready=true;int fresh,old,damaged,missing,installedFiles,serverFiles;
         String status(){
             ArrayList<String> parts=new ArrayList<>();
             if(fresh>0)parts.add("Новые: "+fresh);
@@ -224,10 +224,13 @@ final class ResourceManagerDialog {
         long basis=total>0?total:done;long unit=basis>=1000000L?1000000L:1000L;
         return number(done,unit)+"/"+(total>0?number(total,unit):"?")+(unit==1000000L?" МБ":" КБ");
     }
+    private String filePair(int installed,int server){
+        return "["+installed+"/"+server+"]";
+    }
     private Count count(Collection<String> packages){
         Count count=new Count();
         for(String key:packages)for(ResourceStore.Entry e:groups.get(key)){
-            count.total+=e.size;boolean ready=false;
+            count.total+=e.size;count.serverFiles++;boolean ready=false;
             try{
                 ResourceStore.State s=ResourceStore.state(activity,e,false);
                 ready=s==ResourceStore.State.READY||s==ResourceStore.State.BUNDLED;
@@ -236,16 +239,18 @@ final class ResourceManagerDialog {
             }catch(Exception ignored){}
             if("force".equals(operation)&&e.path.equals(activePath))ready=false;
             count.ready&=ready;
+            if(ready)count.installedFiles++;
             count.done+=ready?e.size:Math.min(e.size,ResourceStore.currentPartialBytes(activity,e));
         }
         return count;
     }
-    private void setRow(Category c,long done,long total,boolean ready,boolean active,String suffix){
+    private void setRow(Category c,long done,long total,boolean ready,boolean active,String suffix,int installedFiles,int serverFiles){
         String amount=total<=0&&!active?("engine".equals(c.key)?"Размер неизвестен":"По выбору"):sizePair(done,total);
+        if(serverFiles>=0)amount+=" "+filePair(installedFiles,serverFiles);
         if("engine".equals(c.key)&&total>0&&!ready&&done==total)amount+=" · Установить";
         if(!suffix.isEmpty())amount+="\n"+suffix;
         c.amount.setText(amount);
-        c.amount.setContentDescription(sizePair(done,total)+(suffix.isEmpty()?"":" · "+suffix));
+        c.amount.setContentDescription(amount);
         int percent=total>0?(int)Math.min(100,done*100.0/total):0;
         c.percent.setText(total>0?percent+"%":active?"…":"");
         c.percent.setContentDescription(suffix.isEmpty()?c.percent.getText():c.percent.getText()+" · "+suffix);
@@ -261,12 +266,12 @@ final class ResourceManagerDialog {
     }
     private void updateRows(){
         if(dialog==null||!dialog.isShowing())return;
-        long allDone=0,allTotal=0;boolean allReady=true;
+        long allDone=0,allTotal=0;boolean allReady=true;int allInstalled=0,allServer=0;
         for(Category c:categories.values()){
             if("engine".equals(c.key)){
                 boolean ready=LocalAiEngineModule.installed(activity);long total=LocalAiEngineModule.totalBytes(activity);
                 long done=LocalAiEngineModule.downloadedBytes(activity);
-                setRow(c,done,total,ready,LocalAiEngineModule.downloading(),ready?"Установлен":done>0&&done==total?"Установить":"");continue;
+                setRow(c,done,total,ready,LocalAiEngineModule.downloading(),ready?"Установлен":done>0&&done==total?"Установить":"",ready?1:0,total>0?1:-1);continue;
             }
             if("gguf".equals(c.key)){
                 java.io.File dir=activity.getExternalFilesDir("models");
@@ -274,14 +279,14 @@ final class ResourceManagerDialog {
                 long bytes=file!=null&&file.isFile()?file.length():0;
                 boolean importing=LocalAiModelStore.importing;
                 setRow(c,importing?LocalAiModelStore.importingBytes:bytes,importing?LocalAiModelStore.importingTotal:bytes,
-                    !importing&&bytes>0,importing,importing?"Импорт":bytes>0?"Импортирована":"По выбору");continue;
+                    !importing&&bytes>0,importing,importing?"Импорт":bytes>0?"Импортирована":"По выбору",0,-1);continue;
             }
             Count n=count(c.packages);allDone+=n.done;allTotal+=n.total;allReady&=n.ready;
-            setRow(c,n.done,n.total,n.ready,false,n.status());
+            allInstalled+=n.installedFiles;allServer+=n.serverFiles;
+            setRow(c,n.done,n.total,n.ready,false,n.status(),n.installedFiles,n.serverFiles);
         }
         String error=ResourceStore.catalogError(activity),auto=ResourceStore.automaticError(activity);
-        int fileCount=0;for(List<ResourceStore.Entry> entries:groups.values())fileCount+=entries.size();
-        summary.setText("Ресурсы игры: "+sizePair(allDone,allTotal)+" · "+fileCount+" файлов"+(error.isEmpty()?"":"\n"+error)+(auto.isEmpty()?"":"\n"+auto));
+        summary.setText("Ресурсы игры: "+sizePair(allDone,allTotal)+" "+filePair(allInstalled,allServer)+(error.isEmpty()?"":"\n"+error)+(auto.isEmpty()?"":"\n"+auto));
         allButton.setEnabled(!busy&&!groups.isEmpty()&&!allReady);
         boolean complete=allReady&&!groups.isEmpty();
         allButton.setText(complete?"✓  Все ресурсы загружены":"Скачать / обновить все ресурсы");
@@ -309,7 +314,7 @@ final class ResourceManagerDialog {
         items.addView(all);all.setChecked(picked.size()==keys.size());
         for(String key:keys){
             Count n=count(Collections.singleton(key));CheckBox box=new CheckBox(activity);
-            box.setText(groups.get(key).get(0).label+"\n"+sizePair(n.done,n.total)+" · "+n.status());
+            box.setText(groups.get(key).get(0).label+"\n"+sizePair(n.done,n.total)+" "+filePair(n.installedFiles,n.serverFiles)+" · "+n.status());
             box.setTextColor(Color.WHITE);box.setButtonTintList(ColorStateList.valueOf(accent));box.setChecked(picked.contains(key));
             box.setOnCheckedChangeListener((v,on)->{if(on)picked.add(key);else picked.remove(key);});
             items.addView(box);boxes.add(box);

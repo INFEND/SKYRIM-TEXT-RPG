@@ -17,3 +17,8 @@ class ResourceManagerVisualContract(unittest.TestCase):
         self.assertIn("Math.min(1f,value)",meter)
         self.assertIn('case "check":line',glyph)
         self.assertIn("Paint.ANTI_ALIAS_FLAG",glyph)
+
+    def test_resource_file_counts_use_ready_entries_not_partial_bytes(self):
+        s=(JAVA/"ResourceManagerDialog.java").read_text()
+        for token in ('return "["+installed+"/"+server+"]"', 'count.serverFiles++', 'if(ready)count.installedFiles++', 'filePair(allInstalled,allServer)', 'filePair(n.installedFiles,n.serverFiles)', 'amount+=" "+filePair(installedFiles,serverFiles)'):
+            self.assertIn(token,s)
