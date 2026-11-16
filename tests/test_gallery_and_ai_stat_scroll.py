@@ -18,7 +18,7 @@ class GalleryAndAiStats(unittest.TestCase):
         self.assertNotIn('page.setText((index+1)+" / "+imageCount(location))',GALLERY)
         self.assertNotIn("Главный вид · ",GALLERY)
         self.assertNotIn("Проведи вбок или нажми на фото",GALLERY)
-        self.assertEqual(GALLERY.count('{"Главный вход в Ривервуд"'),1)
+        self.assertEqual(GALLERY.count('{"Южные ворота Ривервуда","Главная улица Ривервуда","Лесопилка Хода и Гердур","Таверна «Спящий великан»","Мост через Белую реку"}'),1)
 
     def test_swipe_keeps_photo_while_background_prefetches(self):
         self.assertIn("private void prefetch()",GALLERY)

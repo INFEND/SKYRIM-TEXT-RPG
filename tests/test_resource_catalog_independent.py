@@ -10,7 +10,7 @@ class IndependentCatalog(unittest.TestCase):
         self.assertGreaterEqual(sum(len(e["captions"]) for e in registry),166)
         self.assertTrue(all(len(e["captions"])==len(e["archives"]) for e in registry))
         by_slug={e["slug"]:e for e in registry}
-        self.assertEqual(len(by_slug["riverwood"]["captions"]),5)
+        self.assertEqual(by_slug["riverwood"]["captions"],["Южные ворота Ривервуда","Главная улица Ривервуда","Лесопилка Хода и Гердур","Таверна «Спящий великан»","Мост через Белую реку"])
         self.assertEqual(by_slug["riften"]["archives"][3],"riften_extra.zip")
         self.assertEqual(by_slug["highhrothgar"]["archives"][6],"highhrothgar_extra.zip")
     def test_signed_catalog_is_verified_and_reloaded(self):

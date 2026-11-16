@@ -155,7 +155,7 @@ class GalleryExpansion(unittest.TestCase):
             ||!archive("highhrothgar",6).equals("highhrothgar.zip")
             ||!archive("highhrothgar",7).equals("highhrothgar_extra.zip"))
             throw new AssertionError("archive routing");
-        String[] riverwood={"Главный вход в Ривервуд","Главная улица / центр поселения","Лесопилка","Таверна «Спящий великан»","Река и мост к Ветреному пику"};
+        String[] riverwood={"Южные ворота Ривервуда","Главная улица Ривервуда","Лесопилка Хода и Гердур","Таверна «Спящий великан»","Мост через Белую реку"};
         for(int n=0;n<riverwood.length;n++){
             if(!captionFor("Ривервуд",n).equals(riverwood[n]))throw new AssertionError("Riverwood view order");
             if(!archive("riverwood",n+1).equals("riverwood.zip"))throw new AssertionError("Riverwood pack");
