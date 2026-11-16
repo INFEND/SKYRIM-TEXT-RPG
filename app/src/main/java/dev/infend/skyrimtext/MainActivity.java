@@ -2624,39 +2624,126 @@ public final class MainActivity extends Activity {
 
     private void locationDialog(WorldAtlas.Place place){
         TravelPlanner.Route route=TravelPlanner.plan(game,place);
-        String body=place.description+"\n\nТип: "+place.type+
-            "\nРегион: "+GameEngine.REGIONS[place.region]+"\n\n"+route.summary();
-        SkyrimMapCatalog.Site geographic=SkyrimMapCatalog.find(place.name);
-        if(geographic!=null&&!geographic.registered)body+="\n\nПоложение метки на рельефе ориентировочное.";
-        AlertDialog.Builder dialog=new RuneDialogBuilder(this,accent()).setTitle(place.name)
-            .setNegativeButton("Закрыть",null);
+        boolean canTravel=route.allowed&&route.days>0;
+        android.app.Dialog dialog=new android.app.Dialog(this,R.style.RunicDialogTheme);
+        dialog.requestWindowFeature(android.view.Window.FEATURE_NO_TITLE);
+        LinearLayout panel=column();
+        panel.setBackground(AmoledAppearance.window(0xff090909,accent()));
+        panel.setPadding(dp(14),dp(13),dp(14),dp(14));
+        addText(panel,place.name,22,TEXT,true,9);
+
+        ScrollView scroller=new ScrollView(this);
+        scroller.setVerticalScrollBarEnabled(false);
+        scroller.setFillViewport(false);
+        LinearLayout wrapper=column();
+        wrapper.setPadding(0,0,0,dp(8));
+        scroller.addView(wrapper,new ScrollView.LayoutParams(-1,-2));
+        panel.addView(scroller,new LinearLayout.LayoutParams(-1,0,1));
         if(LocationGalleryView.hasGallery(place.name)){
-            android.widget.ScrollView scroller=new android.widget.ScrollView(this);
-            scroller.setFillViewport(false);
-            LinearLayout wrapper=column();
-            wrapper.setPadding(dp(9),dp(9),dp(9),dp(12));
-            scroller.addView(wrapper);
             wrapper.addView(new LocationGalleryView(this,place.name,accent(),false),lp(-1,-2));
             if(place.name.equalsIgnoreCase(game.progress.location))renderLocationWeather(wrapper);
-            TextView description=text(body,14,TEXT,false);
-            description.setLineSpacing(dp(4),1.05f);
-            description.setPadding(dp(8),dp(13),dp(8),dp(5));
-            wrapper.addView(description,lp(-1,-2));
-            routePreview(wrapper,route);
-            dialog.setView(scroller);
-        }else if(visual("travel")&&route.allowed&&route.days>0){
-            LinearLayout wrapper=column();wrapper.setPadding(dp(14),dp(10),dp(14),dp(12));
-            addText(wrapper,body,14,TEXT,false,10);routePreview(wrapper,route);
-            ScrollView scroller=new ScrollView(this);scroller.addView(wrapper);dialog.setView(scroller);
-        }else{
-            dialog.setMessage(body);
+            space(wrapper,10);
         }
-        if(route.allowed&&route.days>0){
-            dialog.setPositiveButton("Начать переход",(d,w)->{
-                java.util.Map<String,Integer> before=itemSnapshot(game);VisualSnapshot visualBefore=new VisualSnapshot(game,"LOC:"+place.name);game.choose("LOC:"+place.name);game.progress.sync(game);captureItemGains(before,game,false);recordVisual(visualBefore,game,place.name);save();tab=0;render();
+
+        LinearLayout details=column();
+        details.setBackground(AmoledAppearance.shape(this,PANEL_2,android.graphics.Color.TRANSPARENT,16));
+        details.setPadding(dp(13),dp(12),dp(13),dp(12));
+        TextView description=text(place.description,15,TEXT,false);
+        description.setLineSpacing(dp(3),1.08f);
+        details.addView(description,lp(-1,-2));
+        SkyrimMapCatalog.Site geographic=SkyrimMapCatalog.find(place.name);
+        if(geographic!=null&&!geographic.registered){
+            space(details,8);
+            addText(details,"Положение метки на рельефе ориентировочное.",12,MUTED,false,0);
+        }
+        wrapper.addView(details,lp(-1,-2));
+
+        if(canTravel){
+            space(wrapper,10);
+            LinearLayout travel=column();
+            travel.setPadding(dp(13),dp(11),dp(13),dp(12));
+            travel.setBackground(AmoledAppearance.shape(this,PANEL_2,android.graphics.Color.TRANSPARENT,16));
+            LinearLayout metrics=row();
+            LinearLayout time=column(), fare=column();
+            metrics.addView(time,new LinearLayout.LayoutParams(0,-2,1));
+            metrics.addView(fare,new LinearLayout.LayoutParams(0,-2,1));
+            addText(time,"В ПУТИ",11,MUTED,true,3);
+            addText(time,route.days+" дн.",17,TEXT,true,0);
+            addText(fare,"ПЕРЕПРАВА",11,MUTED,true,3);
+            addText(fare,route.fare+" септимов",17,ITEM_GOLD,true,0);
+            travel.addView(metrics,lp(-1,-2));
+            space(travel,12);
+            addText(travel,"МАРШРУТ",11,accent(),true,5);
+            if(visual("travel")&&route.stops.size()>1){
+                travel.addView(new VisualEffectsView.RouteLine(this,route.stops.size(),accent(),false),lp(-1,24));
+                space(travel,4);
+            }
+            for(int i=0;i<route.stops.size();i++){
+                LinearLayout line=row();
+                line.addView(new SkyrimIconView(this,"map",accent()),lp(22,25));
+                LinearLayout label=column();
+                label.setPadding(dp(7),dp(3),0,dp(3));
+                addText(label,i==0?"Отправление":i==route.stops.size()-1?"Прибытие":"Переход",11,MUTED,false,1);
+                addText(label,route.stops.get(i),14,TEXT,true,0);
+                line.addView(label,new LinearLayout.LayoutParams(0,-2,1));
+                travel.addView(line,lp(-1,-2));
+            }
+            wrapper.addView(travel,lp(-1,-2));
+        }else{
+            space(wrapper,8);
+            addText(wrapper,route.summary(),13,route.allowed?MUTED:ITEM_DOWN,false,5);
+        }
+
+        // Fixed footer: all actions use the same style and remain above system navigation.
+        LinearLayout footer=column();
+        footer.setPadding(0,dp(8),0,0);
+        if(canTravel&&visual("travel")&&route.stops.size()>1){
+            visualSummaryLink(footer,"МАРШРУТ НА КАРТЕ",()->showRouteMap(route.stops));
+            space(footer,6);
+        }
+        if(canTravel){
+            visualSummaryLink(footer,"НАЧАТЬ ПЕРЕХОД",()->{
+                dialog.dismiss();
+                java.util.Map<String,Integer> before=itemSnapshot(game);
+                VisualSnapshot visualBefore=new VisualSnapshot(game,"LOC:"+place.name);
+                game.choose("LOC:"+place.name);game.progress.sync(game);
+                captureItemGains(before,game,false);recordVisual(visualBefore,game,place.name);
+                save();tab=0;render();
             });
+            space(footer,6);
+        }
+        visualSummaryLink(footer,"ЗАКРЫТЬ",dialog::dismiss);
+        panel.addView(footer,lp(-1,-2));
+        dialog.setContentView(panel);
+        android.view.Window window=dialog.getWindow();
+        if(window!=null){
+            window.setBackgroundDrawableResource(android.R.color.transparent);
+            window.addFlags(android.view.WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+            window.setDimAmount(.72f);
+            window.setGravity(Gravity.CENTER);
         }
         dialog.show();
+        if(window!=null){
+            // Measure the usable activity window, not the raw physical display.
+            android.graphics.Rect safe=new android.graphics.Rect();
+            getWindow().getDecorView().getWindowVisibleDisplayFrame(safe);
+            int width=safe.width(),height=safe.height();
+            if(android.os.Build.VERSION.SDK_INT>=30){
+                android.view.WindowMetrics metrics=getWindowManager().getCurrentWindowMetrics();
+                android.graphics.Insets insets=metrics.getWindowInsets().getInsetsIgnoringVisibility(
+                    android.view.WindowInsets.Type.systemBars()|android.view.WindowInsets.Type.displayCutout());
+                width=metrics.getBounds().width()-insets.left-insets.right;
+                height=metrics.getBounds().height()-insets.top-insets.bottom;
+            }
+            if(width<=0)width=getResources().getDisplayMetrics().widthPixels;
+            if(height<=0)height=getResources().getDisplayMetrics().heightPixels;
+            int usableWidth=Math.max(1,width-dp(24));
+            int usableHeight=Math.max(1,height-dp(32));
+            int cardWidth=Math.min(dp(480),usableWidth);
+            int cardHeight=Math.min(dp(820),usableHeight);
+            window.setLayout(cardWidth,cardHeight);
+        }
+        SovngardeTypeface.watchDialog(dialog);
     }
 
     // Shared item presentation: combat values and equipped slot come from the engine.
