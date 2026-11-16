@@ -18,6 +18,9 @@ class ReleaseHistoryContract(unittest.TestCase):
         for entry in history:
             self.assertIsInstance(entry["notes"], str)
             self.assertTrue(entry["notes"].strip(), "Every released version needs a changelog")
+            for line in entry["notes"].splitlines():
+                if line.strip():
+                    self.assertTrue(line.startswith(("[+] ", "[-] ", "[=] ")), entry["versionName"] + ": invalid changelog marker")
         gradle = (ROOT / "app/build.gradle").read_text(encoding="utf-8")
         code = re.search(r"\bversionCode\s+(\d+)", gradle)
         name = re.search(r"\bversionName\s+['\"]([^'\"]+)['\"]", gradle)
