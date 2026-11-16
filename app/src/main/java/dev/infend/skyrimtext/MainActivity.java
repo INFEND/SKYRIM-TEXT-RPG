@@ -1426,7 +1426,8 @@ public final class MainActivity extends Activity {
     }
     private void renderStory(){
         boolean canonical="CANON".equals(game.mode)||("COMBAT".equals(game.mode)&&("CANONICAL".equals(game.battleKind)||"FACTION".equals(game.battleKind)));
-        if(prefs.getBoolean("ai_enabled",false)&&!canonical&&!KatherineStory.MODE.equals(game.mode)&&!AlmaStory.MODE.equals(game.mode)){renderAiGame();return;}
+        canonical=canonical||KatherineStory.MODE.equals(game.mode)||AlmaStory.MODE.equals(game.mode);
+        if(prefs.getBoolean("ai_enabled",false)&&!canonical){renderAiGame();return;}
         GameEngine.Scene s=game.scene();section(s.kicker,s.title,"");
         if(LocationGalleryView.hasGallery(game.progress.location)){
             content.addView(sceneGallery(game.progress.location),lp(-1,-2));
