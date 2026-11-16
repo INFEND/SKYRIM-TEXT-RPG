@@ -116,6 +116,104 @@ public final class AiGameTurn {
     public static String previewScene(String partial){
         return AiScenePreview.read(partial);
     }
+
+    /** Read choices directly from the accumulated JSON, even while title/detail are
+     * being generated. Preview is deliberately read-only and never applies effects. */
+    public static ArrayList<Option> previewChoices(String partial){
+        ArrayList<Option> out=new ArrayList<>();
+        if(partial==null)return out;
+        int start=0, thought=partial.indexOf("<think>");
+        if(thought>=0){
+            int close=partial.indexOf("</think>",thought);
+            if(close<0)return out;
+            start=close+8;
+        }
+        start=partial.indexOf('{',start);
+        if(start<0)return out;
+        int array=previewField(partial,start,"choices");
+        if(array<0||partial.charAt(array)!='[')return out;
+        int i=previewSpace(partial,array+1);
+        while(i<partial.length()&&out.size()<10&&partial.charAt(i)=='{'){
+            int end=previewObjectEnd(partial,i);
+            String raw=partial.substring(i,end<0?partial.length():end+1);
+            String title=previewString(raw,"title"),detail=previewString(raw,"detail"),
+                skill=previewString(raw,"skill");
+            int chance=-1;String action="";
+            if(end>=0){
+                try{
+                    JSONObject c=new JSONObject(raw);
+                    chance=probability(c,"chance");
+                    action=combatAction(c.optString("combatAction",""));
+                }catch(JSONException ignored){}
+            }
+            if(!title.isEmpty()||!detail.isEmpty())
+                out.add(new Option(limited(title,110),limited(detail,270),limited(skill,65),chance,action));
+            if(end<0)break;
+            i=previewSpace(partial,end+1);
+            if(i>=partial.length()||partial.charAt(i)!=',')break;
+            i=previewSpace(partial,i+1);
+        }
+        return out;
+    }
+    private static int previewSpace(String s,int i){
+        while(i<s.length()&&Character.isWhitespace(s.charAt(i)))i++;
+        return i;
+    }
+    private static int previewQuoteEnd(String s,int i){
+        boolean escaped=false;
+        for(int j=i+1;j<s.length();j++){
+            char c=s.charAt(j);
+            if(escaped)escaped=false;
+            else if(c=='\\')escaped=true;
+            else if(c=='"')return j;
+        }
+        return -1;
+    }
+    private static int previewObjectEnd(String s,int start){
+        int depth=0;
+        for(int i=start;i<s.length();i++){
+            char c=s.charAt(i);
+            if(c=='"'){
+                i=previewQuoteEnd(s,i);
+                if(i<0)return -1;
+            }else if(c=='{')depth++;
+            else if(c=='}'&&--depth==0)return i;
+        }
+        return -1;
+    }
+    /** Locate a direct object member, ignoring nested keys and quoted prose. */
+    private static int previewField(String s,int start,String key){
+        int depth=0;char previous=0;
+        for(int i=start;i<s.length();i++){
+            char c=s.charAt(i);
+            if(Character.isWhitespace(c))continue;
+            if(c=='"'){
+                int end=previewQuoteEnd(s,i);
+                if(end<0)return -1;
+                if(depth==1&&(previous=='{'||previous==',')&&
+                        s.substring(i+1,end).equals(key)){
+                    int colon=previewSpace(s,end+1);
+                    if(colon>=s.length()||s.charAt(colon)!=':')return -1;
+                    int value=previewSpace(s,colon+1);
+                    return value<s.length()?value:-1;
+                }
+                i=end;previous='"';continue;
+            }
+            if(c=='{'||c=='[')depth++;
+            else if(c=='}'||c==']'){
+                if(--depth==0)return -1;
+            }
+            previous=c;
+        }
+        return -1;
+    }
+    private static String previewString(String object,String key){
+        int value=previewField(object,0,key);
+        if(value<0||object.charAt(value)!='"')return "";
+        // Reuse the tested incremental string decoder, including Unicode and escapes.
+        return AiScenePreview.read("{\"scene\":"+object.substring(value));
+    }
+
     private static int change(JSONObject e,String name,int limit)throws JSONException{
         if(!e.has(name))return 0;
         Object raw=e.opt(name);
