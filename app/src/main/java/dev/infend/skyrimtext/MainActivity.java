@@ -4254,7 +4254,7 @@ public final class MainActivity extends Activity {
         livingLink(panel,"Опыт навыка","1 F","skills",()->livingFixSkill(false));livingLink(panel,"Уровень навыка","1 F","skills",()->livingFixSkill(true));
         livingLink(panel,"Уникальные способности","50 F","magic",this::livingPowerShop);
         livingLink(panel,"Уникальные предметы","50 F","armor",this::livingArtifactShop);
-        livingDialog("Магазин компенсаций",panel);
+        livingDialog("Магазин фикскоинов",panel);
     }
     private void livingPowerShop(){
         if(livingBusy())return;LinearLayout panel=column();
@@ -4310,7 +4310,9 @@ public final class MainActivity extends Activity {
     }
     private void renderSettings(){
         section("ПАРАМЕТРЫ","Настройки","Твоя история, твои правила.");
-        LinearLayout expansion=card();addText(expansion,"РАСШИРЕНИЕ МИРА",11,accent(),true,8);
+        int additionsStart=content.getChildCount();
+        int addonStart=content.getChildCount();
+        LinearLayout expansion=column();content.addView(expansion,lp(-1,-2));
         Switch katherineToggle=new Switch(this);katherineToggle.setText("Кэтрин | Нулевой Предел");
         katherineToggle.setTextColor(TEXT);katherineToggle.setThumbTintList(ColorStateList.valueOf(accent()));
         katherineToggle.setChecked(game.katherine.enabled);
@@ -4322,14 +4324,29 @@ public final class MainActivity extends Activity {
         Switch kathAI=new Switch(this);kathAI.setText("Самостоятельные инициативы Кэтрин через ИИ");kathAI.setTextColor(TEXT);kathAI.setThumbTintList(ColorStateList.valueOf(accent()));kathAI.setChecked(game.katherine.companion.aiInitiatives);kathAI.setOnCheckedChangeListener((v,on)->{if(livingBusy()){v.setChecked(game.katherine.companion.aiInitiatives);return;}game.katherine.companion.aiInitiatives=on;prefs.edit().putBoolean("katherine_ai_initiatives",on).apply();save();});expansion.addView(kathAI,lp(-1,52));
         TextView kathProfile=text("Начальное состояние Кэтрин | "+game.katherine.companion.profileName(),14,accent(),true);kathProfile.setPadding(dp(10),dp(12),dp(10),dp(12));expansion.addView(kathProfile,lp(-1,-2));kathProfile.setOnClickListener(v->{if(livingBusy()||game.katherine.stage>0){toast("Начальное состояние доступно до первой встречи с Кэтрин");return;}game.katherine.companion.profile=(game.katherine.companion.profile+1)%3;prefs.edit().putInt("katherine_profile",game.katherine.companion.profile).apply();save();render();});
         addText(expansion,"Влияет на стартовую магию спутницы, а не на создание героя.",11,MUTED,false,6);
+        foldSettingsSection("addon_katherine","Кэтрин | Нулевой Предел",addonStart);
+        addonStart=content.getChildCount();
+        expansion=column();content.addView(expansion,lp(-1,-2));
         Switch itachiToggle=new Switch(this);itachiToggle.setText("Итачи | Алая Ворона");itachiToggle.setTextColor(TEXT);itachiToggle.setThumbTintList(ColorStateList.valueOf(accent()));itachiToggle.setChecked(game.itachi.enabled);itachiToggle.setOnCheckedChangeListener((v,on)->{if(livingBusy()||!game.itachi.setEnabled(game,on)){v.setChecked(game.itachi.enabled);return;}prefs.edit().putBoolean("itachi_enabled",on).apply();save();});expansion.addView(itachiToggle,lp(-1,47));addText(expansion,"Итачи: авторская история, спутница, духовные техники и отношения.",12,MUTED,false,8);
         TextView itachiArt=text("Управление фотографиями Итачи",14,accent(),true);itachiArt.setPadding(dp(10),dp(12),dp(10),dp(12));itachiArt.setOnClickListener(v->itachiLocalGallery(0));expansion.addView(itachiArt,lp(-1,-2));
+        foldSettingsSection("addon_itachi","Итачи | Алая Ворона",addonStart);
+        addonStart=content.getChildCount();
+        expansion=column();content.addView(expansion,lp(-1,-2));
         Switch liviaToggle=new Switch(this);liviaToggle.setText("Ливия | Пепел Хелгена");liviaToggle.setTextColor(TEXT);liviaToggle.setThumbTintList(ColorStateList.valueOf(accent()));liviaToggle.setChecked(game.livia.enabled);liviaToggle.setOnCheckedChangeListener((v,on)->{if(livingBusy()||!game.livia.setEnabled(game,on)){v.setChecked(game.livia.enabled);return;}prefs.edit().putBoolean("livia_enabled",on).apply();save();});expansion.addView(liviaToggle,lp(-1,47));addText(expansion,"Ливия: авторское выживание после Хелгена, месть, прощение, искупление и отношения.",12,MUTED,false,8);
-        actionButton("Портрет Ливии","Импорт оригинального JPEG, PNG или WebP",false,this::liviaPortrait);
+        livingLink(expansion,"Портрет Ливии","Импорт","hero",this::liviaPortrait);
+        foldSettingsSection("addon_livia","Ливия | Пепел Хелгена",addonStart);
+        addonStart=content.getChildCount();
+        expansion=column();content.addView(expansion,lp(-1,-2));
         Switch almaToggle=new Switch(this);almaToggle.setText("Альма | Алая Бессмертная");almaToggle.setTextColor(TEXT);almaToggle.setThumbTintList(ColorStateList.valueOf(accent()));almaToggle.setChecked(game.alma.enabled);
         almaToggle.setOnCheckedChangeListener((v,on)->{if(livingBusy()){v.setChecked(game.alma.enabled);return;}if(!game.alma.setEnabled(game,on)){v.setChecked(game.alma.enabled);return;}prefs.edit().putBoolean("alma_enabled",on).apply();save();});expansion.addView(almaToggle,lp(-1,47));addText(expansion,"Альма: отключение скрывает сюжет, отношения и боевую поддержку. Прогресс и галерея сохраняются.",12,MUTED,false,8);
         addText(expansion,"Необязательная авторская история вне канона TES.",12,MUTED,false,0);
-        if(game.started)livingLink(content,"Магазин компенсаций","∞ F","skills",this::livingFixShop);
+        foldSettingsSection("addon_alma","Альма | Алая Бессмертная",addonStart);
+        addonStart=content.getChildCount();
+        expansion=column();content.addView(expansion,lp(-1,-2));
+        if(game.started)livingLink(expansion,"Открыть магазин","∞ F","skills",this::livingFixShop);
+        else addText(expansion,"Магазин доступен после начала игры.",13,MUTED,false,0);
+        foldSettingsSection("addon_fixshop","Магазин фикскоинов",addonStart);
+        foldSettingsSection("additions","Дополнения",additionsStart);
         content.addView(new NordicArtView(this,NordicArtView.STORY),lp(-1,105));space(content,12);
         int appearanceStart=content.getChildCount();
         LinearLayout palette=card();addText(palette,"ЦВЕТ АКЦЕНТА",11,accent(),true,12);
