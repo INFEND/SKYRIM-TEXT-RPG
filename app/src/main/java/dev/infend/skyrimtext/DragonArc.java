@@ -188,7 +188,7 @@ public final class DragonArc {
         String[] option=OPTIONS[stage][index-1].split("\\|",2);
         g.day+=1; // A choice costs a portion of the day and cannot be farmed.
         if(check>=0){
-            boolean success=new Random().nextInt(100)<check;
+            boolean success=g.rollCheck(check);
             g.stamina=Math.max(0,g.stamina-7);
             if(success){
                 g.progress.dragonInsight=Math.min(15,g.progress.dragonInsight+2);

@@ -33,7 +33,7 @@ class DragonArcContracts(unittest.TestCase):
         ui=java("MainActivity.java")
         self.assertIn('if(index!=3&&index!=5&&index!=7)return -1;',arc)
         self.assertIn('int check=chance(g,action)',arc)
-        self.assertIn('new Random().nextInt(100)<check',arc)
+        self.assertIn('g.rollCheck(check)',arc)
         self.assertIn('if(action.startsWith("DRAGON:"))return DragonArc.chance(g,action);',progress)
         self.assertIn('game.progress.chance(game,c.action)',ui)
         self.assertIn('addChoiceStat(prose,"ШАНС УСПЕХА",chance+"%"',ui)

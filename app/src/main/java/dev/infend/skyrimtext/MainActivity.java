@@ -483,9 +483,9 @@ public final class MainActivity extends Activity {
         if(!cost.isEmpty())addText(host,cost,12,ITEM_GOLD,true,3);
     }
     private static final class VisualSnapshot {
-        final String location,mode,enemy;final int hp,enemyHp,victories,gold,xp,level,day,region,reputation;final int magicka,stamina,hour,chance;final int[] skillXp,skillLevels;final java.util.List<String> stops;
+        final String location,mode,enemy;final int hp,enemyHp,victories,gold,xp,level,day,region,reputation;final int magicka,stamina,hour,chance;final int[] skillXp,skillLevels,needs;final JSONObject inventory;final java.util.List<String> stops;
         VisualSnapshot(GameEngine g){this(g,null);}
-        VisualSnapshot(GameEngine g,String action){location=g.progress.location;mode=g.mode;enemy=g.enemyName;hp=g.hp;enemyHp=g.enemyHp;victories=g.victories;gold=g.gold;xp=g.xp;level=g.level;day=g.day;region=g.region;reputation=g.reputation;magicka=g.magicka;stamina=g.stamina;hour=g.hour;chance=action==null?-1:g.progress.chance(g,action);skillXp=g.progress.skillXp.clone();skillLevels=g.progress.skillLevels.clone();
+        VisualSnapshot(GameEngine g,String action){location=g.progress.location;mode=g.mode;enemy=g.enemyName;hp=g.hp;enemyHp=g.enemyHp;victories=g.victories;gold=g.gold;xp=g.xp;level=g.level;day=g.day;region=g.region;reputation=g.reputation;magicka=g.magicka;stamina=g.stamina;hour=g.hour;chance=action==null?-1:g.progress.chance(g,action);skillXp=g.progress.skillXp.clone();skillLevels=g.progress.skillLevels.clone();g.syncLivingSystems();needs=new int[]{g.needs.food,g.needs.water,g.needs.awake,g.needs.rest};JSONObject copy;try{copy=new JSONObject(g.progress.inventory.toString());}catch(Exception ex){copy=new JSONObject();}inventory=copy;
             WorldAtlas.Place place=null;if(action!=null&&action.startsWith("LOC:"))place=WorldAtlas.find(action.substring(4));
             if(action!=null&&action.startsWith("REGION:"))try{int i=Integer.parseInt(action.substring(7));if(i>=0&&i<TravelPlanner.HUBS.length)place=WorldAtlas.find(TravelPlanner.HUBS[i]);}catch(NumberFormatException ignored){}
             stops=place==null?java.util.Collections.emptyList():TravelPlanner.plan(g,place).stops;
@@ -505,7 +505,9 @@ public final class MainActivity extends Activity {
         livingDelta("Золото",(long)after.gold-before.gold);livingDelta("Опыт персонажа",gained);livingDelta("Здоровье",after.hp-before.hp);livingDelta("Магия",after.magicka-before.magicka);livingDelta("Выносливость",after.stamina-before.stamina);livingDelta("Уровень",after.level-before.level);
         for(int i=0;i<before.skillXp.length;i++){long earned=(long)after.progress.skillXp[i]-before.skillXp[i];for(int l=before.skillLevels[i];l<after.progress.skillLevels[i];l++)earned+=Math.max(100,100*l);if(after.progress.skillLevels[i]==100&&before.skillLevels[i]<100)livingDelta(RpgContent.SKILLS[i]+" (уровни)",after.progress.skillLevels[i]-before.skillLevels[i]);else livingDelta(RpgContent.SKILLS[i]+" (опыт)",earned);}
         livingDelta("Игровое время, ч.",((long)after.day-before.day)*24+after.hour-before.hour);
-        try{after.lastLivingResult=new JSONObject().put("title",livingResultTitle).put("chance",after.lastCheckChance>=0?after.lastCheckChance:livingResultChance).put("roll",after.lastCheckRoll).put("deltas",new JSONObject(livingDeltas));}catch(Exception ignored){}
+        int[] values={after.needs.food,after.needs.water,after.needs.awake,after.needs.rest};String[] names={"Сытость","Запас воды","Бодрость","Отдых"};for(int k=0;k<4;k++)livingDelta(names[k],values[k]-before.needs[k]);
+        JSONObject inventoryChanges=new JSONObject();java.util.LinkedHashSet<String> allIds=new java.util.LinkedHashSet<>();java.util.Iterator<String> oldIds=before.inventory.keys(),newIds=after.progress.inventory.keys();while(oldIds.hasNext())allIds.add(oldIds.next());while(newIds.hasNext())allIds.add(newIds.next());for(String id:allIds){if("Септимы".equals(id))continue;long change=(long)after.progress.quantity(id)-before.inventory.optInt(id);ItemCatalog.Item item=ItemCatalog.find(id);if(change!=0&&item!=null)try{inventoryChanges.put(id,change);}catch(Exception ignored){}}
+        try{after.lastLivingResult=new JSONObject().put("title",livingResultTitle).put("chance",after.lastCheckChance>=0?after.lastCheckChance:livingResultChance).put("roll",after.lastCheckRoll).put("deltas",new JSONObject(livingDeltas)).put("items",inventoryChanges);}catch(Exception ignored){}
         after.needs.sync(after.day,after.hour);combatLabels.clear();combatColors.clear();battleSummaryPending=false;
         after.visitedVisual.add(after.progress.location);
         boolean moved=!before.location.equals(after.progress.location);
@@ -546,12 +548,13 @@ public final class MainActivity extends Activity {
     private void livingDelta(String label,long delta){if(delta!=0)livingDeltas.put(label,delta);}
     private void renderLivingResult(){
         JSONObject result=game.lastLivingResult;JSONObject deltas=result.optJSONObject("deltas");int chance=result.optInt("chance",-1),roll=result.optInt("roll",-1);
-        if((deltas==null||deltas.length()==0)&&roll<0)return;
+        JSONObject items=result.optJSONObject("items");if((deltas==null||deltas.length()==0)&&(items==null||items.length()==0)&&roll<0)return;
         LinearLayout tile=livingTile(content);String title=roll>=1?(roll<=chance?"Успех":"Неудача"):"Результат действия";
         livingLine(tile,title,chance>=0?chance+"%":"",roll>=1?(roll<=chance?ITEM_UP:ITEM_DOWN):accent());
         String label=result.optString("title","");if(!label.isEmpty())addText(tile,label,13,MUTED,false,5);
         if(roll>=1)livingLine(tile,"Бросок",roll+" / 100",MUTED);
         if(deltas!=null){java.util.Iterator<String> keys=deltas.keys();while(keys.hasNext()){String key=keys.next();long n=deltas.optLong(key);if(n==0)continue;int color=key.equals("Золото")?ITEM_GOLD:key.startsWith("Игровое время")?MUTED:n>0?ITEM_UP:ITEM_DOWN;livingLine(tile,key,(n>0?"+":"−")+livingNumber(Math.abs(n)),color);}}
+        if(items!=null&&items.length()>0){java.util.Iterator<String> ids=items.keys();while(ids.hasNext()){String id=ids.next();ItemCatalog.Item item=ItemCatalog.find(id);long count=items.optLong(id);livingLine(tile,item==null?id:item.name,(count>0?"+":"−")+Math.abs(count),count>0?ITEM_UP:ITEM_DOWN);}livingLink(content,"Инвентарь обновлён","","bag",()->{tab=2;render();});}
     }
     private void renderVisualResults(){
         renderLivingResult();
@@ -1484,8 +1487,12 @@ public final class MainActivity extends Activity {
     }
 
     private String choiceSkillName(String action){return "HEAVY".equals(action)?RpgContent.SKILLS[game.progress.equippedWeaponSkill()]:SceneChoiceMeta.skillName(action);}
+    private void livingChanceLink(LinearLayout panel,String title,String calculation){
+        TextView link=text("Показать расчёт  ⌄",12,MUTED,true);link.setPadding(0,dp(4),0,dp(4));panel.addView(link,lp(-1,-2));
+        link.setOnClickListener(v->{LinearLayout details=column();for(String line:calculation.split("\n"))addText(details,line,14,TEXT,false,6);livingDialog(title,details);});
+    }
     private void storyChoice(int position,GameEngine.Choice c,Runnable onClick){
-        int chance=game.progress.chance(game,c.action);
+        int chance=game.progress.chance(game,c.action);String calculation=game.progress.chanceExplanation();
         LinearLayout box=row();box.setGravity(Gravity.CENTER_VERTICAL);
         box.setPadding(dp(14),dp(14),dp(14),dp(14));
         int actionTint=AmoledAppearance.storyTint(c.action,c.title,c.special?accent():BORDER);
@@ -1522,6 +1529,7 @@ public final class MainActivity extends Activity {
             addChoiceStat(prose,"НАВЫК",choiceSkillName(c.action),accent(),4);
             addChoiceStat(prose,"ШАНС УСПЕХА",chance+"%",SceneChoiceMeta.chanceColor(chance),0);
             livingBar(prose,chance,100,SceneChoiceMeta.chanceColor(chance));
+            livingChanceLink(prose,c.title,calculation.isEmpty()?"Шанс движка: "+chance+"%":calculation);
         }else addText(prose,"БЕЗ ПРОВЕРКИ",11,0xffb8c1c4,false,0);
         LinearLayout.LayoutParams layout=lp(-1,-2);layout.bottomMargin=dp(5);
         content.addView(box,layout);
@@ -1895,6 +1903,7 @@ public final class MainActivity extends Activity {
             addChoiceStat(detail,"ШАНС УСПЕХА",displayedChance+"%",
                 SceneChoiceMeta.chanceColor(displayedChance),0);
             livingBar(detail,displayedChance,100,SceneChoiceMeta.chanceColor(displayedChance));
+            livingChanceLink(detail,option.title,combat?game.progress.chanceExplanation():"Оценка ИИ: "+option.chance+"%\nФактический бросок делает игровой движок. Состав коэффициентов модели не задан.");
         }else addText(detail,"БЕЗ ПРОВЕРКИ",12,MUTED,false,0);
         boolean available=!combat||nativeAiCombatAvailable(option.combatAction);
         if(!available){
@@ -3479,18 +3488,25 @@ public final class MainActivity extends Activity {
         game.needs.sync(game.day,game.hour);LinearLayout panel=column();
         String[] names={"Сытость","Запас воды","Бодрость","Отдых"};String[] glyphs={"food","potion","magic","stamina"};int[] values={game.needs.food,game.needs.water,game.needs.awake,game.needs.rest};int[] colors={ITEM_GOLD,0xff75a2dd,ITEM_MAGIC,ITEM_UP};
         for(int k=0;k<2;k++){LinearLayout line=row();panel.addView(line,lp(-1,-2));for(int j=0;j<2;j++){final int i=k*2+j;LinearLayout tile=column();tile.setPadding(dp(12),dp(12),dp(12),dp(12));tile.setBackground(bg(0xff141414,Color.TRANSPARENT,18));LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(0,-2,1);p.setMargins(dp(3),dp(3),dp(3),dp(3));line.addView(tile,p);
-            LinearLayout top=row();top.addView(new SkyrimIconView(this,glyphs[i],colors[i]),lp(28,30));TextView number=text(values[i]+"%",21,colors[i],true);number.setGravity(Gravity.END);top.addView(number,new LinearLayout.LayoutParams(0,-2,1));tile.addView(top);space(tile,10);addText(tile,names[i],14,TEXT,false,8);livingBar(tile,values[i],100,colors[i]);tile.setOnClickListener(v->{if(i<2)livingConsumeDialog(i==1);else showWaitDialog();});}}
+            LinearLayout top=row();top.addView(new SkyrimIconView(this,glyphs[i],colors[i]),lp(28,30));TextView number=text(values[i]+"%",21,colors[i],true);number.setGravity(Gravity.END);top.addView(number,new LinearLayout.LayoutParams(0,-2,1));tile.addView(top);space(tile,10);addText(tile,names[i],14,TEXT,false,8);livingBar(tile,values[i],100,colors[i]);tile.setOnClickListener(v->{if(i<2)livingConsumeDialog(i==1);else livingRestDialog(i==2);});}}
         space(panel,8);addText(panel,game.needs.penalty()>0?"Штраф обычных проверок: −"+game.needs.penalty()+" п.п.":"Состояние в норме",13,game.needs.penalty()>0?ITEM_GOLD:MUTED,false,8);
+        if(game.needs.penalty()>0)addText(panel,game.needs.penaltyDetails(),12,MUTED,false,8);
         addText(panel,"Показатели меняются только с игровым временем. Нажми на карточку для восстановления.",12,MUTED,false,8);
         livingDialog("Состояние персонажа",panel);
     }
+    private void livingRestDialog(boolean sleep){
+        if(livingBusy()){toast("Сейчас действие недоступно");return;}LinearLayout panel=column();panel.setPadding(dp(14),dp(10),dp(14),dp(10));
+        TextView amount=text("1 ч.",22,accent(),true);panel.addView(amount);android.widget.SeekBar slider=new android.widget.SeekBar(this);slider.setMax(23);panel.addView(slider,lp(-1,48));slider.setOnSeekBarChangeListener(new android.widget.SeekBar.OnSeekBarChangeListener(){public void onStartTrackingTouch(android.widget.SeekBar b){}public void onStopTrackingTouch(android.widget.SeekBar b){}public void onProgressChanged(android.widget.SeekBar b,int value,boolean user){amount.setText((value+1)+" ч.");}});
+        addText(panel,sleep?"Сон восстанавливает бодрость и отдых.":"Ожидание восстанавливает отдых, но не заменяет сон.",13,MUTED,false,8);
+        new RuneDialogBuilder(this,accent()).setTitle(sleep?"Сон":"Отдых").setView(panel).setNegativeButton("Отмена",null).setPositiveButton("Начать",(d,w)->{if(livingBusy())return;VisualSnapshot before=new VisualSnapshot(game);if(game.restHours(slider.getProgress()+1,sleep)){recordVisual(before,game,sleep?"Сон":"Отдых");save();render();toast("Готово");}}).show();
+    }
     private void livingConsumeDialog(boolean water){
-        if(aiTurnBusy||"COMBAT".equals(game.mode)){toast("Сейчас действие недоступно");return;}
+        if(livingBusy()){toast("Сейчас действие недоступно");return;}
         java.util.ArrayList<ItemCatalog.Item> choices=new java.util.ArrayList<>();java.util.Iterator<String> it=game.progress.inventory.keys();
-        while(it.hasNext()){ItemCatalog.Item item=ItemCatalog.find(it.next());if(item!=null&&game.progress.quantity(item.id)>0){String cat=item.category.toLowerCase(java.util.Locale.ROOT);boolean isDrink=cat.contains("напит")||cat.contains("вода");if(water?isDrink:cat.equals("еда")||cat.contains("пища"))choices.add(item);}}
+        while(it.hasNext()){ItemCatalog.Item item=ItemCatalog.find(it.next());if(GameEngine.needItem(item,water)&&game.progress.quantity(item.id)>0)choices.add(item);}
         if(choices.isEmpty()){toast(water?"Нет напитков в инвентаре":"Нет еды в инвентаре");return;}
         String[] labels=new String[choices.size()];for(int i=0;i<labels.length;i++)labels[i]=choices.get(i).name+" × "+game.progress.quantity(choices.get(i).id);
-        new RuneDialogBuilder(this,accent()).setTitle(water?"Выпить":"Поесть").setItems(labels,(d,i)->{if(game.progress.removeItem(choices.get(i).id,1)){game.needs.sync(game.day,game.hour);if(water)game.needs.drink();else game.needs.eat();save();render();toast("Потребность восстановлена");}}).setNegativeButton("Отмена",null).show();
+        new RuneDialogBuilder(this,accent()).setTitle(water?"Выпить":"Поесть").setItems(labels,(d,i)->{if(livingBusy())return;VisualSnapshot before=new VisualSnapshot(game);if(game.consumeNeed(choices.get(i).id,water)){recordVisual(before,game,water?"Утоление жажды":"Приём пищи");save();render();toast("Потребность восстановлена");}else toast("Нет необходимости или предмет недоступен");}).setNegativeButton("Отмена",null).show();
     }
     private void renderHeroLegacy(){
         skyrimTopTabs(3);

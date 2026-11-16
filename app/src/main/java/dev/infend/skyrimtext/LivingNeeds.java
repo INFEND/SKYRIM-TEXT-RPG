@@ -20,6 +20,8 @@ public final class LivingNeeds {
     public void recover(int hours,boolean sleep){
         rest=clamp(rest+hours*10);if(sleep)awake=clamp(awake+hours*15);
     }
+    public void tavernRest(){food=water=awake=rest=100;}
+    public String penaltyDetails(){return (food<25?"Голод: −5 п.п.\n":"")+(water<25?"Жажда: −8 п.п.\n":"")+(awake<35?"Недосып: −8 п.п.\n":"")+(rest<25?"Усталость: −5 п.п.\n":"");}
     public int penalty(){return (food<25?5:0)+(water<25?8:0)+(awake<35?8:0)+(rest<25?5:0);}
     public JSONObject toJson(){JSONObject o=new JSONObject();try{o.put("food",food).put("water",water).put("awake",awake).put("rest",rest).put("lastHour",lastHour);}catch(Exception ignored){}return o;}
     public static LivingNeeds fromJson(JSONObject o){LivingNeeds n=new LivingNeeds();if(o!=null){n.food=clamp(o.optInt("food",100));n.water=clamp(o.optInt("water",100));n.awake=clamp(o.optInt("awake",100));n.rest=clamp(o.optInt("rest",100));n.lastHour=o.optLong("lastHour",-1);}return n;}

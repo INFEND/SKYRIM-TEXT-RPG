@@ -236,6 +236,9 @@ public final class RpgProgress {
         }
         g.addXp(amount);
     }
+    private String chanceExplanation="";
+    public String chanceExplanation(){return chanceExplanation;}
+    private static String signed(int x){return (x>=0?"+":"")+x;}
     public int chance(GameEngine g,int actionIndex,int skillIndex,int baseDifficulty){
         int stat=actionIndex%3;
         int exhaustion=stat==1?(g.maxMagicka-g.magicka):stat==2?(g.maxStamina-g.stamina):Math.max(0,g.maxHp-g.hp);
@@ -244,9 +247,16 @@ public final class RpgProgress {
         int skill=skillIndex<0?0:(skillLevel(skillIndex)-15)/2;
         int context=Math.min(18,g.reputation/3)+skill+branches.chanceBonus(skillIndex)+advanced.checkBonus(skillIndex)+(skillIndex==12&&advanced.has(AdvancedPerks.PERSUASION)?5:0)-((int)carryWeight()>45?8:0);
         g.needs.sync(g.day,g.hour);
-        return Math.max(0,RpgContent.successChance(g,stat,difficulty,danger,exhaustion,context)-g.needs.penalty());
+        int base=RpgContent.successChance(g,stat,difficulty,danger,exhaustion,context);
+        int result=Math.max(0,base-g.needs.penalty());
+        int attribute=stat==0?g.maxHp:stat==1?g.maxMagicka:g.maxStamina;
+        int charisma=Math.max(-10,Math.min(10,g.reputation/5));
+        int raw=50+(attribute-100)/7+g.level*2-difficulty-danger*3-exhaustion/5+context+charisma;
+        chanceExplanation="Базовый шанс: 50%\nХарактеристика ("+(stat==0?"здоровье":stat==1?"магия":"выносливость")+"): "+signed((attribute-100)/7)+"\nУровень: "+signed(g.level*2)+"\nСложность: "+signed(-difficulty)+"\nОпасность: "+signed(-danger*3)+"\nУсталость: "+signed(-exhaustion/5)+"\nНавык: "+signed(skill)+"\nТаланты: "+signed(branches.chanceBonus(skillIndex)+advanced.checkBonus(skillIndex)+(skillIndex==12&&advanced.has(AdvancedPerks.PERSUASION)?5:0))+"\nРепутация: "+signed(Math.min(18,g.reputation/3)+charisma)+"\nВес рюкзака: "+signed((int)carryWeight()>45?-8:0)+"\nОграничение 0–100: "+raw+" → "+base+"\nПотребности: −"+g.needs.penalty()+"\nИтог: "+result+"%";
+        return result;
     }
     public int chance(GameEngine g,String action){
+        chanceExplanation="";
         if(action==null)return -1;
         if(action.startsWith("CANON:"))return CanonicalCampaign.chance(g,action);
         if(action.startsWith("DRAGON_NEXT:"))return DragonContinuation.chance(g,action);

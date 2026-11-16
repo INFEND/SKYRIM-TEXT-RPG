@@ -436,7 +436,7 @@ public final class GameEngine {
             case "BOARD": board(); break;
             case "REST":
                 if(gold<20) {message="Хозяин трактира просит 20 септимов. Придётся поискать заработок.";mode="RESULT";}
-                else {gold-=20;day++;syncLivingSystems();needs.eat();needs.drink();needs.recover(8,true);hp=maxHp;magicka=maxMagicka;stamina=maxStamina;message="После тёплого ужина и долгого сна силы восстановились.";mode="RESULT";} break;
+                else {gold-=20;day++;syncLivingSystems();needs.tavernRest();hp=maxHp;magicka=maxMagicka;stamina=maxStamina;message="После тёплого ужина и долгого сна силы восстановились.";mode="RESULT";} break;
             case "Q_ACCEPT": if(questStage==0) {questStage=1;gold+=40;message="Ты принимаешь 40 септимов и получаешь первую зацепку: алтарь находится в Фолкрите.";mode="RESULT";} break;
             case "Q_ALTAR": if(questStage==1 && region==5) {questStage=2;confirmSceneFact("clue", "quest_silver_plate", "Серебряная пластина под алтарём Фолкрита", "FOUND");addXp(35);message="Ты находишь под алтарём серебряную пластину. На ней указан Винтерхолд. +35 опыта.";mode="RESULT";} break;
             case "Q_BOSS": if(questStage==2 && region==6) startBattle("Пепельный страж",90+level*11,12+level*2,"QUEST","Внутри башни оживает существо из пепла и холодного камня."); break;
@@ -667,20 +667,23 @@ public final class GameEngine {
         while(level<100 && xp>=experienceRequired()){xp-=experienceRequired();level++;maxHp+=10;maxStamina+=10;maxMagicka+=10;progress.perkPoints++;hp=maxHp;stamina=maxStamina;magicka=maxMagicka;}
     }
     /** Time-limited rest available outside combat, tracked in the old save schema. */
-    public boolean waitHours(int hours){
+    public boolean waitHours(int hours){return restHours(hours,hours>=6);}
+    public boolean restHours(int hours,boolean sleep){
         if(!started||"COMBAT".equals(mode)||hours<1||hours>24)return false;
         int total=hour+hours;
         day+=total/24;hour=total%24;
-        syncLivingSystems();needs.recover(hours,hours>=6);
-        hp=(int)Math.min(maxHp,(long)hp+hours*(3L+regenBonus[0]*3600L));
-        stamina=(int)Math.min(maxStamina,(long)stamina+hours*(7L+regenBonus[2]*3600L));
-        magicka=(int)Math.min(maxMagicka,(long)magicka+hours*(6L+regenBonus[1]*3600L));
-        message="Отдых длился "+hours+" ч. Наступил день "+day+", "+
+        syncLivingSystems();needs.recover(hours,sleep);
+        hp=(int)Math.min(maxHp,(long)hp+hours*(3L+regenBonus[0]));
+        stamina=(int)Math.min(maxStamina,(long)stamina+hours*(7L+regenBonus[2]));
+        magicka=(int)Math.min(maxMagicka,(long)magicka+hours*(6L+regenBonus[1]));
+        message=(sleep?"Сон":"Отдых")+" длился "+hours+" ч. Наступил день "+day+", "+
             String.format(java.util.Locale.ROOT,"%02d:00",hour)+".";
         progress.recent=message;
         progress.sync(this);
         return true;
     }
+    public static boolean needItem(ItemCatalog.Item item,boolean water){if(item==null)return false;String cat=item.category.toLowerCase(java.util.Locale.ROOT);boolean drink=cat.contains("напит")||cat.contains("вода");return water?drink:cat.equals("еда")||cat.contains("пища");}
+    public boolean consumeNeed(String id,boolean water){if(!started||"COMBAT".equals(mode)||!needItem(ItemCatalog.find(id),water))return false;syncLivingSystems();if((water?needs.water:needs.food)>=100)return false;if(!progress.removeItem(id,1))return false;if(water)needs.drink();else needs.eat();return true;}
     public int healingAmount(){return 45+5*progress.branches.rank(14)+(progress.advanced.has(AdvancedPerks.PHYSICIAN)?10:0)+(progress.advanced.has(AdvancedPerks.BENEFACTOR)?10:0)+(progress.advanced.has(AdvancedPerks.PURE_MIXTURE)?10:0)+(progress.advanced.has(AdvancedPerks.REGENERATION)?10:0);}
     private void restoreRespite(){if(progress.advanced.has(AdvancedPerks.RESPITE))stamina=Math.min(maxStamina,stamina+10);}
     public int staminaPotionAmount(){return 50+(progress.advanced.has(AdvancedPerks.PHYSICIAN)?10:0)+(progress.advanced.has(AdvancedPerks.BENEFACTOR)?10:0)+(progress.advanced.has(AdvancedPerks.PURE_MIXTURE)?10:0);}

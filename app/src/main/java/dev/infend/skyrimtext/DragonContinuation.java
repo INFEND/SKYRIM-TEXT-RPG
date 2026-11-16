@@ -351,7 +351,7 @@ public final class DragonContinuation {
         String[] pair=OPTIONS[stage][choice-1].split("\\|",2);
         if(risky){
             g.stamina=Math.max(0,g.stamina-7);
-            if(new Random().nextInt(100)<probability){
+            if(g.rollCheck(probability)){
                 g.progress.dragonInsight=Math.min(15,g.progress.dragonInsight+2);
                 g.progress.skillExperience(g,SKILLS[stage][choice-1],12+stage*4);
                 g.progress.dragonNextRecent="Успех: "+pair[0]+". "+CONSEQUENCES[stage][choice-1]+" Получены полезные свидетельства.";

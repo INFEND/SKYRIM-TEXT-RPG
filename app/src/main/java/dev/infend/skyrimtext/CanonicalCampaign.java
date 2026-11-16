@@ -228,7 +228,7 @@ public final class CanonicalCampaign {
             if(id==26){g.canonicalPaarthurnax=2;}
             else if(id==2||id==12){
                 int chance=g.progress.chance(g,2,9,20);
-                if(new Random().nextInt(100)<chance){
+                if(g.rollCheck(chance)){
                     g.progress.skillExperience(g,9,30);g.canonicalRecent="Ты успешно миновал опасность скрытно.";g.canonicalPhase=1;g.canonicalPage=0;
                 }else{g.stamina=Math.max(0,g.stamina-10);g.canonicalRecent="Тебя заметили. Придётся готовиться к бою.";}
             }else if(id==3){if(g.progress.carryWeight()+1<=50)g.potions++;}
