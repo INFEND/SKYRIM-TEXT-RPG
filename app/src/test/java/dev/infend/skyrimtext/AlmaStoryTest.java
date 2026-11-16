@@ -17,6 +17,15 @@ public class AlmaStoryTest {
         g.choose("ALMA:finish:eternal");assertEquals("Вечность вдвоём",g.alma.ending);assertEquals("COMPLETED",g.progress.questOutcome(AlmaStory.ID));
         g.choose("ALMA:finish:mortal");assertEquals("Вечность вдвоём",g.alma.ending);
     }
+    @Test public void companionEquipmentAndCombatPersist() throws Exception {
+        GameEngine g=start();g.choose("ALMA:open");for(int i=0;i<4;i++)g.choose("ALMA:good:"+i);
+        g.choose("ALMA:join");g.gold=500;g.choose("ALMA:weapon");g.choose("ALMA:weapon");assertEquals(350,g.gold);
+        g.choose("ALMA:armor");assertEquals(230,g.gold);g.choose("ALMA:gift");g.choose("ALMA:gift");assertEquals(200,g.gold);
+        g.choose("ALMA:hunt");assertEquals("COMBAT",g.mode);assertEquals("ALMA",g.battleKind);
+        int mana=g.alma.mana;assertTrue(g.alma.assist(g,2,30)>0);assertTrue(g.alma.mana<mana);
+        g.alma.victory(g);assertTrue(g.alma.hunterDefeated);
+        g=GameEngine.fromJson(g.toJson().toString());assertEquals(1,g.alma.weapon);assertEquals(1,g.alma.armor);assertTrue(g.alma.hunterDefeated);assertTrue(g.alma.memory.length()>0);
+    }
     @Test public void romanceNotRequiredAndLossIsFinal(){
         GameEngine g=start();g.choose("ALMA:open");for(int i=0;i<11;i++)g.choose("ALMA:cool:"+i);
         g.choose("ALMA:finish:eternal");assertEquals(11,g.alma.stage);

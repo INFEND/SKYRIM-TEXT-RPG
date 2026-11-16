@@ -593,6 +593,7 @@ public final class GameEngine {
     }
     void beginFactionBattle(int f,String name,int health,int damage,String intro){factionBattle=f;startBattle(name,health,damage,"FACTION",intro);}
     void beginCanonicalBattle(String name,int health,int damage,String intro){canonicalShoutCooldown=0;startBattle(name,health,damage,"CANONICAL",intro);}
+    void beginAlmaBattle(){startBattle("Убийца Тёмного Братства",75+level*8,8+level*2,"ALMA","Преследователь преграждает дорогу. Альма предупреждает о засаде.");}
     void beginKatherineBattle(){startBattle("Агент Круга Трёх Когтей",75+level*8,8+level*2,"KATHERINE","Кэтрин поднимает барьер. Агент Круга требует, чтобы она сдалась.");}
     private void startBattle(String name,int health,int dmg,String kind,String intro) {
         resetBattleVisuals();alma.beginBattle();enemyName=name;enemyHp=health;enemyMaxHp=health;enemyDamage=dmg;battleKind=kind;enemyIntro=intro;
