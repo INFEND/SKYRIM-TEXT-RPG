@@ -45,6 +45,12 @@ public class AlmaStoryTest {
         g.choose("ALMA:finish:mortal");g.choose("ALMA:dismiss");g.day++;g.alma.independent(g);assertEquals(1,g.alma.daysIndependent);g.alma.independent(g);assertEquals(1,g.alma.daysIndependent);
         g=GameEngine.fromJson(g.toJson().toString());assertTrue(g.alma.married);assertTrue(g.alma.sharedHome);assertEquals(1,g.alma.daysIndependent);
     }
+    @Test public void disabledAndSavedCompanionEffects() throws Exception{
+        GameEngine g=start();g.choose("ALMA:open");for(int i=0;i<8;i++)g.choose("ALMA:good:"+i);g.choose("ALMA:join");
+        g.alma.rank=3;g.alma.mana=80;assertTrue(g.alma.assist(g,6,100)>0);assertEquals(3,g.alma.markTurns);assertTrue(g.alma.combo(100,true)>0);
+        g=GameEngine.fromJson(g.toJson().toString());assertEquals(3,g.alma.markTurns);assertTrue(g.alma.weaken(20)>0);assertEquals(2,g.alma.markTurns);
+        g.alma.setEnabled(g,false);assertEquals(0,g.alma.combo(100,true));assertEquals(0,g.alma.weaken(20));
+    }
     @Test public void romanceNotRequiredAndLossIsFinal(){
         GameEngine g=start();g.choose("ALMA:open");for(int i=0;i<11;i++)g.choose("ALMA:cool:"+i);
         g.choose("ALMA:finish:eternal");assertEquals(11,g.alma.stage);

@@ -8,7 +8,7 @@ class AlmaSceneAvailabilityTest(unittest.TestCase):
         source = SOURCE.read_text(encoding="utf-8")
         scene = source.split("GameEngine.Scene scene(GameEngine g){", 1)[1]
         guard = scene.split("String stats=", 1)[0]
-        self.assertIn("if(!enabled||terminalLoss()||(!atRiften(g)&&!companion))return", guard)
+        self.assertIn("if(!enabled||terminalLoss()||!present(g))return", guard)
         self.assertIn('.add("ALMA:exit"', guard)
         self.assertEqual(guard.count(".add("), 1)
 
