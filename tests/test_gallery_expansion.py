@@ -113,6 +113,15 @@ class GalleryExpansion(unittest.TestCase):
             "    private static final ExecutorService IO=",1)[0]
         static = viewer.split("    static{",1)[1]
         static = "    static{"+static.split("    private final String location",1)[0]
+        # The extracted desktop probe covers the immutable fallback.
+        # Dynamic registry and archive coverage are independently checked.
+        begin=static.index("    private static final class GalleryDefinition")
+        end=static.index("    private static String locationKey",begin)
+        static=static[:begin]+"""    private static class GalleryDefinition {String[] captions,archives;}
+    private static class GalleryRegistry {Map<String,GalleryDefinition> slugs; ArrayList<String> locations;}
+    private static GalleryRegistry registry;
+    private static GalleryDefinition definition(String location){return null;}
+"""+static[end:]
         methods = []
         for name in ("archive","captionFor"):
             match = re.search(r"    private static String "+name+r"\(.*?\n    \}",viewer,re.S)

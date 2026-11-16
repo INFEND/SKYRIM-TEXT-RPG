@@ -177,7 +177,7 @@ final class ResourceManagerDialog {
         stop.set(false);setBusy(true);showStatus("Проверка каталога в сети…");
         ResourceStore.IO.execute(()->{
             ResourceStore.refreshCatalog(activity);
-            if(!stop.get())ResourceStore.autoSync(activity.getApplicationContext());
+            if(!stop.get())ResourceStore.autoSync(activity.getApplicationContext(),stop);
             ResourceStore.UI.post(()->{
                 if(!dialog.isShowing())return;
                 rebuildGroups();setBusy(false);

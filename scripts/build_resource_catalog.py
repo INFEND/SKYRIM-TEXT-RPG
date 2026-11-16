@@ -56,7 +56,8 @@ def build(commit, thin=False):
         path=f.relative_to(ASSETS).as_posix()
         if not MEDIA_RE.fullmatch(path):raise ValueError("Unrecognized optional media: "+path)
         group=path.split("/")[1]
-        add(path,"media:"+group,"Дополнительные ресурсы: "+group)
+        if group=="mapicons":add(path,"icons:map-markers","Значки карты и поселений")
+        else:add(path,"media:"+group,"Дополнительные ресурсы: "+group)
     listed={e["path"] for e in records}
     for f in ASSETS.rglob("*"):
         if not f.is_file():continue
@@ -97,6 +98,8 @@ def gallery_registry():
             with zipfile.ZipFile(file) as z:
                 if z.testzip():raise ValueError("Damaged gallery "+str(file))
                 for item in z.infolist():
+                    if item.filename=="manifest.json" and item.file_size<=1_000_000:
+                        continue # legacy auxiliary metadata; not a displayed frame
                     if not re.fullmatch(r"\d{2}\.webp",item.filename):raise ValueError("Unexpected gallery member "+item.filename)
                     number=int(item.filename[:2])
                     if number in photos or not 16000<item.file_size<2_000_000:raise ValueError("Invalid gallery frame "+item.filename)

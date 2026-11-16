@@ -261,17 +261,19 @@ final class ResourceStore {
             autoSync(app);
         });
     }
-    static void autoSync(Context app){
+    static void autoSync(Context app){autoSync(app,new AtomicBoolean(false));}
+    static void autoSync(Context app,AtomicBoolean stop){
         int failures=0;String last="";
         try{
             for(Entry e:entries(app)){
+                if(stop.get())return;
                 if(removed(app,e))continue;
                 State state=state(app,e,true);
                 boolean needs=(autoUpdate(app)&&(state==State.OLD||state==State.DAMAGED||state==State.MISSING))
                     ||(autoNew(app)&&state==State.NEW);
                 if(!needs)continue;
-                try{download(app,e,false,new AtomicBoolean(false),null);}
-                catch(Exception ex){failures++;last=e.label+": "+ex.getMessage();}
+                try{download(app,e,false,stop,null);}
+                catch(Exception ex){if(stop.get())return;failures++;last=e.label+": "+ex.getMessage();}
             }
         }catch(Exception ex){failures++;last=String.valueOf(ex.getMessage());}
         if(failures>0){

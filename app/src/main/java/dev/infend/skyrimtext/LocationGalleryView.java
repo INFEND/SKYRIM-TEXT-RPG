@@ -134,7 +134,7 @@ public final class LocationGalleryView extends LinearLayout {
     }
     private static volatile GalleryRegistry registry;
     static void validateCatalog(org.json.JSONArray array,Map<String,ResourceStore.Entry> files)throws Exception{new GalleryRegistry(array,files);}
-    static void applyCatalog(org.json.JSONArray array)throws Exception{if(array!=null)registry=new GalleryRegistry(array,null);}
+    static void applyCatalog(org.json.JSONArray array)throws Exception{registry=array==null?null:new GalleryRegistry(array,null);}
     private static GalleryDefinition definition(String location){GalleryRegistry r=registry;return r==null?null:r.names.get(locationKey(location));}
     private static String locationKey(String location){
         return location==null?"":location.trim().toLowerCase(new Locale("ru")).replace('ё','е');
