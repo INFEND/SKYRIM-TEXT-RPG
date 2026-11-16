@@ -34,7 +34,7 @@ final class SettlementIcons {
         }
         if(site.type.contains("Деревня")||site.type.equals("Город"))return PREFIX+"town";
         if(site.type.contains("Поселение"))return PREFIX+"settlement";
-        return null;
+        return LocationTypeIcons.keyForSite(site);
     }
     private static int indexFor(String key){
         if(key==null)return -1;
@@ -64,6 +64,7 @@ final class SettlementIcons {
         return atlas;
     }
     static boolean draw(Context context,Canvas canvas,String key,float width,float height){
+        if(LocationTypeIcons.draw(context,canvas,key,width,height))return true;
         int index=indexFor(key);
         if(index<0||width<=0||height<=0)return false;
         Bitmap image=load(context);
