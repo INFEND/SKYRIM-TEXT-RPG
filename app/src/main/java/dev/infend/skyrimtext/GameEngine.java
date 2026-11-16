@@ -471,7 +471,7 @@ public final class GameEngine {
             case "BUY_SWORD": buy(180,"Клинок закалён. Атака +6.","SWORD");break;
             case "BUY_ARMOR": buy(160,"Ты облачаешься в стальной нагрудник. Защита +4.","ARMOR");break;
             case "SIDE_ACCEPT": if(sideQuest==2) {sideQuest=1;sideKills=0;message="Заказ принят. Победи трёх противников во время исследования мира.";mode="RESULT";} break;
-            case "SIDE_CLAIM": if(sideQuest==1 && sideKills>=3) {sideQuest=0;sideKills=0;boardCompleted++;gold=nonnegativeAdd(gold,120);addXp(65);message="Заказ выполнен. +120 септимов и +65 опыта.";mode="RESULT";}break;
+            case "SIDE_CLAIM": claimBoard();break;
             case "EVENT_HELP": eventChoice(true);break;
             case "EVENT_SEARCH": eventChoice(false);break;
             case "EVENT_LEAVE": mode="WORLD";message="Ты оставляешь встречу позади и возвращаешься на дорогу.";break;
@@ -567,10 +567,16 @@ public final class GameEngine {
         }
         mode="RESULT";
     }
+    private void claimBoard() {
+        if(sideQuest!=1 || sideKills<3)return;
+        sideQuest=0;sideKills=0;boardCompleted=nonnegativeAdd(boardCompleted,1);
+        gold=nonnegativeAdd(gold,120);addXp(65);
+        message="Заказ выполнен. +120 септимов и +65 опыта.";mode="RESULT";
+    }
     private void board() {
         if(sideQuest==0){mode="RESULT";sideQuest=2;message="На доске висит объявление: «Избавьте дороги от трёх опасных противников. Плата 120 септимов». Открой доску ещё раз, чтобы принять заказ.";}
         else if(sideQuest==2){mode="RESULT";sideQuest=1;sideKills=0;message="Заказ принят. Победи трёх врагов в случайных встречах. Текущий прогресс: 0/3.";}
-        else if(sideKills>=3){sideQuest=0;sideKills=0;gold=nonnegativeAdd(gold,120);addXp(65);message="Заказ выполнен. +120 септимов, +65 опыта.";mode="RESULT";}
+        else if(sideKills>=3){claimBoard();}
         else {message="Заказ активен. Побеждено противников: "+sideKills+"/3.";mode="RESULT";}
     }
     void beginFactionBattle(int f,String name,int health,int damage,String intro){factionBattle=f;startBattle(name,health,damage,"FACTION",intro);}
@@ -642,7 +648,7 @@ public final class GameEngine {
         int reward=25+random.nextInt(26)+level*4;int gain=30+level*9;
         boolean nonlethal="CANONICAL".equals(battleKind)&&(canonicalStage==22||canonicalStage==27||canonicalStage==30);
         if(nonlethal)reward=0;
-        gold=nonnegativeAdd(gold,reward);victories++;if(!nonlethal&&sideQuest==1&&sideKills<3)sideKills++;
+        gold=nonnegativeAdd(gold,reward);victories++;if(!nonlethal&&"WILD".equals(battleKind)&&sideQuest==1&&sideKills<3)sideKills++;
         if("QUEST".equals(battleKind)) {questStage=3;reward+=50;gold=nonnegativeAdd(gold,50);gain+=65;}
         if("DRAGON".equals(battleKind)&&progress.dragonStage==3){
             progress.dragonStage=4;
@@ -745,8 +751,8 @@ public final class GameEngine {
             g.canonicalShouts=j.optInt("canonicalShouts",0)&31;g.canonicalTreaty=Math.max(0,Math.min(3,j.optInt("canonicalTreaty",0)));
             g.canonicalPaarthurnax=Math.max(0,Math.min(2,j.optInt("canonicalPaarthurnax",0)));g.canonicalPrepared=j.optBoolean("canonicalPrepared",false);
             g.canonicalRecent=j.optString("canonicalRecent","");if(g.canonicalRecent.length()>8192)g.canonicalRecent=g.canonicalRecent.substring(0,8192);
-            g.questStage=Math.max(0,Math.min(4,j.optInt("questStage",0)));g.sideQuest=j.optInt("sideQuest",0);
-            g.sideKills=Math.max(0,j.optInt("sideKills",0));g.boardCompleted=Math.max(0,j.optInt("boardCompleted",0));g.explored=Math.max(0,j.optInt("explored",0));
+            g.questStage=Math.max(0,Math.min(4,j.optInt("questStage",0)));g.sideQuest=Math.max(0,Math.min(2,j.optInt("sideQuest",0)));
+            g.sideKills=g.sideQuest==1?Math.max(0,Math.min(3,j.optInt("sideKills",0))):0;g.boardCompleted=Math.max(0,j.optInt("boardCompleted",0));g.explored=Math.max(0,j.optInt("explored",0));
             g.victories=Math.max(0,j.optInt("victories",0));g.reputation=j.optInt("reputation",0);
             g.swordUpgraded=j.optBoolean("swordUpgraded",false);g.armorUpgraded=j.optBoolean("armorUpgraded",false);
             g.mode=j.optString("mode","WORLD");g.message=j.optString("message","");
