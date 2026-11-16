@@ -106,7 +106,7 @@ final class FactionStories {
     boolean canChooseApproach(GameEngine g,int f){return !completed(f)&&phase[f]==1&&g.started&&("WORLD".equals(g.mode)||"RESULT".equals(g.mode))&&chapter(f).place.equalsIgnoreCase(g.progress.location)&&attemptDay[f]!=g.day;}
     boolean setApproach(GameEngine g,int f,int choice){if(!canChooseApproach(g,f)||choice<0||choice>2||(choice==2&&!chapter(f).enemy.isEmpty()))return false;approach[f]=choice;return true;}
     String block(GameEngine g,int f){
-        if(!g.started||!("WORLD".equals(g.mode)||"RESULT".equals(g.mode)))return "Сначала заверши текущую сцену.";
+        if(!g.started||g.road.pending()||!("WORLD".equals(g.mode)||"RESULT".equals(g.mode)))return "Сначала заверши текущую сцену.";
         if(completed(f))return "Кампания завершена.";
         if(f==4&&(started(5)||g.factions.stage(5)>0)||f==5&&(started(4)||g.factions.stage(4)>0))return "Ты выбрал другую сторону гражданской войны.";
         if(!chapter(f).place.equalsIgnoreCase(g.progress.location))return "Прибудь: "+chapter(f).place;
@@ -124,6 +124,7 @@ final class FactionStories {
     boolean advance(GameEngine g,int f){
         if(!block(g,f).isEmpty())return false;g.lastCheckChance=g.lastCheckRoll=-1;Chapter c=chapter(f);
         if(phase[f]==0){phase[f]=1;g.progress.setQuestOutcome("faction_story_"+f,"ACTIVE");g.message=c.story;
+            if(f==6&&index[f]==7)g.road.beginArvak(g);
             if(f==3&&index[f]==2){String prior=g.progress.questOutcome("road_cicero");if("COMPLETED".equals(prior))g.message+="\nЦицерон узнаёт тебя и вспоминает помощь у фермы Лорея.";else if("FAILED".equals(prior))g.message+="\nЦицерон узнаёт тебя и с неприязнью вспоминает, как ты сообщил о нём страже.";}return true;}
         if(phase[f]==2){if(f==3&&index[f]==8&&cicero==0)decide(g,f,0);if(f==0&&index[f]==2&&beast==0)beast=1;if(f==0&&index[f]==5&&hasDecision(f))decide(g,f,0);index[f]++;phase[f]=0;attemptDay[f]=-1;preparation[f]=0;int used=skillForReward(c,f);approach[f]=0;g.progress.skillExperience(g,used,35);g.addXp(30+index[f]*5);g.gold=(int)Math.min(Integer.MAX_VALUE,(long)g.gold+25+index[f]*5);g.progress.sync(g);g.message="Завершено: "+c.title;if(completed(f))g.progress.setQuestOutcome("faction_story_"+f,"COMPLETED");g.recordVisualEvent(g.message);return true;}
         int chance=chance(g,f);g.stamina-=cost(f);attemptDay[f]=g.day;

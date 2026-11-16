@@ -21,4 +21,12 @@ public class RoadEventsTest {
         GameEngine g=new GameEngine();g.start("Герой","Норд","Воин");g.canonicalStage=4;g.progress.location="Ривервуд";g.region=0;g.mode="WORLD";
         g.choose("CANON_OPEN");assertEquals("ROAD",g.mode);g=GameEngine.fromJson(g.toJson().toString());g.choose(g.scene().choices.get(1).action);g.choose("GO_WORLD");assertEquals("CANON",g.mode);assertEquals(4,g.canonicalStage);assertEquals("Драконий Предел",g.progress.location);
     }
+    @Test public void encountersHaveNoMinimumLevel() {
+        GameEngine g=new GameEngine();g.start("Герой","Норд","Воин");g.level=1;g.hour=23;
+        assertTrue(RoadEvents.availableAt(g,"boethiah",0));assertTrue(RoadEvents.availableAt(g,"giant_spider",0));assertTrue(RoadEvents.availableAt(g,"giant_spider_duel",0));assertTrue(RoadEvents.availableAt(g,"gargoyles",0));assertTrue(RoadEvents.availableAt(g,"island_mutiny",9));assertTrue(RoadEvents.availableAt(g,"college",0));assertFalse(RoadEvents.availableAt(g,"island_mutiny",0));assertFalse(RoadEvents.availableAt(g,"gargoyles",9));assertTrue(RoadEvents.eventCount()>=160);
+        g.hour=12;assertFalse(RoadEvents.availableAt(g,"gargoyles",0));assertTrue(RoadEvents.availableAt(g,"vampire_sun",0));
+    }
+    @Test public void oneTimeIslandEncountersStayResolved() {
+        GameEngine g=new GameEngine();g.start("Герой","Норд","Воин");assertTrue(RoadEvents.availableAt(g,"island_flying_wizard",9));g.progress.setQuestOutcome("road_island_flying_wizard","COMPLETED");assertFalse(RoadEvents.availableAt(g,"island_flying_wizard",9));
+    }
 }

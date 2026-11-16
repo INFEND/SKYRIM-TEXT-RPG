@@ -797,7 +797,7 @@ public final class MainActivity extends Activity {
         ScrollView scroller=new ScrollView(this);scroller.addView(panel);
         AlertDialog.Builder dialog=new RuneDialogBuilder(this,accent()).setTitle(FactionCampaign.NAMES[f]).setView(scroller).setNegativeButton("Закрыть",null);
         if(c!=null&&stories.block(game,f).isEmpty())dialog.setPositiveButton(stories.phase(f)==0?"Начать главу":stories.phase(f)==2?"Завершить главу":c.enemy.isEmpty()?"Пройти испытание":"Вступить в бой",(d,w)->{
-            if(livingBusy())return;VisualSnapshot before=new VisualSnapshot(game);if(stories.advance(game,f)){recordVisual(before,game,game.message);save();if("COMBAT".equals(game.mode)){tab=0;render();}else{render();toast(game.message);factionStoryDialog(f);}}
+            if(livingBusy())return;VisualSnapshot before=new VisualSnapshot(game);if(stories.advance(game,f)){recordVisual(before,game,game.message);save();if("COMBAT".equals(game.mode)||RoadEvents.MODE.equals(game.mode)){tab=0;render();}else{render();toast(game.message);factionStoryDialog(f);}}
         });
         if(c!=null&&stories.hasDecision(f)&&stories.block(game,f).isEmpty())dialog.setNeutralButton("Решение",(d,w)->{
             new RuneDialogBuilder(this,accent()).setTitle("Решение героя").setItems(stories.decisionOptions(f),(dd,i)->{if(stories.decide(game,f,i)){save();render();factionStoryDialog(f);}}).setNegativeButton("Отмена",(dd,i)->factionStoryDialog(f)).show();
