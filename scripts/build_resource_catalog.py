@@ -88,6 +88,10 @@ def build(commit, thin=False):
         elif group=="livia":
             if path!="media/livia/portrait.webp":raise ValueError("Invalid Livia portrait path")
             add(path,"media:livia","Ливия | Имперский капитан")
+        elif group=="npc":
+            allowed={"astrid.webp","vex.webp","karliah.webp","nocturnal.webp","elisif.webp"}
+            if f.name not in allowed:raise ValueError("Unknown NPC appearance: "+path)
+            add(path,"media:npc","Индивидуальные портреты NPC")
         elif group=="serana":
             if path!="media/serana/gallery.zip" or hashlib.sha256(f.read_bytes()).hexdigest()!="be77a3f3aa45a80767e43c5200a4440df97109a704b22cc16da7679abfc9bfaa":
                 raise ValueError("Serana gallery differs from the supplied archive")

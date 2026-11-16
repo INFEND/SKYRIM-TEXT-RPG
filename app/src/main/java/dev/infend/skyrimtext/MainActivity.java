@@ -190,6 +190,15 @@ public final class MainActivity extends Activity {
     }
     @Override protected void onActivityResult(int requestCode,int resultCode,Intent data){
         super.onActivityResult(requestCode,resultCode,data);
+        if(requestCode==REQUEST_NPC_APPEARANCES){
+            if(resultCode==RESULT_OK&&data!=null){
+                java.util.ArrayList<android.net.Uri> files=new java.util.ArrayList<>();
+                android.content.ClipData clip=data.getClipData();if(clip!=null){for(int i=0;i<clip.getItemCount()&&i<5;i++){android.net.Uri uri=clip.getItemAt(i).getUri();if(uri!=null)files.add(uri);}}else if(data.getData()!=null)files.add(data.getData());
+                java.util.HashSet<String> installed=new java.util.HashSet<>();int rejected=0;
+                for(android.net.Uri uri:files){try{installed.add(NpcAppearance.install(this,uri));}catch(Exception e){rejected++;}}
+                toast("Портреты: "+installed.size()+" из 5"+(rejected>0?" | Не распознано: "+rejected:""));render();
+            }return;
+        }
         if(requestCode==REQUEST_LIVIA_PORTRAIT){if(resultCode==RESULT_OK&&data!=null&&data.getData()!=null){try{LiviaPortrait.install(this,data.getData());liviaPortrait();}catch(Exception e){toast("Не удалось импортировать портрет: "+e.getMessage());}}return;}
         if(requestCode==REQUEST_ALMA_GALLERY){if(resultCode==RESULT_OK&&data!=null&&data.getData()!=null){try{AlmaGallery.install(this,data.getData());almaGallery(1);}catch(Exception e){toast("Не удалось импортировать галерею: "+e.getMessage());}}return;}
         if(requestCode==REQUEST_SERANA_GALLERY){if(resultCode==RESULT_OK&&data!=null&&data.getData()!=null){try{SeranaGallery.install(this,data.getData());seranaGallery(1);}catch(Exception e){toast("Не удалось импортировать галерею: "+e.getMessage());}}return;}
@@ -412,6 +421,8 @@ public final class MainActivity extends Activity {
         switch(status){case "MET":return "Знакомство";case "HELPED":return "Благодарность";case "INFORMED":return "Обмен сведениями";case "HOSTILE":return "Враждебность";case "DEAD":return "Погиб";case "MISSING":return "Пропал";default:return "Отношение неизвестно";}
     }
     private View npcPortrait(String name){
+        android.graphics.Bitmap individual=NpcAppearance.photo(this,name);
+        if(individual!=null){android.widget.ImageView portrait=new android.widget.ImageView(this);portrait.setImageBitmap(individual);portrait.setAdjustViewBounds(true);portrait.setScaleType(android.widget.ImageView.ScaleType.FIT_CENTER);portrait.setContentDescription(name);return portrait;}
         if(LiviaStory.NAME.equalsIgnoreCase(name)||"Имперский капитан".equalsIgnoreCase(name)){try{android.widget.ImageView portrait=new android.widget.ImageView(this);portrait.setImageBitmap(LiviaPortrait.photo(this));portrait.setAdjustViewBounds(true);portrait.setScaleType(android.widget.ImageView.ScaleType.FIT_CENTER);portrait.setContentDescription("Ливия");portrait.setOnClickListener(v->liviaPortrait());return portrait;}catch(java.io.IOException ignored){return npcEmblem(name,"hero");}}
         if("Серана".equalsIgnoreCase(name)){try{if(SeranaGallery.available(this)){android.widget.ImageView portrait=new android.widget.ImageView(this);portrait.setImageBitmap(SeranaGallery.photo(this,1));portrait.setAdjustViewBounds(true);portrait.setScaleType(android.widget.ImageView.ScaleType.FIT_CENTER);portrait.setContentDescription("Серана");portrait.setOnClickListener(v->seranaGallery(1));return portrait;}}catch(java.io.IOException ignored){}}
 
@@ -457,13 +468,20 @@ public final class MainActivity extends Activity {
         if(LiviaStory.NAME.equalsIgnoreCase(name)||"Имперский капитан".equalsIgnoreCase(name)){TextView portraitButton=text("Портрет Ливии",15,accent(),true);portraitButton.setPadding(dp(12),dp(12),dp(12),dp(12));portraitButton.setOnClickListener(v->liviaPortrait());panel.addView(portraitButton,lp(-1,-2));addText(panel,game.livia.relation()+" | "+game.livia.status(),14,TEXT,true,8);addText(panel,"Доверие "+game.livia.trust+"/100 | Уважение "+game.livia.respect+"/100 | Симпатия "+game.livia.affection+"/100",13,accent(),false,8);}
         if(AlmaStory.NAME.equals(name)){TextView galleryButton=text("Галерея Альмы",15,accent(),true);galleryButton.setPadding(dp(12),dp(12),dp(12),dp(12));galleryButton.setOnClickListener(v->almaGallery(1));panel.addView(galleryButton,lp(-1,-2));addText(panel,"437 лет | Маг крови, бывшая убийца",14,TEXT,true,8);addText(panel,game.alma.relationship()+" | Доверие: "+game.alma.trust+"/100 | Любовь: "+game.alma.love+"/100",14,accent(),true,8);}
         if("Серана".equalsIgnoreCase(name)){TextView galleryButton=text("Галерея Сераны",15,accent(),true);galleryButton.setPadding(dp(12),dp(12),dp(12),dp(12));galleryButton.setOnClickListener(v->seranaGallery(1));panel.addView(galleryButton,lp(-1,-2));}
-        if(!("Серана".equalsIgnoreCase(name)&&SeranaGallery.available(this))&&!KatherineStory.NAME.equals(name)&&!AlmaStory.NAME.equals(name)&&!LiviaStory.NAME.equalsIgnoreCase(name)&&!"Имперский капитан".equalsIgnoreCase(name))addText(panel,"Иллюстративный образ или эмблема, не индивидуальный портрет",11,MUTED,false,10);
+        if(!NpcAppearance.id(name).isEmpty()){
+            TextView artwork=text(NpcAppearance.has(this,name)?"Индивидуальный портрет":"Загрузить индивидуальные портреты",14,accent(),true);artwork.setPadding(dp(12),dp(12),dp(12),dp(12));
+            artwork.setOnClickListener(v->new ResourceManagerDialog(this,accent(),this::render,NpcAppearance.GROUP).show());panel.addView(artwork,lp(-1,-2));
+            TextView importArt=text("Импорт оригинальных WebP",14,accent(),true);importArt.setPadding(dp(12),dp(12),dp(12),dp(12));importArt.setOnClickListener(v->chooseNpcAppearances());panel.addView(importArt,lp(-1,-2));
+        }
+        if(!NpcAppearance.has(this,name)&&!("Серана".equalsIgnoreCase(name)&&SeranaGallery.available(this))&&!KatherineStory.NAME.equals(name)&&!AlmaStory.NAME.equals(name)&&!LiviaStory.NAME.equalsIgnoreCase(name)&&!"Имперский капитан".equalsIgnoreCase(name))addText(panel,"Иллюстративный образ или эмблема, не индивидуальный портрет",11,MUTED,false,10);
         addText(panel,npcStatusLabel(game.sceneState.npcStatusByName(name)),15,TEXT,true,8);
         new RuneDialogBuilder(this,accent()).setTitle(name).setView(panel).setNegativeButton("Закрыть",null).show();
     }
     private static final int REQUEST_LIVIA_PORTRAIT=7227;
     private void chooseLiviaPortrait(){Intent picker=new Intent(Intent.ACTION_OPEN_DOCUMENT);picker.addCategory(Intent.CATEGORY_OPENABLE);picker.setType("image/webp");try{startActivityForResult(picker,REQUEST_LIVIA_PORTRAIT);}catch(Exception e){toast("Не удалось открыть выбор файла");}}
     private void liviaPortrait(){LinearLayout panel=column();try{android.widget.ImageView image=new android.widget.ImageView(this);image.setImageBitmap(LiviaPortrait.photo(this));image.setAdjustViewBounds(true);image.setScaleType(android.widget.ImageView.ScaleType.FIT_CENTER);panel.addView(image,lp(-1,440));}catch(java.io.IOException e){addText(panel,"Портрет не загружен. Выбери исходный WebP или скачай пакет Ливии, если он доступен.",14,TEXT,false,8);}new RuneDialogBuilder(this,accent()).setTitle("Ливия | Портрет").setView(panel).setPositiveButton("Импорт WebP",(d,w)->chooseLiviaPortrait()).setNeutralButton("Ресурсы",(d,w)->new ResourceManagerDialog(this,accent(),this::render,"media:livia").show()).setNegativeButton("Закрыть",null).show();}
+    private static final int REQUEST_NPC_APPEARANCES=7428;
+    private void chooseNpcAppearances(){Intent picker=new Intent(Intent.ACTION_OPEN_DOCUMENT);picker.addCategory(Intent.CATEGORY_OPENABLE);picker.setType("image/webp");picker.putExtra(Intent.EXTRA_ALLOW_MULTIPLE,true);try{startActivityForResult(picker,REQUEST_NPC_APPEARANCES);}catch(Exception e){toast("Не удалось открыть выбор файлов");}}
     private static final int REQUEST_ALMA_GALLERY=7219;
     private void chooseAlmaGallery(){Intent picker=new Intent(Intent.ACTION_OPEN_DOCUMENT);picker.addCategory(Intent.CATEGORY_OPENABLE);picker.setType("application/zip");try{startActivityForResult(picker,REQUEST_ALMA_GALLERY);}catch(Exception e){toast("Не удалось открыть выбор файла");}}
     private void almaGallery(int index){
