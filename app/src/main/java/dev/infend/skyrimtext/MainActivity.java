@@ -1381,6 +1381,7 @@ public final class MainActivity extends Activity {
                 initialPoints,selectedGender,selectedPortrait);
             game.katherine.enabled=prefs.getBoolean("katherine_enabled",true);
             game.katherine.companion.profile=Math.max(0,Math.min(2,prefs.getInt("katherine_profile",0)));
+            game.katherine.companion.aiInitiatives=prefs.getBoolean("katherine_ai_initiatives",true);
             game.alma.enabled=prefs.getBoolean("alma_enabled",true);
             if(selectedStart==0)game.choose("CANON_OPEN");
             tab=0;save();render();
@@ -1520,7 +1521,7 @@ public final class MainActivity extends Activity {
         LinearLayout journal=card();
         addText(journal,"ᚱ  ЖУРНАЛ ПРИКЛЮЧЕНИЙ",11,accent(),true,10);
         if(game.alma.enabled&&game.alma.stage>0)addText(journal,"◉  Алая Бессмертная | "+game.alma.status(),13,TEXT,false,7);
-        if(game.katherine.stage>0)addText(journal,"◉  Нулевой Предел | "+game.katherine.status(),13,TEXT,false,7);
+        if(game.katherine.enabled&&game.katherine.stage>0)addText(journal,"◉  Нулевой Предел | "+game.katherine.status(),13,TEXT,false,7);
         if(game.canonicalStage>0)addText(journal,"◉  Путь Довакина | "+CanonicalCampaign.objective(game),13,TEXT,false,7);
         if(game.questStage>0&&game.questStage<4)
             addText(journal,"◉  Пепельные печати | "+game.questStatus(),13,TEXT,false,7);
@@ -1682,6 +1683,7 @@ public final class MainActivity extends Activity {
     private void renderAiGame(){
         if(game.alma.available(game)&&!livingBusy())actionButton("Альма","Алая Бессмертная | "+game.alma.status(),false,()->{game.choose("ALMA:open");save();render();});
         if(game.katherine.available(game)&&!livingBusy())actionButton("Кэтрин","Нулевой Предел | "+game.katherine.status(),false,()->{game.choose("KATH:open");save();render();});
+        if(game.katherine.active()&&!game.katherine.lastRemark.isEmpty()){LinearLayout npc=card();addText(npc,"КЭТРИН | ЛИЧНАЯ ИНИЦИАТИВА",12,accent(),true,6);addText(npc,game.katherine.lastRemark,14,TEXT,false,6);}
         String source=resolvedAiProvider();
         boolean ready="local".equals(source)?localModelReady():
             "chatgpt".equals(source)?chatGptOAuth.hasAuthorizedPlan():
@@ -4134,10 +4136,10 @@ public final class MainActivity extends Activity {
         katherineToggle.setChecked(game.katherine.enabled);
         katherineToggle.setOnCheckedChangeListener((v,on)->{
             if(livingBusy()){v.setChecked(game.katherine.enabled);return;}
-            game.katherine.enabled=on;
-            if(!on&&KatherineStory.MODE.equals(game.mode))game.mode="WORLD";
+            if(!game.katherine.setEnabled(game,on)){v.setChecked(game.katherine.enabled);return;}
             prefs.edit().putBoolean("katherine_enabled",on).apply();save();
         });expansion.addView(katherineToggle,lp(-1,47));
+        Switch kathAI=new Switch(this);kathAI.setText("Самостоятельные инициативы Кэтрин через ИИ");kathAI.setTextColor(TEXT);kathAI.setThumbTintList(ColorStateList.valueOf(accent()));kathAI.setChecked(game.katherine.companion.aiInitiatives);kathAI.setOnCheckedChangeListener((v,on)->{if(livingBusy()){v.setChecked(game.katherine.companion.aiInitiatives);return;}game.katherine.companion.aiInitiatives=on;prefs.edit().putBoolean("katherine_ai_initiatives",on).apply();save();});expansion.addView(kathAI,lp(-1,52));
         TextView kathProfile=text("Начальное состояние Кэтрин | "+game.katherine.companion.profileName(),14,accent(),true);kathProfile.setPadding(dp(10),dp(12),dp(10),dp(12));expansion.addView(kathProfile,lp(-1,-2));kathProfile.setOnClickListener(v->{if(livingBusy()||game.katherine.stage>0){toast("Начальное состояние доступно до первой встречи с Кэтрин");return;}game.katherine.companion.profile=(game.katherine.companion.profile+1)%3;prefs.edit().putInt("katherine_profile",game.katherine.companion.profile).apply();save();render();});
         addText(expansion,"Влияет на стартовую магию спутницы, а не на создание героя.",11,MUTED,false,6);
         Switch almaToggle=new Switch(this);almaToggle.setText("Альма | Алая Бессмертная");almaToggle.setTextColor(TEXT);almaToggle.setThumbTintList(ColorStateList.valueOf(accent()));almaToggle.setChecked(game.alma.enabled);

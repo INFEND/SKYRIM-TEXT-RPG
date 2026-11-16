@@ -244,6 +244,7 @@ public final class AiGameTurn {
                 String id=fact.optString("id","");
                 String title=fact.optString("title","");
                 String status=fact.optString("status","");
+                if("npc".equals(kind)&&KatherineInitiative.protectedFact(id,title))continue;
                 if(!("npc".equals(kind)||"clue".equals(kind)||"sublocation".equals(kind)))
                     throw new JSONException("Недопустимый тип факта");
                 if(!factIds.add(kind+":"+id))throw new JSONException("Повтор факта сцены");
@@ -265,7 +266,7 @@ public final class AiGameTurn {
             g.progress.quantity(name,g.progress.quantity(name)+inventoryChanges.get(name));
         if(enemy!=null){
             int health=cap(enemy.optInt("hp",0),0,50000);
-            if(health>0&&(!"COMBAT".equals(g.mode)||g.enemyHp<=0))g.resetBattleVisuals();
+            if(health>0&&(!"COMBAT".equals(g.mode)||g.enemyHp<=0)){g.resetBattleVisuals();g.katherine.companion.beginBattle();g.alma.beginBattle();}
             if(health<=0){g.poisonTurns=g.frostTurns=0;}
             g.enemyName=health>0?limited(enemy.optString("name",""),70):"";g.enemyHp=health;
             g.enemyMaxHp=health>0?requiredEnemyInt(enemy,"maxHp",health,50000):0;
@@ -296,6 +297,7 @@ public final class AiGameTurn {
             if("FAILED".equals(state)&&!g.progress.failed.contains(quest))g.progress.failed.add(quest);
         }
         if(nextSceneState!=null)g.sceneState=nextSceneState;
+        if(e.opt("katherineIntent") instanceof String)KatherineInitiative.apply(g,e.optString("katherineIntent"),acted);
         if(!journal.isEmpty()){g.progress.recent=journal;if(g.aiJournal.isEmpty())g.aiJournal=journal;}
         g.progress.sync(g);
     }

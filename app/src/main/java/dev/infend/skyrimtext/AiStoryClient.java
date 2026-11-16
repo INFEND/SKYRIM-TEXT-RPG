@@ -69,6 +69,7 @@ public final class AiStoryClient {
             "id: уникальный стабильный латинский идентификатор 1..48 символов [A-Za-z0-9_-], title: непустое название до 120 символов. "+
             "Записывай только фактически случившиеся встречи, найденные улики и посещённые подлокации; не добавляй слухи, догадки или неразыгранные события. "+
             "Если предыдущего действия не было, effects должен быть пустым {}. Не выдавай награды за создание первой сцены. "+
+            "Кэтрин: только при наличии списка разрешённых инициатив во входе можешь выбрать один effects.katherineIntent. Не изменяй её отношения, статус или квесты через sceneFacts; не утверждай, что неподтверждённая инициатива уже выполнена. "+
             "Если у игрока был вероятностный выбор, реальный бросок и результат указаны во входе. Нельзя менять данный результат задним числом. "+
             "Урон, награды, местоположения и расход предметов должны точно соответствовать рассказу. Приложение ограничит недопустимые изменения, следи за пределом 50 кг. "+
             "Для свободного ответа игрока результат определяй по указанному броску 1..100 и выбранному тобой customChance; успех когда бросок <= customChance. "+
@@ -109,7 +110,7 @@ public final class AiStoryClient {
                 +"В активном бою каждый вариант должен содержать combatAction: ATTACK, HEAVY, MAGIC, DEFEND, POTION или FLEE (только WILD). Не предлагай недоступные ресурсы. Движок сам рассчитывает урон и шанс, не применяй боевые effects. Вне боя combatAction не указывай. "
                 +"В effects разрешены лишь последствия подтверждённого предыдущего действия "
                 +"(hpDelta,goldDelta,xpDelta,staminaDelta,magickaDelta,location,inventory). "
-                +"Вероятности и бросок из данных игры нельзя менять. На первом ходе effects={}. "
+                +"Если разрешено во входе, effects.katherineIntent — один код инициативы Кэтрин. Не меняй её статус. Вероятности и бросок из данных игры нельзя менять. На первом ходе effects={}. "
                 +"Не выдумывай предметы, локации, победы или награды. Начни сразу с JSON и ключа scene; если начало JSON уже задано, продолжай текст сцены, не повторяй ключ.";
         return "Ты каноничный рассказчик Skyrim. Пиши по-русски, атмосферно и от второго лица. "
             +"Учитывай героя, факты состояния и память. Диалог: **Персонаж:**, "
@@ -125,6 +126,7 @@ public final class AiStoryClient {
         StringBuilder b=new StringBuilder();
         b.append(genderInstruction(game));
         if(game.katherine.enabled&&game.katherine.stage>0)b.append(game.katherine.compactContext(game)).append('\n');
+        if(aiControlled){String initiative=KatherineInitiative.context(game);if(!initiative.isEmpty())b.append(initiative).append('\n');}
         b.append("ГЕРОЙ: ").append(crop(game.name,55)).append("; пол ").append(game.gender).append("; раса ").append(game.race)
             .append("; класс ").append(game.heroClass).append("; уровень ").append(game.level)
             .append("; локация ").append(game.progress.location).append("; день ").append(game.day)
@@ -418,6 +420,7 @@ public final class AiStoryClient {
         StringBuilder out=new StringBuilder("ИИ-РЕЖИМ: обычные офлайн-сцены и кнопки выключены. Создай свои десять вариантов и управляй характеристиками через effects.\n");
         out.append(genderInstruction(game));
         if(game.katherine.enabled&&game.katherine.stage>0)out.append("ПЕРСОНАЖ КЭТРИН — СОСТОЯНИЕ ДВИЖКА:\n").append(game.katherine.aiContext()).append('\n');
+        String initiative=KatherineInitiative.context(game);if(!initiative.isEmpty())out.append(initiative).append('\n');
         out.append("Герой: ").append(game.name).append("; пол ").append(game.gender).append("; ").append(game.race).append("; класс ")
                 .append(game.heroClass).append("; уровень ").append(game.level).append("; опыт ").append(game.xp).append('\n');
         out.append("Локация: ").append(game.progress.location).append("; регион ").append(GameEngine.REGIONS[game.region])
