@@ -27,7 +27,7 @@ class OfflineCrashGuard(unittest.TestCase):
         source=(JAVA/"AiStoryClient.java").read_text(encoding="utf-8")
         self.assertIn("localSystemPrompt",source)
         self.assertIn("localUserPrompt",source)
-        self.assertIn("crop(b.toString(),1300)",source)
+        self.assertIn("crop(b.toString(),1650)",source)
         worker=(ENGINE/"LocalAiInferenceService.kt").read_text(encoding="utf-8")
         self.assertIn('"n_ctx" to 8192',worker)
         self.assertIn('"n_predict" to (limit - previousTokens)',worker)

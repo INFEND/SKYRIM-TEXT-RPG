@@ -34,7 +34,7 @@ class LocalAiContract(unittest.TestCase):
         self.assertIn('id!=generation', client)
         ai=(SRC / 'AiStoryClient.java').read_text(encoding='utf-8')
         self.assertIn('localUserPrompt(', ai)
-        self.assertIn('crop(b.toString(),1300)', ai)
+        self.assertIn('crop(b.toString(),1650)', ai)
         self.assertNotIn('contextAi(game,conciseHistory,command)', ai)
         store = (SRC / 'LocalAiModelStore.java').read_text(encoding='utf-8')
         self.assertIn('getExternalFilesDir("models")', store)
