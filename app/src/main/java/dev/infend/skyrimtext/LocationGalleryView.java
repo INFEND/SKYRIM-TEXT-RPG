@@ -105,9 +105,9 @@ public final class LocationGalleryView extends LinearLayout {
         alias("Устенграв","Устенгрев");
     }
     private static final class GalleryDefinition {
-        final String name,slug;final String[] captions,archives;
+        final String name,slug,parent;final String[] captions,archives;
         GalleryDefinition(org.json.JSONObject entry)throws Exception{
-            name=entry.getString("name");slug=entry.getString("slug");
+            name=entry.getString("name");slug=entry.getString("slug");parent=entry.optString("parent","");
             org.json.JSONArray c=entry.getJSONArray("captions"),a=entry.getJSONArray("archives");
             if(name.trim().isEmpty()||!slug.matches("[a-z0-9_-]+")||c.length()==0||c.length()>99||a.length()!=c.length())throw new IllegalArgumentException("Неверная галерея");
             captions=new String[c.length()];archives=new String[c.length()];
@@ -130,6 +130,11 @@ public final class LocationGalleryView extends LinearLayout {
                 if(files!=null)for(String archive:d.archives)if(!files.containsKey("gallery/"+archive))throw new IllegalArgumentException("Нет архива "+archive);
             }
             if(locations.isEmpty())throw new IllegalArgumentException("Пустой реестр галерей");
+            for(GalleryDefinition d:slugs.values()){
+                if(d.parent.isEmpty())continue;
+                GalleryDefinition owner=names.get(locationKey(d.parent));
+                if(owner==null||owner==d||!owner.parent.isEmpty())throw new IllegalArgumentException("Неверная родительская галерея");
+            }
         }
     }
     private static volatile GalleryRegistry registry;
@@ -346,6 +351,36 @@ public final class LocationGalleryView extends LinearLayout {
         }
         show(0);
         prefetch();
+        if(!fullscreen)addInteriorLinks();
+    }
+    /** Interiors have their own captions and packs, never mixed with exterior views. */
+    private void addInteriorLinks(){
+        GalleryRegistry r=registry;
+        GalleryDefinition owner=definition(location);
+        if(r==null||owner==null)return;
+        java.util.ArrayList<GalleryDefinition> children=new java.util.ArrayList<>();
+        for(GalleryDefinition d:r.slugs.values())
+            if(!d.parent.isEmpty()&&definition(d.parent)==owner)children.add(d);
+        children.sort((a,b)->a.name.compareToIgnoreCase(b.name));
+        for(GalleryDefinition d:children){
+            TextView link=text(d.name+"  ›",14,accent);
+            link.setGravity(Gravity.CENTER_VERTICAL);
+            link.setPadding(dp(12),dp(9),dp(12),dp(9));
+            link.setBackground(panel(0xff151515,12,Color.TRANSPARENT));
+            LayoutParams params=new LayoutParams(-1,-2);params.topMargin=dp(6);
+            galleryBody.addView(link,params);
+            link.setOnClickListener(v->openInterior(d.name));
+        }
+    }
+    private void openInterior(String name){
+        if(!hasGallery(name))return;
+        android.widget.ScrollView scroll=new android.widget.ScrollView(getContext());
+        LinearLayout body=new LinearLayout(getContext());body.setOrientation(VERTICAL);
+        body.setPadding(dp(12),dp(8),dp(12),dp(12));body.setBackgroundColor(Color.BLACK);
+        scroll.addView(body);
+        body.addView(new LocationGalleryView(getContext(),name,accent,false),new LayoutParams(-1,-2));
+        android.app.AlertDialog dialog=new RuneDialogBuilder(getContext(),accent).setTitle(name).setView(scroll).setNegativeButton("Закрыть",null).create();
+        dialog.show();
     }
     /** Small borderless vector glyphs, independent of global icon tint and button style. */
     private View galleryGlyph(int kind,int color){

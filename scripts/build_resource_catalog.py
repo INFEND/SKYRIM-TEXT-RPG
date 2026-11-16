@@ -110,6 +110,11 @@ def gallery_registry():
         if not labels or any(not isinstance(x,str) or not x.strip() for x in labels) or set(photos)!=set(range(1,len(labels)+1)):
             raise ValueError("Captions/frames mismatch "+slug)
         entry["archives"]=[photos[i] for i in range(1,len(labels)+1)]
+    for entry in result:
+        parent=entry.get("parent","")
+        if parent:
+            matches=[e for e in result if e["name"].strip().lower().replace("ё","е")==parent.strip().lower().replace("ё","е")]
+            if len(matches)!=1 or matches[0] is entry or matches[0].get("parent"):raise ValueError("Invalid gallery parent "+parent)
     actual={p.stem.removesuffix("_extra") for p in (ASSETS/"gallery").glob("*.zip")}
     if actual!=observed:raise ValueError("Unregistered gallery archives "+str(actual^observed))
     return result
