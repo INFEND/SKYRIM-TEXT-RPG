@@ -4255,24 +4255,125 @@ public final class MainActivity extends Activity {
         foldSettingsSection("amoled","AMOLED | КНОПКИ И ОКНА",start);
     }
 
-    private void livingFixShop(){
-        if(!game.started||aiTurnBusy||!pendingAiAction().isEmpty()||"COMBAT".equals(game.mode)){toast("Магазин недоступен во время активного действия");return;}
-        LinearLayout panel=column();livingLine(panel,"Баланс","∞ F",ITEM_MAGIC);addText(panel,"Системные покупки вне экономики Скайрима. Потрачено: "+livingNumber(game.fixSpent)+" F",12,MUTED,false,8);
-        livingFixRow(panel,"Уровень персонажа","+1 уровень",10,()->{if(game.level>=100)return false;game.addXp(game.experienceRequired()-game.xp);return true;});
-        livingFixRow(panel,"Максимальное здоровье","+10 единиц",1,()->{if(game.maxHp>Integer.MAX_VALUE-10)return false;game.maxHp+=10;return true;});
-        livingFixRow(panel,"Максимальная магия","+10 единиц",1,()->{if(game.maxMagicka>Integer.MAX_VALUE-10)return false;game.maxMagicka+=10;return true;});
-        livingFixRow(panel,"Максимальная выносливость","+10 единиц",1,()->{if(game.maxStamina>Integer.MAX_VALUE-10)return false;game.maxStamina+=10;return true;});
-        livingFixRow(panel,"Золото","+10.000 септимов",1,()->livingFixGold(10000));
-        livingFixRow(panel,"Золото","+100.000 септимов",9,()->livingFixGold(100000));
-        livingFixRow(panel,"Золото","+1.000.000 септимов",80,()->livingFixGold(1000000));
-                livingFixRow(panel,"Все параметры","+100 к каждому",25,()->{if(game.maxHp>Integer.MAX_VALUE-100||game.maxMagicka>Integer.MAX_VALUE-100||game.maxStamina>Integer.MAX_VALUE-100)return false;game.maxHp+=100;game.maxMagicka+=100;game.maxStamina+=100;return true;});
+    private int fixShopPage=0,fixShopSort=0;
+    private String fixShopCategory="Все",fixShopQuery="";
+    private static final String[] FIX_CATEGORIES={"Все","Снаряжение","Магия","Улучшения","Навыки","Септимы","Внешность","Редактор мира","Наборы"};
+    private static final class FixOffer {
+        final String title,detail,category,glyph,rarity;final int price,color;final Runnable action;
+        FixOffer(String t,String d,String c,String g,String rr,int col,int p,Runnable a){title=t;detail=d;category=c;glyph=g;rarity=rr;color=col;price=p;action=a;}
+        String id(){return FixShopState.key(title,price);}
+    }
+    private java.util.ArrayList<FixOffer> fixOffers(){
+        java.util.ArrayList<FixOffer> a=new java.util.ArrayList<>();
+        fixOffer(a,"Уникальные предметы","Создание, привязка к душе и пассивные эффекты","Снаряжение","armor",4,50,this::livingArtifactShop);
+        fixOffer(a,"Уникальные способности","Создание и улучшение собственной магии","Магия","magic",4,50,this::livingPowerShop);
+        fixDirect(a,"Безграничная ноша","+50 кг вместимости","Улучшения","armor",3,150,()->{if(game.progress.fixCarryBonus>999950)return false;game.progress.fixCarryBonus+=50;return true;});
+        fixDirect(a,"Уровень персонажа","+1 уровень","Улучшения","hero",1,10,()->{if(game.level>=100)return false;game.addXp(game.experienceRequired()-game.xp);return true;});
+        fixDirect(a,"Максимальное здоровье","+10 единиц","Улучшения","health",0,1,()->{if(game.maxHp>Integer.MAX_VALUE-10)return false;game.maxHp+=10;return true;});
+        fixDirect(a,"Максимальная магия","+10 единиц","Магия","magic",0,1,()->{if(game.maxMagicka>Integer.MAX_VALUE-10)return false;game.maxMagicka+=10;return true;});
+        fixDirect(a,"Максимальная выносливость","+10 единиц","Улучшения","hero",0,1,()->{if(game.maxStamina>Integer.MAX_VALUE-10)return false;game.maxStamina+=10;return true;});
+        fixDirect(a,"Золото","+10.000 септимов","Септимы","septims",0,1,()->livingFixGold(10000));
+        fixDirect(a,"Золото","+100.000 септимов","Септимы","septims",1,9,()->livingFixGold(100000));
+        fixDirect(a,"Золото","+1.000.000 септимов","Септимы","septims",3,80,()->livingFixGold(1000000));
+        fixDirect(a,"Все параметры","+100 к каждому","Наборы","hero",3,25,()->{if(game.maxHp>Integer.MAX_VALUE-100||game.maxMagicka>Integer.MAX_VALUE-100||game.maxStamina>Integer.MAX_VALUE-100)return false;game.maxHp+=100;game.maxMagicka+=100;game.maxStamina+=100;return true;});
         String[] stats={"здоровья","магии","выносливости"};
-        for(int i=0;i<3;i++){final int index=i;livingFixRow(panel,"Регенерация "+stats[i],"+1 ед. / боевой ход",5,()->{if(game.regenBonus[index]>=1000000)return false;game.regenBonus[index]++;return true;});}
-        livingFixRow(panel,"Игнорировать штрафы регенерации","Постоянный эффект",15,()->{if(game.regenIgnorePenalty)return false;game.regenIgnorePenalty=true;return true;});
-        livingLink(panel,"Опыт навыка","1 F","skills",()->livingFixSkill(false));livingLink(panel,"Уровень навыка","1 F","skills",()->livingFixSkill(true));
-        livingLink(panel,"Уникальные способности","50 F","magic",this::livingPowerShop);
-        livingLink(panel,"Уникальные предметы","50 F","armor",this::livingArtifactShop);
-        livingDialog("Магазин фикскоинов",panel);
+        for(int i=0;i<3;i++){final int index=i;fixDirect(a,"Регенерация "+stats[i],"+1 ед. / боевой ход","Улучшения","health",1,5,()->{if(game.regenBonus[index]>=1000000)return false;game.regenBonus[index]++;return true;});}
+        fixDirect(a,"Игнорировать штрафы регенерации","Постоянный эффект","Улучшения","shield",2,15,()->{if(game.regenIgnorePenalty)return false;game.regenIgnorePenalty=true;return true;});
+        fixOffer(a,"Опыт навыка","+100 опыта выбранного навыка","Навыки","skills",0,1,()->livingFixSkill(false));
+        fixOffer(a,"Уровень навыка","+1 уровень выбранного навыка","Навыки","skills",0,1,()->livingFixSkill(true));
+        fixDirect(a,"Очки талантов","+5 свободных очков","Навыки","skills",2,50,()->{if(game.progress.perkPoints>Integer.MAX_VALUE-5)return false;game.progress.perkPoints+=5;return true;});
+        fixOffer(a,"Новое имя","Переименовать героя","Внешность","hero",1,25,this::fixRename);
+        fixOffer(a,"Новый облик","Выбрать портрет героя","Внешность","hero",2,50,this::fixPortrait);
+        fixOffer(a,"Новое наследие","Сменить расу; сохранить характеристики и навыки","Внешность","hero",3,150,this::fixRace);
+        fixDirect(a,"Благословение исцеления","Полностью восстановить здоровье, магию и силы","Улучшения","health",2,25,()->{if(game.hp==game.maxHp&&game.magicka==game.maxMagicka&&game.stamina==game.maxStamina)return false;game.hp=game.maxHp;game.magicka=game.maxMagicka;game.stamina=game.maxStamina;return true;});
+        fixDirect(a,"Слава героя","+10 репутации","Редактор мира","hero",2,50,()->{if(game.reputation>Integer.MAX_VALUE-10)return false;game.reputation+=10;return true;});
+        return a;
+    }
+    private void fixOffer(java.util.ArrayList<FixOffer> a,String t,String d,String c,String g,int tier,int price,Runnable action){
+        String[] rarity={"ОБЫЧНЫЙ","НЕОБЫЧНЫЙ","РЕДКИЙ","ЭПИЧЕСКИЙ","ЛЕГЕНДАРНЫЙ","МИФИЧЕСКИЙ","БОЖЕСТВЕННЫЙ"};
+        int[] colors={0xffa1a1aa,0xff65d68a,0xff5599ff,0xffb078e8,0xffe8b044,0xffef5555,0xffeabfff};
+        a.add(new FixOffer(t,d,c,g,rarity[tier],colors[tier],price,action));
+    }
+    private void fixDirect(java.util.ArrayList<FixOffer> a,String t,String d,String c,String g,int tier,int price,java.util.function.BooleanSupplier effect){
+        fixOffer(a,t,d,c,g,tier,price,()->fixConfirm(t,d,price,effect,this::livingFixShop));
+    }
+    private boolean fixApply(String title,String detail,int price,java.util.function.BooleanSupplier effect){
+        if(!game.started||livingBusy()||price<=0||game.fixSpent>Long.MAX_VALUE-price||!effect.getAsBoolean()){toast("Покупка недоступна");return false;}
+        game.fixSpent+=price;game.fixShop.record(title,detail,price,game.day);game.progress.sync(game);
+        game.recordVisualEvent("Системная компенсация: "+title);save();render();toast("Покупка применена");return true;
+    }
+    private void fixConfirm(String title,String detail,int price,java.util.function.BooleanSupplier effect,Runnable refresh){
+        new RuneDialogBuilder(this,accent()).setTitle(title).setMessage(detail+" | "+price+" F. Только для текущего сохранения.")
+            .setNegativeButton("Отмена",null).setPositiveButton("Купить",(d,w)->{if(fixApply(title,detail,price,effect))refresh.run();}).show();
+    }
+    private void fixRename(){
+        if(livingBusy())return;LinearLayout panel=column();panel.setPadding(dp(14),dp(8),dp(14),dp(8));
+        EditText input=livingField(panel,"Имя героя","До 60 символов",false);input.setText(game.name);
+        AlertDialog d=new RuneDialogBuilder(this,accent()).setTitle("Новое имя | 25 F").setView(panel).setNegativeButton("Отмена",null).setPositiveButton("Купить",null).create();
+        d.show();d.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v->{String n=input.getText().toString().trim();if(n.isEmpty()||n.length()>60||n.equals(game.name)){toast("Укажи новое имя до 60 символов");return;}if(fixApply("Новое имя",n,25,()->{game.name=n;return true;})){d.dismiss();livingFixShop();}});
+    }
+    private void fixRace(){
+        new RuneDialogBuilder(this,accent()).setTitle("Новое наследие | 150 F").setItems(GameEngine.RACES,(d,i)->{
+            String race=GameEngine.RACES[i];if(race.equals(game.race)){toast("Эта раса уже выбрана");return;}
+            fixConfirm("Новое наследие",race,150,()->{game.race=race;game.portrait=1;return true;},this::livingFixShop);
+        }).setNegativeButton("Отмена",null).show();
+    }
+    private void fixPortrait(){
+        LinearLayout panel=column();addText(panel,"Текущий герой | "+game.race,14,MUTED,false,8);
+        LinearLayout images=row();panel.addView(images,lp(-1,-2));
+        for(int i=1;i<=CharacterIdentity.PORTRAITS_PER_GENDER;i++){final int n=i;LinearLayout cell=column();images.addView(cell,new LinearLayout.LayoutParams(0,-2,1));
+            cell.addView(new CharacterPortraitView(this,game.race,game.gender,n),lp(-1,-2));addText(cell,n==game.portrait?"Выбран":"Облик "+n,12,TEXT,true,8);
+            cell.setOnClickListener(v->{if(n!=game.portrait)fixConfirm("Новый облик","Портрет "+n,50,()->{game.portrait=n;return true;},this::livingFixShop);});
+        }livingDialog("Новый облик | 50 F",panel);
+    }
+    private void livingFixShop(){
+        if(!game.started||livingBusy()){toast("Магазин недоступен во время активного действия");return;}
+        closeLivingDialog();LinearLayout root=column();root.setBackgroundColor(Color.BLACK);root.setPadding(dp(14),dp(12),dp(14),dp(8));
+        LinearLayout head=row();head.setGravity(Gravity.CENTER_VERTICAL);head.addView(text("МАГАЗИН",23,accent(),true),new LinearLayout.LayoutParams(0,-2,1));
+        head.addView(text("∞ F",23,accent(),true),lp(-2,-2));TextView close=text(" × ",28,MUTED,true);close.setOnClickListener(v->closeLivingDialog());head.addView(close,lp(-2,-2));root.addView(head,lp(-1,-2));
+        addText(root,"ФИКСКОИНЫ · ОСОБЫЕ ВОЗМОЖНОСТИ",11,MUTED,false,4);addText(root,"Потрачено в этом сохранении: "+livingNumber(game.fixSpent)+" F",12,MUTED,false,8);
+        LinearLayout filters=column();root.addView(filters,lp(-1,-2));
+        ScrollView scroll=new ScrollView(this);scroll.setFillViewport(false);LinearLayout items=column();scroll.addView(items);root.addView(scroll,new LinearLayout.LayoutParams(-1,0,1));
+        LinearLayout nav=row();root.addView(nav,lp(-1,56));String[] names={"Каталог","Избранное","Покупки","История"};String[] glyphs={"inventory","heart","armor","journal"};
+        for(int i=0;i<names.length;i++){final int index=i;LinearLayout cell=column();cell.setGravity(Gravity.CENTER);nav.addView(cell,new LinearLayout.LayoutParams(0,-1,1));
+            cell.addView(new SkyrimIconView(this,glyphs[i],fixShopPage==i?accent():MUTED),lp(22,22));TextView label=text(names[i],11,fixShopPage==i?accent():MUTED,true);label.setGravity(Gravity.CENTER);cell.addView(label,lp(-1,-2));cell.setOnClickListener(v->{fixShopPage=index;livingFixShop();});
+        }
+        if(fixShopPage<2){
+            HorizontalScrollView categories=new HorizontalScrollView(this);categories.setHorizontalScrollBarEnabled(false);LinearLayout strip=row();categories.addView(strip);filters.addView(categories,lp(-1,-2));
+            for(String cat:FIX_CATEGORIES){TextView chip=text(cat,13,cat.equals(fixShopCategory)?TEXT:MUTED,true);chip.setPadding(dp(12),dp(9),dp(12),dp(9));chip.setBackground(bg(cat.equals(fixShopCategory)?0xff303030:Color.BLACK,Color.TRANSPARENT,20));strip.addView(chip,lp(-2,-2));chip.setOnClickListener(v->{fixShopCategory=cat;livingFixShop();});}
+            LinearLayout searchRow=row();EditText search=new EditText(this);search.setSingleLine(true);search.setTextColor(TEXT);search.setHintTextColor(MUTED);search.setTextSize(sp(13));search.setHint("Поиск товаров");search.setText(fixShopQuery);search.setPadding(dp(10),dp(4),dp(10),dp(4));search.setBackground(bg(0xff141414,Color.TRANSPARENT,14));searchRow.addView(search,new LinearLayout.LayoutParams(0,dp(42),1));
+            TextView sort=text(new String[]{"По умолчанию","Цена ↑","Цена ↓","А–Я"}[fixShopSort],12,accent(),true);sort.setPadding(dp(10),dp(10),dp(4),dp(10));searchRow.addView(sort,lp(-2,-2));sort.setOnClickListener(v->{fixShopSort=(fixShopSort+1)%4;livingFixShop();});filters.addView(searchRow,lp(-1,-2));space(filters,8);
+            search.addTextChangedListener(new android.text.TextWatcher(){public void beforeTextChanged(CharSequence s,int st,int c,int a){}public void onTextChanged(CharSequence s,int st,int before,int count){fixShopQuery=s.toString();fixRenderOffers(items);}public void afterTextChanged(android.text.Editable e){}});
+            fixRenderOffers(items);
+        }else fixRenderLedger(items);
+        activeLivingDialog=new RuneDialogBuilder(this,accent()).setView(root).create();activeLivingDialog.show();
+        if(activeLivingDialog.getWindow()!=null){activeLivingDialog.getWindow().setBackgroundDrawable(new android.graphics.drawable.ColorDrawable(Color.BLACK));activeLivingDialog.getWindow().setLayout(-1,-1);activeLivingDialog.getWindow().setSoftInputMode(android.view.WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);}
+    }
+    private void fixRenderOffers(LinearLayout items){
+        items.removeAllViews();java.util.ArrayList<FixOffer> offers=fixOffers();
+        String q=fixShopQuery.trim().toLowerCase(java.util.Locale.ROOT);
+        offers.removeIf(o->(!"Все".equals(fixShopCategory)&&!fixShopCategory.equals(o.category))||(fixShopPage==1&&!game.fixShop.favorite(o.id()))||!(o.title+" "+o.detail+" "+o.category).toLowerCase(java.util.Locale.ROOT).contains(q));
+        if(fixShopSort==1)offers.sort(java.util.Comparator.comparingInt(o->o.price));
+        else if(fixShopSort==2)offers.sort((a,b)->Integer.compare(b.price,a.price));
+        else if(fixShopSort==3)offers.sort((a,b)->a.title.compareToIgnoreCase(b.title));
+        if(offers.isEmpty()){addText(items,"Нет подходящих товаров.",15,MUTED,false,10);return;}
+        for(int i=0;i<offers.size();i+=2){LinearLayout line=row();line.setGravity(Gravity.TOP);LinearLayout.LayoutParams size=lp(-1,-2);size.bottomMargin=dp(8);items.addView(line,size);fixCard(line,offers.get(i),items);
+            if(i+1<offers.size()){View gap=new View(this);line.addView(gap,lp(8,1));fixCard(line,offers.get(i+1),items);}else{View empty=new View(this);line.addView(empty,new LinearLayout.LayoutParams(0,1,1));}}
+    }
+    private void fixCard(LinearLayout line,FixOffer offer,LinearLayout items){
+        LinearLayout tile=column();tile.setPadding(dp(10),dp(9),dp(10),dp(10));tile.setBackground(bg(0xff121212,Color.TRANSPARENT,18));line.addView(tile,new LinearLayout.LayoutParams(0,-2,1));
+        LinearLayout art=row();art.setGravity(Gravity.CENTER);art.setBackground(bg(0xff1a1a1a,Color.TRANSPARENT,14));tile.addView(art,lp(-1,88));art.addView(new SkyrimIconView(this,offer.glyph,offer.color),lp(61,61));
+        LinearLayout label=row();TextView rare=text(offer.rarity,10,offer.color,true);label.addView(rare,new LinearLayout.LayoutParams(0,-2,1));
+        TextView fav=text(game.fixShop.favorite(offer.id())?"♥":"♡",22,accent(),true);fav.setContentDescription("Избранное: "+offer.title);fav.setOnClickListener(v->{game.fixShop.toggle(offer.id());save();fixRenderOffers(items);});label.addView(fav,lp(-2,-2));tile.addView(label,lp(-1,-2));
+        TextView name=text(offer.title,16,TEXT,true);name.setMaxLines(2);name.setMinHeight(dp(44));tile.addView(name,lp(-1,-2));
+        TextView desc=text(offer.detail,12,MUTED,false);desc.setMaxLines(3);desc.setMinHeight(dp(48));tile.addView(desc,lp(-1,-2));
+        int n=game.fixShop.count(offer.id());if(n>0)addText(tile,"Куплено: "+n,11,accent(),false,3);
+        TextView buy=text("◇ "+offer.price+" F",15,TEXT,true);buy.setGravity(Gravity.CENTER);buy.setBackground(bg(0xff151515,0xff454545,22));tile.addView(buy,lp(-1,40));buy.setOnClickListener(v->offer.action.run());art.setOnClickListener(v->new RuneDialogBuilder(this,accent()).setTitle(offer.title).setMessage(offer.rarity+"\n"+offer.detail+"\nСтоимость: "+offer.price+" F").setNegativeButton("Закрыть",null).setPositiveButton("Далее",(d,w)->offer.action.run()).show());
+    }
+    private void fixRenderLedger(LinearLayout items){
+        org.json.JSONArray history=game.fixShop.history();if(history.length()==0){addText(items,"Покупок в новой истории пока нет. Старые расходы сохранены.",14,MUTED,false,8);return;}
+        java.util.HashSet<String> seen=new java.util.HashSet<>();
+        for(int i=history.length()-1;i>=0;i--){JSONObject e=history.optJSONObject(i);if(e==null)continue;String id=e.optString("id");if(fixShopPage==2&&!seen.add(id))continue;LinearLayout tile=livingTile(items);livingLine(tile,e.optString("title"),fixShopPage==2?"×"+game.fixShop.count(id):e.optInt("price")+" F",accent());addText(tile,e.optString("detail"),13,MUTED,false,4);addText(tile,"День "+e.optInt("day"),11,MUTED,false,0);}
     }
     private void livingPowerShop(){
         if(livingBusy())return;LinearLayout panel=column();
@@ -4311,20 +4412,20 @@ public final class MainActivity extends Activity {
                 try{int stat=Integer.parseInt(strength.getText().toString().trim());String label=name.getText().toString();String raw=cost.getText().toString().trim().replace(',','.');
                     ok=item?game.compensation.createItem(game,label,type,stat,Double.parseDouble(raw),desc.getText().toString()):game.compensation.createPower(label,type,stat,Integer.parseInt(raw));
                 }catch(Exception ignored){}
-                if(!ok){toast("Проверь значения, свободный слот и вес");return;}game.fixSpent+=50;game.progress.sync(game);game.recordVisualEvent("Создана системная компенсация");save();dialog.dismiss();render();if(item)livingArtifactShop();else livingPowerShop();toast("Создано");
+                if(!ok){toast("Проверь значения, свободный слот и вес");return;}game.fixSpent+=50;game.fixShop.record(item?"Создать свой предмет":"Создать свою способность",name.getText().toString(),50,game.day);game.progress.sync(game);game.recordVisualEvent("Создана системная компенсация");save();dialog.dismiss();render();if(item)livingArtifactShop();else livingPowerShop();toast("Создано");
             });
         }).setNegativeButton("Отмена",null).show();
     }
     private void livingFixSkill(boolean level){new RuneDialogBuilder(this,accent()).setTitle(level?"Повысить навык на 1":"Добавить 100 опыта навыка").setItems(RpgContent.SKILLS,(d,index)->{new RuneDialogBuilder(this,accent()).setTitle(RpgContent.SKILLS[index]).setMessage("Стоимость: 1 F").setNegativeButton("Отмена",null).setPositiveButton("Купить",(dd,w)->{
         if(livingBusy()||game.progress.skillLevel(index)>=100||game.fixSpent==Long.MAX_VALUE){toast("Покупка недоступна");return;}
-        if(!game.progress.buyFixSkill(game,index,level)){toast("Покупка недоступна");return;}save();render();livingFixShop();toast("Покупка применена");}).show();}).setNegativeButton("Отмена",null).show();}
+        if(!game.progress.buyFixSkill(game,index,level)){toast("Покупка недоступна");return;}game.fixShop.record(level?"Уровень навыка":"Опыт навыка",RpgContent.SKILLS[index],1,game.day);save();render();livingFixShop();toast("Покупка применена");}).show();}).setNegativeButton("Отмена",null).show();}
     private boolean livingFixGold(int amount){if(game.gold>Integer.MAX_VALUE-amount)return false;game.gold+=amount;return true;}
     private void livingFixRow(LinearLayout host,String title,String detail,int price,java.util.function.BooleanSupplier purchase){
         livingFixRow(host,title,detail,price,purchase,this::livingFixShop);
     }
     private void livingFixRow(LinearLayout host,String title,String detail,int price,java.util.function.BooleanSupplier purchase,Runnable refresh){
         LinearLayout tile=livingTile(host);livingLine(tile,title,price+" F",ITEM_MAGIC);addText(tile,detail,13,MUTED,false,0);
-        tile.setOnClickListener(v->new RuneDialogBuilder(this,accent()).setTitle(title).setMessage(detail+" | "+price+" F. Покупка постоянная.").setNegativeButton("Отмена",null).setPositiveButton("Купить",(d,w)->{if(aiTurnBusy||!pendingAiAction().isEmpty()||"COMBAT".equals(game.mode)||game.fixSpent>Long.MAX_VALUE-price||!purchase.getAsBoolean()){toast("Покупка недоступна");return;}game.fixSpent+=price;game.progress.sync(game);game.recordVisualEvent("Системная компенсация: "+title);save();render();refresh.run();toast("Покупка применена");}).show());
+        tile.setOnClickListener(v->fixConfirm(title,detail,price,purchase,refresh));
     }
     private void renderSettings(){
         section("ПАРАМЕТРЫ","Настройки","Твоя история, твои правила.");

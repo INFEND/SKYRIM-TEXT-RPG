@@ -200,7 +200,8 @@ public final class RpgProgress {
         try{inventory.put(id,Math.max(0,n));if(n<=0)tempered.remove(id);}catch(Exception ignored){}
     }
     public int quantity(String id){return inventory.optInt(id,0);}
-    public double carryLimit(){return 50+(equipped("Зачарованное ожерелье")?25:0)+artifacts.carryBonus(this);}
+    public int fixCarryBonus=0;
+    public double carryLimit(){return 50+fixCarryBonus+(equipped("Зачарованное ожерелье")?25:0)+artifacts.carryBonus(this);}
     public boolean addItem(String id,int quantity){
         if(quantity<=0||ItemCatalog.find(id)==null||CompensationPowers.itemIndex(id)>=0||quantity(id)>Integer.MAX_VALUE-quantity)return false;
         ItemCatalog.Item item=ItemCatalog.find(id);
@@ -390,7 +391,7 @@ public final class RpgProgress {
              .put("skillXp",new JSONArray(skillXp)).put("inventory",inventory)
              .put("completed",new JSONArray(completed)).put("failed",new JSONArray(failed))
              .put("questOutcomes",new JSONObject(questOutcomes)).put("roadArtifacts",artifacts.save())
-             .put("perks",perkPoints).put("combatPerks",new JSONArray(combatPerks)).put("studyPerks",new JSONArray(studyPerks)).put("talentBranches",branches.toJson()).put("advancedPerks",advanced.toJson())
+             .put("fixCarryBonus",fixCarryBonus).put("perks",perkPoints).put("combatPerks",new JSONArray(combatPerks)).put("studyPerks",new JSONArray(studyPerks)).put("talentBranches",branches.toJson()).put("advancedPerks",advanced.toJson())
              .put("equipmentInitialized",equipmentInitialized).put("equipped",new JSONObject(equipped))
              .put("tempered",new JSONObject(tempered))
              .put("activePowerDay",activePowerDay).put("difficulty",difficulty)
@@ -407,7 +408,7 @@ public final class RpgProgress {
         RpgProgress p=new RpgProgress();if(obj==null)return p;
         p.artifacts=RoadArtifacts.restore(obj.optJSONObject("roadArtifacts"));p.branches=TalentBranches.fromJson(obj.optJSONArray("talentBranches"));p.advanced=AdvancedPerks.fromJson(obj.optJSONArray("advancedPerks"));
         p.startId=obj.optString("startId","Хелген");p.location=obj.optString("location","Хелген");
-        p.recent=obj.optString("recent","");p.perkPoints=Math.max(0,obj.optInt("perks",0));
+        p.recent=obj.optString("recent","");p.perkPoints=Math.max(0,obj.optInt("perks",0));p.fixCarryBonus=Math.max(0,Math.min(1000000,obj.optInt("fixCarryBonus",0)));
         p.activePowerDay=obj.optInt("activePowerDay",-1);p.difficulty=obj.optInt("difficulty",0);
         p.actionDay=obj.optInt("actionDay",-1);
         p.dragonStage=Math.max(0,Math.min(DragonArc.FINAL_STAGE,obj.optInt("dragonStage",0)));

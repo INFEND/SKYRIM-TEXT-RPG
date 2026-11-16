@@ -60,6 +60,7 @@ public final class GameEngine {
     public RpgProgress progress = new RpgProgress();
     public LivingNeeds needs=new LivingNeeds();
     public long fixSpent=0;
+    public FixShopState fixShop=new FixShopState();
     public CompensationPowers compensation=new CompensationPowers();
     public JSONObject lastLivingResult=new JSONObject();
     public int lastCheckChance=-1,lastCheckRoll=-1;
@@ -180,7 +181,7 @@ public final class GameEngine {
         if(name.length()>28)name=name.substring(0,28);
         race=contains(RACES,desiredRace)?desiredRace:"Норд";
         heroClass=contains(CLASSES,desiredClass)?desiredClass:"Без класса";
-        started=true;compensation=new CompensationPowers();compensation.installCatalog();lastLivingResult=new JSONObject();lastCheckChance=lastCheckRoll=-1;needs=new LivingNeeds();economy=new LivingEconomy();java.util.Arrays.fill(regenBonus,0);regenIgnorePenalty=false;fixSpent=0;aiTurn=null;sceneState=new SceneState();road=new RoadEvents();katherine=new KatherineStory();alma=new AlmaStory();livia=new LiviaStory();itachi=new ItachiStory();aiJournal="";day=1;hour=8;level=1;xp=0;gold=85;potions=3;manaPotions=1;
+        started=true;compensation=new CompensationPowers();compensation.installCatalog();lastLivingResult=new JSONObject();lastCheckChance=lastCheckRoll=-1;needs=new LivingNeeds();economy=new LivingEconomy();java.util.Arrays.fill(regenBonus,0);regenIgnorePenalty=false;fixSpent=0;fixShop=new FixShopState();aiTurn=null;sceneState=new SceneState();road=new RoadEvents();katherine=new KatherineStory();alma=new AlmaStory();livia=new LiviaStory();itachi=new ItachiStory();aiJournal="";day=1;hour=8;level=1;xp=0;gold=85;potions=3;manaPotions=1;
         questStage=0;sideQuest=0;sideKills=0;boardCompleted=0;explored=0;victories=0;reputation=0;
         swordUpgraded=false;armorUpgraded=false;
         maxHp=100;maxStamina=100;maxMagicka=100;attack=12;armor=2;
@@ -799,7 +800,7 @@ public final class GameEngine {
     public JSONObject toJson() throws JSONException {
         syncLivingSystems();
         JSONObject j=new JSONObject();
-        j.put("needs",needs.toJson()).put("fixSpent",fixSpent).put("economy",economy.toJson()).put("regenBonus",new org.json.JSONArray(regenBonus)).put("regenIgnorePenalty",regenIgnorePenalty).put("compensation",compensation.toJson()).put("lastLivingResult",lastLivingResult);
+        j.put("needs",needs.toJson()).put("fixSpent",fixSpent).put("fixShop",fixShop.toJson()).put("economy",economy.toJson()).put("regenBonus",new org.json.JSONArray(regenBonus)).put("regenIgnorePenalty",regenIgnorePenalty).put("compensation",compensation.toJson()).put("lastLivingResult",lastLivingResult);
         j.put("katherine",katherine.save());
         j.put("alma",alma.save());j.put("livia",livia.save());j.put("itachi",itachi.save());
         j.put("schema",1).put("started",started).put("name",name).put("race",race).put("heroClass",heroClass)
@@ -854,7 +855,7 @@ public final class GameEngine {
             g.enemyHp=Math.max(0,j.optInt("enemyHp",0));g.enemyMaxHp=Math.max(0,j.optInt("enemyMaxHp",0));g.enemyDamage=Math.max(0,j.optInt("enemyDamage",0));
             g.compensation=CompensationPowers.fromJson(j.optJSONObject("compensation"));g.compensation.installCatalog();
             g.progress=RpgProgress.fromJson(j.optJSONObject("progress"));
-             g.needs=LivingNeeds.fromJson(j.optJSONObject("needs"));g.economy=LivingEconomy.fromJson(j.optJSONObject("economy"));g.syncLivingSystems();g.fixSpent=Math.max(0,j.optLong("fixSpent",0));org.json.JSONArray rates=j.optJSONArray("regenBonus");if(rates!=null)for(int i=0;i<3;i++)g.regenBonus[i]=Math.max(0,Math.min(1000000,rates.optInt(i)));g.regenIgnorePenalty=j.optBoolean("regenIgnorePenalty");g.compensation.reconcile(g);JSONObject result=j.optJSONObject("lastLivingResult");if(result!=null)g.lastLivingResult=result;
+             g.needs=LivingNeeds.fromJson(j.optJSONObject("needs"));g.economy=LivingEconomy.fromJson(j.optJSONObject("economy"));g.syncLivingSystems();g.fixSpent=Math.max(0,j.optLong("fixSpent",0));g.fixShop=FixShopState.fromJson(j.optJSONObject("fixShop"));org.json.JSONArray rates=j.optJSONArray("regenBonus");if(rates!=null)for(int i=0;i<3;i++)g.regenBonus[i]=Math.max(0,Math.min(1000000,rates.optInt(i)));g.regenIgnorePenalty=j.optBoolean("regenIgnorePenalty");g.compensation.reconcile(g);JSONObject result=j.optJSONObject("lastLivingResult");if(result!=null)g.lastLivingResult=result;
             g.merchants=MerchantLedger.fromJson(j.optJSONObject("merchants"));g.factions=FactionCampaign.fromJson(j.optJSONObject("factions"));g.factionStories=FactionStories.fromJson(j.optJSONObject("factionStories"));g.factionBattle=Math.max(-1,Math.min(6,j.optInt("factionBattle",-1)));
             org.json.JSONArray holds=j.optJSONArray("holdReputation");if(holds!=null)for(int i=0;i<g.holdReputation.length;i++)g.holdReputation[i]=Math.max(-100,Math.min(100,holds.optInt(i,0)));
             if("COMBAT".equals(g.mode)){g.poisonTurns=Math.max(0,Math.min(2,j.optInt("poisonTurns")));g.frostTurns=Math.max(0,Math.min(2,j.optInt("frostTurns")));}
