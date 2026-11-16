@@ -186,6 +186,7 @@ public final class MainActivity extends Activity {
     }
     @Override protected void onActivityResult(int requestCode,int resultCode,Intent data){
         super.onActivityResult(requestCode,resultCode,data);
+        if(requestCode==REQUEST_ALMA_GALLERY){if(resultCode==RESULT_OK&&data!=null&&data.getData()!=null){try{AlmaGallery.install(this,data.getData());almaGallery(1);}catch(Exception e){toast("Не удалось импортировать галерею: "+e.getMessage());}}return;}
         if(requestCode==REQUEST_KATHERINE_GALLERY){if(resultCode==RESULT_OK&&data!=null&&data.getData()!=null){try{KatherineGallery.install(this,data.getData());katherineGallery(1);}catch(Exception e){toast("Не удалось импортировать галерею: "+e.getMessage());}}return;}
         if(requestCode==LocalAiEngineModule.REQUEST_ACTIVATE){if(localAiClient!=null)localAiClient.onEngineActivationResult(resultCode==RESULT_OK);return;}
         if(requestCode==REQUEST_LOCAL_GGUF&&resultCode==RESULT_OK&&data!=null&&data.getData()!=null)
@@ -405,7 +406,7 @@ public final class MainActivity extends Activity {
         switch(status){case "MET":return "Знакомство";case "HELPED":return "Благодарность";case "INFORMED":return "Обмен сведениями";case "HOSTILE":return "Враждебность";case "DEAD":return "Погиб";case "MISSING":return "Пропал";default:return "Отношение неизвестно";}
     }
     private View npcPortrait(String name){
-        if(AlmaStory.NAME.equalsIgnoreCase(name))return npcEmblem(name,"hero");
+        if(AlmaStory.NAME.equalsIgnoreCase(name)){try{if(AlmaGallery.available(this)){android.widget.ImageView portrait=new android.widget.ImageView(this);portrait.setImageBitmap(AlmaGallery.photo(this,7));portrait.setAdjustViewBounds(true);portrait.setScaleType(android.widget.ImageView.ScaleType.FIT_CENTER);portrait.setContentDescription("Альма");return portrait;}}catch(java.io.IOException ignored){}return npcEmblem(name,"hero");}
         if(KatherineStory.NAME.equalsIgnoreCase(name)){
             String path="media/katherine/portrait.webp";
             try{
@@ -444,10 +445,18 @@ public final class MainActivity extends Activity {
         NpcProfiles.Profile profile=NpcProfiles.find(name);
         if(profile!=null){addText(panel,profile.race+" | "+profile.role,14,TEXT,true,8);}
         if(KatherineStory.NAME.equals(name)){addText(panel,"Магия: "+game.katherine.mana+"/"+game.katherine.maxMana()+" | Победы: "+game.katherine.victories,13,TEXT,false,8);TextView galleryButton=text("Галерея Кэтрин",15,accent(),true);galleryButton.setPadding(dp(12),dp(12),dp(12),dp(12));galleryButton.setOnClickListener(v->katherineGallery(1));panel.addView(galleryButton,lp(-1,-2));addText(panel,"18 лет | Носитель Нулевого Предела",14,TEXT,true,8);addText(panel,"Доверие: "+game.katherine.trust+"/100",14,accent(),true,8);addText(panel,"Уважение: "+game.katherine.respect+"/100 | Симпатия: "+game.katherine.affection+"/100",13,TEXT,false,8);addText(panel,"Ревность: "+game.katherine.jealousy+"/100 | Магический ранг: "+game.katherine.magicRank+"/3",13,TEXT,false,8);addText(panel,"Тактика: "+game.katherine.stanceLabel()+" | "+game.katherine.status(),13,TEXT,false,8);}
-        if(AlmaStory.NAME.equals(name)){addText(panel,"437 лет | Маг крови, бывшая убийца",14,TEXT,true,8);addText(panel,game.alma.relationship()+" | Доверие: "+game.alma.trust+"/100 | Любовь: "+game.alma.love+"/100",14,accent(),true,8);}
-        if(!KatherineStory.NAME.equals(name))addText(panel,"Иллюстративный образ или эмблема, не индивидуальный портрет",11,MUTED,false,10);
+        if(AlmaStory.NAME.equals(name)){TextView galleryButton=text("Галерея Альмы",15,accent(),true);galleryButton.setPadding(dp(12),dp(12),dp(12),dp(12));galleryButton.setOnClickListener(v->almaGallery(1));panel.addView(galleryButton,lp(-1,-2));addText(panel,"437 лет | Маг крови, бывшая убийца",14,TEXT,true,8);addText(panel,game.alma.relationship()+" | Доверие: "+game.alma.trust+"/100 | Любовь: "+game.alma.love+"/100",14,accent(),true,8);}
+        if(!KatherineStory.NAME.equals(name)&&!AlmaStory.NAME.equals(name))addText(panel,"Иллюстративный образ или эмблема, не индивидуальный портрет",11,MUTED,false,10);
         addText(panel,npcStatusLabel(game.sceneState.npcStatusByName(name)),15,TEXT,true,8);
         new RuneDialogBuilder(this,accent()).setTitle(name).setView(panel).setNegativeButton("Закрыть",null).show();
+    }
+    private static final int REQUEST_ALMA_GALLERY=7219;
+    private void chooseAlmaGallery(){Intent picker=new Intent(Intent.ACTION_OPEN_DOCUMENT);picker.addCategory(Intent.CATEGORY_OPENABLE);picker.setType("application/zip");try{startActivityForResult(picker,REQUEST_ALMA_GALLERY);}catch(Exception e){toast("Не удалось открыть выбор файла");}}
+    private void almaGallery(int index){
+        LinearLayout panel=column();panel.setPadding(dp(12),dp(8),dp(12),dp(8));
+        if(!AlmaGallery.available(this)){addText(panel,"Импортируй оригинальный архив Alma_gallery.zip (7 изображений).",14,TEXT,false,8);new RuneDialogBuilder(this,accent()).setTitle("Альма | Галерея").setView(panel).setPositiveButton("Импорт ZIP",(d,w)->chooseAlmaGallery()).setNegativeButton("Закрыть",null).show();return;}
+        try{android.widget.ImageView image=new android.widget.ImageView(this);image.setImageBitmap(AlmaGallery.photo(this,index));image.setAdjustViewBounds(true);image.setScaleType(android.widget.ImageView.ScaleType.FIT_CENTER);panel.addView(image,lp(-1,400));TextView count=text(index+" / "+AlmaGallery.COUNT,14,accent(),true);count.setGravity(Gravity.CENTER);panel.addView(count,lp(-1,34));
+            new RuneDialogBuilder(this,accent()).setTitle("Альма | Галерея").setView(panel).setNegativeButton("Закрыть",null).setNeutralButton("Назад",(d,w)->almaGallery(index==1?AlmaGallery.COUNT:index-1)).setPositiveButton("Вперёд",(d,w)->almaGallery(index==AlmaGallery.COUNT?1:index+1)).show();}catch(Exception e){toast("Не удалось прочитать фото");}
     }
     private static final int REQUEST_KATHERINE_GALLERY=7218;
     private void chooseKatherineGallery(){Intent picker=new Intent(Intent.ACTION_OPEN_DOCUMENT);picker.addCategory(Intent.CATEGORY_OPENABLE);picker.setType("application/zip");try{startActivityForResult(picker,REQUEST_KATHERINE_GALLERY);}catch(Exception e){toast("Не удалось открыть выбор файла");}}
@@ -2019,7 +2028,7 @@ public final class MainActivity extends Activity {
         final String model=local?"Qwen3.5-9B":prefs.getString(chat?"ai_chatgpt_model":"ai_api_model",
                 chat?"":AiModelCatalog.DEFAULT_API);
         if(model.isEmpty()){aiTurnStatus="Сначала выбери модель в настройках";render();return;}
-        final String effort=selectedReasoningEffort(),history=aiMemory.context(aiSession)+"\n"+game.katherine.aiContext();
+        final String effort=selectedReasoningEffort(),history=aiMemory.context(aiSession)+"\n"+game.katherine.aiContext()+"\n"+game.alma.aiContext();
         final String saved;
         try{saved=game.toJson().toString();}
         catch(Exception ex){aiTurnStatus="Не удалось прочитать состояние героя";render();return;}
@@ -2091,7 +2100,7 @@ public final class MainActivity extends Activity {
                     VisualSnapshot visualBefore=new VisualSnapshot(next);
                     completed.apply(next,actionResolved);
                     next.progress.sync(next);
-                    next.katherine.observeTravel(next);
+                    next.katherine.observeTravel(next);next.alma.observeTravel(next);
                     captureItemGains(before,next,!actionResolved);
                     if(actionResolved){if(expectedChance>=0){next.lastCheckChance=expectedChance;next.lastCheckRoll=prefs.getInt(AI_PENDING_DIE,-1);}recordVisual(visualBefore,next,completed.journal.isEmpty()?"Продолжение истории":completed.journal);LockedChecks lockedChecks=LockedChecks.restore(prefs.getString(AI_PENDING_CHECKS,""));if(lockedChecks!=null)next.lastLivingResult.put("checks",lockedChecks.snapshot());}
                     else next.recordVisualEvent(completed.journal.isEmpty()?"Продолжение истории":completed.journal);
@@ -3786,7 +3795,7 @@ public final class MainActivity extends Activity {
         AlmaStory a=game.alma;LinearLayout panel=column();addText(panel,a.relationship()+" | "+a.status(),16,TEXT,true,10);
         String[] labels={"Доверие","Уважение","Симпатия","Любовь","Ревность","Обида","Преданность"};int[] scores={a.trust,a.respect,a.affection,a.love,a.jealousy,a.hurt,a.loyalty};
         for(int i=0;i<labels.length;i++){livingLine(panel,labels[i],scores[i]+" / 100",accent());livingBar(panel,scores[i],100,accent());space(panel,8);}
-        livingDialog("Альма | Отношения",panel);
+        addText(panel,"Ранг "+a.rank+"/5 | Победы "+a.victories+" | Магия "+a.mana+"/"+a.maxMana()+" | Здоровье "+a.health+"/"+a.maxHealth(),13,TEXT,true,8);addText(panel,a.gearLabel()+" | "+a.stanceLabel(),13,MUTED,false,8);if(!a.lastRemark.isEmpty())addText(panel,a.lastRemark,13,TEXT,false,8);TextView gallery=text("Галерея Альмы",15,accent(),true);gallery.setOnClickListener(v->almaGallery(1));panel.addView(gallery,lp(-1,44));TextView memories=text("Личная память | "+a.memory.length()+" событий",14,accent(),true);memories.setOnClickListener(v->{LinearLayout hist=column();for(int i=a.memory.length()-1;i>=0;i--)addText(hist,a.memory.optString(i),13,TEXT,false,8);livingDialog("Альма | Память",hist);});panel.addView(memories,lp(-1,44));livingDialog("Альма | Отношения",panel);
     }
     private void renderLivingRelations(){
         section("ЖУРНАЛ","Отношения","Только подтверждённые знакомства и события.");

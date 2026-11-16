@@ -415,8 +415,8 @@ public final class GameEngine {
             day+=route.days;
             region=target.region;
             progress.location=target.name;
-            katherine.observeTravel(this);
-            katherine.rest(Math.min(24,route.days*3));
+            katherine.observeTravel(this);alma.observeTravel(this);
+            katherine.rest(Math.min(24,route.days*3));alma.rest(Math.min(24,route.days*3));
             // Register only locations reached through the validated atlas route.
             // A stable key keeps repeat visits idempotent across save/load.
             try {
@@ -595,7 +595,7 @@ public final class GameEngine {
     void beginCanonicalBattle(String name,int health,int damage,String intro){canonicalShoutCooldown=0;startBattle(name,health,damage,"CANONICAL",intro);}
     void beginKatherineBattle(){startBattle("Агент Круга Трёх Когтей",75+level*8,8+level*2,"KATHERINE","Кэтрин поднимает барьер. Агент Круга требует, чтобы она сдалась.");}
     private void startBattle(String name,int health,int dmg,String kind,String intro) {
-        resetBattleVisuals();enemyName=name;enemyHp=health;enemyMaxHp=health;enemyDamage=dmg;battleKind=kind;enemyIntro=intro;
+        resetBattleVisuals();alma.beginBattle();enemyName=name;enemyHp=health;enemyMaxHp=health;enemyDamage=dmg;battleKind=kind;enemyIntro=intro;
         battleLog="В бою важна тактика. Следи за запасом сил и магии.";mode="COMBAT";
     }
     // Retain class/quest/AI bonuses in old saves without counting the legacy
@@ -638,6 +638,7 @@ public final class GameEngine {
         if(!"CANON_SHOUT".equals(action)&&canonicalShoutCooldown>0)canonicalShoutCooldown--;
         int kathDamage=katherine.assist(this,battleTurns+1,Math.max(0,enemyHp-damage));
         if(kathDamage>0){damage+=kathDamage;actionText+="\nКэтрин: магический импульс, −"+kathDamage+" здоровья врагу.";}
+        int almaDamage=alma.assist(this,battleTurns+1,Math.max(0,enemyHp-damage));if(almaDamage>0){damage+=almaDamage;actionText+="\nАльма: "+(alma.mortal()?"удар кинжалом":"багровое пламя")+", −"+almaDamage+" здоровья врагу.";}
         lastDealt=Math.min(enemyHp,damage);lastHeavyHit="HEAVY".equals(action)&&lastDealt>0;lastMiss="HEAVY".equals(action)&&lastDealt==0;battleDealt+=lastDealt;battleTurns++;
         enemyHp=Math.max(0,enemyHp-damage);
         if(enemyHp==0) {poisonTurns=frostTurns=0;winBattle(actionText);return;}
@@ -648,6 +649,7 @@ public final class GameEngine {
         if(defending)lastBlocked=Math.max(0,Math.max(1,(int)Math.round(Math.max(1,baseIncoming)*(1-progress.damageReduction())))-incoming);
         int kathProtection=katherine.protect(incoming);incoming-=kathProtection;
         if(kathProtection>0){lastBlocked+=kathProtection;actionText+="\nКэтрин: защитный барьер, −"+kathProtection+" входящего урона.";}
+        int almaProtection=alma.protect(incoming);incoming-=almaProtection;if(almaProtection>0){lastBlocked+=almaProtection;actionText+="\nАльма: защитная магия, −"+almaProtection+" входящего урона.";}
         int poisoned=poisonTurns>0?Math.max(1,maxHp/40):0;
         if(poisonTurns>0)poisonTurns--;if(frostTurns>0){frostTurns--;stamina=Math.max(0,stamina-4);}
         String foe=enemyName.toLowerCase(java.util.Locale.ROOT);
@@ -656,6 +658,7 @@ public final class GameEngine {
         lastTaken=Math.min(hp,incoming+poisoned);battleTaken+=lastTaken;
         hp=Math.max(0,hp-incoming-poisoned);stamina=Math.min(maxStamina,nonnegativeAdd(stamina,3+(progress.hasArmorType(5)&&progress.advanced.has(AdvancedPerks.WIND_WALKER)?2:0)));
         battleLog=actionText+"\n"+enemyName+" отвечает: −"+incoming+" здоровья."+(poisoned>0?"\nЯд: −"+poisoned+" здоровья.":"")+(poisonTurns>0?"\nОтравление: "+poisonTurns+" хода.":"")+(frostTurns>0?"\nОбморожение: "+frostTurns+" хода.":"");
+        if(hp==0&&alma.rescue(this))battleLog+="\nАльма: Алая клятва спасла героя.";
         if(hp==0) {
             int penalty=gold/3;gold-=penalty;hp=Math.max(1,maxHp/2);stamina=Math.max(1,maxStamina/2);
             poisonTurns=frostTurns=0;mode="DEFEAT";message="Ты приходишь в себя у дороги. Прохожие спасли тебя, но потеряно "+penalty+" септимов. Теперь можно подготовиться и вернуться.";
@@ -674,7 +677,7 @@ public final class GameEngine {
                 "Над полем прозвучал голос, которому откликнулись горы. Следующая цель: Айварстед.";
         }
         addXp(gain);mode="RESULT";
-        katherine.victory(this);
+        katherine.victory(this);alma.victory(this);
         message=lastHit+"\n\nПобеда над «"+enemyName+"»! +"+reward+" септимов, +"+gain+" опыта.";
         if("QUEST".equals(battleKind))message+="\n\nЗа стражем ты находишь журнал хранителя. Следующая цель: Солитьюд.";
         if("DRAGON".equals(battleKind))message+="\n\n"+progress.dragonRecent;
@@ -703,7 +706,7 @@ public final class GameEngine {
         if(day>Integer.MAX_VALUE-total/24)return false;
         day+=total/24;hour=total%24;
         syncLivingSystems();needs.recover(hours,sleep);
-        katherine.rest(hours);katherine.autonomous(this);
+        katherine.rest(hours);katherine.autonomous(this);alma.rest(hours);alma.observeTravel(this);
         hp=(int)Math.min(maxHp,(long)hp+hours*(3L+regenBonus[0]));
         stamina=(int)Math.min(maxStamina,(long)stamina+hours*(7L+regenBonus[2]));
         magicka=(int)Math.min(maxMagicka,(long)magicka+hours*(6L+regenBonus[1]));
