@@ -1,3 +1,0 @@
-# Settlement icons
-
-Approved generated sheet cropped into 11 separate 96×96 cells (384×288, transparent lossless WebP after grey palette normalization). Order: Solitude, Dawnstar, Winterhold, Windhelm, Markarth, Morthal, Whiterun, Riften, Falkreath, town, settlement. The 12th cell is empty. SHA-256: 471b9c70466f559736edfbafb115c851aaadfa693ed0ff230a2cd1e80962a615. Nine capitals have unique markers. Raven Rock uses the generic town until its own art is supplied. Villages use town; other settlements use settlement. Map pins and location list share the mapping. Player/focus indicators are unchanged. Core drawable: only 5720 bytes, no extra resource download needed.

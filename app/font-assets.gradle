@@ -1,1 +1,0 @@
-// Optional fonts are no longer Gradle assets. The release catalog pins and verifies them in scripts/build_resource_catalog.py.
