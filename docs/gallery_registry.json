@@ -1,5 +1,17 @@
 [
   {
+    "slug": "alvor_forge",
+    "name": "Кузница Алвора",
+    "parent": "Ривервуд",
+    "captions": [
+      "Кузница Алвора"
+    ],
+    "aliases": [
+      "Alvor's Forge",
+      "Alvor's Smithy"
+    ]
+  },
+  {
     "slug": "sleeping_giant_inn",
     "name": "Таверна «Спящий великан»",
     "parent": "Ривервуд",
