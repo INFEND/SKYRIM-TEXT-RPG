@@ -30,13 +30,42 @@ final class RoadQuests {
         new Task("boethiah","Книга культиста","Святилище Боэтии","Ты находишь святилище и узнаёшь о культе Боэтии. Книга помогла найти место; испытание самой принцессы ещё впереди.","","Испытание Боэтии",15,""),
         new Task("dwemer_children","Переправа Глубинного Народа","Переправа Глубинного Народа","По подсказке детей ты обнаруживаешь древнюю переправу и осматриваешь двемерские развалины.","","",25,""),
         new Task("wolf_escape","След бойцовых волков","Пещера Крегслейн","След приводит к месту незаконных боёв. Оставшийся у входа бандит не хочет пропускать свидетеля.","Бандит Крегслейна","",65,""),
-        new Task("headless","Привал Хамвира","Привал Хамвира","Призрачный всадник исчезает у старых могил. Ты осматриваешь захоронения и находишь забытый тайник.","","",45,"")
+        new Task("headless","Привал Хамвира","Привал Хамвира","Призрачный всадник исчезает у старых могил. Ты осматриваешь захоронения и находишь забытый тайник.","","",45,""),
+        new Task("afflicted_ruins","След в Бтардамзе","Бтардамз","Сведения от святилища приводят к заражённым руинам. У входа стоит вооружённый Страдающий; уничтожь угрозу и выясни, откуда пришли больные.","Страдающий","",65,""),
+        new Task("afflicted_return","Донесение о Страдающих","Святилище Периайта","Ты сообщаешь о найденном в руинах. Это завершает расследование, но не заменяет испытание Периайта.","","",35,""),
+        new Task("mistwatch_return","Судьба освобождённых","Виндхельм","Поговори с караульными о людях, спасённых из Туманной заставы. Их принимают в безопасном месте.","","",40,""),
+        new Task("wolf_escape_report","Доклад о бойцовых зверях","Рифтен","Сообщи страже о незаконных боях и оставшихся следах дрессировщиков.","","",35,""),
+        new Task("frossel_report","След разбойничьей банды","Воронья Скала","Передай сведения о Фросселе местным стражникам. У них появилось основание проверить северные тропы.","","",30,""),
+        new Task("blackbook_research","Исследование Чёрной книги","Тел-Митрин","Покажи запись исследователям Тел-Митрина. Они объясняют, почему обращаться с книгами Апокрифа нужно осторожно.","","Сведения о Чёрной книге",35,""),
+        new Task("hakar_report","Доклад Хакара","Форт Стражи Рассвета","Доставь припасы и сведения о засаде. Дозорные благодарят за помощь и проверяют маршрут новобранца.","","Припасы Стражи Рассвета",45,""),
+        new Task("saliah_report","Донесение Салии","Форт Стражи Рассвета","Передай сведения о северном тайнике. Дозорные отмечают, что запас найден.","","Припасы Стражи Рассвета",45,""),
+        new Task("lynoit_report","Последний дозор Линоита","Форт Стражи Рассвета","Доложи о судьбе Линоита и найденном тайнике. Его товарищи чтут память погибшего.","","Припасы Стражи Рассвета",45,""),
+        new Task("assassin_report","След заказного убийства","Вайтран","Покажи приказ караульному. Он предупреждает, что Братство не раскрывает заказчиков, и принимает сведения о нападении.","","Приказ Тёмного Братства",15,""),
+        new Task("thalmor_report","Распоряжение юстициаров","Виндхельм","Передай содержание талморского приказа местному военному дозору. Они отмечают угрозу на дорогах.","","Приказ Талмора",25,""),
+        new Task("ghost_grave","Потревоженная могила","Привал Хамвира","По следу призрака найди место, где расхитители оставили инструменты. У могильной плиты лежит забытая добыча.","","",45,""),
+        new Task("bitten_hunter","След ночной засады","Пруд Глаз Мары","Проверь следы вампирской охоты у пруда. В этой адаптации охотник указывает на опасный участок восточных дорог.","Вампир","",60,""),
+        new Task("merchant_attack","Сведения о налёте","Вайтран","Доложи о нападении на торговца. Караульный принимает приметы разбойников и обещает проверить тракт.","","",30,""),
+        new Task("island_mutiny","След пиратов Хакнира","Отмель Хакнира","Осмотри лагерь, куда звала пиратка. Оставшиеся разбойники охраняют припасы.","Пират","",75,""),
+        new Task("boethiah_report","Возвращение от святилища","Виндхельм","Ты возвращаешься в город с предупреждением о культе. Испытание Боэтии не считается завершённым.","","Испытание Боэтии",15,"")
     };
     static Task find(String id){for(Task t:TASKS)if(t.id.equals(id))return t;return null;}
     static String title(String key){for(Task t:TASKS)if(t.key().equals(key))return t.title;return key;}
     static boolean active(GameEngine g,Task t){return "ACTIVE".equals(g.progress.questOutcome(t.key()));}
     static boolean here(GameEngine g,Task t){return t.place.equalsIgnoreCase(g.progress.location);}
     static List<Task> visible(GameEngine g){ArrayList<Task> out=new ArrayList<>();for(Task t:TASKS)if(g.progress.questOutcome(t.key())!=null)out.add(t);return out;}
+    private static String next(String id){switch(id){
+        case "afflicted":return "afflicted_ruins";
+        case "afflicted_ruins":return "afflicted_return";
+        case "mistwatch":return "mistwatch_return";
+        case "wolf_escape":return "wolf_escape_report";
+        case "island_frossel":return "frossel_report";
+        case "island_blackbook":return "blackbook_research";
+        case "hakar":return "hakar_report";
+        case "saliah":return "saliah_report";
+        case "lynoit":return "lynoit_report";
+        case "boethiah":return "boethiah_report";
+        default:return "";
+    }}
     static void offer(GameEngine g,String id){Task t=find(id);if(t!=null)g.progress.setQuestOutcome(t.key(),"ACTIVE");}
     static void choices(GameEngine g,GameEngine.Scene s){for(Task t:TASKS)if(active(g,t)&&here(g,t))s.add("ROADQUEST:"+t.id,t.title,t.body);}
     static void choose(GameEngine g,String action){
@@ -48,6 +77,8 @@ final class RoadQuests {
         // Evidence is retained in the inventory for the journal; completed state prevents repeated awards.
         g.gold=GameEngine.nonnegativeAdd(g.gold,t.gold);g.addXp(25);g.progress.setQuestOutcome(t.key(),"COMPLETED");
         g.message=t.body+"\n\nЗадание завершено. +"+t.gold+" септимов, +25 опыта."+(t.item.isEmpty()?"":" Получено: "+t.item+".");
+        String nextId=next(t.id);Task nextTask=find(nextId);if(nextTask!=null&&g.progress.questOutcome(nextTask.key())==null){offer(g,nextId);g.message+="\nСледующая цель: "+nextTask.place+" | "+nextTask.title+".";}
+        if(t.id.endsWith("_report")&&(t.id.startsWith("hakar")||t.id.startsWith("saliah")||t.id.startsWith("lynoit")))g.factions.roadTrust(6,3);
         g.mode="RESULT";g.progress.sync(g);g.recordVisualEvent(t.title+": завершено");
     }
     static void victory(GameEngine g,String battleKind){
@@ -70,6 +101,8 @@ final class RoadQuests {
         case "boethiah":return "Испытание Боэтии";
         case "dead_pendant":return "Кулон погибшей путницы";
         case "mistwatch":return "Письмо о пленных";
+        case "assassin_report":return "Приказ Тёмного Братства";
+        case "thalmor_report":return "Приказ Талмора";
         default:return "";
     }}
     static String lead(GameEngine g,String id){

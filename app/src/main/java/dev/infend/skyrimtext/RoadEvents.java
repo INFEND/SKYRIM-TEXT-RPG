@@ -387,13 +387,13 @@ final class RoadEvents {
     }
     boolean beginArvak(GameEngine g){if(pending()||g.progress.questOutcome("road_arvak")!=null)return false;prepare(g.region);id="arvak";destination=g.progress.location;segmentFrom="Каирн Душ";segmentTo="Каирн Душ";outcome="";canonicalResume=false;serial=serial==Integer.MAX_VALUE?1:serial+1;g.mode=MODE;g.message=find(id).body;return true;}
     private String action(String verb){return "ROAD:"+serial+":"+id+":"+verb;}
-    GameEngine.Scene scene(GameEngine g){GameEngine.Scene s=baseScene(g);RoadDialogue.Profile p=RoadDialogue.find(id);if(p!=null&&dialogueStep==0)s.add(action("ask"),p.question,"Выслушать ответ, не завершая встречу");return s;}
+    GameEngine.Scene scene(GameEngine g){GameEngine.Scene s=baseScene(g);RoadDialogue.Profile p=RoadDialogue.find(id);if(p!=null&&dialogueStep==0)s.add(action("ask"),p.question,p.observation?"Осмотреть ситуацию, не завершая встречу":"Выслушать ответ, не завершая встречу");return s;}
     private GameEngine.Scene baseScene(GameEngine g){
         Event e=find(id);
         if(e==null)return new GameEngine.Scene("В ДОРОГЕ","Переход","Событие недоступно.").primary("GO_WORLD","Продолжить путь","");
         RoadDialogue.Profile profile=RoadDialogue.find(id);
         String body="arvak".equals(id)&&"ACTIVE".equals(g.progress.questOutcome("road_arvak_skull"))?"Душа рассказывает о потерянном коне. Вдалеке мерцает алтарь, на котором лежит череп Арвака. Рядом движутся тени Каирна Душ.":e.body;
-        if(profile!=null){body+="\n\n"+RoadDialogue.line(profile,profile.opening);if(dialogueStep>0)body+="\n\nТы: «"+profile.question+"»\n"+RoadDialogue.line(profile,profile.answer);}
+        if(profile!=null){if(!profile.observation)body+="\n\n"+RoadDialogue.line(profile,profile.opening);if(dialogueStep>0)body+="\n\n"+(profile.observation?"Наблюдение: ":"Ты: «"+profile.question+"»\n")+RoadDialogue.line(profile,profile.answer);}
         GameEngine.Scene s=new GameEngine.Scene("СЛУЧАЙНАЯ ВСТРЕЧА | В ДОРОГЕ",e.title,body+("arvak".equals(id)?"\n\nМесто встречи: Каирн Душ.":"\n\nУчасток: "+(segmentFrom.isEmpty()?g.progress.location:segmentFrom)+" → "+(segmentTo.isEmpty()?destination:segmentTo)+".\nКонечная точка: "+destination+"."));
         if("giant".equals(id))return s.primary(action("fight"),"Помочь Соратникам","Вступить в бой с великаном").add(action("watch"),"Наблюдать за боем","Поговорить с Эйлой после схватки").add(action("leave"),"Пройти мимо","Не вмешиваться");
         if("cicero".equals(id)){
@@ -457,9 +457,9 @@ final class RoadEvents {
         if("giant".equals(id)){fact(g,"road_aela","Эйла Охотница","HELPED");g.factions.roadTrust(0,5);g.message+="\nЭйла приглашает тебя в Йоррваскр, к Кодлаку Белой Гриве.";}
         else if("escort".equals(e.rule)){freed(g);g.message+="\nПленник освобождён после победы над охраной.";}
         else if("civil".equals(e.rule)){int side="empire".equals(decision)?4:5;g.factions.roadTrust(side,5);g.factions.roadTrust(side==4?5:4,-5);g.message+="\nТвою помощь запомнили: "+FactionCampaign.NAMES[side]+". Доверие +5.";} 
-        else if("assassin".equals(id))g.message+="\n"+RoadQuests.evidence(g,"Приказ Тёмного Братства");
+        else if("assassin".equals(id))g.message+="\n"+RoadQuests.lead(g,"assassin_report");
         else if("assassin_mistake".equals(id)||"assassin_other".equals(id))g.message+="\n"+RoadQuests.evidence(g,"Чужой контракт Тёмного Братства");
-        else if("thalmor_order".equals(id))g.message+="\n"+RoadQuests.evidence(g,"Приказ Талмора");
+        else if("thalmor_order".equals(id))g.message+="\n"+RoadQuests.lead(g,"thalmor_report");
         else if(RoadQuests.find(id)!=null)g.message+="\n"+RoadQuests.lead(g,id);
         if("rescue".equals(e.rule)||"hakar".equals(id)){g.reputation++;if("hakar".equals(id))g.factions.roadTrust(6,5);g.message+="\nСпасённый путник благодарит тебя. Репутация +1.";}
         if(groupSize()>1)g.message+="\nПобеждены все "+groupSize()+" противника.";g.progress.sync(g);}
@@ -468,7 +468,7 @@ final class RoadEvents {
         if(!pending()||!MODE.equals(g.mode))return;
         Event e=find(id);String verb=null;
         for(GameEngine.Choice c:scene(g).choices)if(c.action.equals(action)){verb=action.substring(action.lastIndexOf(':')+1);break;}
-        if(verb==null)return;if("ask".equals(verb)){RoadDialogue.Profile p=RoadDialogue.find(id);if(p!=null&&dialogueStep==0){dialogueStep=1;g.message=RoadDialogue.line(p,p.answer);g.progress.skillExperience(g,12,3);g.progress.sync(g);}return;}decision=verb;
+        if(verb==null)return;if("ask".equals(verb)){RoadDialogue.Profile p=RoadDialogue.find(id);if(p!=null&&dialogueStep==0){dialogueStep=1;g.message=RoadDialogue.line(p,p.answer);if(!p.observation)g.progress.skillExperience(g,12,3);g.progress.sync(g);}return;}decision=verb;
         if("giant".equals(id)){
             uniqueOutcome(g,"COMPLETED");
             if("fight".equals(verb)){fact(g,"road_aela","Эйла Охотница","MET");fight(g,e.enemy);}
@@ -496,7 +496,7 @@ final class RoadEvents {
             case "adopt":if("stray_dog".equals(id)){g.progress.setQuestOutcome("road_dog_companion","COMPLETED");finish(g,"Пёс принимает тебя за нового хозяина и становится спутником.");}else{g.progress.setQuestOutcome("road_mount","COMPLETED");finish(g,"Лошадь успокаивается и позволяет тебе взять поводья.");}return;
             case "gourmet":finish(g,"Балбус верит, что встретил Гурмана."+RoadQuests.evidence(g,"Ингредиенты Балбуса"));return;
             case "dwemer":if(g.gold>=1){g.gold--;RoadQuests.offer(g,"dwemer_children");finish(g,"Дети указывают Переправу Глубинного Народа. Цель появилась в журнале.");}else finish(g,"У тебя нет даже одного септима.");return;
-            case "cure":if(g.progress.removeItem("Зелье исцеления болезней",1)){g.reputation++;fact(g,"road_bitten_hunter","Укушенный охотник","HELPED");finish(g,"Охотник выпивает зелье исцеления болезней и благодарит за спасение.");}else finish(g,"У тебя нет подходящего зелья. Охотник отправляется искать целителя.");return;
+            case "cure":if(g.progress.removeItem("Зелье исцеления болезней",1)){g.reputation++;fact(g,"road_bitten_hunter","Укушенный охотник","HELPED");finish(g,"Охотник выпивает зелье исцеления болезней и благодарит за спасение. "+RoadQuests.lead(g,"bitten_hunter"));}else finish(g,"У тебя нет подходящего зелья. Охотник отправляется искать целителя.");return;
             case "observe":finish(g,"island_flying_wizard".equals(id)?"Маг падает с высоты. Эксперимент окончился трагически.":"Стая исчезает в темноте. Опасности нет.");return;
             case "clue":String clue=clueText(id);finish(g,clue+" "+RoadQuests.lead(g,id));return;
             case "reveal_fight":fight(g,e.enemy);return;
@@ -513,6 +513,7 @@ final class RoadEvents {
             case "pay":if(g.gold<25){fight(g,e.enemy);return;}g.gold-=25;finish(g,"Ты отдаёшь 25 септимов и получаешь возможность пройти.");return;
             case "identity":if(g.rollCheck(g.progress.chance(g,2,12,35))){g.progress.skillExperience(g,12,20);fact(g,"road_assassin_mistake","Ассасин Тёмного Братства","INFORMED");finish(g,"Ассасин перечитывает описание цели, замечает несоответствие и убирает кинжал. Он уходит искать настоящую цель.");}else fight(g,e.enemy);return;
             case "talk":
+                if("bitten_hunter".equals(id)){finish(g,"Охотник рассказывает о нападении возле пруда. "+RoadQuests.lead(g,"bitten_hunter"));return;}
                 if("assassin_mistake".equals(id)){if(g.rollCheck(g.progress.chance(g,2,12,40))){g.progress.skillExperience(g,12,20);finish(g,"Ассасин признаёт, что заказчик мог ошибиться, и позволяет тебе уйти.");}else fight(g,e.enemy);return;}
                 if("imperial_patrol".equals(id)||"storm_patrol".equals(id)){int side="imperial_patrol".equals(id)?4:5;finish(g,member(g,side)?"Патруль узнаёт товарища по оружию. Офицер рассказывает о положении на дороге.":member(g,side==4?5:4)?"Патруль замечает твою принадлежность к противнику и требует уйти.":"Офицер советует держаться подальше от военных лагерей.");return;}
                 if("bounty_collector".equals(id)){if(g.rollCheck(g.progress.chance(g,2,12,60))){g.progress.skillExperience(g,12,20);finish(g,"Охотник соглашается дать тебе время. Штраф остаётся непогашенным.");}else fight(g,e.enemy);return;}
@@ -523,7 +524,7 @@ final class RoadEvents {
                     if(g.rollCheck(g.progress.chance(g,2,12,25))){g.progress.skillExperience(g,12,15);finish(g,"Твои доводы убеждают собеседника. Удаётся избежать столкновения.");}
                     else fight(g,e.enemy);return;
                 }
-                g.progress.skillExperience(g,12,8);RoadDialogue.Profile p=RoadDialogue.find(id);finish(g,p==null?"Ты беседуешь с путником и прощаешься. Новые сведения останутся в хронике.":RoadDialogue.line(p,p.answer)+"\nВы прощаетесь и продолжаете путь.");return;
+                g.progress.skillExperience(g,12,8);RoadDialogue.Profile p=RoadDialogue.find(id);finish(g,p==null?"Ты беседуешь с путником и прощаешься. Новые сведения останутся в хронике.":RoadDialogue.line(p,p.answer)+(p.observation?"\nТы продолжаешь путь.":"\nВы прощаетесь и продолжаете путь."));return;
             case "sneak":if(g.rollCheck(g.progress.chance(g,2,9,25))){g.progress.skillExperience(g,9,15);finish(g,"Ты скрываешься и обходишь опасность.");}else fight(g,e.enemy);return;
             case "help":if(g.potions>0){g.potions--;g.reputation++;finish(g,"Ты делишься лечебным зельем. Охотник благодарит за помощь; лечение болезни требует особого средства.");}else finish(g,"У тебя нет лечебного зелья, но охотник получает совет обратиться за помощью.");return;
             case "return":g.reputation++;finish(g,"Ты передаёшь охотнику вещь, оставленную беглецом, и объясняешь, куда тот ушёл.");return;
