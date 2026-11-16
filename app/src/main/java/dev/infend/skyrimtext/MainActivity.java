@@ -1653,7 +1653,7 @@ public final class MainActivity extends Activity {
 
     /** AI mode replaces the entire offline story, not just its dialogue panel. */
     private void renderAiGame(){
-        if(game.katherine.available(game)&&!aiTurnBusy)actionButton("Кэтрин","Нулевой Предел | "+game.katherine.status(),false,()->{game.choose("KATH:open");save();render();});
+        if(game.katherine.available(game)&&!livingBusy())actionButton("Кэтрин","Нулевой Предел | "+game.katherine.status(),false,()->{game.choose("KATH:open");save();render();});
         String source=resolvedAiProvider();
         boolean ready="local".equals(source)?localModelReady():
             "chatgpt".equals(source)?chatGptOAuth.hasAuthorizedPlan():
@@ -3767,7 +3767,7 @@ public final class MainActivity extends Activity {
         section("ЖУРНАЛ","Отношения","Только подтверждённые знакомства и события.");
         if(game.katherine.enabled&&game.katherine.stage>0)renderKatherineRelations();
         org.json.JSONArray npcs=game.sceneState.npcFacts();
-        if(npcs.length()==0){addText(content,"Пока нет подтверждённых знакомств.",15,MUTED,false,8);return;}
+        if(npcs.length()==0){if(!game.katherine.enabled||game.katherine.stage==0)addText(content,"Пока нет подтверждённых знакомств.",15,MUTED,false,8);return;}
         for(int i=0;i<npcs.length();i++){JSONObject n=npcs.optJSONObject(i);if(n==null)continue;String name=n.optString("title"),status=n.optString("status");if(KatherineStory.NAME.equals(name))continue;int score;String relation;
             switch(status){case "HELPED":score=78;relation="Благодарность";break;case "INFORMED":score=60;relation="Обмен сведениями";break;case "MET":score=50;relation="Знакомый";break;case "HOSTILE":score=15;relation="Враждебность";break;default:score=-1;relation=npcStatusLabel(status);}
             if(score>=0)score=n.optInt("relation",score);int color=score<0?MUTED:score>=65?ITEM_UP:score>=40?ITEM_GOLD:ITEM_DOWN;LinearLayout tile=livingTile(content);LinearLayout line=row();line.setGravity(Gravity.CENTER_VERTICAL);
