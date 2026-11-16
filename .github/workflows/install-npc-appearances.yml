@@ -44,8 +44,11 @@ jobs:
           source = pathlib.Path('NPC_Appearances_SKYRIM.zip')
           destination = pathlib.Path('app/src/main/assets/media/npc')
           def verify(name, raw):
-              if len(raw) > 2_000_000 or raw[:4] != b'RIFF' or raw[8:12] != b'WEBP' or hashlib.sha256(raw).hexdigest() != expected[name]:
-                  raise ValueError('Unexpected original WebP: ' + name)
+              is_webp = raw[:4] == b'RIFF' and raw[8:12] == b'WEBP'
+              is_jpeg = raw[:3] == b'\xff\xd8\xff'
+              # Keep original bytes and established asset paths, even for mislabeled JPEGs.
+              if len(raw) > 2_000_000 or not (is_webp or is_jpeg) or hashlib.sha256(raw).hexdigest() != expected[name]:
+                  raise ValueError('Unexpected original image: ' + name)
           if source.exists():
               with zipfile.ZipFile(source) as archive:
                   if Counter(archive.namelist()) != Counter(expected.keys()):
