@@ -53,4 +53,10 @@ public class AiChoiceStreamingTest {
         assertTrue(prompt.endsWith("БРОСОК: НЕУДАЧА"));
         assertTrue(prompt.length()<=3200);
     }
+    @Test public void katherineInitiativeSurvivesLongCommandAndHistory(){
+        GameEngine g=new GameEngine();g.start("Герой","Норд","Маг");g.mode="WORLD";g.progress.location="Хижина Анис";
+        g.katherine.stage=5;g.katherine.following=true;g.katherine.trust=75;g.katherine.magicRank=2;g.katherine.mana=90;
+        String prompt=AiStoryClient.localUserPrompt(g,"x".repeat(5000),"начало "+"x".repeat(3000)+" КОНЕЦ",true);
+        assertTrue(prompt.contains("effects.katherineIntent="));assertTrue(prompt.contains("STUDY"));assertTrue(prompt.endsWith("КОНЕЦ"));assertTrue(prompt.length()<=3200);
+    }
 }

@@ -166,6 +166,7 @@ public final class AiStoryClient {
             .append(" HP ").append(game.enemyHp).append('/').append(game.enemyMaxHp)
             .append("; тип боя ").append(game.battleKind).append(".\n");
         else b.append("Активного боя нет.\n");
+        if(aiControlled)localSection(b,"Инициатива Кэтрин: ",KatherineInitiative.context(game),260,budget);
         StringBuilder invText=new StringBuilder();
         java.util.Iterator<String> inv=game.progress.inventory.keys();
         int count=0;
@@ -184,7 +185,6 @@ public final class AiStoryClient {
             localSection(b,"Кэтрин: ",game.katherine.compactContext(game),220,budget);
         if(game.alma.enabled)
             localSection(b,"Альма: ",game.alma.compactContext(game),220,budget);
-        if(aiControlled)localSection(b,"Инициатива Кэтрин: ",KatherineInitiative.context(game),140,budget);
         String facts=game.sceneState==null?"":game.sceneState.confirmedContext();
         if(!game.alma.enabled){
             StringBuilder filtered=new StringBuilder();
