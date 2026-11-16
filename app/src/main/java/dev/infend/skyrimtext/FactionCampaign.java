@@ -44,7 +44,7 @@ final class FactionCampaign {
 
     String block(GameEngine g,int f){
         if(!valid(f)||!g.started)return "Нет доступного поручения";
-        if(!("WORLD".equals(g.mode)||"RESULT".equals(g.mode)))return "Сначала заверши текущую сцену";
+        if(g.road.pending()||!("WORLD".equals(g.mode)||"RESULT".equals(g.mode)))return "Сначала заверши текущую сцену";
         if(stage[f]>TASK_COUNT)return "Все поручения завершены";
         if((f==4&&stage[5]>0)||(f==5&&stage[4]>0)||(f==4&&g.factionStories.started(5))||(f==5&&g.factionStories.started(4)))return "Ты уже присягнул противоположной стороне";
         if(!place(f).equalsIgnoreCase(g.progress.location))return "Нужно прибыть: "+place(f);

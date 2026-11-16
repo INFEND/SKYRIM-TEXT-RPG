@@ -29,4 +29,8 @@ public class RoadEventsTest {
     @Test public void oneTimeIslandEncountersStayResolved() {
         GameEngine g=new GameEngine();g.start("Герой","Норд","Воин");assertTrue(RoadEvents.availableAt(g,"island_flying_wizard",9));g.progress.setQuestOutcome("road_island_flying_wizard","COMPLETED");assertFalse(RoadEvents.availableAt(g,"island_flying_wizard",9));
     }
+    @Test public void allCatalogEntriesHaveIdenticalEligibilityAtLevelsOneAndHundred() {
+        GameEngine g=new GameEngine();g.start("Герой","Норд","Воин");java.util.List<String> ids=RoadEvents.eventIds();assertEquals(ids.size(),new java.util.HashSet<>(ids).size());
+        for(int hour:new int[]{2,12,23})for(int region=0;region<10;region++)for(String id:ids){g.hour=hour;g.level=1;boolean first=RoadEvents.availableAt(g,id,region);g.level=100;assertEquals(id+" @ "+region,first,RoadEvents.availableAt(g,id,region));}
+    }
 }

@@ -144,7 +144,7 @@ final class RoadEvents {
         new Event("letter_museum","Приглашение в музей","Курьер приносит приглашение Сила Весула посетить музей в Данстаре.","",3,"once"),
         new Event("letter_brotherhood","Таинственная записка","Гонец протягивает лист с чёрной ладонью и коротким предупреждением о том, что Братству всё известно.","",3,"db_letter"),
         new Event("bats","Стая летучих мышей","Из тёмного оврага внезапно вырывается большая стая летучих мышей и исчезает среди деревьев.","",4,"night"),
-        new Event("vampire_assassin","Вампир-ассасин","У костей на обочине из тени возникает вампир с приказом убить противника Стражи Рассвета.","Вампир-ассасин",4,"dg_night"),
+        new Event("vampire_assassin","Вампир-ассасин","У костей на обочине из тени возникает вампир с приказом убить союзника Стражи Рассвета.","Вампир-ассасин",4,"dg_night"),
         new Event("dawnguard_hunters","Охотники на вампиров","Охотники Стражи Рассвета показывают приказ о ликвидации вампира. Они выслеживают свою цель на тракте.","",4,"dg"),
         new Event("hakar","Новобранец Хакар","Молодой боец Стражи Рассвета бежит от двух вампиров, зовя на помощь.","Вампиры",3,"dg_whiterun"),
         new Event("saliah","Дозорная Салия","Всадница Стражи Рассвета везёт ключ и распоряжения о скрытых припасах на севере.","",3,"dg_north"),
@@ -199,7 +199,7 @@ final class RoadEvents {
         new Event("home_bandits","Налёт на усадьбу","У дороги к загородному дому разбойники пытаются завладеть припасами.","Бандиты",3,"homestead"),
         new Event("home_giant","Великан у усадьбы","Возле загородного дома бродит великан; работники стараются не привлекать его внимание.","Великан",2,"homestead")
     };
-    String id="",destination="",outcome="",last="";
+    String id="",destination="",outcome="",last="",segmentFrom="",segmentTo="";
     int serial;
     boolean resuming,canonicalResume;
     private static Event find(String id){for(Event e:EVENTS)if(e.id.equals(id))return e;return null;}
@@ -218,6 +218,7 @@ final class RoadEvents {
     private static boolean oneTime(Event e){return e.rule.endsWith("once")||Arrays.asList("arvak","letter_septimus","letter_brotherhood","hakar","saliah","lynoit","taron_dreth","maven_revenge","louis_revenge","false_vigilants","island_torkild","island_torkild_dead").contains(e.id);}
     static boolean availableAt(GameEngine g,String event,int region){Event e=find(event);return e!=null&&eligible(g,e,region);}
     static int eventCount(){return EVENTS.length;}
+    static List<String> eventIds(){ArrayList<String> ids=new ArrayList<>();for(Event e:EVENTS)ids.add(e.id);return Collections.unmodifiableList(ids); }
     static boolean eligible(GameEngine g,Event e,int region){
         if("unique".equals(e.rule)||"soul_cairn".equals(e.rule))return false;
         if(oneTime(e)&&g.progress.questOutcome("road_"+e.id)!=null)return false;
@@ -277,17 +278,17 @@ final class RoadEvents {
     }
     boolean beginCanonical(GameEngine g,String target){
         if(resuming||pending()||g.canonicalStage!=4||!"Ривервуд".equals(g.progress.location)||!"Драконий Предел".equals(target)||g.progress.questOutcome("road_giant")!=null||g.factions.stage(0)>0||g.factionStories.started(0))return false;
-        id="giant";destination=target;outcome="";canonicalResume=true;serial=serial==Integer.MAX_VALUE?1:serial+1;g.mode=MODE;g.message=find(id).body;return true;
+        id="giant";destination=target;segmentFrom="Ривервуд";segmentTo="Вайтран";outcome="";canonicalResume=true;serial=serial==Integer.MAX_VALUE?1:serial+1;g.mode=MODE;g.message=find(id).body;return true;
     }
     boolean begin(GameEngine g,TravelPlanner.Route route,WorldAtlas.Place target){return begin(g,route,target,new Random());}
     boolean begin(GameEngine g,TravelPlanner.Route route,WorldAtlas.Place target,Random rng){
         if(pending()||route==null||!route.allowed||route.days<=0||route.fare>0)return false;
         String forced=unique(g,route);
-        if(!forced.isEmpty())id=forced;
+        if(!forced.isEmpty()){id=forced;segmentFrom=g.progress.location;segmentTo="giant".equals(id)?"Ферма Пелагио":"Ферма Лорея";}
         else{
             if(rng.nextInt(100)>=Math.min(60,25+route.days*8))return false;
             ArrayList<Event> pool=new ArrayList<>();int total=0;
-            int segment=1+rng.nextInt(route.stops.size()-1);String a=route.stops.get(segment-1),next=route.stops.get(segment);
+            int segment=1+rng.nextInt(route.stops.size()-1);String a=route.stops.get(segment-1),next=route.stops.get(segment);segmentFrom=a;segmentTo=next;
             WorldAtlas.Place stop=WorldAtlas.find(next);int region=stop==null?target.region:stop.region;
             for(Event e:EVENTS)if(!last.equals(e.id)&&eligible(g,e,region)&&locationAllowed(e,a,next,target)){pool.add(e);total+=e.weight;}
             if(total==0)return false;
@@ -300,18 +301,18 @@ final class RoadEvents {
     }
     private static boolean locationAllowed(Event e,String from,String to,WorldAtlas.Place target){
         WorldAtlas.Place p=WorldAtlas.find(to);if(p==null)p=target;
-        if(e.rule.startsWith("city")||"friend".equals(e.rule))return Arrays.asList("Город","Деревня","Поселение").contains(p.type);
+        if(e.rule.startsWith("city")||"friend".equals(e.rule))return Arrays.asList("Столица","Город","Деревня","Поселение").contains(p.type);
         if("fort_dg".equals(e.rule))return from.equals("Форт Стражи Рассвета")||to.equals("Форт Стражи Рассвета");
         if("volkihar".equals(e.rule))return from.contains("Волкихар")||to.contains("Волкихар");
         if("homestead".equals(e.rule))return from.contains("Озёрное")||to.contains("Озёрное")||from.contains("Хельяркен")||to.contains("Хельяркен")||from.contains("Уиндстад")||to.contains("Уиндстад");
         return true;
     }
-    boolean beginArvak(GameEngine g){if(pending()||g.progress.questOutcome("road_arvak")!=null)return false;id="arvak";destination=g.progress.location;outcome="";canonicalResume=false;serial=serial==Integer.MAX_VALUE?1:serial+1;g.mode=MODE;g.message=find(id).body;return true;}
+    boolean beginArvak(GameEngine g){if(pending()||g.progress.questOutcome("road_arvak")!=null)return false;id="arvak";destination=g.progress.location;segmentFrom="Каирн Душ";segmentTo="Каирн Душ";outcome="";canonicalResume=false;serial=serial==Integer.MAX_VALUE?1:serial+1;g.mode=MODE;g.message=find(id).body;return true;}
     private String action(String verb){return "ROAD:"+serial+":"+id+":"+verb;}
     GameEngine.Scene scene(GameEngine g){
         Event e=find(id);
         if(e==null)return new GameEngine.Scene("В ДОРОГЕ","Переход","Событие недоступно.").primary("GO_WORLD","Продолжить путь","");
-        GameEngine.Scene s=new GameEngine.Scene("СЛУЧАЙНАЯ ВСТРЕЧА | В ДОРОГЕ",e.title,e.body+"\n\nМаршрут: "+g.progress.location+" → "+destination+".");
+        GameEngine.Scene s=new GameEngine.Scene("СЛУЧАЙНАЯ ВСТРЕЧА | В ДОРОГЕ",e.title,e.body+("arvak".equals(id)?"\n\nМесто встречи: Каирн Душ.":"\n\nУчасток: "+(segmentFrom.isEmpty()?g.progress.location:segmentFrom)+" → "+(segmentTo.isEmpty()?destination:segmentTo)+".\nКонечная точка: "+destination+"."));
         if("giant".equals(id))return s.primary(action("fight"),"Помочь Соратникам","Вступить в бой с великаном").add(action("watch"),"Наблюдать за боем","Поговорить с Эйлой после схватки").add(action("leave"),"Пройти мимо","Не вмешиваться");
         if("cicero".equals(id))return s.primary(action("help"),"Убедить Ванту Лорея","Помочь Цицерону починить повозку").add(action("report"),"Доложить страже","Поддержать фермера").add(action("leave"),"Пройти мимо","Вернуться к этому позже");
         if("headless".equals(id))return s.primary(action("leave"),"Проводить всадника взглядом","Призрак не останавливается и не отвечает");
@@ -323,6 +324,7 @@ final class RoadEvents {
         if(id.startsWith("letter_"))return s.primary(action("clue"),"Принять письмо","Записать поручение в журнал").add(action("leave"),"Не брать письмо","");
         if("island_blackbook".equals(id)||"island_frossel".equals(id)||"taron_dreth".equals(id)||"island_torkild".equals(id))return s.primary(action("reveal_fight"),"Расспросить путника","Узнать сведения; возможна схватка").add(action("fight"),"Вступить в бой","").add(action("sneak"),"Отойти незаметно","Проверка скрытности");
         if("deep_in_cups".equals(id))return s.primary(action("talk"),"Обсудить старое пари","Проверка красноречия").add(action("fight"),"Отказаться от требований","").add(action("sneak"),"Уйти","");
+        if("island_morgrul".equals(id)||"louis_revenge".equals(id)||"love_triangle".equals(id))return s.primary(action("talk"),"Объяснить, что произошла ошибка","Проверка красноречия").add(action("fight"),"Защититься","").add(action("sneak"),"Скрыться","");
         if("bounty_collector".equals(id))return s.primary(action("talk"),"Показать, что ты не разыскиваемый","Проверка красноречия").add(action("fight"),"Вступить в бой","").add(action("sneak"),"Скрыться","");
         if("friend_gift".equals(id))return s.primary(action("gift"),"Принять подарок","Получить небольшой подарок").add(action("leave"),"Отказаться","");
         if("kynareth".equals(id)||"mistwatch".equals(id)||"pilgrim".equals(id)||"afflicted".equals(id)||"island_hairy_hunter".equals(id)||"saliah".equals(id))return s.primary(action("clue"),"Расспросить о цели","Записать сведения в журнал").add(action("leave"),"Продолжить путь","");
@@ -379,6 +381,7 @@ final class RoadEvents {
             case "storm":fight(g,"Имперские солдаты");return;
             case "pay":if(g.gold<25){fight(g,e.enemy);return;}g.gold-=25;finish(g,"Ты отдаёшь 25 септимов и получаешь возможность пройти.");return;
             case "talk":
+                if("dawnguard_hunters".equals(id)||"dawnguard_attack".equals(id)||"dg_scouts".equals(id)){finish(g,"Охотники говорят о борьбе с вампирами и уходят на поиски. Они не считают тебя своей целью.");return;}
                 if("escort".equals(e.rule)){finish(g,"thalmor_prisoner".equals(id)?"Юстициар говорит, что пленника обвиняют в поклонении Талосу, и требует не вмешиваться.":"Охрана сообщает, что пленник задержан по приказу начальства. Конвой продолжает путь.");return;}
                 if("thief".equals(id)&&(g.factions.stage(2)>0||g.factionStories.done(2)>=2)){finish(g,"Вор узнаёт своего товарища по Гильдии воров и пропускает тебя.");return;}
                 if(!e.enemy.isEmpty()&&!"assassin_other".equals(id)){
@@ -418,10 +421,10 @@ final class RoadEvents {
             else if("escort".equals(find(previous).rule)){outcome+="\nПленник освобождён.";g.reputation++;}
             else if("assassin".equals(previous))outcome+="\nСреди вещей нападавшего обнаружен приказ Тёмного Братства устранить тебя.";
         }else if(outcome.startsWith("Встреча: "))outcome=g.message;
-        destination="";id="";last=previous;resuming=true;
+        destination="";id="";segmentFrom="";segmentTo="";last=previous;resuming=true;
         boolean canonical=canonicalResume;canonicalResume=false;
         try{if("arvak".equals(previous)){g.mode="WORLD";g.message=outcome;}else if(canonical){CanonicalCampaign.open(g);g.canonicalRecent=outcome;g.recordVisualEvent(outcome);}else g.choose("LOC:"+target);}finally{resuming=false;outcome="";}
     }
-    JSONObject save(){JSONObject j=new JSONObject();try{j.put("id",id).put("destination",destination).put("outcome",outcome).put("last",last).put("serial",serial).put("canonicalResume",canonicalResume);}catch(Exception ignored){}return j;}
-    static RoadEvents restore(JSONObject j){RoadEvents r=new RoadEvents();if(j!=null){r.id=j.optString("id","");r.destination=j.optString("destination","");r.outcome=j.optString("outcome","");r.last=j.optString("last","");r.serial=Math.max(0,j.optInt("serial"));r.canonicalResume=j.optBoolean("canonicalResume");if(!r.pending()){r.id="";r.destination="";}}return r;}
+    JSONObject save(){JSONObject j=new JSONObject();try{j.put("id",id).put("destination",destination).put("outcome",outcome).put("last",last).put("serial",serial).put("canonicalResume",canonicalResume).put("segmentFrom",segmentFrom).put("segmentTo",segmentTo);}catch(Exception ignored){}return j;}
+    static RoadEvents restore(JSONObject j){RoadEvents r=new RoadEvents();if(j!=null){r.id=j.optString("id","");r.destination=j.optString("destination","");r.outcome=j.optString("outcome","");r.last=j.optString("last","");r.serial=Math.max(0,j.optInt("serial"));r.canonicalResume=j.optBoolean("canonicalResume");r.segmentFrom=j.optString("segmentFrom","");r.segmentTo=j.optString("segmentTo","");if(!r.pending()){r.id="";r.destination="";}}return r;}
 }
