@@ -190,6 +190,7 @@ public final class MainActivity extends Activity {
     }
     @Override protected void onActivityResult(int requestCode,int resultCode,Intent data){
         super.onActivityResult(requestCode,resultCode,data);
+        if(requestCode==REQUEST_LIVIA_PORTRAIT){if(resultCode==RESULT_OK&&data!=null&&data.getData()!=null){try{LiviaPortrait.install(this,data.getData());liviaPortrait();}catch(Exception e){toast("Не удалось импортировать портрет: "+e.getMessage());}}return;}
         if(requestCode==REQUEST_ALMA_GALLERY){if(resultCode==RESULT_OK&&data!=null&&data.getData()!=null){try{AlmaGallery.install(this,data.getData());almaGallery(1);}catch(Exception e){toast("Не удалось импортировать галерею: "+e.getMessage());}}return;}
         if(requestCode==REQUEST_SERANA_GALLERY){if(resultCode==RESULT_OK&&data!=null&&data.getData()!=null){try{SeranaGallery.install(this,data.getData());seranaGallery(1);}catch(Exception e){toast("Не удалось импортировать галерею: "+e.getMessage());}}return;}
         if(requestCode==REQUEST_KATHERINE_GALLERY){if(resultCode==RESULT_OK&&data!=null&&data.getData()!=null){try{KatherineGallery.install(this,data.getData());katherineGallery(1);}catch(Exception e){toast("Не удалось импортировать галерею: "+e.getMessage());}}return;}
@@ -411,6 +412,7 @@ public final class MainActivity extends Activity {
         switch(status){case "MET":return "Знакомство";case "HELPED":return "Благодарность";case "INFORMED":return "Обмен сведениями";case "HOSTILE":return "Враждебность";case "DEAD":return "Погиб";case "MISSING":return "Пропал";default:return "Отношение неизвестно";}
     }
     private View npcPortrait(String name){
+        if(LiviaStory.NAME.equalsIgnoreCase(name)||"Имперский капитан".equalsIgnoreCase(name)){try{android.widget.ImageView portrait=new android.widget.ImageView(this);portrait.setImageBitmap(LiviaPortrait.photo(this));portrait.setAdjustViewBounds(true);portrait.setScaleType(android.widget.ImageView.ScaleType.FIT_CENTER);portrait.setContentDescription("Ливия");portrait.setOnClickListener(v->liviaPortrait());return portrait;}catch(java.io.IOException ignored){return npcEmblem(name,"hero");}}
         if("Серана".equalsIgnoreCase(name)){try{if(SeranaGallery.available(this)){android.widget.ImageView portrait=new android.widget.ImageView(this);portrait.setImageBitmap(SeranaGallery.photo(this,1));portrait.setAdjustViewBounds(true);portrait.setScaleType(android.widget.ImageView.ScaleType.FIT_CENTER);portrait.setContentDescription("Серана");portrait.setOnClickListener(v->seranaGallery(1));return portrait;}}catch(java.io.IOException ignored){}}
 
         if(AlmaStory.NAME.equalsIgnoreCase(name)){try{if(AlmaGallery.available(this)){android.widget.ImageView portrait=new android.widget.ImageView(this);portrait.setImageBitmap(AlmaGallery.photo(this,7));portrait.setAdjustViewBounds(true);portrait.setScaleType(android.widget.ImageView.ScaleType.FIT_CENTER);portrait.setContentDescription("Альма");return portrait;}}catch(java.io.IOException ignored){}return npcEmblem(name,"hero");}
@@ -452,12 +454,16 @@ public final class MainActivity extends Activity {
         NpcProfiles.Profile profile=NpcProfiles.find(name);
         if(profile!=null){addText(panel,profile.race+" | "+profile.role,14,TEXT,true,8);}
         if(KatherineStory.NAME.equals(name)){addText(panel,"Уровень: "+game.katherine.companion.level+" | Опыт: "+game.katherine.companion.xp+"/"+game.katherine.companion.needXp(),13,TEXT,false,8);addText(panel,"Здоровье: "+game.katherine.companion.hp+"/"+game.katherine.companion.maxHp()+" | "+game.katherine.companion.mood,13,TEXT,false,8);addText(panel,"Инвентарь: "+game.katherine.companion.inventoryLabel(),13,TEXT,false,8);addText(panel,"Заклинание: "+game.katherine.companion.spellName(),13,TEXT,false,8);addText(panel,"Местонахождение: "+game.katherine.location(game),12,MUTED,false,8);if(!game.katherine.companion.ending.isEmpty())addText(panel,"Итог: "+game.katherine.companion.ending,13,TEXT,false,8);addText(panel,"Личная цель: "+game.katherine.companion.currentGoal,13,TEXT,false,8);addText(panel,"Магия: "+game.katherine.mana+"/"+game.katherine.maxMana()+" | Победы: "+game.katherine.victories,13,TEXT,false,8);TextView galleryButton=text("Галерея Кэтрин",15,accent(),true);galleryButton.setPadding(dp(12),dp(12),dp(12),dp(12));galleryButton.setOnClickListener(v->katherineGallery(1));panel.addView(galleryButton,lp(-1,-2));addText(panel,"18 лет | Носитель Нулевого Предела",14,TEXT,true,8);addText(panel,"Доверие: "+game.katherine.trust+"/100",14,accent(),true,8);addText(panel,"Уважение: "+game.katherine.respect+"/100 | Симпатия: "+game.katherine.affection+"/100",13,TEXT,false,8);addText(panel,"Ревность: "+game.katherine.jealousy+"/100 | Магический ранг: "+game.katherine.magicRank+"/3",13,TEXT,false,8);addText(panel,"Тактика: "+game.katherine.stanceLabel()+" | "+game.katherine.status(),13,TEXT,false,8);}
+        if(LiviaStory.NAME.equalsIgnoreCase(name)||"Имперский капитан".equalsIgnoreCase(name)){TextView portraitButton=text("Портрет Ливии",15,accent(),true);portraitButton.setPadding(dp(12),dp(12),dp(12),dp(12));portraitButton.setOnClickListener(v->liviaPortrait());panel.addView(portraitButton,lp(-1,-2));addText(panel,game.livia.relation()+" | "+game.livia.status(),14,TEXT,true,8);addText(panel,"Доверие "+game.livia.trust+"/100 | Уважение "+game.livia.respect+"/100 | Симпатия "+game.livia.affection+"/100",13,accent(),false,8);}
         if(AlmaStory.NAME.equals(name)){TextView galleryButton=text("Галерея Альмы",15,accent(),true);galleryButton.setPadding(dp(12),dp(12),dp(12),dp(12));galleryButton.setOnClickListener(v->almaGallery(1));panel.addView(galleryButton,lp(-1,-2));addText(panel,"437 лет | Маг крови, бывшая убийца",14,TEXT,true,8);addText(panel,game.alma.relationship()+" | Доверие: "+game.alma.trust+"/100 | Любовь: "+game.alma.love+"/100",14,accent(),true,8);}
         if("Серана".equalsIgnoreCase(name)){TextView galleryButton=text("Галерея Сераны",15,accent(),true);galleryButton.setPadding(dp(12),dp(12),dp(12),dp(12));galleryButton.setOnClickListener(v->seranaGallery(1));panel.addView(galleryButton,lp(-1,-2));}
-        if(!("Серана".equalsIgnoreCase(name)&&SeranaGallery.available(this))&&!KatherineStory.NAME.equals(name)&&!AlmaStory.NAME.equals(name))addText(panel,"Иллюстративный образ или эмблема, не индивидуальный портрет",11,MUTED,false,10);
+        if(!("Серана".equalsIgnoreCase(name)&&SeranaGallery.available(this))&&!KatherineStory.NAME.equals(name)&&!AlmaStory.NAME.equals(name)&&!LiviaStory.NAME.equalsIgnoreCase(name)&&!"Имперский капитан".equalsIgnoreCase(name))addText(panel,"Иллюстративный образ или эмблема, не индивидуальный портрет",11,MUTED,false,10);
         addText(panel,npcStatusLabel(game.sceneState.npcStatusByName(name)),15,TEXT,true,8);
         new RuneDialogBuilder(this,accent()).setTitle(name).setView(panel).setNegativeButton("Закрыть",null).show();
     }
+    private static final int REQUEST_LIVIA_PORTRAIT=7227;
+    private void chooseLiviaPortrait(){Intent picker=new Intent(Intent.ACTION_OPEN_DOCUMENT);picker.addCategory(Intent.CATEGORY_OPENABLE);picker.setType("image/webp");try{startActivityForResult(picker,REQUEST_LIVIA_PORTRAIT);}catch(Exception e){toast("Не удалось открыть выбор файла");}}
+    private void liviaPortrait(){LinearLayout panel=column();try{android.widget.ImageView image=new android.widget.ImageView(this);image.setImageBitmap(LiviaPortrait.photo(this));image.setAdjustViewBounds(true);image.setScaleType(android.widget.ImageView.ScaleType.FIT_CENTER);panel.addView(image,lp(-1,440));}catch(java.io.IOException e){addText(panel,"Портрет не загружен. Выбери исходный WebP или скачай пакет Ливии, если он доступен.",14,TEXT,false,8);}new RuneDialogBuilder(this,accent()).setTitle("Ливия | Портрет").setView(panel).setPositiveButton("Импорт WebP",(d,w)->chooseLiviaPortrait()).setNeutralButton("Ресурсы",(d,w)->new ResourceManagerDialog(this,accent(),this::render,"media:livia").show()).setNegativeButton("Закрыть",null).show();}
     private static final int REQUEST_ALMA_GALLERY=7219;
     private void chooseAlmaGallery(){Intent picker=new Intent(Intent.ACTION_OPEN_DOCUMENT);picker.addCategory(Intent.CATEGORY_OPENABLE);picker.setType("application/zip");try{startActivityForResult(picker,REQUEST_ALMA_GALLERY);}catch(Exception e){toast("Не удалось открыть выбор файла");}}
     private void almaGallery(int index){
@@ -1405,6 +1411,7 @@ public final class MainActivity extends Activity {
             game.katherine.companion.profile=Math.max(0,Math.min(2,prefs.getInt("katherine_profile",0)));
             game.katherine.companion.aiInitiatives=prefs.getBoolean("katherine_ai_initiatives",true);
             game.alma.enabled=prefs.getBoolean("alma_enabled",true);
+            game.livia.enabled=prefs.getBoolean("livia_enabled",true);
             if(selectedStart==0)game.choose("CANON_OPEN");
             tab=0;save();render();
         });
@@ -1486,7 +1493,7 @@ public final class MainActivity extends Activity {
     }
     private void renderStory(){
         boolean canonical="CANON".equals(game.mode)||("COMBAT".equals(game.mode)&&("CANONICAL".equals(game.battleKind)||"FACTION".equals(game.battleKind)));
-        canonical=canonical||KatherineStory.MODE.equals(game.mode)||AlmaStory.MODE.equals(game.mode)||("COMBAT".equals(game.mode)&&("KATHERINE".equals(game.battleKind)||"ALMA".equals(game.battleKind)));
+        canonical=canonical||LiviaStory.MODE.equals(game.mode)||("COMBAT".equals(game.mode)&&"LIVIA_DUEL".equals(game.battleKind))||KatherineStory.MODE.equals(game.mode)||AlmaStory.MODE.equals(game.mode)||("COMBAT".equals(game.mode)&&("KATHERINE".equals(game.battleKind)||"ALMA".equals(game.battleKind)));
         canonical=canonical||game.road.pending()||RoadEvents.MODE.equals(game.mode)||("COMBAT".equals(game.mode)&&game.battleKind.startsWith("ROAD_QUEST:"));
         if(prefs.getBoolean("ai_enabled",false)&&!canonical){renderAiGame();return;}
         GameEngine.Scene s=game.scene();section(s.kicker,s.title,"");
@@ -1539,10 +1546,11 @@ public final class MainActivity extends Activity {
 
     private void renderStoryJournal(){
         if(!game.started)return;
-        if(!AlmaStory.MODE.equals(game.mode)&&!KatherineStory.MODE.equals(game.mode)&&!"CANON".equals(game.mode)&&!"QUEST".equals(game.mode)&&!"DRAGON".equals(game.mode)
+        if(!LiviaStory.MODE.equals(game.mode)&&!AlmaStory.MODE.equals(game.mode)&&!KatherineStory.MODE.equals(game.mode)&&!"CANON".equals(game.mode)&&!"QUEST".equals(game.mode)&&!"DRAGON".equals(game.mode)
             &&!"EVENT".equals(game.mode)&&!"RESULT".equals(game.mode))return;
         LinearLayout journal=card();
         addText(journal,"ᚱ  ЖУРНАЛ ПРИКЛЮЧЕНИЙ",11,accent(),true,10);
+        if(game.livia.enabled&&game.livia.stage>0)addText(journal,"◉  "+game.livia.objective(),13,TEXT,false,7);
         if(game.alma.enabled&&game.alma.stage>0)addText(journal,"◉  Алая Бессмертная | "+game.alma.status(),13,TEXT,false,7);
         if(game.katherine.enabled&&game.katherine.stage>0)addText(journal,"◉  Нулевой Предел | "+game.katherine.status(),13,TEXT,false,7);
         if(game.canonicalStage>0)addText(journal,"◉  Путь Довакина | "+CanonicalCampaign.objective(game),13,TEXT,false,7);
@@ -1705,6 +1713,7 @@ public final class MainActivity extends Activity {
 
     /** AI mode replaces the entire offline story, not just its dialogue panel. */
     private void renderAiGame(){
+        if(game.livia.available(game)&&!livingBusy())actionButton("Ливия",game.livia.objective(),false,()->{game.choose("LIVIA:open");save();render();});
         if(game.alma.available(game)&&!livingBusy())actionButton("Альма","Алая Бессмертная | "+game.alma.status(),false,()->{game.choose("ALMA:open");save();render();});
         if(game.katherine.available(game)&&!livingBusy())actionButton("Кэтрин","Нулевой Предел | "+game.katherine.status(),false,()->{game.choose("KATH:open");save();render();});
         if(game.katherine.active()&&!game.katherine.lastRemark.isEmpty()){LinearLayout npc=card();addText(npc,"КЭТРИН | ЛИЧНАЯ ИНИЦИАТИВА",12,accent(),true,6);addText(npc,game.katherine.lastRemark,14,TEXT,false,6);}
@@ -2096,7 +2105,7 @@ public final class MainActivity extends Activity {
         final String model=local?"Qwen3.5-9B":prefs.getString(chat?"ai_chatgpt_model":"ai_api_model",
                 chat?"":AiModelCatalog.DEFAULT_API);
         if(model.isEmpty()){aiTurnStatus="Сначала выбери модель в настройках";render();return;}
-        final String effort=selectedReasoningEffort(),history=aiMemory.context(aiSession)+(local?"":"\n"+game.katherine.aiContext(game)+"\n"+game.alma.aiContext());
+        final String effort=selectedReasoningEffort(),history=aiMemory.context(aiSession)+(local?"":"\n"+game.katherine.aiContext(game)+"\n"+game.alma.aiContext())+"\n"+game.livia.aiContext(game);
         final String saved;
         try{saved=game.toJson().toString();}
         catch(Exception ex){aiTurnStatus="Не удалось прочитать состояние героя";render();return;}
@@ -3849,6 +3858,7 @@ public final class MainActivity extends Activity {
             java.util.ArrayList<String> docs=ItemCatalog.loreDocuments(this);
             addText(content,"ᛟ  ХРОНИКИ И РУКОПИСИ",11,accent(),false,10);
             if(game.katherine.enabled&&game.katherine.stage>0)actionButton("Кэтрин | Нулевой Предел","Авторская история · "+game.katherine.status(),false,()->npcDetails(KatherineStory.NAME));
+            if(game.livia.enabled&&game.livia.stage>0)actionButton("Ливия | Имперский капитан",game.livia.status(),false,()->npcDetails(LiviaStory.NAME));
             if(game.alma.enabled&&game.alma.stage>0)actionButton("Альма | Алая Бессмертная","Авторская история · "+game.alma.status(),false,()->npcDetails(AlmaStory.NAME));
             if(docs.isEmpty())addText(content,"Справочные рукописи пока не загружены.",14,MUTED,false,8);
             for(String file:docs)actionButton("◇  "+file.replace(".txt",""),"Читать рукопись",false,()->showDocument(file));
@@ -3888,6 +3898,7 @@ public final class MainActivity extends Activity {
     private void renderLivingRelations(){
         section("ЖУРНАЛ","Отношения","Только подтверждённые знакомства и события.");
         if(game.katherine.enabled&&game.katherine.stage>0)renderKatherineRelations();
+        if(game.livia.enabled&&game.livia.stage>0)actionButton("Ливия | "+game.livia.relation(),"Доверие "+game.livia.trust+"/100",false,()->npcDetails(LiviaStory.NAME));
         if(game.alma.enabled&&game.alma.stage>0)actionButton("Альма | "+game.alma.relationship(),"Доверие "+game.alma.trust+"/100 · Любовь "+game.alma.love+"/100",false,this::almaRelationshipDetails);
         org.json.JSONArray npcs=game.sceneState.npcFacts();
         if(npcs.length()==0){if((!game.alma.enabled||game.alma.stage==0)&&(!game.katherine.enabled||game.katherine.stage==0))addText(content,"Пока нет подтверждённых знакомств.",15,MUTED,false,8);return;}
@@ -3935,6 +3946,7 @@ public final class MainActivity extends Activity {
         renderFactionJournal();
         renderRoadQuestJournal();
         if(game.katherine.enabled&&game.katherine.stage>0){LinearLayout k=card();addText(k,"НУЛЕВОЙ ПРЕДЕЛ | КРУГ ТРЁХ КОГТЕЙ",13,accent(),true,8);addText(k,game.katherine.objective(),15,TEXT,false,8);if(game.katherine.available(game))actionButton("Поговорить с Кэтрин","Продолжить расследование",false,()->{if(livingBusy())return;game.choose("KATH:open");save();tab=0;render();});}
+        if(game.livia.enabled&&game.livia.stage>0)actionButton(LiviaStory.TITLE,game.livia.status(),false,()->npcDetails(LiviaStory.NAME));
         if(game.alma.enabled&&game.alma.stage>0)actionButton("Алая Бессмертная",game.alma.objective()+" | "+game.alma.stage+"/12",false,()->new RuneDialogBuilder(this,accent()).setTitle("Алая Бессмертная").setMessage(game.alma.objective()+"\n\n"+(game.alma.companion?"Альма путешествует с тобой.":game.alma.terminalLoss()?"История завершена.":"Ищи Альму: "+game.alma.location(game))).setPositiveButton("Закрыть",null).show());
         String[] entries=game.aiJournal.isEmpty()?
             new String[]{"Путь Довакина","Драконий след","Пепельные печати","Опасные дороги"}:
@@ -4223,6 +4235,8 @@ public final class MainActivity extends Activity {
         Switch kathAI=new Switch(this);kathAI.setText("Самостоятельные инициативы Кэтрин через ИИ");kathAI.setTextColor(TEXT);kathAI.setThumbTintList(ColorStateList.valueOf(accent()));kathAI.setChecked(game.katherine.companion.aiInitiatives);kathAI.setOnCheckedChangeListener((v,on)->{if(livingBusy()){v.setChecked(game.katherine.companion.aiInitiatives);return;}game.katherine.companion.aiInitiatives=on;prefs.edit().putBoolean("katherine_ai_initiatives",on).apply();save();});expansion.addView(kathAI,lp(-1,52));
         TextView kathProfile=text("Начальное состояние Кэтрин | "+game.katherine.companion.profileName(),14,accent(),true);kathProfile.setPadding(dp(10),dp(12),dp(10),dp(12));expansion.addView(kathProfile,lp(-1,-2));kathProfile.setOnClickListener(v->{if(livingBusy()||game.katherine.stage>0){toast("Начальное состояние доступно до первой встречи с Кэтрин");return;}game.katherine.companion.profile=(game.katherine.companion.profile+1)%3;prefs.edit().putInt("katherine_profile",game.katherine.companion.profile).apply();save();render();});
         addText(expansion,"Влияет на стартовую магию спутницы, а не на создание героя.",11,MUTED,false,6);
+        Switch liviaToggle=new Switch(this);liviaToggle.setText("Ливия | Пепел Хелгена");liviaToggle.setTextColor(TEXT);liviaToggle.setThumbTintList(ColorStateList.valueOf(accent()));liviaToggle.setChecked(game.livia.enabled);liviaToggle.setOnCheckedChangeListener((v,on)->{if(livingBusy()||!game.livia.setEnabled(game,on)){v.setChecked(game.livia.enabled);return;}prefs.edit().putBoolean("livia_enabled",on).apply();save();});expansion.addView(liviaToggle,lp(-1,47));addText(expansion,"Ливия: авторское выживание после Хелгена, месть, прощение, искупление и отношения.",12,MUTED,false,8);
+        actionButton("Портрет Ливии","Импорт оригинального WebP без генерации",false,this::liviaPortrait);
         Switch almaToggle=new Switch(this);almaToggle.setText("Альма | Алая Бессмертная");almaToggle.setTextColor(TEXT);almaToggle.setThumbTintList(ColorStateList.valueOf(accent()));almaToggle.setChecked(game.alma.enabled);
         almaToggle.setOnCheckedChangeListener((v,on)->{if(livingBusy()){v.setChecked(game.alma.enabled);return;}if(!game.alma.setEnabled(game,on)){v.setChecked(game.alma.enabled);return;}prefs.edit().putBoolean("alma_enabled",on).apply();save();});expansion.addView(almaToggle,lp(-1,47));addText(expansion,"Альма: отключение скрывает сюжет, отношения и боевую поддержку. Прогресс и галерея сохраняются.",12,MUTED,false,8);
         addText(expansion,"Необязательная авторская история вне канона TES.",12,MUTED,false,0);

@@ -75,6 +75,7 @@ public final class GameEngine {
     RoadEvents road = new RoadEvents();
     public KatherineStory katherine = new KatherineStory();
     public AlmaStory alma = new AlmaStory();
+    public LiviaStory livia = new LiviaStory();
     public String aiJournal = "";
     public int poisonTurns,frostTurns,battleTurns,battleDealt,battleTaken,lastDealt,lastTaken,lastHealing,lastBlocked;
     public boolean lastHeavyHit,lastMiss,lastCritical;
@@ -177,7 +178,7 @@ public final class GameEngine {
         if(name.length()>28)name=name.substring(0,28);
         race=contains(RACES,desiredRace)?desiredRace:"Норд";
         heroClass=contains(CLASSES,desiredClass)?desiredClass:"Без класса";
-        started=true;compensation=new CompensationPowers();compensation.installCatalog();lastLivingResult=new JSONObject();lastCheckChance=lastCheckRoll=-1;needs=new LivingNeeds();economy=new LivingEconomy();java.util.Arrays.fill(regenBonus,0);regenIgnorePenalty=false;fixSpent=0;aiTurn=null;sceneState=new SceneState();road=new RoadEvents();katherine=new KatherineStory();alma=new AlmaStory();aiJournal="";day=1;hour=8;level=1;xp=0;gold=85;potions=3;manaPotions=1;
+        started=true;compensation=new CompensationPowers();compensation.installCatalog();lastLivingResult=new JSONObject();lastCheckChance=lastCheckRoll=-1;needs=new LivingNeeds();economy=new LivingEconomy();java.util.Arrays.fill(regenBonus,0);regenIgnorePenalty=false;fixSpent=0;aiTurn=null;sceneState=new SceneState();road=new RoadEvents();katherine=new KatherineStory();alma=new AlmaStory();livia=new LiviaStory();aiJournal="";day=1;hour=8;level=1;xp=0;gold=85;potions=3;manaPotions=1;
         questStage=0;sideQuest=0;sideKills=0;boardCompleted=0;explored=0;victories=0;reputation=0;
         swordUpgraded=false;armorUpgraded=false;
         maxHp=100;maxStamina=100;maxMagicka=100;attack=12;armor=2;
@@ -214,11 +215,13 @@ public final class GameEngine {
     public Scene scene() {
         if(started&&RoadEvents.MODE.equals(mode))return road.scene(this);
         if(started&&road.pending()&&("RESULT".equals(mode)||"DEFEAT".equals(mode)))return new Scene("В ДОРОГЕ","Последствия встречи",message).primary("GO_WORLD","Продолжить переход","Следовать к месту назначения");
+        if(started&&LiviaStory.MODE.equals(mode)){if(livia.enabled&&livia.present(this))return livia.scene(this);mode="WORLD";}
         if(started&&AlmaStory.MODE.equals(mode)){if(alma.enabled)return alma.scene(this);mode="WORLD";}
         if(started&&KatherineStory.MODE.equals(mode))return katherine.scene(this);
         if(started&&"CANON".equals(mode))return CanonicalCampaign.scene(this);
         Scene s=baseScene();
         if(started)progress.fillChoices(this,s);
+        if(livia.available(this))s.add("LIVIA:open","Поговорить с Ливией",livia.objective());
         if(alma.available(this))s.add("ALMA:open","Поговорить с Альмой","Алая Бессмертная | "+alma.status());
         if(katherine.available(this))s.add("KATH:open","Поговорить с Кэтрин","Нулевой Предел | "+katherine.status());
         // Every offline scene follows the same long-form literary presentation.
@@ -394,6 +397,8 @@ public final class GameEngine {
         if (("Q_ACCEPT".equals(action) || "Q_ALTAR".equals(action)
                 || "Q_BOSS".equals(action) || "Q_FINISH".equals(action))
                 && !"QUEST".equals(mode)) return;
+        if(action.startsWith("LIVIA:")){livia.choose(this,action);return;}
+        if(LiviaStory.MODE.equals(mode))return;
         if(action.startsWith("ALMA:")){alma.choose(this,action);return;}
         if(AlmaStory.MODE.equals(mode))return;
         if(action.startsWith("KATH:")){katherine.choose(this,action);return;}
@@ -609,6 +614,7 @@ public final class GameEngine {
     void beginCanonicalBattle(String name,int health,int damage,String intro){canonicalShoutCooldown=0;startBattle(name,health,damage,"CANONICAL",intro);}
     void beginRoadQuestBattle(String id,String enemy,String intro){startBattle(enemy,55+level*5,6+level/3,"ROAD_QUEST:"+id,intro);}
     void beginRoadBattle(String name,int health,int damage,String intro){startBattle(name,health,damage,"WILD",intro);}
+    void beginLiviaDuel(){startBattle("Ливия",100+level*9,10+level*2,"LIVIA_DUEL","Ливия обнажает меч. Этот поединок может завершиться её гибелью.");}
     void beginAlmaBattle(){startBattle("Убийца Тёмного Братства",75+level*8,8+level*2,"ALMA","Преследователь преграждает дорогу. Альма предупреждает о засаде.");}
     void beginKatherineBattle(){startBattle("Агент Круга Трёх Когтей",75+level*8,8+level*2,"KATHERINE","Кэтрин поднимает барьер. Агент Круга требует, чтобы она сдалась.");}
     private void startBattle(String name,int health,int dmg,String kind,String intro) {
@@ -659,6 +665,7 @@ public final class GameEngine {
         int kathDamage=katherine.assist(this,battleTurns+1,Math.max(0,enemyHp-damage));
         if(kathDamage>0){damage+=kathDamage;actionText+="\nКэтрин: "+katherine.companion.lastSpell+", −"+kathDamage+" здоровья врагу.";}
         if(road.hasDog(this)&&enemyHp>damage&&(battleTurns+1)%3==0){damage+=3;actionText+="\nБродячий пёс помогает в бою: −3 здоровья врагу.";}
+        int liviaDamage=livia.assist(battleTurns+1,Math.max(0,enemyHp-damage));if(liviaDamage>0){damage+=liviaDamage;actionText+="\nЛивия: удар мечом, −"+liviaDamage+" здоровья врагу.";}
         int almaDamage=alma.assist(this,battleTurns+1,Math.max(0,enemyHp-damage));if(almaDamage>0){damage+=almaDamage;actionText+="\nАльма: "+alma.powerLabel()+", −"+almaDamage+" здоровья врагу.";}
         int almaCombo=alma.combo(Math.max(0,enemyHp-damage),"MAGIC".equals(action));if(almaCombo>0){damage+=almaCombo;actionText+="\nАльма: Кровавая связка, −"+almaCombo+" здоровья врагу.";}
         int roadAssist=road.allyDamage(this,damage);if(roadAssist>0){damage+=roadAssist;actionText+="\nСоратники атакуют великана: −"+roadAssist+" здоровья.";}
@@ -676,6 +683,7 @@ public final class GameEngine {
         if(kathWeakness>0){lastBlocked+=kathWeakness;actionText+="\nКэтрин: ослабление противника, −"+kathWeakness+" входящего урона.";}
         int kathProtection=katherine.protect(incoming);incoming-=kathProtection;
         if(kathProtection>0){lastBlocked+=kathProtection;actionText+="\nКэтрин: защитный барьер, −"+kathProtection+" входящего урона.";}
+        int liviaProtection=livia.protect(incoming);incoming-=liviaProtection;if(liviaProtection>0){lastBlocked+=liviaProtection;actionText+="\nЛивия: прикрывает щитом, −"+liviaProtection+" входящего урона.";}
         int almaWeakness=alma.weaken(incoming);incoming-=almaWeakness;if(almaWeakness>0){lastBlocked+=almaWeakness;actionText+="\nАльма: Алая тень / Метка смерти, −"+almaWeakness+" входящего урона.";}
         int almaProtection=alma.protect(incoming);incoming-=almaProtection;if(almaProtection>0){lastBlocked+=almaProtection;actionText+="\nАльма: защитная магия, −"+almaProtection+" входящего урона.";}
         int poisoned=poisonTurns>0?Math.max(1,maxHp/40):0;
@@ -706,7 +714,7 @@ public final class GameEngine {
                 "Над полем прозвучал голос, которому откликнулись горы. Следующая цель: Айварстед.";
         }
         addXp(gain);mode="RESULT";
-        katherine.victory(this);alma.victory(this);
+        katherine.victory(this);alma.victory(this);livia.victory(this);
         message=lastHit+"\n\nПобеда над «"+enemyName+"»! +"+reward+" септимов, +"+gain+" опыта.";
         if("QUEST".equals(battleKind))message+="\n\nЗа стражем ты находишь журнал хранителя. Следующая цель: Солитьюд.";
         if("DRAGON".equals(battleKind))message+="\n\n"+progress.dragonRecent;
@@ -763,7 +771,7 @@ public final class GameEngine {
         JSONObject j=new JSONObject();
         j.put("needs",needs.toJson()).put("fixSpent",fixSpent).put("economy",economy.toJson()).put("regenBonus",new org.json.JSONArray(regenBonus)).put("regenIgnorePenalty",regenIgnorePenalty).put("compensation",compensation.toJson()).put("lastLivingResult",lastLivingResult);
         j.put("katherine",katherine.save());
-        j.put("alma",alma.save());
+        j.put("alma",alma.save());j.put("livia",livia.save());
         j.put("schema",1).put("started",started).put("name",name).put("race",race).put("heroClass",heroClass)
          .put("gender",gender).put("portrait",portrait)
          .put("region",region).put("day",day).put("hour",hour).put("level",level).put("xp",xp).put("maxHp",maxHp).put("hp",hp)
@@ -831,6 +839,7 @@ public final class GameEngine {
             g.sceneState=SceneState.fromJson(j.optJSONObject("sceneState"));
             g.road=RoadEvents.restore(j.optJSONObject("road"));if(RoadEvents.MODE.equals(g.mode)&&!g.road.pending())g.mode="WORLD";
              g.katherine=KatherineStory.restore(j.optJSONObject("katherine"));
+             g.livia=LiviaStory.restore(j.optJSONObject("livia"));if(LiviaStory.MODE.equals(g.mode)&&!g.livia.present(g))g.mode="WORLD";
              g.alma=AlmaStory.restore(j.optJSONObject("alma"));if(!g.alma.enabled&&AlmaStory.MODE.equals(g.mode))g.mode="WORLD";
             // Reconcile legacy schema-1 saves with the authoritative quest stage.
             if(g.questStage>=4)g.progress.setQuestOutcome("ash_seals","COMPLETED");
