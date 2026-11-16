@@ -13,7 +13,7 @@ public class RoadEventsTest {
     @Test public void ciceroHelpSurvivesSaveAndIsSingleUse() throws Exception {
         GameEngine g=new GameEngine();g.start("Герой","Норд","Воин");g.progress.location="Вайтран";g.region=0;g.mode="WORLD";
         g.choose("LOC:Ферма Лорея");assertEquals("ROAD",g.mode);
-        int gold=g.gold;String help=g.scene().choices.get(0).action;g.choose(help);assertTrue(g.gold>gold);int paid=g.gold;
+        int gold=g.gold;g.choose(g.scene().choices.get(0).action);assertEquals("ROAD",g.mode);g.choose(g.scene().choices.get(0).action);assertEquals(gold,g.gold);g=GameEngine.fromJson(g.toJson().toString());String help=g.scene().choices.get(0).action;g.choose(help);assertTrue(g.gold>gold);int paid=g.gold;
         g=GameEngine.fromJson(g.toJson().toString());g.choose(help);assertEquals(paid,g.gold);g.choose("GO_WORLD");
         assertEquals("Ферма Лорея",g.progress.location);assertEquals("COMPLETED",g.progress.questOutcome("road_cicero"));
     }
@@ -32,5 +32,9 @@ public class RoadEventsTest {
     @Test public void allCatalogEntriesHaveIdenticalEligibilityAtLevelsOneAndHundred() {
         GameEngine g=new GameEngine();g.start("Герой","Норд","Воин");java.util.List<String> ids=RoadEvents.eventIds();assertEquals(ids.size(),new java.util.HashSet<>(ids).size());
         for(int hour:new int[]{2,12,23})for(int region=0;region<10;region++)for(String id:ids){g.hour=hour;g.level=1;boolean first=RoadEvents.availableAt(g,id,region);g.level=100;assertEquals(id+" @ "+region,first,RoadEvents.availableAt(g,id,region));}
+    }
+    @Test public void ciceroReportBranchRequiresGuardAndFarmer() throws Exception {
+        GameEngine g=new GameEngine();g.start("Герой","Норд","Воин");g.progress.location="Вайтран";g.region=0;g.mode="WORLD";g.choose("LOC:Ферма Лорея");int gold=g.gold;
+        g.choose(g.scene().choices.get(0).action);g.choose(g.scene().choices.get(1).action);assertEquals(gold,g.gold);g=GameEngine.fromJson(g.toJson().toString());g.choose(g.scene().choices.get(0).action);assertEquals("ROAD",g.mode);g.choose(g.scene().choices.get(0).action);assertEquals("FAILED",g.progress.questOutcome("road_cicero"));assertEquals(gold+50,g.gold);
     }
 }

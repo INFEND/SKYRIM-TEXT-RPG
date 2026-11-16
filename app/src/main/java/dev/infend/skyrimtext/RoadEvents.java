@@ -206,7 +206,7 @@ final class RoadEvents {
     private final LinkedHashMap<String,Integer> recentDays=new LinkedHashMap<>();
     private final int[] roadBounties=new int[10];
     private String decision="";
-    private int dialogueStep=0;
+    private int dialogueStep=0,uniqueStep=0;
     private String[] combatGroup=new String[0];
     private int combatIndex=0, encounterRegion=-1;
     private int[] groupHp=new int[0],groupMax=new int[0],groupDamage=new int[0];
@@ -273,7 +273,7 @@ final class RoadEvents {
     private static boolean member(GameEngine g,int faction){return g.factions.stage(faction)>0||g.factionStories.started(faction);}
     private void remember(GameEngine g){recentDays.put(id,g.day);while(recentDays.size()>188)recentDays.remove(recentDays.keySet().iterator().next());}
     private boolean cooled(GameEngine g,Event e){Integer day=recentDays.get(e.id);return day==null||g.day-day>=3||g.day<day;}
-    private void prepare(int region){encounterRegion=region;decision="";dialogueStep=0;clearGroup();victoryApplied=false;}
+    private void prepare(int region){encounterRegion=region;decision="";dialogueStep=0;uniqueStep=0;clearGroup();victoryApplied=false;}
     private static Event find(String id){for(Event e:EVENTS)if(e.id.equals(id))return e;return null;}
     boolean pending(){return !destination.isEmpty()&&find(id)!=null;}
     static boolean pair(String a,String b,String x,String y){return (a.equals(x)&&b.equals(y))||(a.equals(y)&&b.equals(x));}
@@ -396,7 +396,16 @@ final class RoadEvents {
         if(profile!=null){body+="\n\n"+RoadDialogue.line(profile,profile.opening);if(dialogueStep>0)body+="\n\nТы: «"+profile.question+"»\n"+RoadDialogue.line(profile,profile.answer);}
         GameEngine.Scene s=new GameEngine.Scene("СЛУЧАЙНАЯ ВСТРЕЧА | В ДОРОГЕ",e.title,body+("arvak".equals(id)?"\n\nМесто встречи: Каирн Душ.":"\n\nУчасток: "+(segmentFrom.isEmpty()?g.progress.location:segmentFrom)+" → "+(segmentTo.isEmpty()?destination:segmentTo)+".\nКонечная точка: "+destination+"."));
         if("giant".equals(id))return s.primary(action("fight"),"Помочь Соратникам","Вступить в бой с великаном").add(action("watch"),"Наблюдать за боем","Поговорить с Эйлой после схватки").add(action("leave"),"Пройти мимо","Не вмешиваться");
-        if("cicero".equals(id))return s.primary(action("help"),"Убедить Ванту Лорея","Помочь Цицерону починить повозку").add(action("report"),"Доложить страже","Поддержать фермера").add(action("leave"),"Пройти мимо","Вернуться к этому позже");
+        if("cicero".equals(id)){
+            if(uniqueStep==0)return new GameEngine.Scene(s.kicker,s.title,body+"\n\nЦицерон: «Прошу, помоги! Колесо сломалось, а матушка не может ждать. Фермер не желает даже взглянуть на повозку».").primary(action("lorey"),"Поговорить с Вантом Лореем","Услышать его сторону истории").add(action("leave"),"Пройти мимо","Вернуться позже");
+            if(uniqueStep==1)return new GameEngine.Scene(s.kicker,s.title,"У фермы Лорея хозяин отрывается от работы и смотрит на странную повозку.\n\nВант Лорей: «Этот шут меня пугает. Что у него в гробу? Не хочу неприятностей. Если хочешь помочь, сообщи страже».").primary(action("help"),"Убедить Лорея помочь Цицерону","Сказать, что похороны не стоит задерживать").add(action("report"),"Согласиться сообщить страже","Поддержать опасения фермера").add(action("leave"),"Отложить решение","");
+            if(uniqueStep==2)return new GameEngine.Scene(s.kicker,s.title,"Вант Лорей: «Ладно. Я посмотрю, что можно сделать с колесом. Передай ему, что я согласен».\n\nЦицерон всё ещё ждёт у гроба.").primary(action("cicero_reward"),"Вернуться к Цицерону","Сообщить о согласии Лорея");
+            if(uniqueStep==3)return new GameEngine.Scene(s.kicker,s.title,"Ты находишь стражника, патрулирующего дорогу.\n\nСтражник: «Везёт гроб и ведёт себя подозрительно? Я разберусь».").primary(action("guard_report"),"Сообщить о подозрениях Лорея","Стража займётся Цицероном").add(action("reconsider"),"Передумать","Вернуться к Лорею");
+            return new GameEngine.Scene(s.kicker,s.title,"Стражник задерживает шута у повозки. Вант Лорей ждёт известий на ферме.").primary(action("lorey_reward"),"Вернуться к Лорею","Завершить поручение");
+        }
+        if("assassin".equals(id))return s.primary(action("fight"),"Защититься от убийцы","Победа позволяет забрать приказ").add(action("sneak"),"Попытаться скрыться","Проверка скрытности");
+        if("assassin_other".equals(id))return s.primary(action("talk"),"Поговорить с ассасином","Он не считает тебя целью").add(action("leave"),"Не вмешиваться","").add(action("fight"),"Напасть на ассасина","Будет дорожный штраф");
+        if("assassin_mistake".equals(id))return s.primary(action("talk"),"Объяснить ошибку","Проверка красноречия").add(action("identity"),"Представиться и сравнить приметы","Попытаться показать несоответствие").add(action("fight"),"Защититься","").add(action("sneak"),"Скрыться","");
         if("headless".equals(id))return s.primary(action("follow"),"Проследить за всадником","Узнать, куда ведёт призрак").add(action("leave"),"Проводить взглядом","");
         if("arvak".equals(id)){if("ACTIVE".equals(g.progress.questOutcome("road_arvak_skull")))return s.primary(action("arvak_skull"),"Найти череп Арвака","Осмотреть каменный алтарь и вернуть череп хозяину");return s.primary(action("arvak"),"Последовать за Арваком","Узнать о потерянном черепе").add(action("leave"),"Пройти мимо","");}
         if("bats".equals(id)||"island_flying_wizard".equals(id))return s.primary(action("observe"),"Наблюдать","Увидеть исход события").add(action("leave"),"Продолжить путь","");
@@ -468,12 +477,13 @@ final class RoadEvents {
         }
         if("cicero".equals(id)){
             if("leave".equals(verb)){finish(g,"Ты оставляешь шута у повозки. Ещё можно вернуться.");return;}
-            if("help".equals(verb)){
-                uniqueOutcome(g,"COMPLETED");fact(g,"road_cicero","Цицерон","HELPED");g.gold=GameEngine.nonnegativeAdd(g.gold,75+g.level*5);g.progress.skillExperience(g,12,20);
-                finish(g,"Ты убеждаешь Лорея помочь. Цицерон благодарит тебя и платит "+(75+g.level*5)+" септимов.");return;
-            }
-            uniqueOutcome(g,"FAILED");fact(g,"road_cicero","Цицерон","HOSTILE");g.gold=GameEngine.nonnegativeAdd(g.gold,50);
-            finish(g,"Стражник задерживает Цицерона. Лорей платит 50 септимов. Шут запомнил твой выбор.");return;
+            if("lorey".equals(verb)||"reconsider".equals(verb)){uniqueStep=1;g.message="Вант Лорей рассказывает о своих опасениях.";return;}
+            if("help".equals(verb)){uniqueStep=2;g.message="Лорей согласен помочь.";return;}
+            if("report".equals(verb)){uniqueStep=3;g.message="Лорей просит найти стражника.";return;}
+            if("guard_report".equals(verb)){uniqueStep=4;g.message="Стража задерживает Цицерона.";return;}
+            if("cicero_reward".equals(verb)){uniqueOutcome(g,"COMPLETED");fact(g,"road_cicero","Цицерон","HELPED");int reward=75+g.level*5;g.gold=GameEngine.nonnegativeAdd(g.gold,reward);g.progress.skillExperience(g,12,20);finish(g,"Цицерон: «Ты спас матушку! Цицерон не забудет доброты».\nНаграда: "+reward+" септимов.");return;}
+            if("lorey_reward".equals(verb)){uniqueOutcome(g,"FAILED");fact(g,"road_cicero","Цицерон","HOSTILE");g.gold=GameEngine.nonnegativeAdd(g.gold,50);finish(g,"Лорей благодарит за помощь и платит 50 септимов. Цицерон запомнил твой выбор.");return;}
+            return;
         }
         switch(verb){
             case "arvak":g.progress.setQuestOutcome("road_arvak_skull","ACTIVE");g.message="Душа просит отыскать череп своего коня. Ты замечаешь алтарь среди серых камней.";return;
@@ -501,7 +511,9 @@ final class RoadEvents {
             case "empire":fight(g,"Братья Бури");return;
             case "storm":fight(g,"Имперские солдаты");return;
             case "pay":if(g.gold<25){fight(g,e.enemy);return;}g.gold-=25;finish(g,"Ты отдаёшь 25 септимов и получаешь возможность пройти.");return;
+            case "identity":if(g.rollCheck(g.progress.chance(g,2,12,35))){g.progress.skillExperience(g,12,20);fact(g,"road_assassin_mistake","Ассасин Тёмного Братства","INFORMED");finish(g,"Ассасин перечитывает описание цели, замечает несоответствие и убирает кинжал. Он уходит искать настоящую цель.");}else fight(g,e.enemy);return;
             case "talk":
+                if("assassin_mistake".equals(id)){if(g.rollCheck(g.progress.chance(g,2,12,40))){g.progress.skillExperience(g,12,20);finish(g,"Ассасин признаёт, что заказчик мог ошибиться, и позволяет тебе уйти.");}else fight(g,e.enemy);return;}
                 if("imperial_patrol".equals(id)||"storm_patrol".equals(id)){int side="imperial_patrol".equals(id)?4:5;finish(g,member(g,side)?"Патруль узнаёт товарища по оружию. Офицер рассказывает о положении на дороге.":member(g,side==4?5:4)?"Патруль замечает твою принадлежность к противнику и требует уйти.":"Офицер советует держаться подальше от военных лагерей.");return;}
                 if("bounty_collector".equals(id)){if(g.rollCheck(g.progress.chance(g,2,12,60))){g.progress.skillExperience(g,12,20);finish(g,"Охотник соглашается дать тебе время. Штраф остаётся непогашенным.");}else fight(g,e.enemy);return;}
                 if("dawnguard_hunters".equals(id)||"dawnguard_attack".equals(id)||"dg_scouts".equals(id)){finish(g,"Охотники говорят о борьбе с вампирами и уходят на поиски. Они не считают тебя своей целью.");return;}
@@ -539,10 +551,10 @@ final class RoadEvents {
         if(!pending())return;
         String target=destination,previous=id;
         if(outcome.startsWith("Встреча: ")&&"WILD".equals(g.battleKind)&&"RESULT".equals(g.mode)&&g.enemyHp==0){applyVictory(g);outcome=g.message;}else if(outcome.startsWith("Встреча: "))outcome=g.message;
-        destination="";id="";segmentFrom="";segmentTo="";last=previous;clearGroup();dialogueStep=0;decision="";victoryApplied=false;resuming=true;
+        destination="";id="";segmentFrom="";segmentTo="";last=previous;clearGroup();dialogueStep=0;uniqueStep=0;decision="";victoryApplied=false;resuming=true;
         boolean canonical=canonicalResume;canonicalResume=false;
         try{if("arvak".equals(previous)){g.mode="WORLD";g.message=outcome;}else if(canonical){CanonicalCampaign.open(g);g.canonicalRecent=outcome;g.recordVisualEvent(outcome);}else g.choose("LOC:"+target);}finally{resuming=false;outcome="";}
     }
-    JSONObject save(){JSONObject j=new JSONObject();try{j.put("id",id).put("destination",destination).put("outcome",outcome).put("last",last).put("serial",serial).put("canonicalResume",canonicalResume).put("segmentFrom",segmentFrom).put("segmentTo",segmentTo).put("decision",decision).put("dialogueStep",dialogueStep).put("group",new JSONArray(Arrays.asList(combatGroup))).put("groupIndex",combatIndex).put("groupHp",new JSONArray(groupHp)).put("groupMax",new JSONArray(groupMax)).put("groupDamage",new JSONArray(groupDamage)).put("encounterRegion",encounterRegion).put("victoryApplied",victoryApplied).put("recentDays",new JSONObject(recentDays)).put("roadBounties",new JSONArray(roadBounties));}catch(Exception ignored){}return j;}
-    static RoadEvents restore(JSONObject j){RoadEvents r=new RoadEvents();if(j!=null){r.id=j.optString("id","");r.destination=j.optString("destination","");r.outcome=j.optString("outcome","");r.last=j.optString("last","");r.serial=Math.max(0,j.optInt("serial"));r.canonicalResume=j.optBoolean("canonicalResume");r.segmentFrom=j.optString("segmentFrom","");r.segmentTo=j.optString("segmentTo","");r.decision=j.optString("decision","");r.dialogueStep=Math.max(0,Math.min(1,j.optInt("dialogueStep")));r.encounterRegion=Math.max(-1,Math.min(9,j.optInt("encounterRegion",-1)));r.victoryApplied=j.optBoolean("victoryApplied");JSONArray group=j.optJSONArray("group");if(group!=null&&group.length()>0&&group.length()<=8){ArrayList<String> names=new ArrayList<>();for(int i=0;i<group.length();i++){String n=group.optString(i);if(!n.isEmpty()&&n.length()<=100)names.add(n);}r.combatGroup=names.toArray(new String[0]);}r.combatIndex=Math.max(0,Math.min(Math.max(0,r.combatGroup.length-1),j.optInt("groupIndex")));JSONArray hp=j.optJSONArray("groupHp"),max=j.optJSONArray("groupMax"),dmg=j.optJSONArray("groupDamage");int n=r.combatGroup.length;if(n>0&&hp!=null&&max!=null&&dmg!=null&&hp.length()==n&&max.length()==n&&dmg.length()==n){r.groupHp=new int[n];r.groupMax=new int[n];r.groupDamage=new int[n];for(int i=0;i<n;i++){r.groupMax[i]=Math.max(1,Math.min(100000,max.optInt(i)));r.groupHp[i]=Math.max(0,Math.min(r.groupMax[i],hp.optInt(i)));r.groupDamage[i]=Math.max(1,Math.min(100000,dmg.optInt(i)));}}JSONObject recent=j.optJSONObject("recentDays");if(recent!=null)for(Event e:EVENTS)if(recent.has(e.id))r.recentDays.put(e.id,Math.max(0,recent.optInt(e.id)));JSONArray fines=j.optJSONArray("roadBounties");if(fines!=null)for(int i=0;i<10;i++)r.roadBounties[i]=Math.max(0,fines.optInt(i));if(!r.pending()){r.id="";r.destination="";}}return r;}
+    JSONObject save(){JSONObject j=new JSONObject();try{j.put("id",id).put("destination",destination).put("outcome",outcome).put("last",last).put("serial",serial).put("canonicalResume",canonicalResume).put("segmentFrom",segmentFrom).put("segmentTo",segmentTo).put("decision",decision).put("dialogueStep",dialogueStep).put("uniqueStep",uniqueStep).put("group",new JSONArray(Arrays.asList(combatGroup))).put("groupIndex",combatIndex).put("groupHp",new JSONArray(groupHp)).put("groupMax",new JSONArray(groupMax)).put("groupDamage",new JSONArray(groupDamage)).put("encounterRegion",encounterRegion).put("victoryApplied",victoryApplied).put("recentDays",new JSONObject(recentDays)).put("roadBounties",new JSONArray(roadBounties));}catch(Exception ignored){}return j;}
+    static RoadEvents restore(JSONObject j){RoadEvents r=new RoadEvents();if(j!=null){r.id=j.optString("id","");r.destination=j.optString("destination","");r.outcome=j.optString("outcome","");r.last=j.optString("last","");r.serial=Math.max(0,j.optInt("serial"));r.canonicalResume=j.optBoolean("canonicalResume");r.segmentFrom=j.optString("segmentFrom","");r.segmentTo=j.optString("segmentTo","");r.decision=j.optString("decision","");r.dialogueStep=Math.max(0,Math.min(1,j.optInt("dialogueStep")));r.uniqueStep=Math.max(0,Math.min(4,j.optInt("uniqueStep")));r.encounterRegion=Math.max(-1,Math.min(9,j.optInt("encounterRegion",-1)));r.victoryApplied=j.optBoolean("victoryApplied");JSONArray group=j.optJSONArray("group");if(group!=null&&group.length()>0&&group.length()<=8){ArrayList<String> names=new ArrayList<>();for(int i=0;i<group.length();i++){String n=group.optString(i);if(!n.isEmpty()&&n.length()<=100)names.add(n);}r.combatGroup=names.toArray(new String[0]);}r.combatIndex=Math.max(0,Math.min(Math.max(0,r.combatGroup.length-1),j.optInt("groupIndex")));JSONArray hp=j.optJSONArray("groupHp"),max=j.optJSONArray("groupMax"),dmg=j.optJSONArray("groupDamage");int n=r.combatGroup.length;if(n>0&&hp!=null&&max!=null&&dmg!=null&&hp.length()==n&&max.length()==n&&dmg.length()==n){r.groupHp=new int[n];r.groupMax=new int[n];r.groupDamage=new int[n];for(int i=0;i<n;i++){r.groupMax[i]=Math.max(1,Math.min(100000,max.optInt(i)));r.groupHp[i]=Math.max(0,Math.min(r.groupMax[i],hp.optInt(i)));r.groupDamage[i]=Math.max(1,Math.min(100000,dmg.optInt(i)));}}JSONObject recent=j.optJSONObject("recentDays");if(recent!=null)for(Event e:EVENTS)if(recent.has(e.id))r.recentDays.put(e.id,Math.max(0,recent.optInt(e.id)));JSONArray fines=j.optJSONArray("roadBounties");if(fines!=null)for(int i=0;i<10;i++)r.roadBounties[i]=Math.max(0,fines.optInt(i));if(!r.pending()){r.id="";r.destination="";}}return r;}
 }
