@@ -124,7 +124,7 @@ public final class AiStoryClient {
     static String localUserPrompt(GameEngine game,String history,String command,boolean aiControlled){
         StringBuilder b=new StringBuilder();
         b.append(genderInstruction(game));
-        if(game.katherine.enabled&&game.katherine.stage>0)b.append(game.katherine.compactContext()).append('\n');
+        if(game.katherine.enabled&&game.katherine.stage>0)b.append(game.katherine.compactContext(game)).append('\n');
         b.append("ГЕРОЙ: ").append(crop(game.name,55)).append("; пол ").append(game.gender).append("; раса ").append(game.race)
             .append("; класс ").append(game.heroClass).append("; уровень ").append(game.level)
             .append("; локация ").append(game.progress.location).append("; день ").append(game.day)

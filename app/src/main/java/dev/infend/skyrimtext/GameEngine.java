@@ -416,6 +416,7 @@ public final class GameEngine {
             region=target.region;
             progress.location=target.name;
             katherine.observeTravel(this);
+            katherine.rest(Math.min(24,route.days*3));
             // Register only locations reached through the validated atlas route.
             // A stable key keeps repeat visits idempotent across save/load.
             try {
