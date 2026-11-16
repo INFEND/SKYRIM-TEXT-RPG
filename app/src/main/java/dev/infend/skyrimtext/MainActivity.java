@@ -617,6 +617,7 @@ public final class MainActivity extends Activity {
         }
     }
     private int chronicleFilter=0;
+    private boolean chronicleExpanded=false;
     private static int chronicleKind(String event){
         String value=event.toLowerCase(java.util.Locale.ROOT);
         if(value.contains("→"))return 1;
@@ -626,7 +627,18 @@ public final class MainActivity extends Activity {
     }
     private void renderChronicle(){
         if(!visual("chronicle"))return;
-        LinearLayout c=card();addText(c,"ХРОНИКА ПРИКЛЮЧЕНИЙ",12,accent(),true,12);
+        LinearLayout c=card();
+        LinearLayout heading=row();heading.setMinimumHeight(dp(36));
+        TextView title=text("ХРОНИКА ПРИКЛЮЧЕНИЙ",12,accent(),true);
+        heading.addView(title,new LinearLayout.LayoutParams(0,-2,1));
+        TextView arrow=text(chronicleExpanded?"⌃":"⌄",22,accent(),true);
+        arrow.setGravity(Gravity.CENTER);heading.addView(arrow,lp(32,32));
+        c.addView(heading,lp(-1,-2));
+        heading.setFocusable(true);
+        heading.setContentDescription("Хроника приключений, "+(chronicleExpanded?"раскрыто":"свёрнуто"));
+        heading.setOnClickListener(v->{chronicleExpanded=!chronicleExpanded;render();});
+        if(!chronicleExpanded)return;
+        space(c,8);
         String[] labels={"Все","Путь","Бой","Добыча и сделки","События"};
         HorizontalScrollView strip=new HorizontalScrollView(this);strip.setHorizontalScrollBarEnabled(false);LinearLayout filters=row();strip.addView(filters);
         for(int i=0;i<labels.length;i++){final int index=i;TextView choice=text(labels[i],12,i==chronicleFilter?accent():MUTED,true);choice.setPadding(dp(8),dp(8),dp(8),dp(8));filters.addView(choice,lp(-2,-2));choice.setOnClickListener(view->{chronicleFilter=index;render();});}c.addView(strip,lp(-1,-2));
@@ -1177,14 +1189,15 @@ public final class MainActivity extends Activity {
     private void skyrimTopTabs(int current){
         final int[] screens={4,3,6};
         final String[] names={"ЗАДАНИЯ","СТАТИСТИКА","КОДЕКС"};
-        LinearLayout bar=row();bar.setPadding(dp(3),dp(5),dp(3),dp(5));
+        LinearLayout bar=row();bar.setPadding(dp(3),dp(5),dp(3),dp(5));bar.setBaselineAligned(false);
         bar.setBackground(new RuneFrameDrawable(PANEL,BORDER,false));
         content.addView(bar,lp(-1,-2));
         for(int i=0;i<screens.length;i++){
             final int index=screens[i];
             TextView title=text(names[i],12,current==index?accent():MUTED,current==index);
             title.setGravity(Gravity.CENTER);
-            bar.addView(title,new LinearLayout.LayoutParams(0,dp(38),1));
+            title.setMinHeight(dp(38));title.setPadding(dp(2),dp(7),dp(2),dp(7));
+            bar.addView(title,new LinearLayout.LayoutParams(0,-1,1));
             title.setOnClickListener(v->{tab=index;render();});
         }
         content.addView(new SkyrimRuleView(this,accent()),lp(-1,14));
@@ -3684,11 +3697,21 @@ public final class MainActivity extends Activity {
     private void livingRelationDetails(JSONObject n){LinearLayout panel=column();String status=n.optString("status");addText(panel,npcStatusLabel(status),16,TEXT,true,8);if(!"DEAD".equals(status)&&!"MISSING".equals(status))livingLine(panel,"Отношение",n.optInt("relation",50)+" / 100",accent());org.json.JSONArray events=n.optJSONArray("history");addText(panel,"История взаимодействий",13,accent(),true,8);if(events!=null)for(int i=events.length()-1;i>=0;i--){JSONObject e=events.optJSONObject(i);if(e==null)continue;int change=e.optInt("delta");livingLine(panel,npcStatusLabel(e.optString("status")),change==0?"":change>0?"+"+change:String.valueOf(change),change<0?ITEM_DOWN:ITEM_UP);}livingDialog(n.optString("title"),panel);}
     private void renderJournal(){
         skyrimTopTabs(4);
-        LinearLayout switcher=row();content.addView(switcher,lp(-1,-2));
-        for(String label:new String[]{"Задания","Отношения"}){boolean rel=label.equals("Отношения");TextView p=text(label,15,journalRelations==rel?Color.BLACK:TEXT,true);p.setGravity(Gravity.CENTER);p.setPadding(dp(8),dp(11),dp(8),dp(11));p.setBackground(bg(journalRelations==rel?accent():0xff141414,Color.TRANSPARENT,16));LinearLayout.LayoutParams l=new LinearLayout.LayoutParams(0,-2,1);l.setMargins(dp(3),0,dp(3),dp(8));switcher.addView(p,l);p.setOnClickListener(v->{journalRelations=rel;render();});}
+        LinearLayout switcher=row();switcher.setGravity(Gravity.TOP);switcher.setBaselineAligned(false);
+        content.addView(switcher,lp(-1,-2));
+        for(String label:new String[]{"Задания","Отношения"}){
+            boolean rel=label.equals("Отношения"),active=journalRelations==rel;
+            TextView p=text(label,15,active?Color.BLACK:TEXT,true);
+            p.setGravity(Gravity.CENTER);p.setMinHeight(dp(48));p.setPadding(dp(8),dp(11),dp(8),dp(11));
+            p.setBackground(bg(active?accent():0xff141414,Color.TRANSPARENT,16));
+            LinearLayout.LayoutParams l=new LinearLayout.LayoutParams(0,-1,1);
+            l.setMargins(rel?dp(3):0,0,rel?0:dp(3),0);
+            switcher.addView(p,l);p.setSelected(active);
+            p.setOnClickListener(v->{journalRelations=rel;render();});
+        }
+        space(content,8);
         if(journalRelations){renderLivingRelations();return;}
         section("ЛЕТОПИСЬ СЕВЕРА","Журнал","Выбирай задание, чтобы увидеть описание и текущую цель.");
-        renderChronicle();
         renderFactionJournal();
         String[] entries=game.aiJournal.isEmpty()?
             new String[]{"Путь Довакина","Драконий след","Пепельные печати","Опасные дороги"}:
@@ -3785,6 +3808,7 @@ public final class MainActivity extends Activity {
         for(String check:game.progress.failed)
             addText(failedRolls,"✕ "+check,13,MUTED,false,6);
         actionButton("Вернуться к приключению","Продолжить текущую сцену",true,()->{tab=0;render();});
+        renderChronicle();
     }
     private void foldSettingsSection(String key,String name,int from){
         LinearLayout body=column();
