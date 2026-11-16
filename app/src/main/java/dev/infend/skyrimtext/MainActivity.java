@@ -93,6 +93,10 @@ public final class MainActivity extends Activity {
     private long aiRequestSerial;
     private boolean aiTurnProposal;
     private TextView aiTurnText,aiProgressInfo,aiElapsedText,aiReasoningText;
+    private LinearLayout aiChoiceLive;
+    private TextView aiChoiceLiveHeader;
+    private final java.util.ArrayList<AiGameTurn.Option> aiChoicePreview=new java.util.ArrayList<>();
+    private final java.util.ArrayList<TextView[]> aiChoiceLiveRows=new java.util.ArrayList<>();
     private Runnable aiDotsTicker;
     private String aiReasoningPreview="";
     private final java.util.LinkedHashSet<Integer> selectedAiChoices=new java.util.LinkedHashSet<>();
@@ -1672,6 +1676,7 @@ public final class MainActivity extends Activity {
         if(aiElapsedText!=null&&aiDotsTicker!=null)aiElapsedText.removeCallbacks(aiDotsTicker);
         aiDotsTicker=null;
         aiTurnText=null;aiProgressInfo=null;aiElapsedText=null;aiReasoningText=null;
+        aiChoiceLive=null;aiChoiceLiveHeader=null;aiChoiceLiveRows.clear();
     }
     private void updateAiElapsed(){
         if(aiElapsedText==null||aiLocalStartedAt<=0)return;
@@ -1742,6 +1747,11 @@ public final class MainActivity extends Activity {
                 else aiTurnText.setText(SceneTypography.render(aiTurnPreview,accent(),game.name,heroColor()));
                 live.addView(aiTurnText,lp(-1,-2));
                 // card() already attaches the panel to content.
+                aiChoiceLive=column();
+                aiChoiceLiveHeader=text("ГЕНЕРАЦИЯ ВАРИАНТОВ",12,MUTED,true);
+                aiChoiceLive.addView(aiChoiceLiveHeader,lp(-1,-2));
+                content.addView(aiChoiceLive,lp(-1,-2));
+                syncAiChoicePreview();
             }
             space(content,7);
             actionButton("ОСТАНОВИТЬ","Прервать генерацию без изменения сохранения",false,()->{
@@ -1953,6 +1963,41 @@ public final class MainActivity extends Activity {
         if(!aiTurnBusy)render();
     }
 
+    /** Keep preview rows stable while streaming; never make uncommitted actions clickable. */
+    private void syncAiChoicePreview(){
+        if(aiChoiceLive==null||aiChoiceLiveHeader==null)return;
+        aiChoiceLive.setVisibility(aiChoicePreview.isEmpty()?View.GONE:View.VISIBLE);
+        aiChoiceLiveHeader.setText("ГЕНЕРАЦИЯ ВАРИАНТОВ | "+aiChoicePreview.size()+"/10");
+        while(aiChoiceLiveRows.size()>aiChoicePreview.size()){
+            int last=aiChoiceLiveRows.size()-1;
+            aiChoiceLive.removeViewAt(last+1);aiChoiceLiveRows.remove(last);
+        }
+        for(int i=0;i<aiChoicePreview.size();i++){
+            AiGameTurn.Option option=aiChoicePreview.get(i);
+            if(i==aiChoiceLiveRows.size()){
+                LinearLayout row=column();
+                row.setPadding(dp(15),dp(12),dp(15),dp(12));
+                row.setBackground(bg(0xff141414,Color.TRANSPARENT,18));
+                TextView title=text("",17,TEXT,true);
+                title.setTypeface(SovngardeTypeface.face(this,true));
+                TextView detail=text("",14,MUTED,false);
+                TextView meta=text("",12,MUTED,false);
+                row.addView(title,lp(-1,-2));space(row,5);
+                row.addView(detail,lp(-1,-2));row.addView(meta,lp(-1,-2));
+                LinearLayout.LayoutParams p=lp(-1,-2);p.topMargin=dp(6);
+                aiChoiceLive.addView(row,p);
+                aiChoiceLiveRows.add(new TextView[]{title,detail,meta});
+            }
+            TextView[] views=aiChoiceLiveRows.get(i);
+            String title=(showChoiceNumbers()?(i+1)+". ":"")+option.title;
+            String meta=option.chance>=0?(option.skill.isEmpty()?"":option.skill+" | ")+option.chance+"%":option.skill;
+            if(!title.contentEquals(views[0].getText()))views[0].setText(title);
+            if(!option.detail.contentEquals(views[1].getText()))views[1].setText(option.detail);
+            if(!meta.contentEquals(views[2].getText()))views[2].setText(meta);
+            views[2].setVisibility(meta.isEmpty()?View.GONE:View.VISIBLE);
+        }
+    }
+
     private void renderAiChoice(int number,AiGameTurn.Option option){
         LinearLayout row=row();row.setGravity(Gravity.CENTER_VERTICAL);
         row.setPadding(dp(14),dp(14),dp(14),dp(14));
@@ -2032,11 +2077,11 @@ public final class MainActivity extends Activity {
         final String model=local?"Qwen3.5-9B":prefs.getString(chat?"ai_chatgpt_model":"ai_api_model",
                 chat?"":AiModelCatalog.DEFAULT_API);
         if(model.isEmpty()){aiTurnStatus="Сначала выбери модель в настройках";render();return;}
-        final String effort=selectedReasoningEffort(),history=aiMemory.context(aiSession)+"\n"+game.katherine.aiContext()+"\n"+game.alma.aiContext();
+        final String effort=selectedReasoningEffort(),history=aiMemory.context(aiSession)+(local?"":"\n"+game.katherine.aiContext()+"\n"+game.alma.aiContext());
         final String saved;
         try{saved=game.toJson().toString();}
         catch(Exception ex){aiTurnStatus="Не удалось прочитать состояние героя";render();return;}
-        aiTurnBusy=true;aiTurnPreview="";aiReasoningPreview="";
+        aiTurnBusy=true;aiTurnPreview="";aiReasoningPreview="";aiChoicePreview.clear();
         final long requestId=++aiRequestSerial;
         aiTurnProposal=proposalOnly;
         aiLocalStartedAt=android.os.SystemClock.elapsedRealtime();
@@ -2061,18 +2106,22 @@ public final class MainActivity extends Activity {
                 if(!active())return;
                 if(proposalOnly)return;
                 String visible=AiGameTurn.previewScene(accumulated);
-                if(visible.isEmpty()||visible.equals(aiTurnPreview))return;
-                boolean first=aiTurnPreview.isEmpty();
-                aiTurnPreview=visible;
-                if(first&&!local){
-                    aiLocalPhase="Генерация сцены";
-                    if(tab==0&&aiProgressInfo!=null)aiProgressInfo.setText(aiLocalPhase);
+                if(!visible.isEmpty()&&!visible.equals(aiTurnPreview)){
+                    boolean first=aiTurnPreview.isEmpty();
+                    aiTurnPreview=visible;
+                    if(first&&!local){
+                        aiLocalPhase="Генерация сцены";
+                        if(tab==0&&aiProgressInfo!=null)aiProgressInfo.setText(aiLocalPhase);
+                    }
+                    if(tab==0&&aiTurnText!=null&&prefs.getBoolean("ai_enabled",false)){
+                        aiTurnText.setText(SceneTypography.render(visible,accent(),game.name,heroColor()));
+                    }
                 }
-                // Display the first decoded narrative character and every later fragment.
-                // JSON syntax, internal chance proposals and effects stay private.
-                if(tab==0&&aiTurnText!=null&&prefs.getBoolean("ai_enabled",false)){
-                    aiTurnText.setText(SceneTypography.render(visible,accent(),game.name,heroColor()));
-                }
+                // Scene may already be complete while the model is streaming choices.
+                // Do not return early just because the narrative text is unchanged.
+                java.util.ArrayList<AiGameTurn.Option> live=AiGameTurn.previewChoices(accumulated);
+                aiChoicePreview.clear();aiChoicePreview.addAll(live);
+                if(tab==0)syncAiChoicePreview();
             }
             @Override public void onReasoningSummary(String summary){
                 if(!active())return;
