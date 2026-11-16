@@ -85,6 +85,10 @@ def build(commit, thin=False):
             if path!="media/alma/gallery.zip" or hashlib.sha256(f.read_bytes()).hexdigest()!="4910508a80bdcce0f01b802bad50bce41c6a0cafbf2c8a6fcfdfa0a861d25f81":
                 raise ValueError("Alma gallery differs from the supplied archive")
             add(path,"media:alma","Альма | Алая Бессмертная")
+        elif group=="serana":
+            if path!="media/serana/gallery.zip" or hashlib.sha256(f.read_bytes()).hexdigest()!="be77a3f3aa45a80767e43c5200a4440df97109a704b22cc16da7679abfc9bfaa":
+                raise ValueError("Serana gallery differs from the supplied archive")
+            add(path,"media:serana","Серана")
         else:add(path,"media:"+group,"Дополнительные ресурсы: "+group)
     listed={e["path"] for e in records}
     for f in ASSETS.rglob("*"):
