@@ -114,7 +114,7 @@ public final class TravelPlanner {
             days++;
         }
         days=Math.max(1,days);
-        if(game.progress.carryWeight()>CARRY_LIMIT_KG)
+        if(game.progress.carryWeight()>game.progress.carryLimit())
             return blocked("Снаряжение весит больше 50 кг. Освободи часть места в инвентаре.");
         if(game.gold<fare)
             return blocked("Для переправы требуется "+fare+" септимов. Сейчас у тебя "+game.gold+".");

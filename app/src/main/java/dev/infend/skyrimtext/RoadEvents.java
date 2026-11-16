@@ -269,6 +269,10 @@ final class RoadEvents {
     boolean magicalEnemy(String name){String n=name==null?"":name.toLowerCase(Locale.ROOT);return n.contains("маг")||n.contains("некромант")||n.contains("колдун")||n.contains("ведьм")||n.contains("вороже")||n.contains("вампир")||n.contains("атронах")||n.contains("призрак")||n.contains("привидение")||n.contains("дракон")||n.contains("юстициар")||n.contains("малин варен")||n.contains("оркендор")||n.contains("халдин");}
     int extraIncoming(GameEngine g,boolean defending,Random rng){if(!groupActive(g))return 0;ensureGroup(g);int total=0;for(int i=0;i<combatGroup.length;i++){if(i==combatIndex||groupHp[i]<=0)continue;int base=Math.max(1,groupDamage[i]+rng.nextInt(4)-Math.max(0,g.armor-(g.armorUpgraded?4:0))-g.compensation.passiveBonus(g,1));int raw=Math.max(1,base-(defending?groupDamage[i]/2+3+2*g.progress.branches.rank(3):0));total+=Math.max(1,(int)Math.round(raw*(1-g.progress.damageReduction())));}return total;}
     void clearGroup(){combatGroup=new String[0];groupHp=new int[0];groupMax=new int[0];groupDamage=new int[0];combatIndex=0;}
+    static String estate(int region){switch(region){case 5:return "Поместье Озёрное";case 7:return "Хельяркен-холл";case 8:return "Поместье Уиндстад";default:return "";}}
+    static boolean ownsEstate(GameEngine g,int region){return !estate(region).isEmpty()&&"COMPLETED".equals(g.progress.questOutcome("road_estate_"+region));}
+    void estateChoices(GameEngine g,GameEngine.Scene s){WorldAtlas.Place p=WorldAtlas.find(g.progress.location);if(p==null||!"Столица".equals(p.type)||estate(p.region).isEmpty()||ownsEstate(g,p.region))return;s.add("ROADESTATE:"+p.region,"Купить участок: "+estate(p.region),"5000 септимов | открыть загородное поместье");}
+    void buyEstate(GameEngine g,String action){if(pending()||!("WORLD".equals(g.mode)||"RESULT".equals(g.mode)))return;WorldAtlas.Place p=WorldAtlas.find(g.progress.location);if(p==null||!"Столица".equals(p.type)||estate(p.region).isEmpty()||ownsEstate(g,p.region)||!action.equals("ROADESTATE:"+p.region))return;if(g.gold<5000){g.message="Для покупки участка нужно 5000 септимов.";g.mode="RESULT";return;}g.gold-=5000;g.progress.setQuestOutcome("road_estate_"+p.region,"COMPLETED");g.progress.sync(g);g.message="Приобретён участок: "+estate(p.region)+". При посещении усадьбы возможны связанные события.";g.mode="RESULT";g.recordVisualEvent(g.message);}
     int bounty(int region){return region>=0&&region<roadBounties.length?roadBounties[region]:0;}
     void fineChoices(GameEngine g,GameEngine.Scene s){WorldAtlas.Place p=WorldAtlas.find(g.progress.location);if(p!=null&&"Столица".equals(p.type)&&bounty(p.region)>0)s.add("ROADFINE:"+p.region,"Погасить дорожный штраф",bounty(p.region)+" септимов | местная стража");}
     void payFine(GameEngine g,String action){if(pending()||!("WORLD".equals(g.mode)||"RESULT".equals(g.mode)))return;WorldAtlas.Place p=WorldAtlas.find(g.progress.location);if(p==null||!"Столица".equals(p.type)||!action.equals("ROADFINE:"+p.region))return;int fine=bounty(p.region);if(fine<=0)return;if(g.gold<fine){g.message="Не хватает септимов для погашения штрафа.";g.mode="RESULT";return;}g.gold-=fine;roadBounties[p.region]=0;g.progress.sync(g);g.message="Местная стража приняла "+fine+" септимов. Дорожный штраф погашен.";g.mode="RESULT";g.recordVisualEvent(g.message);}
@@ -336,8 +340,8 @@ final class RoadEvents {
             case "city_dg":return g.factionStories.done(6)>=3&&!g.factionStories.completed(6);
             case "fort_dg":return g.factionStories.done(6)>=3&&!g.factionStories.completed(6);
             case "volkihar":return g.factionStories.done(6)>=3&&!g.factionStories.completed(6);
-            case "friend":return g.reputation>0;
-            case "homestead":return region==0||region==5||region==8||region==7;
+            case "friend":return !friendSource(g).isEmpty();
+            case "homestead":return ownsEstate(g,region);
             case "reach":return region==4;
             case "plains":return region==0||region==7;
             case "forest":return region==1||region==5||region==0||region==8;
@@ -371,7 +375,7 @@ final class RoadEvents {
             ArrayList<Integer> land=new ArrayList<>();for(int i=1;i<route.stops.size();i++){WorldAtlas.Place p1=WorldAtlas.find(route.stops.get(i-1)),p2=WorldAtlas.find(route.stops.get(i));if(p1!=null&&p2!=null&&((p1.region==9)!=(p2.region==9)))continue;land.add(i);}if(land.isEmpty())return false;
             int segment=land.get(rng.nextInt(land.size()));String a=route.stops.get(segment-1),next=route.stops.get(segment);segmentFrom=a;segmentTo=next;
             WorldAtlas.Place stop=WorldAtlas.find(next);int region=stop==null?target.region:stop.region;prepare(region);
-            for(Event e:EVENTS)if(!last.equals(e.id)&&cooled(g,e)&&eligible(g,e,region)&&locationAllowed(e,a,next,target)){pool.add(e);total+=e.weight;}
+            for(Event e:EVENTS)if(!last.equals(e.id)&&cooled(g,e)&&eligible(g,e,region)&&locationAllowed(g,e,a,next,target)){pool.add(e);total+=e.weight;}
             if(total==0)return false;
             int roll=rng.nextInt(total);
             for(Event e:pool){roll-=e.weight;if(roll<0){id=e.id;break;}}
@@ -380,12 +384,12 @@ final class RoadEvents {
         destination=target.name;canonicalResume=false;outcome="";serial=serial==Integer.MAX_VALUE?1:serial+1;
         g.mode=MODE;g.message=find(id).body;return true;
     }
-    private static boolean locationAllowed(Event e,String from,String to,WorldAtlas.Place target){
+    private static boolean locationAllowed(GameEngine g,Event e,String from,String to,WorldAtlas.Place target){
         WorldAtlas.Place p=WorldAtlas.find(to);if(p==null)p=target;
         if(e.rule.startsWith("city")||"friend".equals(e.rule))return Arrays.asList("Столица","Город","Деревня","Поселение").contains(p.type);
         if("fort_dg".equals(e.rule))return from.equals("Форт Стражи Рассвета")||to.equals("Форт Стражи Рассвета");
         if("volkihar".equals(e.rule))return from.contains("Волкихар")||to.contains("Волкихар");
-        if("homestead".equals(e.rule))return from.contains("Озёрное")||to.contains("Озёрное")||from.contains("Хельяркен")||to.contains("Хельяркен")||from.contains("Уиндстад")||to.contains("Уиндстад");
+        if("homestead".equals(e.rule)){for(int i:new int[]{5,7,8})if(ownsEstate(g,i)&&(from.equals(estate(i))||to.equals(estate(i))))return true;return false;}
         return true;
     }
     boolean beginArvak(GameEngine g){if(pending()||g.progress.questOutcome("road_arvak")!=null)return false;prepare(g.region);id="arvak";destination=g.progress.location;segmentFrom="Каирн Душ";segmentTo="Каирн Душ";outcome="";canonicalResume=false;serial=serial==Integer.MAX_VALUE?1:serial+1;g.mode=MODE;g.message=find(id).body;return true;}
@@ -396,6 +400,7 @@ final class RoadEvents {
         if(e==null)return new GameEngine.Scene("В ДОРОГЕ","Переход","Событие недоступно.").primary("GO_WORLD","Продолжить путь","");
         RoadDialogue.Profile profile=RoadDialogue.find(id);
         String body="arvak".equals(id)&&"ACTIVE".equals(g.progress.questOutcome("road_arvak_skull"))?"Душа рассказывает о потерянном коне. Вдалеке мерцает алтарь, на котором лежит череп Арвака. Рядом движутся тени Каирна Душ.":e.body;
+        if("friend_gift".equals(id))body=friendName(g)+" узнаёт тебя и вспоминает твою помощь. В руках небольшой свёрток с благодарностью.";
         if(profile!=null){if(!profile.observation)body+="\n\n"+RoadDialogue.line(profile,profile.opening);if(dialogueStep>0)body+="\n\n"+(profile.observation?"Наблюдение: ":"Ты: «"+profile.question+"»\n")+RoadDialogue.line(profile,profile.answer);}
         GameEngine.Scene s=new GameEngine.Scene("СЛУЧАЙНАЯ ВСТРЕЧА | В ДОРОГЕ",e.title,body+("arvak".equals(id)?"\n\nМесто встречи: Каирн Душ.":"\n\nУчасток: "+(segmentFrom.isEmpty()?g.progress.location:segmentFrom)+" → "+(segmentTo.isEmpty()?destination:segmentTo)+".\nКонечная точка: "+destination+"."));
         if("giant".equals(id))return s.primary(action("fight"),"Помочь Соратникам","Вступить в бой с великаном").add(action("watch"),"Наблюдать за боем","Поговорить с Эйлой после схватки").add(action("leave"),"Пройти мимо","Не вмешиваться");
@@ -445,6 +450,10 @@ final class RoadEvents {
         return s;
     }
     private static boolean isHostile(String id){return Arrays.asList("assassin","assassin_mistake","boethiah","dragon_attack","island_dragon","bandits","marauder","bounty_hunters","thalmor_order","vampire_assassin","vampire_attack","death_hounds","werewolf_pack","gargoyles","island_werebears","island_morag_tong","city_vampire_thralls","city_vampire_gargoyle","city_death_hounds","city_vampire_hounds","city_vampire_trio","city_vampire_summoner","hostile_traveler","heavy_breton","dual_wield_imperial").contains(id);}
+    private static final String[][] FRIENDS={{"bitten_hunter","Спасённый охотник"},{"merchant_attack","Спасённый торговец"},{"bard_attack","Талсгар"},{"burned_crops","Фермер, которому ты помог"},{"hakar","Хакар"},{"forsworn_merchant","Торговец, спасённый от Изгоев"},{"peddler_bandit","Спасённый всадник"},{"peddler_forsworn","Спасённый торговец"}};
+    private static String friendSource(GameEngine g){for(String[] f:FRIENDS)if("ACTIVE".equals(g.progress.questOutcome("road_friend_"+f[0])))return f[0];return "";}
+    private static String friendName(GameEngine g){String id=friendSource(g);for(String[] f:FRIENDS)if(f[0].equals(id))return f[1];return "Знакомый путник";}
+    private void rememberFriend(GameEngine g){for(String[] f:FRIENDS)if(f[0].equals(id)){g.progress.setQuestOutcome("road_friend_"+id,"ACTIVE");fact(g,"road_friend_"+id,f[1],"HELPED");return;}}
     private void fact(GameEngine g,String key,String title,String status){try{g.sceneState.setContext(g.day,g.hour,g.progress.location);g.sceneState.confirm("npc",key,title,status);}catch(Exception ignored){}}
     private void uniqueOutcome(GameEngine g,String state){g.progress.setQuestOutcome("road_"+id,state);}
     private void finish(GameEngine g,String text){if(oneTime(find(id))&&!"arvak".equals(id)&&!"leave".equals(decision))uniqueOutcome(g,"COMPLETED");remember(g);outcome=text;last=id;g.message=text;g.mode="RESULT";g.progress.sync(g);g.recordVisualEvent(find(id).title+": "+text);}
@@ -465,7 +474,7 @@ final class RoadEvents {
         else if("assassin_mistake".equals(id)||"assassin_other".equals(id))g.message+="\n"+RoadQuests.evidence(g,"Чужой контракт Тёмного Братства");
         else if("thalmor_order".equals(id))g.message+="\n"+RoadQuests.lead(g,"thalmor_report");
         else if(RoadQuests.find(id)!=null)g.message+="\n"+RoadQuests.lead(g,id);
-        if("rescue".equals(e.rule)||"hakar".equals(id)){g.reputation++;if("hakar".equals(id))g.factions.roadTrust(6,5);g.message+="\nСпасённый путник благодарит тебя. Репутация +1.";}
+        if("rescue".equals(e.rule)||"hakar".equals(id)){rememberFriend(g);g.reputation++;if("hakar".equals(id))g.factions.roadTrust(6,5);g.message+="\nСпасённый путник благодарит тебя. Репутация +1.";}
         if(groupSize()>1)g.message+="\nПобеждены все "+groupSize()+" противника.";g.progress.sync(g);}
     private void freed(GameEngine g){g.reputation++;int side="imperial_prisoner".equals(id)?5:"storm_prisoner".equals(id)?4:-1;if(side>=0){g.factions.roadTrust(side,5);g.factions.roadTrust(side==4?5:4,-5);}if(encounterRegion>=0&&encounterRegion<g.holdReputation.length)g.holdReputation[encounterRegion]=Math.min(100,g.holdReputation[encounterRegion]+2);}
     void choose(GameEngine g,String action){
@@ -500,12 +509,12 @@ final class RoadEvents {
             case "adopt":if("stray_dog".equals(id)){g.progress.setQuestOutcome("road_dog_companion","COMPLETED");finish(g,"Пёс принимает тебя за нового хозяина и становится спутником.");}else{g.progress.setQuestOutcome("road_mount","COMPLETED");finish(g,"Лошадь успокаивается и позволяет тебе взять поводья.");}return;
             case "gourmet":finish(g,"Балбус верит, что встретил Гурмана."+RoadQuests.evidence(g,"Ингредиенты Балбуса"));return;
             case "dwemer":if(g.gold>=1){g.gold--;RoadQuests.offer(g,"dwemer_children");finish(g,"Дети указывают Переправу Глубинного Народа. Цель появилась в журнале.");}else finish(g,"У тебя нет даже одного септима.");return;
-            case "cure":if(g.progress.removeItem("Зелье исцеления болезней",1)){g.reputation++;fact(g,"road_bitten_hunter","Укушенный охотник","HELPED");finish(g,"Охотник выпивает зелье исцеления болезней и благодарит за спасение. "+RoadQuests.lead(g,"bitten_hunter"));}else finish(g,"У тебя нет подходящего зелья. Охотник отправляется искать целителя.");return;
+            case "cure":if(g.progress.removeItem("Зелье исцеления болезней",1)){g.reputation++;rememberFriend(g);fact(g,"road_bitten_hunter","Укушенный охотник","HELPED");finish(g,"Охотник выпивает зелье исцеления болезней и благодарит за спасение. "+RoadQuests.lead(g,"bitten_hunter"));}else finish(g,"У тебя нет подходящего зелья. Охотник отправляется искать целителя.");return;
             case "observe":finish(g,"island_flying_wizard".equals(id)?"Маг падает с высоты. Эксперимент окончился трагически.":"Стая исчезает в темноте. Опасности нет.");return;
             case "clue":String clue=clueText(id);finish(g,clue+" "+RoadQuests.lead(g,id));return;
             case "reveal_fight":fight(g,e.enemy);return;
-            case "gift":g.gold=GameEngine.nonnegativeAdd(g.gold,10);finish(g,"Путник дарит тебе 10 септимов в знак благодарности.");return;
-            case "donate":if(g.gold>=10){g.gold-=10;g.reputation++;finish(g,"Ты отдаёшь фермерам 10 септимов. Они благодарят тебя.");}else finish(g,"У тебя недостаточно септимов, но ты указываешь путь к ближайшему поселению.");return;
+            case "gift":String source=friendSource(g);if(source.isEmpty()){finish(g,"Путник приветствует тебя и продолжает путь.");return;}String friend=friendName(g);g.gold=GameEngine.nonnegativeAdd(g.gold,10);g.progress.setQuestOutcome("road_friend_"+source,"COMPLETED");finish(g,friend+" дарит тебе 10 септимов за прежнюю помощь.");return;
+            case "donate":if(g.gold>=10){g.gold-=10;g.reputation++;rememberFriend(g);finish(g,"Ты отдаёшь фермерам 10 септимов. Они благодарят тебя.");}else finish(g,"У тебя недостаточно септимов, но ты указываешь путь к ближайшему поселению.");return;
             case "song":g.stamina=Math.min(g.maxStamina,g.stamina+5);finish(g,"Талсгар исполняет песню о северных героях. Короткий привал возвращает немного сил.");return;
             case "sanguine_pay":case "sanguine_negotiate":int owed="sanguine_pay".equals(verb)?10000:750;if(g.gold<owed){finish(g,"Не хватает септимов. Пари остаётся незакрытым.");return;}if("sanguine_negotiate".equals(verb)&&!g.rollCheck(g.progress.chance(g,2,12,50))){finish(g,"Аргонианин не соглашается на меньшую сумму.");return;}g.gold-=owed;uniqueOutcome(g,"COMPLETED");finish(g,"Глубокий-в-Кубках принимает "+owed+" септимов и уходит.");return;
             case "fight":fight(g,e.enemy);return;

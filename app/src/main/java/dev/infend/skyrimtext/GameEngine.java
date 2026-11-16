@@ -98,7 +98,7 @@ public final class GameEngine {
     public boolean buyExtra(String id){
         if(!started||!"SHOP".equals(mode)||!merchantExtras().contains(id))return false;
         int price=merchantExtraPrice(id);ItemCatalog.Item item=ItemCatalog.find(id);
-        if(price<=0||merchantStock(id)<=0||gold<price||item==null||progress.carryWeight()+item.weight>50.00001)return false;
+        if(price<=0||merchantStock(id)<=0||gold<price||item==null||progress.carryWeight()+item.weight>progress.carryLimit()+0.00001)return false;
         if(!progress.addItem(id,1))return false;
         if(!merchants.purchase(region,day,id,price)){progress.removeItem(id,1);return false;}
         gold-=price;progress.sync(this);message="Куплено: "+id+" | −"+price+" септимов.";recordVisualEvent(message);return true;
@@ -106,7 +106,7 @@ public final class GameEngine {
     public int maxExtraPurchase(String id){
         ItemCatalog.Item item=ItemCatalog.find(id);int price=merchantExtraPrice(id);
         if(!"SHOP".equals(mode)||item==null||price<=0||!merchantExtras().contains(id))return 0;
-        int weight=item.weight<=0?99:(int)Math.floor((50.00001-progress.carryWeight())/item.weight);
+        int weight=item.weight<=0?99:(int)Math.floor((progress.carryLimit()+0.00001-progress.carryWeight())/item.weight);
         return Math.max(0,Math.min(99,Math.min(merchantStock(id),Math.min(gold/price,weight))));
     }
     public boolean buyExtraMany(String id,int amount){
@@ -261,7 +261,7 @@ public final class GameEngine {
         s.add("SHOP","Торговая лавка","Зелья, оружие и снаряжение");
         s.add("BOARD","Доска заказов","Дополнительное поручение");
         s.add("REST","Отдохнуть в трактире","20 септимов | восстановить силы");
-        RoadQuests.choices(this,s);road.fineChoices(this,s);
+        RoadQuests.choices(this,s);road.fineChoices(this,s);road.estateChoices(this,s);
         return s;
     }
 
@@ -381,6 +381,7 @@ public final class GameEngine {
         if("ROAD_SUMMON_ROSE".equals(action)||"ROAD_SUMMON_AETHER".equals(action)){combatTurn(action);return;}
         if(action.startsWith("ROADQUEST:")){RoadQuests.choose(this,action);return;}
         if(action.startsWith("ROADFINE:")){road.payFine(this,action);return;}
+        if(action.startsWith("ROADESTATE:")){road.buyEstate(this,action);return;}
         if(action.startsWith("ROADSTART:")){RoadQuests.start(this,action.substring("ROADSTART:".length()));return;}
         if(action.startsWith("ROADDEBT:")){if("ROADDEBT:pay".equals(action)||"ROADDEBT:negotiate".equals(action))RoadQuests.payDebt(this,"ROADDEBT:negotiate".equals(action));return;}
         int fixPower=CompensationPowers.actionIndex(action);if(fixPower>=0){if(compensation.available(this,fixPower))combatTurn(action);return;}
@@ -534,7 +535,7 @@ public final class GameEngine {
         if(incoming==null){message="Предмет не найден в каталоге. Покупка отменена.";mode="RESULT";return;}
         double projected=progress.carryWeight()+incoming.weight;
         if(previous!=null&&progress.quantity(replaced)>0)projected-=previous.weight;
-        if(projected>50.00001){
+        if(projected>progress.carryLimit()+0.00001){
             message="Нельзя взять предмет: вес превысит 50 кг. Септимы не списаны.";
             mode="RESULT";return;
         }
@@ -568,7 +569,7 @@ public final class GameEngine {
         } else {
             int found=15+random.nextInt(41);gold=nonnegativeAdd(gold,found);addXp(12);
             boolean extraPotion=random.nextInt(4)==0;
-            boolean canTake=progress.carryWeight()+0.5<=50.00001;
+            boolean canTake=progress.carryWeight()+0.5<=progress.carryLimit()+0.00001;
             if(extraPotion&&canTake)potions++;
             message="В зарослях найден старый тайник. Внутри "+found+" септимов. +12 опыта."+
                 (extraPotion?(canTake?" Найдено лечебное зелье.":" Зелье пришлось оставить из-за веса."):"");
@@ -584,7 +585,7 @@ public final class GameEngine {
             if(help){
                 reputation++;int gain=10+random.nextInt(16);addXp(gain);
                 if(random.nextBoolean()){
-                    boolean canCarry=progress.carryWeight()+0.5<=50.00001;
+                    boolean canCarry=progress.carryWeight()+0.5<=progress.carryLimit()+0.00001;
                     if(canCarry)potions++;
                     message=canCarry?"Ты помогаешь незнакомцу и получаешь лечебное зелье. Репутация +1, опыт +"+gain+".":
                         "Ты помогаешь путнику, но оставляешь зелье из-за тяжёлой поклажи. Репутация +1, опыт +"+gain+".";
