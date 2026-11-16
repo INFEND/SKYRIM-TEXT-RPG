@@ -68,7 +68,7 @@ public final class GameEngine {
     public final int[] regenBonus=new int[3];
     public boolean regenIgnorePenalty;
     public void syncLivingSystems(){needs.sync(day,hour);economy.sync(day);}
-    public int regenRate(int index){return 1+regenBonus[index]+(index==1?compensation.passiveBonus(this,2):0); }
+    public int regenRate(int index){return Math.max(0,1+regenBonus[index]+(index==1?compensation.passiveBonus(this,2):0)+progress.artifacts.regen(progress,index)); }
     private void regenerateCombat(){if(hp<=0||!"COMBAT".equals(mode))return;int penalty=regenIgnorePenalty?0:needs.penalty();hp=(int)Math.min(maxHp,(long)hp+(poisonTurns>0&&!regenIgnorePenalty?regenBonus[0]:Math.max(0,regenRate(0)-(penalty>0?1:0))));magicka=(int)Math.min(maxMagicka,(long)magicka+Math.max(regenBonus[1],regenRate(1)-(penalty>0?1:0)));stamina=(int)Math.min(maxStamina,(long)stamina+(frostTurns>0&&!regenIgnorePenalty?regenBonus[2]:Math.max(0,regenRate(2)-(penalty>0?1:0))));}
     public AiGameTurn aiTurn;
     public SceneState sceneState = new SceneState();
@@ -264,7 +264,7 @@ public final class GameEngine {
         s.add("SHOP","Торговая лавка","Зелья, оружие и снаряжение");
         s.add("BOARD","Доска заказов","Дополнительное поручение");
         s.add("REST","Отдохнуть в трактире","20 септимов | восстановить силы");
-        RoadQuests.choices(this,s);road.fineChoices(this,s);road.estateChoices(this,s);
+        RoadQuests.choices(this,s);road.fineChoices(this,s);road.estateChoices(this,s);progress.artifacts.choices(this,s);
         return s;
     }
 
@@ -333,7 +333,7 @@ public final class GameEngine {
             .add("MAGIC","Магическая вспышка","−"+magicCost()+" магии | усиленный урон")
             .add("DEFEND","Защититься","Уменьшить ответный урон")
             .add("POTION","Выпить лечебное зелье","Осталось: " + potions);
-        road.targetChoices(this,s);
+        road.targetChoices(this,s);progress.artifacts.combatChoices(this,s);
         if(roadSummonTurns==0&&progress.equipped("Роза Сангвина"))s.add("ROAD_SUMMON_ROSE","Призвать дремора","20 магии | три хода помощи");
         if(roadSummonTurns==0&&progress.equipped("Этериевый посох"))s.add("ROAD_SUMMON_AETHER","Призвать автоматон","20 магии | три хода помощи");
         if("WILD".equals(battleKind))s.add("FLEE","Отступить","Шанс выйти из боя без награды");
@@ -383,7 +383,12 @@ public final class GameEngine {
         if(action.startsWith("ROAD_TARGET:")){road.selectTarget(this,action);return;}
         if("ROAD_SUMMON_ROSE".equals(action)||"ROAD_SUMMON_AETHER".equals(action)){combatTurn(action);return;}
         if(action.startsWith("ROADQUEST:")){RoadQuests.choose(this,action);return;}
+        if(action.startsWith("ROADSTONE:")){progress.artifacts.activate(this,action);return;}
+        if("ROADSTONE_TOWER".equals(action)){progress.artifacts.useTower(this);return;}
+        if(action.startsWith("ROADSTAR:")){progress.artifacts.releaseOutside(this,action);return;}
+        if(action.startsWith("ROADSTONE_")||action.startsWith("ROADSTAR_")){combatTurn(action);return;}
         if(action.startsWith("ROADFINE:")){road.payFine(this,action);return;}
+        if(action.startsWith("ROADJAIL:")){road.serveSentence(this,action);return;}
         if(action.startsWith("ROADESTATE:")){road.buyEstate(this,action);return;}
         if(action.startsWith("ROADSTART:")){RoadQuests.start(this,action.substring("ROADSTART:".length()));return;}
         if(action.startsWith("ROADDEBT:")){if("ROADDEBT:pay".equals(action)||"ROADDEBT:negotiate".equals(action))RoadQuests.payDebt(this,"ROADDEBT:negotiate".equals(action));return;}
@@ -628,7 +633,7 @@ public final class GameEngine {
     void beginAlmaBattle(){startBattle("Убийца Тёмного Братства",75+level*8,8+level*2,"ALMA","Преследователь преграждает дорогу. Альма предупреждает о засаде.");}
     void beginKatherineBattle(){startBattle("Агент Круга Трёх Когтей",75+level*8,8+level*2,"KATHERINE","Кэтрин поднимает барьер. Агент Круга требует, чтобы она сдалась.");}
     private void startBattle(String name,int health,int dmg,String kind,String intro) {
-        resetBattleVisuals();alma.beginBattle();katherine.companion.beginBattle();enemyName=name;enemyHp=health;enemyMaxHp=health;enemyDamage=dmg;battleKind=kind;enemyIntro=intro;
+        resetBattleVisuals();progress.artifacts.trapTurns=0;alma.beginBattle();katherine.companion.beginBattle();enemyName=name;enemyHp=health;enemyMaxHp=health;enemyDamage=dmg;battleKind=kind;enemyIntro=intro;
         battleLog="В бою важна тактика. Следи за запасом сил и магии.";mode="COMBAT";
     }
     // Retain class/quest/AI bonuses in old saves without counting the legacy
@@ -646,11 +651,16 @@ public final class GameEngine {
     private void combatTurn(String action) {
         if(!mode.equals("COMBAT"))return;
         lastDealt=lastTaken=lastHealing=lastBlocked=0;lastHeavyHit=lastMiss=lastCritical=false;
-        int damage=0;boolean defending=false;String actionText="";
+        int damage=0;boolean defending=false,shadow=false;String actionText="";
         int custom=CompensationPowers.actionIndex(action);
         if(custom>=0){if(!compensation.available(this,custom))return;magicka-=compensation.cost(custom);if(!compensation.safe[custom])hp-=2;compensation.cooldown[custom]=4;
             int power=compensation.strength(custom);if(compensation.powerType[custom]==1){lastHealing=Math.min(maxHp-hp,power);hp+=lastHealing;actionText=compensation.powerName(custom)+": +"+lastHealing+" здоровья.";}else{damage=power;defending=compensation.powerType[custom]==2;actionText=compensation.powerName(custom)+": −"+damage+" здоровья врагу.";}
         }else switch(action){
+            case "ROADSTONE_RITUAL":if(progress.artifacts.usedDay==day||!progress.artifacts.has(progress,10)||roadSummonTurns>0)return;progress.artifacts.usedDay=day;roadSummonKind=3;roadSummonTurns=3;actionText="Камень Ритуала поднимает мертвеца.";break;
+            case "ROADSTONE_SERPENT":if(progress.artifacts.usedDay==day||!progress.artifacts.has(progress,11))return;progress.artifacts.usedDay=day;damage=25;defending=true;actionText="Камень Змея отравляет и ослабляет врага.";break;
+            case "ROADSTONE_SHADOW":if(progress.artifacts.usedDay==day||!progress.artifacts.has(progress,12))return;progress.artifacts.usedDay=day;shadow=true;actionText="Камень Тени скрывает героя.";break;
+            case "ROADSTAR_TRAP":if(progress.artifacts.trapTurns>0||magicka<10||!((progress.artifacts.whiteSoul==0&&progress.quantity("Звезда Азуры")>0)||(progress.artifacts.blackSoul==0&&progress.quantity("Звезда Чёрной Азуры")>0)))return;magicka-=10;progress.artifacts.trapTurns=3;actionText="Наложен захват души на три хода.";break;
+            case "ROADSTAR_WHITE":case "ROADSTAR_BLACK":int mana=progress.artifacts.release(this,"ROADSTAR_WHITE".equals(action)?1:2);if(mana==0)return;actionText="Душа высвобождена: +"+mana+" магии.";break;
             case "ROAD_SUMMON_ROSE":case "ROAD_SUMMON_AETHER":if(roadSummonTurns>0||magicka<20||!progress.equipped("ROAD_SUMMON_ROSE".equals(action)?"Роза Сангвина":"Этериевый посох"))return;magicka-=20;roadSummonKind="ROAD_SUMMON_ROSE".equals(action)?1:2;roadSummonTurns=3;actionText=roadSummonKind==1?"Роза Сангвина призывает дремора.":"Этериевый посох призывает автоматон.";break;
             case "ATTACK": damage=Math.max(1,effectiveAttack()+random.nextInt(9)-3);actionText="Ты наносишь удар: −"+damage+" здоровья врагу.";break;
             case "HEAVY":if(stamina<heavyCost()){battleLog="Недостаточно выносливости для сильного удара.";return;}
@@ -680,20 +690,23 @@ public final class GameEngine {
         int liviaDamage=livia.assist(battleTurns+1,Math.max(0,enemyHp-damage));if(liviaDamage>0){damage+=liviaDamage;actionText+="\nЛивия: удар мечом, −"+liviaDamage+" здоровья врагу.";}
         int almaDamage=alma.assist(this,battleTurns+1,Math.max(0,enemyHp-damage));if(almaDamage>0){damage+=almaDamage;actionText+="\nАльма: "+alma.powerLabel()+", −"+almaDamage+" здоровья врагу.";}
         int almaCombo=alma.combo(Math.max(0,enemyHp-damage),"MAGIC".equals(action));if(almaCombo>0){damage+=almaCombo;actionText+="\nАльма: Кровавая связка, −"+almaCombo+" здоровья врагу.";}
-        if(roadSummonTurns>0){int summon=Math.min(Math.max(0,enemyHp-damage),roadSummonKind==1?10+level/2:7+level/3);if(summon>0){damage+=summon;actionText+="\n"+(roadSummonKind==1?"Дремора":"Двемерский автоматон")+" наносит "+summon+" урона.";}if(--roadSummonTurns==0){roadSummonKind=0;actionText+="\nПризыв рассеивается.";}}
+        if(roadSummonTurns>0){int summon=Math.min(Math.max(0,enemyHp-damage),roadSummonKind==1?10+level/2:7+level/3);if(summon>0){damage+=summon;actionText+="\n"+(roadSummonKind==1?"Дремора":roadSummonKind==3?"Поднятый мертвец":"Двемерский автоматон")+" наносит "+summon+" урона.";}if(--roadSummonTurns==0){roadSummonKind=0;actionText+="\nПризыв рассеивается.";}}
         int roadAssist=road.allyDamage(this,damage);if(roadAssist>0){damage+=roadAssist;actionText+="\nСоратники атакуют великана: −"+roadAssist+" здоровья.";}
         lastDealt=Math.min(enemyHp,damage);lastHeavyHit="HEAVY".equals(action)&&lastDealt>0;lastMiss="HEAVY".equals(action)&&lastDealt==0;battleDealt+=lastDealt;battleTurns++;
         enemyHp=Math.max(0,enemyHp-damage);road.syncGroup(this);
         boolean defeatedTarget=false;
-        if(enemyHp==0) {poisonTurns=frostTurns=0;if(road.nextOpponent(this,actionText)){actionText=battleLog;defeatedTarget=true;}else{winBattle(actionText);return;}}
+        if(enemyHp==0) {if(!("CANONICAL".equals(battleKind)&&(canonicalStage==22||canonicalStage==27||canonicalStage==30)))actionText+=progress.artifacts.capture(this,enemyName);poisonTurns=frostTurns=0;if(road.nextOpponent(this,actionText)){actionText=battleLog;defeatedTarget=true;}else{winBattle(actionText);return;}}
         int baseIncoming=enemyDamage+random.nextInt(8)-Math.max(0,armor-(armorUpgraded?4:0));
         baseIncoming=Math.max(1,baseIncoming-compensation.passiveBonus(this,1));
         int rawIncoming=Math.max(1,baseIncoming-(defending?enemyDamage/2+3+2*progress.branches.rank(3)+(progress.advanced.has(AdvancedPerks.QUICK_REFLEXES)?2:0)+(progress.advanced.has(AdvancedPerks.SHIELD_WALL)&&!"Не надето".equals(progress.equippedName("shield"))?3:0)+(progress.advanced.has(AdvancedPerks.SHIELD_CHARGE)&&!"Не надето".equals(progress.equippedName("shield"))?4:0):0));
         int incoming=Math.max(1,(int)Math.round(rawIncoming*(1-progress.damageReduction())));
+        if(road.magicalEnemy(enemyName))incoming=progress.artifacts.magicAdjust(progress,incoming);
         int flank=road.extraIncoming(this,defending,random);incoming+=flank;if(flank>0)actionText+="\nОстальные противники атакуют одновременно: −"+flank+" здоровья до защиты спутников.";
         if(defending)lastBlocked=Math.max(0,Math.max(1,(int)Math.round(Math.max(1,baseIncoming)*(1-progress.damageReduction())))-(incoming-flank));
         if(defending&&progress.equipped("Разрушитель Заклинаний")&&road.magicalEnemy(enemyName)){int ward=Math.min(10,incoming);incoming-=ward;lastBlocked+=ward;actionText+="\nРазрушитель Заклинаний: оберег поглощает "+ward+" магического урона.";}
         if(defending&&progress.equipped("Этериевый щит")&&battleTurns%3==0){int phase=Math.max(0,incoming-flank);incoming-=phase;lastBlocked+=phase;actionText+="\nЭтериевый щит: текущий враг становится бесплотным и пропускает ответную атаку.";}
+        if(shadow){lastBlocked+=incoming;incoming=0;actionText+="\nОтветная атака не достигает скрытого героя.";}
+        if(progress.artifacts.trapTurns>0)progress.artifacts.trapTurns--;
         int kathWeakness=katherine.active()?katherine.companion.weaken(incoming):0;incoming-=kathWeakness;
         if(kathWeakness>0){lastBlocked+=kathWeakness;actionText+="\nКэтрин: ослабление противника, −"+kathWeakness+" входящего урона.";}
         int kathProtection=katherine.protect(incoming);incoming-=kathProtection;
@@ -844,7 +857,7 @@ public final class GameEngine {
             g.merchants=MerchantLedger.fromJson(j.optJSONObject("merchants"));g.factions=FactionCampaign.fromJson(j.optJSONObject("factions"));g.factionStories=FactionStories.fromJson(j.optJSONObject("factionStories"));g.factionBattle=Math.max(-1,Math.min(6,j.optInt("factionBattle",-1)));
             org.json.JSONArray holds=j.optJSONArray("holdReputation");if(holds!=null)for(int i=0;i<g.holdReputation.length;i++)g.holdReputation[i]=Math.max(-100,Math.min(100,holds.optInt(i,0)));
             if("COMBAT".equals(g.mode)){g.poisonTurns=Math.max(0,Math.min(2,j.optInt("poisonTurns")));g.frostTurns=Math.max(0,Math.min(2,j.optInt("frostTurns")));}
-            g.roadSummonTurns=Math.max(0,Math.min(3,j.optInt("roadSummonTurns")));g.roadSummonKind=g.roadSummonTurns>0?Math.max(1,Math.min(2,j.optInt("roadSummonKind"))):0;g.battleTurns=Math.max(0,j.optInt("battleTurns"));g.battleDealt=Math.max(0,j.optInt("battleDealt"));g.battleTaken=Math.max(0,j.optInt("battleTaken"));
+            g.roadSummonTurns=Math.max(0,Math.min(3,j.optInt("roadSummonTurns")));g.roadSummonKind=g.roadSummonTurns>0?Math.max(1,Math.min(3,j.optInt("roadSummonKind"))):0;g.battleTurns=Math.max(0,j.optInt("battleTurns"));g.battleDealt=Math.max(0,j.optInt("battleDealt"));g.battleTaken=Math.max(0,j.optInt("battleTaken"));
             org.json.JSONArray visited=j.optJSONArray("visitedVisual");
             if(visited!=null)for(int i=0;i<Math.min(visited.length(),2000);i++){String v=visited.optString(i);if(!v.isEmpty())g.visitedVisual.add(v);}
             if(g.started)g.visitedVisual.add(g.progress.location);

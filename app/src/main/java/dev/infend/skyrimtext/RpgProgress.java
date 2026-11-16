@@ -5,6 +5,7 @@ import java.util.*;
 
 public final class RpgProgress {
     public final JSONObject inventory = new JSONObject();
+    RoadArtifacts artifacts=new RoadArtifacts();
     public final ArrayList<String> completed = new ArrayList<>();
     public final ArrayList<String> failed = new ArrayList<>();
     // Quest outcomes are separate from repeatable skill-check history.
@@ -138,7 +139,7 @@ public final class RpgProgress {
     public boolean hasArmorType(int skill){for(String slot:SLOTS){ItemCatalog.Item item=ItemCatalog.find(equipped.get(slot));if(item!=null&&item.wearable()&&item.baseStat>0&&item.statSkill==skill)return true;}return false;}
     public double damageReduction(){
         boolean heavy=false,light=false;for(String slot:SLOTS){ItemCatalog.Item item=ItemCatalog.find(equipped.get(slot));if(item!=null&&item.wearable()&&item.baseStat>0){heavy|=item.statSkill==4;light|=item.statSkill==5;}}
-        double base=Math.min(0.8,(equippedArmor()+25*armorPieces())*0.0012);
+        double base=Math.min(0.8,(equippedArmor()+25*armorPieces())*0.0012+artifacts.reduction(this));
         int heavyPieces=0,lightPieces=0;
         for(String slot:new String[]{"head","body","hands","feet"}){ItemCatalog.Item item=ItemCatalog.find(equipped.get(slot));if(item!=null&&item.baseStat>0){if(item.statSkill==4)heavyPieces++;if(item.statSkill==5)lightPieces++;}}
         double fit=heavyPieces==4&&advanced.has(AdvancedPerks.WELL_FITTED)?.05:lightPieces==4&&advanced.has(AdvancedPerks.CUSTOM_FIT)?.05:0;
@@ -198,7 +199,7 @@ public final class RpgProgress {
         try{inventory.put(id,Math.max(0,n));if(n<=0)tempered.remove(id);}catch(Exception ignored){}
     }
     public int quantity(String id){return inventory.optInt(id,0);}
-    public double carryLimit(){return 50+(equipped("Зачарованное ожерелье")?25:0);}
+    public double carryLimit(){return 50+(equipped("Зачарованное ожерелье")?25:0)+artifacts.carryBonus(this);}
     public boolean addItem(String id,int quantity){
         if(quantity<=0||ItemCatalog.find(id)==null||CompensationPowers.itemIndex(id)>=0||quantity(id)>Integer.MAX_VALUE-quantity)return false;
         ItemCatalog.Item item=ItemCatalog.find(id);
@@ -230,7 +231,7 @@ public final class RpgProgress {
     public void skillExperience(GameEngine g,int index,int amount){
         if(index<0||index>=skillLevels.length||amount<=0)return;
         if(skillLevels[index]<100){
-            skillXp[index]+=amount+branches.experienceBonus(index,amount)+(index==8&&advanced.has(AdvancedPerks.ENCHANTER)?amount/5:0)+(index==6&&advanced.has(AdvancedPerks.ARCANE_SMITH)?amount/5:0)+(index==8&&advanced.has(AdvancedPerks.EXTRA_EFFECT)||index==17&&advanced.has(AdvancedPerks.TWIN_SOULS)?amount*3/10:0);
+            skillXp[index]+=amount+artifacts.skillBonus(this,index,amount)+branches.experienceBonus(index,amount)+(index==8&&advanced.has(AdvancedPerks.ENCHANTER)?amount/5:0)+(index==6&&advanced.has(AdvancedPerks.ARCANE_SMITH)?amount/5:0)+(index==8&&advanced.has(AdvancedPerks.EXTRA_EFFECT)||index==17&&advanced.has(AdvancedPerks.TWIN_SOULS)?amount*3/10:0);
             while(skillLevels[index]<100&&skillXp[index]>=skillNeed(index)){
                 skillXp[index]-=skillNeed(index);skillLevels[index]++;
                 if(skillLevels[index]==100)skillXp[index]=0;
@@ -253,7 +254,7 @@ public final class RpgProgress {
         int difficulty=baseDifficulty+Math.max(0,15-g.level)*2;
         int danger=Math.max(0,g.region/2)+difficulty/10;
         int skill=skillIndex<0?0:(skillLevel(skillIndex)-15)/2;
-        int context=Math.min(18,g.reputation/3)+skill+branches.chanceBonus(skillIndex)+advanced.checkBonus(skillIndex)+(skillIndex==12&&advanced.has(AdvancedPerks.PERSUASION)?5:0)-(carryWeight()>carryLimit()*0.9?8:0);
+        int context=Math.min(18,g.reputation/3)+skill+artifacts.towerBonus(g,skillIndex)+branches.chanceBonus(skillIndex)+advanced.checkBonus(skillIndex)+(skillIndex==12&&advanced.has(AdvancedPerks.PERSUASION)?5:0)-(carryWeight()>carryLimit()*0.9?8:0);
         g.needs.sync(g.day,g.hour);
         int base=RpgContent.successChance(g,stat,difficulty,danger,exhaustion,context);
         int result=Math.max(0,base-g.needs.penalty());
@@ -387,7 +388,7 @@ public final class RpgProgress {
              .put("points",new JSONArray(spent)).put("skillLevels",new JSONArray(skillLevels))
              .put("skillXp",new JSONArray(skillXp)).put("inventory",inventory)
              .put("completed",new JSONArray(completed)).put("failed",new JSONArray(failed))
-             .put("questOutcomes",new JSONObject(questOutcomes))
+             .put("questOutcomes",new JSONObject(questOutcomes)).put("roadArtifacts",artifacts.save())
              .put("perks",perkPoints).put("combatPerks",new JSONArray(combatPerks)).put("studyPerks",new JSONArray(studyPerks)).put("talentBranches",branches.toJson()).put("advancedPerks",advanced.toJson())
              .put("equipmentInitialized",equipmentInitialized).put("equipped",new JSONObject(equipped))
              .put("tempered",new JSONObject(tempered))
@@ -403,7 +404,7 @@ public final class RpgProgress {
     }
     public static RpgProgress fromJson(JSONObject obj){
         RpgProgress p=new RpgProgress();if(obj==null)return p;
-        p.branches=TalentBranches.fromJson(obj.optJSONArray("talentBranches"));p.advanced=AdvancedPerks.fromJson(obj.optJSONArray("advancedPerks"));
+        p.artifacts=RoadArtifacts.restore(obj.optJSONObject("roadArtifacts"));p.branches=TalentBranches.fromJson(obj.optJSONArray("talentBranches"));p.advanced=AdvancedPerks.fromJson(obj.optJSONArray("advancedPerks"));
         p.startId=obj.optString("startId","Хелген");p.location=obj.optString("location","Хелген");
         p.recent=obj.optString("recent","");p.perkPoints=Math.max(0,obj.optInt("perks",0));
         p.activePowerDay=obj.optInt("activePowerDay",-1);p.difficulty=obj.optInt("difficulty",0);
