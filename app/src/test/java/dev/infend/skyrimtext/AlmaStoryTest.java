@@ -58,6 +58,12 @@ public class AlmaStoryTest {
         g=GameEngine.fromJson(g.toJson().toString());assertEquals(1,g.alma.personalTasks);assertEquals(35,g.alma.seranaTrust);
         g.alma.setEnabled(g,false);int before=g.alma.memory.length();g.day++;g.alma.observeTravel(g);assertEquals(before,g.alma.memory.length());assertTrue(g.alma.compactContext(g).contains("отключена"));
     }
+    @Test public void uniqueEpilogueAndDailyChoice() throws Exception {
+        GameEngine g=start();g.choose("ALMA:open");for(int i=0;i<11;i++)g.choose("ALMA:good:"+i);
+        g.choose("ALMA:join");g.choose("ALMA:research:"+g.day);g.choose("ALMA:personal:"+g.day);assertEquals(1,g.alma.personalTasks);assertEquals(1,g.alma.personalResearch);
+        g.choose("ALMA:finish:queen");assertEquals("Укрепить алую печать",g.alma.epilogueTask());g.choose("ALMA:post:0");g.choose("ALMA:post:1");assertEquals(1,g.alma.postStep);
+        g=GameEngine.fromJson(g.toJson().toString());assertEquals(1,g.alma.postStep);assertEquals(1,g.alma.personalResearch);assertFalse(g.alma.epilogueReady(g));g.day++;g.choose("ALMA:post:1");assertEquals(2,g.alma.postStep);
+    }
     @Test public void romanceNotRequiredAndLossIsFinal(){
         GameEngine g=start();g.choose("ALMA:open");for(int i=0;i<11;i++)g.choose("ALMA:cool:"+i);
         g.choose("ALMA:finish:eternal");assertEquals(11,g.alma.stage);
