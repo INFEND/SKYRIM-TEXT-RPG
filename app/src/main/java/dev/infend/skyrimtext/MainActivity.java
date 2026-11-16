@@ -4286,7 +4286,14 @@ public final class MainActivity extends Activity {
         fixOffer(a,"Новый облик","Выбрать портрет героя","Внешность","hero",2,50,this::fixPortrait);
         fixOffer(a,"Новое наследие","Сменить расу; сохранить характеристики и навыки","Внешность","hero",3,150,this::fixRace);
         fixDirect(a,"Благословение исцеления","Полностью восстановить здоровье, магию и силы","Улучшения","health",2,25,()->{if(game.hp==game.maxHp&&game.magicka==game.maxMagicka&&game.stamina==game.maxStamina)return false;game.hp=game.maxHp;game.magicka=game.maxMagicka;game.stamina=game.maxStamina;return true;});
-        fixDirect(a,"Слава героя","+10 репутации","Редактор мира","hero",2,50,()->{if(game.reputation>Integer.MAX_VALUE-10)return false;game.reputation+=10;return true;});
+        fixDirect(a,"Сердце Довакина","+5 к регенерации здоровья, магии и выносливости. Однократно.","Магия","health",4,500,()->{if(game.fixShop.count(FixShopState.key("Сердце Довакина",500))>0)return false;for(int v:game.regenBonus)if(v>999995)return false;for(int i=0;i<3;i++)game.regenBonus[i]+=5;return true;});
+        fixDirect(a,"Перераспределение перков","Вернуть очки всех купленных талантов, сохранив навыки","Навыки","skills",3,100,()->game.progress.resetFixPerks());
+        if(game.fixShop.editorEnabled){
+            fixDirect(a,"Слава героя","+10 репутации","Редактор мира","hero",2,50,()->{if(game.reputation>Integer.MAX_VALUE-10)return false;game.reputation+=10;return true;});
+            fixOffer(a,"Второй шанс","Воскресить NPC из журнала ИИ-сцен; не откатывает сюжетные квесты","Редактор мира","health",2,300,()->fixNpcChoice(true,false));
+            fixOffer(a,"Чистый лист","Сбросить отношение NPC из журнала ИИ-сцен до 50","Редактор мира","hero",2,150,()->fixNpcChoice(false,true));
+            fixOffer(a,"Нити отношений","Изменить отношение NPC из журнала ИИ-сцен","Редактор мира","hero",3,150,()->fixNpcChoice(false,false));
+        }
         return a;
     }
     private void fixOffer(java.util.ArrayList<FixOffer> a,String t,String d,String c,String g,int tier,int price,Runnable action){
@@ -4305,6 +4312,22 @@ public final class MainActivity extends Activity {
     private void fixConfirm(String title,String detail,int price,java.util.function.BooleanSupplier effect,Runnable refresh){
         new RuneDialogBuilder(this,accent()).setTitle(title).setMessage(detail+" | "+price+" F. Только для текущего сохранения.")
             .setNegativeButton("Отмена",null).setPositiveButton("Купить",(d,w)->{if(fixApply(title,detail,price,effect))refresh.run();}).show();
+    }
+    private void fixNpcChoice(boolean resurrect,boolean reset){
+        if(!game.fixShop.editorEnabled||livingBusy())return;
+        org.json.JSONArray facts=game.sceneState.npcFacts();java.util.ArrayList<JSONObject> choices=new java.util.ArrayList<>();
+        java.util.ArrayList<String> labels=new java.util.ArrayList<>();
+        for(int i=0;i<facts.length();i++){JSONObject e=facts.optJSONObject(i);if(e==null)continue;String status=e.optString("status");if(resurrect?!"DEAD".equals(status):("DEAD".equals(status)||"MISSING".equals(status)))continue;choices.add(e);labels.add(e.optString("title")+" | "+npcStatusLabel(status));}
+        if(choices.isEmpty()){toast("Нет подходящих персонажей в журнале ИИ-сцен");return;}
+        String title=resurrect?"Второй шанс":reset?"Чистый лист":"Нити отношений";int price=resurrect?300:150;
+        new RuneDialogBuilder(this,accent()).setTitle(title+" | "+price+" F").setItems(labels.toArray(new String[0]),(d,i)->{
+            JSONObject e=choices.get(i);String id=e.optString("id"),name=e.optString("title");
+            if(resurrect||reset)fixConfirm(title,name,price,()->fixNpcApply(id,50,resurrect),this::livingFixShop);
+            else new RuneDialogBuilder(this,accent()).setTitle("Отношение: "+name).setItems(new String[]{"0 | Вражда","25 | Недоверие","50 | Нейтрально","75 | Дружба","100 | Доверие"},(dd,index)->fixConfirm(title,name+" | "+(index*25),price,()->fixNpcApply(id,index*25,false),this::livingFixShop)).setNegativeButton("Отмена",null).show();
+        }).setNegativeButton("Отмена",null).show();
+    }
+    private boolean fixNpcApply(String id,int score,boolean resurrect){
+        if(!game.fixShop.editorEnabled)return false;game.sceneState.setContext(game.day,game.hour,game.progress.location);return game.sceneState.fixNpc(id,score,resurrect);
     }
     private void fixRename(){
         if(livingBusy())return;LinearLayout panel=column();panel.setPadding(dp(14),dp(8),dp(14),dp(8));
@@ -4333,6 +4356,7 @@ public final class MainActivity extends Activity {
         head.addView(text("∞ F",23,accent(),true),lp(-2,-2));TextView close=text(" × ",28,MUTED,true);close.setOnClickListener(v->closeLivingDialog());head.addView(close,lp(-2,-2));root.addView(head,lp(-1,-2));
         addText(root,"ФИКСКОИНЫ · ОСОБЫЕ ВОЗМОЖНОСТИ",11,MUTED,false,4);addText(root,"Потрачено в этом сохранении: "+livingNumber(game.fixSpent)+" F",12,MUTED,false,8);
         LinearLayout filters=column();root.addView(filters,lp(-1,-2));
+        if(fixShopPage<2){Switch editor=new Switch(this);editor.setText("Редактор мира");editor.setTextColor(MUTED);editor.setTextSize(sp(12));editor.setThumbTintList(ColorStateList.valueOf(accent()));editor.setChecked(game.fixShop.editorEnabled);filters.addView(editor,lp(-1,37));editor.setOnCheckedChangeListener((v,on)->{game.fixShop.editorEnabled=on;save();livingFixShop();});}
         ScrollView scroll=new ScrollView(this);scroll.setFillViewport(false);LinearLayout items=column();scroll.addView(items);root.addView(scroll,new LinearLayout.LayoutParams(-1,0,1));
         LinearLayout nav=row();root.addView(nav,lp(-1,56));String[] names={"Каталог","Избранное","Покупки","История"};String[] glyphs={"inventory","heart","armor","journal"};
         for(int i=0;i<names.length;i++){final int index=i;LinearLayout cell=column();cell.setGravity(Gravity.CENTER);nav.addView(cell,new LinearLayout.LayoutParams(0,-1,1));
@@ -4367,7 +4391,7 @@ public final class MainActivity extends Activity {
         TextView fav=text(game.fixShop.favorite(offer.id())?"♥":"♡",22,accent(),true);fav.setContentDescription("Избранное: "+offer.title);fav.setOnClickListener(v->{game.fixShop.toggle(offer.id());save();fixRenderOffers(items);});label.addView(fav,lp(-2,-2));tile.addView(label,lp(-1,-2));
         TextView name=text(offer.title,16,TEXT,true);name.setMaxLines(2);name.setMinHeight(dp(44));tile.addView(name,lp(-1,-2));
         TextView desc=text(offer.detail,12,MUTED,false);desc.setMaxLines(3);desc.setMinHeight(dp(48));tile.addView(desc,lp(-1,-2));
-        int n=game.fixShop.count(offer.id());if(n>0)addText(tile,"Куплено: "+n,11,accent(),false,3);
+        int n=game.fixShop.count(offer.id());addText(tile,n>0?"Куплено: "+n:" ",11,accent(),false,3);
         TextView buy=text("◇ "+offer.price+" F",15,TEXT,true);buy.setGravity(Gravity.CENTER);buy.setBackground(bg(0xff151515,0xff454545,22));tile.addView(buy,lp(-1,40));buy.setOnClickListener(v->offer.action.run());art.setOnClickListener(v->new RuneDialogBuilder(this,accent()).setTitle(offer.title).setMessage(offer.rarity+"\n"+offer.detail+"\nСтоимость: "+offer.price+" F").setNegativeButton("Закрыть",null).setPositiveButton("Далее",(d,w)->offer.action.run()).show());
     }
     private void fixRenderLedger(LinearLayout items){

@@ -114,6 +114,19 @@ public final class SceneState {
     }
     public String npcStatusByName(String name){for(JSONObject npc:npcs.values())if(npc.optString("title").equalsIgnoreCase(name))return npc.optString("status");return "";}
     private java.util.ArrayList<JSONObject> orderedNpcs(){java.util.ArrayList<JSONObject> ordered=new java.util.ArrayList<>(npcs.values());ordered.sort((a,b)->Long.compare((long)b.optInt("lastDay")*24+b.optInt("lastHour"),(long)a.optInt("lastDay")*24+a.optInt("lastHour")));return ordered;}
+    /** Explicit shop override, separate from normal monotonic AI confirmations. */
+    public boolean fixNpc(String key,int relation,boolean resurrect){
+        JSONObject e=npcs.get(key);if(e==null||relation<0||relation>100)return false;
+        String oldStatus=e.optString("status");int old=e.optInt("relation",50);
+        if(resurrect?!"DEAD".equals(oldStatus):("DEAD".equals(oldStatus)||"MISSING".equals(oldStatus)||old==relation))return false;
+        String status=resurrect?"MET":oldStatus;
+        try{
+            JSONArray history=e.optJSONArray("history"),next=new JSONArray();
+            if(history!=null)for(int i=Math.max(0,history.length()-(MAX_NPC_HISTORY-1));i<history.length();i++)next.put(history.opt(i));
+            next.put(new JSONObject().put("status",status).put("delta",relation-old).put("day",contextDay).put("hour",contextHour).put("location",contextLocation));
+            e.put("status",status).put("relation",relation).put("delta",relation-old).put("history",next);return true;
+        }catch(JSONException ex){return false;}
+    }
     public JSONArray npcFacts(){JSONArray result=new JSONArray();for(JSONObject npc:orderedNpcs())try{result.put(new JSONObject(npc.toString()));}catch(JSONException ignored){}return result;}
     /** Bounded, read-only context of facts confirmed by the engine. */
     public String confirmedContext() {

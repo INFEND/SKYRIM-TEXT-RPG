@@ -152,6 +152,14 @@ public final class RpgProgress {
     public String startId="Хелген", location="Хелген";
     public String recent="Новая история начинается.";
     public int perkPoints=0;
+    /** Return the actual points spent in all three trees; do not reset skills or XP. */
+    public boolean resetFixPerks(){
+        int spent=0;for(int n:combatPerks)spent+=n;for(int n:studyPerks)spent+=n;
+        for(int i=0;i<RpgContent.SKILLS.length;i++)spent+=branches.rank(i);
+        for(int i=0;i<AdvancedPerks.NAMES.length;i++)if(advanced.has(i))spent++;
+        if(spent==0||perkPoints>Integer.MAX_VALUE-spent)return false;
+        java.util.Arrays.fill(combatPerks,0);java.util.Arrays.fill(studyPerks,0);branches=new TalentBranches();advanced=new AdvancedPerks();perkPoints+=spent;return true;
+    }
     public int activePowerDay=-1;
     public int difficulty=0;
     // First dragon story arc is kept inside existing schema-1 save data.
