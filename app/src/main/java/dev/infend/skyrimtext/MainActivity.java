@@ -176,6 +176,7 @@ public final class MainActivity extends Activity {
     }
     @Override protected void onActivityResult(int requestCode,int resultCode,Intent data){
         super.onActivityResult(requestCode,resultCode,data);
+        if(requestCode==LocalAiEngineModule.REQUEST_ACTIVATE){if(localAiClient!=null)localAiClient.onEngineActivationResult(resultCode==RESULT_OK);return;}
         if(requestCode==REQUEST_LOCAL_GGUF&&resultCode==RESULT_OK&&data!=null&&data.getData()!=null)
             importLocalModel(data.getData());
     }
@@ -217,6 +218,7 @@ public final class MainActivity extends Activity {
                 @Override public void onComplete(String answer){
                     if(!dialog.isShowing())return;
                     long elapsed=(android.os.SystemClock.elapsedRealtime()-start)/1000L;
+                    dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setText("Закрыть");
                     result.setText("ТЕСТ УСПЕШЕН\n\nОтвет: "+answer.trim()+
                         "\nОбщее время: "+elapsed+" с"+
                         "\nСгенерировано: "+tokens[0]+" токенов"+
@@ -224,8 +226,8 @@ public final class MainActivity extends Activity {
                         "\n\nДля длинных сцен Skyrim потребуется значительно больше времени.");
                 }
                 @Override public void onError(String message){
-                    if(dialog.isShowing())result.setText("ТЕСТ НЕ ПРОЙДЕН\n\n"+message+
-                        "\n\nИгровые сохранения не изменены.");
+                    if(dialog.isShowing()){dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setText("Закрыть");result.setText("ТЕСТ НЕ ПРОЙДЕН\n\n"+message+
+                        "\n\nИгровые сохранения не изменены.");}
                 }
             });
         if(!started)result.setText("Модель занята либо импортированный GGUF не найден.");

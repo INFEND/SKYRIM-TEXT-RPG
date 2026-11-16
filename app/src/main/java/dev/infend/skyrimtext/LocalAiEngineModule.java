@@ -19,7 +19,10 @@ import org.json.JSONObject;
 /** Separately installed, signature-checked APK; no downloaded executable is loaded in-process. */
 final class LocalAiEngineModule {
     static final String PACKAGE="dev.infend.skyrimtext.engine";
-    static final int VERSION=1;
+    static final int VERSION=2;
+    static final int REQUEST_ACTIVATE=7108;
+    static Intent activationIntent(boolean returnToGame){return new Intent().setComponent(new ComponentName(PACKAGE,"dev.infend.skyrimtext.EngineActivationActivity")).putExtra("returnToGame",returnToGame);}
+    static String diagnostic(Context c){try{PackageManager pm=c.getPackageManager();PackageInfo info=pm.getPackageInfo(PACKAGE,0);ApplicationInfo app=info.applicationInfo;ServiceInfo svc=pm.getServiceInfo(new ComponentName(PACKAGE,"dev.infend.skyrimtext.LocalAiInferenceService"),0);return "v"+info.versionCode+", приложение "+(app.enabled?"включено":"выключено")+", служба "+(svc.enabled?"включена":"выключена")+", разрешение "+(c.checkSelfPermission("dev.infend.skyrimtext.permission.LOCAL_ENGINE")==PackageManager.PERMISSION_GRANTED?"есть":"нет");}catch(Exception e){return e.getClass().getSimpleName();}}
     private static final AtomicBoolean running=new AtomicBoolean();
     private static final String BASE="https://github.com/INFEND/SKYRIM-TEXT-RPG/releases/download/";
     static File apk(Context c){return new File(c.getFilesDir(),"engine/SKYRIM-LOCAL-AI.apk");}
@@ -102,8 +105,8 @@ final class LocalAiEngineModule {
         if(installed(a)){
             apk(a).delete();
             new RuneDialogBuilder(a,accent).setTitle("ДВИЖОК ЛОКАЛЬНОГО ИИ")
-                .setMessage("Установлен отдельно. Обновления игры его не перекачивают. Удаление движка не удаляет GGUF и сохранения.")
-                .setNegativeButton("Закрыть",null).setPositiveButton("Удалить",(d,w)->a.startActivity(new Intent(Intent.ACTION_DELETE,Uri.parse("package:"+PACKAGE)))).show();return;
+                .setMessage("Установлен отдельно. Версия "+VERSION+". Активируй движок, если Android не запускает службу. GGUF и сохранения не удаляются.")
+                .setNegativeButton("Закрыть",null).setNeutralButton("Активировать",(d,w)->{try{a.startActivity(activationIntent(false));}catch(Exception e){new RuneDialogBuilder(a,accent).setMessage("Не удалось открыть движок: "+e.getMessage()).setPositiveButton("Закрыть",null).show();}}).setPositiveButton("Удалить",(d,w)->a.startActivity(new Intent(Intent.ACTION_DELETE,Uri.parse("package:"+PACKAGE)))).show();return;
         }
         new RuneDialogBuilder(a,accent).setTitle("ДВИЖОК ЛОКАЛЬНОГО ИИ")
             .setMessage(sizeLabel(a)+" | отдельный подписанный компонент. Android попросит подтвердить установку.")

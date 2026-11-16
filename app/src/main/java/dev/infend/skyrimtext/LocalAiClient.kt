@@ -1,5 +1,6 @@
 package dev.infend.skyrimtext
 
+import android.app.Activity
 import android.app.ActivityManager
 import android.content.ComponentName
 import android.content.Context
@@ -29,6 +30,9 @@ class LocalAiClient(private val context: Context) {
     private var messenger: Messenger?=null
     private var binding: ServiceConnection?=null
     private var watchdog: Runnable?=null
+    private var connectWatchdog: Runnable?=null
+    private var activationAttempted=false
+    private var awaitingActivation=false
     private val incoming=Messenger(Handler(Looper.getMainLooper()) { reply ->
         if(reply.what==LocalAiProtocol.MSG_STATUS) {
             val id=reply.data.getLong("id",-1L)
@@ -130,6 +134,8 @@ class LocalAiClient(private val context: Context) {
         request.data=data
         request.replyTo=incoming
         pending=request
+        activationAttempted=false
+        awaitingActivation=false
         listener.onLocalStatus("Подключение к отдельному процессу модели…")
         // Native completion streams tokens, but a hardware hang must still time out.
         val expiry=Runnable {
@@ -144,52 +150,92 @@ class LocalAiClient(private val context: Context) {
         ui.postDelayed(expiry,12L*60L*1000L)
         val current=messenger
         if(current!=null) {
+            pending=null
             send(current,request,id)
-        }else {
-            try {
-                val connection=object:ServiceConnection{
-                    override fun onServiceConnected(name:ComponentName?,binder:IBinder?) {
-                        if(binding!==this)return
-                        if(binder==null){failGeneration(id,"Локальный движок не запустился");return}
-                        val server=Messenger(binder)
-                        messenger=server
-                        val msg=pending
-                        pending=null
-                        if(msg!=null&&synchronized(guard){!closed&&busy&&generation==id})
-                            send(server,msg,id)
-                    }
-                    override fun onServiceDisconnected(name:ComponentName?) {
-                        messenger=null
-                        failGeneration(synchronized(guard){generation},"Процесс локальной модели завершился. Возможно, не хватило памяти или GGUF несовместим с движком.")
-                        releaseBinding()
-                    }
-                    override fun onBindingDied(name:ComponentName?) {
-                        messenger=null
-                        failGeneration(synchronized(guard){generation},"Служба локальной модели аварийно завершилась. Попробуй уменьшить модель или освободить память.")
-                        releaseBinding()
-                    }
-                    override fun onNullBinding(name:ComponentName?) {
-                        failGeneration(synchronized(guard){generation},"Не удалось связаться с локальным движком.")
-                        releaseBinding()
-                    }
-                }
-                binding=connection
-                if(!context.bindService(Intent().setComponent(ComponentName(LocalAiEngineModule.PACKAGE,"dev.infend.skyrimtext.LocalAiInferenceService")),
-                       connection,Context.BIND_AUTO_CREATE)) {
-                    binding=null
-                    failGeneration(id,"Android не запустил процесс локальной модели.")
-                }
-            }catch(ex:Exception) {
-                binding=null
-                failGeneration(id,"Невозможно запустить локальную службу: "+(ex.message?:"ошибка Android"))
+        }else connect(id)
+        return true
+    }
+
+    private fun currentGeneration(id:Long):Boolean=synchronized(guard){!closed&&busy&&id==generation}
+    private fun stopConnectTimeout(){connectWatchdog?.let{ui.removeCallbacks(it)};connectWatchdog=null}
+    private fun connect(id:Long) {
+        if(!currentGeneration(id))return
+        stopConnectTimeout()
+        releaseBinding()
+        val connection=object:ServiceConnection{
+            override fun onServiceConnected(name:ComponentName?,binder:IBinder?) {
+                if(binding!==this||!currentGeneration(id))return
+                stopConnectTimeout()
+                if(binder==null){recoverConnection(id,"Служба вернула пустое подключение");return}
+                val server=Messenger(binder)
+                messenger=server
+                val msg=pending
+                pending=null
+                if(msg!=null)send(server,msg,id)
+            }
+            override fun onServiceDisconnected(name:ComponentName?) {
+                if(binding!==this)return
+                val active=synchronized(guard){generation}
+                releaseBinding()
+                failGeneration(active,"Процесс локального ИИ завершился. Возможны нехватка памяти или сбой нативного движка.")
+            }
+            override fun onBindingDied(name:ComponentName?) {
+                if(binding!==this)return
+                val active=synchronized(guard){generation}
+                if(pending!=null)recoverConnection(active,"Android разорвал подключение к службе")
+                else {releaseBinding();failGeneration(active,"Служба локального ИИ аварийно завершилась. Повтори тест.")}
+            }
+            override fun onNullBinding(name:ComponentName?) {
+                if(binding===this)recoverConnection(synchronized(guard){generation},"Служба не предоставила подключение")
             }
         }
-        return true
+        binding=connection
+        try {
+            val intent=Intent().setComponent(ComponentName(LocalAiEngineModule.PACKAGE,"dev.infend.skyrimtext.LocalAiInferenceService"))
+            if(!context.bindService(intent,connection,Context.BIND_AUTO_CREATE)) {
+                recoverConnection(id,"Android отказал в запуске службы (bindService=false)")
+                return
+            }
+            val timeout=Runnable {if(binding===connection&&messenger==null&&currentGeneration(id))recoverConnection(id,"Служба не подключилась за 10 секунд")}
+            connectWatchdog=timeout
+            ui.postDelayed(timeout,10000L)
+        }catch(ex:Exception) {
+            recoverConnection(id,"Ошибка подключения: "+(ex.message?:ex.javaClass.simpleName))
+        }
+    }
+
+    private fun recoverConnection(id:Long,reason:String) {
+        if(!currentGeneration(id))return
+        releaseBinding()
+        if(!activationAttempted&&pending!=null&&context is Activity&&!context.isFinishing&&!context.isDestroyed) {
+            activationAttempted=true
+            awaitingActivation=true
+            activeListener?.onLocalStatus("Активация отдельного движка Android…")
+            try {
+                context.startActivityForResult(LocalAiEngineModule.activationIntent(true),LocalAiEngineModule.REQUEST_ACTIVATE)
+                return
+            }catch(ex:Exception) {
+                awaitingActivation=false
+                failGeneration(id,reason+". Не удалось открыть экран активации: "+(ex.message?:ex.javaClass.simpleName))
+                return
+            }
+        }
+        failGeneration(id,reason+". Движок: "+LocalAiEngineModule.diagnostic(context)+". Открой приложение SKYRIM Local AI Engine один раз; проверь разрешения автозапуска и фоновой активности OriginOS.")
+    }
+
+    fun onEngineActivationResult(ok:Boolean) {
+        if(!awaitingActivation)return
+        awaitingActivation=false
+        val id=synchronized(guard){generation}
+        if(!currentGeneration(id))return
+        if(!ok){failGeneration(id,"Активация движка отменена. Открой SKYRIM Local AI Engine и повтори тест.");return}
+        activeListener?.onLocalStatus("Повторное подключение к активированному движку…")
+        ui.postDelayed({if(currentGeneration(id))connect(id)},350L)
     }
 
     private fun send(server:Messenger,message:Message,id:Long) {
         try{server.send(message)}
-        catch(ex:RemoteException) {messenger=null;failGeneration(id,"Локальный движок недоступен: "+ex.message)}
+        catch(ex:RemoteException) {releaseBinding();failGeneration(id,"Локальный движок недоступен: "+ex.message)}
     }
 
     private fun failGeneration(id:Long,error:String){
@@ -202,6 +248,9 @@ class LocalAiClient(private val context: Context) {
         }
         watchdog?.let {ui.removeCallbacks(it)}
         watchdog=null
+        stopConnectTimeout()
+        pending=null
+        awaitingActivation=false
         ui.post { listener?.onError(error) }
     }
 
@@ -213,6 +262,7 @@ class LocalAiClient(private val context: Context) {
             activeListener=null
             busy=false
             pending=null
+            awaitingActivation=false
         }
         // The native completion is not cooperatively cancellable. Its own process
         // can be terminated without crashing the foreground game.
@@ -222,6 +272,7 @@ class LocalAiClient(private val context: Context) {
     }
 
     private fun releaseBinding(){
+        stopConnectTimeout()
         val conn=binding
         binding=null
         messenger=null

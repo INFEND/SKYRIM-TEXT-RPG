@@ -115,9 +115,10 @@ jobs:
           gradle --no-daemon --stacktrace :engine:assembleRelease
           cp engine/build/outputs/apk/release/engine-release.apk dist/SKYRIM-LOCAL-AI.apk
           python3 - <<'PY'
-          import pathlib,json,hashlib
+          import pathlib,json,hashlib,re
+          version=int(re.search(r"\bversionCode\s+(\d+)",pathlib.Path("engine/build.gradle").read_text()).group(1))
           p=pathlib.Path("dist/SKYRIM-LOCAL-AI.apk")
-          pathlib.Path("app/src/main/assets/engine_module.json").write_text(json.dumps({"versionCode":1,"size":p.stat().st_size,"sha256":hashlib.sha256(p.read_bytes()).hexdigest()}))
+          pathlib.Path("app/src/main/assets/engine_module.json").write_text(json.dumps({"versionCode":version,"size":p.stat().st_size,"sha256":hashlib.sha256(p.read_bytes()).hexdigest()}))
           PY
           gradle --no-daemon --stacktrace :app:assembleRelease
       - name: Verify Sovngarde fonts inside signed APK
