@@ -47,25 +47,61 @@ final class ResourceStore {
     }
     static final class Catalog {
         final LinkedHashMap<String,Entry> entries=new LinkedHashMap<>();
-        boolean bundled;
-        Catalog(Context c)throws Exception{
+        final boolean bundled;
+        final String commit;
+        final long revision;
+        final JSONArray galleries;
+        Catalog(Context c)throws Exception{this(readEmbedded(c));}
+        private static JSONObject readEmbedded(Context c)throws Exception{
             try(InputStream in=c.getAssets().open(MANIFEST)){
-                ByteArrayOutputStream out=new ByteArrayOutputStream();
-                byte[] buf=new byte[8192];int n;
-                while((n=in.read(buf))!=-1){if(out.size()+n>1_000_000)throw new IOException("Каталог слишком велик");out.write(buf,0,n);}
-                JSONObject j=new JSONObject(out.toString("UTF-8"));
-                String commit=j.getString("commit");
-                if(j.getInt("schema")!=1||!commit.matches("[0-9a-f]{40}"))throw new IOException("Неверная версия каталога");
-                bundled=j.getBoolean("bundled");
-                JSONArray list=j.getJSONArray("files");
-                for(int i=0;i<list.length();i++){Entry e=new Entry(list.getJSONObject(i),commit);if(entries.put(e.path,e)!=null)throw new IOException("Дублирование ресурса");}
-                if(entries.isEmpty())throw new IOException("Пустой каталог");
+                return new JSONObject(new String(SignedResourceCatalog.read(in,2_000_000),java.nio.charset.StandardCharsets.UTF_8));
             }
+        }
+        Catalog(JSONObject j)throws Exception{
+            commit=j.getString("commit");revision=j.optLong("revision",0L);
+            if(j.getInt("schema")!=1||!commit.matches("[0-9a-f]{40}")||revision<0)throw new IOException("Неверная версия каталога");
+            bundled=j.getBoolean("bundled");
+            galleries=j.optJSONArray("galleries");
+            JSONArray list=j.getJSONArray("files");
+            if(list.length()>10000)throw new IOException("Каталог слишком велик");
+            for(int i=0;i<list.length();i++){Entry e=new Entry(list.getJSONObject(i),commit);if(entries.put(e.path,e)!=null)throw new IOException("Дублирование ресурса");}
+            if(entries.isEmpty())throw new IOException("Пустой каталог");
+            if(galleries!=null)LocationGalleryView.validateCatalog(galleries,entries);
         }
     }
     private static synchronized Catalog catalog(Context c)throws Exception{
-        if(catalog==null)catalog=new Catalog(c.getApplicationContext());
+        if(catalog==null){
+            Catalog embedded=new Catalog(c.getApplicationContext());
+            catalog=embedded;
+            if(!embedded.bundled)try{
+                Catalog cached=SignedResourceCatalog.cached(c);
+                if(cached!=null&&!cached.bundled&&cached.revision>=embedded.revision)catalog=cached;
+            }catch(Exception ignored){/* signed APK remains the fallback */}
+            LocationGalleryView.applyCatalog(catalog.galleries);
+        }
         return catalog;
+    }
+    // Only invoked on the serial IO executor. Verify before publishing or replacing
+    // any file; offline clients retain the last verified catalog.
+    static boolean refreshRemote(Context c)throws Exception{
+        Catalog before=catalog(c);
+        if(before.bundled)return false;
+        byte[] envelope=SignedResourceCatalog.fetch(c);
+        Catalog remote=SignedResourceCatalog.verify(c,envelope);
+        if(remote.bundled||remote.revision<=0||remote.galleries==null)throw new IOException("Неполный внешний каталог");
+        if(remote.revision<before.revision)return false;
+        if(remote.revision==before.revision&&!remote.commit.equals(before.commit))throw new IOException("Конфликт ревизий каталога");
+        if(remote.commit.equals(before.commit))return false;
+        SignedResourceCatalog.save(c,envelope);
+        synchronized(ResourceStore.class){catalog=remote;LocationGalleryView.applyCatalog(remote.galleries);changed();}
+        return true;
+    }
+    static String automaticError(Context c){return prefs(c).getString("auto_error","");}
+    static String catalogError(Context c){return prefs(c).getString("catalog_error","");}
+    private static void recordError(Context c,String key,String message){prefs(c).edit().putString(key,message).apply();}
+    static boolean refreshCatalog(Context c){
+        try{boolean changed=refreshRemote(c);recordError(c,"catalog_error","");return changed;}
+        catch(Exception ex){recordError(c,"catalog_error","Каталог: "+ex.getMessage());return false;}
     }
     static List<Entry> entries(Context c)throws Exception{return new ArrayList<>(catalog(c).entries.values());}
     static int generation(){return generation;}
@@ -87,6 +123,8 @@ final class ResourceStore {
     static void autoGallery(Context c,boolean value){prefs(c).edit().putBoolean("auto_gallery",value).apply();}
     static boolean autoUpdate(Context c){return prefs(c).getBoolean("auto_update",false);}
     static void autoUpdate(Context c,boolean value){prefs(c).edit().putBoolean("auto_update",value).apply();}
+    static boolean autoNew(Context c){return prefs(c).getBoolean("auto_new",autoUpdate(c));}
+    static void autoNew(Context c,boolean value){prefs(c).edit().putBoolean("auto_new",value).apply();}
     static boolean automaticAllowed(Context c,String path){
         try{Entry e=catalog(c).entries.get(path);return e!=null&&!removed(c,e);}
         catch(Exception ignored){return false;}
@@ -97,7 +135,7 @@ final class ResourceStore {
         IO.execute(()->{
             try{Entry e=catalog(app).entries.get(path);
                 if(e!=null&&!removed(app,e))download(app,e,false,new AtomicBoolean(false),null);
-            }catch(Exception ignored){}finally{AUTO_GALLERY.remove(path);UI.post(done);}
+            }catch(Exception ex){recordError(app,"auto_error",path+": "+ex.getMessage());UI.post(()->android.widget.Toast.makeText(app,"Не удалось загрузить фото. Подробнее в ресурсах.",android.widget.Toast.LENGTH_LONG).show());}finally{AUTO_GALLERY.remove(path);UI.post(done);}
         });
     }
     private static File file(Context c,Entry e){return new File(new File(c.getFilesDir(),"resource_store/v1"),e.path);}
@@ -125,7 +163,7 @@ final class ResourceStore {
         if(a.bundled)return c.getAssets().open(path);
         throw new FileNotFoundException("Ресурс не загружен");
     }
-    enum State { READY, BUNDLED, MISSING, DAMAGED, OLD }
+    enum State { READY, BUNDLED, MISSING, NEW, DAMAGED, OLD }
     private static String digest(InputStream in)throws Exception{
         MessageDigest md=MessageDigest.getInstance("SHA-256");byte[] buf=new byte[65536];int n;
         while((n=in.read(buf))!=-1)md.update(buf,0,n);
@@ -147,14 +185,15 @@ final class ResourceStore {
                 return !previous.isEmpty()&&!previous.equals(e.sha)?State.OLD:State.DAMAGED;
             }
             if(local(c,e))return State.READY;
-            return State.DAMAGED;
+            String previous=prefs(c).getString("sha:"+e.path,"");
+            return !previous.isEmpty()&&!previous.equals(e.sha)?State.OLD:State.DAMAGED;
         }
         if(catalog(c).bundled){
             if(!verify)return State.BUNDLED;
             try(InputStream in=c.getAssets().open(e.path)){return e.sha.equals(digest(in))?State.BUNDLED:State.DAMAGED;}
             catch(IOException ex){return State.MISSING;}
         }
-        return State.MISSING;
+        return prefs(c).getString("sha:"+e.path,"").isEmpty()?State.NEW:State.MISSING;
     }
     static long storedBytes(Context c,Entry e){return file(c,e).length()+part(c,e).length();}
     static long partialBytes(Context c,Entry e){return part(c,e).length();}
@@ -217,18 +256,28 @@ final class ResourceStore {
         Context app=c.getApplicationContext();
         if(!STARTED.compareAndSet(false,true))return;
         IO.execute(()->{
-            try{migrate(app,null);}catch(Exception ignored){/* explicit manager or pre-install retries */}
-            try{
-                for(Entry e:entries(app)){
-                    boolean installed=file(app,e).isFile()&&!removed(app,e);
-                    State state=state(app,e,true);
-                    // Newly added or intentionally removed packs are never auto-downloaded.
-                    if(installed&&state==State.OLD&&autoUpdate(app)){
-                        try{download(app,e,false,new AtomicBoolean(false),null);}catch(Exception ignored){}
-                    }
-                }
-            }catch(Exception ignored){}
+            try{migrate(app,null);}catch(Exception ex){recordError(app,"auto_error","Перенос: "+ex.getMessage());}
+            refreshCatalog(app);
+            autoSync(app);
         });
+    }
+    static void autoSync(Context app){
+        int failures=0;String last="";
+        try{
+            for(Entry e:entries(app)){
+                if(removed(app,e))continue;
+                State state=state(app,e,true);
+                boolean needs=(autoUpdate(app)&&(state==State.OLD||state==State.DAMAGED||state==State.MISSING))
+                    ||(autoNew(app)&&state==State.NEW);
+                if(!needs)continue;
+                try{download(app,e,false,new AtomicBoolean(false),null);}
+                catch(Exception ex){failures++;last=e.label+": "+ex.getMessage();}
+            }
+        }catch(Exception ex){failures++;last=String.valueOf(ex.getMessage());}
+        if(failures>0){
+            recordError(app,"auto_error","Ошибок автозагрузки: "+failures+" | "+last);
+            UI.post(()->android.widget.Toast.makeText(app,"Не все ресурсы загружены. Подробности в управлении ресурсами.",android.widget.Toast.LENGTH_LONG).show());
+        }else if(autoUpdate(app)||autoNew(app))recordError(app,"auto_error","");
     }
     static void checkNetwork(Context c)throws IOException{
         ConnectivityManager cm=(ConnectivityManager)c.getSystemService(Context.CONNECTIVITY_SERVICE);

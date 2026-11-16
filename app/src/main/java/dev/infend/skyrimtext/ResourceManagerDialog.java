@@ -42,7 +42,17 @@ final class ResourceManagerDialog {
         String actionIcon="";
         Category(String k,String l){key=k;label=l;}
     }
-    private static final class Count {long done,total;boolean ready=true;}
+    private static final class Count {
+        long done,total;boolean ready=true;int fresh,old,damaged,missing;
+        String status(){
+            ArrayList<String> parts=new ArrayList<>();
+            if(fresh>0)parts.add("Новые: "+fresh);
+            if(old>0)parts.add("Обновить: "+old);
+            if(damaged>0)parts.add("Повреждены: "+damaged);
+            if(missing>0)parts.add("Не скачаны: "+missing);
+            return ready?"Установлено":String.join(" · ",parts);
+        }
+    }
     ResourceManagerDialog(Activity a,int color,Runnable refresh){this(a,color,refresh,"");}
     ResourceManagerDialog(Activity a,int color,Runnable refresh,String group){activity=a;accent=color;refreshed=refresh;initialGroup=group;}
     private int dp(int n){return Math.round(n*activity.getResources().getDisplayMetrics().density);}
@@ -111,11 +121,12 @@ final class ResourceManagerDialog {
         addSwitch("Загрузка только через Wi-Fi",ResourceStore.wifiOnly(activity),(v,on)->ResourceStore.wifiOnly(activity,on));
         addSwitch("Докачивать фото при посещении локации",ResourceStore.autoGallery(activity),(v,on)->ResourceStore.autoGallery(activity,on));
         addSwitch("Автообновлять установленные ресурсы",ResourceStore.autoUpdate(activity),(v,on)->ResourceStore.autoUpdate(activity,on));
+        addSwitch("Автоматически скачивать новые ресурсы",ResourceStore.autoNew(activity),(v,on)->ResourceStore.autoNew(activity,on));
         controls=column();root.addView(controls);divider(controls);
         allButton=button("Скачать все ресурсы",true,()->run("download",new LinkedHashSet<>(groups.keySet())));
         controls.addView(allButton,new LinearLayout.LayoutParams(-1,dp(48)));
         LinearLayout tools=new LinearLayout(activity);
-        addTool(tools,"Проверить",()->run("check",new LinkedHashSet<>(groups.keySet())));
+        addTool(tools,"Проверить",this::refreshCatalog);
         addTool(tools,"Перекачать",()->choose("force",new LinkedHashSet<>(groups.keySet())));
         addTool(tools,"Удалить",()->choose("delete",new LinkedHashSet<>(groups.keySet())));
         LinearLayout.LayoutParams tp=new LinearLayout.LayoutParams(-1,dp(42));tp.topMargin=dp(8);controls.addView(tools,tp);
@@ -132,6 +143,17 @@ final class ResourceManagerDialog {
             window.setLayout(Math.min(dp(480),metrics.widthPixels-dp(24)),Math.min(dp(820),Math.round(metrics.heightPixels*.90f)));
         }
         SovngardeTypeface.watchDialog(dialog);
+        rebuildGroups();
+        ResourceStore.UI.post(tick);
+        refreshCatalog();
+        if(groups.containsKey(initialGroup)){
+            for(Category c:categories.values())if(c.packages.contains(initialGroup)){
+                final Category target=c;scroll.post(()->scroll.smoothScrollTo(0,target.body.getTop()));break;
+            }
+        }
+    }
+    private void rebuildGroups(){
+        groups.clear();categories.clear();verified.clear();list.removeAllViews();
         try{for(ResourceStore.Entry e:ResourceStore.entries(activity))groups.computeIfAbsent(e.group,k->new ArrayList<>()).add(e);}
         catch(Exception e){showStatus("Каталог ресурсов отсутствует: "+e.getMessage());}
         for(int i=0;i<KEYS.length;i++){
@@ -148,13 +170,21 @@ final class ResourceManagerDialog {
         categories.put("engine",new Category("engine","Движок локального ИИ"));
         categories.put("gguf",new Category("gguf","Локальные модели GGUF"));
         for(Category c:categories.values())addRow(c);
-        updateRows();ResourceStore.UI.post(tick);
-        if(!groups.isEmpty())run("check",new LinkedHashSet<>(groups.keySet()));
-        if(groups.containsKey(initialGroup)){
-            for(Category c:categories.values())if(c.packages.contains(initialGroup)){
-                final Category target=c;scroll.post(()->scroll.smoothScrollTo(0,target.body.getTop()));break;
-            }
-        }
+        updateRows();
+    }
+    private void refreshCatalog(){
+        if(busy)return;
+        stop.set(false);setBusy(true);showStatus("Проверка каталога в сети…");
+        ResourceStore.IO.execute(()->{
+            ResourceStore.refreshCatalog(activity);
+            if(!stop.get())ResourceStore.autoSync(activity.getApplicationContext());
+            ResourceStore.UI.post(()->{
+                if(!dialog.isShowing())return;
+                rebuildGroups();setBusy(false);
+                if(!stop.get()&&!groups.isEmpty())run("check",new LinkedHashSet<>(groups.keySet()));
+                else showStatus("Проверка остановлена");
+            });
+        });
     }
     private void addRow(Category c){
         LinearLayout row=new LinearLayout(activity);row.setGravity(Gravity.CENTER_VERTICAL);
@@ -199,7 +229,8 @@ final class ResourceManagerDialog {
             try{
                 ResourceStore.State s=ResourceStore.state(activity,e,false);
                 ready=s==ResourceStore.State.READY||s==ResourceStore.State.BUNDLED;
-                if(s==ResourceStore.State.BUNDLED&&verified.get(e.path)==ResourceStore.State.DAMAGED)ready=false;
+                if(s==ResourceStore.State.BUNDLED&&verified.get(e.path)==ResourceStore.State.DAMAGED){ready=false;s=ResourceStore.State.DAMAGED;}
+                switch(s){case NEW:count.fresh++;break;case OLD:count.old++;break;case DAMAGED:count.damaged++;break;case MISSING:count.missing++;break;default:break;}
             }catch(Exception ignored){}
             if("force".equals(operation)&&e.path.equals(activePath))ready=false;
             count.ready&=ready;
@@ -210,6 +241,7 @@ final class ResourceManagerDialog {
     private void setRow(Category c,long done,long total,boolean ready,boolean active,String suffix){
         String amount=total<=0&&!active?("engine".equals(c.key)?"Размер неизвестен":"По выбору"):sizePair(done,total);
         if("engine".equals(c.key)&&total>0&&!ready&&done==total)amount+=" · Установить";
+        if(!suffix.isEmpty())amount+="\n"+suffix;
         c.amount.setText(amount);
         c.amount.setContentDescription(sizePair(done,total)+(suffix.isEmpty()?"":" · "+suffix));
         int percent=total>0?(int)Math.min(100,done*100.0/total):0;
@@ -243,12 +275,13 @@ final class ResourceManagerDialog {
                     !importing&&bytes>0,importing,importing?"Импорт":bytes>0?"Импортирована":"По выбору");continue;
             }
             Count n=count(c.packages);allDone+=n.done;allTotal+=n.total;allReady&=n.ready;
-            setRow(c,n.done,n.total,n.ready,false,n.ready?"Готово":"");
+            setRow(c,n.done,n.total,n.ready,false,n.status());
         }
-        summary.setText("Ресурсы игры: "+sizePair(allDone,allTotal));
+        String error=ResourceStore.catalogError(activity),auto=ResourceStore.automaticError(activity);
+        summary.setText("Ресурсы игры: "+sizePair(allDone,allTotal)+(error.isEmpty()?"":"\n"+error)+(auto.isEmpty()?"":"\n"+auto));
         allButton.setEnabled(!busy&&!groups.isEmpty()&&!allReady);
         boolean complete=allReady&&!groups.isEmpty();
-        allButton.setText(complete?"✓  Все ресурсы загружены":"Скачать все ресурсы");
+        allButton.setText(complete?"✓  Все ресурсы загружены":"Скачать / обновить все ресурсы");
         allButton.setTextColor(complete?0xffb9c6bb:onAccent());
         if(lastAllReady!=complete){allButton.setBackground(shape(complete?0xff151d17:accent,0,14));lastAllReady=complete;}
         allButton.setAlpha(busy&&!complete?.55f:1f);
@@ -273,7 +306,7 @@ final class ResourceManagerDialog {
         items.addView(all);all.setChecked(picked.size()==keys.size());
         for(String key:keys){
             Count n=count(Collections.singleton(key));CheckBox box=new CheckBox(activity);
-            box.setText(groups.get(key).get(0).label+"\n"+sizePair(n.done,n.total));
+            box.setText(groups.get(key).get(0).label+"\n"+sizePair(n.done,n.total)+" · "+n.status());
             box.setTextColor(Color.WHITE);box.setButtonTintList(ColorStateList.valueOf(accent));box.setChecked(picked.contains(key));
             box.setOnCheckedChangeListener((v,on)->{if(on)picked.add(key);else picked.remove(key);});
             items.addView(box);boxes.add(box);
@@ -282,7 +315,7 @@ final class ResourceManagerDialog {
         LinearLayout panel=column();panel.addView(scroll,new LinearLayout.LayoutParams(-1,dp(280)));
         AlertDialog chooser=new RuneDialogBuilder(activity,accent).setTitle(title).setView(panel).setNegativeButton("Закрыть",null).create();
         if(action==null){
-            panel.addView(button("Докачать выбранные",true,()->{if(!picked.isEmpty()){chooser.dismiss();run("download",picked);}}),new LinearLayout.LayoutParams(-1,dp(48)));
+            panel.addView(button("Докачать / обновить выбранные",true,()->{if(!picked.isEmpty()){chooser.dismiss();run("download",picked);}}),new LinearLayout.LayoutParams(-1,dp(48)));
             panel.addView(button("Перекачать выбранные",false,()->{if(!picked.isEmpty()){chooser.dismiss();run("force",picked);}}),new LinearLayout.LayoutParams(-1,dp(48)));
             panel.addView(button("Удалить выбранные",false,()->{if(!picked.isEmpty()){chooser.dismiss();confirmDelete(picked);}}),new LinearLayout.LayoutParams(-1,dp(48)));
         }else panel.addView(button("force".equals(action)?"Перекачать выбранные":"Удалить выбранные",true,()->{

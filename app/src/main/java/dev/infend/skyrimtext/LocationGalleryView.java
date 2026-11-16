@@ -104,6 +104,38 @@ public final class LocationGalleryView extends LinearLayout {
         alias("Ustengrav","Устенгрев");
         alias("Устенграв","Устенгрев");
     }
+    private static final class GalleryDefinition {
+        final String name,slug;final String[] captions,archives;
+        GalleryDefinition(org.json.JSONObject entry)throws Exception{
+            name=entry.getString("name");slug=entry.getString("slug");
+            org.json.JSONArray c=entry.getJSONArray("captions"),a=entry.getJSONArray("archives");
+            if(name.trim().isEmpty()||!slug.matches("[a-z0-9_-]+")||c.length()==0||c.length()>99||a.length()!=c.length())throw new IllegalArgumentException("Неверная галерея");
+            captions=new String[c.length()];archives=new String[c.length()];
+            for(int i=0;i<c.length();i++){
+                captions[i]=c.getString(i);archives[i]=a.getString(i);
+                if(captions[i].trim().isEmpty()||!(archives[i].equals(slug+".zip")||archives[i].equals(slug+"_extra.zip")))throw new IllegalArgumentException("Неверный кадр галереи");
+            }
+        }
+    }
+    private static final class GalleryRegistry {
+        final Map<String,GalleryDefinition> names=new HashMap<>(),slugs=new HashMap<>();
+        final java.util.ArrayList<String> locations=new java.util.ArrayList<>();
+        GalleryRegistry(org.json.JSONArray array,Map<String,ResourceStore.Entry> files)throws Exception{
+            for(int i=0;i<array.length();i++){
+                org.json.JSONObject entry=array.getJSONObject(i);GalleryDefinition d=new GalleryDefinition(entry);
+                if(slugs.put(d.slug,d)!=null||names.put(locationKey(d.name),d)!=null)throw new IllegalArgumentException("Повтор галереи");
+                locations.add(d.name);
+                org.json.JSONArray aliases=entry.optJSONArray("aliases");
+                if(aliases!=null)for(int j=0;j<aliases.length();j++)if(names.put(locationKey(aliases.getString(j)),d)!=null)throw new IllegalArgumentException("Повтор названия");
+                if(files!=null)for(String archive:d.archives)if(!files.containsKey("gallery/"+archive))throw new IllegalArgumentException("Нет архива "+archive);
+            }
+            if(locations.isEmpty())throw new IllegalArgumentException("Пустой реестр галерей");
+        }
+    }
+    private static volatile GalleryRegistry registry;
+    static void validateCatalog(org.json.JSONArray array,Map<String,ResourceStore.Entry> files)throws Exception{new GalleryRegistry(array,files);}
+    static void applyCatalog(org.json.JSONArray array)throws Exception{if(array!=null)registry=new GalleryRegistry(array,null);}
+    private static GalleryDefinition definition(String location){GalleryRegistry r=registry;return r==null?null:r.names.get(locationKey(location));}
     private static String locationKey(String location){
         return location==null?"":location.trim().toLowerCase(new Locale("ru")).replace('ё','е');
     }
@@ -111,12 +143,14 @@ public final class LocationGalleryView extends LinearLayout {
         ID_BY_CITY.put(locationKey(name),ID_BY_CITY.get(locationKey(canonical)));
         PHOTO_INDEX_BY_CITY.put(locationKey(name),PHOTO_INDEX_BY_CITY.get(locationKey(canonical)));
     }
-    public static boolean hasGallery(String location){return ID_BY_CITY.containsKey(locationKey(location));}
+    public static boolean hasGallery(String location){return registry!=null?definition(location)!=null:ID_BY_CITY.containsKey(locationKey(location));}
     public static int imageCount(String location){
+        GalleryDefinition d=definition(location);
+        if(d!=null)return d.captions.length;
         if(!hasGallery(location))return 0;
         return PHOTO_LABELS[PHOTO_INDEX_BY_CITY.get(locationKey(location))].length;
     }
-    public static String[] locations(){return CITIES.clone();}
+    public static String[] locations(){GalleryRegistry r=registry;return r==null?CITIES.clone():r.locations.toArray(new String[0]);}
 
     private final String location,slug;
     private final int accent;
@@ -144,11 +178,15 @@ public final class LocationGalleryView extends LinearLayout {
         return d;
     }
     private static String archive(String slug,int number){
+        GalleryRegistry r=registry;GalleryDefinition d=r==null?null:r.slugs.get(slug);
+        if(d!=null&&number>=1&&number<=d.archives.length)return d.archives[number-1];
         if("riften".equals(slug))return number<=3?"riften.zip":"riften_extra.zip";
         if("highhrothgar".equals(slug)&&number>6)return "highhrothgar_extra.zip";
         return slug+".zip";
     }
     private static String captionFor(String location,int index){
+        GalleryDefinition d=definition(location);
+        if(d!=null)return d.captions[Math.max(0,Math.min(index,d.captions.length-1))];
         Integer city=PHOTO_INDEX_BY_CITY.get(locationKey(location));
         if(city==null)return location;
         return PHOTO_LABELS[city][Math.max(0,Math.min(index,PHOTO_LABELS[city].length-1))];
@@ -174,7 +212,7 @@ public final class LocationGalleryView extends LinearLayout {
     public LocationGalleryView(Context context,String location,int accent,boolean fullscreen){
         super(context);
         if(!hasGallery(location))throw new IllegalArgumentException("Галерея не найдена: "+location);
-        this.location=location;this.slug=ID_BY_CITY.get(locationKey(location));
+        this.location=location;GalleryDefinition d=definition(location);this.slug=d==null?ID_BY_CITY.get(locationKey(location)):d.slug;
         this.accent=accent;this.fullscreen=fullscreen;
         setOrientation(VERTICAL);
         setPadding(dp(2),dp(4),dp(2),dp(8));
@@ -359,9 +397,11 @@ public final class LocationGalleryView extends LinearLayout {
     }
     private void move(int delta){
         int count=imageCount(location);
-        show((current+delta+count)%count);
+        if(count>0)show(Math.floorMod(current+delta,count));
     }
     private void show(int index){
+        int count=imageCount(location);if(count==0)return;
+        if(index<0||index>=count){show(Math.max(0,Math.min(index,count-1)));return;}
         current=index;
         final int target=++requested;
         page.setText(captionFor(location,index));

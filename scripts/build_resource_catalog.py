@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Build the catalog embedded in the signed APK. Optional assets stay in Git."""
-import argparse, hashlib, json, pathlib, re, subprocess, urllib.parse, urllib.request, time
+import argparse, hashlib, json, pathlib, re, subprocess, urllib.parse, urllib.request, time, zipfile
 ROOT=pathlib.Path(__file__).resolve().parents[1]
 ASSETS=ROOT/"app/src/main/assets"
 CITIES=dict(zip("whiterun windhelm winterhold dawnstar markarth morthal riverwood riften solitude falkreath helgen ivarstead rorikstead dragonbridge karthwasten shorsstone kynesgrove darkwater stonehills ravenrock telmithryn skaal highhrothgar bleakfallsbarrow blackreach labyrinthian collegewinterhold throatoftheworld ustengrav".split(),
@@ -66,6 +66,51 @@ def build(commit, thin=False):
             raise ValueError("Asset must be externalized or explicitly approved as core: "+path)
     if not records:raise ValueError("No optional assets")
     return dict(schema=1,commit=commit,bundled=not thin,files=records)
+def gallery_registry():
+    source=(ROOT/"app/src/main/java/dev/infend/skyrimtext/LocationGalleryView.java").read_text(encoding="utf-8")
+    def literals(body):return [json.loads(x) for x in re.findall(r'"(?:\\.|[^"\\])*"',body)]
+    names=literals(source.split("String[] CITIES={",1)[1].split("};",1)[0])
+    slugs=literals(source.split("String[] SLUGS={",1)[1].split("};",1)[0])
+    captions=[literals(x) for x in re.findall(r"\{([^{}]+)\}",source.split("String[][] PHOTO_LABELS={",1)[1].split("};",1)[0])]
+    if not len(names)==len(slugs)==len(captions):raise ValueError("Gallery metadata mismatch")
+    result=[]
+    aliases=re.findall(r'alias\("([^"]+)","([^"]+)"\)',source)
+    custom=ROOT/"docs/gallery_registry.json"
+    for name,slug,labels in zip(names,slugs,captions):
+        result.append(dict(name=name,slug=slug,captions=labels,aliases=[a for a,n in aliases if n==name]))
+    if custom.exists():
+        for entry in json.loads(custom.read_text(encoding="utf-8")):
+            result=[old for old in result if old["slug"]!=entry["slug"]]
+            result.append(entry)
+    observed=set();registered_names=set()
+    for entry in result:
+        slug=entry["slug"]
+        if not re.fullmatch(r"[a-z0-9_-]+",slug) or slug in observed:raise ValueError("Bad gallery slug "+slug)
+        observed.add(slug)
+        for name in [entry["name"]]+entry.get("aliases",[]):
+            key=name.strip().lower().replace("ё","е")
+            if not key or key in registered_names:raise ValueError("Duplicate gallery name "+name)
+            registered_names.add(key)
+        photos={}
+        for file in sorted((ASSETS/"gallery").glob(slug+"*.zip")):
+            if file.stem not in (slug,slug+"_extra"):continue
+            with zipfile.ZipFile(file) as z:
+                if z.testzip():raise ValueError("Damaged gallery "+str(file))
+                for item in z.infolist():
+                    if not re.fullmatch(r"\d{2}\.webp",item.filename):raise ValueError("Unexpected gallery member "+item.filename)
+                    number=int(item.filename[:2])
+                    if number in photos or not 16000<item.file_size<2_000_000:raise ValueError("Invalid gallery frame "+item.filename)
+                    data=z.read(item)
+                    if data[:4]!=b"RIFF" or data[8:12]!=b"WEBP":raise ValueError("Not WebP "+item.filename)
+                    photos[number]=file.name
+        labels=entry["captions"]
+        if not labels or any(not isinstance(x,str) or not x.strip() for x in labels) or set(photos)!=set(range(1,len(labels)+1)):
+            raise ValueError("Captions/frames mismatch "+slug)
+        entry["archives"]=[photos[i] for i in range(1,len(labels)+1)]
+    actual={p.stem.removesuffix("_extra") for p in (ASSETS/"gallery").glob("*.zip")}
+    if actual!=observed:raise ValueError("Unregistered gallery archives "+str(actual^observed))
+    return result
+
 def main():
     parser=argparse.ArgumentParser()
     parser.add_argument("--commit",default=None)
@@ -73,6 +118,11 @@ def main():
     args=parser.parse_args()
     commit=args.commit or subprocess.check_output(["git","rev-parse","HEAD"],cwd=ROOT,text=True).strip()
     data=build(commit,args.thin)
+    data["revision"]=int(subprocess.check_output(["git","show","-s","--format=%ct",commit],cwd=ROOT,text=True).strip())
+    data["galleries"]=gallery_registry()
+    labels={e["slug"]:e["name"] for e in data["galleries"]}
+    for e in data["files"]:
+        if e["group"].startswith("gallery:"):e["label"]=labels[e["group"].split(":",1)[1]]
     if args.thin:
         data["files"].extend(font_records())
     (ASSETS/"resource_manifest.json").write_text(json.dumps(data,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")

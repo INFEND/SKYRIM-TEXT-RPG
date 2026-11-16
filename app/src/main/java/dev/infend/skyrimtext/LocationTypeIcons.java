@@ -14,6 +14,7 @@ final class LocationTypeIcons {
     private static final String PREFIX="location:";
     private static Bitmap atlas;
     private static boolean attempted;
+    private static int resourceGeneration=-1;
     private static final Paint PAINT=new Paint(Paint.ANTI_ALIAS_FLAG|Paint.FILTER_BITMAP_FLAG);
     private LocationTypeIcons(){}
 
@@ -41,11 +42,18 @@ final class LocationTypeIcons {
         }
     }
     private static synchronized Bitmap load(Context context){
+        int current=ResourceStore.generation();
+        if(resourceGeneration!=current){resourceGeneration=current;attempted=false;atlas=null;}
         if(attempted)return atlas;
         attempted=true;
         BitmapFactory.Options options=new BitmapFactory.Options();
         options.inScaled=false;
-        Bitmap loaded=BitmapFactory.decodeResource(context.getResources(),R.drawable.location_icons,options);
+        Bitmap loaded=null;
+        try(java.io.InputStream in=ResourceStore.open(context,"media/mapicons/location_icons.webp")){
+            loaded=BitmapFactory.decodeStream(in,null,options);
+        }catch(Exception ignored){}
+        if(loaded==null||loaded.getWidth()!=CELL*COLUMNS||loaded.getHeight()!=CELL*ROWS)
+            loaded=BitmapFactory.decodeResource(context.getResources(),R.drawable.location_icons,options);
         if(loaded!=null&&loaded.getWidth()==CELL*COLUMNS&&loaded.getHeight()==CELL*ROWS)atlas=loaded;
         return atlas;
     }
