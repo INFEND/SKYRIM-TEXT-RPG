@@ -35,8 +35,24 @@ public final class MainActivity extends Activity {
     // Monochrome translucent menus, following the six provided Skyrim references.
     private static final int BG=0xff000000, PANEL=0xff0b0b0b, PANEL_2=0xff101010;
     private static final int TEXT=0xfff0f1ef, MUTED=0xffaab0b3, BORDER=0xff666d72;
-    private static final int[] ACCENTS={0xffe1e3e3,0xffa4b9bf,0xffb9c9dc,0xffceb48c,0xffc79a97,0xffeeece8};
-    private static final String[] ACCENT_NAMES={"Серебро", "Север", "Лёд", "Древнее золото", "Рубин", "Снег"};
+    private static final int[] ACCENTS={
+        0xffe1e3e3,0xffa4b9bf,0xffb9c9dc,0xffceb48c,0xffc79a97,0xffeeece8,
+        0xfff66c55,0xffd94a6b,0xffd18b70,0xffff9a42,0xfff4b06a,0xfff2cf62,
+        0xffffe79a,0xffc99a5b,0xffc5d86d,0xff83b969,0xff50c18c,0xff45dba2,
+        0xffa8e66c,0xffd7ba71,0xffe4cfab,0xff83dcc5,0xffa8f0e5,0xff64ddf6,
+        0xff6faedb,0xff648fff,0xff83b5ff,0xffababff,0xffaacfef,0xff79e6b7,
+        0xffb794f6,0xffd5a8ff,0xffa58bd9,0xffe38ce5,0xffc7a4c9,0xfff18db0,
+        0xffe7d6b9,0xffcedfef,0xff9ea9c9,0xff68d6c8,0xffb2f2ff,0xff9b9baa
+    };
+    private static final String[] ACCENT_NAMES={
+        "Серебро", "Север", "Лёд", "Древнее золото", "Рубин", "Снег",
+        "Пламя Алдуина", "Кровь Волкихара", "Пепел Хелгена", "Огонь атронаха", "Закат над Вайтраном", "Септим",
+        "Сияние Рассвета", "Двемерская бронза", "Златолист", "Листья Фолкрита", "Лес Фолкрита", "Изумруд Рифта",
+        "Яд фалмера", "Сок живицы", "Хризамера", "Роса Ривервуда", "Призрак Совнгарда", "Ледяной атронах",
+        "Море Призраков", "Знамя Братьев Бури", "Магия Коллегии", "Молния атронаха", "Небо Высокого Хротгара", "Северное сияние",
+        "Аметист Чёрного Предела", "Азура", "Сумерки Ноктюрнал", "Ваббаджек", "Горная лаванда", "Алый паслён",
+        "Кость дракона", "Лунный камень", "Ртутная руда", "Малахит", "Сталгрим", "Эбонит"
+    };
     private static final int[] HERO_NAME_COLORS={
         0xffdeb66d,0xfff1f2ef,0xffa8c8e5,0xffde8789,0xff8ccdab,0xffc5a8e2
     };
