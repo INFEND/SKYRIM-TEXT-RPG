@@ -262,7 +262,8 @@ public final class SkyrimTerrainMapView extends View {
      * A single mapping prevents glyph mismatches between views. */
     public static String iconForSite(SkyrimMapCatalog.Site site){
         String t=site.type;
-        if(site.capital())return "столицы владений";
+        String settlement=SettlementIcons.keyForSite(site);
+        if(settlement!=null)return settlement;
         if(t.contains("Двемер"))return "двемерские руины";
         if(t.contains("дракона"))return "логова драконов";
         if(t.contains("Пещера"))return "пещеры";
@@ -270,7 +271,6 @@ public final class SkyrimTerrainMapView extends View {
         if(t.contains("лагерь")||t.contains("Лагерь"))return "лагеря";
         if(t.contains("Форт"))return "крепости";
         if(t.contains("Башня"))return "башни";
-        if(t.contains("Деревня")||t.contains("Поселение"))return "деревни";
         if(t.contains("Святилище"))return "даэдрические святилища";
         return "обнаруженные места";
     }

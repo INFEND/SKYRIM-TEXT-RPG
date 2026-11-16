@@ -161,6 +161,7 @@ public final class SkyrimIconAtlas {
     }
     public static boolean draw(Context context,Canvas canvas,String key,
                                int tint,float width,float height){
+        if(SettlementIcons.draw(context,canvas,key,width,height))return true;
         Rect sprite=find(context,key);
         if(sprite==null||atlas==null||width<=0||height<=0)return false;
         Paint p=new Paint(Paint.ANTI_ALIAS_FLAG|Paint.FILTER_BITMAP_FLAG|Paint.DITHER_FLAG);
@@ -176,8 +177,7 @@ public final class SkyrimIconAtlas {
     }
     public static boolean drawMarker(Context ctx,Canvas c,String name,
                                      int tint,float x,float y,float size){
-        Rect sprite=find(ctx,name);
-        if(sprite==null||atlas==null)return false;
+        if(size<=0)return false;
         c.save();
         c.translate(x-size/2f,y-size/2f);
         boolean drawn=draw(ctx,c,name,tint,size,size);
