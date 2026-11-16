@@ -436,6 +436,7 @@ public final class AiStoryClient {
             out.append("ПРОТИВНИК: ").append(game.enemyName).append(", HP ").append(game.enemyHp)
                     .append('/').append(game.enemyMaxHp).append(", урон ").append(game.enemyDamage).append('\n');
         String confirmedFacts=game.sceneState==null?"":game.sceneState.confirmedContext();
+        if(!game.alma.enabled){StringBuilder allowed=new StringBuilder();for(String line:confirmedFacts.split("\\n"))if(!line.contains(AlmaStory.ID)&&!line.contains("alma_serana"))allowed.append(line).append('\n');confirmedFacts=allowed.toString();}
         out.append("ПОДТВЕРЖДЁННЫЕ ФАКТЫ СЦЕНЫ (только записи движка):\n");
         out.append(confirmedFacts.isEmpty()?"Пока нет подтверждённых NPC, улик и подлокаций.\n":confirmedFacts+"\n");
         out.append("Не выдавай неподтверждённых NPC, улики и подлокации за существующие факты сохранения. "

@@ -760,7 +760,7 @@ public final class MainActivity extends Activity {
         factionRow(c,"Хранители печатей",game.questStage==4?"Печати восстановлены":game.questStage>0?"Поручение принято":"Нет подтверждённых связей");
         for(int i=0;i<FactionCampaign.NAMES.length;i++){final int index=i;factionRow(c,FactionCampaign.NAMES[i],game.factions.rank(i)+" | "+game.factions.task(i));}
         org.json.JSONArray npcs=game.sceneState.npcFacts();if(npcs.length()>0)addText(c,"ЗНАКОМСТВА",11,accent(),true,9);
-        for(int i=0;i<npcs.length();i++){JSONObject n=npcs.optJSONObject(i);if(n!=null)factionRow(c,n.optString("title"),npcStatusLabel(n.optString("status")));}
+        for(int i=0;i<npcs.length();i++){JSONObject n=npcs.optJSONObject(i);if(n!=null&&(game.alma.enabled||(!AlmaStory.NAME.equals(n.optString("title"))&&!"alma_serana".equals(n.optString("id")))))factionRow(c,n.optString("title"),npcStatusLabel(n.optString("status")));}
     }
     private void factionDialog(){
         String[] labels=new String[FactionCampaign.NAMES.length];
@@ -1518,7 +1518,7 @@ public final class MainActivity extends Activity {
             &&!"EVENT".equals(game.mode)&&!"RESULT".equals(game.mode))return;
         LinearLayout journal=card();
         addText(journal,"ᚱ  ЖУРНАЛ ПРИКЛЮЧЕНИЙ",11,accent(),true,10);
-        if(game.alma.stage>0)addText(journal,"◉  Алая Бессмертная | "+game.alma.status(),13,TEXT,false,7);
+        if(game.alma.enabled&&game.alma.stage>0)addText(journal,"◉  Алая Бессмертная | "+game.alma.status(),13,TEXT,false,7);
         if(game.katherine.stage>0)addText(journal,"◉  Нулевой Предел | "+game.katherine.status(),13,TEXT,false,7);
         if(game.canonicalStage>0)addText(journal,"◉  Путь Довакина | "+CanonicalCampaign.objective(game),13,TEXT,false,7);
         if(game.questStage>0&&game.questStage<4)
@@ -1679,7 +1679,7 @@ public final class MainActivity extends Activity {
 
     /** AI mode replaces the entire offline story, not just its dialogue panel. */
     private void renderAiGame(){
-        if(game.alma.available(game)&&!aiTurnBusy)actionButton("Альма","Алая Бессмертная | "+game.alma.status(),false,()->{game.choose("ALMA:open");save();render();});
+        if(game.alma.available(game)&&!livingBusy())actionButton("Альма","Алая Бессмертная | "+game.alma.status(),false,()->{game.choose("ALMA:open");save();render();});
         if(game.katherine.available(game)&&!livingBusy())actionButton("Кэтрин","Нулевой Предел | "+game.katherine.status(),false,()->{game.choose("KATH:open");save();render();});
         String source=resolvedAiProvider();
         boolean ready="local".equals(source)?localModelReady():
@@ -3777,7 +3777,7 @@ public final class MainActivity extends Activity {
             java.util.ArrayList<String> docs=ItemCatalog.loreDocuments(this);
             addText(content,"ᛟ  ХРОНИКИ И РУКОПИСИ",11,accent(),false,10);
             if(game.katherine.enabled&&game.katherine.stage>0)actionButton("Кэтрин | Нулевой Предел","Авторская история · "+game.katherine.status(),false,()->npcDetails(KatherineStory.NAME));
-            if(game.alma.stage>0)actionButton("Альма | Алая Бессмертная","Авторская история · "+game.alma.status(),false,()->npcDetails(AlmaStory.NAME));
+            if(game.alma.enabled&&game.alma.stage>0)actionButton("Альма | Алая Бессмертная","Авторская история · "+game.alma.status(),false,()->npcDetails(AlmaStory.NAME));
             if(docs.isEmpty())addText(content,"Справочные рукописи пока не загружены.",14,MUTED,false,8);
             for(String file:docs)actionButton("◇  "+file.replace(".txt",""),"Читать рукопись",false,()->showDocument(file));
         }else{
@@ -3796,15 +3796,15 @@ public final class MainActivity extends Activity {
         AlmaStory a=game.alma;LinearLayout panel=column();addText(panel,a.relationship()+" | "+a.status(),16,TEXT,true,10);
         String[] labels={"Доверие","Уважение","Симпатия","Любовь","Ревность","Обида","Преданность"};int[] scores={a.trust,a.respect,a.affection,a.love,a.jealousy,a.hurt,a.loyalty};
         for(int i=0;i<labels.length;i++){livingLine(panel,labels[i],scores[i]+" / 100",accent());livingBar(panel,scores[i],100,accent());space(panel,8);}
-        addText(panel,"Ранг "+a.rank+"/5 | Победы "+a.victories+" | Магия "+a.mana+"/"+a.maxMana()+" | Здоровье "+a.health+"/"+a.maxHealth(),13,TEXT,true,8);addText(panel,a.gearLabel()+" | "+a.stanceLabel(),13,MUTED,false,8);if(!a.lastRemark.isEmpty())addText(panel,a.lastRemark,13,TEXT,false,8);TextView gallery=text("Галерея Альмы",15,accent(),true);gallery.setOnClickListener(v->almaGallery(1));panel.addView(gallery,lp(-1,44));TextView memories=text("Личная память | "+a.memory.length()+" событий",14,accent(),true);memories.setOnClickListener(v->{LinearLayout hist=column();for(int i=a.memory.length()-1;i>=0;i--)addText(hist,a.memory.optString(i),13,TEXT,false,8);livingDialog("Альма | Память",hist);});panel.addView(memories,lp(-1,44));livingDialog("Альма | Отношения",panel);
+        addText(panel,"Ранг "+a.rank+"/5 | Победы "+a.victories+" | Магия "+a.mana+"/"+a.maxMana()+" | Здоровье "+a.health+"/"+a.maxHealth(),13,TEXT,true,8);addText(panel,a.inventoryLabel()+" | "+a.stanceLabel(),13,MUTED,false,8);if(!a.lastRemark.isEmpty())addText(panel,a.lastRemark,13,TEXT,false,8);TextView gallery=text("Галерея Альмы",15,accent(),true);gallery.setOnClickListener(v->almaGallery(1));panel.addView(gallery,lp(-1,44));TextView memories=text("Личная память | "+a.memory.length()+" событий",14,accent(),true);memories.setOnClickListener(v->{LinearLayout hist=column();for(int i=a.memory.length()-1;i>=0;i--)addText(hist,a.memory.optString(i),13,TEXT,false,8);livingDialog("Альма | Память",hist);});panel.addView(memories,lp(-1,44));livingDialog("Альма | Отношения",panel);
     }
     private void renderLivingRelations(){
         section("ЖУРНАЛ","Отношения","Только подтверждённые знакомства и события.");
         if(game.katherine.enabled&&game.katherine.stage>0)renderKatherineRelations();
-        if(game.alma.stage>0)actionButton("Альма | "+game.alma.relationship(),"Доверие "+game.alma.trust+"/100 · Любовь "+game.alma.love+"/100",false,this::almaRelationshipDetails);
+        if(game.alma.enabled&&game.alma.stage>0)actionButton("Альма | "+game.alma.relationship(),"Доверие "+game.alma.trust+"/100 · Любовь "+game.alma.love+"/100",false,this::almaRelationshipDetails);
         org.json.JSONArray npcs=game.sceneState.npcFacts();
-        if(npcs.length()==0){if(game.alma.stage==0&&(!game.katherine.enabled||game.katherine.stage==0))addText(content,"Пока нет подтверждённых знакомств.",15,MUTED,false,8);return;}
-        for(int i=0;i<npcs.length();i++){JSONObject n=npcs.optJSONObject(i);if(n==null)continue;String name=n.optString("title"),status=n.optString("status");if(AlmaStory.NAME.equals(name)||KatherineStory.NAME.equals(name))continue;int score;String relation;
+        if(npcs.length()==0){if((!game.alma.enabled||game.alma.stage==0)&&(!game.katherine.enabled||game.katherine.stage==0))addText(content,"Пока нет подтверждённых знакомств.",15,MUTED,false,8);return;}
+        for(int i=0;i<npcs.length();i++){JSONObject n=npcs.optJSONObject(i);if(n==null)continue;String name=n.optString("title"),status=n.optString("status");if(AlmaStory.NAME.equals(name)||KatherineStory.NAME.equals(name)||(!game.alma.enabled&&"alma_serana".equals(n.optString("id"))))continue;int score;String relation;
             switch(status){case "HELPED":score=78;relation="Благодарность";break;case "INFORMED":score=60;relation="Обмен сведениями";break;case "MET":score=50;relation="Знакомый";break;case "HOSTILE":score=15;relation="Враждебность";break;default:score=-1;relation=npcStatusLabel(status);}
             if(score>=0)score=n.optInt("relation",score);int color=score<0?MUTED:score>=65?ITEM_UP:score>=40?ITEM_GOLD:ITEM_DOWN;LinearLayout tile=livingTile(content);LinearLayout line=row();line.setGravity(Gravity.CENTER_VERTICAL);
             line.addView(new SkyrimIconView(this,"hero",color),lp(38,42));LinearLayout words=column();words.setPadding(dp(10),0,0,0);line.addView(words,new LinearLayout.LayoutParams(0,-2,1));addText(words,name,18,TEXT,true,3);addText(words,relation,13,color,false,0);
@@ -3836,7 +3836,7 @@ public final class MainActivity extends Activity {
         section("ЛЕТОПИСЬ СЕВЕРА","Журнал","Выбирай задание, чтобы увидеть описание и текущую цель.");
         renderFactionJournal();
         if(game.katherine.enabled&&game.katherine.stage>0){LinearLayout k=card();addText(k,"НУЛЕВОЙ ПРЕДЕЛ | КРУГ ТРЁХ КОГТЕЙ",13,accent(),true,8);addText(k,game.katherine.objective(),15,TEXT,false,8);if(game.katherine.available(game))actionButton("Поговорить с Кэтрин","Продолжить расследование",false,()->{if(livingBusy())return;game.choose("KATH:open");save();tab=0;render();});}
-        if(game.alma.stage>0)actionButton("Алая Бессмертная",game.alma.status()+" | "+game.alma.stage+"/12",false,()->new RuneDialogBuilder(this,accent()).setTitle("Алая Бессмертная").setMessage(game.alma.status()+"\n\n"+(game.alma.companion?"Альма путешествует с тобой.":game.alma.terminalLoss()?"История завершена.":"Ищи Альму в Рифтене.")).setPositiveButton("Закрыть",null).show());
+        if(game.alma.enabled&&game.alma.stage>0)actionButton("Алая Бессмертная",game.alma.objective()+" | "+game.alma.stage+"/12",false,()->new RuneDialogBuilder(this,accent()).setTitle("Алая Бессмертная").setMessage(game.alma.objective()+"\n\n"+(game.alma.companion?"Альма путешествует с тобой.":game.alma.terminalLoss()?"История завершена.":"Ищи Альму в Рифтене.")).setPositiveButton("Закрыть",null).show());
         String[] entries=game.aiJournal.isEmpty()?
             new String[]{"Путь Довакина","Драконий след","Пепельные печати","Опасные дороги"}:
             new String[]{"Путь Довакина","Драконий след","Пепельные печати","Опасные дороги","Задание ИИ"};
@@ -4123,7 +4123,7 @@ public final class MainActivity extends Activity {
             prefs.edit().putBoolean("katherine_enabled",on).apply();save();
         });expansion.addView(katherineToggle,lp(-1,47));
         Switch almaToggle=new Switch(this);almaToggle.setText("Альма | Алая Бессмертная");almaToggle.setTextColor(TEXT);almaToggle.setThumbTintList(ColorStateList.valueOf(accent()));almaToggle.setChecked(game.alma.enabled);
-        almaToggle.setOnCheckedChangeListener((v,on)->{if(livingBusy()){v.setChecked(game.alma.enabled);return;}game.alma.enabled=on;if(!on&&AlmaStory.MODE.equals(game.mode))game.mode="WORLD";prefs.edit().putBoolean("alma_enabled",on).apply();save();});expansion.addView(almaToggle,lp(-1,47));
+        almaToggle.setOnCheckedChangeListener((v,on)->{if(livingBusy()){v.setChecked(game.alma.enabled);return;}if(!game.alma.setEnabled(game,on)){v.setChecked(game.alma.enabled);return;}prefs.edit().putBoolean("alma_enabled",on).apply();save();});expansion.addView(almaToggle,lp(-1,47));addText(expansion,"Альма: отключение скрывает сюжет, отношения и боевую поддержку. Прогресс и галерея сохраняются.",12,MUTED,false,8);
         addText(expansion,"Необязательная авторская история вне канона TES.",12,MUTED,false,0);
         if(game.started)livingLink(content,"Магазин компенсаций","∞ F","skills",this::livingFixShop);
         content.addView(new NordicArtView(this,NordicArtView.STORY),lp(-1,105));space(content,12);

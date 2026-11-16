@@ -211,7 +211,7 @@ public final class GameEngine {
     }
 
     public Scene scene() {
-        if(started&&AlmaStory.MODE.equals(mode))return alma.scene(this);
+        if(started&&AlmaStory.MODE.equals(mode)){if(alma.enabled)return alma.scene(this);mode="WORLD";}
         if(started&&KatherineStory.MODE.equals(mode))return katherine.scene(this);
         if(started&&"CANON".equals(mode))return CanonicalCampaign.scene(this);
         Scene s=baseScene();
@@ -639,7 +639,7 @@ public final class GameEngine {
         if(!"CANON_SHOUT".equals(action)&&canonicalShoutCooldown>0)canonicalShoutCooldown--;
         int kathDamage=katherine.assist(this,battleTurns+1,Math.max(0,enemyHp-damage));
         if(kathDamage>0){damage+=kathDamage;actionText+="\nКэтрин: "+katherine.companion.lastSpell+", −"+kathDamage+" здоровья врагу.";}
-        int almaDamage=alma.assist(this,battleTurns+1,Math.max(0,enemyHp-damage));if(almaDamage>0){damage+=almaDamage;actionText+="\nАльма: "+(alma.mortal()?"удар кинжалом":"багровое пламя")+", −"+almaDamage+" здоровья врагу.";}
+        int almaDamage=alma.assist(this,battleTurns+1,Math.max(0,enemyHp-damage));if(almaDamage>0){damage+=almaDamage;actionText+="\nАльма: "+alma.powerLabel()+", −"+almaDamage+" здоровья врагу.";}
         lastDealt=Math.min(enemyHp,damage);lastHeavyHit="HEAVY".equals(action)&&lastDealt>0;lastMiss="HEAVY".equals(action)&&lastDealt==0;battleDealt+=lastDealt;battleTurns++;
         enemyHp=Math.max(0,enemyHp-damage);
         if(enemyHp==0) {poisonTurns=frostTurns=0;winBattle(actionText);return;}
@@ -659,6 +659,7 @@ public final class GameEngine {
         lastTaken=Math.min(hp,incoming+poisoned);battleTaken+=lastTaken;
         hp=Math.max(0,hp-incoming-poisoned);stamina=Math.min(maxStamina,nonnegativeAdd(stamina,3+(progress.hasArmorType(5)&&progress.advanced.has(AdvancedPerks.WIND_WALKER)?2:0)));
         battleLog=actionText+"\n"+enemyName+" отвечает: −"+incoming+" здоровья."+(poisoned>0?"\nЯд: −"+poisoned+" здоровья.":"")+(poisonTurns>0?"\nОтравление: "+poisonTurns+" хода.":"")+(frostTurns>0?"\nОбморожение: "+frostTurns+" хода.":"");
+        if(hp>0){int link=alma.bloodLink(this);if(link>0){lastHealing+=link;battleLog+="\nАльма: Связь душ, +"+link+" здоровья." ;}}
         if(hp==0&&alma.rescue(this))battleLog+="\nАльма: Алая клятва спасла героя.";
         if(hp==0) {
             int penalty=gold/3;gold-=penalty;hp=Math.max(1,maxHp/2);stamina=Math.max(1,maxStamina/2);
@@ -800,7 +801,7 @@ public final class GameEngine {
             g.aiTurn=AiGameTurn.restore(j.optJSONObject("aiTurn"));
             g.sceneState=SceneState.fromJson(j.optJSONObject("sceneState"));
              g.katherine=KatherineStory.restore(j.optJSONObject("katherine"));
-             g.alma=AlmaStory.restore(j.optJSONObject("alma"));
+             g.alma=AlmaStory.restore(j.optJSONObject("alma"));if(!g.alma.enabled&&AlmaStory.MODE.equals(g.mode))g.mode="WORLD";
             // Reconcile legacy schema-1 saves with the authoritative quest stage.
             if(g.questStage>=4)g.progress.setQuestOutcome("ash_seals","COMPLETED");
             else if(g.questStage>0)g.progress.setQuestOutcome("ash_seals","ACTIVE");
