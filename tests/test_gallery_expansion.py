@@ -92,6 +92,19 @@ class GalleryExpansion(unittest.TestCase):
         self.assertEqual(original_bytes, report["original_bytes"])
         self.assertEqual(archive_bytes, report["archive_bytes"])
 
+    def test_dot_catalog_count_matches_actual_gallery_archives(self):
+        viewer = JAVA.read_text(encoding="utf-8")
+        slugs = re.findall(r'"([^"]+)"', viewer.split("String[] SLUGS={",1)[1].split("};",1)[0])
+        labels = re.findall(r'\{([^{}]+)\}', viewer.split("String[][] PHOTO_LABELS={",1)[1].split("};",1)[0])
+        self.assertEqual(len(slugs),len(labels))
+        for slug,row in zip(slugs,labels):
+            expected = len(re.findall(r'"[^"]+"',row))
+            names = set()
+            for path in sorted(ASSETS.glob(slug+".zip")) + sorted(ASSETS.glob(slug+"_extra.zip")):
+                with zipfile.ZipFile(path) as z:
+                    names.update(n for n in z.namelist() if re.fullmatch(r"\d+\.webp",n))
+            self.assertEqual(names,{f"{i:02d}.webp" for i in range(1,expected+1)},slug)
+    
     def test_runtime_aliases_labels_and_archive_routing(self):
         self.assertIsNotNone(shutil.which("javac"), "JDK required for catalog probe")
         viewer = JAVA.read_text(encoding="utf-8")

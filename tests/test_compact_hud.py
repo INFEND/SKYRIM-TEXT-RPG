@@ -28,6 +28,19 @@ class CompactHud(unittest.TestCase):
             self.assertIn(token,GALLERY)
         for token in ('new RuneFrameDrawable', 'header.addView(page', 'String.format("%02d / %02d"'):
             self.assertNotIn(token,GALLERY)
+    def test_gallery_uses_equal_round_dots_in_current_accent(self):
+        for token in ('for(int i=0;i<imageCount(location);i++)',
+                      'new FrameLayout.LayoutParams(dp(7),dp(7),Gravity.CENTER)',
+                      'new LayoutParams(dp(16),dp(28))',
+                      'marker.setShape(GradientDrawable.OVAL)',
+                      'marker.setColor(active?accent:0xff363636)',
+                      'hit.setSelected(active)', 'v->show(index)'):
+            self.assertIn(token,GALLERY)
+        for token in ('hitSize.width=dp(active?', 'dotSize.width=dp(active?',
+                      'if(imageCount(location)==1)indicators.setVisibility',
+                      'Панорама Вайтрана'):
+            self.assertNotIn(token,GALLERY)
+        self.assertIn('{"Главные ворота","Вход в город","Рынок"',GALLERY)
     def test_gallery_weather_is_current_location_and_offline(self):
         self.assertEqual(UI.count('renderLocationWeather(content);'),2)
         self.assertIn('renderLocationWeather(overview);',UI)

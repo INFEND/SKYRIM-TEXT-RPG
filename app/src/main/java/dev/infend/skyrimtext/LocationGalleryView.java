@@ -49,7 +49,7 @@ public final class LocationGalleryView extends LinearLayout {
     private static final Map<String,Integer> PHOTO_INDEX_BY_CITY=new HashMap<>();
     /** Labels follow location/sub-location names, not gallery image numbers. */
     private static final String[][] PHOTO_LABELS={
-        {"Панорама Вайтрана","Главные ворота","Рынок","Ветреный район","Йоррваскр","Драконий Предел"},
+        {"Главные ворота","Вход в город","Рынок","Ветреный район","Йоррваскр","Драконий Предел"},
         {"Главные ворота","Серый квартал","Рынок","Каменный квартал","Дворец королей","Набережная"},
         {"Подход к Винтерхолду","Заснеженная улица","Главная площадь","Врата Коллегии","Двор Коллегии","Зимний двор"},
         {"Подход к Данстару","Порт","Главная улица","Таверна","У причала","Заснеженная бухта"},
@@ -306,7 +306,6 @@ public final class LocationGalleryView extends LinearLayout {
             hit.setOnClickListener(v->show(index));
             indicators.addView(hit,new LayoutParams(dp(16),dp(28)));
         }
-        if(imageCount(location)==1)indicators.setVisibility(View.GONE);
         show(0);
         prefetch();
     }
@@ -346,13 +345,10 @@ public final class LocationGalleryView extends LinearLayout {
             View dot=hit.getChildAt(0);
             boolean active=i==current;
             hit.setSelected(active);
-            LayoutParams hitSize=(LayoutParams)hit.getLayoutParams();
-            hitSize.width=dp(active?30:16);
-            hit.setLayoutParams(hitSize);
-            FrameLayout.LayoutParams dotSize=(FrameLayout.LayoutParams)dot.getLayoutParams();
-            dotSize.width=dp(active?24:7);
-            dot.setLayoutParams(dotSize);
-            dot.setBackground(panel(active?0xffc5aa80:0xff363636,12,Color.TRANSPARENT));
+            GradientDrawable marker=new GradientDrawable();
+            marker.setShape(GradientDrawable.OVAL);
+            marker.setColor(active?accent:0xff363636);
+            dot.setBackground(marker);
         }
     }
     private void openResourceManager(){
