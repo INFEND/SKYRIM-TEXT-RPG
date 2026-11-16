@@ -72,6 +72,7 @@ public final class GameEngine {
     private void regenerateCombat(){if(hp<=0||!"COMBAT".equals(mode))return;int penalty=regenIgnorePenalty?0:needs.penalty();hp=(int)Math.min(maxHp,(long)hp+(poisonTurns>0&&!regenIgnorePenalty?regenBonus[0]:Math.max(0,regenRate(0)-(penalty>0?1:0))));magicka=(int)Math.min(maxMagicka,(long)magicka+Math.max(regenBonus[1],regenRate(1)-(penalty>0?1:0)));stamina=(int)Math.min(maxStamina,(long)stamina+(frostTurns>0&&!regenIgnorePenalty?regenBonus[2]:Math.max(0,regenRate(2)-(penalty>0?1:0))));}
     public AiGameTurn aiTurn;
     public SceneState sceneState = new SceneState();
+    RoadEvents road = new RoadEvents();
     public KatherineStory katherine = new KatherineStory();
     public AlmaStory alma = new AlmaStory();
     public String aiJournal = "";
@@ -176,7 +177,7 @@ public final class GameEngine {
         if(name.length()>28)name=name.substring(0,28);
         race=contains(RACES,desiredRace)?desiredRace:"Норд";
         heroClass=contains(CLASSES,desiredClass)?desiredClass:"Без класса";
-        started=true;compensation=new CompensationPowers();compensation.installCatalog();lastLivingResult=new JSONObject();lastCheckChance=lastCheckRoll=-1;needs=new LivingNeeds();economy=new LivingEconomy();java.util.Arrays.fill(regenBonus,0);regenIgnorePenalty=false;fixSpent=0;aiTurn=null;sceneState=new SceneState();katherine=new KatherineStory();alma=new AlmaStory();aiJournal="";day=1;hour=8;level=1;xp=0;gold=85;potions=3;manaPotions=1;
+        started=true;compensation=new CompensationPowers();compensation.installCatalog();lastLivingResult=new JSONObject();lastCheckChance=lastCheckRoll=-1;needs=new LivingNeeds();economy=new LivingEconomy();java.util.Arrays.fill(regenBonus,0);regenIgnorePenalty=false;fixSpent=0;aiTurn=null;sceneState=new SceneState();road=new RoadEvents();katherine=new KatherineStory();alma=new AlmaStory();aiJournal="";day=1;hour=8;level=1;xp=0;gold=85;potions=3;manaPotions=1;
         questStage=0;sideQuest=0;sideKills=0;boardCompleted=0;explored=0;victories=0;reputation=0;
         swordUpgraded=false;armorUpgraded=false;
         maxHp=100;maxStamina=100;maxMagicka=100;attack=12;armor=2;
@@ -211,6 +212,8 @@ public final class GameEngine {
     }
 
     public Scene scene() {
+        if(started&&RoadEvents.MODE.equals(mode))return road.scene(this);
+        if(started&&road.pending()&&("RESULT".equals(mode)||"DEFEAT".equals(mode)))return new Scene("В ДОРОГЕ","Последствия встречи",message).primary("GO_WORLD","Продолжить переход","Следовать к месту назначения");
         if(started&&AlmaStory.MODE.equals(mode)){if(alma.enabled)return alma.scene(this);mode="WORLD";}
         if(started&&KatherineStory.MODE.equals(mode))return katherine.scene(this);
         if(started&&"CANON".equals(mode))return CanonicalCampaign.scene(this);
@@ -363,6 +366,9 @@ public final class GameEngine {
     public void choose(String action) {
         if (!started || action==null) return;
         lastCheckChance=lastCheckRoll=-1;
+        if(RoadEvents.MODE.equals(mode)){road.choose(this,action);return;}
+        if(road.pending()&&!"COMBAT".equals(mode)){if("GO_WORLD".equals(action))road.resume(this);return;}
+        if(action.startsWith("ROAD:"))return;
         int fixPower=CompensationPowers.actionIndex(action);if(fixPower>=0){if(compensation.available(this,fixPower))combatTurn(action);return;}
         // A pending battle cannot be escaped by invoking a world, map or quest action.
         // This guard also protects saved games restored directly into COMBAT mode.
@@ -411,6 +417,7 @@ public final class GameEngine {
             TravelPlanner.Route route=TravelPlanner.plan(this,target);
             if(!route.allowed){message=route.problem;mode="RESULT";return;}
             if(route.days==0){message="Ты уже находишься здесь.";mode="WORLD";return;}
+            if(!road.resuming&&road.begin(this,route,target))return;
             gold-=route.fare;
             day+=route.days;
             region=target.region;
@@ -427,7 +434,7 @@ public final class GameEngine {
             }
             stamina=Math.max(1,stamina-Math.min(Math.max(0,stamina-1),route.days*(progress.advanced.has(AdvancedPerks.STEALTH)?5:6)));
             magicka=Math.max(1,magicka-Math.min(Math.max(0,magicka-1),route.days*2));
-            String roadEvent=RoadEvents.resolve(this,route);
+            String roadEvent=road.resuming?road.outcome:"";
             message="Ты преодолеваешь дорогу, постепенно оставляя за спиной стоянки, перевалы и чужие костры. "+
                 route.summary()+"\n\nМесто назначения: "+target.name+". "+target.description+
                 (roadEvent.isEmpty()?"":"\n\nВ дороге: "+roadEvent);
@@ -593,6 +600,7 @@ public final class GameEngine {
     }
     void beginFactionBattle(int f,String name,int health,int damage,String intro){factionBattle=f;startBattle(name,health,damage,"FACTION",intro);}
     void beginCanonicalBattle(String name,int health,int damage,String intro){canonicalShoutCooldown=0;startBattle(name,health,damage,"CANONICAL",intro);}
+    void beginRoadBattle(String name,int health,int damage,String intro){startBattle(name,health,damage,"WILD",intro);}
     void beginAlmaBattle(){startBattle("Убийца Тёмного Братства",75+level*8,8+level*2,"ALMA","Преследователь преграждает дорогу. Альма предупреждает о засаде.");}
     void beginKatherineBattle(){startBattle("Агент Круга Трёх Когтей",75+level*8,8+level*2,"KATHERINE","Кэтрин поднимает барьер. Агент Круга требует, чтобы она сдалась.");}
     private void startBattle(String name,int health,int dmg,String kind,String intro) {
@@ -709,7 +717,7 @@ public final class GameEngine {
     /** Time-limited rest available outside combat, tracked in the old save schema. */
     public boolean waitHours(int hours){return restHours(hours,hours>=6);}
     public boolean restHours(int hours,boolean sleep){
-        if(!started||"COMBAT".equals(mode)||hours<1||hours>24)return false;
+        if(!started||"COMBAT".equals(mode)||road.pending()||hours<1||hours>24)return false;
         lastCheckChance=lastCheckRoll=-1;
         int total=hour+hours;
         if(day>Integer.MAX_VALUE-total/24)return false;
@@ -756,7 +764,7 @@ public final class GameEngine {
          .put("battleLog",battleLog).put("battleKind",battleKind).put("enemyIntro",enemyIntro)
          .put("enemyHp",enemyHp).put("enemyMaxHp",enemyMaxHp).put("enemyDamage",enemyDamage).put("progress",progress.toJson())
          .put("aiJournal",aiJournal).put("aiTurn",aiTurn==null?JSONObject.NULL:aiTurn.save())
-         .put("sceneState",sceneState.toJson()).put("merchants",merchants.toJson()).put("factions",factions.toJson()).put("factionStories",factionStories.toJson()).put("factionBattle",factionBattle)
+         .put("road",road.save()).put("sceneState",sceneState.toJson()).put("merchants",merchants.toJson()).put("factions",factions.toJson()).put("factionStories",factionStories.toJson()).put("factionBattle",factionBattle)
          .put("visitedVisual",new org.json.JSONArray(visitedVisual)).put("visualChronicle",visualChronicle)
          .put("holdReputation",new org.json.JSONArray(holdReputation)).put("poisonTurns",poisonTurns).put("frostTurns",frostTurns).put("battleTurns",battleTurns).put("battleDealt",battleDealt).put("battleTaken",battleTaken);
         return j;
@@ -807,6 +815,7 @@ public final class GameEngine {
             g.aiJournal=j.optString("aiJournal","");
             g.aiTurn=AiGameTurn.restore(j.optJSONObject("aiTurn"));
             g.sceneState=SceneState.fromJson(j.optJSONObject("sceneState"));
+            g.road=RoadEvents.restore(j.optJSONObject("road"));if(RoadEvents.MODE.equals(g.mode)&&!g.road.pending())g.mode="WORLD";
              g.katherine=KatherineStory.restore(j.optJSONObject("katherine"));
              g.alma=AlmaStory.restore(j.optJSONObject("alma"));if(!g.alma.enabled&&AlmaStory.MODE.equals(g.mode))g.mode="WORLD";
             // Reconcile legacy schema-1 saves with the authoritative quest stage.

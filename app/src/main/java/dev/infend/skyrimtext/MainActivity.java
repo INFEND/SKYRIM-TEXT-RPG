@@ -1465,6 +1465,7 @@ public final class MainActivity extends Activity {
     private void renderStory(){
         boolean canonical="CANON".equals(game.mode)||("COMBAT".equals(game.mode)&&("CANONICAL".equals(game.battleKind)||"FACTION".equals(game.battleKind)));
         canonical=canonical||KatherineStory.MODE.equals(game.mode)||AlmaStory.MODE.equals(game.mode)||("COMBAT".equals(game.mode)&&("KATHERINE".equals(game.battleKind)||"ALMA".equals(game.battleKind)));
+        canonical=canonical||game.road.pending()||RoadEvents.MODE.equals(game.mode);
         if(prefs.getBoolean("ai_enabled",false)&&!canonical){renderAiGame();return;}
         GameEngine.Scene s=game.scene();section(s.kicker,s.title,"");
         if(LocationGalleryView.hasGallery(game.progress.location)){
@@ -1488,7 +1489,7 @@ public final class MainActivity extends Activity {
         if(battleSummaryPending){battleSummaryPending=false;boolean defeated="DEFEAT".equals(game.mode);if(visual(defeated?"defeat":"victory"))showBattleSummary(defeated);}
         renderItemGains();
         renderStoryJournal();
-        if(prefs.getBoolean("ai_enabled",false)) renderAiStoryPanel();
+        if(prefs.getBoolean("ai_enabled",false)&&!game.road.pending()) renderAiStoryPanel();
         space(content,12);
         addText(content,"Что ты предпримешь?",22,TEXT,true,7);
         addText(content,s.choices.size()+" доступных вариантов. Вероятность показана только для настоящих проверок.",12,MUTED,false,15);
@@ -2744,7 +2745,7 @@ public final class MainActivity extends Activity {
 
     private void locationDialog(WorldAtlas.Place place){
         TravelPlanner.Route route=TravelPlanner.plan(game,place);
-        boolean canTravel=route.allowed&&route.days>0;
+        boolean canTravel=route.allowed&&route.days>0&&!game.road.pending();
         android.app.Dialog dialog=new android.app.Dialog(this,R.style.RunicDialogTheme);
         dialog.requestWindowFeature(android.view.Window.FEATURE_NO_TITLE);
         LinearLayout panel=column();
@@ -3543,7 +3544,7 @@ public final class MainActivity extends Activity {
         livingLink(content,"Сопротивления","","shield",()->livingHeroDetails("Сопротивления",game.progress.racePassive(game)+"\nСнижение физического урона: "+String.format(java.util.Locale.ROOT,"%.1f%%",100*game.progress.damageReduction())));
         livingLink(content,"Подробная статистика","","hero",()->{heroDetailed=true;render();});
     }
-    private boolean livingBusy(){return aiTurnBusy||!pendingAiAction().isEmpty()||"COMBAT".equals(game.mode);}
+    private boolean livingBusy(){return aiTurnBusy||!pendingAiAction().isEmpty()||"COMBAT".equals(game.mode)||game.road.pending();}
     private void livingEconomyDialog(){
         if(livingBusy()){toast("Финансы недоступны во время действия");return;}
         game.syncLivingSystems();LinearLayout panel=column();livingLine(panel,"На руках",livingNumber(game.gold),ITEM_GOLD);livingLine(panel,"В обороте",livingNumber(game.economy.capital),TEXT);livingLine(panel,"Доход / день",livingNumber(game.economy.income()),ITEM_UP);livingLine(panel,"Накопленный доход",livingNumber(game.economy.accrued),ITEM_UP);
