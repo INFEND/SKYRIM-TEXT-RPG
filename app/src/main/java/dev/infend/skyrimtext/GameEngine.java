@@ -257,7 +257,7 @@ public final class GameEngine {
         s.add("SHOP","Торговая лавка","Зелья, оружие и снаряжение");
         s.add("BOARD","Доска заказов","Дополнительное поручение");
         s.add("REST","Отдохнуть в трактире","20 септимов | восстановить силы");
-        RoadQuests.choices(this,s);
+        RoadQuests.choices(this,s);road.fineChoices(this,s);
         return s;
     }
 
@@ -373,6 +373,7 @@ public final class GameEngine {
         if(action.startsWith("ROAD:"))return;
         if(action.startsWith("ROAD_TARGET:")){road.selectTarget(this,action);return;}
         if(action.startsWith("ROADQUEST:")){RoadQuests.choose(this,action);return;}
+        if(action.startsWith("ROADFINE:")){road.payFine(this,action);return;}
         if(action.startsWith("ROADSTART:")){RoadQuests.start(this,action.substring("ROADSTART:".length()));return;}
         if(action.startsWith("ROADDEBT:")){if("ROADDEBT:pay".equals(action)||"ROADDEBT:negotiate".equals(action))RoadQuests.payDebt(this,"ROADDEBT:negotiate".equals(action));return;}
         int fixPower=CompensationPowers.actionIndex(action);if(fixPower>=0){if(compensation.available(this,fixPower))combatTurn(action);return;}

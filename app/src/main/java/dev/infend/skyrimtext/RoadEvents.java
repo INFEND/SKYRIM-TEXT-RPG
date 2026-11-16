@@ -269,6 +269,8 @@ final class RoadEvents {
     int extraIncoming(GameEngine g,boolean defending,Random rng){if(!groupActive(g))return 0;ensureGroup(g);int total=0;for(int i=0;i<combatGroup.length;i++){if(i==combatIndex||groupHp[i]<=0)continue;int base=Math.max(1,groupDamage[i]+rng.nextInt(4)-Math.max(0,g.armor-(g.armorUpgraded?4:0))-g.compensation.passiveBonus(g,1));int raw=Math.max(1,base-(defending?groupDamage[i]/2+3+2*g.progress.branches.rank(3):0));total+=Math.max(1,(int)Math.round(raw*(1-g.progress.damageReduction())));}return total;}
     void clearGroup(){combatGroup=new String[0];groupHp=new int[0];groupMax=new int[0];groupDamage=new int[0];combatIndex=0;}
     int bounty(int region){return region>=0&&region<roadBounties.length?roadBounties[region]:0;}
+    void fineChoices(GameEngine g,GameEngine.Scene s){WorldAtlas.Place p=WorldAtlas.find(g.progress.location);if(p!=null&&"Столица".equals(p.type)&&bounty(p.region)>0)s.add("ROADFINE:"+p.region,"Погасить дорожный штраф",bounty(p.region)+" септимов | местная стража");}
+    void payFine(GameEngine g,String action){if(pending()||!("WORLD".equals(g.mode)||"RESULT".equals(g.mode)))return;WorldAtlas.Place p=WorldAtlas.find(g.progress.location);if(p==null||!"Столица".equals(p.type)||!action.equals("ROADFINE:"+p.region))return;int fine=bounty(p.region);if(fine<=0)return;if(g.gold<fine){g.message="Не хватает септимов для погашения штрафа.";g.mode="RESULT";return;}g.gold-=fine;roadBounties[p.region]=0;g.progress.sync(g);g.message="Местная стража приняла "+fine+" септимов. Дорожный штраф погашен.";g.mode="RESULT";g.recordVisualEvent(g.message);}
     private void addBounty(int region,int amount){if(region>=0&&region<roadBounties.length)roadBounties[region]=GameEngine.nonnegativeAdd(roadBounties[region],amount);}
     private static boolean member(GameEngine g,int faction){return g.factions.stage(faction)>0||g.factionStories.started(faction);}
     private void remember(GameEngine g){recentDays.put(id,g.day);while(recentDays.size()>188)recentDays.remove(recentDays.keySet().iterator().next());}
@@ -309,7 +311,7 @@ final class RoadEvents {
             case "island":case "island_once":return true;
             case "island_db":return g.factionStories.done(3)>=3;
             case "island_dragon":return dragons;
-            case "island_debt":return true;
+            case "island_debt":return RoadQuests.debtActive(g);
             case "once":return true;
             case "day":return !night;
             case "dg":return g.factionStories.done(6)>=4;
@@ -319,12 +321,12 @@ final class RoadEvents {
             case "dg_west":return (region==3||region==4)&&g.factionStories.done(6)>=4;
             case "dg_attack":return g.factionStories.done(6)>=4&&!g.factionStories.completed(6);
             case "beast_night":return night&&g.factionStories.done(0)>=2;
-            case "louis":return region==1;
-            case "sanguine":return true;
+            case "louis":return region==1&&RoadQuests.done(g,"louis_revenge".equals(e.id)?"frost_keep":"frost_maven");
+            case "sanguine":return RoadQuests.done(g,"sanguine_final")&&g.progress.questOutcome("road_deep_in_cups")==null;
             case "peryite":return region==4;
             case "bounty":return g.road.bounty(region)>=1000;
-            case "riverwood":return region==0;
-            case "azura":return g.canonicalStage>=19||"COMPLETED".equals(g.progress.questOutcome("road_azura"));
+            case "riverwood":return region==0&&(RoadQuests.done(g,"riverwood_sven")||RoadQuests.done(g,"riverwood_faendal"));
+            case "azura":return RoadQuests.done(g,"azura_aranea")||RoadQuests.done(g,"azura_black");
             case "septimus":return g.canonicalStage>=19;
             case "db_letter":return g.factionStories.done(3)==1;
             case "aetherium":return region==4||region==3;
@@ -346,7 +348,7 @@ final class RoadEvents {
             case "wedding":return g.factionStories.done(3)<7;
             case "afterwedding":return g.factionStories.done(3)>=7;
             case "ice":return region==3||region==7||region==6;
-            case "east":return region==2;
+            case "east":return region==2&&(!"blood_horkers".equals(e.id)||RoadQuests.done(g,"east_return"));
             case "companions":return region!=0;
             case "babette":return night&&g.factionStories.completed(3);
             case "thalmor_order":return g.canonicalStage>12;
@@ -414,7 +416,7 @@ final class RoadEvents {
         if("lynoit".equals(id)||"island_torkild_dead".equals(id))return s.primary(action("clue"),"Изучить останки и записку","Сохранить сведения").add(action("leave"),"Не трогать тело","");
         if(id.startsWith("letter_"))return s.primary(action("clue"),"Принять письмо","Записать поручение в журнал").add(action("leave"),"Не брать письмо","");
         if("island_blackbook".equals(id)||"island_frossel".equals(id)||"taron_dreth".equals(id)||"island_torkild".equals(id))return s.primary(action("reveal_fight"),"Расспросить путника","Узнать сведения; возможна схватка").add(action("fight"),"Вступить в бой","").add(action("sneak"),"Отойти незаметно","Проверка скрытности");
-        if("deep_in_cups".equals(id))return s.primary(action("talk"),"Обсудить старое пари","Проверка красноречия").add(action("fight"),"Отказаться от требований","").add(action("sneak"),"Уйти","");
+        if("deep_in_cups".equals(id))return s.primary(action("sanguine_pay"),"Оплатить старое пари","10000 септимов").add(action("sanguine_negotiate"),"Снизить плату","Красноречие | 750 септимов").add(action("fight"),"Отказаться от требований","").add(action("sneak"),"Уйти","");
         if("island_morgrul".equals(id)||"louis_revenge".equals(id)||"love_triangle".equals(id))return s.primary(action("talk"),"Объяснить, что произошла ошибка","Проверка красноречия").add(action("fight"),"Защититься","").add(action("sneak"),"Скрыться","");
         if("bounty_collector".equals(id)){int fine=bounty(encounterRegion);return s.primary(action("fine"),"Оплатить штраф",""+fine+" септимов").add(action("talk"),"Попытаться договориться","Проверка красноречия").add(action("fight"),"Вступить в бой","").add(action("sneak"),"Скрыться","");}
         if("friend_gift".equals(id))return s.primary(action("gift"),"Принять подарок","Получить небольшой подарок").add(action("leave"),"Отказаться","");
@@ -448,12 +450,12 @@ final class RoadEvents {
     private int health(GameEngine g,String name){if("giant".equals(id))return 100+g.level*5;if(name.toLowerCase(Locale.ROOT).contains("дракон"))return 130+g.level*5;return (combatGroup.length>1?30:55)+g.level*(combatGroup.length>1?3:5);}
     private int damage(GameEngine g,String name){return ("giant".equals(id)?11:name.toLowerCase(Locale.ROOT).contains("дракон")?13:combatGroup.length>1?4:6)+g.level/3;}
     private void fight(GameEngine g,String enemy){Event e=find(id);if(enemy==null||enemy.isEmpty())return;last=id;remember(g);outcome="Встреча: "+e.title;g.recordVisualEvent(outcome);combatGroup=groupFor(id,enemy);combatIndex=0;victoryApplied=false;groupHp=new int[combatGroup.length];groupMax=new int[combatGroup.length];groupDamage=new int[combatGroup.length];for(int i=0;i<combatGroup.length;i++){groupHp[i]=groupMax[i]=health(g,combatGroup[i]);groupDamage[i]=damage(g,combatGroup[i]);}
-        if(Arrays.asList("wedding_named","assassin_other","bounty_collector").contains(id)){addBounty(encounterRegion,"bounty_collector".equals(id)?1000:1000);g.reputation--;}
+        if(Arrays.asList("wedding_named","assassin_other","bounty_collector","imperial_prisoner","storm_prisoner","thalmor_prisoner").contains(id)){addBounty(encounterRegion,"bounty_collector".equals(id)?1000:1000);g.reputation--;}
         String first=combatGroup[0];g.beginRoadBattle(first,health(g,first),damage(g,first),e.body+(combatGroup.length>1?"\nПротивников: "+combatGroup.length:""));}
     boolean nextOpponent(GameEngine g,String actionText){if(!groupActive(g))return false;ensureGroup(g);String defeated=g.enemyName;int next=-1;for(int i=1;i<=combatGroup.length;i++){int k=(combatIndex+i)%combatGroup.length;if(groupHp[k]>0){next=k;break;}}if(next<0)return false;setTarget(g,next);g.battleLog=actionText+"\n"+defeated+" повержен. Новая цель: "+g.enemyName+".";return true;}
     int allyDamage(GameEngine g,int inflicted){return pending()&&"giant".equals(id)&&"WILD".equals(g.battleKind)&&(g.battleTurns+1)%2==0?Math.min(7,Math.max(0,g.enemyHp-inflicted)):0;}
     void applyVictory(GameEngine g){if(!pending()||victoryApplied||!"WILD".equals(g.battleKind))return;victoryApplied=true;Event e=find(id);if(e==null)return;
-        if(oneTime(e))uniqueOutcome(g,"COMPLETED");
+        if(oneTime(e)||"deep_in_cups".equals(id))uniqueOutcome(g,"COMPLETED");
         if("giant".equals(id)){fact(g,"road_aela","Эйла Охотница","HELPED");g.factions.roadTrust(0,5);g.message+="\nЭйла приглашает тебя в Йоррваскр, к Кодлаку Белой Гриве.";}
         else if("escort".equals(e.rule)){freed(g);g.message+="\nПленник освобождён после победы над охраной.";}
         else if("civil".equals(e.rule)){int side="empire".equals(decision)?4:5;g.factions.roadTrust(side,5);g.factions.roadTrust(side==4?5:4,-5);g.message+="\nТвою помощь запомнили: "+FactionCampaign.NAMES[side]+". Доверие +5.";} 
@@ -503,6 +505,7 @@ final class RoadEvents {
             case "gift":g.gold=GameEngine.nonnegativeAdd(g.gold,10);finish(g,"Путник дарит тебе 10 септимов в знак благодарности.");return;
             case "donate":if(g.gold>=10){g.gold-=10;g.reputation++;finish(g,"Ты отдаёшь фермерам 10 септимов. Они благодарят тебя.");}else finish(g,"У тебя недостаточно септимов, но ты указываешь путь к ближайшему поселению.");return;
             case "song":g.stamina=Math.min(g.maxStamina,g.stamina+5);finish(g,"Талсгар исполняет песню о северных героях. Короткий привал возвращает немного сил.");return;
+            case "sanguine_pay":case "sanguine_negotiate":int owed="sanguine_pay".equals(verb)?10000:750;if(g.gold<owed){finish(g,"Не хватает септимов. Пари остаётся незакрытым.");return;}if("sanguine_negotiate".equals(verb)&&!g.rollCheck(g.progress.chance(g,2,12,50))){finish(g,"Аргонианин не соглашается на меньшую сумму.");return;}g.gold-=owed;uniqueOutcome(g,"COMPLETED");finish(g,"Глубокий-в-Кубках принимает "+owed+" септимов и уходит.");return;
             case "fight":fight(g,e.enemy);return;
             case "free":fight(g,e.enemy);return;
             case "persuade":if(g.rollCheck(g.progress.chance(g,2,12,"thalmor_prisoner".equals(id)?65:40))){g.progress.skillExperience(g,12,25);freed(g);finish(g,"Ты убеждаешь охрану отпустить пленника. Он исчезает в лесу.");}else finish(g,"Охрана отказывает и уводит пленника дальше.");return;
