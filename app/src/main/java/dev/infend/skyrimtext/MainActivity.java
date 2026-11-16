@@ -176,6 +176,7 @@ public final class MainActivity extends Activity {
     }
     @Override protected void onActivityResult(int requestCode,int resultCode,Intent data){
         super.onActivityResult(requestCode,resultCode,data);
+        if(requestCode==REQUEST_KATHERINE_GALLERY){if(resultCode==RESULT_OK&&data!=null&&data.getData()!=null){try{KatherineGallery.install(this,data.getData());katherineGallery(1);}catch(Exception e){toast("Не удалось импортировать галерею: "+e.getMessage());}}return;}
         if(requestCode==LocalAiEngineModule.REQUEST_ACTIVATE){if(localAiClient!=null)localAiClient.onEngineActivationResult(resultCode==RESULT_OK);return;}
         if(requestCode==REQUEST_LOCAL_GGUF&&resultCode==RESULT_OK&&data!=null&&data.getData()!=null)
             importLocalModel(data.getData());
@@ -429,10 +430,24 @@ public final class MainActivity extends Activity {
         panel.addView(npcPortrait(name),lp(112,-2));
         NpcProfiles.Profile profile=NpcProfiles.find(name);
         if(profile!=null){addText(panel,profile.race+" | "+profile.role,14,TEXT,true,8);}
-        if(KatherineStory.NAME.equals(name)){addText(panel,"18 лет | Носитель Нулевого Предела",14,TEXT,true,8);addText(panel,"Доверие: "+game.katherine.trust+"/100",14,accent(),true,8);addText(panel,"Уважение: "+game.katherine.respect+"/100 | Симпатия: "+game.katherine.affection+"/100",13,TEXT,false,8);addText(panel,"Ревность: "+game.katherine.jealousy+"/100 | Магический ранг: "+game.katherine.magicRank+"/3",13,TEXT,false,8);addText(panel,"Тактика: "+game.katherine.stanceLabel()+" | "+game.katherine.status(),13,TEXT,false,8);}
+        if(KatherineStory.NAME.equals(name)){TextView galleryButton=text("Галерея Кэтрин",15,accent(),true);galleryButton.setPadding(dp(12),dp(12),dp(12),dp(12));galleryButton.setOnClickListener(v->katherineGallery(1));panel.addView(galleryButton,lp(-1,-2));addText(panel,"18 лет | Носитель Нулевого Предела",14,TEXT,true,8);addText(panel,"Доверие: "+game.katherine.trust+"/100",14,accent(),true,8);addText(panel,"Уважение: "+game.katherine.respect+"/100 | Симпатия: "+game.katherine.affection+"/100",13,TEXT,false,8);addText(panel,"Ревность: "+game.katherine.jealousy+"/100 | Магический ранг: "+game.katherine.magicRank+"/3",13,TEXT,false,8);addText(panel,"Тактика: "+game.katherine.stanceLabel()+" | "+game.katherine.status(),13,TEXT,false,8);}
         if(!KatherineStory.NAME.equals(name))addText(panel,"Иллюстративный образ или эмблема, не индивидуальный портрет",11,MUTED,false,10);
         addText(panel,npcStatusLabel(game.sceneState.npcStatusByName(name)),15,TEXT,true,8);
         new RuneDialogBuilder(this,accent()).setTitle(name).setView(panel).setNegativeButton("Закрыть",null).show();
+    }
+    private static final int REQUEST_KATHERINE_GALLERY=7218;
+    private void chooseKatherineGallery(){Intent picker=new Intent(Intent.ACTION_OPEN_DOCUMENT);picker.addCategory(Intent.CATEGORY_OPENABLE);picker.setType("application/zip");try{startActivityForResult(picker,REQUEST_KATHERINE_GALLERY);}catch(Exception e){toast("Не удалось открыть выбор файла");}}
+    private void katherineGallery(int index){
+        LinearLayout panel=column();panel.setPadding(dp(12),dp(8),dp(12),dp(8));
+        if(!KatherineGallery.available(this)){
+            addText(panel,"Галерея пока не загружена. Выбери архив Katherine_gallery.zip или скачай пакет в управлении ресурсами, когда он появится на сервере.",14,TEXT,false,8);
+            new RuneDialogBuilder(this,accent()).setTitle("Кэтрин | Галерея").setView(panel).setPositiveButton("Импорт ZIP",(d,w)->chooseKatherineGallery()).setNegativeButton("Закрыть",null).show();return;
+        }
+        try{
+            android.widget.ImageView image=new android.widget.ImageView(this);image.setImageBitmap(KatherineGallery.photo(this,index));image.setAdjustViewBounds(true);image.setScaleType(android.widget.ImageView.ScaleType.FIT_CENTER);panel.addView(image,lp(-1,440));
+            TextView count=text(index+" / "+KatherineGallery.COUNT,14,accent(),true);count.setGravity(Gravity.CENTER);panel.addView(count,lp(-1,34));
+            AlertDialog dialog=new RuneDialogBuilder(this,accent()).setTitle("Кэтрин | Галерея").setView(panel).setNegativeButton("Закрыть",null).setNeutralButton("Назад",(d,w)->katherineGallery(index==1?KatherineGallery.COUNT:index-1)).setPositiveButton("Вперёд",(d,w)->katherineGallery(index==KatherineGallery.COUNT?1:index+1)).create();dialog.show();
+        }catch(Exception e){toast("Не удалось прочитать фото");}
     }
     private String lastNarrative="";
     private void decorateNarrative(LinearLayout host,TextView body,String raw){
