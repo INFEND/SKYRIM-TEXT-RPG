@@ -166,7 +166,12 @@ public final class MainActivity extends Activity {
         super.onDestroy();
     }
     private void newAiSession(){
-        combatVisual="";victoryVisual="";travelVisual="";combatLabels.clear();combatColors.clear();battleSummaryPending=false;travelStops=java.util.Collections.emptyList();lastNarrative="";
+        combatVisual="";victoryVisual="";travelVisual="";livingDeltas.clear();livingResultTitle=action==null?"Итоги действия":action;livingResultChance=before.chance;
+        long gained=(long)after.xp-before.xp;for(int l=before.level;l<after.level;l++)gained+=GameEngine.experienceRequired(l);
+        livingDelta("Золото",(long)after.gold-before.gold);livingDelta("Опыт персонажа",gained);livingDelta("Здоровье",after.hp-before.hp);livingDelta("Магия",after.magicka-before.magicka);livingDelta("Выносливость",after.stamina-before.stamina);livingDelta("Уровень",after.level-before.level);
+        for(int i=0;i<before.skillXp.length;i++){long earned=(long)after.progress.skillXp[i]-before.skillXp[i];for(int l=before.skillLevels[i];l<after.progress.skillLevels[i];l++)earned+=Math.max(100,100*l);if(after.progress.skillLevels[i]==100&&before.skillLevels[i]<100)livingDelta(RpgContent.SKILLS[i]+" (уровни)",after.progress.skillLevels[i]-before.skillLevels[i]);else livingDelta(RpgContent.SKILLS[i]+" (опыт)",earned);}
+        livingDelta("Игровое время, ч.",((long)after.day-before.day)*24+after.hour-before.hour);
+        after.needs.sync(after.day,after.hour);combatLabels.clear();combatColors.clear();battleSummaryPending=false;travelStops=java.util.Collections.emptyList();lastNarrative="";
         recentItemGains.clear();
         selectedAiChoices.clear();aiOwnDraft="";clearAiDraft();
         cancelAiForSourceChange();
@@ -483,15 +488,16 @@ public final class MainActivity extends Activity {
         if(!cost.isEmpty())addText(host,cost,12,ITEM_GOLD,true,3);
     }
     private static final class VisualSnapshot {
-        final String location,mode,enemy;final int hp,enemyHp,victories,gold,xp,level,day,region,reputation;final java.util.List<String> stops;
+        final String location,mode,enemy;final int hp,enemyHp,victories,gold,xp,level,day,region,reputation;final int magicka,stamina,hour,chance;final int[] skillXp,skillLevels;final java.util.List<String> stops;
         VisualSnapshot(GameEngine g){this(g,null);}
-        VisualSnapshot(GameEngine g,String action){location=g.progress.location;mode=g.mode;enemy=g.enemyName;hp=g.hp;enemyHp=g.enemyHp;victories=g.victories;gold=g.gold;xp=g.xp;level=g.level;day=g.day;region=g.region;reputation=g.reputation;
+        VisualSnapshot(GameEngine g,String action){location=g.progress.location;mode=g.mode;enemy=g.enemyName;hp=g.hp;enemyHp=g.enemyHp;victories=g.victories;gold=g.gold;xp=g.xp;level=g.level;day=g.day;region=g.region;reputation=g.reputation;magicka=g.magicka;stamina=g.stamina;hour=g.hour;chance=action==null?-1:g.progress.chance(g,action);skillXp=g.progress.skillXp.clone();skillLevels=g.progress.skillLevels.clone();
             WorldAtlas.Place place=null;if(action!=null&&action.startsWith("LOC:"))place=WorldAtlas.find(action.substring(4));
             if(action!=null&&action.startsWith("REGION:"))try{int i=Integer.parseInt(action.substring(7));if(i>=0&&i<TravelPlanner.HUBS.length)place=WorldAtlas.find(TravelPlanner.HUBS[i]);}catch(NumberFormatException ignored){}
             stops=place==null?java.util.Collections.emptyList():TravelPlanner.plan(g,place).stops;
         }
     }
     private String combatVisual="",victoryVisual="",travelVisual="";
+    private final java.util.LinkedHashMap<String,Long> livingDeltas=new java.util.LinkedHashMap<>();private String livingResultTitle="";private int livingResultChance=-1;
     private final java.util.ArrayList<String> combatLabels=new java.util.ArrayList<>();
     private final java.util.ArrayList<Integer> combatColors=new java.util.ArrayList<>();
     private boolean battleSummaryPending;
@@ -529,13 +535,16 @@ public final class MainActivity extends Activity {
             JSONObject detail=new JSONObject().put("choice",action==null?"":action).put("from",before.location)
                 .put("goldDelta",(long)after.gold-before.gold).put("hpDelta",after.hp-before.hp)
                 .put("reputationDelta",delta).put("days",Math.max(0,after.day-before.day));
-            long xpDelta=(long)after.xp-before.xp;for(int l=before.level;l<after.level;l++)xpDelta+=l*80L;
+            long xpDelta=(long)after.xp-before.xp;for(int l=before.level;l<after.level;l++)xpDelta+=GameEngine.experienceRequired(l);
             detail.put("xpDelta",xpDelta).put("levelDelta",after.level-before.level);
             if(moved&&!before.stops.isEmpty()&&after.progress.location.equals(before.stops.get(before.stops.size()-1)))detail.put("route",new org.json.JSONArray(before.stops));
             after.recordVisualEvent(event,detail);
         }catch(org.json.JSONException ignored){after.recordVisualEvent(event);}
     }
+    private void livingDelta(String label,long delta){if(delta!=0)livingDeltas.put(label,delta);}
+    private void renderLivingResult(){if(livingDeltas.isEmpty())return;LinearLayout tile=livingTile(content);livingLine(tile,"Результат действия",livingResultChance>=0?livingResultChance+"%":"",accent());for(java.util.Map.Entry<String,Long> e:livingDeltas.entrySet()){long n=e.getValue();int color=e.getKey().equals("Золото")?ITEM_GOLD:e.getKey().startsWith("Игровое время")?MUTED:n>0?ITEM_UP:ITEM_DOWN;livingLine(tile,e.getKey(),(n>0?"+":"−")+livingNumber(Math.abs(n)),color);} }
     private void renderVisualResults(){
+        renderLivingResult();
         if(visual("damage")&&!combatLabels.isEmpty()){
             LinearLayout box=card();
             for(int i=0;i<combatLabels.size();i++){
@@ -1458,6 +1467,7 @@ public final class MainActivity extends Activity {
         box.setPadding(dp(14),dp(14),dp(14),dp(14));
         int actionTint=AmoledAppearance.storyTint(c.action,c.title,c.special?accent():BORDER);
         box.setBackground(new RuneFrameDrawable(PANEL,actionTint,c.special||AmoledAppearance.buttons()==5));
+        box.setBackground(bg(0xff141414,Color.TRANSPARENT,18));
         if(showChoiceNumbers()){
             TextView ordinal=text(String.valueOf(position),17,c.special?accent():MUTED,true);
             ordinal.setGravity(Gravity.CENTER);
@@ -1488,6 +1498,7 @@ public final class MainActivity extends Activity {
         if(chance>=0){
             addChoiceStat(prose,"НАВЫК",choiceSkillName(c.action),accent(),4);
             addChoiceStat(prose,"ШАНС УСПЕХА",chance+"%",SceneChoiceMeta.chanceColor(chance),0);
+            livingBar(prose,chance,100,SceneChoiceMeta.chanceColor(chance));
         }else addText(prose,"БЕЗ ПРОВЕРКИ",11,0xffb8c1c4,false,0);
         LinearLayout.LayoutParams layout=lp(-1,-2);layout.bottomMargin=dp(5);
         content.addView(box,layout);
@@ -1687,7 +1698,7 @@ public final class MainActivity extends Activity {
         own.setInputType(InputType.TYPE_CLASS_TEXT|InputType.TYPE_TEXT_FLAG_MULTI_LINE|InputType.TYPE_TEXT_FLAG_CAP_SENTENCES);
         own.setMinLines(3);own.setMaxLines(7);
         own.setPadding(dp(13),dp(11),dp(13),dp(11));
-        own.setBackground(new RuneFrameDrawable(PANEL_2,BORDER,false));
+        own.setBackground(bg(0xff141414,Color.TRANSPARENT,18));
         content.addView(own,lp(-1,-2));
         space(content,10);
         actionButton("ОТПРАВИТЬ","Отправить выбранные ответы и свой текст одним действием",true,()->{
@@ -1802,7 +1813,7 @@ public final class MainActivity extends Activity {
         if("FLEE".equals(action)&&!"WILD".equals(game.battleKind))return;
         if(!nativeAiCombatAvailable(action))return;
         java.util.Map<String,Integer> before=itemSnapshot(game);
-        VisualSnapshot visualBefore=new VisualSnapshot(game);
+        VisualSnapshot visualBefore=new VisualSnapshot(game,action);
         game.choose(action);
         game.progress.sync(game);
         captureItemGains(before,game,false);
@@ -1829,6 +1840,7 @@ public final class MainActivity extends Activity {
         boolean selected=selectedAiChoices.contains(number);
         int actionTint=AmoledAppearance.storyTint(option.combatAction,option.title,selected?accent():BORDER);
         row.setBackground(new RuneFrameDrawable(PANEL,actionTint,selected||AmoledAppearance.buttons()==5));
+        row.setBackground(bg(selected?0xff252525:0xff141414,Color.TRANSPARENT,18));
         TextView ordinal=showChoiceNumbers()?text(String.valueOf(number),17,
             selected?accent():MUTED,true):null;
         if(ordinal!=null){
@@ -1854,6 +1866,7 @@ public final class MainActivity extends Activity {
             addChoiceStat(detail,"НАВЫК",option.skill.isEmpty()?"Способности":option.skill,accent(),3);
             addChoiceStat(detail,"ШАНС УСПЕХА",displayedChance+"%",
                 SceneChoiceMeta.chanceColor(displayedChance),0);
+            livingBar(detail,displayedChance,100,SceneChoiceMeta.chanceColor(displayedChance));
         }else addText(detail,"БЕЗ ПРОВЕРКИ",12,MUTED,false,0);
         boolean available=!combat||nativeAiCombatAvailable(option.combatAction);
         if(!available){
@@ -1873,7 +1886,7 @@ public final class MainActivity extends Activity {
             if(!selectedAiChoices.add(number))selectedAiChoices.remove(number);
             persistAiDraft();
             boolean active=selectedAiChoices.contains(number);
-            row.setBackground(new RuneFrameDrawable(PANEL,AmoledAppearance.storyTint(option.combatAction,option.title,active?accent():BORDER),active||AmoledAppearance.buttons()==5));
+            row.setBackground(bg(active?0xff252525:0xff141414,Color.TRANSPARENT,18));
             if(ordinal!=null)ordinal.setTextColor(active?accent():MUTED);
             row.setContentDescription("Вариант "+number+". "+option.title+". "+(active?"Выбран":"Не выбран"));
         });
@@ -3267,8 +3280,94 @@ public final class MainActivity extends Activity {
         r.addView(text(label,14,MUTED,false),new LinearLayout.LayoutParams(0,-2,1));
         r.addView(text(value,15,TEXT,true));
     }
+    private boolean heroDetailed;
+    private int skillGroup;
+    private boolean journalRelations;
+    private static final String[] LIVING_SKILL_GROUPS={"Воинские","Воровские","Магические","Прочие"};
+    private static final int[][] LIVING_SKILLS={{0,1,3,2,5,4},{9,10,11},{13,14,15,17,16},{6,7,8,12}};
+    private static final int[] LIVING_COLORS={0xffdf8278,0xff71c99b,0xff78a4ff,0xffd4b57b};
+    private LinearLayout livingTile(LinearLayout host){
+        LinearLayout tile=column();tile.setPadding(dp(14),dp(13),dp(14),dp(13));tile.setBackground(bg(0xff141414,Color.TRANSPARENT,18));
+        LinearLayout.LayoutParams p=lp(-1,-2);p.bottomMargin=dp(8);host.addView(tile,p);return tile;
+    }
+    private void livingLine(LinearLayout host,String label,String value,int color){
+        LinearLayout line=row();line.setGravity(Gravity.CENTER_VERTICAL);line.addView(text(label,14,TEXT,false),new LinearLayout.LayoutParams(0,-2,1));line.addView(text(value,15,color,true),lp(-2,-2));host.addView(line,lp(-1,-2));space(host,6);
+    }
+    private void livingBar(LinearLayout host,int value,int max,int color){
+        ProgressBar bar=new ProgressBar(this,null,android.R.attr.progressBarStyleHorizontal);
+        bar.setMax(Math.max(1,max));bar.setProgress(Math.max(0,Math.min(value,max)));bar.setProgressTintList(ColorStateList.valueOf(color));bar.setProgressBackgroundTintList(ColorStateList.valueOf(0xff303030));
+        host.addView(bar,lp(-1,5));space(host,7);
+    }
+    private void livingLink(LinearLayout host,String label,String value,String glyph,Runnable action){
+        LinearLayout tile=livingTile(host);LinearLayout line=row();line.setGravity(Gravity.CENTER_VERTICAL);
+        line.addView(new SkyrimIconView(this,glyph,accent()),lp(27,29));LinearLayout words=column();words.setPadding(dp(10),0,dp(6),0);line.addView(words,new LinearLayout.LayoutParams(0,-2,1));addText(words,label,16,TEXT,true,0);
+        if(!value.isEmpty())line.addView(text(value,13,MUTED,false),lp(-2,-2));TextView arrow=text("›",24,MUTED,false);line.addView(arrow,lp(20,-2));tile.addView(line,lp(-1,-2));tile.setOnClickListener(v->action.run());
+    }
+    private void livingDialog(String title,LinearLayout panel){
+        panel.setPadding(dp(14),dp(10),dp(14),dp(10));ScrollView sc=new ScrollView(this);sc.setFillViewport(false);sc.addView(panel);
+        new RuneDialogBuilder(this,accent()).setTitle(title).setView(sc).setNegativeButton("Закрыть",null).show();
+    }
     private void renderHero(){
+        if(heroDetailed){renderHeroLegacy();return;}
+        skyrimTopTabs(3);game.needs.sync(game.day,game.hour);
+        LinearLayout head=row();head.setGravity(Gravity.CENTER_VERTICAL);head.addView(new CharacterPortraitView(this,game.race,game.gender,game.portrait),lp(92,-2));
+        LinearLayout identity=column();identity.setPadding(dp(13),0,0,0);head.addView(identity,new LinearLayout.LayoutParams(0,-2,1));
+        addText(identity,game.name,24,heroColor(),true,4);addText(identity,game.race+" · "+game.heroClass,13,MUTED,false,8);
+        livingLine(identity,"Уровень "+game.level,game.level>=100?"MAX":game.xp+" / "+game.experienceRequired(),accent());livingBar(identity,game.level>=100?1:game.xp,game.level>=100?1:game.experienceRequired(),accent());
+        content.addView(head,lp(-1,-2));space(content,12);
+        String portraitPath=CharacterIdentity.portraitPath(game.race,game.gender,game.portrait);
+        if(!ResourceStore.has(this,portraitPath))livingLink(content,"Загрузить портрет","","hero",()->new ResourceManagerDialog(this,accent(),this::render,ResourceStore.portraitGroup(portraitPath)).show());
+        livingLine(content,"Здоровье",game.hp+" / "+game.maxHp,ITEM_DOWN);livingBar(content,game.hp,game.maxHp,ITEM_DOWN);
+        livingLine(content,"Магия",game.magicka+" / "+game.maxMagicka,0xff75a2dd);livingBar(content,game.magicka,game.maxMagicka,0xff75a2dd);
+        livingLine(content,"Выносливость",game.stamina+" / "+game.maxStamina,ITEM_UP);livingBar(content,game.stamina,game.maxStamina,ITEM_UP);
+        LinearLayout money=livingTile(content);LinearLayout columns=row();money.addView(columns,lp(-1,-2));
+        String[] labels={"На руках","В обороте","Доход / день"};String[] values={livingNumber(game.gold),"—","—"};
+        for(int i=0;i<3;i++){LinearLayout cell=column();columns.addView(cell,new LinearLayout.LayoutParams(0,-2,1));addText(cell,labels[i],11,MUTED,false,4);addText(cell,values[i],20,i==0?ITEM_GOLD:TEXT,true,0);}
+        livingLink(content,"Потребности",game.needs.penalty()==0?"В норме":"Требуют внимания","health",this::livingNeedsDialog);
+        livingLink(content,"Навыки","18","skills",this::livingSkillsDialog);
+        livingLink(content,"Способности","","magic",()->livingHeroDetails("Способности",game.progress.racePower(game)+"\n\nКрики: "+CanonicalCampaign.shouts(game)));
+        livingLink(content,"Пассивные эффекты","","shield",()->livingHeroDetails("Пассивные эффекты",game.progress.racePassive(game)+(game.poisonTurns>0?"\nОтравление: "+game.poisonTurns+" х.":"")+(game.frostTurns>0?"\nОбморожение: "+game.frostTurns+" х.":"")));
+        livingLink(content,"Экипировка","","armor",()->{tab=2;render();});
+        livingLink(content,"Сопротивления","","shield",()->livingHeroDetails("Сопротивления",game.progress.racePassive(game)+"\nСнижение физического урона: "+String.format(java.util.Locale.ROOT,"%.1f%%",100*game.progress.damageReduction())));
+        livingLink(content,"Подробная статистика","","hero",()->{heroDetailed=true;render();});
+    }
+    private String livingNumber(long n){return String.format(java.util.Locale.US,"%,d",n).replace(',','.');}
+    private void livingHeroDetails(String title,String description){
+        LinearLayout box=column();addText(box,description,15,TEXT,false,8);
+        livingLink(box,"Все способности и таланты","","skills",()->{heroDetailed=true;tab=3;render();});livingDialog(title,box);
+    }
+    private void livingSkillsDialog(){
+        LinearLayout panel=column();LinearLayout filters=row();panel.addView(filters,lp(-1,-2));LinearLayout cards=column();space(panel,9);panel.addView(cards,lp(-1,-2));
+        TextView[] pills=new TextView[LIVING_SKILL_GROUPS.length];
+        Runnable refresh=()->{
+            cards.removeAllViews();for(int k=0;k<pills.length;k++)if(pills[k]!=null){pills[k].setBackground(bg(k==skillGroup?accent():0xff222222,Color.TRANSPARENT,16));pills[k].setTextColor(k==skillGroup?Color.BLACK:MUTED);}
+            for(int index:LIVING_SKILLS[skillGroup]){int level=game.progress.skillLevel(index);LinearLayout tile=livingTile(cards);
+                livingLine(tile,RpgContent.SKILLS[index],String.valueOf(level),LIVING_COLORS[skillGroup]);livingBar(tile,level>=100?1:game.progress.skillXp[index],level>=100?1:game.progress.skillNeed(index),LIVING_COLORS[skillGroup]);
+                livingLine(tile,level>=100?"Легендарный":"Опыт",level>=100?"MAX":livingNumber(game.progress.skillXp[index])+" / "+livingNumber(game.progress.skillNeed(index)),MUTED);tile.setOnClickListener(v->showSkill(index));}
+        };
+        for(int i=0;i<pills.length;i++){final int index=i;TextView p=text(LIVING_SKILL_GROUPS[i],11,TEXT,true);p.setGravity(Gravity.CENTER);p.setPadding(dp(3),dp(10),dp(3),dp(10));LinearLayout.LayoutParams l=new LinearLayout.LayoutParams(0,-2,1);l.rightMargin=dp(3);filters.addView(p,l);pills[i]=p;p.setOnClickListener(v->{skillGroup=index;refresh.run();});}
+        refresh.run();livingDialog("Навыки",panel);
+    }
+    private void livingNeedsDialog(){
+        game.needs.sync(game.day,game.hour);LinearLayout panel=column();
+        String[] names={"Сытость","Запас воды","Бодрость","Отдых"};String[] glyphs={"food","potion","magic","stamina"};int[] values={game.needs.food,game.needs.water,game.needs.awake,game.needs.rest};int[] colors={ITEM_GOLD,0xff75a2dd,ITEM_MAGIC,ITEM_UP};
+        for(int k=0;k<2;k++){LinearLayout line=row();panel.addView(line,lp(-1,-2));for(int j=0;j<2;j++){final int i=k*2+j;LinearLayout tile=column();tile.setPadding(dp(12),dp(12),dp(12),dp(12));tile.setBackground(bg(0xff141414,Color.TRANSPARENT,18));LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(0,-2,1);p.setMargins(dp(3),dp(3),dp(3),dp(3));line.addView(tile,p);
+            LinearLayout top=row();top.addView(new SkyrimIconView(this,glyphs[i],colors[i]),lp(28,30));TextView number=text(values[i]+"%",21,colors[i],true);number.setGravity(Gravity.END);top.addView(number,new LinearLayout.LayoutParams(0,-2,1));tile.addView(top);space(tile,10);addText(tile,names[i],14,TEXT,false,8);livingBar(tile,values[i],100,colors[i]);tile.setOnClickListener(v->{if(i<2)livingConsumeDialog(i==1);else showWaitDialog();});}}
+        space(panel,8);addText(panel,game.needs.penalty()>0?"Штраф обычных проверок: −"+game.needs.penalty()+" п.п.":"Состояние в норме",13,game.needs.penalty()>0?ITEM_GOLD:MUTED,false,8);
+        addText(panel,"Показатели меняются только с игровым временем. Нажми на карточку для восстановления.",12,MUTED,false,8);
+        livingDialog("Состояние персонажа",panel);
+    }
+    private void livingConsumeDialog(boolean water){
+        if(aiTurnBusy||"COMBAT".equals(game.mode)){toast("Сейчас действие недоступно");return;}
+        java.util.ArrayList<ItemCatalog.Item> choices=new java.util.ArrayList<>();java.util.Iterator<String> it=game.progress.inventory.keys();
+        while(it.hasNext()){ItemCatalog.Item item=ItemCatalog.find(it.next());if(item!=null&&game.progress.quantity(item.id)>0){String cat=item.category.toLowerCase(java.util.Locale.ROOT);boolean isDrink=cat.contains("напит")||cat.contains("вода");if(water?isDrink:cat.equals("еда")||cat.contains("пища"))choices.add(item);}}
+        if(choices.isEmpty()){toast(water?"Нет напитков в инвентаре":"Нет еды в инвентаре");return;}
+        String[] labels=new String[choices.size()];for(int i=0;i<labels.length;i++)labels[i]=choices.get(i).name+" × "+game.progress.quantity(choices.get(i).id);
+        new RuneDialogBuilder(this,accent()).setTitle(water?"Выпить":"Поесть").setItems(labels,(d,i)->{if(game.progress.removeItem(choices.get(i).id,1)){game.needs.sync(game.day,game.hour);if(water)game.needs.drink();else game.needs.eat();save();render();toast("Потребность восстановлена");}}).setNegativeButton("Отмена",null).show();
+    }
+    private void renderHeroLegacy(){
         skyrimTopTabs(3);
+        livingLink(content,"К обзору героя","","hero",()->{heroDetailed=false;render();});
         section("ЛИЧНОЕ ДЕЛО",""+game.name,game.race+" | "+game.heroClass+" | уровень "+game.level);
         CharacterPortraitView portrait=new CharacterPortraitView(this,game.race,game.gender,game.portrait);
         LinearLayout.LayoutParams portraitParams=lp(150,-2);portraitParams.gravity=Gravity.CENTER_HORIZONTAL;
@@ -3456,8 +3555,23 @@ public final class MainActivity extends Activity {
         }
     }
     private String selectedJournalEntry="Путь Довакина";
+    private void renderLivingRelations(){
+        section("ЖУРНАЛ","Отношения","Только подтверждённые знакомства и события.");
+        org.json.JSONArray npcs=game.sceneState.npcFacts();
+        if(npcs.length()==0){addText(content,"Пока нет подтверждённых знакомств.",15,MUTED,false,8);return;}
+        for(int i=0;i<npcs.length();i++){JSONObject n=npcs.optJSONObject(i);if(n==null)continue;String name=n.optString("title"),status=n.optString("status");int score;String relation;
+            switch(status){case "HELPED":score=78;relation="Благодарность";break;case "INFORMED":score=60;relation="Обмен сведениями";break;case "MET":score=50;relation="Знакомый";break;case "HOSTILE":score=15;relation="Враждебность";break;default:score=-1;relation=npcStatusLabel(status);}
+            int color=score<0?MUTED:score>=65?ITEM_UP:score>=40?ITEM_GOLD:ITEM_DOWN;LinearLayout tile=livingTile(content);LinearLayout line=row();line.setGravity(Gravity.CENTER_VERTICAL);
+            line.addView(new SkyrimIconView(this,"hero",color),lp(38,42));LinearLayout words=column();words.setPadding(dp(10),0,0,0);line.addView(words,new LinearLayout.LayoutParams(0,-2,1));addText(words,name,18,TEXT,true,3);addText(words,relation,13,color,false,0);
+            if(score>=0)line.addView(text(score+" / 100",16,color,true));tile.addView(line);space(tile,10);if(score>=0)livingBar(tile,score,100,color);
+            addText(tile,"Последнее подтверждённое состояние: "+npcStatusLabel(status),12,MUTED,false,0);tile.setOnClickListener(v->npcDetails(name));}
+        addText(content,"Число отражает оценку известного статуса, а не скрытые намерения персонажа.",11,MUTED,false,4);
+    }
     private void renderJournal(){
         skyrimTopTabs(4);
+        LinearLayout switcher=row();content.addView(switcher,lp(-1,-2));
+        for(String label:new String[]{"Задания","Отношения"}){boolean rel=label.equals("Отношения");TextView p=text(label,15,journalRelations==rel?Color.BLACK:TEXT,true);p.setGravity(Gravity.CENTER);p.setPadding(dp(8),dp(11),dp(8),dp(11));p.setBackground(bg(journalRelations==rel?accent():0xff141414,Color.TRANSPARENT,16));LinearLayout.LayoutParams l=new LinearLayout.LayoutParams(0,-2,1);l.setMargins(dp(3),0,dp(3),dp(8));switcher.addView(p,l);p.setOnClickListener(v->{journalRelations=rel;render();});}
+        if(journalRelations){renderLivingRelations();return;}
         section("ЛЕТОПИСЬ СЕВЕРА","Журнал","Выбирай задание, чтобы увидеть описание и текущую цель.");
         renderChronicle();
         renderFactionJournal();
@@ -3662,8 +3776,27 @@ public final class MainActivity extends Activity {
         foldSettingsSection("amoled","AMOLED | КНОПКИ И ОКНА",start);
     }
 
+    private void livingFixShop(){
+        if(!game.started||aiTurnBusy||!pendingAiAction().isEmpty()||"COMBAT".equals(game.mode)){toast("Магазин недоступен во время активного действия");return;}
+        LinearLayout panel=column();livingLine(panel,"Баланс","∞ F",ITEM_MAGIC);addText(panel,"Системные покупки вне экономики Скайрима. Потрачено: "+livingNumber(game.fixSpent)+" F",12,MUTED,false,8);
+        livingFixRow(panel,"Уровень персонажа","+1 уровень",10,()->{if(game.level>=100)return false;game.addXp(game.experienceRequired()-game.xp);return true;});
+        livingFixRow(panel,"Максимальное здоровье","+10 единиц",1,()->{if(game.maxHp>Integer.MAX_VALUE-10)return false;game.maxHp+=10;return true;});
+        livingFixRow(panel,"Максимальная магия","+10 единиц",1,()->{if(game.maxMagicka>Integer.MAX_VALUE-10)return false;game.maxMagicka+=10;return true;});
+        livingFixRow(panel,"Максимальная выносливость","+10 единиц",1,()->{if(game.maxStamina>Integer.MAX_VALUE-10)return false;game.maxStamina+=10;return true;});
+        livingFixRow(panel,"Золото","+10.000 септимов",1,()->livingFixGold(10000));
+        livingFixRow(panel,"Золото","+100.000 септимов",9,()->livingFixGold(100000));
+        livingFixRow(panel,"Золото","+1.000.000 септимов",80,()->livingFixGold(1000000));
+        addText(panel,"Регенерация, уникальные способности и предметы требуют отдельной механики и пока недоступны.",12,MUTED,false,8);
+        livingDialog("Магазин компенсаций",panel);
+    }
+    private boolean livingFixGold(int amount){if(game.gold>Integer.MAX_VALUE-amount)return false;game.gold+=amount;return true;}
+    private void livingFixRow(LinearLayout host,String title,String detail,int price,java.util.function.BooleanSupplier purchase){
+        LinearLayout tile=livingTile(host);livingLine(tile,title,price+" F",ITEM_MAGIC);addText(tile,detail,13,MUTED,false,0);
+        tile.setOnClickListener(v->new RuneDialogBuilder(this,accent()).setTitle(title).setMessage(detail+" | "+price+" F. Покупка постоянная.").setNegativeButton("Отмена",null).setPositiveButton("Купить",(d,w)->{if(aiTurnBusy||!pendingAiAction().isEmpty()||"COMBAT".equals(game.mode)||game.fixSpent>Long.MAX_VALUE-price||!purchase.getAsBoolean()){toast("Покупка недоступна");return;}game.fixSpent+=price;game.progress.sync(game);game.recordVisualEvent("Системная компенсация: "+title);save();render();toast("Покупка применена");}).show());
+    }
     private void renderSettings(){
         section("ПАРАМЕТРЫ","Настройки","Твоя история, твои правила.");
+        if(game.started)livingLink(content,"Магазин компенсаций","∞ F","skills",this::livingFixShop);
         content.addView(new NordicArtView(this,NordicArtView.STORY),lp(-1,105));space(content,12);
         int appearanceStart=content.getChildCount();
         LinearLayout palette=card();addText(palette,"ЦВЕТ АКЦЕНТА",11,accent(),true,12);

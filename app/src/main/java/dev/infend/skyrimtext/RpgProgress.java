@@ -243,7 +243,8 @@ public final class RpgProgress {
         int danger=Math.max(0,g.region/2)+difficulty/10;
         int skill=skillIndex<0?0:(skillLevel(skillIndex)-15)/2;
         int context=Math.min(18,g.reputation/3)+skill+branches.chanceBonus(skillIndex)+advanced.checkBonus(skillIndex)+(skillIndex==12&&advanced.has(AdvancedPerks.PERSUASION)?5:0)-((int)carryWeight()>45?8:0);
-        return RpgContent.successChance(g,stat,difficulty,danger,exhaustion,context);
+        g.needs.sync(g.day,g.hour);
+        return Math.max(0,RpgContent.successChance(g,stat,difficulty,danger,exhaustion,context)-g.needs.penalty());
     }
     public int chance(GameEngine g,String action){
         if(action==null)return -1;

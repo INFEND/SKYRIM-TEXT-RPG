@@ -58,6 +58,8 @@ public final class GameEngine {
     public String enemyName = "", battleLog = "", battleKind = "", enemyIntro = "";
     public int enemyHp = 0, enemyMaxHp = 0, enemyDamage = 0;
     public RpgProgress progress = new RpgProgress();
+    public LivingNeeds needs=new LivingNeeds();
+    public long fixSpent=0;
     public AiGameTurn aiTurn;
     public SceneState sceneState = new SceneState();
     public String aiJournal = "";
@@ -162,7 +164,7 @@ public final class GameEngine {
         if(name.length()>28)name=name.substring(0,28);
         race=contains(RACES,desiredRace)?desiredRace:"Норд";
         heroClass=contains(CLASSES,desiredClass)?desiredClass:"Без класса";
-        started=true;aiTurn=null;sceneState=new SceneState();aiJournal="";day=1;hour=8;level=1;xp=0;gold=85;potions=3;manaPotions=1;
+        started=true;needs=new LivingNeeds();fixSpent=0;aiTurn=null;sceneState=new SceneState();aiJournal="";day=1;hour=8;level=1;xp=0;gold=85;potions=3;manaPotions=1;
         questStage=0;sideQuest=0;sideKills=0;boardCompleted=0;explored=0;victories=0;reputation=0;
         swordUpgraded=false;armorUpgraded=false;
         maxHp=100;maxStamina=100;maxMagicka=100;attack=12;armor=2;
@@ -651,6 +653,7 @@ public final class GameEngine {
         if(!started||"COMBAT".equals(mode)||hours<1||hours>24)return false;
         int total=hour+hours;
         day+=total/24;hour=total%24;
+        needs.sync(day,hour);needs.recover(hours,hours>=6);
         hp=Math.min(maxHp,hp+hours*3);
         stamina=Math.min(maxStamina,stamina+hours*7);
         magicka=Math.min(maxMagicka,magicka+hours*6);
@@ -670,7 +673,9 @@ public final class GameEngine {
     public String questDetails() {switch(questStage){case 0:return "Поговори с хранителем в разделе «Главная история».";case 1:return "Доберись до Фолкрита и осмотри алтарь.";case 2:return "Найди башню в Винтерхолде и победи пепельного стража.";case 3:return "Передай журнал хранителям Солитьюда.";default:return "Сюжетная линия завершена. Ты можешь продолжать приключения.";}}
     private static boolean contains(String[] arr,String v){for(String s:arr)if(s.equals(v))return true;return false;}
     public JSONObject toJson() throws JSONException {
+        needs.sync(day,hour);
         JSONObject j=new JSONObject();
+        j.put("needs",needs.toJson()).put("fixSpent",fixSpent);
         j.put("schema",1).put("started",started).put("name",name).put("race",race).put("heroClass",heroClass)
          .put("gender",gender).put("portrait",portrait)
          .put("region",region).put("day",day).put("hour",hour).put("level",level).put("xp",xp).put("maxHp",maxHp).put("hp",hp)
@@ -722,6 +727,7 @@ public final class GameEngine {
             g.battleKind=j.optString("battleKind","");g.enemyIntro=j.optString("enemyIntro","");
             g.enemyHp=Math.max(0,j.optInt("enemyHp",0));g.enemyMaxHp=Math.max(0,j.optInt("enemyMaxHp",0));g.enemyDamage=Math.max(0,j.optInt("enemyDamage",0));
             g.progress=RpgProgress.fromJson(j.optJSONObject("progress"));
+             g.needs=LivingNeeds.fromJson(j.optJSONObject("needs"));g.needs.sync(g.day,g.hour);g.fixSpent=Math.max(0,j.optLong("fixSpent",0));
             g.merchants=MerchantLedger.fromJson(j.optJSONObject("merchants"));g.factions=FactionCampaign.fromJson(j.optJSONObject("factions"));g.factionStories=FactionStories.fromJson(j.optJSONObject("factionStories"));g.factionBattle=Math.max(-1,Math.min(6,j.optInt("factionBattle",-1)));
             org.json.JSONArray holds=j.optJSONArray("holdReputation");if(holds!=null)for(int i=0;i<g.holdReputation.length;i++)g.holdReputation[i]=Math.max(-100,Math.min(100,holds.optInt(i,0)));
             if("COMBAT".equals(g.mode)){g.poisonTurns=Math.max(0,Math.min(2,j.optInt("poisonTurns")));g.frostTurns=Math.max(0,Math.min(2,j.optInt("frostTurns")));}
