@@ -130,7 +130,7 @@ public final class GameEngine {
     }
     public boolean canSell(ItemCatalog.Item item){
         return started&&"SHOP".equals(mode)&&item!=null&&item.value>0&&progress.quantity(item.id)>0
-            &&!progress.equipped(item.id)&&progress.temperQuality(item.id)==0&&!"Квестовые предметы".equals(item.category)&&!"Ключи".equals(item.category)
+            &&!progress.equipped(item.id)&&!progress.artifacts.filled(item.id)&&progress.temperQuality(item.id)==0&&!"Квестовые предметы".equals(item.category)&&!"Ключи".equals(item.category)
             &&!"Септимы".equals(item.id)&&!"Лечебное зелье".equals(item.id)&&!"Зелье магии".equals(item.id)
             &&!"Походный клинок".equals(item.id)&&!"Дорожная одежда".equals(item.id)
             &&!(swordUpgraded&&"Стальной меч".equals(item.id))&&!(armorUpgraded&&"Стальная кираса".equals(item.id));
@@ -656,9 +656,9 @@ public final class GameEngine {
         if(custom>=0){if(!compensation.available(this,custom))return;magicka-=compensation.cost(custom);if(!compensation.safe[custom])hp-=2;compensation.cooldown[custom]=4;
             int power=compensation.strength(custom);if(compensation.powerType[custom]==1){lastHealing=Math.min(maxHp-hp,power);hp+=lastHealing;actionText=compensation.powerName(custom)+": +"+lastHealing+" здоровья.";}else{damage=power;defending=compensation.powerType[custom]==2;actionText=compensation.powerName(custom)+": −"+damage+" здоровья врагу.";}
         }else switch(action){
-            case "ROADSTONE_RITUAL":if(progress.artifacts.usedDay==day||!progress.artifacts.has(progress,10)||roadSummonTurns>0)return;progress.artifacts.usedDay=day;roadSummonKind=3;roadSummonTurns=3;actionText="Камень Ритуала поднимает мертвеца.";break;
-            case "ROADSTONE_SERPENT":if(progress.artifacts.usedDay==day||!progress.artifacts.has(progress,11))return;progress.artifacts.usedDay=day;damage=25;defending=true;actionText="Камень Змея отравляет и ослабляет врага.";break;
-            case "ROADSTONE_SHADOW":if(progress.artifacts.usedDay==day||!progress.artifacts.has(progress,12))return;progress.artifacts.usedDay=day;shadow=true;actionText="Камень Тени скрывает героя.";break;
+            case "ROADSTONE_RITUAL":if(!progress.artifacts.powerReady(this,10)||roadSummonTurns>0)return;progress.artifacts.usePower(this,10);roadSummonKind=3;roadSummonTurns=3;actionText="Камень Ритуала поднимает мертвеца.";break;
+            case "ROADSTONE_SERPENT":if(!progress.artifacts.powerReady(this,11))return;progress.artifacts.usePower(this,11);damage=25;defending=true;actionText="Камень Змея отравляет и ослабляет врага.";break;
+            case "ROADSTONE_SHADOW":if(!progress.artifacts.powerReady(this,12))return;progress.artifacts.usePower(this,12);shadow=true;actionText="Камень Тени скрывает героя.";break;
             case "ROADSTAR_TRAP":if(progress.artifacts.trapTurns>0||magicka<10||!((progress.artifacts.whiteSoul==0&&progress.quantity("Звезда Азуры")>0)||(progress.artifacts.blackSoul==0&&progress.quantity("Звезда Чёрной Азуры")>0)))return;magicka-=10;progress.artifacts.trapTurns=3;actionText="Наложен захват души на три хода.";break;
             case "ROADSTAR_WHITE":case "ROADSTAR_BLACK":int mana=progress.artifacts.release(this,"ROADSTAR_WHITE".equals(action)?1:2);if(mana==0)return;actionText="Душа высвобождена: +"+mana+" магии.";break;
             case "ROAD_SUMMON_ROSE":case "ROAD_SUMMON_AETHER":if(roadSummonTurns>0||magicka<20||!progress.equipped("ROAD_SUMMON_ROSE".equals(action)?"Роза Сангвина":"Этериевый посох"))return;magicka-=20;roadSummonKind="ROAD_SUMMON_ROSE".equals(action)?1:2;roadSummonTurns=3;actionText=roadSummonKind==1?"Роза Сангвина призывает дремора.":"Этериевый посох призывает автоматон.";break;
@@ -695,7 +695,7 @@ public final class GameEngine {
         lastDealt=Math.min(enemyHp,damage);lastHeavyHit="HEAVY".equals(action)&&lastDealt>0;lastMiss="HEAVY".equals(action)&&lastDealt==0;battleDealt+=lastDealt;battleTurns++;
         enemyHp=Math.max(0,enemyHp-damage);road.syncGroup(this);
         boolean defeatedTarget=false;
-        if(enemyHp==0) {if(!("CANONICAL".equals(battleKind)&&(canonicalStage==22||canonicalStage==27||canonicalStage==30)))actionText+=progress.artifacts.capture(this,enemyName);poisonTurns=frostTurns=0;if(road.nextOpponent(this,actionText)){actionText=battleLog;defeatedTarget=true;}else{winBattle(actionText);return;}}
+        if(enemyHp==0) {road.recordRoadKill(this);if(!("CANONICAL".equals(battleKind)&&(canonicalStage==22||canonicalStage==27||canonicalStage==30)))actionText+=progress.artifacts.capture(this,enemyName);poisonTurns=frostTurns=0;if(road.nextOpponent(this,actionText)){actionText=battleLog;defeatedTarget=true;}else{winBattle(actionText);return;}}
         int baseIncoming=enemyDamage+random.nextInt(8)-Math.max(0,armor-(armorUpgraded?4:0));
         baseIncoming=Math.max(1,baseIncoming-compensation.passiveBonus(this,1));
         int rawIncoming=Math.max(1,baseIncoming-(defending?enemyDamage/2+3+2*progress.branches.rank(3)+(progress.advanced.has(AdvancedPerks.QUICK_REFLEXES)?2:0)+(progress.advanced.has(AdvancedPerks.SHIELD_WALL)&&!"Не надето".equals(progress.equippedName("shield"))?3:0)+(progress.advanced.has(AdvancedPerks.SHIELD_CHARGE)&&!"Не надето".equals(progress.equippedName("shield"))?4:0):0));

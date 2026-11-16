@@ -139,7 +139,8 @@ public final class RpgProgress {
     public boolean hasArmorType(int skill){for(String slot:SLOTS){ItemCatalog.Item item=ItemCatalog.find(equipped.get(slot));if(item!=null&&item.wearable()&&item.baseStat>0&&item.statSkill==skill)return true;}return false;}
     public double damageReduction(){
         boolean heavy=false,light=false;for(String slot:SLOTS){ItemCatalog.Item item=ItemCatalog.find(equipped.get(slot));if(item!=null&&item.wearable()&&item.baseStat>0){heavy|=item.statSkill==4;light|=item.statSkill==5;}}
-        double base=Math.min(0.8,(equippedArmor()+25*armorPieces())*0.0012+artifacts.reduction(this));
+        double base=Math.min(0.8,(equippedArmor()+25*armorPieces())*0.0012);
+        base=Math.min(0.8,base+artifacts.reduction(this));
         int heavyPieces=0,lightPieces=0;
         for(String slot:new String[]{"head","body","hands","feet"}){ItemCatalog.Item item=ItemCatalog.find(equipped.get(slot));if(item!=null&&item.baseStat>0){if(item.statSkill==4)heavyPieces++;if(item.statSkill==5)lightPieces++;}}
         double fit=heavyPieces==4&&advanced.has(AdvancedPerks.WELL_FITTED)?.05:lightPieces==4&&advanced.has(AdvancedPerks.CUSTOM_FIT)?.05:0;
@@ -325,7 +326,7 @@ public final class RpgProgress {
         int skill=skillFor(index);
         int chance=chance(g,action);
         attemptedToday.add(action);
-        boolean success=g.rollCheck(chance);
+        boolean success=g.rollCheck(chance);artifacts.consumeTower(g,skill);
         int fatigue=3+(index%4)*2;
         g.stamina=Math.max(0,g.stamina-fatigue);
         if(success){

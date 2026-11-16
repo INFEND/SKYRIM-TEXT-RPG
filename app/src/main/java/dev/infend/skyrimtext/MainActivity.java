@@ -3295,7 +3295,7 @@ public final class MainActivity extends Activity {
         content.addView(entry,lp(-1,-2));entry.setOnClickListener(v->itemDialog(item));
     }
     private boolean canDiscardItem(ItemCatalog.Item item){
-        if(CompensationPowers.itemIndex(item.id)>=0)return false;
+        if(CompensationPowers.itemIndex(item.id)>=0||game.progress.artifacts.filled(item.id))return false;
         return !"COMBAT".equals(game.mode)&&game.progress.quantity(item.id)>0
             &&!"Квестовые предметы".equals(item.category)&&!"Ключи".equals(item.category)
             &&!"Септимы".equals(item.id)&&!"Лечебное зелье".equals(item.id)&&!"Зелье магии".equals(item.id)
