@@ -415,7 +415,7 @@ public final class GameEngine {
             day+=route.days;
             region=target.region;
             progress.location=target.name;
-            katherine.observeTravel(this);alma.observeTravel(this);
+            katherine.observeTravel(this);katherine.autonomous(this);alma.observeTravel(this);
             katherine.rest(Math.min(24,route.days*3));alma.rest(Math.min(24,route.days*3));
             // Register only locations reached through the validated atlas route.
             // A stable key keeps repeat visits idempotent across save/load.
@@ -637,6 +637,7 @@ public final class GameEngine {
         }
         compensation.tick();
         if(!"CANON_SHOUT".equals(action)&&canonicalShoutCooldown>0)canonicalShoutCooldown--;
+        String kathSupply=katherine.companion.useSupplies(katherine);if(!kathSupply.isEmpty())actionText+="\n"+kathSupply;
         int kathBurn=katherine.active()?katherine.companion.ongoingDamage(Math.max(0,enemyHp-damage)):0;
         if(kathBurn>0){damage+=kathBurn;actionText+="\nКэтрин: остаточное пламя, −"+kathBurn+" здоровья врагу.";}
         int kathDamage=katherine.assist(this,battleTurns+1,Math.max(0,enemyHp-damage));

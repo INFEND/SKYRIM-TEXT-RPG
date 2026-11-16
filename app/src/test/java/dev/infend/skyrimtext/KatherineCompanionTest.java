@@ -25,4 +25,13 @@ public class KatherineCompanionTest {
         g.day=3;g.hour=12;g.progress.location="Коллегия Винтерхолда";assertTrue(k.present(g));
         g.progress.location="Рифтен";assertFalse(k.present(g));
     }
+    @Test public void suppliesAndIndependentGoals() throws Exception {
+        GameEngine g=game();KatherineStory k=g.katherine;g.potions=2;g.manaPotions=2;
+        g.choose("KATH:stockhp");g.choose("KATH:stockmana");
+        assertEquals(1,g.potions);assertEquals(1,g.manaPotions);assertEquals(1,k.companion.healthPotions);assertEquals(1,k.companion.magicPotions);
+        k.companion.hp=10;k.mana=5;assertFalse(k.companion.useSupplies(k).isEmpty());assertEquals(50,k.companion.hp);assertFalse(k.companion.useSupplies(k).isEmpty());assertEquals(50,k.mana);
+        k.stage=10;g.choose("KATH:ending_free");g.day=3;k.autonomous(g);assertTrue(k.companion.currentGoal.contains("резонанс"));
+        int count=k.memory.length();k.autonomous(g);assertEquals(count,k.memory.length());
+        GameEngine next=GameEngine.fromJson(g.toJson().toString());assertEquals(k.companion.currentGoal,next.katherine.companion.currentGoal);
+    }
 }
