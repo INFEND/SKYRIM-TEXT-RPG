@@ -150,12 +150,13 @@ public final class CanonicalCampaign {
         else if(g.canonicalStage<=COUNT){
             Stage s=stage(g.canonicalStage);
             // Returning from free exploration requires a new journey, not an invisible teleport.
-            if(!s.place.equals(g.progress.location))move(g,s);
+            if(!s.place.equals(g.progress.location)&&move(g,s))return;
             g.mode="CANON";
         }else{g.mode="WORLD";g.message=objective(g);}
     }
-    private static void move(GameEngine g,Stage s){
+    private static boolean move(GameEngine g,Stage s){
         if(!s.place.equals(g.progress.location)){
+            if(g.road.beginCanonical(g,s.place))return true;
             g.day+=g.region==s.region?0:1;
             int total=g.hour+(g.region==s.region?2:5);
             g.day+=total/24;g.hour=total%24;
@@ -164,12 +165,13 @@ public final class CanonicalCampaign {
             g.visitedVisual.add(s.place);
             g.recordVisualEvent("Прибытие: "+s.place);
         }
+        return false;
     }
     private static void enter(GameEngine g,boolean first){
         Stage s=stage(g.canonicalStage);
         g.canonicalPage=0;g.canonicalPhase=0;g.canonicalPrepared=false;g.canonicalRecent="";
         if(first){g.region=s.region;g.progress.location=s.place;g.visitedVisual.add(s.place);}
-        else move(g,s);
+        else if(move(g,s)){g.progress.setQuestOutcome(quest(g.canonicalStage),"ACTIVE");return;}
         g.progress.setQuestOutcome(quest(g.canonicalStage),"ACTIVE");
         g.mode="CANON";
     }

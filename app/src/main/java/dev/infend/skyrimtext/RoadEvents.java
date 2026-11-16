@@ -89,7 +89,7 @@ final class RoadEvents {
     };
     String id="",destination="",outcome="",last="";
     int serial;
-    boolean resuming;
+    boolean resuming,canonicalResume;
     private static Event find(String id){for(Event e:EVENTS)if(e.id.equals(id))return e;return null;}
     boolean pending(){return !destination.isEmpty()&&find(id)!=null;}
     static boolean pair(String a,String b,String x,String y){return (a.equals(x)&&b.equals(y))||(a.equals(y)&&b.equals(x));}
@@ -123,6 +123,10 @@ final class RoadEvents {
             default:return !"assassin".equals(e.id)||(!g.factionStories.started(3)&&g.factions.stage(3)==0);
         }
     }
+    boolean beginCanonical(GameEngine g,String target){
+        if(resuming||pending()||g.canonicalStage!=4||!"Ривервуд".equals(g.progress.location)||!"Драконий Предел".equals(target)||g.progress.questOutcome("road_giant")!=null||g.factions.stage(0)>0||g.factionStories.started(0))return false;
+        id="giant";destination=target;outcome="";canonicalResume=true;serial=serial==Integer.MAX_VALUE?1:serial+1;g.mode=MODE;g.message=find(id).body;return true;
+    }
     boolean begin(GameEngine g,TravelPlanner.Route route,WorldAtlas.Place target){return begin(g,route,target,new Random());}
     boolean begin(GameEngine g,TravelPlanner.Route route,WorldAtlas.Place target,Random rng){
         if(pending()||route==null||!route.allowed||route.days<=0||route.fare>0)return false;
@@ -138,7 +142,7 @@ final class RoadEvents {
             for(Event e:pool){roll-=e.weight;if(roll<0){id=e.id;break;}}
         }
         if(find(id)==null)return false;
-        destination=target.name;outcome="";serial=serial==Integer.MAX_VALUE?1:serial+1;
+        destination=target.name;canonicalResume=false;outcome="";serial=serial==Integer.MAX_VALUE?1:serial+1;
         g.mode=MODE;g.message=find(id).body;return true;
     }
     private String action(String verb){return "ROAD:"+serial+":"+id+":"+verb;}
@@ -215,8 +219,9 @@ final class RoadEvents {
             else if("escort".equals(find(previous).rule))outcome+="\nПленник освобождён.";
         }else if(outcome.startsWith("Встреча: "))outcome=g.message;
         destination="";id="";last=previous;resuming=true;
-        try{g.choose("LOC:"+target);}finally{resuming=false;outcome="";}
+        boolean canonical=canonicalResume;canonicalResume=false;
+        try{if(canonical){CanonicalCampaign.open(g);g.canonicalRecent=outcome;g.recordVisualEvent(outcome);}else g.choose("LOC:"+target);}finally{resuming=false;outcome="";}
     }
-    JSONObject save(){JSONObject j=new JSONObject();try{j.put("id",id).put("destination",destination).put("outcome",outcome).put("last",last).put("serial",serial);}catch(Exception ignored){}return j;}
-    static RoadEvents restore(JSONObject j){RoadEvents r=new RoadEvents();if(j!=null){r.id=j.optString("id","");r.destination=j.optString("destination","");r.outcome=j.optString("outcome","");r.last=j.optString("last","");r.serial=Math.max(0,j.optInt("serial"));if(!r.pending()){r.id="";r.destination="";}}return r;}
+    JSONObject save(){JSONObject j=new JSONObject();try{j.put("id",id).put("destination",destination).put("outcome",outcome).put("last",last).put("serial",serial).put("canonicalResume",canonicalResume);}catch(Exception ignored){}return j;}
+    static RoadEvents restore(JSONObject j){RoadEvents r=new RoadEvents();if(j!=null){r.id=j.optString("id","");r.destination=j.optString("destination","");r.outcome=j.optString("outcome","");r.last=j.optString("last","");r.serial=Math.max(0,j.optInt("serial"));r.canonicalResume=j.optBoolean("canonicalResume");if(!r.pending()){r.id="";r.destination="";}}return r;}
 }

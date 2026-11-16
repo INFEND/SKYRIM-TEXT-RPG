@@ -12,6 +12,7 @@ public class CanonicalCampaignTest {
         int fights=0;
         for(int i=1;i<=CanonicalCampaign.COUNT;i++){
             assertEquals(i,g.canonicalStage);
+            if(RoadEvents.MODE.equals(g.mode)){assertEquals(4,i);g.choose(g.scene().choices.get(1).action);g.choose("GO_WORLD");}
             assertEquals("CANON",g.mode);
             String action=g.scene().choices.get(0).action;
             g.choose(action);

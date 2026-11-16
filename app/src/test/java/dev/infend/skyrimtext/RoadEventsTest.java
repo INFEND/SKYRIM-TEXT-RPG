@@ -17,4 +17,8 @@ public class RoadEventsTest {
         g=GameEngine.fromJson(g.toJson().toString());g.choose(help);assertEquals(paid,g.gold);g.choose("GO_WORLD");
         assertEquals("Ферма Лорея",g.progress.location);assertEquals("COMPLETED",g.progress.questOutcome("road_cicero"));
     }
+    @Test public void canonicalRoadResumesWithoutChangingQuestStage() throws Exception {
+        GameEngine g=new GameEngine();g.start("Герой","Норд","Воин");g.canonicalStage=4;g.progress.location="Ривервуд";g.region=0;g.mode="WORLD";
+        g.choose("CANON_OPEN");assertEquals("ROAD",g.mode);g=GameEngine.fromJson(g.toJson().toString());g.choose(g.scene().choices.get(1).action);g.choose("GO_WORLD");assertEquals("CANON",g.mode);assertEquals(4,g.canonicalStage);assertEquals("Драконий Предел",g.progress.location);
+    }
 }
