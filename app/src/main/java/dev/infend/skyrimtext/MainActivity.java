@@ -1764,6 +1764,7 @@ public final class MainActivity extends Activity {
         if(!aiTurnStatus.isEmpty())addText(content,aiTurnStatus,12,MUTED,false,11);
         if("COMBAT".equals(game.mode)&&game.enemyHp>0){
             addText(content,"БОЙ | "+game.enemyName+" | "+game.enemyHp+"/"+game.enemyMaxHp,14,accent(),true,8);
+            if(game.road.groupActive(game))addText(content,game.road.groupStatus(game),13,TEXT,false,8);
             actionButton("УДАР","Обычная атака",true,()->resolveNativeAiCombat("ATTACK"));
             actionButton("СИЛЬНЫЙ УДАР",game.heavyCost()+" единиц сил | "+game.progress.chance(game,"HEAVY")+"%",game.stamina>=game.heavyCost(),()->resolveNativeAiCombat("HEAVY"));
             actionButton("МАГИЯ",game.magicCost()+" единиц магии",game.magicka>=game.magicCost(),()->resolveNativeAiCombat("MAGIC"));

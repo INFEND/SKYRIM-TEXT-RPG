@@ -2,7 +2,7 @@ package dev.infend.skyrimtext;
 import org.junit.Test;
 import static org.junit.Assert.*;
 public class RoadGroupBattleTest {
-    private GameEngine hero(){GameEngine g=new GameEngine();g.start("Герой","Норд","Воин");g.progress.location="Вайтран";g.region=0;g.mode="WORLD";return g;}
+    private GameEngine hero(){GameEngine g=new GameEngine();g.start("Герой","Норд","Воин");g.hp=g.maxHp=500;g.progress.location="Вайтран";g.region=0;g.mode="WORLD";return g;}
     private void setup(GameEngine g,String id){g.road.id=id;g.road.destination="Ривервуд";g.road.segmentFrom="Вайтран";g.road.segmentTo="Ривервуд";g.mode="ROAD";}
     private void choose(GameEngine g,String verb){for(GameEngine.Choice c:g.scene().choices)if(c.action.endsWith(":"+verb)){g.choose(c.action);return;}fail("Missing "+verb);}
     @Test public void prisonerIsNotFreedUntilAllGuardsDefeatedAndSaveWorks() throws Exception {

@@ -326,6 +326,7 @@ public final class GameEngine {
             .add("MAGIC","Магическая вспышка","−"+magicCost()+" магии | усиленный урон")
             .add("DEFEND","Защититься","Уменьшить ответный урон")
             .add("POTION","Выпить лечебное зелье","Осталось: " + potions);
+        road.targetChoices(this,s);
         if("WILD".equals(battleKind))s.add("FLEE","Отступить","Шанс выйти из боя без награды");
         if("CANONICAL".equals(battleKind)&&canonicalShouts!=0&&canonicalShoutCooldown==0)s.add("CANON_SHOUT",CanonicalCampaign.combatShout(this),"Урон и ослабление врага | Восстановление 3 хода");
         for(int i=0;i<CompensationPowers.SLOTS;i++)if(compensation.available(this,i))s.add("FIX_POWER:"+i,compensation.powerName(i),compensation.detail(i));
@@ -370,6 +371,7 @@ public final class GameEngine {
         if(RoadEvents.MODE.equals(mode)){road.choose(this,action);return;}
         if(road.pending()&&!"COMBAT".equals(mode)){if("GO_WORLD".equals(action))road.resume(this);return;}
         if(action.startsWith("ROAD:"))return;
+        if(action.startsWith("ROAD_TARGET:")){road.selectTarget(this,action);return;}
         if(action.startsWith("ROADQUEST:")){RoadQuests.choose(this,action);return;}
         int fixPower=CompensationPowers.actionIndex(action);if(fixPower>=0){if(compensation.available(this,fixPower))combatTurn(action);return;}
         // A pending battle cannot be escaped by invoking a world, map or quest action.
@@ -658,13 +660,15 @@ public final class GameEngine {
         int almaCombo=alma.combo(Math.max(0,enemyHp-damage),"MAGIC".equals(action));if(almaCombo>0){damage+=almaCombo;actionText+="\nАльма: Кровавая связка, −"+almaCombo+" здоровья врагу.";}
         int roadAssist=road.allyDamage(this,damage);if(roadAssist>0){damage+=roadAssist;actionText+="\nСоратники атакуют великана: −"+roadAssist+" здоровья.";}
         lastDealt=Math.min(enemyHp,damage);lastHeavyHit="HEAVY".equals(action)&&lastDealt>0;lastMiss="HEAVY".equals(action)&&lastDealt==0;battleDealt+=lastDealt;battleTurns++;
-        enemyHp=Math.max(0,enemyHp-damage);
-        if(enemyHp==0) {poisonTurns=frostTurns=0;if(road.nextOpponent(this,actionText)){regenerateCombat();return;}winBattle(actionText);return;}
+        enemyHp=Math.max(0,enemyHp-damage);road.syncGroup(this);
+        boolean defeatedTarget=false;
+        if(enemyHp==0) {poisonTurns=frostTurns=0;if(road.nextOpponent(this,actionText)){actionText=battleLog;defeatedTarget=true;}else{winBattle(actionText);return;}}
         int baseIncoming=enemyDamage+random.nextInt(8)-Math.max(0,armor-(armorUpgraded?4:0));
         baseIncoming=Math.max(1,baseIncoming-compensation.passiveBonus(this,1));
         int rawIncoming=Math.max(1,baseIncoming-(defending?enemyDamage/2+3+2*progress.branches.rank(3)+(progress.advanced.has(AdvancedPerks.QUICK_REFLEXES)?2:0)+(progress.advanced.has(AdvancedPerks.SHIELD_WALL)&&!"Не надето".equals(progress.equippedName("shield"))?3:0)+(progress.advanced.has(AdvancedPerks.SHIELD_CHARGE)&&!"Не надето".equals(progress.equippedName("shield"))?4:0):0));
         int incoming=Math.max(1,(int)Math.round(rawIncoming*(1-progress.damageReduction())));
-        if(defending)lastBlocked=Math.max(0,Math.max(1,(int)Math.round(Math.max(1,baseIncoming)*(1-progress.damageReduction())))-incoming);
+        int flank=road.extraIncoming(this,defending,random);incoming+=flank;if(flank>0)actionText+="\nОстальные противники атакуют одновременно: −"+flank+" здоровья до защиты спутников.";
+        if(defending)lastBlocked=Math.max(0,Math.max(1,(int)Math.round(Math.max(1,baseIncoming)*(1-progress.damageReduction())))-(incoming-flank));
         int kathWeakness=katherine.active()?katherine.companion.weaken(incoming):0;incoming-=kathWeakness;
         if(kathWeakness>0){lastBlocked+=kathWeakness;actionText+="\nКэтрин: ослабление противника, −"+kathWeakness+" входящего урона.";}
         int kathProtection=katherine.protect(incoming);incoming-=kathProtection;
@@ -678,7 +682,7 @@ public final class GameEngine {
         if(!defending&&foe.contains("ледяной призрак"))frostTurns=2;
         lastTaken=Math.min(hp,incoming+poisoned);battleTaken+=lastTaken;
         hp=Math.max(0,hp-incoming-poisoned);stamina=Math.min(maxStamina,nonnegativeAdd(stamina,3+(progress.hasArmorType(5)&&progress.advanced.has(AdvancedPerks.WIND_WALKER)?2:0)));
-        battleLog=actionText+"\n"+enemyName+" отвечает: −"+incoming+" здоровья."+(poisoned>0?"\nЯд: −"+poisoned+" здоровья.":"")+(poisonTurns>0?"\nОтравление: "+poisonTurns+" хода.":"")+(frostTurns>0?"\nОбморожение: "+frostTurns+" хода.":"");
+        battleLog=actionText+"\n"+(road.groupActive(this)?"Отряд противников":enemyName)+" отвечает: −"+incoming+" здоровья."+(poisoned>0?"\nЯд: −"+poisoned+" здоровья.":"")+(poisonTurns>0?"\nОтравление: "+poisonTurns+" хода.":"")+(frostTurns>0?"\nОбморожение: "+frostTurns+" хода.":"");
         if(hp>0){int link=alma.bloodLink(this);if(link>0){lastHealing+=link;battleLog+="\nАльма: Связь душ, +"+link+" здоровья." ;}}
         if(hp==0&&alma.rescue(this))battleLog+="\nАльма: Алая клятва спасла героя.";
         if(hp==0) {
