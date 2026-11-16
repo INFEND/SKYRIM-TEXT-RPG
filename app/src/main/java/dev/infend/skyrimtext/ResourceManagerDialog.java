@@ -68,7 +68,7 @@ final class ResourceManagerDialog {
     private ImageButton iconButton(String key,int color,int background){
         ImageButton b=new ImageButton(activity);
         b.setBackgroundTintList(null);b.setBackground(shape(background,0,14));
-        b.setImageDrawable(new ResourceGlyph(key,color));b.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
+        b.setImageDrawable(new ResourceGlyph(key,color));b.setScaleType(ImageView.ScaleType.FIT_CENTER);
         b.setPadding(dp(10),dp(10),dp(10),dp(10));return b;
     }
     private void addTool(LinearLayout line,String label,Runnable action){
@@ -212,6 +212,7 @@ final class ResourceManagerDialog {
         c.amount.setContentDescription(sizePair(done,total)+(suffix.isEmpty()?"":" · "+suffix));
         int percent=total>0?(int)Math.min(100,done*100.0/total):0;
         c.percent.setText(total>0?percent+"%":active?"…":"");
+        c.percent.setContentDescription(suffix.isEmpty()?c.percent.getText():c.percent.getText()+" · "+suffix);
         c.progress.update(total>0?Math.min(1f,done/(float)total):0f,total<=0&&active);
         String glyph=ready?"check":active?"clock":"download";
         if(!glyph.equals(c.actionIcon)){
