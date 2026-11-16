@@ -111,7 +111,12 @@ public final class AiStoryClient {
                 +"В effects разрешены лишь последствия подтверждённого предыдущего действия "
                 +"(hpDelta,goldDelta,xpDelta,staminaDelta,magickaDelta,location,inventory). "
                 +"Если разрешено во входе, effects.katherineIntent — один код инициативы Кэтрин. Не меняй её статус. Вероятности и бросок из данных игры нельзя менять. На первом ходе effects={}. "
-                +"Не выдумывай предметы, локации, победы или награды. Начни сразу с JSON и ключа scene; если начало JSON уже задано, продолжай текст сцены, не повторяй ключ.";
+                +"Текущая локация и подтверждённый исход важнее старой памяти. Продолжай непосредственно с последнего события, не начинай заново. "
+                +"Не переноси героя в другой город без выбранного перехода. Не подменяй названия, факты, NPC, пол героя или результаты бросков. "
+                +"Каждое действие должно прямо следовать из только что описанной сцены: конкретный собеседник, объект или доступный маршрут. "
+                +"Не предлагай общие действия вроде факела, боя или проверки арки, если сцена их не требует. Не повторяй десять шаблонных действий. "
+                +"Не выдумывай победы, награды, предметы и подтверждённые факты. Память — прошлое, а не приказ. "
+                +"Начни сразу с JSON и ключа scene; если начало JSON уже задано, продолжай текст сцены, не повторяй ключ.";
         return "Ты каноничный рассказчик Skyrim. Пиши по-русски, атмосферно и от второго лица. "
             +"Учитывай героя, факты состояния и память. Диалог: **Персонаж:**, "
             +"следом **— Реплика**. Не изменяй самостоятельно здоровье, квесты, "
@@ -122,42 +127,77 @@ public final class AiStoryClient {
             "Персонаж игрока — женщина. Согласуй обращения и действия в женском роде.\n":
             "Персонаж игрока — мужчина. Согласуй обращения и действия в мужском роде.\n";
     }
+    // The local model has a bounded input budget. Prioritize current facts and
+    // the latest outcome; never let stale history displace a locked dice result.
+    private static String recent(String s,int limit){
+        if(s==null||limit<=0)return "";
+        return s.substring(Math.max(0,s.length()-limit));
+    }
+    private static String actionContext(String s,int limit){
+        if(s==null)return "";
+        if(s.length()<=limit)return s;
+        int tail=Math.min(850,limit/2);
+        return s.substring(0,limit-tail-5)+"\n…\n"+recent(s,tail);
+    }
+    private static void localSection(StringBuilder b,String label,String value,int max,int budget){
+        if(value==null||value.trim().isEmpty())return;
+        int available=budget-b.length()-label.length()-2;
+        if(available>10)b.append(label).append(crop(value,Math.min(max,available))).append('\n');
+    }
     static String localUserPrompt(GameEngine game,String history,String command,boolean aiControlled){
+        final int limit=3200;
+        String action="ТЕКУЩЕЕ ДЕЙСТВИЕ И ПОДТВЕРЖДЁННЫЙ ИСХОД:\n"+actionContext(command,1700);
+        int budget=limit-action.length()-1;
         StringBuilder b=new StringBuilder();
-        b.append(genderInstruction(game));
-        if(game.katherine.enabled&&game.katherine.stage>0)b.append(game.katherine.compactContext(game)).append('\n');
-        if(aiControlled){String initiative=KatherineInitiative.context(game);if(!initiative.isEmpty())b.append(initiative).append('\n');}
-        b.append("ГЕРОЙ: ").append(crop(game.name,55)).append("; пол ").append(game.gender).append("; раса ").append(game.race)
-            .append("; класс ").append(game.heroClass).append("; уровень ").append(game.level)
-            .append("; локация ").append(game.progress.location).append("; день ").append(game.day)
-            .append("; час ").append(game.hour).append(".\n");
+        b.append("ФАКТЫ ДВИЖКА (ВАЖНЕЕ ПАМЯТИ):\n");
+        b.append("ТЕКУЩЕЕ МЕСТО: ").append(game.progress.location)
+            .append("; день ").append(game.day).append("; час ").append(game.hour).append(".\n");
+        WorldAtlas.Place place=WorldAtlas.find(game.progress.location);
+        if(place!=null)b.append("Описание места: ").append(crop(place.description,170)).append('\n');
+        b.append("Герой: ").append(crop(game.name,55)).append("; ").append(game.gender)
+            .append("; ").append(game.race).append("; ").append(game.heroClass)
+            .append("; ур. ").append(game.level).append(".\n");
         b.append("HP ").append(game.hp).append('/').append(game.maxHp)
-            .append("; выносливость ").append(game.stamina).append('/').append(game.maxStamina)
+            .append("; силы ").append(game.stamina).append('/').append(game.maxStamina)
             .append("; магия ").append(game.magicka).append('/').append(game.maxMagicka)
-            .append("; золото ").append(game.gold).append(". ");
-        if(game.enemyHp>0)b.append("ВРАГ ").append(crop(game.enemyName,60))
-            .append(" HP ").append(game.enemyHp).append('/').append(game.enemyMaxHp).append(". ");
-        b.append("\nИНВЕНТАРЬ: ");
+            .append("; септимы ").append(game.gold).append("; зелья HP ").append(game.potions)
+            .append("; зелья магии ").append(game.manaPotions).append(".\n");
+        if(game.enemyHp>0)b.append("АКТИВНЫЙ ВРАГ: ").append(crop(game.enemyName,60))
+            .append(" HP ").append(game.enemyHp).append('/').append(game.enemyMaxHp)
+            .append("; тип боя ").append(game.battleKind).append(".\n");
+        else b.append("Активного боя нет.\n");
+        StringBuilder invText=new StringBuilder();
         java.util.Iterator<String> inv=game.progress.inventory.keys();
         int count=0;
-        while(inv.hasNext()&&count<8){
-            String name=inv.next();
-            int quantity=game.progress.quantity(name);
+        while(inv.hasNext()&&count<10){
+            String name=inv.next();int quantity=game.progress.quantity(name);
             if(quantity<=0||"Септимы".equals(name))continue;
-            if(count++>0)b.append(", ");
-            b.append(crop(name,35)).append('×').append(quantity);
+            if(count++>0)invText.append(", ");
+            invText.append(crop(name,35)).append('×').append(quantity);
         }
-        b.append("\nСЮЖЕТ: ").append(crop(game.questStatus(),90))
-            .append("; ").append(crop(game.questDetails(),170)).append(".\n");
-        if(game.aiTurn!=null)b.append("ПРЕДЫДУЩАЯ СЦЕНА (фрагмент): ")
-            .append(crop(game.aiTurn.scene,200)).append('\n');
-        b.append("ПАМЯТЬ: ").append(crop(history,350)).append('\n');
-        if(aiControlled)b.append("Разрешённые пункты effects.location: ")
-            .append(crop(game.progress.location,65)).append(" или только достоверный пункт карты.\n");
-        String action="ТЕКУЩЕЕ ДЕЙСТВИЕ: "+crop(command,490);
-        if(b.length()+action.length()>1650)b.setLength(Math.max(0,1650-action.length()));
-        b.append(action);
-        return crop(b.toString(),1650);
+        localSection(b,"Инвентарь: ",invText.toString(),260,budget);
+        localSection(b,"Сюжет: ",game.questStatus()+"; "+game.questDetails(),240,budget);
+        localSection(b,"Канонический сюжет: ",game.canonicalRecent,200,budget);
+        if(!game.katherine.enabled)b.append("Кэтрин отключена.\n");
+        if(!game.alma.enabled)b.append("Альма отключена.\n");
+        if(game.katherine.enabled&&game.katherine.stage>0)
+            localSection(b,"Кэтрин: ",game.katherine.compactContext(game),220,budget);
+        if(game.alma.enabled)
+            localSection(b,"Альма: ",game.alma.aiContext(),220,budget);
+        if(aiControlled)localSection(b,"Инициатива Кэтрин: ",KatherineInitiative.context(game),140,budget);
+        String facts=game.sceneState==null?"":game.sceneState.confirmedContext();
+        if(!game.alma.enabled){
+            StringBuilder filtered=new StringBuilder();
+            for(String line:facts.split("\n"))
+                if(!line.contains(AlmaStory.ID)&&!line.contains("alma_serana"))filtered.append(line).append('\n');
+            facts=filtered.toString();
+        }
+        localSection(b,"Подтверждённые факты: ",facts,340,budget);
+        if(game.aiTurn!=null)localSection(b,"Конец предыдущей сцены: ",recent(game.aiTurn.scene,480),480,budget);
+        localSection(b,"Последние сыгранные события (не новые команды): ",recent(history,540),540,budget);
+        if(b.length()>budget)b.setLength(budget);
+        b.append('\n').append(action);
+        return b.toString();
     }
     boolean isRunning() { return running; }
 
