@@ -150,7 +150,7 @@ public final class AiStoryClient {
         int budget=limit-action.length()-1;
         StringBuilder b=new StringBuilder();
         b.append("ФАКТЫ ДВИЖКА (ВАЖНЕЕ ПАМЯТИ):\n");
-        b.append("ТЕКУЩЕЕ МЕСТО: ").append(game.locationLabel())
+        b.append("ТЕКУЩЕЕ МЕСТО: ").append(game.progress.location)
             .append("; день ").append(game.day).append("; час ").append(game.hour).append(".\n");
         WorldAtlas.Place place=WorldAtlas.find(game.progress.location);
         if(place!=null)b.append("Описание места: ").append(crop(place.description,170)).append('\n');
@@ -397,7 +397,7 @@ public final class AiStoryClient {
         out.append("Герой: ").append(g.name).append("; пол: ").append(g.gender).append("; раса: ").append(g.race)
                 .append("; класс: ").append(g.heroClass).append("; уровень: ").append(g.level)
                 .append("; опыт: ").append(g.xp).append('/').append(g.level*80).append('\n');
-        out.append("Место: ").append(g.locationLabel()).append(", ").append(GameEngine.REGIONS[g.region])
+        out.append("Место: ").append(g.progress.location).append(", ").append(GameEngine.REGIONS[g.region])
                 .append("; игровой день: ").append(g.day).append("; режим: ").append(g.mode).append('\n');
         out.append("Здоровье: ").append(g.hp).append('/').append(g.maxHp)
                 .append("; выносливость: ").append(g.stamina).append('/').append(g.maxStamina)
@@ -463,7 +463,7 @@ public final class AiStoryClient {
         String initiative=KatherineInitiative.context(game);if(!initiative.isEmpty())out.append(initiative).append('\n');
         out.append("Герой: ").append(game.name).append("; пол ").append(game.gender).append("; ").append(game.race).append("; класс ")
                 .append(game.heroClass).append("; уровень ").append(game.level).append("; опыт ").append(game.xp).append('\n');
-        out.append("Локация: ").append(game.locationLabel()).append("; регион ").append(GameEngine.REGIONS[game.region])
+        out.append("Локация: ").append(game.progress.location).append("; регион ").append(GameEngine.REGIONS[game.region])
                 .append("; день ").append(game.day).append("; время ")
                 .append(String.format(java.util.Locale.ROOT,"%02d:00",game.hour)).append('\n');
         out.append("Здоровье ").append(game.hp).append('/').append(game.maxHp)

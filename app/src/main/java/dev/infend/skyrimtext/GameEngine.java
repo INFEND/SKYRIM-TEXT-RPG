@@ -42,8 +42,6 @@ public final class GameEngine {
     }
 
     public boolean started;
-    public String whiterunSection="gate";
-    public String locationLabel(){return WhiterunDistricts.location(this);}
     public String name = "Странник", race = "Норд", heroClass = "Воин";
     public String gender = CharacterIdentity.MALE;
     public int portrait = 1;
@@ -207,7 +205,6 @@ public final class GameEngine {
         }
         hp=maxHp;magicka=maxMagicka;stamina=maxStamina;
         progress=RpgProgress.newHero(this,origin,points);
-        whiterunSection="gate";
         String[] back=RpgContent.startParts(origin);
         region=Integer.parseInt(back[2]);
         canonicalStage=canonicalPhase=canonicalPage=canonicalShouts=canonicalTreaty=canonicalPaarthurnax=canonicalShoutCooldown=0;canonicalPrepared=false;canonicalRecent="";
@@ -220,7 +217,6 @@ public final class GameEngine {
         if(started&&AlmaStory.MODE.equals(mode)){if(alma.enabled)return alma.scene(this);mode="WORLD";}
         if(started&&KatherineStory.MODE.equals(mode))return katherine.scene(this);
         if(started&&"CANON".equals(mode))return CanonicalCampaign.scene(this);
-        if(started&&WhiterunDistricts.isMode(mode)){if(WhiterunDistricts.here(this))return WhiterunDistricts.scene(this);mode="WORLD";}
         Scene s=baseScene();
         if(started)progress.fillChoices(this,s);
         if(alma.available(this))s.add("ALMA:open","Поговорить с Альмой","Алая Бессмертная | "+alma.status());
@@ -250,9 +246,8 @@ public final class GameEngine {
     }
 
     private Scene worldScene() {
-        Scene s = new Scene("СКАЙРИМ | ДЕНЬ " + day, WhiterunDistricts.here(this)?locationLabel():progress.location + " | " + REGIONS[region], (WhiterunDistricts.here(this)?WhiterunDistricts.description(whiterunSection):DESCRIPTIONS[region]) + "\n\nМестность: "+locationLabel()+"." +
+        Scene s = new Scene("СКАЙРИМ | ДЕНЬ " + day, progress.location + " | " + REGIONS[region], DESCRIPTIONS[region] + "\n\nМестность: "+progress.location+"." +
             (message.isEmpty()?"":"\n\n"+message));
-        if(WhiterunDistricts.here(this))s.add("CITY_OPEN","Районы Вайтрана","Перемещение по районам, улицам и зданиям");
         s.primary("CANON_OPEN","Главная история | Путь Довакина",CanonicalCampaign.objective(this));
         s.add("DRAGON_OPEN","Драконий след",DragonArc.status(this));
         s.add("EXPLORE","Исследовать окрестности","Случайные встречи, тайники и опасности");
@@ -419,8 +414,6 @@ public final class GameEngine {
             }
             progress.sync(this);return;
         }
-        if("CITY_OPEN".equals(action)||action.startsWith("CITY:")){WhiterunDistricts.choose(this,action);return;}
-        if(WhiterunDistricts.isMode(mode)&&!"GO_WORLD".equals(action))return;
         if (action.startsWith("ACT:")){progress.perform(this,action);progress.sync(this);return;}
         if(action.startsWith("LOC:")){
             WorldAtlas.Place target=WorldAtlas.find(action.substring(4));
@@ -433,7 +426,6 @@ public final class GameEngine {
             day+=route.days;
             region=target.region;
             progress.location=target.name;
-            whiterunSection="gate";
             katherine.observeTravel(this);katherine.autonomous(this);alma.observeTravel(this);
             katherine.rest(Math.min(24,route.days*3));alma.rest(Math.min(24,route.days*3));
             // Register only locations reached through the validated atlas route.
@@ -770,7 +762,7 @@ public final class GameEngine {
         j.put("katherine",katherine.save());
         j.put("alma",alma.save());
         j.put("schema",1).put("started",started).put("name",name).put("race",race).put("heroClass",heroClass)
-         .put("gender",gender).put("portrait",portrait).put("whiterunSection",WhiterunDistricts.normalize(whiterunSection))
+         .put("gender",gender).put("portrait",portrait)
          .put("region",region).put("day",day).put("hour",hour).put("level",level).put("xp",xp).put("maxHp",maxHp).put("hp",hp)
          .put("maxStamina",maxStamina).put("stamina",stamina).put("maxMagicka",maxMagicka).put("magicka",magicka)
          .put("gold",gold).put("potions",potions).put("manaPotions",manaPotions).put("attack",attack).put("armor",armor)
@@ -821,7 +813,6 @@ public final class GameEngine {
             g.enemyHp=Math.max(0,j.optInt("enemyHp",0));g.enemyMaxHp=Math.max(0,j.optInt("enemyMaxHp",0));g.enemyDamage=Math.max(0,j.optInt("enemyDamage",0));
             g.compensation=CompensationPowers.fromJson(j.optJSONObject("compensation"));g.compensation.installCatalog();
             g.progress=RpgProgress.fromJson(j.optJSONObject("progress"));
-            g.whiterunSection=WhiterunDistricts.normalize(j.optString("whiterunSection","gate"));
              g.needs=LivingNeeds.fromJson(j.optJSONObject("needs"));g.economy=LivingEconomy.fromJson(j.optJSONObject("economy"));g.syncLivingSystems();g.fixSpent=Math.max(0,j.optLong("fixSpent",0));org.json.JSONArray rates=j.optJSONArray("regenBonus");if(rates!=null)for(int i=0;i<3;i++)g.regenBonus[i]=Math.max(0,Math.min(1000000,rates.optInt(i)));g.regenIgnorePenalty=j.optBoolean("regenIgnorePenalty");g.compensation.reconcile(g);JSONObject result=j.optJSONObject("lastLivingResult");if(result!=null)g.lastLivingResult=result;
             g.merchants=MerchantLedger.fromJson(j.optJSONObject("merchants"));g.factions=FactionCampaign.fromJson(j.optJSONObject("factions"));g.factionStories=FactionStories.fromJson(j.optJSONObject("factionStories"));g.factionBattle=Math.max(-1,Math.min(6,j.optInt("factionBattle",-1)));
             org.json.JSONArray holds=j.optJSONArray("holdReputation");if(holds!=null)for(int i=0;i<g.holdReputation.length;i++)g.holdReputation[i]=Math.max(-100,Math.min(100,holds.optInt(i,0)));

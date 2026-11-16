@@ -1470,7 +1470,7 @@ public final class MainActivity extends Activity {
         boolean canonical="CANON".equals(game.mode)||("COMBAT".equals(game.mode)&&("CANONICAL".equals(game.battleKind)||"FACTION".equals(game.battleKind)));
         canonical=canonical||KatherineStory.MODE.equals(game.mode)||AlmaStory.MODE.equals(game.mode)||("COMBAT".equals(game.mode)&&("KATHERINE".equals(game.battleKind)||"ALMA".equals(game.battleKind)));
         canonical=canonical||game.road.pending()||RoadEvents.MODE.equals(game.mode)||("COMBAT".equals(game.mode)&&game.battleKind.startsWith("ROAD_QUEST:"));
-        if(prefs.getBoolean("ai_enabled",false)&&!canonical&&!WhiterunDistricts.isMode(game.mode)){renderAiGame();return;}
+        if(prefs.getBoolean("ai_enabled",false)&&!canonical){renderAiGame();return;}
         GameEngine.Scene s=game.scene();section(s.kicker,s.title,"");
         if(LocationGalleryView.hasGallery(game.progress.location)){
             content.addView(sceneGallery(game.progress.location),lp(-1,-2));
@@ -1493,7 +1493,7 @@ public final class MainActivity extends Activity {
         if(battleSummaryPending){battleSummaryPending=false;boolean defeated="DEFEAT".equals(game.mode);if(visual(defeated?"defeat":"victory"))showBattleSummary(defeated);}
         renderItemGains();
         renderStoryJournal();
-        if(prefs.getBoolean("ai_enabled",false)&&!game.road.pending()&&!WhiterunDistricts.isMode(game.mode)) renderAiStoryPanel();
+        if(prefs.getBoolean("ai_enabled",false)&&!game.road.pending()) renderAiStoryPanel();
         space(content,12);
         addText(content,"Что ты предпримешь?",22,TEXT,true,7);
         addText(content,s.choices.size()+" доступных вариантов. Вероятность показана только для настоящих проверок.",12,MUTED,false,15);
@@ -1687,7 +1687,6 @@ public final class MainActivity extends Activity {
 
     /** AI mode replaces the entire offline story, not just its dialogue panel. */
     private void renderAiGame(){
-        if(WhiterunDistricts.here(game)&&"WORLD".equals(game.mode)&&!livingBusy())actionButton("Районы Вайтрана",game.locationLabel(),false,()->{if(livingBusy())return;game.choose("CITY_OPEN");save();render();});
         if(game.alma.available(game)&&!livingBusy())actionButton("Альма","Алая Бессмертная | "+game.alma.status(),false,()->{game.choose("ALMA:open");save();render();});
         if(game.katherine.available(game)&&!livingBusy())actionButton("Кэтрин","Нулевой Предел | "+game.katherine.status(),false,()->{game.choose("KATH:open");save();render();});
         if(game.katherine.active()&&!game.katherine.lastRemark.isEmpty()){LinearLayout npc=card();addText(npc,"КЭТРИН | ЛИЧНАЯ ИНИЦИАТИВА",12,accent(),true,6);addText(npc,game.katherine.lastRemark,14,TEXT,false,6);}
@@ -2506,7 +2505,7 @@ public final class MainActivity extends Activity {
     private void renderMap(){
         section("АТЛАС СЕВЕРА","Карта Скайрима","Выбери материк или Солстейм. Нажми на метку, чтобы открыть место и маршрут.");
         LinearLayout overview=card();
-        addText(overview,"⌖  ВЫ НАХОДИТЕСЬ: "+game.locationLabel(),15,accent(),true,10);
+        addText(overview,"⌖  ВЫ НАХОДИТЕСЬ: "+game.progress.location,15,accent(),true,10);
         addText(overview,"День "+game.day+"  |  "+SkyrimMapCatalog.size()+" локаций",13,MUTED,false,9);
         final SkyrimTerrainMapView terrainMap=new SkyrimTerrainMapView(this,game,this::locationDialog,hiddenMapTypes);
         activeTerrainMap=terrainMap;
