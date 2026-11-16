@@ -198,13 +198,13 @@ public final class RpgProgress {
     }
     public int quantity(String id){return inventory.optInt(id,0);}
     public boolean addItem(String id,int quantity){
-        if(quantity<=0||ItemCatalog.find(id)==null)return false;
+        if(quantity<=0||ItemCatalog.find(id)==null||CompensationPowers.itemIndex(id)>=0)return false;
         ItemCatalog.Item item=ItemCatalog.find(id);
         if(item.weight>0&&carryWeight()+item.weight*quantity>50.00001)return false;
         quantity(id,quantity(id)+quantity);return true;
     }
     public boolean removeItem(String id,int amount){
-        if(amount<1||quantity(id)<amount)return false;
+        if(amount<1||quantity(id)<amount||CompensationPowers.itemIndex(id)>=0)return false;
         quantity(id,quantity(id)-amount);
         if(quantity(id)==0)unequip(id);
         return true;
@@ -306,7 +306,7 @@ public final class RpgProgress {
         int skill=skillFor(index);
         int chance=chance(g,action);
         attemptedToday.add(action);
-        boolean success=new Random().nextInt(100)<chance;
+        boolean success=g.rollCheck(chance);
         int fatigue=3+(index%4)*2;
         g.stamina=Math.max(0,g.stamina-fatigue);
         if(success){

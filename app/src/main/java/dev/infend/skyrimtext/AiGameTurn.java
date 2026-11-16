@@ -182,6 +182,7 @@ public final class AiGameTurn {
                 if("Септимы".equals(name)||"Лечебное зелье".equals(name)||"Зелье магии".equals(name))
                     throw new JSONException("Валюту и зелья меняют отдельные поля");
                 if(ItemCatalog.find(name)==null)throw new JSONException("Предмет неизвестен: "+name);
+                if(CompensationPowers.itemIndex(name)>=0)throw new JSONException("Системный предмет не изменяется ИИ");
                 changes.put(name,changes.getOrDefault(name,0)+change(item,"delta",50));
             }
             double weight=g.progress.carryWeight();

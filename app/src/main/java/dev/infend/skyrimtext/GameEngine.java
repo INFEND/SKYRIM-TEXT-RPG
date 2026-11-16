@@ -60,11 +60,15 @@ public final class GameEngine {
     public RpgProgress progress = new RpgProgress();
     public LivingNeeds needs=new LivingNeeds();
     public long fixSpent=0;
+    public CompensationPowers compensation=new CompensationPowers();
+    public JSONObject lastLivingResult=new JSONObject();
+    public int lastCheckChance=-1,lastCheckRoll=-1;
+    public boolean rollCheck(int chance){lastCheckChance=Math.max(0,Math.min(100,chance));lastCheckRoll=random.nextInt(100)+1;return lastCheckRoll<=lastCheckChance;}
     public LivingEconomy economy=new LivingEconomy();
     public final int[] regenBonus=new int[3];
     public boolean regenIgnorePenalty;
     public void syncLivingSystems(){needs.sync(day,hour);economy.sync(day);}
-    public int regenRate(int index){return 1+regenBonus[index];}
+    public int regenRate(int index){return 1+regenBonus[index]+(index==1&&compensation.active(this,2)?3:0); }
     private void regenerateCombat(){if(hp<=0||!"COMBAT".equals(mode))return;int penalty=regenIgnorePenalty?0:needs.penalty();hp=(int)Math.min(maxHp,(long)hp+(poisonTurns>0&&!regenIgnorePenalty?regenBonus[0]:Math.max(0,regenRate(0)-(penalty>0?1:0))));magicka=(int)Math.min(maxMagicka,(long)magicka+Math.max(regenBonus[1],regenRate(1)-(penalty>0?1:0)));stamina=(int)Math.min(maxStamina,(long)stamina+(frostTurns>0&&!regenIgnorePenalty?regenBonus[2]:Math.max(0,regenRate(2)-(penalty>0?1:0))));}
     public AiGameTurn aiTurn;
     public SceneState sceneState = new SceneState();
@@ -72,7 +76,7 @@ public final class GameEngine {
     public int poisonTurns,frostTurns,battleTurns,battleDealt,battleTaken,lastDealt,lastTaken,lastHealing,lastBlocked;
     public boolean lastHeavyHit,lastMiss,lastCritical;
     public final int[] holdReputation=new int[10];
-    public void resetBattleVisuals(){poisonTurns=frostTurns=battleTurns=battleDealt=battleTaken=lastDealt=lastTaken=lastHealing=lastBlocked=0;lastHeavyHit=lastMiss=lastCritical=false;}
+    public void resetBattleVisuals(){java.util.Arrays.fill(compensation.cooldown,0);poisonTurns=frostTurns=battleTurns=battleDealt=battleTaken=lastDealt=lastTaken=lastHealing=lastBlocked=0;lastHeavyHit=lastMiss=lastCritical=false;}
     private MerchantLedger merchants=new MerchantLedger();
     FactionCampaign factions=new FactionCampaign();
     FactionStories factionStories=new FactionStories();
@@ -170,7 +174,7 @@ public final class GameEngine {
         if(name.length()>28)name=name.substring(0,28);
         race=contains(RACES,desiredRace)?desiredRace:"Норд";
         heroClass=contains(CLASSES,desiredClass)?desiredClass:"Без класса";
-        started=true;needs=new LivingNeeds();economy=new LivingEconomy();java.util.Arrays.fill(regenBonus,0);regenIgnorePenalty=false;fixSpent=0;aiTurn=null;sceneState=new SceneState();aiJournal="";day=1;hour=8;level=1;xp=0;gold=85;potions=3;manaPotions=1;
+        started=true;compensation=new CompensationPowers();lastLivingResult=new JSONObject();lastCheckChance=lastCheckRoll=-1;needs=new LivingNeeds();economy=new LivingEconomy();java.util.Arrays.fill(regenBonus,0);regenIgnorePenalty=false;fixSpent=0;aiTurn=null;sceneState=new SceneState();aiJournal="";day=1;hour=8;level=1;xp=0;gold=85;potions=3;manaPotions=1;
         questStage=0;sideQuest=0;sideKills=0;boardCompleted=0;explored=0;victories=0;reputation=0;
         swordUpgraded=false;armorUpgraded=false;
         maxHp=100;maxStamina=100;maxMagicka=100;attack=12;armor=2;
@@ -314,6 +318,7 @@ public final class GameEngine {
             .add("POTION","Выпить лечебное зелье","Осталось: " + potions);
         if("WILD".equals(battleKind))s.add("FLEE","Отступить","Шанс выйти из боя без награды");
         if("CANONICAL".equals(battleKind)&&canonicalShouts!=0&&canonicalShoutCooldown==0)s.add("CANON_SHOUT",CanonicalCampaign.combatShout(this),"Урон и ослабление врага | Восстановление 3 хода");
+        for(int i=0;i<3;i++)if(compensation.available(this,i))s.add("FIX_POWER:"+i,CompensationPowers.NAMES[i],compensation.detail(i));
         return s;
     }
 
@@ -349,6 +354,8 @@ public final class GameEngine {
 
     public void choose(String action) {
         if (!started || action==null) return;
+        lastCheckChance=lastCheckRoll=-1;
+        int fixPower=CompensationPowers.actionIndex(action);if(fixPower>=0){if(compensation.available(this,fixPower))combatTurn(action);return;}
         // A pending battle cannot be escaped by invoking a world, map or quest action.
         // This guard also protects saved games restored directly into COMBAT mode.
         if("CANON_SHOUT".equals(action)){if("COMBAT".equals(mode)&&"CANONICAL".equals(battleKind))combatTurn(action);return;}
@@ -534,7 +541,7 @@ public final class GameEngine {
         // The exact percentage shown in the scene is the same value used in this roll.
         String action=help?"EVENT_HELP":"EVENT_SEARCH";
         int successChance=progress.chance(this,action);
-        boolean succeeded=random.nextInt(100)<successChance;
+        boolean succeeded=rollCheck(successChance);
         if(succeeded){
             if(help){
                 reputation++;int gain=10+random.nextInt(16);addXp(gain);
@@ -572,7 +579,7 @@ public final class GameEngine {
     // Retain class/quest/AI bonuses in old saves without counting the legacy
     // shop's fixed equipment bonus twice. New gear uses the catalog statistic.
     public int effectiveAttack(){
-        int intrinsic=Math.max(0,attack-(swordUpgraded?6:0)-7);
+        int intrinsic=Math.max(0,attack-(swordUpgraded?6:0)-7)+(compensation.active(this,0)?8:0);
         return Math.max(1,intrinsic+(int)Math.round(progress.equippedDamage()*(1+.05*progress.branches.rank(progress.equippedWeaponSkill()))));
     }
     public int effectiveArmor(){
@@ -585,28 +592,33 @@ public final class GameEngine {
         if(!mode.equals("COMBAT"))return;
         lastDealt=lastTaken=lastHealing=lastBlocked=0;lastHeavyHit=lastMiss=lastCritical=false;
         int damage=0;boolean defending=false;String actionText="";
-        switch(action){
+        int custom=CompensationPowers.actionIndex(action);
+        if(custom>=0){if(!compensation.available(this,custom))return;magicka-=compensation.cost(custom);if(!compensation.safe[custom])hp-=2;compensation.cooldown[custom]=4;
+            int power=compensation.strength(custom);if(custom==1){lastHealing=Math.min(maxHp-hp,power);hp+=lastHealing;actionText=CompensationPowers.NAMES[custom]+": +"+lastHealing+" здоровья.";}else{damage=power;defending=custom==2;actionText=CompensationPowers.NAMES[custom]+": −"+damage+" здоровья врагу.";}
+        }else switch(action){
             case "ATTACK": damage=Math.max(1,effectiveAttack()+random.nextInt(9)-3);actionText="Ты наносишь удар: −"+damage+" здоровья врагу.";break;
             case "HEAVY":if(stamina<heavyCost()){battleLog="Недостаточно выносливости для сильного удара.";return;}
                 int hitChance=progress.chance(this,"HEAVY");stamina-=heavyCost();
-                if(random.nextInt(100)<hitChance){damage=Math.max(1,(int)Math.round((effectiveAttack()*2+random.nextInt(9))*(1+(progress.equippedWeaponSkill()==0&&progress.advanced.has(AdvancedPerks.PARALYZING)||progress.equippedWeaponSkill()==1&&progress.advanced.has(AdvancedPerks.SWEEP)?.15:0))));actionText="Сильный удар! −"+damage+" здоровья врагу.";}else actionText="Сильный удар проходит мимо.";break;
+                if(rollCheck(hitChance)){damage=Math.max(1,(int)Math.round((effectiveAttack()*2+random.nextInt(9))*(1+(progress.equippedWeaponSkill()==0&&progress.advanced.has(AdvancedPerks.PARALYZING)||progress.equippedWeaponSkill()==1&&progress.advanced.has(AdvancedPerks.SWEEP)?.15:0))));actionText="Сильный удар! −"+damage+" здоровья врагу.";}else actionText="Сильный удар проходит мимо.";break;
             case "MAGIC":if(magicka<magicCost()){battleLog="Недостаточно магии. Нужны "+magicCost()+" единиц.";return;}magicka-=magicCost();damage=(int)Math.round((18+level*4+random.nextInt(8))*(1+.05*progress.branches.rank(13)+(progress.advanced.has(AdvancedPerks.DUAL_CAST)?.10:0)));actionText="Магическая вспышка обжигает врага: −"+damage+".";break;
             case "CANON_SHOUT":if(!"CANONICAL".equals(battleKind)||canonicalShouts==0||canonicalShoutCooldown>0)return;
                 damage=24+level*3+((canonicalShouts&4)!=0?12:0);defending=true;canonicalShoutCooldown=3;actionText=CanonicalCampaign.combatShout(this)+": −"+damage+" здоровья врагу.";break;
             case "DEFEND": defending=true;stamina=Math.min(maxStamina,stamina+12);magicka=Math.min(maxMagicka,magicka+5+(progress.advanced.has(AdvancedPerks.RECOVERY)?3:0)+(progress.advanced.has(AdvancedPerks.REGENERATION)?5:0));actionText="Ты встаёшь в оборону, восстанавливая силы.";break;
             case "POTION":if(potions==0){battleLog="Лечебных зелий больше нет.";return;}potions--;int restored=Math.min(healingAmount(),maxHp-hp);hp+=restored;restoreRespite();lastHealing=restored;actionText="Ты восстанавливаешь "+restored+" здоровья.";break;
-            case "FLEE":if(battleKind.equals("WILD")&&random.nextInt(100)<progress.chance(this,"FLEE")){mode="RESULT";poisonTurns=frostTurns=0;message="Ты уходишь от противника. Трофеев нет.";return;}actionText="Попытка отступить не удалась.";break;
+            case "FLEE":if(battleKind.equals("WILD")&&rollCheck(progress.chance(this,"FLEE"))){mode="RESULT";poisonTurns=frostTurns=0;message="Ты уходишь от противника. Трофеев нет.";return;}actionText="Попытка отступить не удалась.";break;
             default:return;
         }
         if(damage>0&&("ATTACK".equals(action)||"HEAVY".equals(action))&&progress.equippedWeaponSkill()==2&&progress.advanced.has(AdvancedPerks.POWER_SHOT)){damage=(int)Math.round(damage*1.10);actionText="Мощный выстрел: −"+damage+" здоровья врагу.";}
         if("ATTACK".equals(action)&&damage>0&&random.nextInt(100)<criticalChance()){
             lastCritical=true;damage=Math.max(1,(int)Math.round(damage*1.5));actionText="Критический удар! −"+damage+" здоровья врагу.";
         }
+        compensation.tick();
         if(!"CANON_SHOUT".equals(action)&&canonicalShoutCooldown>0)canonicalShoutCooldown--;
         lastDealt=Math.min(enemyHp,damage);lastHeavyHit="HEAVY".equals(action)&&lastDealt>0;lastMiss="HEAVY".equals(action)&&lastDealt==0;battleDealt+=lastDealt;battleTurns++;
         enemyHp=Math.max(0,enemyHp-damage);
         if(enemyHp==0) {poisonTurns=frostTurns=0;winBattle(actionText);return;}
         int baseIncoming=enemyDamage+random.nextInt(8)-Math.max(0,armor-(armorUpgraded?4:0));
+        if(compensation.active(this,1))baseIncoming=Math.max(1,baseIncoming-5);
         int rawIncoming=Math.max(1,baseIncoming-(defending?enemyDamage/2+3+2*progress.branches.rank(3)+(progress.advanced.has(AdvancedPerks.QUICK_REFLEXES)?2:0)+(progress.advanced.has(AdvancedPerks.SHIELD_WALL)&&!"Не надето".equals(progress.equippedName("shield"))?3:0)+(progress.advanced.has(AdvancedPerks.SHIELD_CHARGE)&&!"Не надето".equals(progress.equippedName("shield"))?4:0):0));
         int incoming=Math.max(1,(int)Math.round(rawIncoming*(1-progress.damageReduction())));
         if(defending)lastBlocked=Math.max(0,Math.max(1,(int)Math.round(Math.max(1,baseIncoming)*(1-progress.damageReduction())))-incoming);
@@ -681,7 +693,7 @@ public final class GameEngine {
     public JSONObject toJson() throws JSONException {
         syncLivingSystems();
         JSONObject j=new JSONObject();
-        j.put("needs",needs.toJson()).put("fixSpent",fixSpent).put("economy",economy.toJson()).put("regenBonus",new org.json.JSONArray(regenBonus)).put("regenIgnorePenalty",regenIgnorePenalty);
+        j.put("needs",needs.toJson()).put("fixSpent",fixSpent).put("economy",economy.toJson()).put("regenBonus",new org.json.JSONArray(regenBonus)).put("regenIgnorePenalty",regenIgnorePenalty).put("compensation",compensation.toJson()).put("lastLivingResult",lastLivingResult);
         j.put("schema",1).put("started",started).put("name",name).put("race",race).put("heroClass",heroClass)
          .put("gender",gender).put("portrait",portrait)
          .put("region",region).put("day",day).put("hour",hour).put("level",level).put("xp",xp).put("maxHp",maxHp).put("hp",hp)
@@ -733,7 +745,7 @@ public final class GameEngine {
             g.battleKind=j.optString("battleKind","");g.enemyIntro=j.optString("enemyIntro","");
             g.enemyHp=Math.max(0,j.optInt("enemyHp",0));g.enemyMaxHp=Math.max(0,j.optInt("enemyMaxHp",0));g.enemyDamage=Math.max(0,j.optInt("enemyDamage",0));
             g.progress=RpgProgress.fromJson(j.optJSONObject("progress"));
-             g.needs=LivingNeeds.fromJson(j.optJSONObject("needs"));g.economy=LivingEconomy.fromJson(j.optJSONObject("economy"));g.syncLivingSystems();g.fixSpent=Math.max(0,j.optLong("fixSpent",0));org.json.JSONArray rates=j.optJSONArray("regenBonus");if(rates!=null)for(int i=0;i<3;i++)g.regenBonus[i]=Math.max(0,Math.min(1000000,rates.optInt(i)));g.regenIgnorePenalty=j.optBoolean("regenIgnorePenalty");
+             g.needs=LivingNeeds.fromJson(j.optJSONObject("needs"));g.economy=LivingEconomy.fromJson(j.optJSONObject("economy"));g.syncLivingSystems();g.fixSpent=Math.max(0,j.optLong("fixSpent",0));org.json.JSONArray rates=j.optJSONArray("regenBonus");if(rates!=null)for(int i=0;i<3;i++)g.regenBonus[i]=Math.max(0,Math.min(1000000,rates.optInt(i)));g.regenIgnorePenalty=j.optBoolean("regenIgnorePenalty");g.compensation=CompensationPowers.fromJson(j.optJSONObject("compensation"));g.compensation.reconcile(g);JSONObject result=j.optJSONObject("lastLivingResult");if(result!=null)g.lastLivingResult=result;
             g.merchants=MerchantLedger.fromJson(j.optJSONObject("merchants"));g.factions=FactionCampaign.fromJson(j.optJSONObject("factions"));g.factionStories=FactionStories.fromJson(j.optJSONObject("factionStories"));g.factionBattle=Math.max(-1,Math.min(6,j.optInt("factionBattle",-1)));
             org.json.JSONArray holds=j.optJSONArray("holdReputation");if(holds!=null)for(int i=0;i<g.holdReputation.length;i++)g.holdReputation[i]=Math.max(-100,Math.min(100,holds.optInt(i,0)));
             if("COMBAT".equals(g.mode)){g.poisonTurns=Math.max(0,Math.min(2,j.optInt("poisonTurns")));g.frostTurns=Math.max(0,Math.min(2,j.optInt("frostTurns")));}

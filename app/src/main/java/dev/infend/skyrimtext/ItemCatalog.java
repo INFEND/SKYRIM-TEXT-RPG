@@ -257,6 +257,11 @@ public final class ItemCatalog {
         if(!items.containsKey(name))put(name,category,icon,weight,cost,desc,effect,stat,skill);
     }
     static { ApparelAndPotionCatalog.register(); WorldItemCatalog.register(); LibraryItemCatalog.register(); CommonItemCatalog.register(); }
+    static {
+        put(CompensationPowers.ITEMS[0],"Оружие","⚔",6,0,"Уникальное оружие компенсации, не подлежит передаче.","Привязано к владельцу.",24,0);
+        put(CompensationPowers.ITEMS[1],"Броня","⬟",8,0,"Уникальная кираса компенсации.","Привязано к владельцу.",32,4);
+        put(CompensationPowers.ITEMS[2],"Украшения","◈",0.2,0,"Уникальное кольцо компенсации.","Привязано к владельцу.",0,-1);
+    }
     private ItemCatalog(){}
     public static synchronized void initialize(Context c){
         if(loaded)return;
