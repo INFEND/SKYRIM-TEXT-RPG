@@ -40,3 +40,18 @@ class ResourceStoreTest(unittest.TestCase):
         self.assertIn("ResourceStore.generation()",p)
         self.assertIn("ResourceStore.portraitGroup",ui)
 if __name__=="__main__":unittest.main()
+
+class ResourceUnitCounts(unittest.TestCase):
+    def test_counts_are_actual_archive_members_and_sprite_slots(self):
+        import zipfile
+        data=catalog.build("a"*40,True)
+        entries={e["path"]:e for e in data["files"]}
+        for path,e in entries.items():
+            if path.startswith("gallery/"):
+                with zipfile.ZipFile(catalog.ASSETS/path) as z:
+                    self.assertEqual(e["units"],sum(x.filename.endswith(".webp") for x in z.infolist()))
+        self.assertEqual(sum(e["units"] for e in entries.values() if e["group"].startswith("gallery:")),sum(len(g["captions"]) for g in catalog.gallery_registry()))
+        self.assertEqual(entries["icons/skyrim_icons_358_exact.webp"]["units"],358)
+        self.assertEqual(entries["icons/skyrim_icons_358_exact.json"]["units"],0)
+        self.assertEqual(entries["media/mapicons/settlement_icons.webp"]["units"],11)
+        self.assertEqual(entries["media/mapicons/location_icons.webp"]["units"],6)

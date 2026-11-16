@@ -30,10 +30,18 @@ final class ResourceStore {
     private static volatile Catalog catalog;
     private static final Set<String> AUTO_GALLERY=Collections.synchronizedSet(new HashSet<>());
     static final class Entry {
-        final String path,group,label,sha,url; final long size;
+        final String path,group,label,sha,url; final long size; int units; final boolean explicitUnits;
         Entry(JSONObject j,String commit)throws Exception{
             path=j.getString("path");group=j.getString("group");label=j.getString("label");
             sha=j.getString("sha256");size=j.getLong("size");
+            explicitUnits=j.has("units");
+            int legacy="icons/skyrim_icons_358_exact.webp".equals(path)?358:
+                "icons/skyrim_icons_358_exact.json".equals(path)?0:
+                "media/mapicons/settlement_icons.webp".equals(path)?11:
+                "media/mapicons/location_icons.webp".equals(path)?6:1;
+            units=j.optInt("units",legacy);
+            if(units<0||units>100000||(units==0&&!"icons/skyrim_icons_358_exact.json".equals(path)))
+                throw new IOException("Некорректное количество ресурсов");
             if(!path.matches("(gallery/[a-z0-9_-]+\\.zip|maps/[a-z0-9_-]+\\.webp|icons/skyrim_icons_358_exact\\.(webp|json)|portraits/[a-z]+_(male|female)_[1-3]\\.webp|fonts/choices/[a-z0-9_-]+/(regular|bold|italic|bolditalic)\\.ttf|fonts/choices/[a-z0-9_-]+/OFL\\.txt|media/[a-z0-9_-]+/[a-z0-9_-]+\\.(webp|png|jpg|jpeg|zip|ogg|mp3|mp4|json))")
                 ||!sha.matches("[0-9a-f]{64}")||size<=0||size>100_000_000L)
                 throw new IOException("Некорректный каталог ресурсов");
@@ -57,7 +65,7 @@ final class ResourceStore {
                 ||!galleries.toString().equals(other.galleries.toString()))return false;
             for(Entry e:entries.values()){
                 Entry b=other.entries.get(e.path);
-                if(b==null||e.size!=b.size||!e.sha.equals(b.sha)||!e.group.equals(b.group)||!e.label.equals(b.label)
+                if(b==null||e.size!=b.size||e.units!=b.units||!e.sha.equals(b.sha)||!e.group.equals(b.group)||!e.label.equals(b.label)
                     ||(e.path.startsWith("fonts/choices/")&&!e.url.equals(b.url)))return false;
             }
             return true;
@@ -77,7 +85,23 @@ final class ResourceStore {
             if(list.length()>10000)throw new IOException("Каталог слишком велик");
             for(int i=0;i<list.length();i++){Entry e=new Entry(list.getJSONObject(i),commit);if(entries.put(e.path,e)!=null)throw new IOException("Дублирование ресурса");}
             if(entries.isEmpty())throw new IOException("Пустой каталог");
-            if(galleries!=null)LocationGalleryView.validateCatalog(galleries,entries);
+            if(galleries!=null){
+                LocationGalleryView.validateCatalog(galleries,entries);
+                Map<String,Integer> frames=new HashMap<>();
+                for(int i=0;i<galleries.length();i++){
+                    JSONArray archives=galleries.getJSONObject(i).getJSONArray("archives");
+                    for(int k=0;k<archives.length();k++){
+                        String path="gallery/"+archives.getString(k);
+                        frames.put(path,frames.getOrDefault(path,0)+1);
+                    }
+                }
+                for(Entry e:entries.values())if(e.path.startsWith("gallery/")){
+                    Integer count=frames.get(e.path);
+                    if(count==null||count<=0||(e.explicitUnits&&e.units!=count))
+                        throw new IOException("Количество фотографий не соответствует каталогу");
+                    e.units=count;
+                }
+            }
         }
     }
     private static synchronized Catalog catalog(Context c)throws Exception{

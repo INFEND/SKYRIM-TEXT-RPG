@@ -29,7 +29,7 @@ def font_records():
                 except Exception:
                     if attempt==2:raise
                     time.sleep(attempt+1)
-            result.append(dict(path=entry["asset"],group="font:"+family["id"],label="Шрифт: "+family["name"],size=len(raw),sha256=hashlib.sha256(raw).hexdigest(),url=url))
+            result.append(dict(path=entry["asset"],group="font:"+family["id"],label="Шрифт: "+family["name"],size=len(raw),sha256=hashlib.sha256(raw).hexdigest(),url=url,units=1))
     return result
 
 def build(commit, thin=False):
@@ -39,7 +39,27 @@ def build(commit, thin=False):
         f=ASSETS/path
         size=f.stat().st_size
         if not 0<size<=100_000_000:raise ValueError("Invalid optional asset size: "+path)
-        records.append(dict(path=path,group=group,label=label,size=size,sha256=hashlib.sha256(f.read_bytes()).hexdigest()))
+        units=1
+        if path.endswith(".zip"):
+            with zipfile.ZipFile(f) as z:
+                if path.startswith("gallery/"):
+                    units=sum(bool(re.fullmatch(r"\d{2}\.webp",item.filename)) for item in z.infolist())
+                else:
+                    units=sum(not item.is_dir() for item in z.infolist())
+                if units<1:raise ValueError("Empty resource archive: "+path)
+        elif path=="icons/skyrim_icons_358_exact.webp":
+            index=json.loads((ASSETS/"icons/skyrim_icons_358_exact.json").read_text(encoding="utf-8"))
+            units=len(index["icons"])
+            if units!=index["total"] or units!=index["unique"]:raise ValueError("Icon count mismatch")
+        elif path=="icons/skyrim_icons_358_exact.json":
+            units=0 # auxiliary index is required by the image, not an extra icon
+        elif path in ("media/mapicons/settlement_icons.webp","media/mapicons/location_icons.webp"):
+            cls="SettlementIcons" if "settlement" in path else "LocationTypeIcons"
+            source=(ROOT/"app/src/main/java/dev/infend/skyrimtext"/(cls+".java")).read_text(encoding="utf-8")
+            slots=re.findall(r'case PREFIX\+"[^"]+":return (\d+);',source)
+            units=len(set(slots))
+            if units<1 or set(map(int,slots))!=set(range(units)):raise ValueError("Icon slots mismatch: "+path)
+        records.append(dict(path=path,group=group,label=label,size=size,sha256=hashlib.sha256(f.read_bytes()).hexdigest(),units=units))
     for f in sorted((ASSETS/"gallery").glob("*.zip")):
         city=f.stem.removesuffix("_extra")
         add("gallery/"+f.name,"gallery:"+city,CITIES.get(city,city))

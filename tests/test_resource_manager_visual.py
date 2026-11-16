@@ -20,7 +20,7 @@ class ResourceManagerVisualContract(unittest.TestCase):
 
     def test_resource_file_counts_use_ready_entries_not_partial_bytes(self):
         s=(JAVA/"ResourceManagerDialog.java").read_text()
-        for token in ('return "["+installed+"/"+server+"]"', 'count.serverFiles++', 'if(ready)count.installedFiles++', 'filePair(allInstalled,allServer)', 'filePair(n.installedFiles,n.serverFiles)', 'amount+=" "+filePair(installedFiles,serverFiles)'):
+        for token in ('return "["+installed+"/"+server+"]"', 'count.serverFiles+=e.units', 'count.installedFiles+=e.units', 'filePair(allInstalled,allServer)', 'filePair(n.installedFiles,n.serverFiles)', 'amount+=" "+filePair(installedFiles,serverFiles)'):
             self.assertIn(token,s)
 
     def test_engine_install_status_is_not_duplicated(self):

@@ -42,7 +42,7 @@ class IndependentCatalog(unittest.TestCase):
         self.assertIn("Серверный каталог старее установленного",store)
         self.assertIn("Каталог актуален",ui)
         self.assertIn("catalogReport",ui)
-        self.assertIn("case NEW:fresh++",ui)
+        self.assertIn("case NEW:fresh+=e.units",ui)
 
     def test_code_only_commits_do_not_make_catalog_stale(self):
         store=(JAVA/"ResourceStore.java").read_text()

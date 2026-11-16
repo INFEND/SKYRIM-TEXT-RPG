@@ -230,16 +230,16 @@ final class ResourceManagerDialog {
     private Count count(Collection<String> packages){
         Count count=new Count();
         for(String key:packages)for(ResourceStore.Entry e:groups.get(key)){
-            count.total+=e.size;count.serverFiles++;boolean ready=false;
+            count.total+=e.size;count.serverFiles+=e.units;boolean ready=false;
             try{
                 ResourceStore.State s=ResourceStore.state(activity,e,false);
                 ready=s==ResourceStore.State.READY||s==ResourceStore.State.BUNDLED;
                 if(s==ResourceStore.State.BUNDLED&&verified.get(e.path)==ResourceStore.State.DAMAGED){ready=false;s=ResourceStore.State.DAMAGED;}
-                switch(s){case NEW:count.fresh++;break;case OLD:count.old++;break;case DAMAGED:count.damaged++;break;case MISSING:count.missing++;break;default:break;}
+                switch(s){case NEW:count.fresh+=e.units;break;case OLD:count.old+=e.units;break;case DAMAGED:count.damaged+=e.units;break;case MISSING:count.missing+=e.units;break;default:break;}
             }catch(Exception ignored){}
             if("force".equals(operation)&&e.path.equals(activePath))ready=false;
             count.ready&=ready;
-            if(ready)count.installedFiles++;
+            if(ready&&(!"icons/skyrim_icons_358_exact.webp".equals(e.path)||ResourceStore.has(activity,"icons/skyrim_icons_358_exact.json")))count.installedFiles+=e.units;
             count.done+=ready?e.size:Math.min(e.size,ResourceStore.currentPartialBytes(activity,e));
         }
         return count;
@@ -371,7 +371,7 @@ final class ResourceManagerDialog {
             }
             if("check".equals(op)&&!stop.get()){
                 int fresh=0,old=0,missing=0,damaged=0;
-                for(ResourceStore.State state:result.values())switch(state){case NEW:fresh++;break;case OLD:old++;break;case MISSING:missing++;break;case DAMAGED:damaged++;break;default:break;}
+                for(ResourceStore.Entry e:work){ResourceStore.State state=result.get(e.path);if(state==null)continue;switch(state){case NEW:fresh+=e.units;break;case OLD:old+=e.units;break;case MISSING:missing+=e.units;break;case DAMAGED:damaged+=e.units;break;default:break;}}
                 message=catalogReport+(ResourceStore.catalogError(activity).isEmpty()?"":"\nПо локальному каталогу:")+"\nНовые: "+fresh+" · Обновить: "+old+" · Не скачаны: "+missing+" · Повреждены: "+damaged;
             }
             final String report=errors==0?message:message+" | ошибок: "+errors+" | "+last;
