@@ -10,7 +10,7 @@ ENGINE = (ROOT / "app/src/main/java/dev/infend/skyrimtext/GameEngine.java").read
 class QuestAcceptanceGuards(unittest.TestCase):
     def test_main_quest_acceptance_is_one_time(self):
         self.assertRegex(ENGINE, r'case "Q_ACCEPT":\s*if\s*\(questStage\s*==\s*0\)')
-        self.assertRegex(ENGINE, r'if\s*\(questStage\s*==\s*0\)\s*\{questStage=1;gold\+=40;')
+        self.assertRegex(ENGINE, r'if\s*\(questStage\s*==\s*0\)\s*\{questStage=1;gold=nonnegativeAdd\(gold,40\);')
 
     def test_bounty_acceptance_cannot_reset_active_kills(self):
         self.assertRegex(ENGINE, r'case "SIDE_ACCEPT":\s*if\s*\(sideQuest\s*==\s*2\)')

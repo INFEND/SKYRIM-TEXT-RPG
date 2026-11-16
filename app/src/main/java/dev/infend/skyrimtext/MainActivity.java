@@ -1578,8 +1578,8 @@ public final class MainActivity extends Activity {
             .remove(AI_PENDING_DIE).remove(AI_PENDING_SCENE)
             .remove(AI_PENDING_SESSION).remove(AI_PENDING_INSTRUCTION).remove(AI_PENDING_CHECKS).apply();
     }
-    private void storeAiPending(String action,int chance,int die){
-        prefs.edit().putString(AI_PENDING_ACTION,action)
+    private boolean storeAiPending(String action,int chance,int die){
+        return prefs.edit().putString(AI_PENDING_ACTION,action)
             .putInt(AI_PENDING_CHANCE,chance).putInt(AI_PENDING_DIE,die)
             .putInt(AI_PENDING_SCENE,game.aiTurn==null?0:game.aiTurn.scene.hashCode())
             .putString(AI_PENDING_SESSION,aiSession).remove(AI_PENDING_INSTRUCTION).remove(AI_PENDING_CHECKS).commit();
@@ -1588,6 +1588,14 @@ public final class MainActivity extends Activity {
         return prefs.edit().putString(AI_PENDING_ACTION,compound).putInt(AI_PENDING_CHANCE,-2).putInt(AI_PENDING_DIE,-1)
             .putInt(AI_PENDING_SCENE,game.aiTurn.scene.hashCode()).putString(AI_PENDING_SESSION,aiSession)
             .putString(AI_PENDING_INSTRUCTION,instruction).putString(AI_PENDING_CHECKS,checks.toString()).commit();
+    }
+    private void retryLockedAction(){
+        String action=pendingAiAction();if(action.isEmpty()||aiTurnBusy)return;
+        String instruction=prefs.getString(AI_PENDING_INSTRUCTION,"");
+        if(!instruction.isEmpty()){if(LockedChecks.restore(prefs.getString(AI_PENDING_CHECKS,""))==null){toast("Запись бросков повреждена");return;}requestAiTurn(instruction,true);return;}
+        int chance=prefs.getInt(AI_PENDING_CHANCE,-2),die=prefs.getInt(AI_PENDING_DIE,-1);
+        if(chance< -1||chance>100||(chance>=0&&(die<1||die>100))){toast("Запись броска повреждена");return;}
+        requestAiTurn(lockedFreeInstruction(action,chance,die),true,false,chance,null);
     }
     private String lockedFreeInstruction(String action,int chance,int die){
         String verdict=chance<0?"Проверка не требуется, действие гарантировано.":
@@ -1683,8 +1691,8 @@ public final class MainActivity extends Activity {
         if("COMBAT".equals(game.mode)&&game.enemyHp>0){
             addText(content,"БОЙ | "+game.enemyName+" | "+game.enemyHp+"/"+game.enemyMaxHp,14,accent(),true,8);
             actionButton("УДАР","Обычная атака",true,()->resolveNativeAiCombat("ATTACK"));
-            actionButton("СИЛЬНЫЙ УДАР","10 единиц сил | "+game.progress.chance(game,"HEAVY")+"%",game.stamina>=10,()->resolveNativeAiCombat("HEAVY"));
-            actionButton("МАГИЯ","12 единиц магии",game.magicka>=12,()->resolveNativeAiCombat("MAGIC"));
+            actionButton("СИЛЬНЫЙ УДАР",game.heavyCost()+" единиц сил | "+game.progress.chance(game,"HEAVY")+"%",game.stamina>=game.heavyCost(),()->resolveNativeAiCombat("HEAVY"));
+            actionButton("МАГИЯ",game.magicCost()+" единиц магии",game.magicka>=game.magicCost(),()->resolveNativeAiCombat("MAGIC"));
             actionButton("ЗАЩИТА","Восстановить силы и уменьшить входящий урон",true,()->resolveNativeAiCombat("DEFEND"));
             for(int i=0;i<CompensationPowers.SLOTS;i++){final int index=i;if(game.compensation.available(game,i))actionButton(game.compensation.powerName(i),game.compensation.detail(i),true,()->resolveNativeAiCombat("FIX_POWER:"+index));}
             actionButton("ЛЕЧЕБНОЕ ЗЕЛЬЕ","В наличии: "+game.potions,game.potions>0,()->resolveNativeAiCombat("POTION"));
@@ -1698,6 +1706,7 @@ public final class MainActivity extends Activity {
                 requestAiTurn("Начни историю моего героя в текущем месте. Это первый ход: не меняй параметры, предоставь ten choices.",false));
             return;
         }
+        String pending=pendingAiAction();if(!pending.isEmpty())actionButton("ПОВТОРИТЬ ЗАФИКСИРОВАННОЕ ДЕЙСТВИЕ","Сохранённый бросок не изменится",true,()->retryLockedAction());
         LinearLayout narrative=card();
         aiTurnText=text("",18,TEXT,false);
         aiTurnText.setTypeface(SovngardeTypeface.face(this,false));
@@ -1843,8 +1852,8 @@ public final class MainActivity extends Activity {
         int custom=CompensationPowers.actionIndex(action);if(custom>=0)return game.compensation.available(game,custom);
         switch(action){
             case "ATTACK":case "DEFEND":return true;
-            case "HEAVY":return game.stamina>=10;
-            case "MAGIC":return game.magicka>=12;
+            case "HEAVY":return game.stamina>=game.heavyCost();
+            case "MAGIC":return game.magicka>=game.magicCost();
             case "POTION":return game.potions>0;
             case "FLEE":return "WILD".equals(game.battleKind);
             default:return false;
@@ -1853,8 +1862,8 @@ public final class MainActivity extends Activity {
 
     private void resolveNativeAiCombat(String action){
         if(aiTurnBusy||!"COMBAT".equals(game.mode)||game.enemyHp<=0)return;
-        if("HEAVY".equals(action)&&game.stamina<10)return;
-        if("MAGIC".equals(action)&&game.magicka<12)return;
+        if("HEAVY".equals(action)&&game.stamina<game.heavyCost())return;
+        if("MAGIC".equals(action)&&game.magicka<game.magicCost())return;
         if("POTION".equals(action)&&game.potions<=0)return;
         if("FLEE".equals(action)&&!"WILD".equals(game.battleKind))return;
         if(!nativeAiCombatAvailable(action))return;
@@ -2017,7 +2026,7 @@ public final class MainActivity extends Activity {
                         // The short chance-only response is never written to RPG memory.
                         int fixedChance=AiGameTurn.parseChance(answer);
                         int die=fixedChance<0?-1:AiGameTurn.roll();
-                        storeAiPending(customAction,fixedChance,die);
+                        if(!storeAiPending(customAction,fixedChance,die))throw new IllegalStateException("Не удалось сохранить бросок");
                         aiTurnBusy=false;aiTurnPreview="";
                         requestAiTurn(lockedFreeInstruction(customAction,fixedChance,die),
                             true,false,fixedChance,null);
