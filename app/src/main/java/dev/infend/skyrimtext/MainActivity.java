@@ -1341,6 +1341,7 @@ public final class MainActivity extends Activity {
             if(n!=5){toast("Распредели все 5 свободных очков");return;}
             newAiSession();game.start(nameField.getText().toString(),selectedRace,selectedClass,selectedStart,
                 initialPoints,selectedGender,selectedPortrait);
+            game.katherine.enabled=prefs.getBoolean("katherine_enabled",true);
             if(selectedStart==0)game.choose("CANON_OPEN");
             tab=0;save();render();
         });
@@ -4052,6 +4053,17 @@ public final class MainActivity extends Activity {
     }
     private void renderSettings(){
         section("ПАРАМЕТРЫ","Настройки","Твоя история, твои правила.");
+        LinearLayout expansion=card();addText(expansion,"РАСШИРЕНИЕ МИРА",11,accent(),true,8);
+        Switch katherineToggle=new Switch(this);katherineToggle.setText("Кэтрин | Нулевой Предел");
+        katherineToggle.setTextColor(TEXT);katherineToggle.setThumbTintList(ColorStateList.valueOf(accent()));
+        katherineToggle.setChecked(game.katherine.enabled);
+        katherineToggle.setOnCheckedChangeListener((v,on)->{
+            if(livingBusy()){v.setChecked(game.katherine.enabled);return;}
+            game.katherine.enabled=on;
+            if(!on&&KatherineStory.MODE.equals(game.mode))game.mode="WORLD";
+            prefs.edit().putBoolean("katherine_enabled",on).apply();save();
+        });expansion.addView(katherineToggle,lp(-1,47));
+        addText(expansion,"Необязательная авторская история вне канона TES.",12,MUTED,false,0);
         if(game.started)livingLink(content,"Магазин компенсаций","∞ F","skills",this::livingFixShop);
         content.addView(new NordicArtView(this,NordicArtView.STORY),lp(-1,105));space(content,12);
         int appearanceStart=content.getChildCount();
