@@ -60,6 +60,12 @@ public final class GameEngine {
     public RpgProgress progress = new RpgProgress();
     public LivingNeeds needs=new LivingNeeds();
     public long fixSpent=0;
+    public LivingEconomy economy=new LivingEconomy();
+    public final int[] regenBonus=new int[3];
+    public boolean regenIgnorePenalty;
+    public void syncLivingSystems(){needs.sync(day,hour);economy.sync(day);}
+    public int regenRate(int index){return 1+regenBonus[index];}
+    private void regenerateCombat(){if(hp<=0||!"COMBAT".equals(mode))return;int penalty=regenIgnorePenalty?0:needs.penalty();hp=(int)Math.min(maxHp,(long)hp+(poisonTurns>0&&!regenIgnorePenalty?regenBonus[0]:Math.max(0,regenRate(0)-(penalty>0?1:0))));magicka=(int)Math.min(maxMagicka,(long)magicka+Math.max(regenBonus[1],regenRate(1)-(penalty>0?1:0)));stamina=(int)Math.min(maxStamina,(long)stamina+(frostTurns>0&&!regenIgnorePenalty?regenBonus[2]:Math.max(0,regenRate(2)-(penalty>0?1:0))));}
     public AiGameTurn aiTurn;
     public SceneState sceneState = new SceneState();
     public String aiJournal = "";
@@ -164,7 +170,7 @@ public final class GameEngine {
         if(name.length()>28)name=name.substring(0,28);
         race=contains(RACES,desiredRace)?desiredRace:"Норд";
         heroClass=contains(CLASSES,desiredClass)?desiredClass:"Без класса";
-        started=true;needs=new LivingNeeds();fixSpent=0;aiTurn=null;sceneState=new SceneState();aiJournal="";day=1;hour=8;level=1;xp=0;gold=85;potions=3;manaPotions=1;
+        started=true;needs=new LivingNeeds();economy=new LivingEconomy();java.util.Arrays.fill(regenBonus,0);regenIgnorePenalty=false;fixSpent=0;aiTurn=null;sceneState=new SceneState();aiJournal="";day=1;hour=8;level=1;xp=0;gold=85;potions=3;manaPotions=1;
         questStage=0;sideQuest=0;sideKills=0;boardCompleted=0;explored=0;victories=0;reputation=0;
         swordUpgraded=false;armorUpgraded=false;
         maxHp=100;maxStamina=100;maxMagicka=100;attack=12;armor=2;
@@ -195,7 +201,7 @@ public final class GameEngine {
         String[] back=RpgContent.startParts(origin);
         region=Integer.parseInt(back[2]);
         canonicalStage=canonicalPhase=canonicalPage=canonicalShouts=canonicalTreaty=canonicalPaarthurnax=canonicalShoutCooldown=0;canonicalPrepared=false;canonicalRecent="";
-        mode="INTRO";message="";merchants=new MerchantLedger();factions=new FactionCampaign();factionStories=new FactionStories();factionBattle=-1;resetBattleVisuals();java.util.Arrays.fill(holdReputation,0);visitedVisual.clear();visualChronicle=new org.json.JSONArray();visitedVisual.add(progress.location);
+        syncLivingSystems();mode="INTRO";message="";merchants=new MerchantLedger();factions=new FactionCampaign();factionStories=new FactionStories();factionBattle=-1;resetBattleVisuals();java.util.Arrays.fill(holdReputation,0);visitedVisual.clear();visualChronicle=new org.json.JSONArray();visitedVisual.add(progress.location);
     }
 
     public Scene scene() {
@@ -423,7 +429,7 @@ public final class GameEngine {
             case "BOARD": board(); break;
             case "REST":
                 if(gold<20) {message="Хозяин трактира просит 20 септимов. Придётся поискать заработок.";mode="RESULT";}
-                else {gold-=20;day++;hp=maxHp;magicka=maxMagicka;stamina=maxStamina;message="После тёплого ужина и долгого сна силы восстановились.";mode="RESULT";} break;
+                else {gold-=20;day++;syncLivingSystems();needs.eat();needs.drink();needs.recover(8,true);hp=maxHp;magicka=maxMagicka;stamina=maxStamina;message="После тёплого ужина и долгого сна силы восстановились.";mode="RESULT";} break;
             case "Q_ACCEPT": if(questStage==0) {questStage=1;gold+=40;message="Ты принимаешь 40 септимов и получаешь первую зацепку: алтарь находится в Фолкрите.";mode="RESULT";} break;
             case "Q_ALTAR": if(questStage==1 && region==5) {questStage=2;confirmSceneFact("clue", "quest_silver_plate", "Серебряная пластина под алтарём Фолкрита", "FOUND");addXp(35);message="Ты находишь под алтарём серебряную пластину. На ней указан Винтерхолд. +35 опыта.";mode="RESULT";} break;
             case "Q_BOSS": if(questStage==2 && region==6) startBattle("Пепельный страж",90+level*11,12+level*2,"QUEST","Внутри башни оживает существо из пепла и холодного камня."); break;
@@ -615,7 +621,7 @@ public final class GameEngine {
         if(hp==0) {
             int penalty=gold/3;gold-=penalty;hp=Math.max(1,maxHp/2);stamina=Math.max(1,maxStamina/2);
             poisonTurns=frostTurns=0;mode="DEFEAT";message="Ты приходишь в себя у дороги. Прохожие спасли тебя, но потеряно "+penalty+" септимов. Теперь можно подготовиться и вернуться.";
-        }
+        }else regenerateCombat();
     }
     private void winBattle(String lastHit) {
         int reward=25+random.nextInt(26)+level*4;int gain=30+level*9;
@@ -653,10 +659,10 @@ public final class GameEngine {
         if(!started||"COMBAT".equals(mode)||hours<1||hours>24)return false;
         int total=hour+hours;
         day+=total/24;hour=total%24;
-        needs.sync(day,hour);needs.recover(hours,hours>=6);
-        hp=Math.min(maxHp,hp+hours*3);
-        stamina=Math.min(maxStamina,stamina+hours*7);
-        magicka=Math.min(maxMagicka,magicka+hours*6);
+        syncLivingSystems();needs.recover(hours,hours>=6);
+        hp=(int)Math.min(maxHp,(long)hp+hours*(3L+regenBonus[0]*3600L));
+        stamina=(int)Math.min(maxStamina,(long)stamina+hours*(7L+regenBonus[2]*3600L));
+        magicka=(int)Math.min(maxMagicka,(long)magicka+hours*(6L+regenBonus[1]*3600L));
         message="Отдых длился "+hours+" ч. Наступил день "+day+", "+
             String.format(java.util.Locale.ROOT,"%02d:00",hour)+".";
         progress.recent=message;
@@ -673,9 +679,9 @@ public final class GameEngine {
     public String questDetails() {switch(questStage){case 0:return "Поговори с хранителем в разделе «Главная история».";case 1:return "Доберись до Фолкрита и осмотри алтарь.";case 2:return "Найди башню в Винтерхолде и победи пепельного стража.";case 3:return "Передай журнал хранителям Солитьюда.";default:return "Сюжетная линия завершена. Ты можешь продолжать приключения.";}}
     private static boolean contains(String[] arr,String v){for(String s:arr)if(s.equals(v))return true;return false;}
     public JSONObject toJson() throws JSONException {
-        needs.sync(day,hour);
+        syncLivingSystems();
         JSONObject j=new JSONObject();
-        j.put("needs",needs.toJson()).put("fixSpent",fixSpent);
+        j.put("needs",needs.toJson()).put("fixSpent",fixSpent).put("economy",economy.toJson()).put("regenBonus",new org.json.JSONArray(regenBonus)).put("regenIgnorePenalty",regenIgnorePenalty);
         j.put("schema",1).put("started",started).put("name",name).put("race",race).put("heroClass",heroClass)
          .put("gender",gender).put("portrait",portrait)
          .put("region",region).put("day",day).put("hour",hour).put("level",level).put("xp",xp).put("maxHp",maxHp).put("hp",hp)
@@ -727,7 +733,7 @@ public final class GameEngine {
             g.battleKind=j.optString("battleKind","");g.enemyIntro=j.optString("enemyIntro","");
             g.enemyHp=Math.max(0,j.optInt("enemyHp",0));g.enemyMaxHp=Math.max(0,j.optInt("enemyMaxHp",0));g.enemyDamage=Math.max(0,j.optInt("enemyDamage",0));
             g.progress=RpgProgress.fromJson(j.optJSONObject("progress"));
-             g.needs=LivingNeeds.fromJson(j.optJSONObject("needs"));g.needs.sync(g.day,g.hour);g.fixSpent=Math.max(0,j.optLong("fixSpent",0));
+             g.needs=LivingNeeds.fromJson(j.optJSONObject("needs"));g.economy=LivingEconomy.fromJson(j.optJSONObject("economy"));g.syncLivingSystems();g.fixSpent=Math.max(0,j.optLong("fixSpent",0));org.json.JSONArray rates=j.optJSONArray("regenBonus");if(rates!=null)for(int i=0;i<3;i++)g.regenBonus[i]=Math.max(0,Math.min(1000000,rates.optInt(i)));g.regenIgnorePenalty=j.optBoolean("regenIgnorePenalty");
             g.merchants=MerchantLedger.fromJson(j.optJSONObject("merchants"));g.factions=FactionCampaign.fromJson(j.optJSONObject("factions"));g.factionStories=FactionStories.fromJson(j.optJSONObject("factionStories"));g.factionBattle=Math.max(-1,Math.min(6,j.optInt("factionBattle",-1)));
             org.json.JSONArray holds=j.optJSONArray("holdReputation");if(holds!=null)for(int i=0;i<g.holdReputation.length;i++)g.holdReputation[i]=Math.max(-100,Math.min(100,holds.optInt(i,0)));
             if("COMBAT".equals(g.mode)){g.poisonTurns=Math.max(0,Math.min(2,j.optInt("poisonTurns")));g.frostTurns=Math.max(0,Math.min(2,j.optInt("frostTurns")));}

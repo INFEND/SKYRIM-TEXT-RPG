@@ -142,13 +142,13 @@ public final class AiGameTurn {
         // Active encounters are owned exclusively by native combat.
         if(g.enemyHp>0)throw new JSONException("Сначала выполни боевое действие через движок");
         JSONObject e=effects;
-        int maxHp=cap((long)g.maxHp+change(e,"maxHpDelta",50),1,10000);
-        int maxSt=cap((long)g.maxStamina+change(e,"maxStaminaDelta",50),1,10000);
-        int maxMg=cap((long)g.maxMagicka+change(e,"maxMagickaDelta",50),1,10000);
+        int maxHp=cap((long)g.maxHp+change(e,"maxHpDelta",50),1,Math.max(10000,g.maxHp));
+        int maxSt=cap((long)g.maxStamina+change(e,"maxStaminaDelta",50),1,Math.max(10000,g.maxStamina));
+        int maxMg=cap((long)g.maxMagicka+change(e,"maxMagickaDelta",50),1,Math.max(10000,g.maxMagicka));
         int hp=cap((long)g.hp+change(e,"hpDelta",500),0,maxHp);
         int st=cap((long)g.stamina+change(e,"staminaDelta",500),0,maxSt);
         int mg=cap((long)g.magicka+change(e,"magickaDelta",500),0,maxMg);
-        int gold=cap((long)g.gold+change(e,"goldDelta",5000),0,10000000);
+        int gold=cap((long)g.gold+change(e,"goldDelta",5000),0,Math.max(10000000,g.gold));
         int addHours=change(e,"hourDelta",24);
         if(addHours<0 || change(e,"dayDelta",30)<0)
             throw new JSONException("Игровое время нельзя переводить назад");

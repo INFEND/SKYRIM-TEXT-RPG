@@ -56,8 +56,20 @@ public final class SceneState {
                 throw new JSONException("Откат подтверждённого факта запрещён");
             }
         }
-        entries.put(safeId,new JSONObject().put("id",safeId).put("title",safeTitle).put("status",status));
+        JSONObject prior=entries.get(safeId);
+        JSONObject next=new JSONObject().put("id",safeId).put("title",safeTitle).put("status",status);
+        if("npc".equals(kind)){
+            int old=prior==null?50:prior.optInt("relation",initialRelation(prior.optString("status")));
+            String previous=prior==null?"":prior.optString("status");
+            int change=previous.equals(status)?0:status.equals("HELPED")?20:status.equals("INFORMED")?10:status.equals("HOSTILE")?-40:0;
+            int score=prior==null?initialRelation(status):Math.max(0,Math.min(100,old+change));
+            JSONArray history=prior==null?new JSONArray():prior.optJSONArray("history");if(history==null)history=new JSONArray();
+            if(!previous.equals(status)){JSONArray bounded=new JSONArray();for(int i=Math.max(0,history.length()-15);i<history.length();i++)bounded.put(history.opt(i));bounded.put(new JSONObject().put("status",status).put("delta",prior==null?0:score-old));history=bounded;}
+            next.put("relation",score).put("history",history).put("delta",previous.equals(status)&&prior!=null?prior.optInt("delta",0):prior==null?0:score-old);
+        }
+        entries.put(safeId,next);
     }
+    private static int initialRelation(String status){switch(status){case "HELPED":return 70;case "INFORMED":return 60;case "HOSTILE":return 10;default:return 50;}}
     private static boolean allowedStatus(String kind,String status) {
         if(status==null)return false;
         switch(kind) {
@@ -143,6 +155,9 @@ public final class SceneState {
                     // Duplicate IDs in corrupted saves cannot overwrite the first valid fact.
                     if(state.contains(kind,key))continue;
                     state.confirm(kind,key,entry.getString("title"),entry.getString("status"));
+                    if("npc".equals(kind)){JSONObject restored=state.npcs.get(key);restored.put("relation",Math.max(0,Math.min(100,entry.optInt("relation",restored.optInt("relation",50)))));restored.put("delta",Math.max(-100,Math.min(100,entry.optInt("delta",0))));
+                        JSONArray old=entry.optJSONArray("history");if(old!=null){JSONArray safe=new JSONArray();for(int k=Math.max(0,old.length()-16);k<old.length();k++){JSONObject e=old.optJSONObject(k);if(e!=null&&allowedStatus("npc",e.optString("status")))safe.put(new JSONObject().put("status",e.optString("status")).put("delta",Math.max(-100,Math.min(100,e.optInt("delta",0)))));}restored.put("history",safe);}}
+
                 }catch(JSONException invalid){
                     // Skip only this invalid optional record; preserve the character.
                 }

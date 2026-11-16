@@ -166,12 +166,7 @@ public final class MainActivity extends Activity {
         super.onDestroy();
     }
     private void newAiSession(){
-        combatVisual="";victoryVisual="";travelVisual="";livingDeltas.clear();livingResultTitle=action==null?"Итоги действия":action;livingResultChance=before.chance;
-        long gained=(long)after.xp-before.xp;for(int l=before.level;l<after.level;l++)gained+=GameEngine.experienceRequired(l);
-        livingDelta("Золото",(long)after.gold-before.gold);livingDelta("Опыт персонажа",gained);livingDelta("Здоровье",after.hp-before.hp);livingDelta("Магия",after.magicka-before.magicka);livingDelta("Выносливость",after.stamina-before.stamina);livingDelta("Уровень",after.level-before.level);
-        for(int i=0;i<before.skillXp.length;i++){long earned=(long)after.progress.skillXp[i]-before.skillXp[i];for(int l=before.skillLevels[i];l<after.progress.skillLevels[i];l++)earned+=Math.max(100,100*l);if(after.progress.skillLevels[i]==100&&before.skillLevels[i]<100)livingDelta(RpgContent.SKILLS[i]+" (уровни)",after.progress.skillLevels[i]-before.skillLevels[i]);else livingDelta(RpgContent.SKILLS[i]+" (опыт)",earned);}
-        livingDelta("Игровое время, ч.",((long)after.day-before.day)*24+after.hour-before.hour);
-        after.needs.sync(after.day,after.hour);combatLabels.clear();combatColors.clear();battleSummaryPending=false;travelStops=java.util.Collections.emptyList();lastNarrative="";
+        combatVisual="";victoryVisual="";travelVisual="";livingDeltas.clear();livingResultTitle="";livingResultChance=-1;combatLabels.clear();combatColors.clear();battleSummaryPending=false;travelStops=java.util.Collections.emptyList();lastNarrative="";
         recentItemGains.clear();
         selectedAiChoices.clear();aiOwnDraft="";clearAiDraft();
         cancelAiForSourceChange();
@@ -504,7 +499,13 @@ public final class MainActivity extends Activity {
     private void combatLabel(String label,int color){combatLabels.add(label);combatColors.add(color);}
     private java.util.List<String> travelStops=java.util.Collections.emptyList();private boolean animateTravelOnce;
     private void recordVisual(VisualSnapshot before,GameEngine after,String action){
-        combatVisual="";victoryVisual="";travelVisual="";combatLabels.clear();combatColors.clear();battleSummaryPending=false;
+        after.syncLivingSystems();
+        combatVisual="";victoryVisual="";travelVisual="";livingDeltas.clear();livingResultTitle=action==null?"Итоги действия":action;livingResultChance=before.chance;
+        long gained=(long)after.xp-before.xp;for(int l=before.level;l<after.level;l++)gained+=GameEngine.experienceRequired(l);
+        livingDelta("Золото",(long)after.gold-before.gold);livingDelta("Опыт персонажа",gained);livingDelta("Здоровье",after.hp-before.hp);livingDelta("Магия",after.magicka-before.magicka);livingDelta("Выносливость",after.stamina-before.stamina);livingDelta("Уровень",after.level-before.level);
+        for(int i=0;i<before.skillXp.length;i++){long earned=(long)after.progress.skillXp[i]-before.skillXp[i];for(int l=before.skillLevels[i];l<after.progress.skillLevels[i];l++)earned+=Math.max(100,100*l);if(after.progress.skillLevels[i]==100&&before.skillLevels[i]<100)livingDelta(RpgContent.SKILLS[i]+" (уровни)",after.progress.skillLevels[i]-before.skillLevels[i]);else livingDelta(RpgContent.SKILLS[i]+" (опыт)",earned);}
+        livingDelta("Игровое время, ч.",((long)after.day-before.day)*24+after.hour-before.hour);
+        after.needs.sync(after.day,after.hour);combatLabels.clear();combatColors.clear();battleSummaryPending=false;
         after.visitedVisual.add(after.progress.location);
         boolean moved=!before.location.equals(after.progress.location);
         if(moved){travelVisual=before.location+" → "+after.progress.location+" | "+Math.max(0,after.day-before.day)+" дн.";travelStops=before.stops.isEmpty()?java.util.Arrays.asList(before.location,after.progress.location):before.stops;animateTravelOnce=true;}
@@ -1703,6 +1704,9 @@ public final class MainActivity extends Activity {
         space(content,10);
         actionButton("ОТПРАВИТЬ","Отправить выбранные ответы и свой текст одним действием",true,()->{
             String value=own.getText().toString().trim();
+            if(value.equalsIgnoreCase("/фк")||value.equalsIgnoreCase("/фикскоин")){livingFixShop();return;}
+            if(value.equalsIgnoreCase("/отношения")){journalRelations=true;tab=4;render();return;}
+            if(value.equalsIgnoreCase("/статистика")||value.equalsIgnoreCase("/stats")){heroDetailed=false;tab=3;render();return;}
             if(value.length()>1500){toast("Не более 1500 символов своего текста");return;}
             java.util.ArrayList<Integer> indexes=new java.util.ArrayList<>(selectedAiChoices);
             java.util.Collections.sort(indexes);
@@ -3396,7 +3400,7 @@ public final class MainActivity extends Activity {
     }
     private void renderHero(){
         if(heroDetailed){renderHeroLegacy();return;}
-        skyrimTopTabs(3);game.needs.sync(game.day,game.hour);
+        skyrimTopTabs(3);game.syncLivingSystems();
         LinearLayout head=row();head.setGravity(Gravity.CENTER_VERTICAL);head.addView(new CharacterPortraitView(this,game.race,game.gender,game.portrait),lp(92,-2));
         LinearLayout identity=column();identity.setPadding(dp(13),0,0,0);head.addView(identity,new LinearLayout.LayoutParams(0,-2,1));
         addText(identity,game.name,24,heroColor(),true,4);addText(identity,game.race+" · "+game.heroClass,13,MUTED,false,8);
@@ -3404,11 +3408,11 @@ public final class MainActivity extends Activity {
         content.addView(head,lp(-1,-2));space(content,12);
         String portraitPath=CharacterIdentity.portraitPath(game.race,game.gender,game.portrait);
         if(!ResourceStore.has(this,portraitPath))livingLink(content,"Загрузить портрет","","hero",()->new ResourceManagerDialog(this,accent(),this::render,ResourceStore.portraitGroup(portraitPath)).show());
-        livingLine(content,"Здоровье",game.hp+" / "+game.maxHp,ITEM_DOWN);livingBar(content,game.hp,game.maxHp,ITEM_DOWN);
-        livingLine(content,"Магия",game.magicka+" / "+game.maxMagicka,0xff75a2dd);livingBar(content,game.magicka,game.maxMagicka,0xff75a2dd);
-        livingLine(content,"Выносливость",game.stamina+" / "+game.maxStamina,ITEM_UP);livingBar(content,game.stamina,game.maxStamina,ITEM_UP);
+        livingLine(content,"Здоровье",game.hp+" / "+game.maxHp,ITEM_DOWN);livingBar(content,game.hp,game.maxHp,ITEM_DOWN);addText(content,"Регенерация в бою: +"+game.regenRate(0)+" ед. / ход",11,MUTED,false,9);
+        livingLine(content,"Магия",game.magicka+" / "+game.maxMagicka,0xff75a2dd);livingBar(content,game.magicka,game.maxMagicka,0xff75a2dd);addText(content,"Регенерация в бою: +"+game.regenRate(1)+" ед. / ход",11,MUTED,false,9);
+        livingLine(content,"Выносливость",game.stamina+" / "+game.maxStamina,ITEM_UP);livingBar(content,game.stamina,game.maxStamina,ITEM_UP);addText(content,"Регенерация в бою: +"+game.regenRate(2)+" ед. / ход",11,MUTED,false,9);
         LinearLayout money=livingTile(content);LinearLayout columns=row();money.addView(columns,lp(-1,-2));
-        String[] labels={"На руках","В обороте","Доход / день"};String[] values={livingNumber(game.gold),"—","—"};
+        String[] labels={"На руках","В обороте","Доход / день"};String[] values={livingNumber(game.gold),livingNumber(game.economy.capital),livingNumber(game.economy.income())};money.setOnClickListener(v->livingEconomyDialog());
         for(int i=0;i<3;i++){LinearLayout cell=column();columns.addView(cell,new LinearLayout.LayoutParams(0,-2,1));addText(cell,labels[i],11,MUTED,false,4);addText(cell,values[i],20,i==0?ITEM_GOLD:TEXT,true,0);}
         livingLink(content,"Потребности",game.needs.penalty()==0?"В норме":"Требуют внимания","health",this::livingNeedsDialog);
         livingLink(content,"Навыки","18","skills",this::livingSkillsDialog);
@@ -3418,6 +3422,15 @@ public final class MainActivity extends Activity {
         livingLink(content,"Сопротивления","","shield",()->livingHeroDetails("Сопротивления",game.progress.racePassive(game)+"\nСнижение физического урона: "+String.format(java.util.Locale.ROOT,"%.1f%%",100*game.progress.damageReduction())));
         livingLink(content,"Подробная статистика","","hero",()->{heroDetailed=true;render();});
     }
+    private boolean livingBusy(){return aiTurnBusy||!pendingAiAction().isEmpty()||"COMBAT".equals(game.mode);}
+    private void livingEconomyDialog(){
+        if(livingBusy()){toast("Финансы недоступны во время действия");return;}
+        game.syncLivingSystems();LinearLayout panel=column();livingLine(panel,"На руках",livingNumber(game.gold),ITEM_GOLD);livingLine(panel,"В обороте",livingNumber(game.economy.capital),TEXT);livingLine(panel,"Доход / день",livingNumber(game.economy.income()),ITEM_UP);livingLine(panel,"Накопленный доход",livingNumber(game.economy.accrued),ITEM_UP);
+        addText(panel,"Торговые вложения: 2% в игровой день. Прибыль начисляется без повторов.",12,MUTED,false,8);
+        livingLink(panel,"Вложить 1.000","","septims",()->livingEconomyChange(true));livingLink(panel,"Вернуть 1.000","","septims",()->livingEconomyChange(false));
+        livingLink(panel,"Забрать прибыль","","septims",()->{if(livingBusy())return;int n=game.economy.claim(game);game.progress.sync(game);save();render();toast("Получено "+livingNumber(n)+" септимов");});livingDialog("Финансы",panel);
+    }
+    private void livingEconomyChange(boolean invest){if(livingBusy())return;boolean ok=invest?game.economy.invest(game,1000):game.economy.withdraw(game,1000);if(ok){game.progress.sync(game);save();render();}toast(ok?"Операция выполнена":"Недостаточно средств");}
     private String livingNumber(long n){return String.format(java.util.Locale.US,"%,d",n).replace(',','.');}
     private void livingHeroDetails(String title,String description){
         LinearLayout box=column();addText(box,description,15,TEXT,false,8);
@@ -3648,12 +3661,13 @@ public final class MainActivity extends Activity {
         if(npcs.length()==0){addText(content,"Пока нет подтверждённых знакомств.",15,MUTED,false,8);return;}
         for(int i=0;i<npcs.length();i++){JSONObject n=npcs.optJSONObject(i);if(n==null)continue;String name=n.optString("title"),status=n.optString("status");int score;String relation;
             switch(status){case "HELPED":score=78;relation="Благодарность";break;case "INFORMED":score=60;relation="Обмен сведениями";break;case "MET":score=50;relation="Знакомый";break;case "HOSTILE":score=15;relation="Враждебность";break;default:score=-1;relation=npcStatusLabel(status);}
-            int color=score<0?MUTED:score>=65?ITEM_UP:score>=40?ITEM_GOLD:ITEM_DOWN;LinearLayout tile=livingTile(content);LinearLayout line=row();line.setGravity(Gravity.CENTER_VERTICAL);
+            if(score>=0)score=n.optInt("relation",score);int color=score<0?MUTED:score>=65?ITEM_UP:score>=40?ITEM_GOLD:ITEM_DOWN;LinearLayout tile=livingTile(content);LinearLayout line=row();line.setGravity(Gravity.CENTER_VERTICAL);
             line.addView(new SkyrimIconView(this,"hero",color),lp(38,42));LinearLayout words=column();words.setPadding(dp(10),0,0,0);line.addView(words,new LinearLayout.LayoutParams(0,-2,1));addText(words,name,18,TEXT,true,3);addText(words,relation,13,color,false,0);
             if(score>=0)line.addView(text(score+" / 100",16,color,true));tile.addView(line);space(tile,10);if(score>=0)livingBar(tile,score,100,color);
-            addText(tile,"Последнее подтверждённое состояние: "+npcStatusLabel(status),12,MUTED,false,0);tile.setOnClickListener(v->npcDetails(name));}
-        addText(content,"Число отражает оценку известного статуса, а не скрытые намерения персонажа.",11,MUTED,false,4);
+            int change=n.optInt("delta",0);addText(tile,"Последнее событие: "+npcStatusLabel(status)+(change==0?"":change>0?" | +"+change:" | "+change),12,MUTED,false,0);tile.setOnClickListener(v->livingRelationDetails(n));}
+        addText(content,"Отношения меняются после подтверждённых событий. Скрытые намерения не раскрываются.",11,MUTED,false,4);
     }
+    private void livingRelationDetails(JSONObject n){LinearLayout panel=column();String status=n.optString("status");addText(panel,npcStatusLabel(status),16,TEXT,true,8);if(!"DEAD".equals(status)&&!"MISSING".equals(status))livingLine(panel,"Отношение",n.optInt("relation",50)+" / 100",accent());org.json.JSONArray events=n.optJSONArray("history");addText(panel,"История взаимодействий",13,accent(),true,8);if(events!=null)for(int i=events.length()-1;i>=0;i--){JSONObject e=events.optJSONObject(i);if(e==null)continue;int change=e.optInt("delta");livingLine(panel,npcStatusLabel(e.optString("status")),change==0?"":change>0?"+"+change:String.valueOf(change),change<0?ITEM_DOWN:ITEM_UP);}livingDialog(n.optString("title"),panel);}
     private void renderJournal(){
         skyrimTopTabs(4);
         LinearLayout switcher=row();content.addView(switcher,lp(-1,-2));
@@ -3873,9 +3887,17 @@ public final class MainActivity extends Activity {
         livingFixRow(panel,"Золото","+10.000 септимов",1,()->livingFixGold(10000));
         livingFixRow(panel,"Золото","+100.000 септимов",9,()->livingFixGold(100000));
         livingFixRow(panel,"Золото","+1.000.000 септимов",80,()->livingFixGold(1000000));
-        addText(panel,"Регенерация, уникальные способности и предметы требуют отдельной механики и пока недоступны.",12,MUTED,false,8);
+                livingFixRow(panel,"Все параметры","+100 к каждому",25,()->{if(game.maxHp>Integer.MAX_VALUE-100||game.maxMagicka>Integer.MAX_VALUE-100||game.maxStamina>Integer.MAX_VALUE-100)return false;game.maxHp+=100;game.maxMagicka+=100;game.maxStamina+=100;return true;});
+        String[] stats={"здоровья","магии","выносливости"};
+        for(int i=0;i<3;i++){final int index=i;livingFixRow(panel,"Регенерация "+stats[i],"+1 ед. / боевой ход",5,()->{if(game.regenBonus[index]>=1000000)return false;game.regenBonus[index]++;return true;});}
+        livingFixRow(panel,"Игнорировать штрафы регенерации","Постоянный эффект",15,()->{if(game.regenIgnorePenalty)return false;game.regenIgnorePenalty=true;return true;});
+        livingLink(panel,"Опыт навыка","1 F","skills",()->livingFixSkill(false));livingLink(panel,"Уровень навыка","1 F","skills",()->livingFixSkill(true));
+        addText(panel,"Уникальные способности и предметы пока недоступны.",12,MUTED,false,8);
         livingDialog("Магазин компенсаций",panel);
     }
+    private void livingFixSkill(boolean level){new RuneDialogBuilder(this,accent()).setTitle(level?"Повысить навык на 1":"Добавить 100 опыта навыка").setItems(RpgContent.SKILLS,(d,index)->{new RuneDialogBuilder(this,accent()).setTitle(RpgContent.SKILLS[index]).setMessage("Стоимость: 1 F").setNegativeButton("Отмена",null).setPositiveButton("Купить",(dd,w)->{
+        if(livingBusy()||game.progress.skillLevel(index)>=100||game.fixSpent==Long.MAX_VALUE){toast("Покупка недоступна");return;}
+        if(level){game.progress.skillLevels[index]++;if(game.progress.skillLevels[index]>=100)game.progress.skillXp[index]=0;}else{game.progress.skillXp[index]+=100;while(game.progress.skillLevel(index)<100&&game.progress.skillXp[index]>=game.progress.skillNeed(index)){game.progress.skillXp[index]-=game.progress.skillNeed(index);game.progress.skillLevels[index]++;}if(game.progress.skillLevel(index)>=100)game.progress.skillXp[index]=0;}game.fixSpent++;game.progress.sync(game);save();render();toast("Покупка применена");}).show();}).setNegativeButton("Отмена",null).show();}
     private boolean livingFixGold(int amount){if(game.gold>Integer.MAX_VALUE-amount)return false;game.gold+=amount;return true;}
     private void livingFixRow(LinearLayout host,String title,String detail,int price,java.util.function.BooleanSupplier purchase){
         LinearLayout tile=livingTile(host);livingLine(tile,title,price+" F",ITEM_MAGIC);addText(tile,detail,13,MUTED,false,0);
