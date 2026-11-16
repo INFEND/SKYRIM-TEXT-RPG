@@ -124,6 +124,7 @@ public final class AiStoryClient {
     static String localUserPrompt(GameEngine game,String history,String command,boolean aiControlled){
         StringBuilder b=new StringBuilder();
         b.append(genderInstruction(game));
+        if(game.katherine.enabled&&game.katherine.stage>0)b.append(game.katherine.compactContext()).append('\n');
         b.append("ГЕРОЙ: ").append(crop(game.name,55)).append("; пол ").append(game.gender).append("; раса ").append(game.race)
             .append("; класс ").append(game.heroClass).append("; уровень ").append(game.level)
             .append("; локация ").append(game.progress.location).append("; день ").append(game.day)
@@ -152,7 +153,7 @@ public final class AiStoryClient {
         if(aiControlled)b.append("Разрешённые пункты effects.location: ")
             .append(crop(game.progress.location,65)).append(" или только достоверный пункт карты.\n");
         b.append("ТЕКУЩЕЕ ДЕЙСТВИЕ: ").append(crop(command,490));
-        return crop(b.toString(),1300);
+        return crop(b.toString(),1650);
     }
     boolean isRunning() { return running; }
 
@@ -347,6 +348,7 @@ public final class AiStoryClient {
         GameEngine.Scene scene = g.scene();
         StringBuilder out = new StringBuilder();
         out.append(genderInstruction(g));
+        if(g.katherine.enabled&&g.katherine.stage>0)out.append(g.katherine.aiContext()).append('\n');
         out.append("ПРОВЕРЕННЫЕ ФАКТЫ ИГРОВОГО ДВИЖКА:\n");
         out.append("Герой: ").append(g.name).append("; пол: ").append(g.gender).append("; раса: ").append(g.race)
                 .append("; класс: ").append(g.heroClass).append("; уровень: ").append(g.level)
@@ -413,6 +415,7 @@ public final class AiStoryClient {
     private static String contextAi(GameEngine game,String memory,String command){
         StringBuilder out=new StringBuilder("ИИ-РЕЖИМ: обычные офлайн-сцены и кнопки выключены. Создай свои десять вариантов и управляй характеристиками через effects.\n");
         out.append(genderInstruction(game));
+        if(game.katherine.enabled&&game.katherine.stage>0)out.append("ПЕРСОНАЖ КЭТРИН — СОСТОЯНИЕ ДВИЖКА:\n").append(game.katherine.aiContext()).append('\n');
         out.append("Герой: ").append(game.name).append("; пол ").append(game.gender).append("; ").append(game.race).append("; класс ")
                 .append(game.heroClass).append("; уровень ").append(game.level).append("; опыт ").append(game.xp).append('\n');
         out.append("Локация: ").append(game.progress.location).append("; регион ").append(GameEngine.REGIONS[game.region])

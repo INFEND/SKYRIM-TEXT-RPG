@@ -592,6 +592,7 @@ public final class GameEngine {
     }
     void beginFactionBattle(int f,String name,int health,int damage,String intro){factionBattle=f;startBattle(name,health,damage,"FACTION",intro);}
     void beginCanonicalBattle(String name,int health,int damage,String intro){canonicalShoutCooldown=0;startBattle(name,health,damage,"CANONICAL",intro);}
+    void beginKatherineBattle(){startBattle("Агент Круга Трёх Когтей",75+level*8,8+level*2,"KATHERINE","Кэтрин поднимает барьер. Агент Круга требует, чтобы она сдалась.");}
     private void startBattle(String name,int health,int dmg,String kind,String intro) {
         resetBattleVisuals();enemyName=name;enemyHp=health;enemyMaxHp=health;enemyDamage=dmg;battleKind=kind;enemyIntro=intro;
         battleLog="В бою важна тактика. Следи за запасом сил и магии.";mode="COMBAT";
@@ -672,6 +673,7 @@ public final class GameEngine {
                 "Над полем прозвучал голос, которому откликнулись горы. Следующая цель: Айварстед.";
         }
         addXp(gain);mode="RESULT";
+        katherine.victory(this);
         message=lastHit+"\n\nПобеда над «"+enemyName+"»! +"+reward+" септимов, +"+gain+" опыта.";
         if("QUEST".equals(battleKind))message+="\n\nЗа стражем ты находишь журнал хранителя. Следующая цель: Солитьюд.";
         if("DRAGON".equals(battleKind))message+="\n\n"+progress.dragonRecent;
@@ -700,6 +702,7 @@ public final class GameEngine {
         if(day>Integer.MAX_VALUE-total/24)return false;
         day+=total/24;hour=total%24;
         syncLivingSystems();needs.recover(hours,sleep);
+        katherine.rest(hours);katherine.autonomous(this);
         hp=(int)Math.min(maxHp,(long)hp+hours*(3L+regenBonus[0]));
         stamina=(int)Math.min(maxStamina,(long)stamina+hours*(7L+regenBonus[2]));
         magicka=(int)Math.min(maxMagicka,(long)magicka+hours*(6L+regenBonus[1]));

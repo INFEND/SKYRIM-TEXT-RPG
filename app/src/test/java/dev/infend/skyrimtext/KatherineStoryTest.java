@@ -32,4 +32,15 @@ public class KatherineStoryTest {
         assertTrue(g.katherine.assist(g,1,100)>0);assertEquals(0,g.katherine.assist(g,2,100));assertTrue(g.katherine.protect(15)>0);
         g.choose("KATH:leave");assertFalse(g.katherine.active());assertEquals(0,g.katherine.assist(g,1,100));
     }
+    @Test public void finaleManaAndAutonomy() throws Exception {
+        GameEngine g=new GameEngine();g.start("Герой","Норд","Маг");g.mode=KatherineStory.MODE;g.progress.location="Хижина Анис";
+        KatherineStory k=g.katherine;k.stage=8;k.following=true;k.trust=70;k.respect=60;k.magicRank=3;k.mana=100;
+        g.choose("KATH:trail");assertEquals(9,k.stage);
+        g.choose("KATH:negotiate");assertEquals(10,k.stage);
+        g.choose("KATH:conclude");assertEquals(11,k.stage);assertEquals("COMPLETED",g.progress.questOutcome(KatherineStory.FINALE));
+        int before=k.mana;assertTrue(k.assist(g,1,100)>0);assertEquals(before-8,k.mana);
+        k.mana=0;assertEquals(0,k.assist(g,3,100));assertEquals(0,k.protect(20));k.rest(2);assertEquals(16,k.mana);
+        k.autonomous(g);int count=k.memory.length();k.autonomous(g);assertEquals(count,k.memory.length());
+        GameEngine restored=GameEngine.fromJson(g.toJson().toString());assertEquals(11,restored.katherine.stage);assertEquals(16,restored.katherine.mana);
+    }
 }

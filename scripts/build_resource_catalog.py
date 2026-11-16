@@ -77,7 +77,10 @@ def build(commit, thin=False):
         if not MEDIA_RE.fullmatch(path):raise ValueError("Unrecognized optional media: "+path)
         group=path.split("/")[1]
         if group=="mapicons":add(path,"icons:map-markers","Значки карты и поселений")
-        elif group=="katherine":add(path,"media:katherine","Кэтрин")
+        elif group=="katherine":
+            if path.endswith("/gallery.zip") and hashlib.sha256(f.read_bytes()).hexdigest()!="d68789d37c7dff7ffd8d517169b1ee974df65f56c815ef6131263e9eb6f68fa8":
+                raise ValueError("Katherine gallery differs from the supplied archive")
+            add(path,"media:katherine","Кэтрин")
         else:add(path,"media:"+group,"Дополнительные ресурсы: "+group)
     listed={e["path"] for e in records}
     for f in ASSETS.rglob("*"):
