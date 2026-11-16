@@ -68,7 +68,7 @@ public final class GameEngine {
     public final int[] regenBonus=new int[3];
     public boolean regenIgnorePenalty;
     public void syncLivingSystems(){needs.sync(day,hour);economy.sync(day);}
-    public int regenRate(int index){return 1+regenBonus[index]+(index==1&&compensation.active(this,2)?3:0); }
+    public int regenRate(int index){return 1+regenBonus[index]+(index==1?compensation.passiveBonus(this,2):0); }
     private void regenerateCombat(){if(hp<=0||!"COMBAT".equals(mode))return;int penalty=regenIgnorePenalty?0:needs.penalty();hp=(int)Math.min(maxHp,(long)hp+(poisonTurns>0&&!regenIgnorePenalty?regenBonus[0]:Math.max(0,regenRate(0)-(penalty>0?1:0))));magicka=(int)Math.min(maxMagicka,(long)magicka+Math.max(regenBonus[1],regenRate(1)-(penalty>0?1:0)));stamina=(int)Math.min(maxStamina,(long)stamina+(frostTurns>0&&!regenIgnorePenalty?regenBonus[2]:Math.max(0,regenRate(2)-(penalty>0?1:0))));}
     public AiGameTurn aiTurn;
     public SceneState sceneState = new SceneState();
@@ -174,7 +174,7 @@ public final class GameEngine {
         if(name.length()>28)name=name.substring(0,28);
         race=contains(RACES,desiredRace)?desiredRace:"Норд";
         heroClass=contains(CLASSES,desiredClass)?desiredClass:"Без класса";
-        started=true;compensation=new CompensationPowers();lastLivingResult=new JSONObject();lastCheckChance=lastCheckRoll=-1;needs=new LivingNeeds();economy=new LivingEconomy();java.util.Arrays.fill(regenBonus,0);regenIgnorePenalty=false;fixSpent=0;aiTurn=null;sceneState=new SceneState();aiJournal="";day=1;hour=8;level=1;xp=0;gold=85;potions=3;manaPotions=1;
+        started=true;compensation=new CompensationPowers();compensation.installCatalog();lastLivingResult=new JSONObject();lastCheckChance=lastCheckRoll=-1;needs=new LivingNeeds();economy=new LivingEconomy();java.util.Arrays.fill(regenBonus,0);regenIgnorePenalty=false;fixSpent=0;aiTurn=null;sceneState=new SceneState();aiJournal="";day=1;hour=8;level=1;xp=0;gold=85;potions=3;manaPotions=1;
         questStage=0;sideQuest=0;sideKills=0;boardCompleted=0;explored=0;victories=0;reputation=0;
         swordUpgraded=false;armorUpgraded=false;
         maxHp=100;maxStamina=100;maxMagicka=100;attack=12;armor=2;
@@ -318,7 +318,7 @@ public final class GameEngine {
             .add("POTION","Выпить лечебное зелье","Осталось: " + potions);
         if("WILD".equals(battleKind))s.add("FLEE","Отступить","Шанс выйти из боя без награды");
         if("CANONICAL".equals(battleKind)&&canonicalShouts!=0&&canonicalShoutCooldown==0)s.add("CANON_SHOUT",CanonicalCampaign.combatShout(this),"Урон и ослабление врага | Восстановление 3 хода");
-        for(int i=0;i<3;i++)if(compensation.available(this,i))s.add("FIX_POWER:"+i,CompensationPowers.NAMES[i],compensation.detail(i));
+        for(int i=0;i<CompensationPowers.SLOTS;i++)if(compensation.available(this,i))s.add("FIX_POWER:"+i,compensation.powerName(i),compensation.detail(i));
         return s;
     }
 
@@ -579,7 +579,7 @@ public final class GameEngine {
     // Retain class/quest/AI bonuses in old saves without counting the legacy
     // shop's fixed equipment bonus twice. New gear uses the catalog statistic.
     public int effectiveAttack(){
-        int intrinsic=Math.max(0,attack-(swordUpgraded?6:0)-7)+(compensation.active(this,0)?8:0);
+        int intrinsic=Math.max(0,attack-(swordUpgraded?6:0)-7)+compensation.passiveBonus(this,0);
         return Math.max(1,intrinsic+(int)Math.round(progress.equippedDamage()*(1+.05*progress.branches.rank(progress.equippedWeaponSkill()))));
     }
     public int effectiveArmor(){
@@ -594,7 +594,7 @@ public final class GameEngine {
         int damage=0;boolean defending=false;String actionText="";
         int custom=CompensationPowers.actionIndex(action);
         if(custom>=0){if(!compensation.available(this,custom))return;magicka-=compensation.cost(custom);if(!compensation.safe[custom])hp-=2;compensation.cooldown[custom]=4;
-            int power=compensation.strength(custom);if(custom==1){lastHealing=Math.min(maxHp-hp,power);hp+=lastHealing;actionText=CompensationPowers.NAMES[custom]+": +"+lastHealing+" здоровья.";}else{damage=power;defending=custom==2;actionText=CompensationPowers.NAMES[custom]+": −"+damage+" здоровья врагу.";}
+            int power=compensation.strength(custom);if(compensation.powerType[custom]==1){lastHealing=Math.min(maxHp-hp,power);hp+=lastHealing;actionText=compensation.powerName(custom)+": +"+lastHealing+" здоровья.";}else{damage=power;defending=compensation.powerType[custom]==2;actionText=compensation.powerName(custom)+": −"+damage+" здоровья врагу.";}
         }else switch(action){
             case "ATTACK": damage=Math.max(1,effectiveAttack()+random.nextInt(9)-3);actionText="Ты наносишь удар: −"+damage+" здоровья врагу.";break;
             case "HEAVY":if(stamina<heavyCost()){battleLog="Недостаточно выносливости для сильного удара.";return;}
@@ -618,7 +618,7 @@ public final class GameEngine {
         enemyHp=Math.max(0,enemyHp-damage);
         if(enemyHp==0) {poisonTurns=frostTurns=0;winBattle(actionText);return;}
         int baseIncoming=enemyDamage+random.nextInt(8)-Math.max(0,armor-(armorUpgraded?4:0));
-        if(compensation.active(this,1))baseIncoming=Math.max(1,baseIncoming-5);
+        baseIncoming=Math.max(1,baseIncoming-compensation.passiveBonus(this,1));
         int rawIncoming=Math.max(1,baseIncoming-(defending?enemyDamage/2+3+2*progress.branches.rank(3)+(progress.advanced.has(AdvancedPerks.QUICK_REFLEXES)?2:0)+(progress.advanced.has(AdvancedPerks.SHIELD_WALL)&&!"Не надето".equals(progress.equippedName("shield"))?3:0)+(progress.advanced.has(AdvancedPerks.SHIELD_CHARGE)&&!"Не надето".equals(progress.equippedName("shield"))?4:0):0));
         int incoming=Math.max(1,(int)Math.round(rawIncoming*(1-progress.damageReduction())));
         if(defending)lastBlocked=Math.max(0,Math.max(1,(int)Math.round(Math.max(1,baseIncoming)*(1-progress.damageReduction())))-incoming);
@@ -744,8 +744,9 @@ public final class GameEngine {
             g.enemyName=j.optString("enemyName","");g.battleLog=j.optString("battleLog","");
             g.battleKind=j.optString("battleKind","");g.enemyIntro=j.optString("enemyIntro","");
             g.enemyHp=Math.max(0,j.optInt("enemyHp",0));g.enemyMaxHp=Math.max(0,j.optInt("enemyMaxHp",0));g.enemyDamage=Math.max(0,j.optInt("enemyDamage",0));
+            g.compensation=CompensationPowers.fromJson(j.optJSONObject("compensation"));g.compensation.installCatalog();
             g.progress=RpgProgress.fromJson(j.optJSONObject("progress"));
-             g.needs=LivingNeeds.fromJson(j.optJSONObject("needs"));g.economy=LivingEconomy.fromJson(j.optJSONObject("economy"));g.syncLivingSystems();g.fixSpent=Math.max(0,j.optLong("fixSpent",0));org.json.JSONArray rates=j.optJSONArray("regenBonus");if(rates!=null)for(int i=0;i<3;i++)g.regenBonus[i]=Math.max(0,Math.min(1000000,rates.optInt(i)));g.regenIgnorePenalty=j.optBoolean("regenIgnorePenalty");g.compensation=CompensationPowers.fromJson(j.optJSONObject("compensation"));g.compensation.reconcile(g);JSONObject result=j.optJSONObject("lastLivingResult");if(result!=null)g.lastLivingResult=result;
+             g.needs=LivingNeeds.fromJson(j.optJSONObject("needs"));g.economy=LivingEconomy.fromJson(j.optJSONObject("economy"));g.syncLivingSystems();g.fixSpent=Math.max(0,j.optLong("fixSpent",0));org.json.JSONArray rates=j.optJSONArray("regenBonus");if(rates!=null)for(int i=0;i<3;i++)g.regenBonus[i]=Math.max(0,Math.min(1000000,rates.optInt(i)));g.regenIgnorePenalty=j.optBoolean("regenIgnorePenalty");g.compensation.reconcile(g);JSONObject result=j.optJSONObject("lastLivingResult");if(result!=null)g.lastLivingResult=result;
             g.merchants=MerchantLedger.fromJson(j.optJSONObject("merchants"));g.factions=FactionCampaign.fromJson(j.optJSONObject("factions"));g.factionStories=FactionStories.fromJson(j.optJSONObject("factionStories"));g.factionBattle=Math.max(-1,Math.min(6,j.optInt("factionBattle",-1)));
             org.json.JSONArray holds=j.optJSONArray("holdReputation");if(holds!=null)for(int i=0;i<g.holdReputation.length;i++)g.holdReputation[i]=Math.max(-100,Math.min(100,holds.optInt(i,0)));
             if("COMBAT".equals(g.mode)){g.poisonTurns=Math.max(0,Math.min(2,j.optInt("poisonTurns")));g.frostTurns=Math.max(0,Math.min(2,j.optInt("frostTurns")));}

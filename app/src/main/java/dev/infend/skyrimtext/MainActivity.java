@@ -1658,7 +1658,7 @@ public final class MainActivity extends Activity {
             actionButton("СИЛЬНЫЙ УДАР","10 единиц сил | "+game.progress.chance(game,"HEAVY")+"%",game.stamina>=10,()->resolveNativeAiCombat("HEAVY"));
             actionButton("МАГИЯ","12 единиц магии",game.magicka>=12,()->resolveNativeAiCombat("MAGIC"));
             actionButton("ЗАЩИТА","Восстановить силы и уменьшить входящий урон",true,()->resolveNativeAiCombat("DEFEND"));
-            for(int i=0;i<3;i++){final int index=i;if(game.compensation.available(game,i))actionButton(CompensationPowers.NAMES[i],game.compensation.detail(i),true,()->resolveNativeAiCombat("FIX_POWER:"+index));}
+            for(int i=0;i<CompensationPowers.SLOTS;i++){final int index=i;if(game.compensation.available(game,i))actionButton(game.compensation.powerName(i),game.compensation.detail(i),true,()->resolveNativeAiCombat("FIX_POWER:"+index));}
             actionButton("ЛЕЧЕБНОЕ ЗЕЛЬЕ","В наличии: "+game.potions,game.potions>0,()->resolveNativeAiCombat("POTION"));
             if("WILD".equals(game.battleKind))
                 actionButton("ОТСТУПИТЬ","Шанс: "+game.progress.chance(game,"FLEE")+"%",true,()->resolveNativeAiCombat("FLEE"));
@@ -3151,7 +3151,7 @@ public final class MainActivity extends Activity {
         space(view,6);view.addView(new SkyrimRuleView(this,0xff888888),lp(-1,12));space(view,6);
         itemDetailMetrics(view,item);itemDivider(view,9);
         itemEffect(view,item);
-        int artifact=CompensationPowers.itemIndex(item.id);if(artifact>=0){addText(view,game.compensation.bound[artifact]?"Привязка к душе":"Системное снаряжение | нельзя потерять",12,ITEM_MAGIC,true,5);if(game.compensation.passive[artifact])addText(view,new String[]{"+8 к атаке","−5 входящего урона","+3 регенерации магии"}[artifact]+" при экипировке",13,ITEM_UP,false,6);}
+        int artifact=CompensationPowers.itemIndex(item.id);if(artifact>=0){addText(view,game.compensation.bound[artifact]?"Привязка к душе":"Системное снаряжение | нельзя потерять",12,ITEM_MAGIC,true,5);if(game.compensation.passive[artifact])addText(view,game.compensation.passiveLabel(artifact)+" при экипировке",13,ITEM_UP,false,6);}
         itemEffectPreview(view,item);
         TextView description=itemText(item.description,14,0xffa3a3a3,false);
         description.setTypeface(SovngardeTypeface.styled(this,Typeface.ITALIC));
@@ -3447,7 +3447,7 @@ public final class MainActivity extends Activity {
     private String livingNumber(long n){return String.format(java.util.Locale.US,"%,d",n).replace(',','.');}
     private void livingHeroDetails(String title,String description){
         LinearLayout box=column();addText(box,description,15,TEXT,false,8);
-        if("Способности".equals(title))for(int i=0;i<3;i++)if(game.compensation.ranks[i]>0){LinearLayout tile=livingTile(box);livingLine(tile,CompensationPowers.NAMES[i],"Ранг "+game.compensation.ranks[i],ITEM_MAGIC);addText(tile,game.compensation.detail(i),13,MUTED,false,0);}
+        if("Способности".equals(title))for(int i=0;i<CompensationPowers.SLOTS;i++)if(game.compensation.ranks[i]>0){LinearLayout tile=livingTile(box);livingLine(tile,game.compensation.powerName(i),"Ранг "+game.compensation.ranks[i],ITEM_MAGIC);addText(tile,game.compensation.detail(i),13,MUTED,false,0);}
         livingLink(box,"Все способности и таланты","","skills",()->{heroDetailed=true;tab=3;render();});livingDialog(title,box);
     }
     private void livingSkillsDialog(){
@@ -3912,20 +3912,44 @@ public final class MainActivity extends Activity {
     }
     private void livingPowerShop(){
         if(livingBusy())return;LinearLayout panel=column();
-        for(int i=0;i<3;i++){final int index=i;int rank=game.compensation.ranks[i];
-            if(rank==0)livingFixRow(panel,CompensationPowers.NAMES[i],"Новая способность | 30 силы",50,()->game.compensation.buyPower(index));
-            else{addText(panel,CompensationPowers.NAMES[i]+" | Ранг "+rank,17,ITEM_MAGIC,true,5);addText(panel,game.compensation.detail(i),13,MUTED,false,8);
+        livingLink(panel,"Создать свою способность","50 F","magic",()->livingCreate(false));
+        for(int i=0;i<CompensationPowers.SLOTS;i++){final int index=i;int rank=game.compensation.ranks[i];if(i>=3&&rank==0)continue;
+            if(rank==0)livingFixRow(panel,game.compensation.powerName(i),"Новая способность | 30 силы",50,()->game.compensation.buyPower(index));
+            else{addText(panel,game.compensation.powerName(i)+" | Ранг "+rank,17,ITEM_MAGIC,true,5);addText(panel,game.compensation.detail(i),13,MUTED,false,8);
                 livingFixRow(panel,"Улучшить способность","+15 силы",25,()->game.compensation.upgrade(index));
                 if(!game.compensation.safe[i])livingFixRow(panel,"Убрать отдачу","Без расхода здоровья",40,()->game.compensation.removeSide(index));
-                if(game.compensation.discounts[i]<4)livingFixRow(panel,"Снизить стоимость","−5 магии",30,()->game.compensation.reduce(index));}}
+                if(game.compensation.cost(i)>1)livingFixRow(panel,"Снизить стоимость","−5 магии",30,()->game.compensation.reduce(index));}}
         livingDialog("Уникальные способности",panel);
     }
     private void livingArtifactShop(){
         if(livingBusy())return;LinearLayout panel=column();String[] effects={"+8 к атаке","−5 входящего урона","+3 к регенерации магии"};
-        for(int i=0;i<3;i++){final int index=i;String name=CompensationPowers.ITEMS[i];if(!game.compensation.owned[i])livingFixRow(panel,name,"Уникальное снаряжение",50,()->game.compensation.buyItem(game,index));
+        livingLink(panel,"Создать свой предмет","50 F","armor",()->livingCreate(true));
+        for(int i=0;i<CompensationPowers.SLOTS;i++){final int index=i;String name=game.compensation.itemName(i);if(i>=3&&!game.compensation.owned[i])continue;if(!game.compensation.owned[i])livingFixRow(panel,name,"Уникальное снаряжение",50,()->game.compensation.buyItem(game,index));
             else{addText(panel,name,17,ITEM_MAGIC,true,5);if(!game.compensation.bound[i])livingFixRow(panel,"Привязка к душе","Отметка в карточке предмета",20,()->game.compensation.bind(index));
-                if(!game.compensation.passive[i])livingFixRow(panel,"Пассивный эффект",effects[i],25,()->game.compensation.addPassive(index));else addText(panel,effects[i]+" при экипировке",13,ITEM_UP,false,8);}}
+                if(!game.compensation.passive[i])livingFixRow(panel,"Пассивный эффект",game.compensation.passiveLabel(i),25,()->game.compensation.addPassive(index));else addText(panel,game.compensation.passiveLabel(i)+" при экипировке",13,ITEM_UP,false,8);}}
         livingDialog("Уникальные предметы",panel);
+    }
+    private EditText livingField(LinearLayout panel,String label,String hint,boolean number){
+        addText(panel,label,13,MUTED,true,4);EditText field=new EditText(this);field.setTextColor(TEXT);field.setHintTextColor(MUTED);field.setHint(hint);field.setTextSize(sp(15));field.setSingleLine(true);if(number)field.setInputType(InputType.TYPE_CLASS_NUMBER|InputType.TYPE_NUMBER_FLAG_DECIMAL);field.setPadding(dp(12),dp(10),dp(12),dp(10));field.setBackground(bg(0xff141414,Color.TRANSPARENT,12));panel.addView(field,lp(-1,-2));space(panel,8);return field;
+    }
+    private void livingCreate(boolean item){
+        if(livingBusy())return;String[] types=item?new String[]{"Одноручное оружие","Нагрудник","Кольцо"}:new String[]{"Урон","Лечение","Урон и защита"};
+        new RuneDialogBuilder(this,accent()).setTitle("Выбери тип").setItems(types,(d,type)->{
+            LinearLayout panel=column();panel.setPadding(dp(15),dp(10),dp(15),dp(10));addText(panel,types[type]+" | 50 F",16,ITEM_MAGIC,true,10);
+            EditText name=livingField(panel,"Название","До 60 символов",false);
+            EditText strength=livingField(panel,item?"Базовый урон / броня (0–500)":"Сила (1–500)",item&&type==2?"0":"30",true);strength.setText(item&&type==2?"0":"30");
+            EditText cost=livingField(panel,item?"Вес, кг (0.01–50)":"Расход магии (1–500)",item?"1":"25",true);cost.setText(item?"1":"25");
+            EditText desc=item?livingField(panel,"Описание","До 400 символов",false):null;
+            addText(panel,"Доступно 9 собственных слотов каждого вида. Предметы нельзя потерять; действует предел веса.",12,MUTED,false,6);
+            AlertDialog dialog=new RuneDialogBuilder(this,accent()).setTitle(item?"Создать предмет":"Создать способность").setView(panel).setNegativeButton("Отмена",null).setPositiveButton("Создать",null).create();
+            dialog.show();dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v->{
+                if(livingBusy()||game.fixSpent>Long.MAX_VALUE-50)return;boolean ok=false;
+                try{int stat=Integer.parseInt(strength.getText().toString().trim());String label=name.getText().toString();String raw=cost.getText().toString().trim().replace(',','.');
+                    ok=item?game.compensation.createItem(game,label,type,stat,Double.parseDouble(raw),desc.getText().toString()):game.compensation.createPower(label,type,stat,Integer.parseInt(raw));
+                }catch(Exception ignored){}
+                if(!ok){toast("Проверь значения, свободный слот и вес");return;}game.fixSpent+=50;game.progress.sync(game);game.recordVisualEvent("Создана системная компенсация");save();dialog.dismiss();render();toast("Создано");
+            });
+        }).setNegativeButton("Отмена",null).show();
     }
     private void livingFixSkill(boolean level){new RuneDialogBuilder(this,accent()).setTitle(level?"Повысить навык на 1":"Добавить 100 опыта навыка").setItems(RpgContent.SKILLS,(d,index)->{new RuneDialogBuilder(this,accent()).setTitle(RpgContent.SKILLS[index]).setMessage("Стоимость: 1 F").setNegativeButton("Отмена",null).setPositiveButton("Купить",(dd,w)->{
         if(livingBusy()||game.progress.skillLevel(index)>=100||game.fixSpent==Long.MAX_VALUE){toast("Покупка недоступна");return;}

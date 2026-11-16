@@ -19,7 +19,11 @@ public final class ItemCatalog {
         public final double baseStat;
         public final int statSkill;
         Item(String n,String cat,String ic,double kg,int septims,String desc,String eff,double stat,int skill){
-            id=n;name=n;category=cat;icon=ic;weight=kg;value=septims;description=desc;effect=eff;
+            this(n,n,cat,ic,kg,septims,desc,eff,stat,skill,"");
+        }
+        private final String fixedSlot;
+        Item(String key,String n,String cat,String ic,double kg,int septims,String desc,String eff,double stat,int skill,String slot){
+            id=key;name=n;fixedSlot=slot;category=cat;icon=ic;weight=kg;value=septims;description=desc;effect=eff;
             baseStat=stat;statSkill=skill;
         }
         public boolean weapon(){return "Оружие".equals(category)||"Боеприпасы".equals(category)||statSkill>=0&&statSkill<=2;}
@@ -31,6 +35,7 @@ public final class ItemCatalog {
         }
         // Only known, non-enchanted standard equipment can be tempered.
         public String temperMaterial(){
+            if(CompensationPowers.itemIndex(id)>=0)return "";
             if(baseStat<=0||statSkill<0||"Артефакты".equals(category)||"Боеприпасы".equals(category))return "";
             String n=name.toLowerCase(Locale.ROOT).replace('ё','е');
             if(n.contains("чешуйчат"))return "Драконья чешуя";
@@ -54,6 +59,7 @@ public final class ItemCatalog {
             return "";
         }
         public String slot(){
+            if(!fixedSlot.isEmpty())return fixedSlot;
             if(weapon())return "Боеприпасы".equals(category)?"ammo":"weapon";
             if(!wearable())return "";
             String n=name.toLowerCase(Locale.ROOT).replace('ё','е');
@@ -261,6 +267,11 @@ public final class ItemCatalog {
         put(CompensationPowers.ITEMS[0],"Оружие","⚔",6,0,"Уникальное оружие компенсации, не подлежит передаче.","Привязано к владельцу.",24,0);
         put(CompensationPowers.ITEMS[1],"Броня","⬟",8,0,"Уникальная кираса компенсации.","Привязано к владельцу.",32,4);
         put(CompensationPowers.ITEMS[2],"Украшения","◈",0.2,0,"Уникальное кольцо компенсации.","Привязано к владельцу.",0,-1);
+    }
+    static synchronized void clearCustom(){for(int i=3;i<CompensationPowers.SLOTS;i++)items.remove(CompensationPowers.itemId(i));}
+    static synchronized void registerCustom(String id,String name,int type,int stat,double weight,String description){
+        String[] categories={"Оружие","Броня","Украшения"},slots={"weapon","body","ring"},icons={"⚔","⬟","◈"};
+        items.put(id,new Item(id,name,categories[type],icons[type],weight,0,description,"Системное снаряжение.",type==2?0:stat,type==0?0:type==1?4:-1,slots[type]));
     }
     private ItemCatalog(){}
     public static synchronized void initialize(Context c){
