@@ -58,7 +58,7 @@ class SkyrimReferenceRedesign(unittest.TestCase):
         self.assertIn("private void showWaitDialog()",ui)
         self.assertIn("SeekBar slider=new android.widget.SeekBar",ui)
         self.assertIn("game.waitHours(slider.getProgress()+1)",ui)
-        self.assertIn('if(!started||"COMBAT".equals(mode)||hours<1||hours>24)',game)
+        self.assertIn('if(!started||"COMBAT".equals(mode)||road.pending()||hours<1||hours>24)',game)
         self.assertIn('.put("hour",hour)',game)
         self.assertIn('j.optInt("hour",8)',game)
 
