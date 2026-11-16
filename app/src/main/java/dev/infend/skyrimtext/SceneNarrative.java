@@ -189,7 +189,7 @@ public final class SceneNarrative {
         String body;
         switch(g.mode){
             case "INTRO":body=intro(g,s);break;
-            case "WORLD":body=world(g,s);break;
+            case "WORLD":body=WhiterunDistricts.here(g)?s.body:world(g,s);break;
             case "TRAVEL":body=travel(g,s);break;
             case "QUEST":body=quest(g,s);break;
             case "DRAGON":body=dragon(g,s);break;
