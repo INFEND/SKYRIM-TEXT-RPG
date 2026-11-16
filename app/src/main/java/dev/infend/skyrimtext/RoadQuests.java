@@ -46,7 +46,32 @@ final class RoadQuests {
         new Task("bitten_hunter","След ночной засады","Пруд Глаз Мары","Проверь следы вампирской охоты у пруда. В этой адаптации охотник указывает на опасный участок восточных дорог.","Вампир","",60,""),
         new Task("merchant_attack","Сведения о налёте","Вайтран","Доложи о нападении на торговца. Караульный принимает приметы разбойников и обещает проверить тракт.","","",30,""),
         new Task("island_mutiny","След пиратов Хакнира","Отмель Хакнира","Осмотри лагерь, куда звала пиратка. Оставшиеся разбойники охраняют припасы.","Пират","",75,""),
-        new Task("boethiah_report","Возвращение от святилища","Виндхельм","Ты возвращаешься в город с предупреждением о культе. Испытание Боэтии не считается завершённым.","","Испытание Боэтии",15,"")
+        new Task("boethiah_report","Возвращение от святилища","Виндхельм","Ты возвращаешься в город с предупреждением о культе. Испытание Боэтии не считается завершённым.","","Испытание Боэтии",15,""),
+        new Task("frost_intro","Слово дано","Рифтен","Луи Летруш просит навестить Сибби Чёрный Вереск. Сибби указывает резиденцию, где держат Мороза.","","",0,""),
+        new Task("frost_lodge","Документы и Мороз","Резиденция Черный Вереск","Преодолей охрану резиденции, найди родословную Мороза и выведи коня из стойла.","Наёмник Чёрного Вереска","",0,"Родословная Мороза"),
+        new Task("frost_keep","Оставить Мороза себе","Рифтен","Ты присваиваешь Мороза. Луи считает сделку сорванной.","","Родословная Мороза",0,""),
+        new Task("frost_deliver","Передать Мороза Луи","Рифтен","Луи получает коня, как было обещано.","","Родословная Мороза",150,""),
+        new Task("frost_maven","Предупредить Мавен","Рифтен","Ты сообщаешь Мавен о сделке и передаёшь коня Луи.","","Родословная Мороза",150,""),
+        new Task("sanguine_intro","Незабываемая ночка","Вайтран","Сэм Гевен приглашает на состязание в выпивке. Следующее утро начинается с провала в памяти.","","",0,""),
+        new Task("sanguine_temple","Беспорядок в храме","Маркарт","Сенна рассказывает о вчерашнем происшествии в храме Дибеллы и направляет в Рорикстед.","","",0,""),
+        new Task("sanguine_goat","Пропавшая коза","Рорикстед","Эннис просит вернуть козу, проданную великану. Преодолей угрозу и верни животное.","Великан","",0,""),
+        new Task("sanguine_ring","Несостоявшаяся свадьба","Вайтран","Изольда вспоминает кольцо и указывает путь к Морвунскару.","","",0,""),
+        new Task("sanguine_final","Встреча с Сангвином","Морвунскар","Победи мага и найди портал к Сэму. Он раскрывает свою сущность и вручает Розу Сангвина.","Маг Морвунскара","",0,"Роза Сангвина"),
+        new Task("azura_intro","Видение Арании","Святилище Азуры","Арания Иенит рассказывает о видении эльфийского мага в Винтерхолде.","","",0,""),
+        new Task("azura_nelacar","Разговор с Нелакаром","Винтерхолд","Нелакар объясняет историю Малина Варена и направляет в Глубины Илиналты.","","",0,""),
+        new Task("azura_star","Повреждённая звезда","Глубины Илиналты","Некроманты защищают останки Малина Варена. Добудь повреждённую звезду.","Некромант","",0,"Повреждённая Звезда Азуры"),
+        new Task("azura_aranea","Вернуть звезду Азуре","Святилище Азуры","Арания помогает войти в звезду. Уничтожь душу Малина Варена и очисти артефакт.","Малин Варен","Повреждённая Звезда Азуры",0,"Звезда Азуры"),
+        new Task("azura_black","Передать звезду Нелакару","Винтерхолд","Нелакар помогает войти в звезду и уничтожить Малина Варена. Артефакт становится Чёрной звездой.","Малин Варен","Повреждённая Звезда Азуры",0,"Звезда Чёрной Азуры"),
+        new Task("east_intro","Солнце восходит на востоке","Виндхельм","Ортус Эндарио просит выяснить причины нападений Кровавых хоркеров на корабли.","","",0,""),
+        new Task("east_pirates","Пиратское убежище","Каприз Яфета","Победи Халдина на базе пиратов и сорви налёты на торговые суда.","Халдин","",0,""),
+        new Task("east_return","Доклад Ортусу","Виндхельм","Восточная имперская компания принимает подтверждение разгрома пиратов.","","",200,""),
+        new Task("steward_intro","Новый управитель","Тел-Митрин","Нелот просит найти нового управителя в Вороньей Скале.","","",0,""),
+        new Task("steward_recruit","Найти Дроваса","Воронья Скала","Дровас Релви соглашается отправиться к Нелоту, умалчивая о своём долге.","","",0,""),
+        new Task("steward_return","Управитель Нелота","Тел-Митрин","Дровас приступает к работе. Нелот платит за помощь; Моргрул требует вернуть долг беглеца.","","",100,""),
+        new Task("mogrul_debt","Новый долг","Воронья Скала","Моргрул требует тысячу септимов за Дроваса. Пока долг не оплачен, его люди преследуют должника.","","",0,""),
+        new Task("riverwood_rival","Любовный треугольник","Ривервуд","Свен и Фендал соперничают за Камиллу. Выбери, чьё письмо передать.","","",0,""),
+        new Task("riverwood_sven","Поддержать Свена","Ривервуд","Ты передаёшь Камилле письмо, компрометирующее Фендала. Свен благодарит.","","",25,""),
+        new Task("riverwood_faendal","Поддержать Фендала","Ривервуд","Ты передаёшь Камилле письмо, компрометирующее Свена. Фендал благодарит.","","",25,"")
     };
     static Task find(String id){for(Task t:TASKS)if(t.id.equals(id))return t;return null;}
     static String title(String key){for(Task t:TASKS)if(t.key().equals(key))return t.title;return key;}
@@ -64,19 +89,62 @@ final class RoadQuests {
         case "saliah":return "saliah_report";
         case "lynoit":return "lynoit_report";
         case "boethiah":return "boethiah_report";
+        case "frost_intro":return "frost_lodge";
+        case "sanguine_intro":return "sanguine_temple";
+        case "sanguine_temple":return "sanguine_goat";
+        case "sanguine_goat":return "sanguine_ring";
+        case "sanguine_ring":return "sanguine_final";
+        case "azura_intro":return "azura_nelacar";
+        case "azura_nelacar":return "azura_star";
+        case "pilgrim":return "azura_intro";
+        case "east_intro":return "east_pirates";
+        case "east_pirates":return "east_return";
+        case "steward_intro":return "steward_recruit";
+        case "steward_recruit":return "steward_return";
+        case "steward_return":return "mogrul_debt";
         default:return "";
     }}
     static void offer(GameEngine g,String id){Task t=find(id);if(t!=null)g.progress.setQuestOutcome(t.key(),"ACTIVE");}
-    static void choices(GameEngine g,GameEngine.Scene s){for(Task t:TASKS)if(active(g,t)&&here(g,t))s.add("ROADQUEST:"+t.id,t.title,t.body);}
+    static boolean done(GameEngine g,String id){return "COMPLETED".equals(g.progress.questOutcome("lead_"+id));}
+    private static String branchGroup(String id){switch(id){
+        case "frost_keep":return "frost_choice";
+        case "frost_deliver":return "frost_choice";
+        case "frost_maven":return "frost_choice";
+        case "azura_aranea":return "azura_choice";
+        case "azura_black":return "azura_choice";
+        case "riverwood_sven":return "riverwood_choice";
+        case "riverwood_faendal":return "riverwood_choice";
+        default:return "";
+    }}
+    private static boolean startable(GameEngine g,Task t){if(g.progress.questOutcome(t.key())!=null||!here(g,t))return false;switch(t.id){
+        case "frost_intro":case "sanguine_intro":case "azura_intro":case "east_intro":case "steward_intro":case "riverwood_rival":return true;
+        case "frost_keep":return done(g,"frost_lodge")&&g.progress.questOutcome("frost_choice")==null;
+        case "frost_deliver":return done(g,"frost_lodge")&&g.progress.questOutcome("frost_choice")==null;
+        case "frost_maven":return done(g,"frost_lodge")&&g.progress.questOutcome("frost_choice")==null;
+        case "azura_aranea":return done(g,"azura_star")&&g.progress.questOutcome("azura_choice")==null;
+        case "azura_black":return done(g,"azura_star")&&g.progress.questOutcome("azura_choice")==null;
+        case "riverwood_sven":return done(g,"riverwood_rival")&&g.progress.questOutcome("riverwood_choice")==null;
+        case "riverwood_faendal":return done(g,"riverwood_rival")&&g.progress.questOutcome("riverwood_choice")==null;
+        default:return false;
+    }}
+    static void choices(GameEngine g,GameEngine.Scene s){for(Task t:TASKS){if(active(g,t)&&here(g,t))s.add("ROADQUEST:"+t.id,t.title,t.body);else if(startable(g,t))s.add("ROADSTART:"+t.id,t.title,"Начать поручение или выбрать развилку");}if(debtActive(g)&&"Воронья Скала".equals(g.progress.location)){s.add("ROADDEBT:pay","Погасить долг Моргрулу","1000 септимов");s.add("ROADDEBT:negotiate","Снизить долг","Красноречие | 500 септимов");}}
+    static void start(GameEngine g,String id){Task t=find(id);if(g.road.pending()||!"WORLD".equals(g.mode)||t==null||!startable(g,t))return;String group=branchGroup(id);if(!group.isEmpty())g.progress.setQuestOutcome(group,"COMPLETED");offer(g,id);g.message="Принято: "+t.title+". "+t.body;g.recordVisualEvent(g.message);}
+    static boolean debtActive(GameEngine g){return "ACTIVE".equals(g.progress.questOutcome("lead_mogrul_debt"));}
+    static void payDebt(GameEngine g,boolean reduced){if(g.road.pending()||!("WORLD".equals(g.mode)||"RESULT".equals(g.mode))||!"Воронья Скала".equals(g.progress.location)||!debtActive(g))return;int cost=reduced?500:1000;if(g.gold<cost){g.message="Не хватает септимов.";g.mode="RESULT";return;}if(reduced&&!g.rollCheck(g.progress.chance(g,2,12,50))){g.message="Моргрул отказывается снизить долг.";g.mode="RESULT";return;}g.gold-=cost;g.progress.setQuestOutcome("lead_mogrul_debt","COMPLETED");g.progress.sync(g);g.message="Долг погашен. Головорезы Моргрула больше не преследуют тебя.";g.mode="RESULT";}
     static void choose(GameEngine g,String action){
         if(g.road.pending()||!("WORLD".equals(g.mode)||"RESULT".equals(g.mode)))return;
         Task t=find(action.substring("ROADQUEST:".length()));if(t==null||!active(g,t)||!here(g,t))return;
+        if("mogrul_debt".equals(t.id)){g.message="Моргрул требует 1000 септимов. Оплати долг или попробуй договориться.";g.mode="WORLD";return;}
         if(!t.required.isEmpty()&&g.progress.quantity(t.required)==0){g.message="Не хватает предмета: "+t.required;g.mode="RESULT";return;}
         if(!t.enemy.isEmpty()&&!"COMPLETED".equals(g.progress.questOutcome(t.combatKey()))){g.beginRoadQuestBattle(t.id,t.enemy,t.body);return;}
         if(!t.item.isEmpty()&&!g.progress.addItem(t.item,1)){g.message="Освободи место в сумке для награды.";g.mode="RESULT";return;}
-        // Evidence is retained in the inventory for the journal; completed state prevents repeated awards.
+        if(t.id.equals("azura_aranea")||t.id.equals("azura_black"))g.progress.removeItem("Повреждённая Звезда Азуры",1);
+        if(t.id.equals("frost_keep"))g.progress.setQuestOutcome("road_mount","COMPLETED");
+        if(t.id.equals("frost_keep")||t.id.equals("frost_deliver")||t.id.equals("frost_maven"))g.progress.removeItem("Родословная Мороза",1);
+        // Evidence retained except explicitly surrendered; terminal state prevents duplicate awards.
         g.gold=GameEngine.nonnegativeAdd(g.gold,t.gold);g.addXp(25);g.progress.setQuestOutcome(t.key(),"COMPLETED");
         g.message=t.body+"\n\nЗадание завершено. +"+t.gold+" септимов, +25 опыта."+(t.item.isEmpty()?"":" Получено: "+t.item+".");
+        if("frost_lodge".equals(t.id))g.message+="\nВернись в Рифтен и выбери судьбу Мороза.";if("azura_star".equals(t.id))g.message+="\nВыбери Аранию у святилища или Нелакара в Винтерхолде.";if("riverwood_rival".equals(t.id))g.message+="\nВыбери, чьё письмо передать Камилле.";
         String nextId=next(t.id);Task nextTask=find(nextId);if(nextTask!=null&&g.progress.questOutcome(nextTask.key())==null){offer(g,nextId);g.message+="\nСледующая цель: "+nextTask.place+" | "+nextTask.title+".";}
         if(t.id.endsWith("_report")&&(t.id.startsWith("hakar")||t.id.startsWith("saliah")||t.id.startsWith("lynoit")))g.factions.roadTrust(6,3);
         g.mode="RESULT";g.progress.sync(g);g.recordVisualEvent(t.title+": завершено");

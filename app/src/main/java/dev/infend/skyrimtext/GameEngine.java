@@ -373,6 +373,8 @@ public final class GameEngine {
         if(action.startsWith("ROAD:"))return;
         if(action.startsWith("ROAD_TARGET:")){road.selectTarget(this,action);return;}
         if(action.startsWith("ROADQUEST:")){RoadQuests.choose(this,action);return;}
+        if(action.startsWith("ROADSTART:")){RoadQuests.start(this,action.substring("ROADSTART:".length()));return;}
+        if(action.startsWith("ROADDEBT:")){if("ROADDEBT:pay".equals(action)||"ROADDEBT:negotiate".equals(action))RoadQuests.payDebt(this,"ROADDEBT:negotiate".equals(action));return;}
         int fixPower=CompensationPowers.actionIndex(action);if(fixPower>=0){if(compensation.available(this,fixPower))combatTurn(action);return;}
         // A pending battle cannot be escaped by invoking a world, map or quest action.
         // This guard also protects saved games restored directly into COMBAT mode.
