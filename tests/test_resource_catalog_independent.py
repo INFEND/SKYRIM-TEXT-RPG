@@ -51,3 +51,17 @@ class IndependentCatalog(unittest.TestCase):
         self.assertIn("!e.sha.equals(b.sha)",store)
         self.assertNotIn("    paths:",workflow)
         self.assertIn("CATALOG_SHA=$(git rev-parse HEAD)",workflow)
+
+    def test_resource_only_commits_skip_apk_build_and_catalog_refreshes_independently(self):
+        ota=(ROOT/".github/workflows/android-ota.yml").read_text()
+        store=(JAVA/"ResourceStore.java").read_text()
+        ui=(JAVA/"ResourceManagerDialog.java").read_text()
+        job=(JAVA/"ResourceSyncJob.java").read_text()
+        for token in ("paths-ignore:", "app/src/main/assets/gallery/**", "app/src/main/assets/media/**", "docs/gallery_registry.json"):
+            self.assertIn(token,ota)
+        self.assertIn("CHECK_INTERVAL_MS=5L*60L*1000L",store)
+        self.assertIn("catalogGeneration++",store)
+        self.assertIn("displayedCatalogGeneration!=ResourceStore.catalogGeneration()",ui)
+        self.assertIn("ResourceStore.automaticSync",job)
+        self.assertIn("setPersisted(true)",job)
+        self.assertIn("if(removed(app,e))continue",store)

@@ -3,6 +3,13 @@ name: Android APK and OTA
 on:
   push:
     branches: [main]
+    paths-ignore:
+      - 'app/src/main/assets/gallery/**'
+      - 'app/src/main/assets/media/**'
+      - 'app/src/main/assets/maps/**'
+      - 'app/src/main/assets/portraits/**'
+      - 'app/src/main/assets/icons/skyrim_icons_358_exact.*'
+      - 'docs/gallery_registry.json'
   workflow_dispatch:
 
 permissions:

@@ -139,7 +139,16 @@ public final class MainActivity extends Activity {
         getWindow().getDecorView().setSystemUiVisibility(0);
         render();
     }
-    @Override protected void onResume(){super.onResume();if(updater!=null && prefs!=null){
+    private final Runnable resourceRefreshTick=new Runnable(){
+        @Override public void run(){
+            ResourceStore.requestAutomaticSync(MainActivity.this);
+            ResourceStore.UI.postDelayed(this,ResourceStore.CHECK_INTERVAL_MS);
+        }
+    };
+    @Override protected void onResume(){super.onResume();
+        ResourceStore.UI.removeCallbacks(resourceRefreshTick);
+        ResourceStore.UI.post(resourceRefreshTick);
+        if(updater!=null && prefs!=null){
         updater.onHostResume();
         if(prefs.getBoolean(OtaUpdateSchedule.PREF_ON_LAUNCH,true)){
             long now=System.currentTimeMillis();long last=prefs.getLong("last_check",0);
@@ -154,9 +163,10 @@ public final class MainActivity extends Activity {
         state.putIntArray("hero_points",initialPoints.clone());
         super.onSaveInstanceState(state);
     }
-    @Override protected void onPause(){if(updater!=null)updater.onHostPause();save();super.onPause();}
+    @Override protected void onPause(){ResourceStore.UI.removeCallbacks(resourceRefreshTick);if(updater!=null)updater.onHostPause();save();super.onPause();}
     @Override protected void onNewIntent(Intent intent){super.onNewIntent(intent);setIntent(intent);if(updater!=null&&intent.getBooleanExtra("ota_open_from_notification",false))updater.onNotificationIntent();}
     @Override protected void onDestroy(){
+        ResourceStore.UI.removeCallbacks(resourceRefreshTick);
         clearAiLiveViews();
         aiRequestSerial++;
         if(updater!=null)updater.onHostDestroy();

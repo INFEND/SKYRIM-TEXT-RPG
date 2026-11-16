@@ -26,7 +26,10 @@ final class ResourceStore {
     static final ExecutorService IO=Executors.newSingleThreadExecutor();
     static final Handler UI=new Handler(Looper.getMainLooper());
     private static final AtomicBoolean STARTED=new AtomicBoolean();
-    private static volatile int generation;
+    private static volatile int generation,catalogGeneration;
+    private static long lastAutomaticCheck=-300000L;
+    private static final AtomicBoolean AUTO_QUEUED=new AtomicBoolean();
+    static final long CHECK_INTERVAL_MS=5L*60L*1000L;
     private static volatile Catalog catalog;
     private static final Set<String> AUTO_GALLERY=Collections.synchronizedSet(new HashSet<>());
     static final class Entry {
@@ -129,7 +132,7 @@ final class ResourceStore {
         if(remote.revision==before.revision&&!remote.commit.equals(before.commit))throw new IOException("Конфликт ревизий каталога");
         if(remote.commit.equals(before.commit))return false;
         SignedResourceCatalog.save(c,envelope);
-        synchronized(ResourceStore.class){catalog=remote;LocationGalleryView.applyCatalog(remote.galleries);changed();}
+        synchronized(ResourceStore.class){catalog=remote;LocationGalleryView.applyCatalog(remote.galleries);catalogGeneration++;changed();}
         return true;
     }
     static String automaticError(Context c){return prefs(c).getString("auto_error","");}
@@ -141,6 +144,7 @@ final class ResourceStore {
     }
     static List<Entry> entries(Context c)throws Exception{return new ArrayList<>(catalog(c).entries.values());}
     static int generation(){return generation;}
+    static int catalogGeneration(){return catalogGeneration;}
     static String portraitGroup(String path){
         String name=path.substring(path.lastIndexOf('/')+1);
         int split=name.indexOf('_');
@@ -154,13 +158,13 @@ final class ResourceStore {
     private static void changed(){generation++;}
     private static SharedPreferences prefs(Context c){return c.getSharedPreferences(PREF,Context.MODE_PRIVATE);}
     static boolean wifiOnly(Context c){return prefs(c).getBoolean("wifi_only",false);}
-    static void wifiOnly(Context c,boolean value){prefs(c).edit().putBoolean("wifi_only",value).apply();}
+    static void wifiOnly(Context c,boolean value){prefs(c).edit().putBoolean("wifi_only",value).apply();ResourceSyncJob.configure(c);}
     static boolean autoGallery(Context c){return prefs(c).getBoolean("auto_gallery",false);}
     static void autoGallery(Context c,boolean value){prefs(c).edit().putBoolean("auto_gallery",value).apply();}
-    static boolean autoUpdate(Context c){return prefs(c).getBoolean("auto_update",false);}
-    static void autoUpdate(Context c,boolean value){prefs(c).edit().putBoolean("auto_update",value).apply();}
-    static boolean autoNew(Context c){return prefs(c).getBoolean("auto_new",autoUpdate(c));}
-    static void autoNew(Context c,boolean value){prefs(c).edit().putBoolean("auto_new",value).apply();}
+    static boolean autoUpdate(Context c){return prefs(c).getBoolean("auto_update",true);}
+    static void autoUpdate(Context c,boolean value){prefs(c).edit().putBoolean("auto_update",value).apply();if(value)requestAutomaticSync(c);}
+    static boolean autoNew(Context c){return prefs(c).getBoolean("auto_new",true);}
+    static void autoNew(Context c,boolean value){prefs(c).edit().putBoolean("auto_new",value).apply();if(value)requestAutomaticSync(c);}
     static boolean automaticAllowed(Context c,String path){
         try{Entry e=catalog(c).entries.get(path);return e!=null&&!removed(c,e);}
         catch(Exception ignored){return false;}
@@ -293,9 +297,23 @@ final class ResourceStore {
         if(!STARTED.compareAndSet(false,true))return;
         IO.execute(()->{
             try{migrate(app,null);}catch(Exception ex){recordError(app,"auto_error","Перенос: "+ex.getMessage());}
-            refreshCatalog(app);
-            autoSync(app);
+            automaticSync(app,new AtomicBoolean(false));
         });
+        ResourceSyncJob.configure(app);
+    }
+    // Runs on IO only; coalesces launch, foreground and Android background checks.
+    static void automaticSync(Context app,AtomicBoolean stop){
+        if(stop.get())return;
+        long now=android.os.SystemClock.elapsedRealtime();
+        if(now-lastAutomaticCheck<CHECK_INTERVAL_MS)return;
+        lastAutomaticCheck=now;
+        refreshCatalog(app);
+        if(!stop.get()&&catalogError(app).isEmpty()&&(autoUpdate(app)||autoNew(app)))autoSync(app,stop);
+    }
+    static void requestAutomaticSync(Context c){
+        Context app=c.getApplicationContext();
+        if(!AUTO_QUEUED.compareAndSet(false,true))return;
+        IO.execute(()->{try{automaticSync(app,new AtomicBoolean(false));}finally{AUTO_QUEUED.set(false);}});
     }
     static void autoSync(Context app){autoSync(app,new AtomicBoolean(false));}
     static void autoSync(Context app,AtomicBoolean stop){
@@ -304,7 +322,7 @@ final class ResourceStore {
             for(Entry e:entries(app)){
                 if(stop.get())return;
                 if(removed(app,e))continue;
-                State state=state(app,e,true);
+                State state=state(app,e,false);
                 boolean needs=(autoUpdate(app)&&(state==State.OLD||state==State.DAMAGED||state==State.MISSING))
                     ||(autoNew(app)&&state==State.NEW);
                 if(!needs)continue;

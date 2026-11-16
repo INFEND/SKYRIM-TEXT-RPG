@@ -32,6 +32,7 @@ final class ResourceManagerDialog {
     private ImageButton closeButton;
     private boolean lastAllReady;
     private boolean busy;
+    private int displayedCatalogGeneration=-1;
     private String activePath="", operation="", catalogReport="";
     private static final int MUTED=0xffaaaaaa;
     private static final String[] KEYS={"gallery","portraits","map","icons","font","media"};
@@ -153,6 +154,7 @@ final class ResourceManagerDialog {
         }
     }
     private void rebuildGroups(){
+        int generation=ResourceStore.catalogGeneration();
         groups.clear();categories.clear();verified.clear();list.removeAllViews();
         try{for(ResourceStore.Entry e:ResourceStore.entries(activity))groups.computeIfAbsent(e.group,k->new ArrayList<>()).add(e);}
         catch(Exception e){showStatus("Каталог ресурсов отсутствует: "+e.getMessage());}
@@ -170,6 +172,7 @@ final class ResourceManagerDialog {
         categories.put("engine",new Category("engine","Движок локального ИИ"));
         categories.put("gguf",new Category("gguf","Локальные модели GGUF"));
         for(Category c:categories.values())addRow(c);
+        displayedCatalogGeneration=generation;
         updateRows();
     }
     private void refreshCatalog(){
@@ -295,7 +298,10 @@ final class ResourceManagerDialog {
         allButton.setAlpha(busy&&!complete?.55f:1f);
     }
     private final Runnable tick=new Runnable(){@Override public void run(){
-        if(dialog!=null&&dialog.isShowing()){updateRows();ResourceStore.UI.postDelayed(this,500);}
+        if(dialog!=null&&dialog.isShowing()){
+            if(!busy&&displayedCatalogGeneration!=ResourceStore.catalogGeneration())rebuildGroups();else updateRows();
+            ResourceStore.UI.postDelayed(this,500);
+        }
     }};
     private void details(Category c){
         LinkedHashSet<String> picked=new LinkedHashSet<>(c.packages);

@@ -32,6 +32,7 @@
         <provider android:name=".LocalAiModelProvider" android:authorities="${applicationId}.models"
             android:exported="true" android:readPermission="dev.infend.skyrimtext.permission.LOCAL_ENGINE"
             android:writePermission="dev.infend.skyrimtext.permission.LOCAL_ENGINE" />
+        <service android:name=".ResourceSyncJob" android:exported="true" android:permission="android.permission.BIND_JOB_SERVICE" />
         <service android:name=".BackgroundUpdateJob" android:exported="true" android:permission="android.permission.BIND_JOB_SERVICE" />
         <receiver android:name=".OtaBootReceiver" android:exported="false">
             <intent-filter>
