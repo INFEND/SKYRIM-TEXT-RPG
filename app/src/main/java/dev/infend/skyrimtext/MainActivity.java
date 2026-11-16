@@ -745,7 +745,7 @@ public final class MainActivity extends Activity {
         ScrollView scroller=new ScrollView(this);scroller.addView(panel);
         AlertDialog.Builder dialog=new RuneDialogBuilder(this,accent()).setTitle(FactionCampaign.NAMES[f]).setView(scroller).setNegativeButton("Закрыть",null);
         if(c!=null&&stories.block(game,f).isEmpty())dialog.setPositiveButton(stories.phase(f)==0?"Начать главу":stories.phase(f)==2?"Завершить главу":c.enemy.isEmpty()?"Пройти испытание":"Вступить в бой",(d,w)->{
-            if(stories.advance(game,f)){save();if("COMBAT".equals(game.mode)){tab=0;render();}else{render();toast(game.message);factionStoryDialog(f);}}
+            if(livingBusy())return;VisualSnapshot before=new VisualSnapshot(game);if(stories.advance(game,f)){recordVisual(before,game,game.message);save();if("COMBAT".equals(game.mode)){tab=0;render();}else{render();toast(game.message);factionStoryDialog(f);}}
         });
         if(c!=null&&stories.hasDecision(f)&&stories.block(game,f).isEmpty())dialog.setNeutralButton("Решение",(d,w)->{
             new RuneDialogBuilder(this,accent()).setTitle("Решение героя").setItems(stories.decisionOptions(f),(dd,i)->{if(stories.decide(game,f,i)){save();render();factionStoryDialog(f);}}).setNegativeButton("Отмена",(dd,i)->factionStoryDialog(f)).show();
@@ -771,9 +771,9 @@ public final class MainActivity extends Activity {
         WorldAtlas.Place destination=WorldAtlas.find(game.factions.place(f));if(destination!=null&&!destination.name.equals(game.progress.location)&&!"COMBAT".equals(game.mode))visualSummaryLink(panel,"МАРШРУТ К ЦЕЛИ",()->locationDialog(destination));
         AlertDialog.Builder dialog=new RuneDialogBuilder(this,accent()).setTitle(FactionCampaign.NAMES[f]).setView(panel).setNegativeButton("Закрыть",null);
         if(blocked.isEmpty())dialog.setPositiveButton(game.factions.stage(f)==0?"Вступить":"Выполнить",(d,w)->{
-            if(game.factions.perform(game,f)){save();render();toast(game.message);factionDetails(f);}
+            if(livingBusy())return;VisualSnapshot before=new VisualSnapshot(game);if(game.factions.perform(game,f)){recordVisual(before,game,game.message);save();render();toast(game.message);factionDetails(f);}
         });
-        if(blocked.isEmpty()&&game.factions.stage(f)>0)dialog.setNeutralButton("Переговоры",(d,w)->{if(game.factions.perform(game,f,true)){save();render();toast(game.message);factionDetails(f);}});
+        if(blocked.isEmpty()&&game.factions.stage(f)>0)dialog.setNeutralButton("Переговоры",(d,w)->{if(livingBusy())return;VisualSnapshot before=new VisualSnapshot(game);if(game.factions.perform(game,f,true)){recordVisual(before,game,game.message);save();render();toast(game.message);factionDetails(f);}});
         dialog.show();
     }
     private void reputationRow(LinearLayout host,String name,int score,String status){
@@ -920,6 +920,7 @@ public final class MainActivity extends Activity {
     }
 
     private void render(){
+        closeLivingDialog();
         clearAiLiveViews();
         rememberViewport();
         if(game.started&&game.visitedVisual.add(game.progress.location))save();
@@ -3448,9 +3449,12 @@ public final class MainActivity extends Activity {
         line.addView(new SkyrimIconView(this,glyph,accent()),lp(27,29));LinearLayout words=column();words.setPadding(dp(10),0,dp(6),0);line.addView(words,new LinearLayout.LayoutParams(0,-2,1));addText(words,label,16,TEXT,true,0);
         if(!value.isEmpty())line.addView(text(value,13,MUTED,false),lp(-2,-2));TextView arrow=text("›",24,MUTED,false);line.addView(arrow,lp(20,-2));tile.addView(line,lp(-1,-2));tile.setOnClickListener(v->action.run());
     }
+    private AlertDialog activeLivingDialog;
+    private void closeLivingDialog(){AlertDialog old=activeLivingDialog;activeLivingDialog=null;if(old!=null&&old.isShowing())old.dismiss();}
     private void livingDialog(String title,LinearLayout panel){
+        closeLivingDialog();
         panel.setPadding(dp(14),dp(10),dp(14),dp(10));ScrollView sc=new ScrollView(this);sc.setFillViewport(false);sc.addView(panel);
-        new RuneDialogBuilder(this,accent()).setTitle(title).setView(sc).setNegativeButton("Закрыть",null).show();
+        activeLivingDialog=new RuneDialogBuilder(this,accent()).setTitle(title).setView(sc).setNegativeButton("Закрыть",null).show();
     }
     private void renderHero(){
         if(heroDetailed){renderHeroLegacy();return;}
@@ -3481,10 +3485,19 @@ public final class MainActivity extends Activity {
         if(livingBusy()){toast("Финансы недоступны во время действия");return;}
         game.syncLivingSystems();LinearLayout panel=column();livingLine(panel,"На руках",livingNumber(game.gold),ITEM_GOLD);livingLine(panel,"В обороте",livingNumber(game.economy.capital),TEXT);livingLine(panel,"Доход / день",livingNumber(game.economy.income()),ITEM_UP);livingLine(panel,"Накопленный доход",livingNumber(game.economy.accrued),ITEM_UP);
         addText(panel,"Торговые вложения: 2% в игровой день. Прибыль начисляется без повторов.",12,MUTED,false,8);
-        livingLink(panel,"Вложить 1.000","","septims",()->livingEconomyChange(true));livingLink(panel,"Вернуть 1.000","","septims",()->livingEconomyChange(false));
-        livingLink(panel,"Забрать прибыль","","septims",()->{if(livingBusy())return;int n=game.economy.claim(game);game.progress.sync(game);save();render();toast("Получено "+livingNumber(n)+" септимов");});livingDialog("Финансы",panel);
+        livingLink(panel,"Вложить септимы","","septims",()->livingEconomyChange(true));livingLink(panel,"Вернуть вложения","","septims",()->livingEconomyChange(false));
+        livingLink(panel,"Забрать прибыль","","septims",()->{if(livingBusy())return;int n=game.economy.claim(game);game.progress.sync(game);save();render();livingEconomyDialog();toast("Получено "+livingNumber(n)+" септимов");});livingDialog("Финансы",panel);
     }
-    private void livingEconomyChange(boolean invest){if(livingBusy())return;boolean ok=invest?game.economy.invest(game,1000):game.economy.withdraw(game,1000);if(ok){game.progress.sync(game);save();render();}toast(ok?"Операция выполнена":"Недостаточно средств");}
+    private void livingEconomyChange(boolean invest){
+        if(livingBusy())return;
+        int available=invest?Math.min(game.gold,Integer.MAX_VALUE-game.economy.capital):Math.min(game.economy.capital,Integer.MAX_VALUE-game.gold);
+        if(available<=0){toast("Нет доступных средств");return;}
+        LinearLayout panel=column();panel.setPadding(dp(14),dp(10),dp(14),dp(10));addText(panel,"Доступно: "+livingNumber(available)+" септимов",14,ITEM_GOLD,true,8);
+        EditText amount=livingField(panel,"Сумма","1–"+available,true);amount.setInputType(InputType.TYPE_CLASS_NUMBER);amount.setText(String.valueOf(Math.min(available,1000)));
+        AlertDialog dialog=new RuneDialogBuilder(this,accent()).setTitle(invest?"Вложить":"Вернуть вложения").setView(panel).setNegativeButton("Отмена",null).setNeutralButton("Всё",null).setPositiveButton("Подтвердить",null).create();dialog.show();
+        dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setOnClickListener(v->amount.setText(String.valueOf(available)));
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v->{if(livingBusy())return;int n;try{n=Integer.parseInt(amount.getText().toString().trim());}catch(Exception ex){toast("Введи целое число");return;}boolean ok=invest?game.economy.invest(game,n):game.economy.withdraw(game,n);if(!ok){toast("Недопустимая сумма");return;}game.progress.sync(game);save();dialog.dismiss();render();livingEconomyDialog();toast("Операция выполнена");});
+    }
     private String livingNumber(long n){return String.format(java.util.Locale.US,"%,d",n).replace(',','.');}
     private void livingHeroDetails(String title,String description){
         LinearLayout box=column();addText(box,description,15,TEXT,false,8);
@@ -3517,7 +3530,7 @@ public final class MainActivity extends Activity {
         if(livingBusy()){toast("Сейчас действие недоступно");return;}LinearLayout panel=column();panel.setPadding(dp(14),dp(10),dp(14),dp(10));
         TextView amount=text("1 ч.",22,accent(),true);panel.addView(amount);android.widget.SeekBar slider=new android.widget.SeekBar(this);slider.setMax(23);panel.addView(slider,lp(-1,48));slider.setOnSeekBarChangeListener(new android.widget.SeekBar.OnSeekBarChangeListener(){public void onStartTrackingTouch(android.widget.SeekBar b){}public void onStopTrackingTouch(android.widget.SeekBar b){}public void onProgressChanged(android.widget.SeekBar b,int value,boolean user){amount.setText((value+1)+" ч.");}});
         addText(panel,sleep?"Сон восстанавливает бодрость и отдых.":"Ожидание восстанавливает отдых, но не заменяет сон.",13,MUTED,false,8);
-        new RuneDialogBuilder(this,accent()).setTitle(sleep?"Сон":"Отдых").setView(panel).setNegativeButton("Отмена",null).setPositiveButton("Начать",(d,w)->{if(livingBusy())return;VisualSnapshot before=new VisualSnapshot(game);if(game.restHours(slider.getProgress()+1,sleep)){recordVisual(before,game,sleep?"Сон":"Отдых");save();render();toast("Готово");}}).show();
+        new RuneDialogBuilder(this,accent()).setTitle(sleep?"Сон":"Отдых").setView(panel).setNegativeButton("Отмена",null).setPositiveButton("Начать",(d,w)->{if(livingBusy())return;VisualSnapshot before=new VisualSnapshot(game);if(game.restHours(slider.getProgress()+1,sleep)){recordVisual(before,game,sleep?"Сон":"Отдых");save();render();livingNeedsDialog();toast("Готово");}}).show();
     }
     private void livingConsumeDialog(boolean water){
         if(livingBusy()){toast("Сейчас действие недоступно");return;}
@@ -3525,7 +3538,7 @@ public final class MainActivity extends Activity {
         while(it.hasNext()){ItemCatalog.Item item=ItemCatalog.find(it.next());if(GameEngine.needItem(item,water)&&game.progress.quantity(item.id)>0)choices.add(item);}
         if(choices.isEmpty()){toast(water?"Нет напитков в инвентаре":"Нет еды в инвентаре");return;}
         String[] labels=new String[choices.size()];for(int i=0;i<labels.length;i++)labels[i]=choices.get(i).name+" × "+game.progress.quantity(choices.get(i).id);
-        new RuneDialogBuilder(this,accent()).setTitle(water?"Выпить":"Поесть").setItems(labels,(d,i)->{if(livingBusy())return;VisualSnapshot before=new VisualSnapshot(game);if(game.consumeNeed(choices.get(i).id,water)){recordVisual(before,game,water?"Утоление жажды":"Приём пищи");save();render();toast("Потребность восстановлена");}else toast("Нет необходимости или предмет недоступен");}).setNegativeButton("Отмена",null).show();
+        new RuneDialogBuilder(this,accent()).setTitle(water?"Выпить":"Поесть").setItems(labels,(d,i)->{if(livingBusy())return;VisualSnapshot before=new VisualSnapshot(game);if(game.consumeNeed(choices.get(i).id,water)){recordVisual(before,game,water?"Утоление жажды":"Приём пищи");save();render();livingNeedsDialog();toast("Потребность восстановлена");}else toast("Нет необходимости или предмет недоступен");}).setNegativeButton("Отмена",null).show();
     }
     private void renderHeroLegacy(){
         skyrimTopTabs(3);
@@ -3973,19 +3986,19 @@ public final class MainActivity extends Activity {
         if(livingBusy())return;LinearLayout panel=column();
         livingLink(panel,"Создать свою способность","50 F","magic",()->livingCreate(false));
         for(int i=0;i<CompensationPowers.SLOTS;i++){final int index=i;int rank=game.compensation.ranks[i];if(i>=3&&rank==0)continue;
-            if(rank==0)livingFixRow(panel,game.compensation.powerName(i),"Новая способность | 30 силы",50,()->game.compensation.buyPower(index));
+            if(rank==0)livingFixRow(panel,game.compensation.powerName(i),"Новая способность | 30 силы",50,()->game.compensation.buyPower(index),this::livingPowerShop);
             else{addText(panel,game.compensation.powerName(i)+" | Ранг "+rank,17,ITEM_MAGIC,true,5);addText(panel,game.compensation.detail(i),13,MUTED,false,8);
-                livingFixRow(panel,"Улучшить способность","+15 силы",25,()->game.compensation.upgrade(index));
-                if(!game.compensation.safe[i])livingFixRow(panel,"Убрать отдачу","Без расхода здоровья",40,()->game.compensation.removeSide(index));
-                if(game.compensation.cost(i)>1)livingFixRow(panel,"Снизить стоимость","−5 магии",30,()->game.compensation.reduce(index));}}
+                livingFixRow(panel,"Улучшить способность","+15 силы",25,()->game.compensation.upgrade(index),this::livingPowerShop);
+                if(!game.compensation.safe[i])livingFixRow(panel,"Убрать отдачу","Без расхода здоровья",40,()->game.compensation.removeSide(index),this::livingPowerShop);
+                if(game.compensation.cost(i)>1)livingFixRow(panel,"Снизить стоимость","−5 магии",30,()->game.compensation.reduce(index),this::livingPowerShop);}}
         livingDialog("Уникальные способности",panel);
     }
     private void livingArtifactShop(){
         if(livingBusy())return;LinearLayout panel=column();String[] effects={"+8 к атаке","−5 входящего урона","+3 к регенерации магии"};
         livingLink(panel,"Создать свой предмет","50 F","armor",()->livingCreate(true));
-        for(int i=0;i<CompensationPowers.SLOTS;i++){final int index=i;String name=game.compensation.itemName(i);if(i>=3&&!game.compensation.owned[i])continue;if(!game.compensation.owned[i])livingFixRow(panel,name,"Уникальное снаряжение",50,()->game.compensation.buyItem(game,index));
-            else{addText(panel,name,17,ITEM_MAGIC,true,5);if(!game.compensation.bound[i])livingFixRow(panel,"Привязка к душе","Отметка в карточке предмета",20,()->game.compensation.bind(index));
-                if(!game.compensation.passive[i])livingFixRow(panel,"Пассивный эффект",game.compensation.passiveLabel(i),25,()->game.compensation.addPassive(index));else addText(panel,game.compensation.passiveLabel(i)+" при экипировке",13,ITEM_UP,false,8);}}
+        for(int i=0;i<CompensationPowers.SLOTS;i++){final int index=i;String name=game.compensation.itemName(i);if(i>=3&&!game.compensation.owned[i])continue;if(!game.compensation.owned[i])livingFixRow(panel,name,"Уникальное снаряжение",50,()->game.compensation.buyItem(game,index),this::livingArtifactShop);
+            else{addText(panel,name,17,ITEM_MAGIC,true,5);if(!game.compensation.bound[i])livingFixRow(panel,"Привязка к душе","Отметка в карточке предмета",20,()->game.compensation.bind(index),this::livingArtifactShop);
+                if(!game.compensation.passive[i])livingFixRow(panel,"Пассивный эффект",game.compensation.passiveLabel(i),25,()->game.compensation.addPassive(index),this::livingArtifactShop);else addText(panel,game.compensation.passiveLabel(i)+" при экипировке",13,ITEM_UP,false,8);}}
         livingDialog("Уникальные предметы",panel);
     }
     private EditText livingField(LinearLayout panel,String label,String hint,boolean number){
@@ -4006,17 +4019,20 @@ public final class MainActivity extends Activity {
                 try{int stat=Integer.parseInt(strength.getText().toString().trim());String label=name.getText().toString();String raw=cost.getText().toString().trim().replace(',','.');
                     ok=item?game.compensation.createItem(game,label,type,stat,Double.parseDouble(raw),desc.getText().toString()):game.compensation.createPower(label,type,stat,Integer.parseInt(raw));
                 }catch(Exception ignored){}
-                if(!ok){toast("Проверь значения, свободный слот и вес");return;}game.fixSpent+=50;game.progress.sync(game);game.recordVisualEvent("Создана системная компенсация");save();dialog.dismiss();render();toast("Создано");
+                if(!ok){toast("Проверь значения, свободный слот и вес");return;}game.fixSpent+=50;game.progress.sync(game);game.recordVisualEvent("Создана системная компенсация");save();dialog.dismiss();render();if(item)livingArtifactShop();else livingPowerShop();toast("Создано");
             });
         }).setNegativeButton("Отмена",null).show();
     }
     private void livingFixSkill(boolean level){new RuneDialogBuilder(this,accent()).setTitle(level?"Повысить навык на 1":"Добавить 100 опыта навыка").setItems(RpgContent.SKILLS,(d,index)->{new RuneDialogBuilder(this,accent()).setTitle(RpgContent.SKILLS[index]).setMessage("Стоимость: 1 F").setNegativeButton("Отмена",null).setPositiveButton("Купить",(dd,w)->{
         if(livingBusy()||game.progress.skillLevel(index)>=100||game.fixSpent==Long.MAX_VALUE){toast("Покупка недоступна");return;}
-        if(!game.progress.buyFixSkill(game,index,level)){toast("Покупка недоступна");return;}save();render();toast("Покупка применена");}).show();}).setNegativeButton("Отмена",null).show();}
+        if(!game.progress.buyFixSkill(game,index,level)){toast("Покупка недоступна");return;}save();render();livingFixShop();toast("Покупка применена");}).show();}).setNegativeButton("Отмена",null).show();}
     private boolean livingFixGold(int amount){if(game.gold>Integer.MAX_VALUE-amount)return false;game.gold+=amount;return true;}
     private void livingFixRow(LinearLayout host,String title,String detail,int price,java.util.function.BooleanSupplier purchase){
+        livingFixRow(host,title,detail,price,purchase,this::livingFixShop);
+    }
+    private void livingFixRow(LinearLayout host,String title,String detail,int price,java.util.function.BooleanSupplier purchase,Runnable refresh){
         LinearLayout tile=livingTile(host);livingLine(tile,title,price+" F",ITEM_MAGIC);addText(tile,detail,13,MUTED,false,0);
-        tile.setOnClickListener(v->new RuneDialogBuilder(this,accent()).setTitle(title).setMessage(detail+" | "+price+" F. Покупка постоянная.").setNegativeButton("Отмена",null).setPositiveButton("Купить",(d,w)->{if(aiTurnBusy||!pendingAiAction().isEmpty()||"COMBAT".equals(game.mode)||game.fixSpent>Long.MAX_VALUE-price||!purchase.getAsBoolean()){toast("Покупка недоступна");return;}game.fixSpent+=price;game.progress.sync(game);game.recordVisualEvent("Системная компенсация: "+title);save();render();toast("Покупка применена");}).show());
+        tile.setOnClickListener(v->new RuneDialogBuilder(this,accent()).setTitle(title).setMessage(detail+" | "+price+" F. Покупка постоянная.").setNegativeButton("Отмена",null).setPositiveButton("Купить",(d,w)->{if(aiTurnBusy||!pendingAiAction().isEmpty()||"COMBAT".equals(game.mode)||game.fixSpent>Long.MAX_VALUE-price||!purchase.getAsBoolean()){toast("Покупка недоступна");return;}game.fixSpent+=price;game.progress.sync(game);game.recordVisualEvent("Системная компенсация: "+title);save();render();refresh.run();toast("Покупка применена");}).show());
     }
     private void renderSettings(){
         section("ПАРАМЕТРЫ","Настройки","Твоя история, твои правила.");

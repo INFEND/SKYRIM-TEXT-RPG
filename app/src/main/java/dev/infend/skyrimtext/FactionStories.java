@@ -122,12 +122,12 @@ final class FactionStories {
     }
     private int skillForReward(Chapter c,int f){return approach[f]==2?12:c.skill;}
     boolean advance(GameEngine g,int f){
-        if(!block(g,f).isEmpty())return false;Chapter c=chapter(f);
+        if(!block(g,f).isEmpty())return false;g.lastCheckChance=g.lastCheckRoll=-1;Chapter c=chapter(f);
         if(phase[f]==0){phase[f]=1;g.progress.setQuestOutcome("faction_story_"+f,"ACTIVE");g.message=c.story;return true;}
         if(phase[f]==2){if(f==3&&index[f]==8&&cicero==0)decide(g,f,0);if(f==0&&index[f]==2&&beast==0)beast=1;if(f==0&&index[f]==5&&hasDecision(f))decide(g,f,0);index[f]++;phase[f]=0;attemptDay[f]=-1;preparation[f]=0;int used=skillForReward(c,f);approach[f]=0;g.progress.skillExperience(g,used,35);g.addXp(30+index[f]*5);g.gold=(int)Math.min(Integer.MAX_VALUE,(long)g.gold+25+index[f]*5);g.progress.sync(g);g.message="Завершено: "+c.title;if(completed(f))g.progress.setQuestOutcome("faction_story_"+f,"COMPLETED");g.recordVisualEvent(g.message);return true;}
         int chance=chance(g,f);g.stamina-=cost(f);attemptDay[f]=g.day;
         if(!c.enemy.isEmpty()){g.beginFactionBattle(f,c.enemy,45+g.level*10+index[f]*7-(approach[f]==1?15:0),6+g.level*2,c.story);return true;}
-        if(new java.util.Random().nextInt(100)<chance){phase[f]=2;g.message="Испытание пройдено. Заверши главу.";}else{preparation[f]=Math.min(50,preparation[f]+10);g.message="Попытка не удалась. Ты разобрал ошибки с наставником. Подготовка: +"+preparation[f]+" к следующей проверке. Повтори в другой день.";}
+        if(g.rollCheck(chance)){phase[f]=2;g.message="Испытание пройдено. Заверши главу.";}else{preparation[f]=Math.min(50,preparation[f]+10);g.message="Попытка не удалась. Ты разобрал ошибки с наставником. Подготовка: +"+preparation[f]+" к следующей проверке. Повтори в другой день.";}
         return true;
     }
     void victory(int f){if(f>=0&&f<DATA.length&&!completed(f)&&phase[f]==1&&!chapter(f).enemy.isEmpty())phase[f]=2;}

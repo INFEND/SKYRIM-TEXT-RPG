@@ -55,10 +55,11 @@ final class FactionCampaign {
     boolean perform(GameEngine g,int f){return perform(g,f,false);}
     boolean perform(GameEngine g,int f,boolean talk){
         if(!block(g,f).isEmpty())return false;
+        g.lastCheckChance=g.lastCheckRoll=-1;
         if(stage[f]==0){stage[f]=1;g.progress.setQuestOutcome("faction_"+f,"ACTIVE");g.message="Ты вступаешь в организацию «"+NAMES[f]+"». Первое поручение: "+task(f);g.recordVisualEvent(g.message);return true;}
         int step=stage[f],skill=talk?12:SKILLS[f][step-1],probability=chance(g,f,talk);
         attemptDay[f]=g.day;g.stamina-=10;
-        if(random.nextInt(100)>=probability){trust[f]=Math.max(-100,trust[f]-3);g.message="Поручение не удалось: "+TASKS[f][step-1]+". Повторить можно в другой день.";g.recordVisualEvent(g.message);return true;}
+        if(!g.rollCheck(probability)){trust[f]=Math.max(-100,trust[f]-3);g.message="Поручение не удалось: "+TASKS[f][step-1]+". Повторить можно в другой день.";g.recordVisualEvent(g.message);return true;}
         stage[f]++;trust[f]=Math.min(100,trust[f]+12);int reward=20+step*15;g.gold=(int)Math.min(Integer.MAX_VALUE,(long)g.gold+reward);
         g.reputation++;g.holdReputation[g.region]=Math.min(100,g.holdReputation[g.region]+1);
         g.progress.skillExperience(g,skill,25+step*15);

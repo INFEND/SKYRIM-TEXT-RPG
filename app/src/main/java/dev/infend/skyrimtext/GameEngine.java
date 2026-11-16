@@ -676,6 +676,7 @@ public final class GameEngine {
         if(!started||"COMBAT".equals(mode)||hours<1||hours>24)return false;
         lastCheckChance=lastCheckRoll=-1;
         int total=hour+hours;
+        if(day>Integer.MAX_VALUE-total/24)return false;
         day+=total/24;hour=total%24;
         syncLivingSystems();needs.recover(hours,sleep);
         hp=(int)Math.min(maxHp,(long)hp+hours*(3L+regenBonus[0]));
@@ -690,7 +691,7 @@ public final class GameEngine {
     public static boolean needItem(ItemCatalog.Item item,boolean water){if(item==null)return false;String cat=item.category.toLowerCase(java.util.Locale.ROOT);boolean drink=cat.contains("напит")||cat.contains("вода");return water?drink:cat.equals("еда")||cat.contains("пища");}
     public boolean consumeNeed(String id,boolean water){if(!started||"COMBAT".equals(mode)||!needItem(ItemCatalog.find(id),water))return false;syncLivingSystems();if((water?needs.water:needs.food)>=100)return false;if(!progress.removeItem(id,1))return false;lastCheckChance=lastCheckRoll=-1;if(water)needs.drink();else needs.eat();return true;}
     public int healingAmount(){return 45+5*progress.branches.rank(14)+(progress.advanced.has(AdvancedPerks.PHYSICIAN)?10:0)+(progress.advanced.has(AdvancedPerks.BENEFACTOR)?10:0)+(progress.advanced.has(AdvancedPerks.PURE_MIXTURE)?10:0)+(progress.advanced.has(AdvancedPerks.REGENERATION)?10:0);}
-    private void restoreRespite(){if(progress.advanced.has(AdvancedPerks.RESPITE))stamina=Math.min(maxStamina,stamina+10);}
+    private void restoreRespite(){if(progress.advanced.has(AdvancedPerks.RESPITE))stamina=Math.min(maxStamina,nonnegativeAdd(stamina,10));}
     public int staminaPotionAmount(){return 50+(progress.advanced.has(AdvancedPerks.PHYSICIAN)?10:0)+(progress.advanced.has(AdvancedPerks.BENEFACTOR)?10:0)+(progress.advanced.has(AdvancedPerks.PURE_MIXTURE)?10:0);}
     public boolean drinkHealing() {if(!started||"COMBAT".equals(mode)||potions<=0||hp>=maxHp)return false;potions--;hp=Math.min(maxHp,nonnegativeAdd(hp,healingAmount()));restoreRespite();progress.sync(this);return true;}
     public boolean drinkStamina(){if(!started||"COMBAT".equals(mode)||stamina>=maxStamina||!progress.removeItem("Зелье запаса сил",1))return false;stamina=Math.min(maxStamina,nonnegativeAdd(stamina,staminaPotionAmount()));progress.sync(this);return true;}

@@ -425,6 +425,8 @@ public final class AiStoryClient {
                 .append(", защита ").append(game.effectiveArmor()).append(", репутация ").append(game.reputation)
                 .append(", вес ").append(game.progress.carryWeight()).append("/50 кг\n");
         out.append("Лечебные зелья ").append(game.potions).append(", зелья магии ").append(game.manaPotions).append('\n');
+        out.append("Потребности (100 — норма): сытость ").append(game.needs.food).append(", вода ").append(game.needs.water).append(", бодрость ").append(game.needs.awake).append(", отдых ").append(game.needs.rest).append(". Штраф проверок: ").append(game.needs.penalty()).append(" п.п. Учитывай его при оценке риска.\n");
+        out.append("Торговый капитал ").append(game.economy.capital).append(", доход за день ").append(game.economy.income()).append(", накоплено ").append(game.economy.accrued).append(". Эти поля и фикскоины управляются только движком.\n");
         out.append("Сюжет Пепельные печати: ").append(game.questStatus()).append(", ").append(game.questDetails()).append('\n');
         out.append("Драконий сюжет: ").append(DragonArc.status(game)).append('\n');
         if(game.enemyHp>0)
