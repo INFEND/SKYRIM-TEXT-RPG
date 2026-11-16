@@ -152,7 +152,9 @@ public final class AiStoryClient {
         b.append("ПАМЯТЬ: ").append(crop(history,350)).append('\n');
         if(aiControlled)b.append("Разрешённые пункты effects.location: ")
             .append(crop(game.progress.location,65)).append(" или только достоверный пункт карты.\n");
-        b.append("ТЕКУЩЕЕ ДЕЙСТВИЕ: ").append(crop(command,490));
+        String action="ТЕКУЩЕЕ ДЕЙСТВИЕ: "+crop(command,490);
+        if(b.length()+action.length()>1650)b.setLength(Math.max(0,1650-action.length()));
+        b.append(action);
         return crop(b.toString(),1650);
     }
     boolean isRunning() { return running; }

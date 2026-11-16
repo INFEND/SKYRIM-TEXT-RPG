@@ -13,6 +13,14 @@ final class KatherineCompanion {
     boolean engaged=false,married=false,dragonEcho=false,portalUsed=false,damonSafe=false,elisifMet=false;
     String ending="",mood="Спокойна",lastSpell="";
     JSONArray milestones=new JSONArray();
+    int burn=0, slow=0, shock=0;
+    static final String[] PROFILES={"Запечатанная магия","Опытная чародейка","Верховная чародейка"};
+    String profileName(){return PROFILES[profile];}
+    String independentLocation(int day,int hour){if(!"Свободная дорога".equals(ending))return "Хижина Анис";if(hour<8||hour>=20)return "Хижина Анис";switch(Math.floorMod(day,3)){case 0:return "Коллегия Винтерхолда";case 1:return "Солитьюд";default:return "Ривервуд";}}
+    void beginBattle(){burn=slow=shock=0;}
+    int ongoingDamage(int remaining){if(burn<=0||remaining<=0)return 0;burn--;return Math.min(remaining,3);}
+    int weaken(int incoming){int reduction=0;if(slow>0){slow--;reduction+=3;}if(shock>0){shock--;reduction+=2;}return Math.min(Math.max(0,incoming-1),reduction);}
+    void castEffect(int spell){if(spell==1)burn=2;else if(spell==2)slow=2;else if(spell==3)shock=2;else if(spell==4){burn=2;shock=2;}else if(spell==5)slow=2;}
     int maxHp(){return 100+10*(level-1)+gear*10;}
     int needXp(){return level*100;}
     int limitSpell(int rank){return rank<=0?0:rank==1?3:rank==2?4:5;}
@@ -24,16 +32,17 @@ final class KatherineCompanion {
     void rest(int hours){hp=Math.min(maxHp(),hp+Math.max(0,Math.min(24,hours))*8);}
     void updateMood(KatherineStory k){mood=hurt>=60?"Обижена":hp<maxHp()/3?"Ослаблена":k.jealousy>=50?"Ревнует":k.romance&&love>=75?"Влюблена":k.trust>=70?"Доверяет":"Насторожена";}
     void endRomance(){engaged=false;married=false;}
-    JSONObject save() throws JSONException{return new JSONObject().put("hp",hp).put("xp",xp).put("level",level).put("spell",spell).put("gear",gear).put("focus",focus).put("love",love).put("hurt",hurt).put("attachment",attachment).put("lastDate",lastDate).put("lastJoint",lastJoint).put("lastRepair",lastRepair).put("lastDamon",lastDamon).put("lastElisif",lastElisif).put("profile",profile).put("engaged",engaged).put("married",married).put("dragonEcho",dragonEcho).put("portalUsed",portalUsed).put("damonSafe",damonSafe).put("elisifMet",elisifMet).put("ending",ending).put("mood",mood).put("lastSpell",lastSpell).put("milestones",milestones);}
+    JSONObject save() throws JSONException{return new JSONObject().put("hp",hp).put("xp",xp).put("level",level).put("spell",spell).put("gear",gear).put("focus",focus).put("love",love).put("hurt",hurt).put("attachment",attachment).put("lastDate",lastDate).put("lastJoint",lastJoint).put("lastRepair",lastRepair).put("lastDamon",lastDamon).put("lastElisif",lastElisif).put("profile",profile).put("engaged",engaged).put("married",married).put("dragonEcho",dragonEcho).put("portalUsed",portalUsed).put("damonSafe",damonSafe).put("elisifMet",elisifMet).put("ending",ending).put("mood",mood).put("lastSpell",lastSpell).put("milestones",milestones).put("burn",burn).put("slow",slow).put("shock",shock);}
     static KatherineCompanion restore(JSONObject j,int rank,boolean romance){KatherineCompanion c=new KatherineCompanion();if(j==null)return c;
-        c.level=Math.max(1,Math.min(100,j.optInt("level",1)));c.xp=Math.max(0,Math.min(c.needXp()-1,j.optInt("xp")));c.gear=Math.max(0,Math.min(2,j.optInt("gear")));c.focus=Math.max(0,Math.min(2,j.optInt("focus")));c.hp=Math.max(0,Math.min(c.maxHp(),j.optInt("hp",c.maxHp())));c.spell=Math.max(0,Math.min(c.limitSpell(rank),j.optInt("spell")));c.love=KatherineStory.clamp(j.optInt("love"));c.hurt=KatherineStory.clamp(j.optInt("hurt"));c.attachment=KatherineStory.clamp(j.optInt("attachment"));c.lastDate=j.optInt("lastDate",-1);c.lastJoint=j.optInt("lastJoint",-1);c.lastRepair=j.optInt("lastRepair",-1);c.lastDamon=j.optInt("lastDamon",-1);c.lastElisif=j.optInt("lastElisif",-1);c.profile=Math.max(0,Math.min(2,j.optInt("profile")));c.engaged=romance&&j.optBoolean("engaged");c.married=c.engaged&&j.optBoolean("married");c.dragonEcho=j.optBoolean("dragonEcho");c.portalUsed=j.optBoolean("portalUsed");c.damonSafe=j.optBoolean("damonSafe");c.elisifMet=j.optBoolean("elisifMet");c.ending=j.optString("ending","");c.mood=j.optString("mood","Спокойна");c.lastSpell=j.optString("lastSpell","");JSONArray arr=j.optJSONArray("milestones");if(arr!=null)for(int i=0;i<Math.min(256,arr.length());i++)c.milestone(arr.optString(i));return c;}
+        c.level=Math.max(1,Math.min(100,j.optInt("level",1)));c.xp=Math.max(0,Math.min(c.needXp()-1,j.optInt("xp")));c.gear=Math.max(0,Math.min(2,j.optInt("gear")));c.focus=Math.max(0,Math.min(2,j.optInt("focus")));c.hp=Math.max(0,Math.min(c.maxHp(),j.optInt("hp",c.maxHp())));c.spell=Math.max(0,Math.min(c.limitSpell(rank),j.optInt("spell")));c.love=KatherineStory.clamp(j.optInt("love"));c.hurt=KatherineStory.clamp(j.optInt("hurt"));c.attachment=KatherineStory.clamp(j.optInt("attachment"));c.lastDate=j.optInt("lastDate",-1);c.lastJoint=j.optInt("lastJoint",-1);c.lastRepair=j.optInt("lastRepair",-1);c.lastDamon=j.optInt("lastDamon",-1);c.lastElisif=j.optInt("lastElisif",-1);c.profile=Math.max(0,Math.min(2,j.optInt("profile")));c.engaged=romance&&j.optBoolean("engaged");c.married=c.engaged&&j.optBoolean("married");c.dragonEcho=j.optBoolean("dragonEcho");c.portalUsed=j.optBoolean("portalUsed");c.damonSafe=j.optBoolean("damonSafe");c.elisifMet=j.optBoolean("elisifMet");c.ending=j.optString("ending","");c.mood=j.optString("mood","Спокойна");c.lastSpell=j.optString("lastSpell","");c.burn=Math.max(0,Math.min(2,j.optInt("burn")));c.slow=Math.max(0,Math.min(2,j.optInt("slow")));c.shock=Math.max(0,Math.min(2,j.optInt("shock")));JSONArray arr=j.optJSONArray("milestones");if(arr!=null)for(int i=0;i<Math.min(256,arr.length());i++)c.milestone(arr.optString(i));return c;}
     void appendChoices(GameEngine.Scene s,GameEngine g,KatherineStory k){
         if(k.active()){
+            if(k.companion.hp<k.companion.maxHp()&&g.potions>0)s.add("KATH:heal","Передать лечебное зелье","Лечение Кэтрин | −1 зелье");
             if(k.magicRank>0)s.add("KATH:spell","Выбрать заклинание",spellName());
             if(gear<2&&g.gold>=120*(gear+1))s.add("KATH:gear","Улучшить одеяние",120*(gear+1)+" септимов");
             if(focus<2&&g.gold>=100*(focus+1))s.add("KATH:focus","Улучшить магический фокус",100*(focus+1)+" септимов");
             if(k.magicRank>=3&&!dragonEcho&&g.progress.dragonStage>=4)s.add("KATH:echo","Исследовать драконий отклик","Не означает подтверждения драконьей души");
-            if(k.magicRank>=3&&k.mana>=35&&!portalUsed)s.add("KATH:portal","Стабилизировать пространство","Вернуться в хижину Анис | 35 магии");
+            if(k.magicRank>=3&&k.mana>=35&&!portalUsed&&!KatherineStory.atHut(g))s.add("KATH:portal","Стабилизировать пространство","Вернуться в хижину Анис | 35 магии");
         }
         if(k.romance&&lastDate!=g.day)s.add("KATH:date","Провести время вместе","Свидание и личный разговор");
         if(k.romance&&love>=65&&k.trust>=80&&hurt<25&&!engaged&&damonSafe)s.add("KATH:engage","Обсудить помолвку","Добровольное решение");
@@ -46,11 +55,12 @@ final class KatherineCompanion {
     }
     boolean choose(GameEngine g,KatherineStory k,String action){
         switch(action){
+            case "KATH:heal":if(k.active()&&hp<maxHp()&&g.potions>0){g.potions--;hp=Math.min(maxHp(),hp+40);k.remember(g,"Кэтрин приняла лечебное зелье.");}return true;
             case "KATH:spell":if(k.active()&&k.magicRank>0){spell=(spell+1)%(limitSpell(k.magicRank)+1);k.remember(g,"Кэтрин выбрала заклинание: "+spellName());}return true;
             case "KATH:gear":if(k.active()&&gear<2&&g.gold>=120*(gear+1)){g.gold-=120*(gear+1);gear++;hp=Math.min(maxHp(),hp+10);k.remember(g,"Кэтрин получила: "+GEAR[gear]);}return true;
             case "KATH:focus":if(k.active()&&focus<2&&g.gold>=100*(focus+1)){g.gold-=100*(focus+1);focus++;k.remember(g,"Кэтрин получила: "+FOCUS[focus]);}return true;
             case "KATH:echo":if(k.active()&&k.magicRank>=3&&!dragonEcho&&g.progress.dragonStage>=4){dragonEcho=true;milestone("Изучен драконий отклик");k.remember(g,"Кэтрин исследовала резонанс драконьей магии. Природа отклика не доказана.");}return true;
-            case "KATH:portal":if(k.active()&&k.magicRank>=3&&!portalUsed&&k.mana>=35){WorldAtlas.Place p=WorldAtlas.find("Хижина Анис");if(p!=null){k.mana-=35;portalUsed=true;g.progress.location=p.name;g.region=p.region;g.mode="WORLD";k.observeTravel(g);k.remember(g,"Пространственный переход в хижину Анис.");}}return true;
+            case "KATH:portal":if(k.active()&&k.magicRank>=3&&!portalUsed&&k.mana>=35&&!KatherineStory.atHut(g)){WorldAtlas.Place p=WorldAtlas.find("Хижина Анис");if(p!=null){k.mana-=35;portalUsed=true;g.progress.location=p.name;g.region=p.region;g.mode="WORLD";g.alma.observeTravel(g);k.observeTravel(g);k.remember(g,"Пространственный переход в хижину Анис.");}}return true;
             case "KATH:date":if(k.romance&&lastDate!=g.day){lastDate=g.day;love=KatherineStory.clamp(love+10);attachment=KatherineStory.clamp(attachment+6);k.affection=KatherineStory.clamp(k.affection+4);k.remember(g,"Кэтрин провела время с героем, рассказала о своих мечтах и по взаимному согласию поцеловала его.");}return true;
             case "KATH:engage":if(k.romance&&!engaged&&love>=65&&k.trust>=80&&hurt<25&&damonSafe){engaged=true;milestone("Помолвка");k.remember(g,"Кэтрин и герой по обоюдному согласию решили обручиться.");}return true;
             case "KATH:wedding":if(k.romance&&engaged&&!married&&love>=85&&k.trust>=90&&hurt<15&&g.progress.location.contains("Рифтен")){married=true;milestone("Свадьба");k.remember(g,"Кэтрин и герой заключили добровольный союз в храме Мары.");}return true;

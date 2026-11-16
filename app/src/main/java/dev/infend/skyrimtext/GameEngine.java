@@ -596,7 +596,7 @@ public final class GameEngine {
     void beginAlmaBattle(){startBattle("Убийца Тёмного Братства",75+level*8,8+level*2,"ALMA","Преследователь преграждает дорогу. Альма предупреждает о засаде.");}
     void beginKatherineBattle(){startBattle("Агент Круга Трёх Когтей",75+level*8,8+level*2,"KATHERINE","Кэтрин поднимает барьер. Агент Круга требует, чтобы она сдалась.");}
     private void startBattle(String name,int health,int dmg,String kind,String intro) {
-        resetBattleVisuals();alma.beginBattle();enemyName=name;enemyHp=health;enemyMaxHp=health;enemyDamage=dmg;battleKind=kind;enemyIntro=intro;
+        resetBattleVisuals();alma.beginBattle();katherine.companion.beginBattle();enemyName=name;enemyHp=health;enemyMaxHp=health;enemyDamage=dmg;battleKind=kind;enemyIntro=intro;
         battleLog="В бою важна тактика. Следи за запасом сил и магии.";mode="COMBAT";
     }
     // Retain class/quest/AI bonuses in old saves without counting the legacy
@@ -637,6 +637,8 @@ public final class GameEngine {
         }
         compensation.tick();
         if(!"CANON_SHOUT".equals(action)&&canonicalShoutCooldown>0)canonicalShoutCooldown--;
+        int kathBurn=katherine.active()?katherine.companion.ongoingDamage(Math.max(0,enemyHp-damage)):0;
+        if(kathBurn>0){damage+=kathBurn;actionText+="\nКэтрин: остаточное пламя, −"+kathBurn+" здоровья врагу.";}
         int kathDamage=katherine.assist(this,battleTurns+1,Math.max(0,enemyHp-damage));
         if(kathDamage>0){damage+=kathDamage;actionText+="\nКэтрин: "+katherine.companion.lastSpell+", −"+kathDamage+" здоровья врагу.";}
         int almaDamage=alma.assist(this,battleTurns+1,Math.max(0,enemyHp-damage));if(almaDamage>0){damage+=almaDamage;actionText+="\nАльма: "+alma.powerLabel()+", −"+almaDamage+" здоровья врагу.";}
@@ -648,6 +650,8 @@ public final class GameEngine {
         int rawIncoming=Math.max(1,baseIncoming-(defending?enemyDamage/2+3+2*progress.branches.rank(3)+(progress.advanced.has(AdvancedPerks.QUICK_REFLEXES)?2:0)+(progress.advanced.has(AdvancedPerks.SHIELD_WALL)&&!"Не надето".equals(progress.equippedName("shield"))?3:0)+(progress.advanced.has(AdvancedPerks.SHIELD_CHARGE)&&!"Не надето".equals(progress.equippedName("shield"))?4:0):0));
         int incoming=Math.max(1,(int)Math.round(rawIncoming*(1-progress.damageReduction())));
         if(defending)lastBlocked=Math.max(0,Math.max(1,(int)Math.round(Math.max(1,baseIncoming)*(1-progress.damageReduction())))-incoming);
+        int kathWeakness=katherine.active()?katherine.companion.weaken(incoming):0;incoming-=kathWeakness;
+        if(kathWeakness>0){lastBlocked+=kathWeakness;actionText+="\nКэтрин: ослабление противника, −"+kathWeakness+" входящего урона.";}
         int kathProtection=katherine.protect(incoming);incoming-=kathProtection;
         if(kathProtection>0){lastBlocked+=kathProtection;actionText+="\nКэтрин: защитный барьер, −"+kathProtection+" входящего урона.";}
         int almaProtection=alma.protect(incoming);incoming-=almaProtection;if(almaProtection>0){lastBlocked+=almaProtection;actionText+="\nАльма: защитная магия, −"+almaProtection+" входящего урона.";}
