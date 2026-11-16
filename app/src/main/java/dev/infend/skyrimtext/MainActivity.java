@@ -85,6 +85,7 @@ public final class MainActivity extends Activity {
     private static final String AI_PENDING_DIE="ai_pending_die";
     private static final String AI_PENDING_SCENE="ai_pending_scene_hash";
     private static final String AI_PENDING_SESSION="ai_pending_session";
+    private static final String AI_PENDING_INSTRUCTION="ai_pending_instruction",AI_PENDING_CHECKS="ai_pending_checks";
     private boolean aiTurnBusy;
     private String aiTurnPreview="",aiTurnStatus="";
     private String aiLocalPhase="Локальная генерация…";
@@ -548,11 +549,12 @@ public final class MainActivity extends Activity {
     private void livingDelta(String label,long delta){if(delta!=0)livingDeltas.put(label,delta);}
     private void renderLivingResult(){
         JSONObject result=game.lastLivingResult;JSONObject deltas=result.optJSONObject("deltas");int chance=result.optInt("chance",-1),roll=result.optInt("roll",-1);
-        JSONObject items=result.optJSONObject("items");if((deltas==null||deltas.length()==0)&&(items==null||items.length()==0)&&roll<0)return;
+        JSONObject items=result.optJSONObject("items");org.json.JSONArray checks=result.optJSONArray("checks");if((deltas==null||deltas.length()==0)&&(items==null||items.length()==0)&&(checks==null||checks.length()==0)&&roll<0)return;
         LinearLayout tile=livingTile(content);String title=roll>=1?(roll<=chance?"Успех":"Неудача"):"Результат действия";
         livingLine(tile,title,chance>=0?chance+"%":"",roll>=1?(roll<=chance?ITEM_UP:ITEM_DOWN):accent());
         String label=result.optString("title","");if(!label.isEmpty())addText(tile,label,13,MUTED,false,5);
         if(roll>=1)livingLine(tile,"Бросок",roll+" / 100",MUTED);
+        if(checks!=null)for(int i=0;i<checks.length();i++){JSONObject check=checks.optJSONObject(i);if(check==null)continue;int probability=check.optInt("chance",-1),die=check.optInt("roll",-1);boolean success=AiGameTurn.success(probability,die);addText(tile,check.optString("title"),13,TEXT,true,4);livingLine(tile,probability<0?"Без проверки":success?"Успех":"Неудача",probability<0?"":die+" / 100 · "+probability+"%",success?ITEM_UP:ITEM_DOWN);}
         if(deltas!=null){java.util.Iterator<String> keys=deltas.keys();while(keys.hasNext()){String key=keys.next();long n=deltas.optLong(key);if(n==0)continue;int color=key.equals("Золото")?ITEM_GOLD:key.startsWith("Игровое время")?MUTED:n>0?ITEM_UP:ITEM_DOWN;livingLine(tile,key,(n>0?"+":"−")+livingNumber(Math.abs(n)),color);}}
         if(items!=null&&items.length()>0){java.util.Iterator<String> ids=items.keys();while(ids.hasNext()){String id=ids.next();ItemCatalog.Item item=ItemCatalog.find(id);long count=items.optLong(id);livingLine(tile,item==null?id:item.name,(count>0?"+":"−")+Math.abs(count),count>0?ITEM_UP:ITEM_DOWN);}livingLink(content,"Инвентарь обновлён","","bag",()->{tab=2;render();});}
     }
@@ -1574,13 +1576,18 @@ public final class MainActivity extends Activity {
     private void clearAiPending(){
         prefs.edit().remove(AI_PENDING_ACTION).remove(AI_PENDING_CHANCE)
             .remove(AI_PENDING_DIE).remove(AI_PENDING_SCENE)
-            .remove(AI_PENDING_SESSION).apply();
+            .remove(AI_PENDING_SESSION).remove(AI_PENDING_INSTRUCTION).remove(AI_PENDING_CHECKS).apply();
     }
     private void storeAiPending(String action,int chance,int die){
         prefs.edit().putString(AI_PENDING_ACTION,action)
             .putInt(AI_PENDING_CHANCE,chance).putInt(AI_PENDING_DIE,die)
             .putInt(AI_PENDING_SCENE,game.aiTurn==null?0:game.aiTurn.scene.hashCode())
-            .putString(AI_PENDING_SESSION,aiSession).apply();
+            .putString(AI_PENDING_SESSION,aiSession).remove(AI_PENDING_INSTRUCTION).remove(AI_PENDING_CHECKS).commit();
+    }
+    private boolean storeSelectedChecks(String compound,String instruction,LockedChecks checks){
+        return prefs.edit().putString(AI_PENDING_ACTION,compound).putInt(AI_PENDING_CHANCE,-2).putInt(AI_PENDING_DIE,-1)
+            .putInt(AI_PENDING_SCENE,game.aiTurn.scene.hashCode()).putString(AI_PENDING_SESSION,aiSession)
+            .putString(AI_PENDING_INSTRUCTION,instruction).putString(AI_PENDING_CHECKS,checks.toString()).commit();
     }
     private String lockedFreeInstruction(String action,int chance,int die){
         String verdict=chance<0?"Проверка не требуется, действие гарантировано.":
@@ -1778,6 +1785,7 @@ public final class MainActivity extends Activity {
                 .append(value).append("\n");
             String compound=combined.toString();
             persistAiDraft();
+            String locked=pendingAiAction();if(!locked.isEmpty()&&!compound.equals(locked)){toast("Исход уже зафиксирован. Повтори исходный выбор без изменений.");return;}
             if(!value.isEmpty()){
                 if(compound.equals(pendingAiAction())){
                     int chance=prefs.getInt(AI_PENDING_CHANCE,-1);
@@ -1790,14 +1798,15 @@ public final class MainActivity extends Activity {
                     "\nОцени единый шанс составного действия. Не исполняй до броска Android.",false,true,-2,compound);
                 return;
             }
-            clearAiPending();
+            if(compound.equals(pendingAiAction())){String lockedInstruction=prefs.getString(AI_PENDING_INSTRUCTION,"");if(!lockedInstruction.isEmpty()&&LockedChecks.restore(prefs.getString(AI_PENDING_CHECKS,""))!=null){requestAiTurn(lockedInstruction,true);return;}toast("Сохранённая проверка недоступна");return;}
+            LockedChecks checks=new LockedChecks();
             StringBuilder instruction=new StringBuilder(compound);
             instruction.append("\nУчитывай конфликты действий: невозможное не исполняй. ");
             instruction.append("Исходы выполнимых действий уже установлены Android:\n");
             for(Integer index:indexes){
                 if(index<1||index>game.aiTurn.choices.size())continue;
                 AiGameTurn.Option option=game.aiTurn.choices.get(index-1);
-                int die=option.chance<0?-1:AiGameTurn.roll();
+                int die=option.chance<0?-1:AiGameTurn.roll();checks.add(index,option.title,option.chance,die);
                 instruction.append("Вариант ").append(index).append(": ");
                 if(option.chance<0)instruction.append("без проверки.");
                 else instruction.append("шанс ").append(option.chance).append("%, бросок ")
@@ -1806,6 +1815,7 @@ public final class MainActivity extends Activity {
                 instruction.append("\n");
             }
             instruction.append("Продолжи историю, применив effects только за совершённые действия.");
+            if(!storeSelectedChecks(compound,instruction.toString(),checks)){toast("Не удалось сохранить броски");return;}
             requestAiTurn(instruction.toString(),true);
         });
     }
@@ -2022,7 +2032,7 @@ public final class MainActivity extends Activity {
                     completed.apply(next,actionResolved);
                     next.progress.sync(next);
                     captureItemGains(before,next,!actionResolved);
-                    if(actionResolved){if(expectedChance>=0){next.lastCheckChance=expectedChance;next.lastCheckRoll=prefs.getInt(AI_PENDING_DIE,-1);}recordVisual(visualBefore,next,completed.journal.isEmpty()?"Продолжение истории":completed.journal);}
+                    if(actionResolved){if(expectedChance>=0){next.lastCheckChance=expectedChance;next.lastCheckRoll=prefs.getInt(AI_PENDING_DIE,-1);}recordVisual(visualBefore,next,completed.journal.isEmpty()?"Продолжение истории":completed.journal);LockedChecks lockedChecks=LockedChecks.restore(prefs.getString(AI_PENDING_CHECKS,""));if(lockedChecks!=null)next.lastLivingResult.put("checks",lockedChecks.snapshot());}
                     else next.recordVisualEvent(completed.journal.isEmpty()?"Продолжение истории":completed.journal);
                     next.aiTurn=completed;
                     game=next;
@@ -3531,10 +3541,10 @@ public final class MainActivity extends Activity {
         heroEntry(c,"Победы",String.valueOf(game.victories));heroEntry(c,"Исследований",String.valueOf(game.explored));
         LinearLayout items=card();addText(items,"СНАРЯЖЕНИЕ",11,accent(),true,12);
         gearVisual(items);
-        addText(items,"Оружие: "+game.progress.equippedName("weapon"),15,TEXT,false,10);
+        addText(items,"Оружие: "+game.progress.equippedDisplayName("weapon"),15,TEXT,false,10);
         String[] gearSlots={"body","head","hands","feet","shield","ring","neck","ammo"};
         String[] gearLabels={"Доспех","Голова","Руки","Ноги","Щит","Кольцо","Амулет","Боеприпасы"};
-        for(int i=0;i<gearSlots.length;i++)addText(items,gearLabels[i]+": "+game.progress.equippedName(gearSlots[i]),15,TEXT,false,6);
+        for(int i=0;i<gearSlots.length;i++)addText(items,gearLabels[i]+": "+game.progress.equippedDisplayName(gearSlots[i]),15,TEXT,false,6);
         addText(items,"Снижение физического урона: "+String.format(java.util.Locale.ROOT,"%.1f%%",100*game.progress.damageReduction()),12,accent(),true,8);
         addText(items,"Лечебные зелья: "+game.potions,14,MUTED,false,6);
         addText(items,"Зелья магии: "+game.manaPotions,14,MUTED,false,0);
@@ -3993,7 +4003,7 @@ public final class MainActivity extends Activity {
     }
     private void livingFixSkill(boolean level){new RuneDialogBuilder(this,accent()).setTitle(level?"Повысить навык на 1":"Добавить 100 опыта навыка").setItems(RpgContent.SKILLS,(d,index)->{new RuneDialogBuilder(this,accent()).setTitle(RpgContent.SKILLS[index]).setMessage("Стоимость: 1 F").setNegativeButton("Отмена",null).setPositiveButton("Купить",(dd,w)->{
         if(livingBusy()||game.progress.skillLevel(index)>=100||game.fixSpent==Long.MAX_VALUE){toast("Покупка недоступна");return;}
-        if(level){game.progress.skillLevels[index]++;if(game.progress.skillLevels[index]>=100)game.progress.skillXp[index]=0;}else{game.progress.skillXp[index]+=100;while(game.progress.skillLevel(index)<100&&game.progress.skillXp[index]>=game.progress.skillNeed(index)){game.progress.skillXp[index]-=game.progress.skillNeed(index);game.progress.skillLevels[index]++;}if(game.progress.skillLevel(index)>=100)game.progress.skillXp[index]=0;}game.fixSpent++;game.progress.sync(game);save();render();toast("Покупка применена");}).show();}).setNegativeButton("Отмена",null).show();}
+        if(!game.progress.buyFixSkill(game,index,level)){toast("Покупка недоступна");return;}save();render();toast("Покупка применена");}).show();}).setNegativeButton("Отмена",null).show();}
     private boolean livingFixGold(int amount){if(game.gold>Integer.MAX_VALUE-amount)return false;game.gold+=amount;return true;}
     private void livingFixRow(LinearLayout host,String title,String detail,int price,java.util.function.BooleanSupplier purchase){
         LinearLayout tile=livingTile(host);livingLine(tile,title,price+" F",ITEM_MAGIC);addText(tile,detail,13,MUTED,false,0);

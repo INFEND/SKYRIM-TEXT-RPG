@@ -112,6 +112,7 @@ public final class RpgProgress {
     }
     public void unequip(String id){if(id==null)return;equipmentInitialized=true;equipped.values().removeIf(id::equals);}
     public String equippedName(String slot){String id=equipped.get(slot);return id==null||quantity(id)<1?"Не надето":id;}
+    public String equippedDisplayName(String slot){String id=equippedName(slot);ItemCatalog.Item item=ItemCatalog.find(id);return item==null?id:item.name;}
     public double equippedDamage(){
         ItemCatalog.Item item=ItemCatalog.find(equipped.get("weapon"));
         return item!=null&&quantity(item.id)>0&&item.baseStat>=0?item.currentStat(this):0;
@@ -198,7 +199,7 @@ public final class RpgProgress {
     }
     public int quantity(String id){return inventory.optInt(id,0);}
     public boolean addItem(String id,int quantity){
-        if(quantity<=0||ItemCatalog.find(id)==null||CompensationPowers.itemIndex(id)>=0)return false;
+        if(quantity<=0||ItemCatalog.find(id)==null||CompensationPowers.itemIndex(id)>=0||quantity(id)>Integer.MAX_VALUE-quantity)return false;
         ItemCatalog.Item item=ItemCatalog.find(id);
         if(item.weight>0&&carryWeight()+item.weight*quantity>50.00001)return false;
         quantity(id,quantity(id)+quantity);return true;
@@ -235,6 +236,12 @@ public final class RpgProgress {
             }
         }
         g.addXp(amount);
+    }
+    public boolean buyFixSkill(GameEngine g,int index,boolean level){
+        if(index<0||index>=skillLevels.length||skillLevels[index]>=100||g.fixSpent==Long.MAX_VALUE||!g.started||"COMBAT".equals(g.mode))return false;
+        if(level){skillLevels[index]++;if(skillLevels[index]>=100)skillXp[index]=0;}
+        else {skillXp[index]+=100;while(skillLevels[index]<100&&skillXp[index]>=skillNeed(index)){skillXp[index]-=skillNeed(index);skillLevels[index]++;}if(skillLevels[index]>=100)skillXp[index]=0;g.addXp(100);}
+        g.fixSpent++;sync(g);return true;
     }
     private String chanceExplanation="";
     public String chanceExplanation(){return chanceExplanation;}
@@ -428,7 +435,7 @@ public final class RpgProgress {
         JSONArray levels=obj.optJSONArray("skillLevels"),xp=obj.optJSONArray("skillXp"),pts=obj.optJSONArray("points");
         for(int i=0;i<p.skillLevels.length;i++){
             if(levels!=null)p.skillLevels[i]=Math.max(0,Math.min(100,levels.optInt(i,15)));
-            if(xp!=null)p.skillXp[i]=Math.max(0,xp.optInt(i,0));
+            if(xp!=null)p.skillXp[i]=p.skillLevels[i]>=100?0:Math.max(0,Math.min(p.skillNeed(i)-1,xp.optInt(i,0)));
         }
         for(int i=0;i<3;i++)if(pts!=null)p.spent[i]=Math.max(0,Math.min(5,pts.optInt(i,0)));
         JSONObject inv=obj.optJSONObject("inventory");

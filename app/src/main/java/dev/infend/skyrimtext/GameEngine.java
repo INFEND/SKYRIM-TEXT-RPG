@@ -439,10 +439,10 @@ public final class GameEngine {
             case "REST":
                 if(gold<20) {message="Хозяин трактира просит 20 септимов. Придётся поискать заработок.";mode="RESULT";}
                 else {gold-=20;day++;syncLivingSystems();needs.tavernRest();hp=maxHp;magicka=maxMagicka;stamina=maxStamina;message="После тёплого ужина и долгого сна силы восстановились.";mode="RESULT";} break;
-            case "Q_ACCEPT": if(questStage==0) {questStage=1;gold+=40;message="Ты принимаешь 40 септимов и получаешь первую зацепку: алтарь находится в Фолкрите.";mode="RESULT";} break;
+            case "Q_ACCEPT": if(questStage==0) {questStage=1;gold=nonnegativeAdd(gold,40);message="Ты принимаешь 40 септимов и получаешь первую зацепку: алтарь находится в Фолкрите.";mode="RESULT";} break;
             case "Q_ALTAR": if(questStage==1 && region==5) {questStage=2;confirmSceneFact("clue", "quest_silver_plate", "Серебряная пластина под алтарём Фолкрита", "FOUND");addXp(35);message="Ты находишь под алтарём серебряную пластину. На ней указан Винтерхолд. +35 опыта.";mode="RESULT";} break;
             case "Q_BOSS": if(questStage==2 && region==6) startBattle("Пепельный страж",90+level*11,12+level*2,"QUEST","Внутри башни оживает существо из пепла и холодного камня."); break;
-            case "Q_FINISH": if(questStage==3 && region==3) {questStage=4;confirmSceneFact("clue", "quest_seal", "Печать хранителей восстановлена", "RESOLVED");gold+=300;reputation+=5;addXp(180);message="Хранители принимают журнал и восстанавливают печать. Скайрим получает ещё один мирный рассвет. Награда: 300 септимов и 180 опыта.";mode="RESULT";} break;
+            case "Q_FINISH": if(questStage==3 && region==3) {questStage=4;confirmSceneFact("clue", "quest_seal", "Печать хранителей восстановлена", "RESOLVED");gold=nonnegativeAdd(gold,300);reputation+=5;addXp(180);message="Хранители принимают журнал и восстанавливают печать. Скайрим получает ещё один мирный рассвет. Награда: 300 септимов и 180 опыта.";mode="RESULT";} break;
             case "TALK_HELP":
                 confirmCurrentConversation();
                 if(!hasNpcStatus("_helped"))
@@ -471,7 +471,7 @@ public final class GameEngine {
             case "BUY_SWORD": buy(180,"Клинок закалён. Атака +6.","SWORD");break;
             case "BUY_ARMOR": buy(160,"Ты облачаешься в стальной нагрудник. Защита +4.","ARMOR");break;
             case "SIDE_ACCEPT": if(sideQuest==2) {sideQuest=1;sideKills=0;message="Заказ принят. Победи трёх противников во время исследования мира.";mode="RESULT";} break;
-            case "SIDE_CLAIM": if(sideQuest==1 && sideKills>=3) {sideQuest=0;sideKills=0;boardCompleted++;gold+=120;addXp(65);message="Заказ выполнен. +120 септимов и +65 опыта.";mode="RESULT";}break;
+            case "SIDE_CLAIM": if(sideQuest==1 && sideKills>=3) {sideQuest=0;sideKills=0;boardCompleted++;gold=nonnegativeAdd(gold,120);addXp(65);message="Заказ выполнен. +120 септимов и +65 опыта.";mode="RESULT";}break;
             case "EVENT_HELP": eventChoice(true);break;
             case "EVENT_SEARCH": eventChoice(false);break;
             case "EVENT_LEAVE": mode="WORLD";message="Ты оставляешь встречу позади и возвращаешься на дорогу.";break;
@@ -531,7 +531,7 @@ public final class GameEngine {
             };
             message=events[random.nextInt(events.length)];mode="EVENT";
         } else {
-            int found=15+random.nextInt(41);gold+=found;addXp(12);
+            int found=15+random.nextInt(41);gold=nonnegativeAdd(gold,found);addXp(12);
             boolean extraPotion=random.nextInt(4)==0;
             boolean canTake=progress.carryWeight()+0.5<=50.00001;
             if(extraPotion&&canTake)potions++;
@@ -554,9 +554,9 @@ public final class GameEngine {
                     message=canCarry?"Ты помогаешь незнакомцу и получаешь лечебное зелье. Репутация +1, опыт +"+gain+".":
                         "Ты помогаешь путнику, но оставляешь зелье из-за тяжёлой поклажи. Репутация +1, опыт +"+gain+".";
                 }
-                else{gold+=25;message="В благодарность тебе вручают 25 септимов. Репутация +1, опыт +"+gain+".";}
+                else{gold=nonnegativeAdd(gold,25);message="В благодарность тебе вручают 25 септимов. Репутация +1, опыт +"+gain+".";}
             }else{
-                int found=28+random.nextInt(44);gold+=found;addXp(10);
+                int found=28+random.nextInt(44);gold=nonnegativeAdd(gold,found);addXp(10);
                 message="Под камнем найдено "+found+" септимов. Получено 10 опыта.";
             }
             progress.completed.add((help?"Помощь путнику":"Исследование находки")+" | день "+day);
@@ -570,7 +570,7 @@ public final class GameEngine {
     private void board() {
         if(sideQuest==0){mode="RESULT";sideQuest=2;message="На доске висит объявление: «Избавьте дороги от трёх опасных противников. Плата 120 септимов». Открой доску ещё раз, чтобы принять заказ.";}
         else if(sideQuest==2){mode="RESULT";sideQuest=1;sideKills=0;message="Заказ принят. Победи трёх врагов в случайных встречах. Текущий прогресс: 0/3.";}
-        else if(sideKills>=3){sideQuest=0;sideKills=0;gold+=120;addXp(65);message="Заказ выполнен. +120 септимов, +65 опыта.";mode="RESULT";}
+        else if(sideKills>=3){sideQuest=0;sideKills=0;gold=nonnegativeAdd(gold,120);addXp(65);message="Заказ выполнен. +120 септимов, +65 опыта.";mode="RESULT";}
         else {message="Заказ активен. Побеждено противников: "+sideKills+"/3.";mode="RESULT";}
     }
     void beginFactionBattle(int f,String name,int health,int damage,String intro){factionBattle=f;startBattle(name,health,damage,"FACTION",intro);}
@@ -606,7 +606,7 @@ public final class GameEngine {
             case "MAGIC":if(magicka<magicCost()){battleLog="Недостаточно магии. Нужны "+magicCost()+" единиц.";return;}magicka-=magicCost();damage=(int)Math.round((18+level*4+random.nextInt(8))*(1+.05*progress.branches.rank(13)+(progress.advanced.has(AdvancedPerks.DUAL_CAST)?.10:0)));actionText="Магическая вспышка обжигает врага: −"+damage+".";break;
             case "CANON_SHOUT":if(!"CANONICAL".equals(battleKind)||canonicalShouts==0||canonicalShoutCooldown>0)return;
                 damage=24+level*3+((canonicalShouts&4)!=0?12:0);defending=true;canonicalShoutCooldown=3;actionText=CanonicalCampaign.combatShout(this)+": −"+damage+" здоровья врагу.";break;
-            case "DEFEND": defending=true;stamina=Math.min(maxStamina,stamina+12);magicka=Math.min(maxMagicka,magicka+5+(progress.advanced.has(AdvancedPerks.RECOVERY)?3:0)+(progress.advanced.has(AdvancedPerks.REGENERATION)?5:0));actionText="Ты встаёшь в оборону, восстанавливая силы.";break;
+            case "DEFEND": defending=true;stamina=Math.min(maxStamina,nonnegativeAdd(stamina,12));magicka=Math.min(maxMagicka,nonnegativeAdd(magicka,5+(progress.advanced.has(AdvancedPerks.RECOVERY)?3:0)+(progress.advanced.has(AdvancedPerks.REGENERATION)?5:0)));actionText="Ты встаёшь в оборону, восстанавливая силы.";break;
             case "POTION":if(potions==0){battleLog="Лечебных зелий больше нет.";return;}potions--;int restored=Math.min(healingAmount(),maxHp-hp);hp+=restored;restoreRespite();lastHealing=restored;actionText="Ты восстанавливаешь "+restored+" здоровья.";break;
             case "FLEE":if(battleKind.equals("WILD")&&rollCheck(progress.chance(this,"FLEE"))){mode="RESULT";poisonTurns=frostTurns=0;message="Ты уходишь от противника. Трофеев нет.";return;}actionText="Попытка отступить не удалась.";break;
             default:return;
@@ -631,7 +631,7 @@ public final class GameEngine {
         if(!defending&&foe.contains("морозный паук"))poisonTurns=2;
         if(!defending&&foe.contains("ледяной призрак"))frostTurns=2;
         lastTaken=Math.min(hp,incoming+poisoned);battleTaken+=lastTaken;
-        hp=Math.max(0,hp-incoming-poisoned);stamina=Math.min(maxStamina,stamina+3+(progress.hasArmorType(5)&&progress.advanced.has(AdvancedPerks.WIND_WALKER)?2:0));
+        hp=Math.max(0,hp-incoming-poisoned);stamina=Math.min(maxStamina,nonnegativeAdd(stamina,3+(progress.hasArmorType(5)&&progress.advanced.has(AdvancedPerks.WIND_WALKER)?2:0)));
         battleLog=actionText+"\n"+enemyName+" отвечает: −"+incoming+" здоровья."+(poisoned>0?"\nЯд: −"+poisoned+" здоровья.":"")+(poisonTurns>0?"\nОтравление: "+poisonTurns+" хода.":"")+(frostTurns>0?"\nОбморожение: "+frostTurns+" хода.":"");
         if(hp==0) {
             int penalty=gold/3;gold-=penalty;hp=Math.max(1,maxHp/2);stamina=Math.max(1,maxStamina/2);
@@ -642,11 +642,11 @@ public final class GameEngine {
         int reward=25+random.nextInt(26)+level*4;int gain=30+level*9;
         boolean nonlethal="CANONICAL".equals(battleKind)&&(canonicalStage==22||canonicalStage==27||canonicalStage==30);
         if(nonlethal)reward=0;
-        gold+=reward;victories++;if(!nonlethal&&sideQuest==1&&sideKills<3)sideKills++;
-        if("QUEST".equals(battleKind)) {questStage=3;reward+=50;gold+=50;gain+=65;}
+        gold=nonnegativeAdd(gold,reward);victories++;if(!nonlethal&&sideQuest==1&&sideKills<3)sideKills++;
+        if("QUEST".equals(battleKind)) {questStage=3;reward+=50;gold=nonnegativeAdd(gold,50);gain+=65;}
         if("DRAGON".equals(battleKind)&&progress.dragonStage==3){
             progress.dragonStage=4;
-            reward+=85;gold+=85;gain+=90;
+            reward+=85;gold=nonnegativeAdd(gold,85);gain+=90;
             progress.dragonRecent="У сторожевой башни повержен дракон. "+
                 "Над полем прозвучал голос, которому откликнулись горы. Следующая цель: Айварстед.";
         }
@@ -665,9 +665,10 @@ public final class GameEngine {
     }
     public static int experienceRequired(int level){return Math.max(1,Math.min(100,level))*100;}
     public int experienceRequired(){return experienceRequired(level);}
+    public static int nonnegativeAdd(int value,int amount){return (int)Math.max(0,Math.min(Integer.MAX_VALUE,(long)value+amount));}
     public void addXp(int amount) {
-        xp+=amount;
-        while(level<100 && xp>=experienceRequired()){xp-=experienceRequired();level++;maxHp+=10;maxStamina+=10;maxMagicka+=10;progress.perkPoints++;hp=maxHp;stamina=maxStamina;magicka=maxMagicka;}
+        if(amount<=0)return;xp=nonnegativeAdd(xp,amount);
+        while(level<100 && xp>=experienceRequired()){xp-=experienceRequired();level++;maxHp=nonnegativeAdd(maxHp,10);maxStamina=nonnegativeAdd(maxStamina,10);maxMagicka=nonnegativeAdd(maxMagicka,10);progress.perkPoints=nonnegativeAdd(progress.perkPoints,1);hp=maxHp;stamina=maxStamina;magicka=maxMagicka;}
     }
     /** Time-limited rest available outside combat, tracked in the old save schema. */
     public boolean waitHours(int hours){return restHours(hours,hours>=6);}
@@ -691,9 +692,9 @@ public final class GameEngine {
     public int healingAmount(){return 45+5*progress.branches.rank(14)+(progress.advanced.has(AdvancedPerks.PHYSICIAN)?10:0)+(progress.advanced.has(AdvancedPerks.BENEFACTOR)?10:0)+(progress.advanced.has(AdvancedPerks.PURE_MIXTURE)?10:0)+(progress.advanced.has(AdvancedPerks.REGENERATION)?10:0);}
     private void restoreRespite(){if(progress.advanced.has(AdvancedPerks.RESPITE))stamina=Math.min(maxStamina,stamina+10);}
     public int staminaPotionAmount(){return 50+(progress.advanced.has(AdvancedPerks.PHYSICIAN)?10:0)+(progress.advanced.has(AdvancedPerks.BENEFACTOR)?10:0)+(progress.advanced.has(AdvancedPerks.PURE_MIXTURE)?10:0);}
-    public boolean drinkHealing() {if(!started||"COMBAT".equals(mode)||potions<=0||hp>=maxHp)return false;potions--;hp=Math.min(maxHp,hp+healingAmount());restoreRespite();progress.sync(this);return true;}
-    public boolean drinkStamina(){if(!started||"COMBAT".equals(mode)||stamina>=maxStamina||!progress.removeItem("Зелье запаса сил",1))return false;stamina=Math.min(maxStamina,stamina+staminaPotionAmount());progress.sync(this);return true;}
-    public boolean drinkMana() {if(!started||"COMBAT".equals(mode)||manaPotions<=0||magicka>=maxMagicka)return false;manaPotions--;magicka=Math.min(maxMagicka,magicka+35);return true;}
+    public boolean drinkHealing() {if(!started||"COMBAT".equals(mode)||potions<=0||hp>=maxHp)return false;potions--;hp=Math.min(maxHp,nonnegativeAdd(hp,healingAmount()));restoreRespite();progress.sync(this);return true;}
+    public boolean drinkStamina(){if(!started||"COMBAT".equals(mode)||stamina>=maxStamina||!progress.removeItem("Зелье запаса сил",1))return false;stamina=Math.min(maxStamina,nonnegativeAdd(stamina,staminaPotionAmount()));progress.sync(this);return true;}
+    public boolean drinkMana() {if(!started||"COMBAT".equals(mode)||manaPotions<=0||magicka>=maxMagicka)return false;manaPotions--;magicka=Math.min(maxMagicka,nonnegativeAdd(magicka,35));return true;}
     public String questStatus() {switch(questStage){case 0:return "не начато";case 1:return "Фолкрит";case 2:return "Винтерхолд";case 3:return "Солитьюд";default:return "завершено";}}
     public String questDetails() {switch(questStage){case 0:return "Поговори с хранителем в разделе «Главная история».";case 1:return "Доберись до Фолкрита и осмотри алтарь.";case 2:return "Найди башню в Винтерхолде и победи пепельного стража.";case 3:return "Передай журнал хранителям Солитьюда.";default:return "Сюжетная линия завершена. Ты можешь продолжать приключения.";}}
     private static boolean contains(String[] arr,String v){for(String s:arr)if(s.equals(v))return true;return false;}
@@ -731,7 +732,7 @@ public final class GameEngine {
             g.gender=CharacterIdentity.normalizeGender(j.optString("gender",CharacterIdentity.MALE));
             g.portrait=CharacterIdentity.normalizePortrait(j.optInt("portrait",1));
             g.region=Math.max(0,Math.min(REGIONS.length-1,j.optInt("region",0)));
-            g.day=Math.max(1,j.optInt("day",1));g.hour=Math.max(0,Math.min(23,j.optInt("hour",8)));g.level=Math.max(1,j.optInt("level",1));g.xp=Math.max(0,j.optInt("xp",0));
+            g.day=Math.max(1,j.optInt("day",1));g.hour=Math.max(0,Math.min(23,j.optInt("hour",8)));g.level=Math.max(1,Math.min(100,j.optInt("level",1)));g.xp=Math.max(0,j.optInt("xp",0));
             g.maxHp=Math.max(1,j.optInt("maxHp",100));g.hp=Math.max(0,Math.min(g.maxHp,j.optInt("hp",100)));
             g.maxStamina=Math.max(1,j.optInt("maxStamina",65));g.stamina=Math.max(0,Math.min(g.maxStamina,j.optInt("stamina",65)));
             g.maxMagicka=Math.max(1,j.optInt("maxMagicka",40));g.magicka=Math.max(0,Math.min(g.maxMagicka,j.optInt("magicka",40)));
