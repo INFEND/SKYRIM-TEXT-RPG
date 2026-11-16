@@ -467,14 +467,14 @@ public final class MainActivity extends Activity {
     private void katherineGallery(int index){
         LinearLayout panel=column();panel.setPadding(dp(12),dp(8),dp(12),dp(8));
         if(!KatherineGallery.available(this)){
-            addText(panel,"Галерея пока не загружена. Выбери архив Katherine_gallery.zip или скачай пакет в управлении ресурсами, когда он появится на сервере.",14,TEXT,false,8);
-            new RuneDialogBuilder(this,accent()).setTitle("Кэтрин | Галерея").setView(panel).setPositiveButton("Импорт ZIP",(d,w)->chooseKatherineGallery()).setNegativeButton("Закрыть",null).show();return;
+            addText(panel,"Оригинальная галерея: 10 фотографий. Скачай подписанный пакет Кэтрин из управления ресурсами. Ручной импорт остаётся доступен.",14,TEXT,false,8);
+            new RuneDialogBuilder(this,accent()).setTitle("Кэтрин | Галерея").setView(panel).setPositiveButton("Скачать",(d,w)->new ResourceManagerDialog(this,accent(),this::render,"media:katherine").show()).setNeutralButton("Импорт ZIP",(d,w)->chooseKatherineGallery()).setNegativeButton("Закрыть",null).show();return;
         }
         try{
             android.widget.ImageView image=new android.widget.ImageView(this);image.setImageBitmap(KatherineGallery.photo(this,index));image.setAdjustViewBounds(true);image.setScaleType(android.widget.ImageView.ScaleType.FIT_CENTER);panel.addView(image,lp(-1,440));
             TextView count=text(index+" / "+KatherineGallery.COUNT,14,accent(),true);count.setGravity(Gravity.CENTER);panel.addView(count,lp(-1,34));
             AlertDialog dialog=new RuneDialogBuilder(this,accent()).setTitle("Кэтрин | Галерея").setView(panel).setNegativeButton("Закрыть",null).setNeutralButton("Назад",(d,w)->katherineGallery(index==1?KatherineGallery.COUNT:index-1)).setPositiveButton("Вперёд",(d,w)->katherineGallery(index==KatherineGallery.COUNT?1:index+1)).create();dialog.show();
-        }catch(Exception e){toast("Не удалось прочитать фото");}
+        }catch(Exception e){new RuneDialogBuilder(this,accent()).setTitle("Кэтрин | Галерея").setMessage("Не удалось прочитать фото. Восстанови пакет в управлении ресурсами или повтори импорт оригинального архива.").setPositiveButton("Восстановить",(d,w)->new ResourceManagerDialog(this,accent(),this::render,"media:katherine").show()).setNeutralButton("Импорт ZIP",(d,w)->chooseKatherineGallery()).setNegativeButton("Закрыть",null).show();}
     }
     private String lastNarrative="";
     private void decorateNarrative(LinearLayout host,TextView body,String raw){
