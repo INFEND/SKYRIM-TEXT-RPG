@@ -320,7 +320,7 @@ public final class GameEngine {
     }
     private Scene battleScene() {
         Scene s=new Scene("БОЙ | " + REGIONS[region], enemyName, enemyIntro + "\n\n" + battleLog +
-            "\n\nПротивник: " + enemyHp + "/" + enemyMaxHp + " здоровья.\nТы: " + hp + "/" + maxHp + " здоровья.")
+            "\n\nПротивник: " + enemyHp + "/" + enemyMaxHp + " здоровья."+road.groupStatus(this)+"\nТы: " + hp + "/" + maxHp + " здоровья.")
             .primary("ATTACK","Обычный удар","Стабильный урон, без затрат")
             .add("HEAVY","Сильный удар","−"+heavyCost()+" выносливости | риск промаха")
             .add("MAGIC","Магическая вспышка","−"+magicCost()+" магии | усиленный урон")
@@ -656,9 +656,10 @@ public final class GameEngine {
         if(road.hasDog(this)&&enemyHp>damage&&(battleTurns+1)%3==0){damage+=3;actionText+="\nБродячий пёс помогает в бою: −3 здоровья врагу.";}
         int almaDamage=alma.assist(this,battleTurns+1,Math.max(0,enemyHp-damage));if(almaDamage>0){damage+=almaDamage;actionText+="\nАльма: "+alma.powerLabel()+", −"+almaDamage+" здоровья врагу.";}
         int almaCombo=alma.combo(Math.max(0,enemyHp-damage),"MAGIC".equals(action));if(almaCombo>0){damage+=almaCombo;actionText+="\nАльма: Кровавая связка, −"+almaCombo+" здоровья врагу.";}
+        int roadAssist=road.allyDamage(this,damage);if(roadAssist>0){damage+=roadAssist;actionText+="\nСоратники атакуют великана: −"+roadAssist+" здоровья.";}
         lastDealt=Math.min(enemyHp,damage);lastHeavyHit="HEAVY".equals(action)&&lastDealt>0;lastMiss="HEAVY".equals(action)&&lastDealt==0;battleDealt+=lastDealt;battleTurns++;
         enemyHp=Math.max(0,enemyHp-damage);
-        if(enemyHp==0) {poisonTurns=frostTurns=0;winBattle(actionText);return;}
+        if(enemyHp==0) {poisonTurns=frostTurns=0;if(road.nextOpponent(this,actionText)){regenerateCombat();return;}winBattle(actionText);return;}
         int baseIncoming=enemyDamage+random.nextInt(8)-Math.max(0,armor-(armorUpgraded?4:0));
         baseIncoming=Math.max(1,baseIncoming-compensation.passiveBonus(this,1));
         int rawIncoming=Math.max(1,baseIncoming-(defending?enemyDamage/2+3+2*progress.branches.rank(3)+(progress.advanced.has(AdvancedPerks.QUICK_REFLEXES)?2:0)+(progress.advanced.has(AdvancedPerks.SHIELD_WALL)&&!"Не надето".equals(progress.equippedName("shield"))?3:0)+(progress.advanced.has(AdvancedPerks.SHIELD_CHARGE)&&!"Не надето".equals(progress.equippedName("shield"))?4:0):0));
@@ -704,6 +705,7 @@ public final class GameEngine {
         if("DRAGON".equals(battleKind))message+="\n\n"+progress.dragonRecent;
         if(sideQuest==1)message+="\nЗаказ доски: "+sideKills+"/3.";
         if(battleKind.startsWith("ROAD_QUEST:"))RoadQuests.victory(this,battleKind);
+        if("WILD".equals(battleKind)&&road.pending())road.applyVictory(this);
         if("FACTION".equals(battleKind)){factionStories.victory(factionBattle);factionBattle=-1;message+="\n\nОткрой сюжет фракции, чтобы завершить главу.";}
         if("CANONICAL".equals(battleKind)){
             if(canonicalStage==27)message="Ловушка сомкнулась. Одавинг жив и готов к разговору.";
@@ -839,7 +841,7 @@ public final class GameEngine {
             }
             if(j.optJSONObject("progress")==null)g.progress.location=REGIONS[g.region];
             g.progress.sync(g);
-            if(g.mode.equals("COMBAT")&&g.enemyHp<=0)g.mode="WORLD";
+            if(g.mode.equals("COMBAT")&&g.enemyHp<=0)g.mode=g.road.pending()?"RESULT":"WORLD";
         }catch(Exception ignore){return new GameEngine();}
         return g;
     }

@@ -1,6 +1,7 @@
 package dev.infend.skyrimtext;
 import java.util.*;
 import org.json.JSONObject;
+import org.json.JSONArray;
 
 /** Saved, weighted road scenes. The validated journey is resumed exactly once. */
 final class RoadEvents {
@@ -202,6 +203,66 @@ final class RoadEvents {
     String id="",destination="",outcome="",last="",segmentFrom="",segmentTo="";
     int serial;
     boolean resuming,canonicalResume;
+    private final LinkedHashMap<String,Integer> recentDays=new LinkedHashMap<>();
+    private final int[] roadBounties=new int[10];
+    private String decision="";
+    private String[] combatGroup=new String[0];
+    private int combatIndex=0, encounterRegion=-1;
+    private boolean victoryApplied=false;
+    private static String[] groupFor(String id,String enemy){switch(id){
+        case "imperial_prisoner":return new String[]{"Имперский легионер","Имперский лучник","Имперский офицер"};
+        case "storm_prisoner":return new String[]{"Брат Бури","Лучник Братьев Бури","Офицер Братьев Бури"};
+        case "thalmor_prisoner":return new String[]{"Талморский солдат","Талморский лучник","Талморский юстициар"};
+        case "marauder":return new String[]{"Мародёр","Мародёр-лучник","Главарь мародёров"};
+        case "bandits":return new String[]{"Бандит","Бандит-лучник","Главарь бандитов"};
+        case "false_imperials":return new String[]{"Бандит в имперской броне","Бандит в имперской броне"};
+        case "merchant_attack":return new String[]{"Бандит","Бандит"};
+        case "bandit_battle":return new String[]{"Бандит","Бандит-лучник","Главарь бандитов"};
+        case "wolves":return new String[]{"Волк","Волк","Волк"};
+        case "bounty_hunters":return new String[]{"Наёмный головорез","Наёмный лучник","Главарь головорезов"};
+        case "thalmor_order":return new String[]{"Талморский солдат","Талморский лучник","Талморский юстициар"};
+        case "vampire_hound":return new String[]{"Гончая смерти","Вампир"};
+        case "vampire_attack":return new String[]{"Вампир","Вампир-прислужник","Старший вампир"};
+        case "vampire_vigilant_body":return new String[]{"Вампир","Вампир"};
+        case "hakar":return new String[]{"Вампир","Вампир"};
+        case "werewolf_pack":return new String[]{"Оборотень","Оборотень"};
+        case "gargoyles":return new String[]{"Горгулья","Горгулья"};
+        case "death_hounds":return new String[]{"Гончая смерти","Гончая смерти","Гончая смерти"};
+        case "city_death_hounds":return new String[]{"Гончая смерти","Гончая смерти","Гончая смерти"};
+        case "city_vampire_hounds":return new String[]{"Гончая смерти","Гончая смерти","Вампир"};
+        case "city_vampire_trio":return new String[]{"Гончая смерти","Горгулья","Вампир"};
+        case "city_vampire_thralls":return new String[]{"Раб вампира","Раб вампира","Вампир"};
+        case "city_vampire_gargoyle":return new String[]{"Горгулья","Вампир"};
+        case "city_vampire_summoner":return new String[]{"Горгулья","Вампир-призыватель"};
+        case "island_werebears":return new String[]{"Медведь-оборотень","Медведь-оборотень","Медведь-оборотень"};
+        case "island_morag_tong":return new String[]{"Ассасин Мораг Тонг","Ассасин Мораг Тонг"};
+        case "island_morgrul":return new String[]{"Головорез Моргрула","Головорез Моргрула"};
+        case "island_ice_reavers":return new String[]{"Ледяное привидение","Ледяное привидение"};
+        case "forsworn_merchant":return new String[]{"Изгой","Изгой-лучник","Изгой"};
+        case "peddler_forsworn":return new String[]{"Изгой","Изгой-лучник","Изгой"};
+        case "home_bandits":return new String[]{"Бандит","Бандит"};
+        case "love_triangle":return new String[]{"Наёмный головорез","Наёмный головорез","Главарь головорезов"};
+        case "necromancers":return new String[]{"Некромант","Некромант"};
+        case "vigilant_skeletons":return new String[]{"Скелет","Скелет"};
+        case "wolf_escape":return new String[]{"Волк","Волк"};
+        case "dg_vampire_scouts":return new String[]{"Вампир-разведчик","Вампир-разведчик"};
+        case "false_vigilants":return new String[]{"Вампир-лжедозорный","Вампир-лжедозорный"};
+        case "vampire_bandits":return new String[]{"Вампир","Вампир"};
+        case "werewolf_vampires":return new String[]{"Вампир","Вампир","Вампир"};
+        case "island_reavers":return new String[]{"Разбойник Солстейма","Разбойник Солстейма"};
+        case "civil_battle":return enemy.contains("Имперск")?new String[]{"Имперский легионер","Имперский лучник","Имперский офицер"}:new String[]{"Брат Бури","Лучник Братьев Бури","Офицер Братьев Бури"};
+        default:return new String[]{enemy};
+    }}
+    int groupSize(){return combatGroup.length;}
+    int groupCurrent(){return Math.min(combatGroup.length,combatIndex+1);}
+    boolean groupActive(GameEngine g){return pending()&&"WILD".equals(g.battleKind)&&combatGroup.length>1;}
+    String groupStatus(GameEngine g){return groupActive(g)?"\nПротивник "+groupCurrent()+"/"+groupSize():"";}
+    int bounty(int region){return region>=0&&region<roadBounties.length?roadBounties[region]:0;}
+    private void addBounty(int region,int amount){if(region>=0&&region<roadBounties.length)roadBounties[region]=GameEngine.nonnegativeAdd(roadBounties[region],amount);}
+    private static boolean member(GameEngine g,int faction){return g.factions.stage(faction)>0||g.factionStories.started(faction);}
+    private void remember(GameEngine g){recentDays.put(id,g.day);while(recentDays.size()>188)recentDays.remove(recentDays.keySet().iterator().next());}
+    private boolean cooled(GameEngine g,Event e){Integer day=recentDays.get(e.id);return day==null||g.day-day>=3||g.day<day;}
+    private void prepare(int region){encounterRegion=region;decision="";combatGroup=new String[0];combatIndex=0;victoryApplied=false;}
     private static Event find(String id){for(Event e:EVENTS)if(e.id.equals(id))return e;return null;}
     boolean pending(){return !destination.isEmpty()&&find(id)!=null;}
     static boolean pair(String a,String b,String x,String y){return (a.equals(x)&&b.equals(y))||(a.equals(y)&&b.equals(x));}
@@ -223,6 +284,7 @@ final class RoadEvents {
     static List<String> eventIds(){ArrayList<String> ids=new ArrayList<>();for(Event e:EVENTS)ids.add(e.id);return Collections.unmodifiableList(ids); }
     static boolean eligible(GameEngine g,Event e,int region){
         if("unique".equals(e.rule)||"soul_cairn".equals(e.rule))return false;
+        if("civil".equals(e.rule)&&(g.factionStories.completed(4)||g.factionStories.completed(5)))return false;
         if("stray_dog".equals(e.id)&&"COMPLETED".equals(g.progress.questOutcome("road_dog_companion")))return false;
         if("horse".equals(e.id)&&"COMPLETED".equals(g.progress.questOutcome("road_mount")))return false;
         if(oneTime(e)&&g.progress.questOutcome("road_"+e.id)!=null)return false;
@@ -249,7 +311,7 @@ final class RoadEvents {
             case "louis":return region==1;
             case "sanguine":return true;
             case "peryite":return region==4;
-            case "bounty":return true;
+            case "bounty":return g.road.bounty(region)>=1000;
             case "riverwood":return region==0;
             case "azura":return g.canonicalStage>=19||"COMPLETED".equals(g.progress.questOutcome("road_azura"));
             case "septimus":return g.canonicalStage>=19;
@@ -282,19 +344,20 @@ final class RoadEvents {
     }
     boolean beginCanonical(GameEngine g,String target){
         if(resuming||pending()||g.canonicalStage!=4||!"Ривервуд".equals(g.progress.location)||!"Драконий Предел".equals(target)||g.progress.questOutcome("road_giant")!=null||g.factions.stage(0)>0||g.factionStories.started(0))return false;
-        id="giant";destination=target;segmentFrom="Ривервуд";segmentTo="Вайтран";outcome="";canonicalResume=true;serial=serial==Integer.MAX_VALUE?1:serial+1;g.mode=MODE;g.message=find(id).body;return true;
+        prepare(0);id="giant";destination=target;segmentFrom="Ривервуд";segmentTo="Вайтран";outcome="";canonicalResume=true;serial=serial==Integer.MAX_VALUE?1:serial+1;g.mode=MODE;g.message=find(id).body;return true;
     }
     boolean begin(GameEngine g,TravelPlanner.Route route,WorldAtlas.Place target){return begin(g,route,target,new Random());}
     boolean begin(GameEngine g,TravelPlanner.Route route,WorldAtlas.Place target,Random rng){
-        if(pending()||route==null||!route.allowed||route.days<=0||route.fare>0)return false;
+        if(pending()||route==null||!route.allowed||route.days<=0||route.stops.size()<2)return false;
         String forced=unique(g,route);
-        if(!forced.isEmpty()){id=forced;segmentFrom=g.progress.location;segmentTo="giant".equals(id)?"Ферма Пелагио":"Ферма Лорея";}
+        if(!forced.isEmpty()){prepare(0);id=forced;segmentFrom=g.progress.location;segmentTo="giant".equals(id)?"Ферма Пелагио":"Ферма Лорея";}
         else{
             if(rng.nextInt(100)>=Math.min(60,25+route.days*8))return false;
             ArrayList<Event> pool=new ArrayList<>();int total=0;
-            int segment=1+rng.nextInt(route.stops.size()-1);String a=route.stops.get(segment-1),next=route.stops.get(segment);segmentFrom=a;segmentTo=next;
-            WorldAtlas.Place stop=WorldAtlas.find(next);int region=stop==null?target.region:stop.region;
-            for(Event e:EVENTS)if(!last.equals(e.id)&&eligible(g,e,region)&&locationAllowed(e,a,next,target)){pool.add(e);total+=e.weight;}
+            ArrayList<Integer> land=new ArrayList<>();for(int i=1;i<route.stops.size();i++){WorldAtlas.Place p1=WorldAtlas.find(route.stops.get(i-1)),p2=WorldAtlas.find(route.stops.get(i));if(p1!=null&&p2!=null&&((p1.region==9)!=(p2.region==9)))continue;land.add(i);}if(land.isEmpty())return false;
+            int segment=land.get(rng.nextInt(land.size()));String a=route.stops.get(segment-1),next=route.stops.get(segment);segmentFrom=a;segmentTo=next;
+            WorldAtlas.Place stop=WorldAtlas.find(next);int region=stop==null?target.region:stop.region;prepare(region);
+            for(Event e:EVENTS)if(!last.equals(e.id)&&cooled(g,e)&&eligible(g,e,region)&&locationAllowed(e,a,next,target)){pool.add(e);total+=e.weight;}
             if(total==0)return false;
             int roll=rng.nextInt(total);
             for(Event e:pool){roll-=e.weight;if(roll<0){id=e.id;break;}}
@@ -311,7 +374,7 @@ final class RoadEvents {
         if("homestead".equals(e.rule))return from.contains("Озёрное")||to.contains("Озёрное")||from.contains("Хельяркен")||to.contains("Хельяркен")||from.contains("Уиндстад")||to.contains("Уиндстад");
         return true;
     }
-    boolean beginArvak(GameEngine g){if(pending()||g.progress.questOutcome("road_arvak")!=null)return false;id="arvak";destination=g.progress.location;segmentFrom="Каирн Душ";segmentTo="Каирн Душ";outcome="";canonicalResume=false;serial=serial==Integer.MAX_VALUE?1:serial+1;g.mode=MODE;g.message=find(id).body;return true;}
+    boolean beginArvak(GameEngine g){if(pending()||g.progress.questOutcome("road_arvak")!=null)return false;prepare(g.region);id="arvak";destination=g.progress.location;segmentFrom="Каирн Душ";segmentTo="Каирн Душ";outcome="";canonicalResume=false;serial=serial==Integer.MAX_VALUE?1:serial+1;g.mode=MODE;g.message=find(id).body;return true;}
     private String action(String verb){return "ROAD:"+serial+":"+id+":"+verb;}
     GameEngine.Scene scene(GameEngine g){
         Event e=find(id);
@@ -330,7 +393,7 @@ final class RoadEvents {
         if("island_blackbook".equals(id)||"island_frossel".equals(id)||"taron_dreth".equals(id)||"island_torkild".equals(id))return s.primary(action("reveal_fight"),"Расспросить путника","Узнать сведения; возможна схватка").add(action("fight"),"Вступить в бой","").add(action("sneak"),"Отойти незаметно","Проверка скрытности");
         if("deep_in_cups".equals(id))return s.primary(action("talk"),"Обсудить старое пари","Проверка красноречия").add(action("fight"),"Отказаться от требований","").add(action("sneak"),"Уйти","");
         if("island_morgrul".equals(id)||"louis_revenge".equals(id)||"love_triangle".equals(id))return s.primary(action("talk"),"Объяснить, что произошла ошибка","Проверка красноречия").add(action("fight"),"Защититься","").add(action("sneak"),"Скрыться","");
-        if("bounty_collector".equals(id))return s.primary(action("talk"),"Показать, что ты не разыскиваемый","Проверка красноречия").add(action("fight"),"Вступить в бой","").add(action("sneak"),"Скрыться","");
+        if("bounty_collector".equals(id)){int fine=bounty(encounterRegion);return s.primary(action("fine"),"Оплатить штраф",""+fine+" септимов").add(action("talk"),"Попытаться договориться","Проверка красноречия").add(action("fight"),"Вступить в бой","").add(action("sneak"),"Скрыться","");}
         if("friend_gift".equals(id))return s.primary(action("gift"),"Принять подарок","Получить небольшой подарок").add(action("leave"),"Отказаться","");
         if("kynareth".equals(id)||"mistwatch".equals(id)||"pilgrim".equals(id)||"afflicted".equals(id)||"island_hairy_hunter".equals(id)||"saliah".equals(id))return s.primary(action("clue"),"Расспросить о цели","Записать сведения в журнал").add(action("leave"),"Продолжить путь","");
         if("revelers".equals(id)){s.primary(action("drink"),"Принять медовуху","Подарок весельчаков");if(g.progress.quantity("Медовуха Хоннинга")>0&&!"COMPLETED".equals(g.progress.questOutcome("road_reveler_necklace")))s.add(action("mead_exchange"),"Угостить медовухой Хоннинга","Получить зачарованное ожерелье");if(g.progress.quantity("Медовуха Чёрного Вереска")>0)s.add(action("black_mead"),"Предложить медовуху Чёрного Вереска","");return s.add(action("leave"),"Продолжить путь","");}
@@ -341,8 +404,9 @@ final class RoadEvents {
         if("wolf_escape".equals(id))return s.primary(action("fight"),"Защититься от волков","").add(action("clue"),"Изучить следы","Узнать о пещере Крегслейн").add(action("leave"),"Продолжить путь","");
         if("burned_crops".equals(id))return s.primary(action("donate"),"Пожертвовать 10 септимов","Помочь лишившимся дома").add(action("talk"),"Расспросить о нападении","").add(action("leave"),"Продолжить путь","");
         if("bard".equals(id)||"bard_rest".equals(id))return s.primary(action("song"),"Попросить исполнить песню","Послушать барда").add(action("talk"),"Поговорить","").add(action("leave"),"Продолжить путь","");
-        if("escort".equals(e.rule))return s.primary(action("leave"),"Пропустить конвой","Не вмешиваться").add(action("talk"),"Расспросить о пленнике","Узнать причину задержания").add(action("free"),"Освободить пленника","Вступить в бой с охраной");
+        if("escort".equals(e.rule)){s.primary(action("leave"),"Пропустить конвой","Не вмешиваться").add(action("talk"),"Расспросить о пленнике","Узнать причину задержания").add(action("free"),"Освободить пленника","Вступить в бой со всем конвоем").add(action("persuade"),"Договориться об освобождении","Проверка красноречия");if(!"thalmor_prisoner".equals(id)&&g.gold>=100)s.add(action("bribe"),"Предложить выкуп","100 септимов");return s;}
         if("civil".equals(e.rule))return s.primary(action("leave"),"Обойти сражение","Не вмешиваться").add(action("empire"),"Помочь имперцам","Сразиться с Братьями Бури").add(action("storm"),"Помочь Братьям Бури","Сразиться с имперцами");
+        if("imperial_patrol".equals(id)||"storm_patrol".equals(id)){int side="imperial_patrol".equals(id)?4:5;return s.primary(action("talk"),member(g,side)?"Представиться товарищам по оружию":"Поговорить с патрулём","").add(action("leave"),"Пропустить патруль","");}
         if("fugitive".equals(e.rule))return s.primary(action("return"),"Вернуть вещь охотнику","Рассказать о беглеце").add(action("keep"),"Оставить вещь себе","Скрыть беглеца").add(action("leave"),"Не вмешиваться","");
         if("heal".equals(e.rule))return s.primary(action("cure"),"Дать зелье исцеления болезней","В сумке: "+g.progress.quantity("Зелье исцеления болезней")).add(action("talk"),"Спросить о вампирах","Узнать о нападении").add(action("leave"),"Продолжить путь","");
         if("loot".equals(e.rule))return s.primary(action("search"),"Изучить записку","Поискать полезные сведения").add(action("leave"),"Не трогать тело","");
@@ -350,23 +414,42 @@ final class RoadEvents {
         else if("assassin_mistake".equals(id))s.primary(action("talk"),"Объяснить ошибку","Проверка красноречия");
         else if(e.enemy.isEmpty()||"assassin_other".equals(id))s.primary(action("talk"),"Заговорить","Узнать больше");
         if(!e.enemy.isEmpty())s.add(action("fight"),"rescue".equals(e.rule)?"Вмешаться и помочь":"Вступить в бой","Реальная пошаговая схватка");
-        if("assassin".equals(id)||"dragon_attack".equals(id)||"bandits".equals(id))s.add(action("sneak"),"Попытаться скрыться","Проверка скрытности");
+        if(isHostile(id))s.add(action("sneak"),"Попытаться скрыться","Проверка скрытности");
         else s.add(action("leave"),"Продолжить путь","Не вмешиваться");
         return s;
     }
+    private static boolean isHostile(String id){return Arrays.asList("assassin","assassin_mistake","boethiah","dragon_attack","island_dragon","bandits","marauder","bounty_hunters","thalmor_order","vampire_assassin","vampire_attack","death_hounds","werewolf_pack","gargoyles","island_werebears","island_morag_tong","city_vampire_thralls","city_vampire_gargoyle","city_death_hounds","city_vampire_hounds","city_vampire_trio","city_vampire_summoner","hostile_traveler","heavy_breton","dual_wield_imperial").contains(id);}
     private void fact(GameEngine g,String key,String title,String status){try{g.sceneState.setContext(g.day,g.hour,g.progress.location);g.sceneState.confirm("npc",key,title,status);}catch(Exception ignored){}}
     private void uniqueOutcome(GameEngine g,String state){g.progress.setQuestOutcome("road_"+id,state);}
-    private void finish(GameEngine g,String text){if(oneTime(find(id))&&!"arvak".equals(id)&&!(id.startsWith("letter_")&&text.startsWith("Ты не вмешиваешься")))uniqueOutcome(g,"COMPLETED");outcome=text;last=id;g.message=text;g.mode="RESULT";g.progress.sync(g);g.recordVisualEvent(find(id).title+": "+text);}
-    private void fight(GameEngine g,String enemy){Event e=find(id);last=id;outcome="Встреча: "+e.title;g.recordVisualEvent(outcome);g.beginRoadBattle(enemy,("giant".equals(id)?100:enemy.contains("Дракон")?130:55)+g.level*5,("giant".equals(id)?11:enemy.contains("Дракон")?13:6)+g.level/3,e.body);}
+    private void finish(GameEngine g,String text){if(oneTime(find(id))&&!"arvak".equals(id)&&!"leave".equals(decision))uniqueOutcome(g,"COMPLETED");remember(g);outcome=text;last=id;g.message=text;g.mode="RESULT";g.progress.sync(g);g.recordVisualEvent(find(id).title+": "+text);}
+    private int health(GameEngine g,String name){if("giant".equals(id))return 100+g.level*5;if(name.toLowerCase(Locale.ROOT).contains("дракон"))return 130+g.level*5;return (combatGroup.length>1?30:55)+g.level*(combatGroup.length>1?3:5);}
+    private int damage(GameEngine g,String name){return ("giant".equals(id)?11:name.toLowerCase(Locale.ROOT).contains("дракон")?13:combatGroup.length>1?4:6)+g.level/3;}
+    private void fight(GameEngine g,String enemy){Event e=find(id);if(enemy==null||enemy.isEmpty())return;last=id;remember(g);outcome="Встреча: "+e.title;g.recordVisualEvent(outcome);combatGroup=groupFor(id,enemy);combatIndex=0;victoryApplied=false;
+        if(Arrays.asList("wedding_named","assassin_other","bounty_collector").contains(id)){addBounty(encounterRegion,"bounty_collector".equals(id)?1000:1000);g.reputation--;}
+        String first=combatGroup[0];g.beginRoadBattle(first,health(g,first),damage(g,first),e.body+(combatGroup.length>1?"\nПротивников: "+combatGroup.length:""));}
+    boolean nextOpponent(GameEngine g,String actionText){if(!groupActive(g)||combatIndex+1>=combatGroup.length)return false;String defeated=g.enemyName;combatIndex++;String next=combatGroup[combatIndex];g.enemyName=next;g.enemyHp=health(g,next);g.enemyMaxHp=g.enemyHp;g.enemyDamage=damage(g,next);g.battleLog=actionText+"\n"+defeated+" повержен. В бой вступает "+next+" ("+groupCurrent()+"/"+groupSize()+").";return true;}
+    int allyDamage(GameEngine g,int inflicted){return pending()&&"giant".equals(id)&&"WILD".equals(g.battleKind)&&(g.battleTurns+1)%2==0?Math.min(7,Math.max(0,g.enemyHp-inflicted)):0;}
+    void applyVictory(GameEngine g){if(!pending()||victoryApplied||!"WILD".equals(g.battleKind))return;victoryApplied=true;Event e=find(id);if(e==null)return;
+        if(oneTime(e))uniqueOutcome(g,"COMPLETED");
+        if("giant".equals(id)){fact(g,"road_aela","Эйла Охотница","HELPED");g.factions.roadTrust(0,5);g.message+="\nЭйла приглашает тебя в Йоррваскр, к Кодлаку Белой Гриве.";}
+        else if("escort".equals(e.rule)){freed(g);g.message+="\nПленник освобождён после победы над охраной.";}
+        else if("civil".equals(e.rule)){int side="empire".equals(decision)?4:5;g.factions.roadTrust(side,5);g.factions.roadTrust(side==4?5:4,-5);g.message+="\nТвою помощь запомнили: "+FactionCampaign.NAMES[side]+". Доверие +5.";} 
+        else if("assassin".equals(id))g.message+="\n"+RoadQuests.evidence(g,"Приказ Тёмного Братства");
+        else if("assassin_mistake".equals(id)||"assassin_other".equals(id))g.message+="\n"+RoadQuests.evidence(g,"Чужой контракт Тёмного Братства");
+        else if("thalmor_order".equals(id))g.message+="\n"+RoadQuests.evidence(g,"Приказ Талмора");
+        else if(RoadQuests.find(id)!=null)g.message+="\n"+RoadQuests.lead(g,id);
+        if("rescue".equals(e.rule)||"hakar".equals(id)){g.reputation++;if("hakar".equals(id))g.factions.roadTrust(6,5);g.message+="\nСпасённый путник благодарит тебя. Репутация +1.";}
+        if(groupSize()>1)g.message+="\nПобеждены все "+groupSize()+" противника.";g.progress.sync(g);}
+    private void freed(GameEngine g){g.reputation++;int side="imperial_prisoner".equals(id)?5:"storm_prisoner".equals(id)?4:-1;if(side>=0){g.factions.roadTrust(side,5);g.factions.roadTrust(side==4?5:4,-5);}if(encounterRegion>=0&&encounterRegion<g.holdReputation.length)g.holdReputation[encounterRegion]=Math.min(100,g.holdReputation[encounterRegion]+2);}
     void choose(GameEngine g,String action){
         if(!pending()||!MODE.equals(g.mode))return;
         Event e=find(id);String verb=null;
         for(GameEngine.Choice c:scene(g).choices)if(c.action.equals(action)){verb=action.substring(action.lastIndexOf(':')+1);break;}
-        if(verb==null)return;
+        if(verb==null)return;decision=verb;
         if("giant".equals(id)){
             uniqueOutcome(g,"COMPLETED");
             if("fight".equals(verb)){fact(g,"road_aela","Эйла Охотница","MET");fight(g,e.enemy);}
-            else {if("watch".equals(verb))fact(g,"road_aela","Эйла Охотница","INFORMED");finish(g,"watch".equals(verb)?"Соратники одолели великана. Эйла предлагает встретиться с Кодлаком Белой Гривой в Йоррваскре.":"Ты оставляешь Соратников позади.");}
+            else {if("watch".equals(verb)){fact(g,"road_aela","Эйла Охотница","INFORMED");g.factions.roadTrust(0,2);}finish(g,"watch".equals(verb)?"Соратники одолели великана. Эйла предлагает встретиться с Кодлаком Белой Гривой в Йоррваскре.":"Ты оставляешь Соратников позади.");}
             return;
         }
         if("cicero".equals(id)){
@@ -398,10 +481,15 @@ final class RoadEvents {
             case "song":g.stamina=Math.min(g.maxStamina,g.stamina+5);finish(g,"Талсгар исполняет песню о северных героях. Короткий привал возвращает немного сил.");return;
             case "fight":fight(g,e.enemy);return;
             case "free":fight(g,e.enemy);return;
+            case "persuade":if(g.rollCheck(g.progress.chance(g,2,12,"thalmor_prisoner".equals(id)?65:40))){g.progress.skillExperience(g,12,25);freed(g);finish(g,"Ты убеждаешь охрану отпустить пленника. Он исчезает в лесу.");}else finish(g,"Охрана отказывает и уводит пленника дальше.");return;
+            case "bribe":if(g.gold>=100){g.gold-=100;freed(g);finish(g,"Офицер принимает выкуп в 100 септимов и освобождает пленника.");}else finish(g,"Для выкупа не хватает денег. Конвой уходит.");return;
+            case "fine":int fine=bounty(encounterRegion);if(fine>0&&g.gold>=fine){g.gold-=fine;roadBounties[encounterRegion]=0;finish(g,"Ты оплачиваешь "+fine+" септимов. Дорожный штраф погашен.");}else finish(g,"Не хватает денег для погашения штрафа. Охотник обещает вернуться.");return;
             case "empire":fight(g,"Братья Бури");return;
             case "storm":fight(g,"Имперские солдаты");return;
             case "pay":if(g.gold<25){fight(g,e.enemy);return;}g.gold-=25;finish(g,"Ты отдаёшь 25 септимов и получаешь возможность пройти.");return;
             case "talk":
+                if("imperial_patrol".equals(id)||"storm_patrol".equals(id)){int side="imperial_patrol".equals(id)?4:5;finish(g,member(g,side)?"Патруль узнаёт товарища по оружию. Офицер рассказывает о положении на дороге.":member(g,side==4?5:4)?"Патруль замечает твою принадлежность к противнику и требует уйти.":"Офицер советует держаться подальше от военных лагерей.");return;}
+                if("bounty_collector".equals(id)){if(g.rollCheck(g.progress.chance(g,2,12,60))){g.progress.skillExperience(g,12,20);finish(g,"Охотник соглашается дать тебе время. Штраф остаётся непогашенным.");}else fight(g,e.enemy);return;}
                 if("dawnguard_hunters".equals(id)||"dawnguard_attack".equals(id)||"dg_scouts".equals(id)){finish(g,"Охотники говорят о борьбе с вампирами и уходят на поиски. Они не считают тебя своей целью.");return;}
                 if("escort".equals(e.rule)){finish(g,"thalmor_prisoner".equals(id)?"Юстициар говорит, что пленника обвиняют в поклонении Талосу, и требует не вмешиваться.":"Охрана сообщает, что пленник задержан по приказу начальства. Конвой продолжает путь.");return;}
                 if("thief".equals(id)&&(g.factions.stage(2)>0||g.factionStories.done(2)>=2)){finish(g,"Вор узнаёт своего товарища по Гильдии воров и пропускает тебя.");return;}
@@ -436,20 +524,11 @@ final class RoadEvents {
     void resume(GameEngine g){
         if(!pending())return;
         String target=destination,previous=id;
-        if(outcome.startsWith("Встреча: ")&&"WILD".equals(g.battleKind)&&"RESULT".equals(g.mode)&&g.enemyHp==0){
-            outcome=g.message;
-            if(oneTime(find(previous)))uniqueOutcome(g,"COMPLETED");
-            if("giant".equals(previous)){fact(g,"road_aela","Эйла Охотница","HELPED");outcome+="\nЭйла приглашает тебя в Йоррваскр, к Кодлаку Белой Гриве.";}
-            else if("escort".equals(find(previous).rule)){outcome+="\nПленник освобождён.";g.reputation++;}
-            else if("assassin".equals(previous))outcome+="\n"+RoadQuests.evidence(g,"Приказ Тёмного Братства");
-            else if("assassin_mistake".equals(previous)||"assassin_other".equals(previous))outcome+="\n"+RoadQuests.evidence(g,"Чужой контракт Тёмного Братства");
-            else if("thalmor_order".equals(previous))outcome+="\n"+RoadQuests.evidence(g,"Приказ Талмора");
-            else if(RoadQuests.find(previous)!=null)outcome+="\n"+RoadQuests.lead(g,previous);
-        }else if(outcome.startsWith("Встреча: "))outcome=g.message;
-        destination="";id="";segmentFrom="";segmentTo="";last=previous;resuming=true;
+        if(outcome.startsWith("Встреча: ")&&"WILD".equals(g.battleKind)&&"RESULT".equals(g.mode)&&g.enemyHp==0){applyVictory(g);outcome=g.message;}else if(outcome.startsWith("Встреча: "))outcome=g.message;
+        destination="";id="";segmentFrom="";segmentTo="";last=previous;combatGroup=new String[0];combatIndex=0;decision="";victoryApplied=false;resuming=true;
         boolean canonical=canonicalResume;canonicalResume=false;
         try{if("arvak".equals(previous)){g.mode="WORLD";g.message=outcome;}else if(canonical){CanonicalCampaign.open(g);g.canonicalRecent=outcome;g.recordVisualEvent(outcome);}else g.choose("LOC:"+target);}finally{resuming=false;outcome="";}
     }
-    JSONObject save(){JSONObject j=new JSONObject();try{j.put("id",id).put("destination",destination).put("outcome",outcome).put("last",last).put("serial",serial).put("canonicalResume",canonicalResume).put("segmentFrom",segmentFrom).put("segmentTo",segmentTo);}catch(Exception ignored){}return j;}
-    static RoadEvents restore(JSONObject j){RoadEvents r=new RoadEvents();if(j!=null){r.id=j.optString("id","");r.destination=j.optString("destination","");r.outcome=j.optString("outcome","");r.last=j.optString("last","");r.serial=Math.max(0,j.optInt("serial"));r.canonicalResume=j.optBoolean("canonicalResume");r.segmentFrom=j.optString("segmentFrom","");r.segmentTo=j.optString("segmentTo","");if(!r.pending()){r.id="";r.destination="";}}return r;}
+    JSONObject save(){JSONObject j=new JSONObject();try{j.put("id",id).put("destination",destination).put("outcome",outcome).put("last",last).put("serial",serial).put("canonicalResume",canonicalResume).put("segmentFrom",segmentFrom).put("segmentTo",segmentTo).put("decision",decision).put("group",new JSONArray(Arrays.asList(combatGroup))).put("groupIndex",combatIndex).put("encounterRegion",encounterRegion).put("victoryApplied",victoryApplied).put("recentDays",new JSONObject(recentDays)).put("roadBounties",new JSONArray(roadBounties));}catch(Exception ignored){}return j;}
+    static RoadEvents restore(JSONObject j){RoadEvents r=new RoadEvents();if(j!=null){r.id=j.optString("id","");r.destination=j.optString("destination","");r.outcome=j.optString("outcome","");r.last=j.optString("last","");r.serial=Math.max(0,j.optInt("serial"));r.canonicalResume=j.optBoolean("canonicalResume");r.segmentFrom=j.optString("segmentFrom","");r.segmentTo=j.optString("segmentTo","");r.decision=j.optString("decision","");r.encounterRegion=Math.max(-1,Math.min(9,j.optInt("encounterRegion",-1)));r.victoryApplied=j.optBoolean("victoryApplied");JSONArray group=j.optJSONArray("group");if(group!=null&&group.length()>0&&group.length()<=8){ArrayList<String> names=new ArrayList<>();for(int i=0;i<group.length();i++){String n=group.optString(i);if(!n.isEmpty()&&n.length()<=100)names.add(n);}r.combatGroup=names.toArray(new String[0]);}r.combatIndex=Math.max(0,Math.min(Math.max(0,r.combatGroup.length-1),j.optInt("groupIndex")));JSONObject recent=j.optJSONObject("recentDays");if(recent!=null)for(Event e:EVENTS)if(recent.has(e.id))r.recentDays.put(e.id,Math.max(0,recent.optInt(e.id)));JSONArray fines=j.optJSONArray("roadBounties");if(fines!=null)for(int i=0;i<10;i++)r.roadBounties[i]=Math.max(0,fines.optInt(i));if(!r.pending()){r.id="";r.destination="";}}return r;}
 }

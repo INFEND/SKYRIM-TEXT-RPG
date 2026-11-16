@@ -32,6 +32,7 @@ final class FactionCampaign {
     private final Random random=new Random();
     FactionCampaign(){java.util.Arrays.fill(attemptDay,-1);}
     int trust(int f){return valid(f)?trust[f]:0;}
+    void roadTrust(int f,int delta){if(valid(f))trust[f]=Math.max(-100,Math.min(100,trust[f]+delta));}
     int stage(int f){return valid(f)?stage[f]:0;}
     boolean valid(int f){return f>=0&&f<NAMES.length;}
     String rank(int f){return new String[]{"Не вступил","Новобранец","Посвящённый","Проверенный член","Ветеран","Доверенный член","Наставник","Заслуженный член"}[stage(f)];}
