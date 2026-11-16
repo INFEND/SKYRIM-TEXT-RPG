@@ -394,6 +394,17 @@ public final class MainActivity extends Activity {
         switch(status){case "MET":return "Знакомство";case "HELPED":return "Благодарность";case "INFORMED":return "Обмен сведениями";case "HOSTILE":return "Враждебность";case "DEAD":return "Погиб";case "MISSING":return "Пропал";default:return "Отношение неизвестно";}
     }
     private View npcPortrait(String name){
+        if(KatherineStory.NAME.equalsIgnoreCase(name)){
+            String path="media/katherine/portrait.webp";
+            try(java.io.InputStream in=ResourceStore.open(this,path)){
+                android.graphics.Bitmap bitmap=android.graphics.BitmapFactory.decodeStream(in);
+                if(bitmap!=null){android.widget.ImageView portrait=new android.widget.ImageView(this);
+                    portrait.setImageBitmap(bitmap);portrait.setAdjustViewBounds(true);
+                    portrait.setScaleType(android.widget.ImageView.ScaleType.FIT_CENTER);
+                    portrait.setContentDescription("Кэтрин");return portrait;}
+            }catch(java.io.IOException ignored){}
+            return npcEmblem(name,"hero");
+        }
         NpcProfiles.Profile profile=NpcProfiles.find(name);
         if(profile!=null){
             if(profile.dragon)return npcEmblem(profile.name,"dragon");
@@ -418,7 +429,8 @@ public final class MainActivity extends Activity {
         panel.addView(npcPortrait(name),lp(112,-2));
         NpcProfiles.Profile profile=NpcProfiles.find(name);
         if(profile!=null){addText(panel,profile.race+" | "+profile.role,14,TEXT,true,8);}
-        addText(panel,"Иллюстративный образ или эмблема, не индивидуальный портрет",11,MUTED,false,10);
+        if(KatherineStory.NAME.equals(name)){addText(panel,"18 лет | Носитель Нулевого Предела",14,TEXT,true,8);addText(panel,"Доверие: "+game.katherine.trust+"/100",14,accent(),true,8);}
+        if(!KatherineStory.NAME.equals(name))addText(panel,"Иллюстративный образ или эмблема, не индивидуальный портрет",11,MUTED,false,10);
         addText(panel,npcStatusLabel(game.sceneState.npcStatusByName(name)),15,TEXT,true,8);
         new RuneDialogBuilder(this,accent()).setTitle(name).setView(panel).setNegativeButton("Закрыть",null).show();
     }
@@ -1329,6 +1341,7 @@ public final class MainActivity extends Activity {
             if(n!=5){toast("Распредели все 5 свободных очков");return;}
             newAiSession();game.start(nameField.getText().toString(),selectedRace,selectedClass,selectedStart,
                 initialPoints,selectedGender,selectedPortrait);
+            game.katherine.enabled=prefs.getBoolean("katherine_enabled",true);
             if(selectedStart==0)game.choose("CANON_OPEN");
             tab=0;save();render();
         });
@@ -1410,7 +1423,7 @@ public final class MainActivity extends Activity {
     }
     private void renderStory(){
         boolean canonical="CANON".equals(game.mode)||("COMBAT".equals(game.mode)&&("CANONICAL".equals(game.battleKind)||"FACTION".equals(game.battleKind)));
-        if(prefs.getBoolean("ai_enabled",false)&&!canonical){renderAiGame();return;}
+        if(prefs.getBoolean("ai_enabled",false)&&!canonical&&!KatherineStory.MODE.equals(game.mode)){renderAiGame();return;}
         GameEngine.Scene s=game.scene();section(s.kicker,s.title,"");
         if(LocationGalleryView.hasGallery(game.progress.location)){
             content.addView(sceneGallery(game.progress.location),lp(-1,-2));
@@ -1461,10 +1474,11 @@ public final class MainActivity extends Activity {
 
     private void renderStoryJournal(){
         if(!game.started)return;
-        if(!"CANON".equals(game.mode)&&!"QUEST".equals(game.mode)&&!"DRAGON".equals(game.mode)
+        if(!KatherineStory.MODE.equals(game.mode)&&!"CANON".equals(game.mode)&&!"QUEST".equals(game.mode)&&!"DRAGON".equals(game.mode)
             &&!"EVENT".equals(game.mode)&&!"RESULT".equals(game.mode))return;
         LinearLayout journal=card();
         addText(journal,"ᚱ  ЖУРНАЛ ПРИКЛЮЧЕНИЙ",11,accent(),true,10);
+        if(game.katherine.stage>0)addText(journal,"◉  Нулевой Предел | "+game.katherine.status(),13,TEXT,false,7);
         if(game.canonicalStage>0)addText(journal,"◉  Путь Довакина | "+CanonicalCampaign.objective(game),13,TEXT,false,7);
         if(game.questStage>0&&game.questStage<4)
             addText(journal,"◉  Пепельные печати | "+game.questStatus(),13,TEXT,false,7);
@@ -1624,6 +1638,7 @@ public final class MainActivity extends Activity {
 
     /** AI mode replaces the entire offline story, not just its dialogue panel. */
     private void renderAiGame(){
+        if(game.katherine.available(game)&&!aiTurnBusy)actionButton("Кэтрин","Нулевой Предел | "+game.katherine.status(),false,()->{game.choose("KATH:open");save();render();});
         String source=resolvedAiProvider();
         boolean ready="local".equals(source)?localModelReady():
             "chatgpt".equals(source)?chatGptOAuth.hasAuthorizedPlan():
@@ -4038,6 +4053,17 @@ public final class MainActivity extends Activity {
     }
     private void renderSettings(){
         section("ПАРАМЕТРЫ","Настройки","Твоя история, твои правила.");
+        LinearLayout expansion=card();addText(expansion,"РАСШИРЕНИЕ МИРА",11,accent(),true,8);
+        Switch katherineToggle=new Switch(this);katherineToggle.setText("Кэтрин | Нулевой Предел");
+        katherineToggle.setTextColor(TEXT);katherineToggle.setThumbTintList(ColorStateList.valueOf(accent()));
+        katherineToggle.setChecked(game.katherine.enabled);
+        katherineToggle.setOnCheckedChangeListener((v,on)->{
+            if(livingBusy()){v.setChecked(game.katherine.enabled);return;}
+            game.katherine.enabled=on;
+            if(!on&&KatherineStory.MODE.equals(game.mode))game.mode="WORLD";
+            prefs.edit().putBoolean("katherine_enabled",on).apply();save();
+        });expansion.addView(katherineToggle,lp(-1,47));
+        addText(expansion,"Необязательная авторская история вне канона TES.",12,MUTED,false,0);
         if(game.started)livingLink(content,"Магазин компенсаций","∞ F","skills",this::livingFixShop);
         content.addView(new NordicArtView(this,NordicArtView.STORY),lp(-1,105));space(content,12);
         int appearanceStart=content.getChildCount();
