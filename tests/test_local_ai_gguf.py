@@ -24,7 +24,7 @@ class LocalAiContract(unittest.TestCase):
         self.assertIn('engine.releaseContext(', worker)
         self.assertIn('android:process=":llm"', manifest)
         self.assertIn('class LocalAiInferenceService', worker)
-        self.assertIn('"n_ctx" to 4096', worker)
+        self.assertIn('"n_ctx" to 8192', worker)
         self.assertIn('Process.killProcess(Process.myPid())', worker)
         self.assertIn('context.bindService(', client)
         self.assertIn('onServiceDisconnected', client)

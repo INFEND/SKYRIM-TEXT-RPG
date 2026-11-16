@@ -52,6 +52,7 @@ class LocalAiInferenceService : Service() {
     @Volatile private var busy = false
     private var loadedPath = ""
     private var loadedContext: Int? = null
+    private var loadedRecovery = false
     private var activeReply: Messenger? = null
     private var activeId: Long = -1L
     private var textBuffer = StringBuilder()
@@ -69,6 +70,9 @@ class LocalAiInferenceService : Service() {
         val prompt = data.getString("prompt").orEmpty()
         val limit = data.getInt("maxTokens", 1024).coerceIn(24, 3072)
         val scene = data.getBoolean("scene", false)
+        val recovery = data.getBoolean("recovery", false)
+        val resume = if (recovery) data.getString("resumeText").orEmpty().takeIf { it.length <= 30000 }.orEmpty() else ""
+        val previousTokens = if (resume.isNotEmpty()) data.getInt("resumeTokens", 0).coerceIn(0, limit - 24) else 0
 
         if (busy) {
             finish(receiver, id, null, "Предыдущая локальная генерация ещё выполняется.", 0, 0f, 0L)
@@ -88,10 +92,18 @@ class LocalAiInferenceService : Service() {
             activeReply = receiver
             activeId = id
             textBuffer = StringBuilder()
-            tokenCount = 0
+            tokenCount = previousTokens
             generatedAt = 0L
         }
-        status(receiver, id, "Запуск локального ИИ…")
+        status(receiver, id, if (recovery) "Восстановление локального ИИ…" else "Запуск локального ИИ…")
+        if (recovery && android.os.Build.VERSION.SDK_INT >= 30) {
+            try {
+                val manager = getSystemService(android.app.ActivityManager::class.java)
+                val exit = manager?.getHistoricalProcessExitReasons(packageName, 0, 8)
+                    ?.firstOrNull { it.processName == "$packageName:llm" }
+                if (exit != null) android.util.Log.w("SkyrimLocalAI", "Previous worker exit: reason=${exit.reason}, status=${exit.status}, pss=${exit.pss} KB")
+            } catch (_: Exception) {}
+        }
         scope.launch {
             var answer: String? = null
             var failure: String? = null
@@ -99,7 +111,7 @@ class LocalAiInferenceService : Service() {
             var speed = 0f
             var elapsed = 0L
             try {
-                val context = ensureLoaded(path, receiver, id)
+                val context = ensureLoaded(path, receiver, id, recovery)
                 status(receiver, id, "Подготовка игрового контекста…")
                 val messages = listOf<Map<String, Any>>(
                     mapOf("role" to "system", "content" to system),
@@ -113,7 +125,7 @@ class LocalAiInferenceService : Service() {
                         "<|im_start|>user\n" + prompt + "<|im_end|>\n<|im_start|>assistant\n")
                 status(receiver, id, "Генерация ответа, токены появятся по мере готовности…")
                 val direct = AiScenePreview.directPrompt(formatted)
-                val prefix = AiScenePreview.scenePrefix(direct, scene)
+                val prefix = if (resume.isNotEmpty()) resume else AiScenePreview.scenePrefix(direct, scene)
                 // Prefill is part of the response, not a generated token.
                 synchronized(stateLock) {
                     textBuffer.append(prefix)
@@ -123,7 +135,7 @@ class LocalAiInferenceService : Service() {
                 val result = engine.launchCompletion(context, mapOf(
                     "prompt" to (direct + prefix),
                     "emit_partial_completion" to true,
-                    "n_predict" to limit,
+                    "n_predict" to (limit - previousTokens),
                     "temperature" to 0.7,
                     "top_p" to 0.9,
                     "top_k" to 40,
@@ -135,14 +147,14 @@ class LocalAiInferenceService : Service() {
                     textBuffer.toString()
                 }
                 if (result == null) error("Нативный движок не завершил генерацию.")
-                answer = if (count > 0 && streamed.length > prefix.length) streamed else {
+                answer = if (count > previousTokens && streamed.length > prefix.length) streamed else {
                     val completion = (result["text"] as? String)
                         ?: (result["content"] as? String)
                         ?: ""
                     if (completion.isBlank()) "" else prefix + completion
                 }
                 if (answer.isBlank()) error("Модель не вернула текст. Проверь GGUF и шаблон диалога.")
-                speed = if (elapsed > 0) (count * 1000f / elapsed) else 0f
+                speed = if (elapsed > 0) ((count - previousTokens) * 1000f / elapsed) else 0f
             } catch (error: Throwable) {
                 failure = error.message ?: "Ошибка движка llama.cpp"
             } finally {
@@ -156,8 +168,8 @@ class LocalAiInferenceService : Service() {
         }
     }
 
-    private fun ensureLoaded(path: String, receiver: Messenger, id: Long): Int {
-        if (loadedPath == path && loadedContext != null) return loadedContext!!
+    private fun ensureLoaded(path: String, receiver: Messenger, id: Long, recovery: Boolean): Int {
+        if (loadedPath == path && loadedContext != null && loadedRecovery == recovery) return loadedContext!!
         loadedContext?.let {
             try { engine.releaseContext(it) } catch (_: Throwable) {}
         }
@@ -172,9 +184,11 @@ class LocalAiInferenceService : Service() {
             "model" to uri.toString(),
             "model_fd" to fd,
             "embedding" to false,
-            "n_ctx" to 4096,
-            "n_batch" to 512,
-            "n_threads" to 4,
+            // Reserve room for prompt, ten choices and resumed output.
+            "n_ctx" to 8192,
+            // Reduce transient native scratch allocations.
+            "n_batch" to (if (recovery) 32 else 128),
+            "n_threads" to (if (recovery) 3 else 4),
             "n_gpu_layers" to 0,
             "use_mmap" to true,
             "use_mlock" to false,
@@ -186,6 +200,7 @@ class LocalAiInferenceService : Service() {
             ?: error("Движок не вернул идентификатор контекста.")
         loadedPath = path
         loadedContext = context
+        loadedRecovery = recovery
         status(receiver, id, "Модель загружена, контекст готов.")
         return context
     }

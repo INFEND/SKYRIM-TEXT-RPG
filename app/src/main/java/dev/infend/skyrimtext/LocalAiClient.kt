@@ -26,6 +26,10 @@ class LocalAiClient(private val context: Context) {
     private var closed=false
     private var generation=0L
     private var pending: Message?=null
+    private var requestData: Bundle?=null
+    private var recoveryUsed=false
+    private var lastPartial=""
+    private var lastTokens=0
     private var activeListener: AiStoryClient.Listener?=null
     private var messenger: Messenger?=null
     private var binding: ServiceConnection?=null
@@ -48,7 +52,11 @@ class LocalAiClient(private val context: Context) {
             if(listener!=null) {
                 val partial=reply.data.getString("text").orEmpty()
                 val tokens=reply.data.getInt("tokens",0)
-                if(partial.isNotEmpty())listener.onText(partial)
+                if(partial.isNotEmpty()) {
+                    lastPartial=partial
+                    lastTokens=tokens
+                    listener.onText(partial)
+                }
                 if(tokens>0)listener.onLocalStatus("Генерация: "+tokens+" токенов")
             }
         }else if(reply.what==LocalAiProtocol.MSG_RESULT) {
@@ -62,6 +70,9 @@ class LocalAiClient(private val context: Context) {
             }
             watchdog?.let{ui.removeCallbacks(it)}
             watchdog=null
+            requestData=null
+            lastPartial=""
+            lastTokens=0
             val error=reply.data.getString("error")
             val answer=reply.data.getString("answer")
             if(!error.isNullOrBlank())listener?.onError(error)
@@ -134,10 +145,24 @@ class LocalAiClient(private val context: Context) {
         request.data=data
         request.replyTo=incoming
         pending=request
+        requestData=Bundle(data)
+        recoveryUsed=false
+        lastPartial=""
+        lastTokens=0
         activationAttempted=false
         awaitingActivation=false
         listener.onLocalStatus("Подключение к отдельному процессу модели…")
-        // Native completion streams tokens, but a hardware hang must still time out.
+        armWatchdog(id)
+        val current=messenger
+        if(current!=null) {
+            pending=null
+            send(current,request,id)
+        }else connect(id)
+        return true
+    }
+
+    private fun armWatchdog(id:Long) {
+        watchdog?.let{ui.removeCallbacks(it)}
         val expiry=Runnable {
             val timedOut=synchronized(guard){busy&&generation==id&&!closed}
             if(timedOut){
@@ -148,12 +173,35 @@ class LocalAiClient(private val context: Context) {
         }
         watchdog=expiry
         ui.postDelayed(expiry,12L*60L*1000L)
-        val current=messenger
-        if(current!=null) {
-            pending=null
-            send(current,request,id)
-        }else connect(id)
-        return true
+    }
+
+    private fun recoverProcess(id:Long,reason:String) {
+        if(!currentGeneration(id)) {releaseBinding();return}
+        releaseBinding()
+        val original=requestData
+        if(recoveryUsed||original==null||(lastTokens>0&&lastTokens>=original.getInt("maxTokens")-24)) {
+            failGeneration(id,reason.trimEnd('.')+" (получено $lastTokens токенов). Повтори действие")
+            return
+        }
+        recoveryUsed=true
+        // A new ID rejects queued callbacks from the dead process.
+        val retryId=synchronized(guard){++generation}
+        val data=Bundle(original)
+        data.putLong("id",retryId)
+        data.putBoolean("recovery",true)
+        if(lastPartial.length in 1..30000 && lastTokens>0) {
+            data.putString("resumeText",lastPartial)
+            data.putInt("resumeTokens",lastTokens)
+        }
+        val msg=Message.obtain(null,LocalAiProtocol.MSG_GENERATE)
+        msg.data=data
+        msg.replyTo=incoming
+        pending=msg
+        activationAttempted=false
+        awaitingActivation=false
+        activeListener?.onLocalStatus("Восстановление локального ИИ: $lastTokens токенов…")
+        armWatchdog(retryId)
+        ui.postDelayed({if(currentGeneration(retryId))connect(retryId)},500L)
     }
 
     private fun currentGeneration(id:Long):Boolean=synchronized(guard){!closed&&busy&&id==generation}
@@ -176,14 +224,13 @@ class LocalAiClient(private val context: Context) {
             override fun onServiceDisconnected(name:ComponentName?) {
                 if(binding!==this)return
                 val active=synchronized(guard){generation}
-                releaseBinding()
-                failGeneration(active,"Процесс локального ИИ завершился. Возможны нехватка памяти или сбой нативного движка.")
+                recoverProcess(active,"Процесс локального ИИ завершился. Возможны нехватка памяти или сбой нативного движка")
             }
             override fun onBindingDied(name:ComponentName?) {
                 if(binding!==this)return
                 val active=synchronized(guard){generation}
                 if(pending!=null)recoverConnection(active,"Android разорвал подключение к службе")
-                else {releaseBinding();failGeneration(active,"Служба локального ИИ аварийно завершилась. Повтори тест.")}
+                else recoverProcess(active,"Служба локального ИИ аварийно завершилась")
             }
             override fun onNullBinding(name:ComponentName?) {
                 if(binding===this)recoverConnection(synchronized(guard){generation},"Служба не предоставила подключение")
@@ -192,7 +239,7 @@ class LocalAiClient(private val context: Context) {
         binding=connection
         try {
             val intent=Intent().setComponent(ComponentName(LocalAiEngineModule.PACKAGE,"dev.infend.skyrimtext.LocalAiInferenceService"))
-            if(!context.bindService(intent,connection,Context.BIND_AUTO_CREATE)) {
+            if(!context.bindService(intent,connection,Context.BIND_AUTO_CREATE or Context.BIND_IMPORTANT)) {
                 recoverConnection(id,"Android отказал в запуске службы (bindService=false)")
                 return
             }
@@ -235,7 +282,7 @@ class LocalAiClient(private val context: Context) {
 
     private fun send(server:Messenger,message:Message,id:Long) {
         try{server.send(message)}
-        catch(ex:RemoteException) {releaseBinding();failGeneration(id,"Локальный движок недоступен: "+ex.message)}
+        catch(ex:RemoteException) {recoverProcess(id,"Локальный движок недоступен: "+ex.message)}
     }
 
     private fun failGeneration(id:Long,error:String){
@@ -250,6 +297,9 @@ class LocalAiClient(private val context: Context) {
         watchdog=null
         stopConnectTimeout()
         pending=null
+        requestData=null
+        lastPartial=""
+        lastTokens=0
         awaitingActivation=false
         ui.post { listener?.onError(error) }
     }
@@ -262,6 +312,9 @@ class LocalAiClient(private val context: Context) {
             activeListener=null
             busy=false
             pending=null
+            requestData=null
+            lastPartial=""
+            lastTokens=0
             awaitingActivation=false
         }
         // The native completion is not cooperatively cancellable. Its own process
