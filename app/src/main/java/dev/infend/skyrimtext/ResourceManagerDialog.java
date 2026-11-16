@@ -208,7 +208,9 @@ final class ResourceManagerDialog {
         return count;
     }
     private void setRow(Category c,long done,long total,boolean ready,boolean active,String suffix){
-        c.amount.setText(total<=0&&!active?("engine".equals(c.key)?"Размер неизвестен":"По выбору"):sizePair(done,total));
+        String amount=total<=0&&!active?("engine".equals(c.key)?"Размер неизвестен":"По выбору"):sizePair(done,total);
+        if("engine".equals(c.key)&&total>0&&!ready&&done==total)amount+=" · Установить";
+        c.amount.setText(amount);
         c.amount.setContentDescription(sizePair(done,total)+(suffix.isEmpty()?"":" · "+suffix));
         int percent=total>0?(int)Math.min(100,done*100.0/total):0;
         c.percent.setText(total>0?percent+"%":active?"…":"");
