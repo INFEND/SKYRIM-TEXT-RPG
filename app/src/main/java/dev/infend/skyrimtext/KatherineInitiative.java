@@ -9,15 +9,15 @@ final class KatherineInitiative {
     static ArrayList<String> allowed(GameEngine g){
         ArrayList<String> out=new ArrayList<>();
         KatherineStory k=g.katherine;KatherineCompanion c=k.companion;
-        if(!g.started||!k.enabled||!k.active()||k.stage<5||!k.present(g)||!k.companion.aiInitiatives||g.enemyHp>0||"COMBAT".equals(g.mode)||c.lastAiDay==g.day)return out;
-        out.add(TALK);out.add(BALANCE);
+        if(!g.started||!k.enabled||k.stage<5||!k.present(g)||!k.companion.aiInitiatives||g.enemyHp>0||"COMBAT".equals(g.mode)||c.lastAiDay==g.day)return out;
+        out.add(TALK);if(k.active())out.add(BALANCE);
         if(k.trust<45||c.hurt>=25)out.add(BOUNDARIES);
         if(c.hp<c.maxHp()/2||k.mana<k.maxMana()/2||g.hp<g.maxHp/2)out.add(REST);
         if(k.magicRank>0&&k.mana>=12&&c.hp>0)out.add(STUDY);
-        if(c.hp>0){out.add(GUARD);if(k.mana>=20)out.add(ATTACK);}
-        if((c.healthPotions>0&&c.hp<c.maxHp()/3)||(c.magicPotions>0&&k.mana<k.maxMana()/4))out.add(SUPPLIES);
+        if(k.active()&&c.hp>0){out.add(GUARD);if(k.mana>=20)out.add(ATTACK);}
+        if(k.active()&&((c.healthPotions>0&&c.hp<c.maxHp()/3)||(c.magicPotions>0&&k.mana<k.maxMana()/4)))out.add(SUPPLIES);
         if(KatherineStory.atHut(g)&&c.damonSafe)out.add(DAMON);
-        if(g.alma.active()&&c.lastJoint!=g.day)out.add(ALMA);
+        if(k.active()&&g.alma.active()&&c.lastJoint!=g.day)out.add(ALMA);
         return out;
     }
     static String context(GameEngine g){ArrayList<String> a=allowed(g);return a.isEmpty()?"":"Инициатива Кэтрин (на свой выбор, не обязательна): effects.katherineIntent="+String.join("|",a)+". Только один код; движок проверит условия.";}

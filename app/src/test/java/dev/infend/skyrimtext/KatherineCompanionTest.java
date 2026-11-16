@@ -34,4 +34,22 @@ public class KatherineCompanionTest {
         int count=k.memory.length();k.autonomous(g);assertEquals(count,k.memory.length());
         GameEngine next=GameEngine.fromJson(g.toJson().toString());assertEquals(k.companion.currentGoal,next.katherine.companion.currentGoal);
     }
+    @Test public void epilogueAndHomePersist() throws Exception {
+        GameEngine g=game();KatherineStory k=g.katherine;k.stage=10;g.choose("KATH:ending_alliance");
+        g.choose("KATH:epilogue:0");g.choose("KATH:epilogue:1");assertEquals(1,k.companion.epilogueStep);
+        g.day++;g.choose("KATH:epilogue:1");g.day++;g.choose("KATH:epilogue:2");assertEquals(3,k.companion.epilogueStep);
+        k.romance=true;k.companion.engaged=true;k.companion.married=true;g.progress.location="Рифтен";g.gold=1000;
+        g.choose("KATH:home");g.choose("KATH:home");assertEquals(500,g.gold);assertTrue(k.companion.sharedHome);
+        k.companion.hp=20;g.choose("KATH:homeEvening");g.choose("KATH:homeEvening");assertEquals(44,k.companion.hp);
+        GameEngine next=GameEngine.fromJson(g.toJson().toString());assertTrue(next.katherine.companion.sharedHome);assertEquals(3,next.katherine.companion.epilogueStep);
+        next.choose("KATH:break");assertFalse(next.katherine.companion.sharedHome);
+    }
+    @Test public void independentEventsUseNpcLocationAndDoNotRepeat() {
+        GameEngine g=game();KatherineStory k=g.katherine;k.stage=10;g.choose("KATH:ending_free");
+        g.day=3;g.hour=12;g.progress.location="Рифтен";k.autonomous(g);int xp=k.companion.xp;assertEquals(12,xp);
+        assertTrue(k.memory.optString(k.memory.length()-1).contains("Коллегия Винтерхолда"));
+        k.autonomous(g);assertEquals(xp,k.companion.xp);assertEquals(1,k.companion.daysIndependent);
+        assertFalse(KatherineInitiative.apply(g,"TALK",true));g.progress.location="Коллегия Винтерхолда";
+        assertFalse(KatherineInitiative.apply(g,"GUARD",true));assertTrue(KatherineInitiative.apply(g,"TALK",true));
+    }
 }
