@@ -72,7 +72,7 @@ class GeographicSource(unittest.TestCase):
 class GameEngine {
  boolean started=true; int region=2,gold=250; Progress progress=new Progress();
  static class Progress {String location="Виндхельм"; double weight;
-  double carryWeight(){return weight;}}
+  double carryWeight(){return weight;} double carryLimit(){return 50.0;}}
 }''')
             (root/"Probe.java").write_text('''package dev.infend.skyrimtext;
 import java.util.*;

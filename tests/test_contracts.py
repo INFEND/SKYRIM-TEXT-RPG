@@ -110,8 +110,8 @@ class GameContracts(unittest.TestCase):
         catalog=text("ItemCatalog.java")
         shop=engine[engine.index('private void buy('):engine.index('private void explore()')]
         self.assertIn('double projected=progress.carryWeight()+incoming.weight',shop)
-        self.assertIn('if(projected>50.00001)',shop)
-        self.assertLess(shop.index('if(projected>50.00001)'),shop.index('gold-=price;'))
+        self.assertIn('if(projected>progress.carryLimit()+0.00001)',shop)
+        self.assertLess(shop.index('if(projected>progress.carryLimit()+0.00001)'),shop.index('gold-=price;'))
         self.assertIn('progress.carryWeight()+0.5<=progress.carryLimit()+0.00001',engine)
         self.assertIn('put(feminine[i]+" кираса"',catalog)
         self.assertIn('put(plural[i]+" перчатки"',catalog)
