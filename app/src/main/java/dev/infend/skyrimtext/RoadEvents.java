@@ -316,11 +316,12 @@ final class RoadEvents {
     GameEngine.Scene scene(GameEngine g){
         Event e=find(id);
         if(e==null)return new GameEngine.Scene("В ДОРОГЕ","Переход","Событие недоступно.").primary("GO_WORLD","Продолжить путь","");
-        GameEngine.Scene s=new GameEngine.Scene("СЛУЧАЙНАЯ ВСТРЕЧА | В ДОРОГЕ",e.title,e.body+("arvak".equals(id)?"\n\nМесто встречи: Каирн Душ.":"\n\nУчасток: "+(segmentFrom.isEmpty()?g.progress.location:segmentFrom)+" → "+(segmentTo.isEmpty()?destination:segmentTo)+".\nКонечная точка: "+destination+"."));
+        String body="arvak".equals(id)&&"ACTIVE".equals(g.progress.questOutcome("road_arvak_skull"))?"Душа рассказывает о потерянном коне. Вдалеке мерцает алтарь, на котором лежит череп Арвака. Рядом движутся тени Каирна Душ.":e.body;
+        GameEngine.Scene s=new GameEngine.Scene("СЛУЧАЙНАЯ ВСТРЕЧА | В ДОРОГЕ",e.title,body+("arvak".equals(id)?"\n\nМесто встречи: Каирн Душ.":"\n\nУчасток: "+(segmentFrom.isEmpty()?g.progress.location:segmentFrom)+" → "+(segmentTo.isEmpty()?destination:segmentTo)+".\nКонечная точка: "+destination+"."));
         if("giant".equals(id))return s.primary(action("fight"),"Помочь Соратникам","Вступить в бой с великаном").add(action("watch"),"Наблюдать за боем","Поговорить с Эйлой после схватки").add(action("leave"),"Пройти мимо","Не вмешиваться");
         if("cicero".equals(id))return s.primary(action("help"),"Убедить Ванту Лорея","Помочь Цицерону починить повозку").add(action("report"),"Доложить страже","Поддержать фермера").add(action("leave"),"Пройти мимо","Вернуться к этому позже");
         if("headless".equals(id))return s.primary(action("follow"),"Проследить за всадником","Узнать, куда ведёт призрак").add(action("leave"),"Проводить взглядом","");
-        if("arvak".equals(id)){if("ACTIVE".equals(g.progress.questOutcome("road_arvak_skull")))return s.primary(action("arvak_skull"),"Найти череп Арвака","Осмотреть каменный алтарь и вернуть череп хозяину").add(action("leave"),"Отложить поиски","");return s.primary(action("arvak"),"Последовать за Арваком","Узнать о потерянном черепе").add(action("leave"),"Пройти мимо","");}
+        if("arvak".equals(id)){if("ACTIVE".equals(g.progress.questOutcome("road_arvak_skull")))return s.primary(action("arvak_skull"),"Найти череп Арвака","Осмотреть каменный алтарь и вернуть череп хозяину");return s.primary(action("arvak"),"Последовать за Арваком","Узнать о потерянном черепе").add(action("leave"),"Пройти мимо","");}
         if("bats".equals(id)||"island_flying_wizard".equals(id))return s.primary(action("observe"),"Наблюдать","Увидеть исход события").add(action("leave"),"Продолжить путь","");
         if("ghost_grave".equals(id))return s.primary(action("fight"),"Последовать за призраком","Защитить могилу от разбойников").add(action("leave"),"Продолжить путь","");
         if("vampire_sun".equals(id))return s.primary(action("leave"),"Позволить вампиру уйти","Не нападать").add(action("fight"),"Атаковать вампира","");
@@ -381,7 +382,7 @@ final class RoadEvents {
             case "arvak":g.progress.setQuestOutcome("road_arvak_skull","ACTIVE");g.message="Душа просит отыскать череп своего коня. Ты замечаешь алтарь среди серых камней.";return;
             case "arvak_skull":if(!RoadQuests.item(g,"Череп Арвака")){finish(g,"В сумке нет места. Вернись к поискам позже.");return;}uniqueOutcome(g,"COMPLETED");g.progress.setQuestOutcome("road_arvak_skull","COMPLETED");g.progress.setQuestOutcome("road_arvak_mount","COMPLETED");g.progress.removeItem("Череп Арвака",1);g.addXp(40);finish(g,"Ты возвращаешь череп хозяину. Арвак становится доступен для путешествий: расход запаса сил уменьшен. +40 опыта.");return;
             case "follow":RoadQuests.offer(g,"headless");finish(g,"Всадник исчезает в сторону Привала Хамвира. Цель отмечена в журнале.");return;
-            case "drink":if(RoadQuests.item(g,"Медовуха Хоннинга"))finish(g,"Весельчаки делятся медовухой Хоннинга.");else finish(g,"В сумке нет места для бутылки.");return;
+            case "drink":if(g.progress.addItem("Медовуха Хоннинга",1))finish(g,"Весельчаки делятся медовухой Хоннинга.");else finish(g,"В сумке нет места для бутылки.");return;
             case "mead_exchange":if(g.progress.quantity("Медовуха Хоннинга")>0&&g.progress.addItem("Зачарованное ожерелье",1)){g.progress.removeItem("Медовуха Хоннинга",1);g.progress.setQuestOutcome("road_reveler_necklace","COMPLETED");finish(g,"Весельчаки принимают медовуху и дарят зачарованное ожерелье.");}else finish(g,"Обмен не состоялся: нет напитка или места в сумке.");return;
             case "black_mead":finish(g,"Весельчаки отказываются от медовухи Чёрного Вереска и уходят.");return;
             case "staff":if(g.gold>=25&&g.progress.addItem("Посох огненных стрел",1)){g.gold-=25;finish(g,"Маг отдаёт посох за 25 септимов.");}else finish(g,"Покупка не состоялась: проверь деньги и вес сумки.");return;
@@ -429,6 +430,7 @@ final class RoadEvents {
         case "pilgrim":return "Фалдрус рассказывает о святилище Азуры в горах Винтерхолда.";
         case "afflicted":return "Страдающий рассказывает о святилище Периайта и Бтардамзе.";
         case "island_hairy_hunter":return "Охотник рассказывает о стае Маджни на скале Морозной Луны.";
+        case "wolf_escape":return "На погибшем дрессировщике найдена зацепка о пещере Крегслейн.";
         default:return "Ты записываешь полученные сведения в хронику.";
     }}
     void resume(GameEngine g){
