@@ -14,7 +14,7 @@ public class FactionStoriesRuntimeTest {
                 assertNotNull(chapter.place,p);assertTrue(chapter.place,TravelPlanner.plan(h,p).allowed);
                 h.progress.location=p.name;h.region=p.region;h.mode="WORLD";h.stamina=h.maxStamina;
                 assertTrue(h.factionStories.advance(h,f));assertEquals(1,h.factionStories.phase(f));
-                if(RoadEvents.MODE.equals(h.mode)){assertEquals(6,f);assertEquals(7,i);h=GameEngine.fromJson(h.toJson().toString());h.choose(h.scene().choices.get(0).action);h.choose("GO_WORLD");assertEquals("WORLD",h.mode);assertEquals("COMPLETED",h.progress.questOutcome("road_arvak"));}
+                if(RoadEvents.MODE.equals(h.mode)){assertEquals(6,f);assertEquals(7,i);h=GameEngine.fromJson(h.toJson().toString());h.choose(h.scene().choices.get(0).action);assertEquals("ROAD",h.mode);h=GameEngine.fromJson(h.toJson().toString());h.choose(h.scene().choices.get(0).action);h.choose("GO_WORLD");assertEquals("WORLD",h.mode);assertEquals("COMPLETED",h.progress.questOutcome("road_arvak"));assertTrue(h.road.hasMount(h));}
                 if(!chapter.enemy.isEmpty()){
                     assertTrue(h.factionStories.advance(h,f));assertEquals("COMBAT",h.mode);
                     h=GameEngine.fromJson(h.toJson().toString());assertEquals("FACTION",h.battleKind);

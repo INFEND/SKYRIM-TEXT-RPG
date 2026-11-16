@@ -218,9 +218,13 @@ final class RoadEvents {
     private static boolean oneTime(Event e){return e.rule.endsWith("once")||Arrays.asList("arvak","letter_septimus","letter_brotherhood","hakar","saliah","lynoit","taron_dreth","maven_revenge","louis_revenge","false_vigilants","island_torkild","island_torkild_dead").contains(e.id);}
     static boolean availableAt(GameEngine g,String event,int region){Event e=find(event);return e!=null&&eligible(g,e,region);}
     static int eventCount(){return EVENTS.length;}
+    boolean hasDog(GameEngine g){return "COMPLETED".equals(g.progress.questOutcome("road_dog_companion"));}
+    boolean hasMount(GameEngine g){return "COMPLETED".equals(g.progress.questOutcome("road_mount"))||"COMPLETED".equals(g.progress.questOutcome("road_arvak_mount"));}
     static List<String> eventIds(){ArrayList<String> ids=new ArrayList<>();for(Event e:EVENTS)ids.add(e.id);return Collections.unmodifiableList(ids); }
     static boolean eligible(GameEngine g,Event e,int region){
         if("unique".equals(e.rule)||"soul_cairn".equals(e.rule))return false;
+        if("stray_dog".equals(e.id)&&"COMPLETED".equals(g.progress.questOutcome("road_dog_companion")))return false;
+        if("horse".equals(e.id)&&"COMPLETED".equals(g.progress.questOutcome("road_mount")))return false;
         if(oneTime(e)&&g.progress.questOutcome("road_"+e.id)!=null)return false;
         if(e.id.startsWith("island_torkild")&&(g.progress.questOutcome("road_island_torkild")!=null||g.progress.questOutcome("road_island_torkild_dead")!=null))return false;
         boolean island=e.rule.startsWith("island");
@@ -315,8 +319,8 @@ final class RoadEvents {
         GameEngine.Scene s=new GameEngine.Scene("СЛУЧАЙНАЯ ВСТРЕЧА | В ДОРОГЕ",e.title,e.body+("arvak".equals(id)?"\n\nМесто встречи: Каирн Душ.":"\n\nУчасток: "+(segmentFrom.isEmpty()?g.progress.location:segmentFrom)+" → "+(segmentTo.isEmpty()?destination:segmentTo)+".\nКонечная точка: "+destination+"."));
         if("giant".equals(id))return s.primary(action("fight"),"Помочь Соратникам","Вступить в бой с великаном").add(action("watch"),"Наблюдать за боем","Поговорить с Эйлой после схватки").add(action("leave"),"Пройти мимо","Не вмешиваться");
         if("cicero".equals(id))return s.primary(action("help"),"Убедить Ванту Лорея","Помочь Цицерону починить повозку").add(action("report"),"Доложить страже","Поддержать фермера").add(action("leave"),"Пройти мимо","Вернуться к этому позже");
-        if("headless".equals(id))return s.primary(action("leave"),"Проводить всадника взглядом","Призрак не останавливается и не отвечает");
-        if("arvak".equals(id))return s.primary(action("arvak"),"Последовать за Арваком","Узнать о потерянном черепе").add(action("leave"),"Пройти мимо","");
+        if("headless".equals(id))return s.primary(action("follow"),"Проследить за всадником","Узнать, куда ведёт призрак").add(action("leave"),"Проводить взглядом","");
+        if("arvak".equals(id)){if("ACTIVE".equals(g.progress.questOutcome("road_arvak_skull")))return s.primary(action("arvak_skull"),"Найти череп Арвака","Осмотреть каменный алтарь и вернуть череп хозяину").add(action("leave"),"Отложить поиски","");return s.primary(action("arvak"),"Последовать за Арваком","Узнать о потерянном черепе").add(action("leave"),"Пройти мимо","");}
         if("bats".equals(id)||"island_flying_wizard".equals(id))return s.primary(action("observe"),"Наблюдать","Увидеть исход события").add(action("leave"),"Продолжить путь","");
         if("ghost_grave".equals(id))return s.primary(action("fight"),"Последовать за призраком","Защитить могилу от разбойников").add(action("leave"),"Продолжить путь","");
         if("vampire_sun".equals(id))return s.primary(action("leave"),"Позволить вампиру уйти","Не нападать").add(action("fight"),"Атаковать вампира","");
@@ -328,12 +332,18 @@ final class RoadEvents {
         if("bounty_collector".equals(id))return s.primary(action("talk"),"Показать, что ты не разыскиваемый","Проверка красноречия").add(action("fight"),"Вступить в бой","").add(action("sneak"),"Скрыться","");
         if("friend_gift".equals(id))return s.primary(action("gift"),"Принять подарок","Получить небольшой подарок").add(action("leave"),"Отказаться","");
         if("kynareth".equals(id)||"mistwatch".equals(id)||"pilgrim".equals(id)||"afflicted".equals(id)||"island_hairy_hunter".equals(id)||"saliah".equals(id))return s.primary(action("clue"),"Расспросить о цели","Записать сведения в журнал").add(action("leave"),"Продолжить путь","");
+        if("revelers".equals(id)){s.primary(action("drink"),"Принять медовуху","Подарок весельчаков");if(g.progress.quantity("Медовуха Хоннинга")>0&&!"COMPLETED".equals(g.progress.questOutcome("road_reveler_necklace")))s.add(action("mead_exchange"),"Угостить медовухой Хоннинга","Получить зачарованное ожерелье");if(g.progress.quantity("Медовуха Чёрного Вереска")>0)s.add(action("black_mead"),"Предложить медовуху Чёрного Вереска","");return s.add(action("leave"),"Продолжить путь","");}
+        if("mage".equals(id))return s.primary(action("staff"),"Предложить выкупить посох","25 септимов, текстовая адаптация").add(action("talk"),"Расспросить о магии","").add(action("leave"),"Продолжить путь","");
+        if("stray_dog".equals(id)||"horse".equals(id))return s.primary(action("adopt"),"stray_dog".equals(id)?"Позвать пса с собой":"Забрать лошадь","stray_dog".equals(id)?"Спутник помогает в бою":"Меньше расход сил в путешествии").add(action("leave"),"Оставить в покое","");
+        if("balbus".equals(id)){s.primary(action("talk"),"Расспросить о Гурмане","");if(g.factionStories.done(3)>=10)s.add(action("gourmet"),"Представиться Гурманом","Получить ингредиенты");return s.add(action("leave"),"Продолжить путь","");}
+        if("dwemer_children".equals(id))return s.primary(action("dwemer"),"Заплатить 1 септим","Узнать о древней переправе").add(action("leave"),"Продолжить путь","");
+        if("wolf_escape".equals(id))return s.primary(action("fight"),"Защититься от волков","").add(action("clue"),"Изучить следы","Узнать о пещере Крегслейн").add(action("leave"),"Продолжить путь","");
         if("burned_crops".equals(id))return s.primary(action("donate"),"Пожертвовать 10 септимов","Помочь лишившимся дома").add(action("talk"),"Расспросить о нападении","").add(action("leave"),"Продолжить путь","");
         if("bard".equals(id)||"bard_rest".equals(id))return s.primary(action("song"),"Попросить исполнить песню","Послушать барда").add(action("talk"),"Поговорить","").add(action("leave"),"Продолжить путь","");
         if("escort".equals(e.rule))return s.primary(action("leave"),"Пропустить конвой","Не вмешиваться").add(action("talk"),"Расспросить о пленнике","Узнать причину задержания").add(action("free"),"Освободить пленника","Вступить в бой с охраной");
         if("civil".equals(e.rule))return s.primary(action("leave"),"Обойти сражение","Не вмешиваться").add(action("empire"),"Помочь имперцам","Сразиться с Братьями Бури").add(action("storm"),"Помочь Братьям Бури","Сразиться с имперцами");
         if("fugitive".equals(e.rule))return s.primary(action("return"),"Вернуть вещь охотнику","Рассказать о беглеце").add(action("keep"),"Оставить вещь себе","Скрыть беглеца").add(action("leave"),"Не вмешиваться","");
-        if("heal".equals(e.rule))return s.primary(action("help"),"Отдать лечебное зелье","Если есть в сумке").add(action("talk"),"Спросить о вампирах","Узнать о нападении").add(action("leave"),"Продолжить путь","");
+        if("heal".equals(e.rule))return s.primary(action("cure"),"Дать зелье исцеления болезней","В сумке: "+g.progress.quantity("Зелье исцеления болезней")).add(action("talk"),"Спросить о вампирах","Узнать о нападении").add(action("leave"),"Продолжить путь","");
         if("loot".equals(e.rule))return s.primary(action("search"),"Изучить записку","Поискать полезные сведения").add(action("leave"),"Не трогать тело","");
         if("robber".equals(id)||"thief".equals(id)||"false_imperials".equals(id))s.primary(action("pay"),"Заплатить","До 25 септимов").add(action("talk"),"Попытаться договориться","Проверка красноречия");
         else if("assassin_mistake".equals(id))s.primary(action("talk"),"Объяснить ошибку","Проверка красноречия");
@@ -368,10 +378,20 @@ final class RoadEvents {
             finish(g,"Стражник задерживает Цицерона. Лорей платит 50 септимов. Шут запомнил твой выбор.");return;
         }
         switch(verb){
-            case "arvak":uniqueOutcome(g,"COMPLETED");g.progress.setQuestOutcome("road_arvak_skull","ACTIVE");finish(g,"Призрачный конь исчезает вдали. Нужно найти его череп в Каирне Душ. Сведения записаны.");return;
+            case "arvak":g.progress.setQuestOutcome("road_arvak_skull","ACTIVE");g.message="Душа просит отыскать череп своего коня. Ты замечаешь алтарь среди серых камней.";return;
+            case "arvak_skull":if(!RoadQuests.item(g,"Череп Арвака")){finish(g,"В сумке нет места. Вернись к поискам позже.");return;}uniqueOutcome(g,"COMPLETED");g.progress.setQuestOutcome("road_arvak_skull","COMPLETED");g.progress.setQuestOutcome("road_arvak_mount","COMPLETED");g.progress.removeItem("Череп Арвака",1);g.addXp(40);finish(g,"Ты возвращаешь череп хозяину. Арвак становится доступен для путешествий: расход запаса сил уменьшен. +40 опыта.");return;
+            case "follow":RoadQuests.offer(g,"headless");finish(g,"Всадник исчезает в сторону Привала Хамвира. Цель отмечена в журнале.");return;
+            case "drink":if(RoadQuests.item(g,"Медовуха Хоннинга"))finish(g,"Весельчаки делятся медовухой Хоннинга.");else finish(g,"В сумке нет места для бутылки.");return;
+            case "mead_exchange":if(g.progress.quantity("Медовуха Хоннинга")>0&&g.progress.addItem("Зачарованное ожерелье",1)){g.progress.removeItem("Медовуха Хоннинга",1);g.progress.setQuestOutcome("road_reveler_necklace","COMPLETED");finish(g,"Весельчаки принимают медовуху и дарят зачарованное ожерелье.");}else finish(g,"Обмен не состоялся: нет напитка или места в сумке.");return;
+            case "black_mead":finish(g,"Весельчаки отказываются от медовухи Чёрного Вереска и уходят.");return;
+            case "staff":if(g.gold>=25&&g.progress.addItem("Посох огненных стрел",1)){g.gold-=25;finish(g,"Маг отдаёт посох за 25 септимов.");}else finish(g,"Покупка не состоялась: проверь деньги и вес сумки.");return;
+            case "adopt":if("stray_dog".equals(id)){g.progress.setQuestOutcome("road_dog_companion","COMPLETED");finish(g,"Пёс принимает тебя за нового хозяина и становится спутником.");}else{g.progress.setQuestOutcome("road_mount","COMPLETED");finish(g,"Лошадь успокаивается и позволяет тебе взять поводья.");}return;
+            case "gourmet":finish(g,"Балбус верит, что встретил Гурмана."+RoadQuests.evidence(g,"Ингредиенты Балбуса"));return;
+            case "dwemer":if(g.gold>=1){g.gold--;RoadQuests.offer(g,"dwemer_children");finish(g,"Дети указывают Переправу Глубинного Народа. Цель появилась в журнале.");}else finish(g,"У тебя нет даже одного септима.");return;
+            case "cure":if(g.progress.removeItem("Зелье исцеления болезней",1)){g.reputation++;fact(g,"road_bitten_hunter","Укушенный охотник","HELPED");finish(g,"Охотник выпивает зелье исцеления болезней и благодарит за спасение.");}else finish(g,"У тебя нет подходящего зелья. Охотник отправляется искать целителя.");return;
             case "observe":finish(g,"island_flying_wizard".equals(id)?"Маг падает с высоты. Эксперимент окончился трагически.":"Стая исчезает в темноте. Опасности нет.");return;
-            case "clue":String clue=clueText(id);g.progress.setQuestOutcome("lead_"+id,"ACTIVE");finish(g,clue);return;
-            case "reveal_fight":g.progress.setQuestOutcome("lead_"+id,"ACTIVE");fight(g,e.enemy);return;
+            case "clue":String clue=clueText(id);finish(g,clue+" "+RoadQuests.lead(g,id));return;
+            case "reveal_fight":fight(g,e.enemy);return;
             case "gift":g.gold=GameEngine.nonnegativeAdd(g.gold,10);finish(g,"Путник дарит тебе 10 септимов в знак благодарности.");return;
             case "donate":if(g.gold>=10){g.gold-=10;g.reputation++;finish(g,"Ты отдаёшь фермерам 10 септимов. Они благодарят тебя.");}else finish(g,"У тебя недостаточно септимов, но ты указываешь путь к ближайшему поселению.");return;
             case "song":g.stamina=Math.min(g.maxStamina,g.stamina+5);finish(g,"Талсгар исполняет песню о северных героях. Короткий привал возвращает немного сил.");return;
@@ -391,9 +411,9 @@ final class RoadEvents {
                 g.progress.skillExperience(g,12,8);finish(g,"Ты беседуешь с путником и прощаешься. Новые сведения останутся в хронике.");return;
             case "sneak":if(g.rollCheck(g.progress.chance(g,2,9,25))){g.progress.skillExperience(g,9,15);finish(g,"Ты скрываешься и обходишь опасность.");}else fight(g,e.enemy);return;
             case "help":if(g.potions>0){g.potions--;g.reputation++;finish(g,"Ты делишься лечебным зельем. Охотник благодарит за помощь; лечение болезни требует особого средства.");}else finish(g,"У тебя нет лечебного зелья, но охотник получает совет обратиться за помощью.");return;
-            case "return":g.reputation++;finish(g,"Ты возвращаешь вещь владельцу и объясняешь, куда ушёл беглец.");return;
-            case "keep":g.gold=GameEngine.nonnegativeAdd(g.gold,15);finish(g,"Ты оставляешь вещь себе и позже получаешь за неё 15 септимов.");return;
-            case "search":boolean added=g.progress.addItem("Отмычка",1);finish(g,"Ты изучаешь записку."+ (added?" Найдена отмычка.":" Сумка не позволяет взять находку."));return;
+            case "return":g.reputation++;finish(g,"Ты передаёшь охотнику вещь, оставленную беглецом, и объясняешь, куда тот ушёл.");return;
+            case "keep":finish(g,g.progress.addItem("Похищенное кольцо",1)?"Ты прячешь кольцо в сумку. Охотник уходит по ложному следу.":"Ты не можешь взять кольцо: сумка переполнена. Беглец уносит его.");return;
+            case "search":finish(g,"Ты изучаешь записку. "+RoadQuests.lead(g,id));return;
             default:finish(g,"Ты не вмешиваешься и продолжаешь дорогу.");
         }
     }
@@ -419,7 +439,10 @@ final class RoadEvents {
             if(oneTime(find(previous)))uniqueOutcome(g,"COMPLETED");
             if("giant".equals(previous)){fact(g,"road_aela","Эйла Охотница","HELPED");outcome+="\nЭйла приглашает тебя в Йоррваскр, к Кодлаку Белой Гриве.";}
             else if("escort".equals(find(previous).rule)){outcome+="\nПленник освобождён.";g.reputation++;}
-            else if("assassin".equals(previous))outcome+="\nСреди вещей нападавшего обнаружен приказ Тёмного Братства устранить тебя.";
+            else if("assassin".equals(previous))outcome+="\n"+RoadQuests.evidence(g,"Приказ Тёмного Братства");
+            else if("assassin_mistake".equals(previous)||"assassin_other".equals(previous))outcome+="\n"+RoadQuests.evidence(g,"Чужой контракт Тёмного Братства");
+            else if("thalmor_order".equals(previous))outcome+="\n"+RoadQuests.evidence(g,"Приказ Талмора");
+            else if(RoadQuests.find(previous)!=null)outcome+="\n"+RoadQuests.lead(g,previous);
         }else if(outcome.startsWith("Встреча: "))outcome=g.message;
         destination="";id="";segmentFrom="";segmentTo="";last=previous;resuming=true;
         boolean canonical=canonicalResume;canonicalResume=false;

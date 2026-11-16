@@ -1469,7 +1469,7 @@ public final class MainActivity extends Activity {
     private void renderStory(){
         boolean canonical="CANON".equals(game.mode)||("COMBAT".equals(game.mode)&&("CANONICAL".equals(game.battleKind)||"FACTION".equals(game.battleKind)));
         canonical=canonical||KatherineStory.MODE.equals(game.mode)||AlmaStory.MODE.equals(game.mode)||("COMBAT".equals(game.mode)&&("KATHERINE".equals(game.battleKind)||"ALMA".equals(game.battleKind)));
-        canonical=canonical||game.road.pending()||RoadEvents.MODE.equals(game.mode);
+        canonical=canonical||game.road.pending()||RoadEvents.MODE.equals(game.mode)||("COMBAT".equals(game.mode)&&game.battleKind.startsWith("ROAD_QUEST:"));
         if(prefs.getBoolean("ai_enabled",false)&&!canonical){renderAiGame();return;}
         GameEngine.Scene s=game.scene();section(s.kicker,s.title,"");
         if(LocationGalleryView.hasGallery(game.progress.location)){
@@ -3885,6 +3885,16 @@ public final class MainActivity extends Activity {
         String[] names={"Доверие","Уважение","Симпатия","Ревность","Любовь","Привязанность","Обида"};int[] scores={k.trust,k.respect,k.affection,k.jealousy,k.companion.love,k.companion.attachment,k.companion.hurt};for(int i=0;i<names.length;i++){livingLine(tile,names[i],scores[i]+" / 100",accent());livingBar(tile,scores[i],100,accent());space(tile,5);}if(!k.lastRemark.isEmpty())addText(tile,k.lastRemark,13,MUTED,false,8);TextView memories=text("Личная память | "+k.memory.length()+" событий",14,accent(),true);memories.setPadding(dp(8),dp(12),dp(8),dp(12));tile.addView(memories,lp(-1,-2));memories.setOnClickListener(v->{LinearLayout p=column();for(int i=0;i<k.companion.milestones.length();i++)addText(p,"◇ "+k.companion.milestones.optString(i),13,accent(),true,8);for(int i=k.memory.length()-1;i>=Math.max(0,k.memory.length()-100);i--)addText(p,k.memory.optString(i),13,TEXT,false,8);if(k.memory.length()>100)addText(p,"Показаны последние 100 из "+k.memory.length()+" сохранённых событий.",12,MUTED,false,8);livingDialog("Кэтрин | Личная память",p);});tile.setOnClickListener(v->npcDetails(KatherineStory.NAME));
     }
     private void livingRelationDetails(JSONObject n){LinearLayout panel=column();String status=n.optString("status");addText(panel,npcStatusLabel(status),16,TEXT,true,8);if(!"DEAD".equals(status)&&!"MISSING".equals(status))livingLine(panel,"Отношение",n.optInt("relation",50)+" / 100",accent());if(n.optInt("lastDay")>0){livingLine(panel,"Последняя встреча","День "+n.optInt("lastDay")+" | "+String.format(java.util.Locale.ROOT,"%02d:00",n.optInt("lastHour")),MUTED);addText(panel,n.optString("lastLocation"),13,MUTED,false,8);}org.json.JSONArray events=n.optJSONArray("history");addText(panel,"История взаимодействий",13,accent(),true,8);if(events!=null)for(int i=events.length()-1;i>=0;i--){JSONObject e=events.optJSONObject(i);if(e==null)continue;int change=e.optInt("delta");livingLine(panel,npcStatusLabel(e.optString("status")),change==0?"":change>0?"+"+change:String.valueOf(change),change<0?ITEM_DOWN:ITEM_UP);if(e.optInt("day")>0)addText(panel,"День "+e.optInt("day")+" | "+String.format(java.util.Locale.ROOT,"%02d:00",e.optInt("hour"))+" · "+e.optString("location"),12,MUTED,false,7);}livingDialog(n.optString("title"),panel);}
+    private void renderRoadQuestJournal(){
+        java.util.List<RoadQuests.Task> tasks=RoadQuests.visible(game);if(tasks.isEmpty()&&!game.road.hasDog(game)&&!game.road.hasMount(game))return;
+        LinearLayout panel=card();addText(panel,"ДОРОЖНЫЕ ПОРУЧЕНИЯ",12,accent(),true,8);
+        if(game.road.hasDog(game))addText(panel,"Спутник: бродячий пёс | помощь в бою",13,TEXT,false,6);
+        if(game.road.hasMount(game))addText(panel,"Верховая лошадь / Арвак | меньший расход сил в пути",13,TEXT,false,6);
+        for(RoadQuests.Task task:tasks){boolean active=RoadQuests.active(game,task);addText(panel,task.title+" | "+(active?"Активно":"Завершено"),14,TEXT,true,5);addText(panel,task.place,12,MUTED,false,6);if(!active)continue;final RoadQuests.Task t=task;
+            if(RoadQuests.here(game,t))visualSummaryLink(panel,"ПРОДОЛЖИТЬ",()->{if(livingBusy())return;VisualSnapshot before=new VisualSnapshot(game);game.choose("ROADQUEST:"+t.id);game.progress.sync(game);recordVisual(before,game,t.title);save();tab=0;render();});
+            else{WorldAtlas.Place p=WorldAtlas.find(t.place);if(p!=null)visualSummaryLink(panel,"МАРШРУТ К ЦЕЛИ",()->locationDialog(p));}space(panel,5);
+        }
+    }
     private void renderJournal(){
         skyrimTopTabs(4);
         LinearLayout switcher=row();switcher.setGravity(Gravity.TOP);switcher.setBaselineAligned(false);
@@ -3903,6 +3913,7 @@ public final class MainActivity extends Activity {
         if(journalRelations){renderLivingRelations();return;}
         section("ЛЕТОПИСЬ СЕВЕРА","Журнал","Выбирай задание, чтобы увидеть описание и текущую цель.");
         renderFactionJournal();
+        renderRoadQuestJournal();
         if(game.katherine.enabled&&game.katherine.stage>0){LinearLayout k=card();addText(k,"НУЛЕВОЙ ПРЕДЕЛ | КРУГ ТРЁХ КОГТЕЙ",13,accent(),true,8);addText(k,game.katherine.objective(),15,TEXT,false,8);if(game.katherine.available(game))actionButton("Поговорить с Кэтрин","Продолжить расследование",false,()->{if(livingBusy())return;game.choose("KATH:open");save();tab=0;render();});}
         if(game.alma.enabled&&game.alma.stage>0)actionButton("Алая Бессмертная",game.alma.objective()+" | "+game.alma.stage+"/12",false,()->new RuneDialogBuilder(this,accent()).setTitle("Алая Бессмертная").setMessage(game.alma.objective()+"\n\n"+(game.alma.companion?"Альма путешествует с тобой.":game.alma.terminalLoss()?"История завершена.":"Ищи Альму: "+game.alma.location(game))).setPositiveButton("Закрыть",null).show());
         String[] entries=game.aiJournal.isEmpty()?
@@ -3984,7 +3995,7 @@ public final class MainActivity extends Activity {
         boolean any=false;
         for(java.util.Map.Entry<String,String> q:game.progress.questOutcomes.entrySet())
             if("FAILED".equals(q.getValue())){
-                addText(failures,"✕ "+q.getKey(),13,MUTED,false,6);any=true;
+                addText(failures,"✕ "+("road_cicero".equals(q.getKey())?"Запоздалые похороны":RoadQuests.title(q.getKey())),13,MUTED,false,6);any=true;
             }
         if(!any)addText(failures,"Проваленных заданий нет.",14,MUTED,false,0);
         LinearLayout successRolls=card();

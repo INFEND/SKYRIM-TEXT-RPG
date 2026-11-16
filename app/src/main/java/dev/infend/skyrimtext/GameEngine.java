@@ -257,6 +257,7 @@ public final class GameEngine {
         s.add("SHOP","Торговая лавка","Зелья, оружие и снаряжение");
         s.add("BOARD","Доска заказов","Дополнительное поручение");
         s.add("REST","Отдохнуть в трактире","20 септимов | восстановить силы");
+        RoadQuests.choices(this,s);
         return s;
     }
 
@@ -369,6 +370,7 @@ public final class GameEngine {
         if(RoadEvents.MODE.equals(mode)){road.choose(this,action);return;}
         if(road.pending()&&!"COMBAT".equals(mode)){if("GO_WORLD".equals(action))road.resume(this);return;}
         if(action.startsWith("ROAD:"))return;
+        if(action.startsWith("ROADQUEST:")){RoadQuests.choose(this,action);return;}
         int fixPower=CompensationPowers.actionIndex(action);if(fixPower>=0){if(compensation.available(this,fixPower))combatTurn(action);return;}
         // A pending battle cannot be escaped by invoking a world, map or quest action.
         // This guard also protects saved games restored directly into COMBAT mode.
@@ -432,7 +434,7 @@ public final class GameEngine {
             } catch (JSONException ignored) {
                 // Optional scene metadata cannot invalidate a completed journey.
             }
-            stamina=Math.max(1,stamina-Math.min(Math.max(0,stamina-1),route.days*(progress.advanced.has(AdvancedPerks.STEALTH)?5:6)));
+            stamina=Math.max(1,stamina-Math.min(Math.max(0,stamina-1),route.days*Math.max(1,(progress.advanced.has(AdvancedPerks.STEALTH)?5:6)-(road.hasMount(this)?2:0))));
             magicka=Math.max(1,magicka-Math.min(Math.max(0,magicka-1),route.days*2));
             String roadEvent=road.resuming?road.outcome:"";
             message="Ты преодолеваешь дорогу, постепенно оставляя за спиной стоянки, перевалы и чужие костры. "+
@@ -600,6 +602,7 @@ public final class GameEngine {
     }
     void beginFactionBattle(int f,String name,int health,int damage,String intro){factionBattle=f;startBattle(name,health,damage,"FACTION",intro);}
     void beginCanonicalBattle(String name,int health,int damage,String intro){canonicalShoutCooldown=0;startBattle(name,health,damage,"CANONICAL",intro);}
+    void beginRoadQuestBattle(String id,String enemy,String intro){startBattle(enemy,55+level*5,6+level/3,"ROAD_QUEST:"+id,intro);}
     void beginRoadBattle(String name,int health,int damage,String intro){startBattle(name,health,damage,"WILD",intro);}
     void beginAlmaBattle(){startBattle("Убийца Тёмного Братства",75+level*8,8+level*2,"ALMA","Преследователь преграждает дорогу. Альма предупреждает о засаде.");}
     void beginKatherineBattle(){startBattle("Агент Круга Трёх Когтей",75+level*8,8+level*2,"KATHERINE","Кэтрин поднимает барьер. Агент Круга требует, чтобы она сдалась.");}
@@ -650,6 +653,7 @@ public final class GameEngine {
         if(kathBurn>0){damage+=kathBurn;actionText+="\nКэтрин: остаточное пламя, −"+kathBurn+" здоровья врагу.";}
         int kathDamage=katherine.assist(this,battleTurns+1,Math.max(0,enemyHp-damage));
         if(kathDamage>0){damage+=kathDamage;actionText+="\nКэтрин: "+katherine.companion.lastSpell+", −"+kathDamage+" здоровья врагу.";}
+        if(road.hasDog(this)&&enemyHp>damage&&(battleTurns+1)%3==0){damage+=3;actionText+="\nБродячий пёс помогает в бою: −3 здоровья врагу.";}
         int almaDamage=alma.assist(this,battleTurns+1,Math.max(0,enemyHp-damage));if(almaDamage>0){damage+=almaDamage;actionText+="\nАльма: "+alma.powerLabel()+", −"+almaDamage+" здоровья врагу.";}
         int almaCombo=alma.combo(Math.max(0,enemyHp-damage),"MAGIC".equals(action));if(almaCombo>0){damage+=almaCombo;actionText+="\nАльма: Кровавая связка, −"+almaCombo+" здоровья врагу.";}
         lastDealt=Math.min(enemyHp,damage);lastHeavyHit="HEAVY".equals(action)&&lastDealt>0;lastMiss="HEAVY".equals(action)&&lastDealt==0;battleDealt+=lastDealt;battleTurns++;
@@ -699,6 +703,7 @@ public final class GameEngine {
         if("QUEST".equals(battleKind))message+="\n\nЗа стражем ты находишь журнал хранителя. Следующая цель: Солитьюд.";
         if("DRAGON".equals(battleKind))message+="\n\n"+progress.dragonRecent;
         if(sideQuest==1)message+="\nЗаказ доски: "+sideKills+"/3.";
+        if(battleKind.startsWith("ROAD_QUEST:"))RoadQuests.victory(this,battleKind);
         if("FACTION".equals(battleKind)){factionStories.victory(factionBattle);factionBattle=-1;message+="\n\nОткрой сюжет фракции, чтобы завершить главу.";}
         if("CANONICAL".equals(battleKind)){
             if(canonicalStage==27)message="Ловушка сомкнулась. Одавинг жив и готов к разговору.";
