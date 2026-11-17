@@ -1728,6 +1728,13 @@ public final class MainActivity extends Activity {
             for(int i=0;i<names.length;i++)if(names[i].equals(place))d=i;
             if("Рыночная площадь".equals(place))d=0;
         }
+        if("Солитьюд".equals(city)&&"Высокий шпиль".equals(place)){
+            new RuneDialogBuilder(this,accent()).setTitle(place).setView(panel).setPositiveButton("Посетить",(dialog,w)->{
+                if(!city.equals(game.progress.location)||!"WORLD".equals(game.mode)||game.road.pending())return;
+                if(aiClient!=null)aiClient.cancel();if(localAiClient!=null)localAiClient.cancel();
+                game.choose("SOLITUDE:open");game.choose("SOLITUDE:home");save();tab=0;render();
+            }).setNegativeButton("Закрыть",null).show();return;
+        }
         final int district=d;
         int shop=-1;if("Солитьюд".equals(city))for(int i=0;i<SolitudeShops.NAMES.length;i++)if(SolitudeShops.NAMES[i].equals(place))shop=i;
         final int localShop=shop;

@@ -10,7 +10,7 @@ public class SolitudeCityTest {
     @Test public void cityMenuAndWorkSurviveReload() throws Exception {
         GameEngine g=city();
         assertTrue(g.scene().choices.stream().anyMatch(c->c.action.equals("SOLITUDE:open")));
-        g.choose("SOLITUDE:open");assertEquals(9,g.scene().choices.size());
+        g.choose("SOLITUDE:open");assertEquals(10,g.scene().choices.size());
         g.choose("SOLITUDE:visit:7");int gold=g.gold, stamina=g.stamina;
         g.choose("SOLITUDE:job:14");assertEquals(gold+30,g.gold);assertEquals(stamina-18,g.stamina);
         assertEquals(11,g.hour);assertEquals("Солитьюд",g.progress.location);

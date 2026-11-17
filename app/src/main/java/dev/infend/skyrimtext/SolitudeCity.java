@@ -45,13 +45,14 @@ final class SolitudeCity {
     };
     private final int[] lastDay=new int[JOBS.length];
     private SolitudeShops shops=new SolitudeShops();
+    private SolitudeHome home=new SolitudeHome();
     static boolean here(GameEngine g){return g.started&&g.region==3&&"Солитьюд".equals(g.progress.location);}
     static boolean isMode(String m){return MODE.equals(m)||(m!=null&&m.startsWith(PREFIX));}
     private static int district(String mode){
         for(int i=0;i<PLACES.length;i++)if((PREFIX+i).equals(mode))return i;
         return -1;
     }
-    static boolean validMode(String mode){return MODE.equals(mode)||district(mode)>=0||SolitudeShops.index(mode)>=0;}
+    static boolean validMode(String mode){return MODE.equals(mode)||district(mode)>=0||SolitudeShops.index(mode)>=0||SolitudeHome.MODE.equals(mode);}
     private String blocked(GameEngine g,int i){
         Job j=JOBS[i];
         if(lastDay[i]>=g.day)return "Уже выполнено сегодня";
@@ -69,12 +70,14 @@ final class SolitudeCity {
             (j.skill<0?"":" | "+RpgContent.SKILLS[j.skill]);
     }
     GameEngine.Scene scene(GameEngine g){
+        if(SolitudeHome.MODE.equals(g.mode))return home.scene(g);
         int store=SolitudeShops.index(g.mode);if(store>=0)return shops.scene(g,store);
         int d=district(g.mode);
         if(d<0){
             GameEngine.Scene s=new GameEngine.Scene("СОЛИТЬЮД | ДЕНЬ "+g.day,"Жизнь столицы",
                 "Над городом возвышается Синий дворец, под аркой шумит море. Выбери, куда отправиться. Местные поручения и уроки имеют свои часы работы и не требуют перехода на глобальной карте.");
             for(int i=0;i<PLACES.length;i++)s.add(PREFIX+"visit:"+i,PLACES[i],PROSE[i]);
+            s.add("SOLITUDE:home","Высокий шпиль",SolitudeHome.owns(g)?"Собственный дом":"Поместье | покупка в Синем дворце");
             return s.add("GO_WORLD","Вернуться к приключению","Открыть обычные действия города");
         }
         GameEngine.Scene s=new GameEngine.Scene("СОЛИТЬЮД | "+g.hour+":00",PLACES[d],PROSE[d]+
@@ -86,6 +89,7 @@ final class SolitudeCity {
         if(d==1){String old=g.mode;g.mode="WORLD";boolean available=g.livia.available(g);g.mode=old;
             if(available)s.add(PREFIX+"livia","Поговорить с Ливией",g.livia.objective());}
         for(int i=0;i<SolitudeShops.NAMES.length;i++)if(SolitudeShops.district(i)==d)s.add(PREFIX+"store:"+i,SolitudeShops.NAMES[i],SolitudeShops.OWNERS[i]+" | "+(SolitudeShops.open(g,i)?"Открыто":"Закрыто (8:00–20:00)"));
+        if(d==2)home.palace(g,s);
         SolitudeEncounters.choices(g,s,d);
         return s.add(PREFIX+"back","На улицы Солитьюда","Вернуться к выбору районов").add("GO_WORLD","Завершить прогулку","Вернуться к приключению");
     }
@@ -99,13 +103,16 @@ final class SolitudeCity {
         if(!validMode(g.mode))return;
         if("GO_WORLD".equals(action)){g.mode="WORLD";return;}
         if((PREFIX+"back").equals(action)){g.mode=MODE;g.message="";return;}
+        if(SolitudeHome.MODE.equals(g.mode)){home.choose(g,action);return;}
         int store=SolitudeShops.index(g.mode);if(store>=0){shops.choose(g,store,action);return;}
         int d=district(g.mode);
         if(MODE.equals(g.mode)){
+            if(SolitudeHome.MODE.equals(action)){g.mode=SolitudeHome.MODE;g.message="";return;}
             for(int i=0;i<PLACES.length;i++)if((PREFIX+"visit:"+i).equals(action)){g.mode=PREFIX+i;g.message="";return;}
             return;
         }
         for(int i=0;i<SolitudeShops.NAMES.length;i++)if(d==SolitudeShops.district(i)&&(PREFIX+"store:"+i).equals(action)){g.mode=SolitudeShops.MODE+i;g.message="";return;}
+        if(d==2&&home.palaceAction(g,action))return;
         if(SolitudeEncounters.choose(g,d,action))return;
         if((PREFIX+"shop").equals(action)&&(d==0||d==5)){g.mode="WORLD";g.choose("SHOP");return;}
         if((PREFIX+"rest").equals(action)&&d==6){g.mode="WORLD";g.choose("REST");return;}
@@ -125,11 +132,12 @@ final class SolitudeCity {
             g.progress.sync(g);return;
         }
     }
-    JSONObject save(){JSONObject o=new JSONObject();try{o.put("lastDay",new JSONArray(lastDay)).put("shops",shops.save());}catch(Exception ignored){}return o;}
+    JSONObject save(){JSONObject o=new JSONObject();try{o.put("lastDay",new JSONArray(lastDay)).put("shops",shops.save()).put("home",home.save());}catch(Exception ignored){}return o;}
     static SolitudeCity restore(JSONObject o){
         SolitudeCity s=new SolitudeCity();JSONArray a=o==null?null:o.optJSONArray("lastDay");
         if(a!=null)for(int i=0;i<s.lastDay.length;i++)s.lastDay[i]=Math.max(0,a.optInt(i,0));
         s.shops=SolitudeShops.restore(o==null?null:o.optJSONObject("shops"));
+        s.home=SolitudeHome.restore(o==null?null:o.optJSONObject("home"));
         return s;
     }
 }

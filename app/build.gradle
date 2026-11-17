@@ -14,8 +14,8 @@ android {
         applicationId 'dev.infend.skyrimtext'
         minSdk 26
         targetSdk 34
-        versionCode 210
-        versionName '1.0.209'
+        versionCode 211
+        versionName '1.0.210'
         resConfigs 'ru'
         ndk { abiFilters 'arm64-v8a' }
     }
