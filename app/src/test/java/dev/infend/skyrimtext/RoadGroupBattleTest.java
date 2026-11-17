@@ -18,4 +18,17 @@ public class RoadGroupBattleTest {
     @Test public void nonlethalPrisonerReleaseCostsRealGold() {
         GameEngine g=hero();g.gold=150;setup(g,"storm_prisoner");choose(g,"bribe");assertEquals("RESULT",g.mode);assertEquals(50,g.gold);assertEquals(5,g.factions.trust(4));
     }
+
+    @Test public void expandedGroupsMatchRoadScenesAndPersist() throws Exception {
+        String[] ids={"wolves","vampire_trick","dog_wolves","sabre_mammoth","warlock","ice_wraiths","ice_bandits","necromancer_revenge","ghost_grave","taron_dreth"};
+        int[] counts={2,2,2,2,3,2,2,2,2,2};
+        for(int i=0;i<ids.length;i++){
+            GameEngine g=hero();setup(g,ids[i]);choose(g,"fight");assertEquals(ids[i],"COMBAT",g.mode);assertEquals(ids[i],counts[i],g.road.groupSize());
+            g.enemyHp=1;g.choose("ATTACK");assertEquals("COMBAT",g.mode);assertEquals(counts[i]-1,g.road.livingCount(g));
+            g=GameEngine.fromJson(g.toJson().toString());assertEquals(counts[i]-1,g.road.livingCount(g));assertEquals(0,g.road.targetHp(g,0));
+        }
+    }
+    @Test public void paidFriendGiftCannotBeReactivatedByRepeatedHelp() {
+        GameEngine g=hero();g.progress.setQuestOutcome("road_friend_burned_crops","COMPLETED");g.gold=100;setup(g,"burned_crops");choose(g,"donate");assertEquals("RESULT",g.mode);assertEquals("COMPLETED",g.progress.questOutcome("road_friend_burned_crops"));assertFalse(RoadEvents.availableAt(g,"friend_gift",0));
+    }
 }

@@ -221,7 +221,22 @@ final class RoadEvents {
         case "false_imperials":return new String[]{"Бандит в имперской броне","Бандит в имперской броне"};
         case "merchant_attack":return new String[]{"Бандит","Бандит"};
         case "bandit_battle":return new String[]{"Бандит","Бандит-лучник","Главарь бандитов"};
-        case "wolves":return new String[]{"Волк","Волк","Волк"};
+        case "wolves":return new String[]{"Волк","Волк"};
+        case "vampire_trick":return new String[]{"Прислужник вампира","Вампир"};
+        case "dog_wolves":return new String[]{"Волк","Волк"};
+        case "sabre_mammoth":return new String[]{"Саблезуб","Саблезуб"};
+        case "companion_vilkas":return new String[]{"Саблезуб","Саблезуб"};
+        case "giant_bandits":return new String[]{"Бандит","Бандит-лучник"};
+        case "forsworn_orcs":return new String[]{"Изгой","Изгой-лучник"};
+        case "forsworn_soldiers":return new String[]{"Изгой","Изгой-лучник"};
+        case "warlock":return new String[]{"Бандит","Бандит-лучник","Главарь бандитов"};
+        case "afflicted_revenge":return new String[]{"Страдающий","Страдающий"};
+        case "ice_wraiths":return new String[]{"Ледяное привидение","Ледяное привидение"};
+        case "ice_bandits":return new String[]{"Ледяное привидение","Ледяное привидение"};
+        case "necromancer_revenge":return new String[]{"Некромант","Некромант"};
+        case "blood_horkers":return new String[]{"Пират Кровавых хоркеров","Пират Кровавых хоркеров"};
+        case "ghost_grave":return new String[]{"Расхититель могил","Расхититель могил"};
+        case "taron_dreth":return new String[]{"Телохранитель Тарона Дрета","Тарон Дрет"};
         case "bounty_hunters":return new String[]{"Наёмный головорез","Наёмный лучник","Главарь головорезов"};
         case "thalmor_order":return new String[]{"Талморский солдат","Талморский лучник","Талморский юстициар"};
         case "vampire_hound":return new String[]{"Гончая смерти","Вампир"};
@@ -281,7 +296,7 @@ final class RoadEvents {
     void serveSentence(GameEngine g,String action){if(pending()||!("WORLD".equals(g.mode)||"RESULT".equals(g.mode)))return;WorldAtlas.Place p=WorldAtlas.find(g.progress.location);if(p==null||!"Столица".equals(p.type)||!action.equals("ROADJAIL:"+p.region)||bounty(p.region)<=0)return;int fine=bounty(p.region),days=jailDays(fine);if(g.day>Integer.MAX_VALUE-days)return;for(int i=0;i<days;i++)g.restHours(24,true);int confiscated=g.progress.quantity("Похищенное кольцо");if(confiscated>0)g.progress.removeItem("Похищенное кольцо",confiscated);int lost=0;for(int i=0;i<g.progress.skillXp.length;i++){int n=Math.min(g.progress.skillXp[i],days*10);g.progress.skillXp[i]-=n;lost+=n;}roadBounties[p.region]=0;g.progress.sync(g);g.message="Наказание отбыто: "+days+" дн. Штраф "+fine+" септимов погашен. Потеряно "+lost+" прогресса навыков."+(confiscated>0?" Украденные кольца конфискованы.":"");g.mode="RESULT";g.recordVisualEvent(g.message);}
     private void addBounty(int region,int amount){if(region>=0&&region<roadBounties.length)roadBounties[region]=GameEngine.nonnegativeAdd(roadBounties[region],amount);}
     private static boolean member(GameEngine g,int faction){return g.factions.stage(faction)>0||g.factionStories.started(faction);}
-    private void remember(GameEngine g){recentDays.put(id,g.day);while(recentDays.size()>188)recentDays.remove(recentDays.keySet().iterator().next());}
+    private void remember(GameEngine g){recentDays.put(id,g.day);while(recentDays.size()>EVENTS.length)recentDays.remove(recentDays.keySet().iterator().next());}
     private boolean cooled(GameEngine g,Event e){Integer day=recentDays.get(e.id);return day==null||g.day-day>=3||g.day<day;}
     private void prepare(int region){encounterRegion=region;decision="";dialogueStep=0;uniqueStep=0;clearGroup();victoryApplied=false;chargedKills=0;}
     private static Event find(String id){for(Event e:EVENTS)if(e.id.equals(id))return e;return null;}
@@ -471,7 +486,7 @@ final class RoadEvents {
     private static final String[][] FRIENDS={{"bitten_hunter","Спасённый охотник"},{"merchant_attack","Спасённый торговец"},{"bard_attack","Талсгар"},{"burned_crops","Фермер, которому ты помог"},{"hakar","Хакар"},{"forsworn_merchant","Торговец, спасённый от Изгоев"},{"peddler_bandit","Спасённый всадник"},{"peddler_forsworn","Спасённый торговец"}};
     private static String friendSource(GameEngine g){for(String[] f:FRIENDS)if("ACTIVE".equals(g.progress.questOutcome("road_friend_"+f[0])))return f[0];return "";}
     private static String friendName(GameEngine g){String id=friendSource(g);for(String[] f:FRIENDS)if(f[0].equals(id))return f[1];return "Знакомый путник";}
-    private void rememberFriend(GameEngine g){for(String[] f:FRIENDS)if(f[0].equals(id)){g.progress.setQuestOutcome("road_friend_"+id,"ACTIVE");fact(g,"road_friend_"+id,f[1],"HELPED");return;}}
+    private void rememberFriend(GameEngine g){for(String[] f:FRIENDS)if(f[0].equals(id)){String key="road_friend_"+id;if(!"COMPLETED".equals(g.progress.questOutcome(key)))g.progress.setQuestOutcome(key,"ACTIVE");fact(g,key,f[1],"HELPED");return;}}
     private void fact(GameEngine g,String key,String title,String status){try{g.sceneState.setContext(g.day,g.hour,g.progress.location);g.sceneState.confirm("npc",key,title,status);}catch(Exception ignored){}}
     private void uniqueOutcome(GameEngine g,String state){g.progress.setQuestOutcome("road_"+id,state);}
     private void finish(GameEngine g,String text){if(oneTime(find(id))&&!"arvak".equals(id)&&!"leave".equals(decision))uniqueOutcome(g,"COMPLETED");remember(g);outcome=text;last=id;g.message=text;g.mode="RESULT";g.progress.sync(g);g.recordVisualEvent(find(id).title+": "+text);}
