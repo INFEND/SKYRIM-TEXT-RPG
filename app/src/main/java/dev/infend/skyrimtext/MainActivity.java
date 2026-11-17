@@ -4294,15 +4294,15 @@ public final class MainActivity extends Activity {
         }
         fixDirect(a,"Верный скакун","Лошадь уменьшает расход выносливости в пути","Транспорт","map",2,150,()->{if(game.road.hasMount(game)||game.progress.questOutcome("road_mount")!=null)return false;game.progress.setQuestOutcome("road_mount","COMPLETED");return true;});
         fixDirect(a,"Верный пёс","Пёс помогает в бою каждые три хода","Питомцы","hero",2,100,()->{if(game.road.hasDog(game)||game.progress.questOutcome("road_dog_companion")!=null)return false;game.progress.setQuestOutcome("road_dog_companion","COMPLETED");return true;});
-        fixDirect(a,"Нулевой Предел","Активировать существующую историю Кэтрин","Дополнения","magic",4,250,()->!game.katherine.enabled&&game.katherine.setEnabled(game,true));
-        fixDirect(a,"Алая Ворона","Активировать существующую историю Итачи","Дополнения","magic",4,250,()->!game.itachi.enabled&&game.itachi.setEnabled(game,true));
-        fixDirect(a,"Пепел Хелгена","Активировать существующую историю Ливии","Дополнения","hero",4,250,()->!game.livia.enabled&&game.livia.setEnabled(game,true));
-        fixDirect(a,"Алая Бессмертная","Активировать существующую историю Альмы","Дополнения","hero",4,250,()->!game.alma.enabled&&game.alma.setEnabled(game,true));
+        fixOffer(a,"Нулевой Предел","Кэтрин | "+(game.katherine.enabled?"Включено":"Отключено"),"Дополнения","magic",4,0,()->{if(livingBusy())return;if(game.katherine.setEnabled(game,!game.katherine.enabled)){save();render();livingFixShop();}});
+        fixOffer(a,"Алая Ворона","Итачи | "+(game.itachi.enabled?"Включено":"Отключено"),"Дополнения","magic",4,0,()->{if(livingBusy())return;if(game.itachi.setEnabled(game,!game.itachi.enabled)){save();render();livingFixShop();}});
+        fixOffer(a,"Пепел Хелгена","Ливия | "+(game.livia.enabled?"Включено":"Отключено"),"Дополнения","hero",4,0,()->{if(livingBusy())return;if(game.livia.setEnabled(game,!game.livia.enabled)){save();render();livingFixShop();}});
+        fixOffer(a,"Алая Бессмертная","Альма | "+(game.alma.enabled?"Включено":"Отключено"),"Дополнения","hero",4,0,()->{if(livingBusy())return;if(game.alma.setEnabled(game,!game.alma.enabled)){save();render();livingFixShop();}});
         fixOffer(a,"Галерея спутников","Кэтрин, Итачи, Ливия и Альма: портреты и истории","Персонажи","hero",4,0,this::fixCompanions);
         fixOffer(a,"Коллекция покупок","Уникальных применённых товаров: "+game.fixShop.distinctApplied(),"Коллекции","armor",3,0,()->{fixShopPage=2;livingFixShop();});
         java.util.ArrayList<FixShopCatalog.Offer> gear=FixShopCatalog.featured();
         try{gear.addAll(FixShopCatalog.parse(game.fixShop.customCatalog));}catch(Exception ignored){}
-        try(java.io.InputStream in=ResourceStore.open(this,"shop/catalog.json")){java.io.ByteArrayOutputStream out=new java.io.ByteArrayOutputStream();byte[] data=new byte[4096];int n;while((n=in.read(data))!=-1){if(out.size()+n>65536)throw new java.io.IOException("catalog too large");out.write(data,0,n);}gear.addAll(FixShopCatalog.parse(out.toString("UTF-8")));}catch(Exception ignored){}
+        try(java.io.InputStream in=ResourceStore.open(this,"media/shop/catalog.json")){java.io.ByteArrayOutputStream out=new java.io.ByteArrayOutputStream();byte[] data=new byte[4096];int n;while((n=in.read(data))!=-1){if(out.size()+n>65536)throw new java.io.IOException("catalog too large");out.write(data,0,n);}gear.addAll(FixShopCatalog.parse(out.toString("UTF-8")));}catch(Exception ignored){}
         java.util.HashSet<String> gearSeen=new java.util.HashSet<>();
         for(FixShopCatalog.Offer offer:gear){if(!gearSeen.add(offer.key()))continue;ItemCatalog.Item item=ItemCatalog.find(offer.item);if(item==null)continue;fixOffer(a,offer.title(),item.category+" | "+item.weight+" кг | получить позднее","Снаряжение",item.icon,3,offer.price,()->fixReserve(offer));}
         if(game.fixShop.editorEnabled){
@@ -4390,12 +4390,12 @@ public final class MainActivity extends Activity {
     }
     private void livingFixShop(){
         if(!game.started||livingBusy()){toast("Магазин недоступен во время активного действия");return;}
-        closeLivingDialog();LinearLayout root=column();root.setBackgroundColor(Color.BLACK);root.setPadding(dp(14),dp(12),dp(14),dp(8));
+        closeLivingDialog();ResourceStore.requestAutomaticSync(this);LinearLayout root=column();root.setBackgroundColor(Color.BLACK);root.setPadding(dp(14),dp(12),dp(14),dp(8));
         LinearLayout head=row();head.setGravity(Gravity.CENTER_VERTICAL);head.addView(text("МАГАЗИН",23,accent(),true),new LinearLayout.LayoutParams(0,-2,1));
         head.addView(text("∞ F",23,accent(),true),lp(-2,-2));TextView close=text(" × ",28,MUTED,true);close.setOnClickListener(v->closeLivingDialog());head.addView(close,lp(-2,-2));root.addView(head,lp(-1,-2));
         addText(root,"ФИКСКОИНЫ · ОСОБЫЕ ВОЗМОЖНОСТИ",11,MUTED,false,4);addText(root,"Потрачено в этом сохранении: "+livingNumber(game.fixSpent)+" F",12,MUTED,false,8);
         LinearLayout filters=column();root.addView(filters,lp(-1,-2));
-        if(fixShopPage<2){Switch editor=new Switch(this);editor.setText("Редактор мира");editor.setTextColor(MUTED);editor.setTextSize(sp(12));editor.setThumbTintList(ColorStateList.valueOf(accent()));editor.setChecked(game.fixShop.editorEnabled);filters.addView(editor,lp(-1,37));editor.setOnCheckedChangeListener((v,on)->{game.fixShop.editorEnabled=on;save();livingFixShop();});TextView imp=text("Импорт каталога JSON",12,accent(),true);imp.setPadding(dp(8),dp(7),dp(8),dp(7));filters.addView(imp,lp(-1,-2));imp.setOnClickListener(v->fixImport());}
+        if(fixShopPage<2){Switch editor=new Switch(this);editor.setText("Редактор мира");editor.setTextColor(MUTED);editor.setTextSize(sp(12));editor.setThumbTintList(ColorStateList.valueOf(accent()));editor.setChecked(game.fixShop.editorEnabled);filters.addView(editor,lp(-1,37));editor.setOnCheckedChangeListener((v,on)->{game.fixShop.editorEnabled=on;save();livingFixShop();});TextView imp=text("Импорт каталога JSON  |  Ресурсы магазина",12,accent(),true);imp.setPadding(dp(8),dp(7),dp(8),dp(7));filters.addView(imp,lp(-1,-2));imp.setOnClickListener(v->new RuneDialogBuilder(this,accent()).setTitle("Каталог магазина").setItems(new String[]{"Импорт JSON","Обновить ресурсы магазина"},(d,i)->{if(i==0)fixImport();else{closeLivingDialog();new ResourceManagerDialog(this,accent(),this::livingFixShop,"media:shop").show();}}).setNegativeButton("Отмена",null).show());}
         ScrollView scroll=new ScrollView(this);scroll.setFillViewport(false);LinearLayout items=column();scroll.addView(items);root.addView(scroll,new LinearLayout.LayoutParams(-1,0,1));
         LinearLayout nav=row();root.addView(nav,lp(-1,56));String[] names={"Каталог","Избранное","Покупки","История"};String[] glyphs={"inventory","heart","armor","journal"};
         for(int i=0;i<names.length;i++){final int index=i;LinearLayout cell=column();cell.setGravity(Gravity.CENTER);nav.addView(cell,new LinearLayout.LayoutParams(0,-1,1));
@@ -4423,9 +4423,25 @@ public final class MainActivity extends Activity {
         for(int i=0;i<offers.size();i+=2){LinearLayout line=row();line.setGravity(Gravity.TOP);LinearLayout.LayoutParams size=lp(-1,-2);size.bottomMargin=dp(8);items.addView(line,size);fixCard(line,offers.get(i),items);
             if(i+1<offers.size()){View gap=new View(this);line.addView(gap,lp(8,1));fixCard(line,offers.get(i+1),items);}else{View empty=new View(this);line.addView(empty,new LinearLayout.LayoutParams(0,1,1));}}
     }
+    private View fixArtwork(FixOffer offer){
+        String path="";String title=offer.title;
+        if(title.startsWith("Даэдрический меч"))path="media/items/daedric_sword.webp";
+        else if(title.startsWith("Эбонитовый меч"))path="media/items/ebony_sword.webp";
+        else if(title.startsWith("Эбонитовая броня")||title.startsWith("Эбонитовая кираса"))path="media/items/ebony_armor.webp";
+        else if(title.startsWith("Стальной кинжал"))path="media/items/steel_dagger.webp";
+        if("Нулевой Предел".equals(title))return npcPortrait("Кэтрин");
+        if("Алая Ворона".equals(title))return npcPortrait("Итачи");
+        if("Пепел Хелгена".equals(title))return npcPortrait("Ливия");
+        if("Алая Бессмертная".equals(title))return npcPortrait("Альма");
+        if(!path.isEmpty())try(java.io.InputStream in=ResourceStore.open(this,path)){
+            android.graphics.Bitmap bitmap=android.graphics.BitmapFactory.decodeStream(in);
+            if(bitmap!=null){android.widget.ImageView view=new android.widget.ImageView(this);view.setImageBitmap(bitmap);view.setScaleType(android.widget.ImageView.ScaleType.FIT_CENTER);return view;}
+        }catch(Exception ignored){}
+        return new FixShopArtwork(this,title,offer.glyph,offer.color);
+    }
     private void fixCard(LinearLayout line,FixOffer offer,LinearLayout items){
         LinearLayout tile=column();tile.setPadding(dp(10),dp(9),dp(10),dp(10));tile.setBackground(bg(0xff121212,Color.TRANSPARENT,18));line.addView(tile,new LinearLayout.LayoutParams(0,-2,1));
-        LinearLayout art=row();art.setGravity(Gravity.CENTER);art.setBackground(bg(0xff1a1a1a,Color.TRANSPARENT,14));tile.addView(art,lp(-1,88));art.addView(new SkyrimIconView(this,offer.glyph,offer.color),lp(61,61));
+        LinearLayout art=row();art.setGravity(Gravity.CENTER);art.setBackground(bg(0xff1a1a1a,Color.TRANSPARENT,14));art.setClipToOutline(true);tile.addView(art,lp(-1,108));art.addView(fixArtwork(offer),lp(-1,-1));
         LinearLayout label=row();TextView rare=text(offer.rarity,10,offer.color,true);label.addView(rare,new LinearLayout.LayoutParams(0,-2,1));
         TextView fav=text(game.fixShop.favorite(offer.id())?"♥":"♡",22,accent(),true);fav.setContentDescription("Избранное: "+offer.title);fav.setOnClickListener(v->{game.fixShop.toggle(offer.id());save();fixRenderOffers(items);});label.addView(fav,lp(-2,-2));tile.addView(label,lp(-1,-2));
         TextView name=text(offer.title,16,TEXT,true);name.setMaxLines(2);name.setMinHeight(dp(44));tile.addView(name,lp(-1,-2));

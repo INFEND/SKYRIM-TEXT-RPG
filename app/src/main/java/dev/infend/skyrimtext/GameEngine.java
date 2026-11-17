@@ -770,7 +770,7 @@ public final class GameEngine {
     /** Time-limited rest available outside combat, tracked in the old save schema. */
     public boolean fixTeleport(String name){
         if(!started||!fixShop.editorEnabled||road.pending()||!"WORLD".equals(mode)&&!"RESULT".equals(mode)||!visitedVisual.contains(name)||name.equals(progress.location))return false;
-        WorldAtlas.Place target=WorldAtlas.find(name);if(target==null)return false;region=target.region;progress.location=target.name;mode="WORLD";message="Магический переход: "+target.name;recordVisualEvent(message);return true;
+        WorldAtlas.Place target=WorldAtlas.find(name);if(target==null)return false;region=target.region;progress.location=target.name;katherine.observeTravel(this);alma.observeTravel(this);mode="WORLD";message="Магический переход: "+target.name;recordVisualEvent(message);return true;
     }
     public boolean waitHours(int hours){return restHours(hours,hours>=6);}
     public boolean restHours(int hours,boolean sleep){

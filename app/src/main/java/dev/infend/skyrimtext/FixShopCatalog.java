@@ -16,8 +16,8 @@ public final class FixShopCatalog {
         if(o==null||o.quantity<1||o.quantity>100||o.price<1||o.price>100000||o.item.length()>150)return false;
         ItemCatalog.Item i=ItemCatalog.find(o.item);
         return i!=null&&CompensationPowers.itemIndex(o.item)<0&&i.value>0&&
-          ("Оружие".equals(i.category)||"Броня".equals(i.category)||"Украшения".equals(i.category)||"Одежда".equals(i.category)||"Боеприпасы".equals(i.category)||"Артефакты".equals(i.category))&&
-          !"Походный клинок".equals(o.item)&&!"Дорожная одежда".equals(o.item);
+          ("Оружие".equals(i.category)||"Броня".equals(i.category)||"Украшения".equals(i.category)||"Одежда".equals(i.category)||"Боеприпасы".equals(i.category))&&
+          !"Походный клинок".equals(o.item)&&!"Дорожная одежда".equals(o.item)&&!"Стальной меч".equals(o.item)&&!"Стальная кираса".equals(o.item);
     }
     public static ArrayList<Offer> featured(){
         ArrayList<Offer> a=new ArrayList<>();
