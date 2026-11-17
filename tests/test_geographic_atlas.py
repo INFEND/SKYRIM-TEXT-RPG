@@ -70,7 +70,9 @@ class GeographicSource(unittest.TestCase):
             (root/"WorldAtlas.java").write_text(atlas)
             (root/"GameEngine.java").write_text('''package dev.infend.skyrimtext;
 class GameEngine {
- boolean started=true; int region=2,gold=250; Progress progress=new Progress();
+ boolean started=true; int region=2,gold=250; Progress progress=new Progress(); FixShop fixShop=new FixShop();
+ static class FixShop {Gifts gifts=new Gifts();}
+ static class Gifts {int days(int n){return n;} int fare(int n){return n;}}
  static class Progress {String location="Виндхельм"; double weight;
   double carryWeight(){return weight;} double carryLimit(){return 50.0;}}
 }''')

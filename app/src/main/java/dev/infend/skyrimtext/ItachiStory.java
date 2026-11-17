@@ -55,7 +55,7 @@ final class ItachiStory {
             if(stage==FINAL-1)s.primary("ITACHI:stay","Предложить ей остаться","Новый дом по её собственному выбору").add("ITACHI:free","Поддержать её свободу","Она останется независимой странницей");
             else {String[] help={"Представиться и выслушать","Попросить объяснить Шаринган","Изучить знак на карте","Предложить отдых","Исследовать печать вместе"};String[] quiet={"Не расспрашивать о прошлом","Не просить демонстрации","Дать ей время","Оставить решение о тренировке ей","Предложить осторожный подход"};s.primary("ITACHI:help:"+stage,help[stage],"Доверие и уважение").add("ITACHI:caution:"+stage,quiet[stage],"Уважать её границы");}
         }else{
-            s=new GameEngine.Scene(TITLE,relation(),"Итачи спокойно смотрит на тебя.\n\nИтачи:\n— "+(romance?"Рядом с тобой я могу позволить себе тишину.":"У каждого из нас свой путь. Иногда они совпадают.")+"\n\nДоверие "+trust+"/100 | Уважение "+respect+"/100 | Симпатия "+affection+"/100\nЭнергия "+energy+"/100\n"+memory);
+            s=new GameEngine.Scene(TITLE,relation(),"Итачи спокойно смотрит на тебя.\n\nИтачи:\n— "+(romance?"Рядом с тобой я могу позволить себе тишину.":"У каждого из нас свой путь. Иногда они совпадают.")+"\n\nДоверие "+trust+"/100 | Уважение "+respect+"/100 | Симпатия "+affection+"/100\n"+stats()+"\n"+skills()+"\nНастроение: "+mood()+" | Любовь "+love+"/100 | Привязанность "+attachment+"/100\n"+memory);
             if(!following&&trust>=35)s.add("ITACHI:join","Пригласить в отряд","Иллюзии, огонь и защита");
             if(following)s.add("ITACHI:leave","Отпустить спутницу","Продолжит самостоятельное путешествие").add("ITACHI:stance","Изменить тактику",stanceLabel());
             if(lastTalk!=g.day)s.add("ITACHI:talk","Поговорить у костра","Доверие и симпатия").add("ITACHI:train","Тренироваться вместе","Уважение и восстановление энергии");
@@ -83,9 +83,9 @@ final class ItachiStory {
             stage=FINAL;ending="ITACHI:stay".equals(action)?"Новый дом":"Свободная дорога";trust=clamp(trust+12);respect=clamp(respect+10);affection=clamp(affection+8);gain(60);remember("Вы закрыли межмировую печать. "+ending+".");g.addXp(100);if(!present(g))g.mode="WORLD";return;
         }
         switch(action){
-            case "ITACHI:join":if(!following&&trust>=35){following=true;memory="Итачи согласилась путешествовать с тобой.";}break;
-            case "ITACHI:leave":if(following){following=false;g.mode="WORLD";}break;
-            case "ITACHI:talk":if(lastTalk!=g.day){lastTalk=g.day;trust=clamp(trust+6);respect=clamp(respect+4);affection=clamp(affection+7);memory="Итачи рассказала о том, что ценит свободу выбора.";}break;
+            case "ITACHI:join":if(!following&&trust>=35){following=true;remember("Итачи согласилась путешествовать с тобой.");}break;
+            case "ITACHI:leave":if(following){following=false;g.mode="WORLD";remember("Итачи продолжила самостоятельное путешествие.");}break;
+            case "ITACHI:talk":if(lastTalk!=g.day){lastTalk=g.day;trust=clamp(trust+6);respect=clamp(respect+4);affection=clamp(affection+7);attachment=clamp(attachment+4);remember("Итачи рассказала о том, что ценит свободу выбора.");}break;
             case "ITACHI:train":if(lastTalk!=g.day){lastTalk=g.day;respect=clamp(respect+7);trust=clamp(trust+4);recover(3);blade=clamp(blade+2);illusion=clamp(illusion+2);spirit=clamp(spirit+2);gain(25);remember("Вы разобрали тактику и отработали защиту.");}break;
             case "ITACHI:romance":if(!romance&&trust>=75&&respect>=65&&affection>=55){romance=true;love=Math.max(love,45);attachment=Math.max(attachment,35);remember("Итачи ответила взаимностью. Ваш союз основан на свободном выборе.");}break;
             case "ITACHI:date":if(romance&&lastDate!=g.day){lastDate=g.day;trust=clamp(trust+3);affection=clamp(affection+5);love=clamp(love+10);attachment=clamp(attachment+7);remember(DATES[Math.floorMod(dates,DATES.length)]);dates=Math.min(10000,dates+1);}break;
