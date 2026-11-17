@@ -95,7 +95,17 @@ final class RoadQuests {
         new Task("razor_return","Вернуть части Бритвы","Данстар","Сил принимает три части, оплачивает работу и предлагает встретиться у святилища Мерунеса Дагона.","","",1800,""),
         new Task("razor_altar","Воля Мерунеса Дагона","Святилище Мерунеса Дагона","Даэдрический князь требует смерти Сила в обмен на восстановление Бритвы. Сил умоляет пощадить его. Сделай выбор.","","",0,""),
         new Task("razor_kill","Выполнить приказ Дагона","Святилище Мерунеса Дагона","Сил защищается. После его смерти Дагон восстанавливает Бритву.","Сил Весул","",0,"Бритва Мерунеса"),
-        new Task("razor_spare","Пощадить Сила","Святилище Мерунеса Дагона","Ты отказываешься убить Сила. Даэдра нападает за неповиновение; Сил благодарит за спасение, но Бритва остаётся разбитой.","Дремора","",500,"")
+        new Task("razor_spare","Пощадить Сила","Святилище Мерунеса Дагона","Ты отказываешься убить Сила. Даэдра нападает за неповиновение; Сил благодарит за спасение, но Бритва остаётся разбитой.","Дремора","",500,""),
+        new Task("boethiah_trial","Зов Боэтии","Святилище Боэтии","Жрица объясняет испытание предательства. Ты получаешь ритуальный клинок и можешь отказаться или привести доверившегося тебе наёмника.","","",0,"Клинок жертвоприношения"),
+        new Task("boethiah_refuse","Отказаться от испытания","Святилище Боэтии","Ты отказываешься предавать доверившегося тебе человека. Жрица прогоняет тебя. Артефакт Боэтии недоступен.","","",0,""),
+        new Task("boethiah_hire","Найти наёмника","Виндхельм","Наёмник соглашается сопровождать тебя за 500 септимов. Он считает, что предстоит обычное путешествие к святилищу.","","",0,""),
+        new Task("boethiah_sacrifice","Исполнить условие Боэтии","Святилище Боэтии","Наёмник становится у жертвенного столпа. Ты предаёшь его доверие и исполняешь требование жрицы. Боэтия является через погибшего.","","Клинок жертвоприношения",0,""),
+        new Task("boethiah_release","Отпустить наёмника","Святилище Боэтии","Ты раскрываешь истинную цель путешествия и отпускаешь наёмника живым. Испытание прекращается, плата не возвращается.","","",0,""),
+        new Task("boethiah_cult","Последний из культистов","Святилище Боэтии","Боэтия приказывает своим почитателям сразиться. Один из культистов преграждает тебе путь.","Культист Боэтии","",0,""),
+        new Task("boethiah_priestess","Испытание жрицы","Святилище Боэтии","Жрица вступает в бой. Победи последнюю соперницу и выслушай волю Боэтии.","Жрица Боэтии","",0,""),
+        new Task("boethiah_ridge","Хребет Острие Ножа","Хребет Острие Ножа","Боэтия велит устранить охрану убежища прежнего избранника. Пройди через сторожевой отряд разбойников.","Разбойник Острия Ножа","",0,""),
+        new Task("boethiah_champion","Прежний избранник","Хребет Острие Ножа","В глубине шахты прежний избранник Боэтии принимает вызов. Победи его и забери Эбонитовую кольчугу.","Избранник Боэтии","",0,"Эбонитовая кольчуга"),
+        new Task("boethiah_don","Новый избранник Боэтии","Хребет Острие Ножа","Надень Эбонитовую кольчугу. Боэтия признаёт тебя своим новым избранником.","","Эбонитовая кольчуга",0,"")
     };
     static Task find(String id){for(Task t:TASKS)if(t.id.equals(id))return t;return null;}
     static String title(String key){for(Task t:TASKS)if(t.key().equals(key))return t.title;return key;}
@@ -113,6 +123,11 @@ final class RoadQuests {
         case "saliah":return "saliah_report";
         case "lynoit":return "lynoit_report";
         case "boethiah":return "boethiah_report";
+        case "boethiah_sacrifice":return "boethiah_cult";
+        case "boethiah_cult":return "boethiah_priestess";
+        case "boethiah_priestess":return "boethiah_ridge";
+        case "boethiah_ridge":return "boethiah_champion";
+        case "boethiah_champion":return "boethiah_don";
         case "letter_museum":return "razor_intro";
         case "razor_return":return "razor_altar";
         case "peryite_intro":return "peryite_ritual";
@@ -150,6 +165,8 @@ final class RoadQuests {
         case "riverwood_faendal":return "riverwood_choice";
         case "aether_crown":case "aether_shield":case "aether_staff":return "aether_choice";
         case "razor_kill":case "razor_spare":return "razor_choice";
+        case "boethiah_refuse":case "boethiah_hire":return "boethiah_first_choice";
+        case "boethiah_sacrifice":case "boethiah_release":return "boethiah_final_choice";
         default:return "";
     }}
     private static boolean startable(GameEngine g,Task t){return here(g,t)&&availableStart(g,t);}
@@ -164,10 +181,13 @@ final class RoadQuests {
         case "riverwood_faendal":return done(g,"riverwood_rival")&&g.progress.questOutcome("riverwood_choice")==null;
         case "aether_crown":case "aether_shield":case "aether_staff":return done(g,"aether_forge")&&g.progress.questOutcome("aether_choice")==null;
         case "razor_kill":case "razor_spare":return done(g,"razor_altar")&&g.progress.questOutcome("razor_choice")==null;
+        case "boethiah_trial":return true;
+        case "boethiah_refuse":case "boethiah_hire":return done(g,"boethiah_trial")&&g.progress.questOutcome("boethiah_first_choice")==null;
+        case "boethiah_sacrifice":case "boethiah_release":return done(g,"boethiah_hire")&&g.progress.questOutcome("boethiah_final_choice")==null;
         default:return false;
     }}
     static void choices(GameEngine g,GameEngine.Scene s){for(Task t:TASKS){if(active(g,t)&&here(g,t))s.add("ROADQUEST:"+t.id,t.title,t.body);else if(startable(g,t))s.add("ROADSTART:"+t.id,t.title,"Начать поручение или выбрать развилку");}if(debtActive(g)&&"Воронья Скала".equals(g.progress.location)){s.add("ROADDEBT:pay","Погасить долг Моргрулу","1000 септимов");s.add("ROADDEBT:negotiate","Снизить долг","Красноречие | 500 септимов");}}
-    static void start(GameEngine g,String id){Task t=find(id);if(g.road.pending()||!("WORLD".equals(g.mode)||"RESULT".equals(g.mode))||t==null||!startable(g,t))return;String group=branchGroup(id);if(!group.isEmpty()){if(!t.required.isEmpty()&&g.progress.quantity(t.required)==0){g.message="Сначала восстанови предмет: "+t.required;return;}if("aether_choice".equals(group)&&g.progress.quantity("Этериевый осколок")<4){g.message="Сначала собери четыре осколка.";return;}g.progress.setQuestOutcome(group,"COMPLETED");}offer(g,id);g.mode="WORLD";g.message="Принято: "+t.title+". "+t.body;g.recordVisualEvent(g.message);}
+    static void start(GameEngine g,String id){Task t=find(id);if(g.road.pending()||!("WORLD".equals(g.mode)||"RESULT".equals(g.mode))||t==null||!startable(g,t))return;String group=branchGroup(id);if("boethiah_hire".equals(id)&&g.gold<500){g.message="Для найма нужно 500 септимов.";g.mode="RESULT";return;}if(!group.isEmpty()){if(!t.required.isEmpty()&&g.progress.quantity(t.required)==0){g.message="Сначала восстанови предмет: "+t.required;return;}if("aether_choice".equals(group)&&g.progress.quantity("Этериевый осколок")<4){g.message="Сначала собери четыре осколка.";return;}g.progress.setQuestOutcome(group,"COMPLETED");}offer(g,id);g.mode="WORLD";g.message="Принято: "+t.title+". "+t.body;g.recordVisualEvent(g.message);}
     static boolean debtActive(GameEngine g){return "ACTIVE".equals(g.progress.questOutcome("lead_mogrul_debt"));}
     static void payDebt(GameEngine g,boolean reduced){if(g.road.pending()||!("WORLD".equals(g.mode)||"RESULT".equals(g.mode))||!"Воронья Скала".equals(g.progress.location)||!debtActive(g))return;int cost=reduced?500:1000;if(g.gold<cost){g.message="Не хватает септимов.";g.mode="RESULT";return;}if(reduced&&!g.rollCheck(g.progress.chance(g,2,12,50))){g.message="Моргрул отказывается снизить долг.";g.mode="RESULT";return;}g.gold-=cost;g.progress.setQuestOutcome("lead_mogrul_debt","COMPLETED");g.progress.sync(g);g.message="Долг погашен. Головорезы Моргрула больше не преследуют тебя.";g.mode="RESULT";}
     private static final String[] RAZOR_ITEMS={"Рукоять Бритвы Мерунеса","Осколки лезвия Бритвы Мерунеса","Навершие Бритвы Мерунеса"};
@@ -175,6 +195,8 @@ final class RoadQuests {
     static void choose(GameEngine g,String action){
         if(g.road.pending()||!("WORLD".equals(g.mode)||"RESULT".equals(g.mode)))return;
         Task t=find(action.substring("ROADQUEST:".length()));if(t==null||!active(g,t)||!here(g,t))return;
+        if("boethiah_hire".equals(t.id)&&g.gold<500){g.message="Для найма нужно 500 септимов.";g.mode="RESULT";return;}
+        if("boethiah_don".equals(t.id)&&!g.progress.equipped("Эбонитовая кольчуга")){g.message="Надень Эбонитовую кольчугу в инвентаре, чтобы завершить испытание.";g.mode="RESULT";return;}
         if("mogrul_debt".equals(t.id)){g.message="Моргрул требует 1000 септимов. Оплати долг или попробуй договориться.";g.mode="WORLD";return;}
         if("razor_return".equals(t.id))for(String item:RAZOR_ITEMS)if(g.progress.quantity(item)<1){g.message="Сначала найди: "+item;g.mode="RESULT";return;}
         if("peryite_ritual".equals(t.id))for(String item:PERYITE_ITEMS)if(g.progress.quantity(item)<1){g.message="Для ритуала Кеша требуется: "+item;g.mode="RESULT";return;}
@@ -184,6 +206,10 @@ final class RoadQuests {
         if(!t.item.isEmpty()&&!g.progress.addItem(t.item,1)){g.message="Освободи место в сумке для награды.";g.mode="RESULT";return;}
         if("peryite_ritual".equals(t.id))for(String item:PERYITE_ITEMS)g.progress.removeItem(item,1);
         if("razor_return".equals(t.id))for(String item:RAZOR_ITEMS)g.progress.removeItem(item,1);
+        if("boethiah_hire".equals(t.id)){g.gold-=500;g.progress.setQuestOutcome("road_boethiah_hireling","ACTIVE");}
+        if("boethiah_sacrifice".equals(t.id)){g.progress.setQuestOutcome("road_boethiah_hireling","COMPLETED");g.progress.setQuestOutcome("road_boethiah_victim","COMPLETED");g.reputation-=5;}
+        if("boethiah_release".equals(t.id)){g.progress.setQuestOutcome("road_boethiah_hireling","COMPLETED");g.reputation++;}
+        if("boethiah_don".equals(t.id))g.progress.setQuestOutcome("road_boethiah_champion","COMPLETED");
         if("razor_spare".equals(t.id))g.reputation++;
         if("razor_kill".equals(t.id))g.reputation--;
         if("aether_choice".equals(branchGroup(t.id)))g.progress.removeItem("Этериевый осколок",4);
@@ -198,6 +224,8 @@ final class RoadQuests {
         if("peryite_ritual".equals(t.id))for(String step:new String[]{"peryite_ruby","peryite_silver","peryite_flower","peryite_dust"})g.progress.setQuestOutcome("lead_"+step,"COMPLETED");
         if("aether_forge".equals(t.id))g.message+="\nВыбери один этериевый предмет через журнал или историю.";
         if("razor_intro".equals(t.id)){for(String step:new String[]{"razor_hilt","razor_shards","razor_pommel","razor_return"})offer(g,step);g.message+="\nТри части отмечены в журнале. Их можно найти в любом порядке.";}if("razor_altar".equals(t.id))g.message+="\nВ журнале появились два взаимоисключающих решения.";
+        if("boethiah_trial".equals(t.id))g.message+="\nВыбери отказ или найм человека в Виндхельме.";
+        if("boethiah_hire".equals(t.id))g.message+="\nНаёмник следует за тобой и помогает в бою. Вернись к святилищу для окончательного выбора.";
         String nextId=next(t.id);Task nextTask=find(nextId);if(nextTask!=null&&g.progress.questOutcome(nextTask.key())==null){offer(g,nextId);g.message+="\nСледующая цель: "+nextTask.place+" | "+nextTask.title+".";}
         if(t.id.endsWith("_report")&&(t.id.startsWith("hakar")||t.id.startsWith("saliah")||t.id.startsWith("lynoit")))g.factions.roadTrust(6,3);
         g.mode="RESULT";g.progress.sync(g);g.recordVisualEvent(t.title+": завершено");

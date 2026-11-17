@@ -264,7 +264,7 @@ public final class RpgProgress {
         int difficulty=baseDifficulty+Math.max(0,15-g.level)*2;
         int danger=Math.max(0,g.region/2)+difficulty/10;
         int skill=skillIndex<0?0:(skillLevel(skillIndex)-15)/2;
-        int context=Math.min(18,g.reputation/3)+skill+artifacts.towerBonus(g,skillIndex)+branches.chanceBonus(skillIndex)+advanced.checkBonus(skillIndex)+(skillIndex==12&&advanced.has(AdvancedPerks.PERSUASION)?5:0)-(carryWeight()>carryLimit()*0.9?8:0);
+        int context=Math.min(18,g.reputation/3)+skill+(skillIndex==9&&equipped("Эбонитовая кольчуга")?15:0)+artifacts.towerBonus(g,skillIndex)+branches.chanceBonus(skillIndex)+advanced.checkBonus(skillIndex)+(skillIndex==12&&advanced.has(AdvancedPerks.PERSUASION)?5:0)-(carryWeight()>carryLimit()*0.9?8:0);
         g.needs.sync(g.day,g.hour);
         int base=RpgContent.successChance(g,stat,difficulty,danger,exhaustion,context);
         int result=Math.max(0,base-g.needs.penalty());

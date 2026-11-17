@@ -691,6 +691,8 @@ public final class GameEngine {
         int kathDamage=katherine.assist(this,battleTurns+1,Math.max(0,enemyHp-damage));
         if(kathDamage>0){damage+=kathDamage;actionText+="\nКэтрин: "+katherine.companion.lastSpell+", −"+kathDamage+" здоровья врагу.";}
         if(damage>0&&("ATTACK".equals(action)||"HEAVY".equals(action))&&progress.equipped("Бритва Мерунеса")&&"WILD".equals(battleKind)&&!enemyName.toLowerCase(java.util.Locale.ROOT).contains("карстааг")&&random.nextInt(10000)<198){damage=enemyHp;actionText+="\nБритва Мерунеса срабатывает: противник падает замертво.";}
+        if(progress.equipped("Эбонитовая кольчуга")&&enemyHp>damage){int aura=Math.min(5,enemyHp-damage);damage+=aura;actionText+="\nЯдовитая аура Эбонитовой кольчуги: −"+aura+" здоровья врагу.";}
+        if("ACTIVE".equals(progress.questOutcome("road_boethiah_hireling"))&&enemyHp>damage){int assist=Math.min(3,enemyHp-damage);damage+=assist;actionText+="\nНаёмник из Виндхельма помогает в бою: −"+assist+" здоровья врагу.";}
         if(road.hasDog(this)&&enemyHp>damage&&(battleTurns+1)%3==0){damage+=3;actionText+="\nБродячий пёс помогает в бою: −3 здоровья врагу.";}
         int petDamage=fixShop.world.petDamage(battleTurns+1,Math.max(0,enemyHp-damage));if(petDamage>0){damage+=petDamage;actionText+="\n"+fixShop.world.petName()+": −"+petDamage+" здоровья врагу.";}
         int customDamage=fixShop.world.companionDamage(battleTurns+1,Math.max(0,enemyHp-damage));if(customDamage>0){damage+=customDamage;actionText+="\n"+fixShop.world.companionName()+": −"+customDamage+" здоровья врагу.";}
