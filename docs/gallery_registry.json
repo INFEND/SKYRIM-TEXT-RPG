@@ -1968,5 +1968,355 @@
       "The Wind Stone",
       "Wind Stone"
     ]
+  },
+  {
+    "slug": "bonechill_passage",
+    "name": "Сквозняковый проход",
+    "captions": [
+      "Сквозняковый проход"
+    ],
+    "aliases": [
+      "Bonechill Passage"
+    ]
+  },
+  {
+    "slug": "blackbone_isle",
+    "name": "Остров Чёрной Кости",
+    "captions": [
+      "Остров Чёрной Кости"
+    ],
+    "aliases": [
+      "Blackbone Isle"
+    ]
+  },
+  {
+    "slug": "bloodchill_cavern",
+    "name": "Пещера Кровавый Холод",
+    "captions": [
+      "Пещера Кровавый Холод"
+    ],
+    "aliases": [
+      "Bloodchill Cavern"
+    ]
+  },
+  {
+    "slug": "bloated_mans_grotto",
+    "name": "Грот Утопленника",
+    "captions": [
+      "Грот Утопленника"
+    ],
+    "aliases": [
+      "Bloated Man's Grotto"
+    ]
+  },
+  {
+    "slug": "blind_cliff_cave",
+    "name": "Пещера Отвесный Утес",
+    "captions": [
+      "Пещера Отвесный Утес"
+    ],
+    "aliases": [
+      "Blind Cliff Cave"
+    ]
+  },
+  {
+    "slug": "bleakcoast_cave",
+    "name": "Пещера Холодный Берег",
+    "captions": [
+      "Пещера Холодный Берег"
+    ],
+    "aliases": [
+      "Bleakcoast Cave"
+    ]
+  },
+  {
+    "slug": "boulderfall_cave",
+    "name": "Камнепадная пещера",
+    "captions": [
+      "Камнепадная пещера"
+    ],
+    "aliases": [
+      "Boulderfall Cave"
+    ]
+  },
+  {
+    "slug": "broken_oar_grotto",
+    "name": "Сломанное Весло",
+    "captions": [
+      "Сломанное Весло"
+    ],
+    "aliases": [
+      "Broken Oar Grotto"
+    ]
+  },
+  {
+    "slug": "bronze_water_cave",
+    "name": "Пещера Бронзовая Вода",
+    "captions": [
+      "Пещера Бронзовая Вода"
+    ],
+    "aliases": [
+      "Bronze Water Cave"
+    ]
+  },
+  {
+    "slug": "darkfall_cave",
+    "name": "Пещера Вечерняя Пустота",
+    "captions": [
+      "Пещера Вечерняя Пустота"
+    ],
+    "aliases": [
+      "Darkfall Cave"
+    ]
+  },
+  {
+    "slug": "dimhollow_crypt",
+    "name": "Крипта Ночной Пустоты",
+    "captions": [
+      "Крипта Ночной Пустоты"
+    ],
+    "aliases": [
+      "Dimhollow Crypt"
+    ]
+  },
+  {
+    "slug": "forebears_holdout",
+    "name": "Убежище Предков",
+    "captions": [
+      "Убежище Предков"
+    ],
+    "aliases": [
+      "Forebears' Holdout"
+    ]
+  },
+  {
+    "slug": "dayspring_canyon",
+    "name": "Каньон Дневной Зари",
+    "captions": [
+      "Каньон Дневной Зари"
+    ],
+    "aliases": [
+      "Dayspring Canyon"
+    ]
+  },
+  {
+    "slug": "brinewater_grotto",
+    "name": "Грот Соленая Вода",
+    "captions": [
+      "Грот Соленая Вода"
+    ],
+    "aliases": [
+      "Brinewater Grotto"
+    ]
+  },
+  {
+    "slug": "frostroot_cave",
+    "name": "Пещера Морозного Корня",
+    "captions": [
+      "Пещера Морозного Корня"
+    ],
+    "aliases": [
+      "Frostroot Cave"
+    ]
+  },
+  {
+    "slug": "giants_tooth",
+    "name": "Зуб Великана",
+    "captions": [
+      "Зуб Великана"
+    ],
+    "aliases": [
+      "Giant's Tooth"
+    ]
+  },
+  {
+    "slug": "eldergleam_sanctuary",
+    "name": "Святилище Великого Древа",
+    "captions": [
+      "Святилище Великого Древа"
+    ],
+    "aliases": [
+      "Eldergleam Sanctuary"
+    ]
+  },
+  {
+    "slug": "gloomreach",
+    "name": "Мрачный Предел",
+    "captions": [
+      "Мрачный Предел"
+    ],
+    "aliases": [
+      "Gloomreach"
+    ]
+  },
+  {
+    "slug": "forsaken_cave",
+    "name": "Забытая пещера",
+    "captions": [
+      "Забытая пещера"
+    ],
+    "aliases": [
+      "Forsaken Cave"
+    ]
+  },
+  {
+    "slug": "fallowstone_cave",
+    "name": "Пещера Жёлтый Камень",
+    "captions": [
+      "Пещера Жёлтый Камень"
+    ],
+    "aliases": [
+      "Fallowstone Cave"
+    ]
+  },
+  {
+    "slug": "duskglow_crevice",
+    "name": "Закатная расщелина",
+    "captions": [
+      "Закатная расщелина"
+    ],
+    "aliases": [
+      "Duskglow Crevice"
+    ]
+  },
+  {
+    "slug": "crystaldrift_cave",
+    "name": "Кристаллическая пещера",
+    "captions": [
+      "Кристаллическая пещера"
+    ],
+    "aliases": [
+      "Crystaldrift Cave"
+    ]
+  },
+  {
+    "slug": "cronvangr_cave",
+    "name": "Пещера Кронвангр",
+    "captions": [
+      "Пещера Кронвангр"
+    ],
+    "aliases": [
+      "Cronvangr Cave"
+    ]
+  },
+  {
+    "slug": "cragslane_cavern",
+    "name": "Пещера Крегслейн",
+    "captions": [
+      "Пещера Крегслейн"
+    ],
+    "aliases": [
+      "Cragslane Cavern"
+    ]
+  },
+  {
+    "slug": "chillwind_depths",
+    "name": "Провал Сквозняков",
+    "captions": [
+      "Провал Сквозняков"
+    ],
+    "aliases": [
+      "Chillwind Depths"
+    ]
+  },
+  {
+    "slug": "brucas_leap_redoubt",
+    "name": "Оплот Прыжок Брюсы",
+    "captions": [
+      "Оплот Прыжок Брюсы"
+    ],
+    "aliases": [
+      "Bruca's Leap Redoubt"
+    ]
+  },
+  {
+    "slug": "brood_cavern",
+    "name": "Разводная пещера",
+    "captions": [
+      "Разводная пещера"
+    ],
+    "aliases": [
+      "Brood Cavern"
+    ]
+  },
+  {
+    "slug": "broken_helm_hollow",
+    "name": "Лощина Сломанный Шлем",
+    "captions": [
+      "Лощина Сломанный Шлем"
+    ],
+    "aliases": [
+      "Broken Helm Hollow"
+    ]
+  },
+  {
+    "slug": "broken_fang_cave",
+    "name": "Пещера Сломанный Клык",
+    "captions": [
+      "Пещера Сломанный Клык"
+    ],
+    "aliases": [
+      "Broken Fang Cave"
+    ]
+  },
+  {
+    "slug": "darkshade",
+    "name": "Глубокая Тень",
+    "captions": [
+      "Глубокая Тень"
+    ],
+    "aliases": [
+      "Darkshade"
+    ]
+  },
+  {
+    "slug": "greywater_grotto",
+    "name": "Грот Серая Вода",
+    "captions": [
+      "Грот Серая Вода"
+    ],
+    "aliases": [
+      "Greywater Grotto"
+    ]
+  },
+  {
+    "slug": "graywinter_watch",
+    "name": "Серозимняя застава",
+    "captions": [
+      "Серозимняя застава"
+    ],
+    "aliases": [
+      "Graywinter Watch"
+    ]
+  },
+  {
+    "slug": "glenmoril_coven",
+    "name": "Гленморильский ковен",
+    "captions": [
+      "Гленморильский ковен"
+    ],
+    "aliases": [
+      "Glenmoril Coven"
+    ]
+  },
+  {
+    "slug": "darkwater_pass",
+    "name": "Черный проход",
+    "captions": [
+      "Черный проход"
+    ],
+    "aliases": [
+      "Darkwater Pass"
+    ]
+  },
+  {
+    "slug": "cragwallow_slope",
+    "name": "Откос Крегвеллоу",
+    "captions": [
+      "Откос Крегвеллоу"
+    ],
+    "aliases": [
+      "Cragwallow Slope"
+    ]
   }
 ]
