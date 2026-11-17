@@ -1427,5 +1427,367 @@
       "Dragon Mound: Temple Foothills",
       "Курган у Подножия храма"
     ]
+  },
+  {
+    "slug": "katlas_farm",
+    "name": "Ферма Катлы",
+    "parent": "Солитьюд",
+    "aliases": [
+      "Katla's Farm",
+      "Solitude Stables",
+      "Конюшни Солитьюда",
+      "Солитьюд - Конюшни"
+    ],
+    "captions": [
+      "Ферма Катлы у дороги к Солитьюду"
+    ],
+    "artwork": {
+      "date": "2026-11-17",
+      "generator": "image_gen",
+      "kind": "generated artistic interpretation",
+      "prompt": "Use case: stylized-concept. Asset type: one landscape location illustration for the Android game SKYRIM TEXT RPG. Create a SINGLE continuous full-bleed scene, aspect ratio 16:9, around 1672 x 941 or larger. Style: consistent with a polished photorealistic Nordic fantasy environment illustration, very detailed physically grounded stone, timber and foliage, restrained natural color, atmospheric depth, believable architecture, immersive eye-level 28–35 mm view, sharp but not oversharpened. A newly generated artistic interpretation of the named Skyrim place, not a collage. Main subjects fit fully inside the frame and remain legible on a phone. No people close to the camera, no HUD, no UI, no text, no captions, no logos, no watermark, no border, no modern objects, no magical effects. Avoid malformed horse anatomy, repeated objects, extreme bloom, shallow focus and painterly brush strokes. Scene: Katla's Farm, Haafingar, Skyrim: a prosperous small Nordic working farm and the Solitude stables below the road to Solitude. Foreground orderly low crop plots with cabbages, leeks, potatoes and a little wheat, rough split-rail fences; middle ground weathered timber farmhouse with steep thatch roof and an adjacent open horse shelter with a palomino horse; an unmistakable modest wooden WINDMILL on the farm. Far background the great natural stone arch carrying the fortified city of Solitude above the river valley, distant and correctly subordinate to the farm. Cool evergreen slopes, damp dirt road, late autumn grass, soft cloudy daylight with restrained warm window light. Keep the working farm and windmill as main subjects; no waterwheel or sawmill.",
+      "source_sha256": "02974b75c8e82bfc0839b15a77c3f7e005759d60aa3008f4c986dd5c12903cd4",
+      "source_bytes": 3851246,
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "archive_sha256": "94d2baf35f5c432be084a343870afe044f8001ba910dd2042877a99b880aabfa",
+      "archive_bytes": 593812,
+      "compression": {
+        "format": "WebP",
+        "dimensions": [
+          1672,
+          941
+        ],
+        "quality": 88,
+        "full_resolution_luma_ssim": 0.9896625876426697,
+        "worst_128px_luma_ssim": 0.9785141348838806,
+        "chroma_mean_absolute_error": 1.7266692386700497,
+        "chroma_95th_percentile_error": 5,
+        "trials": [
+          {
+            "quality": 76,
+            "bytes": 374546,
+            "full_resolution_luma_ssim": 0.9680706858634949,
+            "worst_128px_luma_ssim": 0.9461992383003235,
+            "chroma_mean_absolute_error": 2.1442544325745287,
+            "chroma_95th_percentile_error": 6
+          },
+          {
+            "quality": 80,
+            "bytes": 436050,
+            "full_resolution_luma_ssim": 0.9772051572799683,
+            "worst_128px_luma_ssim": 0.9583112001419067,
+            "chroma_mean_absolute_error": 1.999640894091087,
+            "chroma_95th_percentile_error": 6
+          },
+          {
+            "quality": 84,
+            "bytes": 493852,
+            "full_resolution_luma_ssim": 0.9832003712654114,
+            "worst_128px_luma_ssim": 0.9680134057998657,
+            "chroma_mean_absolute_error": 1.896014369321042,
+            "chroma_95th_percentile_error": 6
+          },
+          {
+            "quality": 88,
+            "bytes": 593700,
+            "full_resolution_luma_ssim": 0.9896625876426697,
+            "worst_128px_luma_ssim": 0.9785141348838806,
+            "chroma_mean_absolute_error": 1.7266692386700497,
+            "chroma_95th_percentile_error": 5
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "markarth_stables",
+    "name": "Конюшни Маркарта",
+    "parent": "Маркарт",
+    "aliases": [
+      "Markarth Stables",
+      "Маркарт - Конюшни"
+    ],
+    "captions": [
+      "Каменные конюшни у ворот Маркарта"
+    ],
+    "artwork": {
+      "date": "2026-11-17",
+      "generator": "image_gen",
+      "kind": "generated artistic interpretation",
+      "prompt": "Use case: stylized-concept. Asset type: one landscape location illustration for the Android game SKYRIM TEXT RPG. Create a SINGLE continuous full-bleed scene, aspect ratio 16:9, around 1672 x 941 or larger. Style: consistent with a polished photorealistic Nordic fantasy environment illustration, very detailed physically grounded stone, timber and foliage, restrained natural color, atmospheric depth, believable architecture, immersive eye-level 28–35 mm view, sharp but not oversharpened. A newly generated artistic interpretation of the named Skyrim place, not a collage. Main subjects fit fully inside the frame and remain legible on a phone. No people close to the camera, no HUD, no UI, no text, no captions, no logos, no watermark, no border, no modern objects, no magical effects. Avoid malformed horse anatomy, repeated objects, extreme bloom, shallow focus and painterly brush strokes. Scene: Markarth Stables immediately outside Markarth in the rocky Reach, Skyrim. Distinctive heavy ancient DWEMER stone stable house with angular carved pale gray stone, bronze accents, a stepped geometric entry and two small squat Dwarven guard towers nearby. Beside the building a sheltered horse bay and fenced patch with a clearly visible pinto horse, a wooden trough, a little straw and a parked practical carriage. Craggy steep limestone cliffs and sparse tawny scrub; the massive Dwemer-style outer gate and walls of Markarth recede naturally behind the stable. Weathered stone textures, cool diffuse afternoon sky and restrained amber lamps. The stone stable compound, not the city interior, dominates the view. Do not replace it with a wooden farmhouse; no waterfalls across the stables.",
+      "source_sha256": "888e92211b2b8ace32087f6d160952e587c9609fcbbb8678198247cc9ae0396a",
+      "source_bytes": 3884848,
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "archive_sha256": "2cbcd883d2a5a27c26fa08f0ba1a1643c4da81bf02305b171547c541bae4c09f",
+      "archive_bytes": 593514,
+      "compression": {
+        "format": "WebP",
+        "dimensions": [
+          1672,
+          941
+        ],
+        "quality": 88,
+        "full_resolution_luma_ssim": 0.9894689321517944,
+        "worst_128px_luma_ssim": 0.9811496734619141,
+        "chroma_mean_absolute_error": 1.5803062506038064,
+        "chroma_95th_percentile_error": 5,
+        "trials": [
+          {
+            "quality": 76,
+            "bytes": 372294,
+            "full_resolution_luma_ssim": 0.966775119304657,
+            "worst_128px_luma_ssim": 0.9538506865501404,
+            "chroma_mean_absolute_error": 1.9344603114878298,
+            "chroma_95th_percentile_error": 6
+          },
+          {
+            "quality": 80,
+            "bytes": 429082,
+            "full_resolution_luma_ssim": 0.975716769695282,
+            "worst_128px_luma_ssim": 0.9661906957626343,
+            "chroma_mean_absolute_error": 1.8462124178187715,
+            "chroma_95th_percentile_error": 5
+          },
+          {
+            "quality": 84,
+            "bytes": 499056,
+            "full_resolution_luma_ssim": 0.9829246997833252,
+            "worst_128px_luma_ssim": 0.9725842475891113,
+            "chroma_mean_absolute_error": 1.7248689422328887,
+            "chroma_95th_percentile_error": 5
+          },
+          {
+            "quality": 88,
+            "bytes": 593402,
+            "full_resolution_luma_ssim": 0.9894689321517944,
+            "worst_128px_luma_ssim": 0.9811496734619141,
+            "chroma_mean_absolute_error": 1.5803062506038064,
+            "chroma_95th_percentile_error": 5
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "riften_stables",
+    "name": "Конюшни Рифтена",
+    "parent": "Рифтен",
+    "aliases": [
+      "Riften Stables",
+      "Рифтен - Конюшни"
+    ],
+    "captions": [
+      "Конюшни у северных ворот Рифтена"
+    ],
+    "artwork": {
+      "date": "2026-11-17",
+      "generator": "image_gen",
+      "kind": "generated artistic interpretation",
+      "prompt": "Use case: stylized-concept. Asset type: one landscape location illustration for the Android game SKYRIM TEXT RPG. Create a SINGLE continuous full-bleed scene, aspect ratio 16:9, around 1672 x 941 or larger. Style: consistent with a polished photorealistic Nordic fantasy environment illustration, very detailed physically grounded stone, timber and foliage, restrained natural color, atmospheric depth, believable architecture, immersive eye-level 28–35 mm view, sharp but not oversharpened. A newly generated artistic interpretation of the named Skyrim place, not a collage. Main subjects fit fully inside the frame and remain legible on a phone. No people close to the camera, no HUD, no UI, no text, no captions, no logos, no watermark, no border, no modern objects, no magical effects. Avoid malformed horse anatomy, repeated objects, extreme bloom, shallow focus and painterly brush strokes. Scene: Riften Stables just OUTSIDE the NORTH gate of Riften, Skyrim. Rustic compact weathered Nordic timber stable house and open-front horse shelter, steep shingled timber roof, low stone footings, a split-rail paddock with a correctly proportioned dapple-gray horse, straw, trough, a modest carriage standing by the earthen approach road. The stone-and-timber city wall and northern gate of Riften are in the middle distance, golden yellow birches and a few dark pines around the road, brown and ochre fallen leaves, the unmistakably autumnal Rift. Mild cloudy late afternoon daylight, subtle amber light in the stable window. Frame the stable yard at eye height, keeping the horse and building readable. No interior canals, no snowy tundra, no generic castle dominating the view.",
+      "source_sha256": "8ca19b1e45fdd792c5ba1c7c3e941d366ab154b996c0e0ebda330a986dd44a3e",
+      "source_bytes": 3830761,
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "archive_sha256": "b139d80aa05dc88463c3f15810a1721176e1a677965c737eba05f1bb1b409d6b",
+      "archive_bytes": 621574,
+      "compression": {
+        "format": "WebP",
+        "dimensions": [
+          1672,
+          941
+        ],
+        "quality": 88,
+        "full_resolution_luma_ssim": 0.9893907904624939,
+        "worst_128px_luma_ssim": 0.9818556308746338,
+        "chroma_mean_absolute_error": 2.231631891655523,
+        "chroma_95th_percentile_error": 7,
+        "trials": [
+          {
+            "quality": 76,
+            "bytes": 388996,
+            "full_resolution_luma_ssim": 0.967182457447052,
+            "worst_128px_luma_ssim": 0.9570322632789612,
+            "chroma_mean_absolute_error": 2.716434402473191,
+            "chroma_95th_percentile_error": 8
+          },
+          {
+            "quality": 80,
+            "bytes": 456768,
+            "full_resolution_luma_ssim": 0.9768784642219543,
+            "worst_128px_luma_ssim": 0.9670846462249756,
+            "chroma_mean_absolute_error": 2.5520770304420117,
+            "chroma_95th_percentile_error": 8
+          },
+          {
+            "quality": 84,
+            "bytes": 523216,
+            "full_resolution_luma_ssim": 0.9832791686058044,
+            "worst_128px_luma_ssim": 0.9750622510910034,
+            "chroma_mean_absolute_error": 2.412109623275656,
+            "chroma_95th_percentile_error": 8
+          },
+          {
+            "quality": 88,
+            "bytes": 621462,
+            "full_resolution_luma_ssim": 0.9893907904624939,
+            "worst_128px_luma_ssim": 0.9818556308746338,
+            "chroma_mean_absolute_error": 2.231631891655523,
+            "chroma_95th_percentile_error": 7
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "whiterun_stables",
+    "name": "Конюшни Вайтрана",
+    "parent": "Вайтран",
+    "aliases": [
+      "Whiterun Stables",
+      "Вайтран - Конюшни"
+    ],
+    "captions": [
+      "Конюшни Вайтрана на краю тундры"
+    ],
+    "artwork": {
+      "date": "2026-11-17",
+      "generator": "image_gen",
+      "kind": "generated artistic interpretation",
+      "prompt": "Use case: stylized-concept. Asset type: one landscape location illustration for the Android game SKYRIM TEXT RPG. Create a SINGLE continuous full-bleed scene, aspect ratio 16:9, around 1672 x 941 or larger. Style: consistent with a polished photorealistic Nordic fantasy environment illustration, very detailed physically grounded stone, timber and foliage, restrained natural color, atmospheric depth, believable architecture, immersive eye-level 28–35 mm view, sharp but not oversharpened. A newly generated artistic interpretation of the named Skyrim place, not a collage. Main subjects fit fully inside the frame and remain legible on a phone. No people close to the camera, no HUD, no UI, no text, no captions, no logos, no watermark, no border, no modern objects, no magical effects. Avoid malformed horse anatomy, repeated objects, extreme bloom, shallow focus and painterly brush strokes. Scene: Whiterun Stables immediately outside Whiterun, Skyrim, on the city approach in the open golden central tundra. A recognizable compact Nordic timber-and-plaster stable building on low fieldstone footings with steep weathered thatch roof and curved wooden gable tips, an attached open wooden horse shelter, rustic paddock and an anatomically natural black horse, hay and trough. A practical wooden travel carriage rests near the road. Behind, uphill and at believable scale, the outer timber-and-stone walls of Whiterun and the long curved Nordic roof of Dragonsreach; open dry yellow grass, rocky tundra and distant gray-blue mountains. Soft clear late afternoon light with restrained warm highlights; panoramic but subject-focused. Do not show an interior city street or dense forest; the stable yard is the foreground subject.",
+      "source_sha256": "8e98f26179fc0bbf894e86c3ad7032ebceb137947dbe458adad711e8020c6d43",
+      "source_bytes": 3575655,
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "archive_sha256": "6d2752c2c9f0e5e7cc87fb370f26921d268fc25e348ee3c7ed3e59ad75bf69eb",
+      "archive_bytes": 531948,
+      "compression": {
+        "format": "WebP",
+        "dimensions": [
+          1672,
+          941
+        ],
+        "quality": 88,
+        "full_resolution_luma_ssim": 0.9874975085258484,
+        "worst_128px_luma_ssim": 0.9794964790344238,
+        "chroma_mean_absolute_error": 1.7692900253725803,
+        "chroma_95th_percentile_error": 5,
+        "trials": [
+          {
+            "quality": 76,
+            "bytes": 322200,
+            "full_resolution_luma_ssim": 0.9633077383041382,
+            "worst_128px_luma_ssim": 0.943504273891449,
+            "chroma_mean_absolute_error": 2.2431862037230066,
+            "chroma_95th_percentile_error": 7
+          },
+          {
+            "quality": 80,
+            "bytes": 377022,
+            "full_resolution_luma_ssim": 0.9724588990211487,
+            "worst_128px_luma_ssim": 0.955655574798584,
+            "chroma_mean_absolute_error": 2.111999412718832,
+            "chroma_95th_percentile_error": 6
+          },
+          {
+            "quality": 84,
+            "bytes": 445152,
+            "full_resolution_luma_ssim": 0.9809669256210327,
+            "worst_128px_luma_ssim": 0.9684131741523743,
+            "chroma_mean_absolute_error": 1.9532520376876885,
+            "chroma_95th_percentile_error": 6
+          },
+          {
+            "quality": 88,
+            "bytes": 531836,
+            "full_resolution_luma_ssim": 0.9874975085258484,
+            "worst_128px_luma_ssim": 0.9794964790344238,
+            "chroma_mean_absolute_error": 1.7692900253725803,
+            "chroma_95th_percentile_error": 5
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "windhelm_stables",
+    "name": "Конюшни Виндхельма",
+    "parent": "Виндхельм",
+    "aliases": [
+      "Windhelm Stables",
+      "Виндхельм - Конюшни"
+    ],
+    "captions": [
+      "Заснеженные конюшни у моста Виндхельма"
+    ],
+    "artwork": {
+      "date": "2026-11-17",
+      "generator": "image_gen",
+      "kind": "generated artistic interpretation",
+      "prompt": "Use case: stylized-concept. Asset type: one landscape location illustration for the Android game SKYRIM TEXT RPG. Create a SINGLE continuous full-bleed scene, aspect ratio 16:9, around 1672 x 941 or larger. Style: consistent with a polished photorealistic Nordic fantasy environment illustration, very detailed physically grounded stone, timber and foliage, restrained natural color, atmospheric depth, believable architecture, immersive eye-level 28–35 mm view, sharp but not oversharpened. A newly generated artistic interpretation of the named Skyrim place, not a collage. Main subjects fit fully inside the frame and remain legible on a phone. No people close to the camera, no HUD, no UI, no text, no captions, no logos, no watermark, no border, no modern objects, no magical effects. Avoid malformed horse anatomy, repeated objects, extreme bloom, shallow focus and painterly brush strokes. Scene: Windhelm Stables on the southern landward approach to the great stone bridge leading into Windhelm, Skyrim. A compact traditional Nordic timber stable house and open-front horse shelter on stone footings, steep thatch roof dusted with snow, a fenced stable yard with a well-proportioned bay horse with a white facial blaze and white socks, wooden trough and straw, a modest travel carriage nearby. The old broad gray stone bridge with worn parapets crosses the cold White River in the middle distance toward Windhelm's huge weathered dark Nordic stone gate and walls. Frosty rocks, sparse snow-laden conifers, scattered snow on the track, gray winter sky and soft flurries; warm lantern glow within the shelter. Clearly the stables OUTSIDE the city, with the bridge behind, not an urban market. The stable structure stays the main subject.",
+      "source_sha256": "c87557e2aff998c53b99f05fc1535bae798ca401e97cbc1dcf9f5ed0c9160ecb",
+      "source_bytes": 3727599,
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "archive_sha256": "251aaf2d80c1fcb9fd53150f037f5813ec1e4fa5e3293a1e2c3e1ae63c144e51",
+      "archive_bytes": 544654,
+      "compression": {
+        "format": "WebP",
+        "dimensions": [
+          1672,
+          941
+        ],
+        "quality": 88,
+        "full_resolution_luma_ssim": 0.9884335994720459,
+        "worst_128px_luma_ssim": 0.9772313237190247,
+        "chroma_mean_absolute_error": 1.2849060477248575,
+        "chroma_95th_percentile_error": 4,
+        "trials": [
+          {
+            "quality": 76,
+            "bytes": 335380,
+            "full_resolution_luma_ssim": 0.9658103585243225,
+            "worst_128px_luma_ssim": 0.9459468126296997,
+            "chroma_mean_absolute_error": 1.6247470368995622,
+            "chroma_95th_percentile_error": 5
+          },
+          {
+            "quality": 80,
+            "bytes": 391150,
+            "full_resolution_luma_ssim": 0.9746797680854797,
+            "worst_128px_luma_ssim": 0.9574862718582153,
+            "chroma_mean_absolute_error": 1.5311382958168294,
+            "chroma_95th_percentile_error": 5
+          },
+          {
+            "quality": 84,
+            "bytes": 457734,
+            "full_resolution_luma_ssim": 0.9822708964347839,
+            "worst_128px_luma_ssim": 0.9685236811637878,
+            "chroma_mean_absolute_error": 1.4275505417732333,
+            "chroma_95th_percentile_error": 4
+          },
+          {
+            "quality": 88,
+            "bytes": 544542,
+            "full_resolution_luma_ssim": 0.9884335994720459,
+            "worst_128px_luma_ssim": 0.9772313237190247,
+            "chroma_mean_absolute_error": 1.2849060477248575,
+            "chroma_95th_percentile_error": 4
+          }
+        ]
+      }
+    }
   }
 ]
