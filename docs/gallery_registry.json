@@ -818,5 +818,330 @@
       "Таверна Деревянное кружево",
       "Деревянное кружево"
     ]
+  },
+  {
+    "name": "Кровавый Трон",
+    "slug": "bloodlet_throne",
+    "captions": [
+      "Кровавый Трон — внешний вид"
+    ],
+    "aliases": [
+      "Bloodlet Throne"
+    ]
+  },
+  {
+    "name": "Сломанная башня",
+    "slug": "broken_tower_redoubt",
+    "captions": [
+      "Сломанная башня — внешний вид"
+    ],
+    "aliases": [
+      "Broken Tower Redoubt"
+    ]
+  },
+  {
+    "name": "Замок Волкихар",
+    "slug": "castle_volkihar",
+    "captions": [
+      "Замок Волкихар — внешний вид"
+    ],
+    "aliases": [
+      "Castle Volkihar",
+      "Castle Volkihar (DG)"
+    ]
+  },
+  {
+    "name": "Крепость Треснувший Бивень",
+    "slug": "cracked_tusk_keep",
+    "captions": [
+      "Крепость Треснувший Бивень — внешний вид"
+    ],
+    "aliases": [
+      "Cracked Tusk Keep"
+    ]
+  },
+  {
+    "name": "Башня Светотьмы",
+    "slug": "darklight_tower",
+    "captions": [
+      "Башня Светотьмы — внешний вид"
+    ],
+    "aliases": [
+      "Darklight Tower"
+    ]
+  },
+  {
+    "name": "Дрифтшейд - Приют",
+    "slug": "driftshade_refuge",
+    "captions": [
+      "Дрифтшейд - Приют — внешний вид"
+    ],
+    "aliases": [
+      "Driftshade Refuge",
+      "Дрифтшейд — Приют",
+      "Дрифтшейд",
+      "Дрифтшейд-Приют"
+    ]
+  },
+  {
+    "name": "Зуб Фалдара",
+    "slug": "faldars_tooth",
+    "captions": [
+      "Зуб Фалдара — внешний вид"
+    ],
+    "aliases": [
+      "Faldar's Tooth"
+    ]
+  },
+  {
+    "name": "Крепость Феллглоу",
+    "slug": "fellglow_keep",
+    "captions": [
+      "Крепость Феллглоу — внешний вид"
+    ],
+    "aliases": [
+      "Fellglow Keep"
+    ]
+  },
+  {
+    "name": "Форт Амол",
+    "slug": "fort_amol",
+    "captions": [
+      "Форт Амол — внешний вид"
+    ],
+    "aliases": [
+      "Fort Amol"
+    ]
+  },
+  {
+    "name": "Форт Стражи Рассвета",
+    "slug": "fort_dawnguard",
+    "captions": [
+      "Форт Стражи Рассвета — внешний вид"
+    ],
+    "aliases": [
+      "Fort Dawnguard",
+      "Fort Dawnguard (DG)"
+    ]
+  },
+  {
+    "name": "Форт Данстад",
+    "slug": "fort_dunstad",
+    "captions": [
+      "Форт Данстад — внешний вид"
+    ],
+    "aliases": [
+      "Fort Dunstad"
+    ]
+  },
+  {
+    "name": "Форт Феллхаммер",
+    "slug": "fort_fellhammer",
+    "captions": [
+      "Форт Феллхаммер — внешний вид"
+    ],
+    "aliases": [
+      "Fort Fellhammer"
+    ]
+  },
+  {
+    "name": "Форт Гринвол",
+    "slug": "fort_greenwall",
+    "captions": [
+      "Форт Гринвол — внешний вид"
+    ],
+    "aliases": [
+      "Fort Greenwall"
+    ]
+  },
+  {
+    "name": "Форт Греймур",
+    "slug": "fort_greymoor",
+    "captions": [
+      "Форт Греймур — внешний вид"
+    ],
+    "aliases": [
+      "Fort Greymoor"
+    ]
+  },
+  {
+    "name": "Форт Храгстад",
+    "slug": "fort_hraggstad",
+    "captions": [
+      "Форт Храгстад — внешний вид"
+    ],
+    "aliases": [
+      "Fort Hraggstad"
+    ]
+  },
+  {
+    "name": "Форт Кастав",
+    "slug": "fort_kastav",
+    "captions": [
+      "Форт Кастав — внешний вид"
+    ],
+    "aliases": [
+      "Fort Kastav"
+    ]
+  },
+  {
+    "name": "Форт Нойград",
+    "slug": "fort_neugrad",
+    "captions": [
+      "Форт Нойград — внешний вид"
+    ],
+    "aliases": [
+      "Fort Neugrad"
+    ]
+  },
+  {
+    "name": "Форт Сноухок",
+    "slug": "fort_snowhawk",
+    "captions": [
+      "Форт Сноухок — внешний вид"
+    ],
+    "aliases": [
+      "Fort Snowhawk"
+    ]
+  },
+  {
+    "name": "Форт Сангард",
+    "slug": "fort_sungard",
+    "captions": [
+      "Форт Сангард — внешний вид"
+    ],
+    "aliases": [
+      "Fort Sungard"
+    ]
+  },
+  {
+    "name": "Висельная скала",
+    "slug": "gallows_rock",
+    "captions": [
+      "Висельная скала — внешний вид"
+    ],
+    "aliases": [
+      "Gallows Rock"
+    ]
+  },
+  {
+    "name": "Хармугстал",
+    "slug": "harmugstahl",
+    "captions": [
+      "Хармугстал — внешний вид"
+    ],
+    "aliases": [
+      "Harmugstahl"
+    ]
+  },
+  {
+    "name": "Глубины Илиналты",
+    "slug": "ilinaltas_deep",
+    "captions": [
+      "Глубины Илиналты — внешний вид"
+    ],
+    "aliases": [
+      "Ilinalta's Deep"
+    ]
+  },
+  {
+    "name": "Туманная застава",
+    "slug": "mistwatch",
+    "captions": [
+      "Туманная застава — внешний вид"
+    ],
+    "aliases": [
+      "Mistwatch"
+    ]
+  },
+  {
+    "name": "Морвунскар",
+    "slug": "morvunskar",
+    "captions": [
+      "Морвунскар — внешний вид"
+    ],
+    "aliases": [
+      "Morvunskar"
+    ]
+  },
+  {
+    "name": "Храм Призывателей Ночи",
+    "slug": "nightcaller_temple",
+    "captions": [
+      "Храм Призывателей Ночи — внешний вид"
+    ],
+    "aliases": [
+      "Nightcaller Temple"
+    ]
+  },
+  {
+    "name": "Северная сторожевая крепость",
+    "slug": "northwatch_keep",
+    "captions": [
+      "Северная сторожевая крепость — внешний вид"
+    ],
+    "aliases": [
+      "Northwatch Keep"
+    ]
+  },
+  {
+    "name": "Тревская застава",
+    "slug": "trevas_watch",
+    "captions": [
+      "Тревская застава — внешний вид"
+    ],
+    "aliases": [
+      "Treva's Watch"
+    ]
+  },
+  {
+    "name": "Западная сторожевая башня",
+    "slug": "western_watchtower",
+    "captions": [
+      "Западная сторожевая башня — внешний вид"
+    ],
+    "aliases": [
+      "Western Watchtower"
+    ]
+  },
+  {
+    "name": "Пепельная крепость",
+    "slug": "ashfallow_citadel",
+    "captions": [
+      "Пепельная крепость — внешний вид"
+    ],
+    "aliases": [
+      "Ashfallow Citadel"
+    ]
+  },
+  {
+    "name": "Форт Морозного Мотылька",
+    "slug": "fort_frostmoth",
+    "captions": [
+      "Форт Морозного Мотылька — внешний вид"
+    ],
+    "aliases": [
+      "Fort Frostmoth"
+    ]
+  },
+  {
+    "name": "Башня Высокая Точка",
+    "slug": "highpoint_tower",
+    "captions": [
+      "Башня Высокая Точка — внешний вид"
+    ],
+    "aliases": [
+      "Highpoint Tower"
+    ]
+  },
+  {
+    "name": "Заброшенная тюрьма",
+    "slug": "abandoned_prison",
+    "captions": [
+      "Заброшенная тюрьма — внешний вид"
+    ],
+    "aliases": [
+      "Abandoned Prison"
+    ]
   }
 ]
