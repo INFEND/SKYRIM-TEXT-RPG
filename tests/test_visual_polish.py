@@ -15,7 +15,9 @@ class VisualPolish(unittest.TestCase):
         gallery=s.split('private View sceneGallery(',1)[1].split('private void stateEffects()',1)[0]
         self.assertNotIn('VisualEffectsView',gallery)
         self.assertNotIn('"dust"',gallery)
-        self.assertIn('noticeQueue.addLast(message)',s)
-        self.assertIn('if(noticeShowing||noticeQueue.isEmpty()',s)
+        self.assertIn('noticeQueue.addLast(new GameNotice(message,TEXT,false))',s)
+        self.assertIn('if(activeNotice!=null||isFinishing()',s)
+        self.assertIn('NOTICE_INTERVAL_MS=3000L',s)
+        self.assertIn('noticeHandler.postDelayed(noticeEnd,NOTICE_INTERVAL_MS)',s)
         self.assertIn('slot.equals(item.slot())',s)
         self.assertIn('chronicleFilter!=0&&kind!=chronicleFilter',s)
