@@ -42,7 +42,7 @@ class AiGameDirectorContracts(unittest.TestCase):
         self.assertIn("chance<0||roll<=chance",bridge)
         self.assertIn("probability(c,\"chance\")",bridge)
         self.assertIn("AiGameTurn.success(option.chance,die)",ui)
-        self.assertIn("AiGameTurn completed=AiGameTurn.parse(answer)",ui)
+        self.assertIn("AiGameTurn completed=AiGameTurn.parseModel(answer,expectedChance)",ui)
         self.assertIn("GameEngine next=GameEngine.fromJson(saved)",ui)
         self.assertIn("completed.apply(next,actionResolved)",ui)
         self.assertIn("next.aiTurn=completed",ui)

@@ -12,5 +12,5 @@ class LocalAiRecovery(unittest.TestCase):
         for s in ('"n_ctx" to 8192', '"n_batch" to (if (recovery) 32 else 128)', '"n_predict" to (limit - previousTokens)', 'tokenCount = previousTokens', 'if (resume.isNotEmpty()) resume', 'count > previousTokens', 'getHistoricalProcessExitReasons'):
             self.assertIn(s,w)
         ui=(APP/"MainActivity.java").read_text()
-        self.assertIn("AiGameTurn completed=AiGameTurn.parse(answer)",ui)
+        self.assertIn("AiGameTurn completed=AiGameTurn.parseModel(answer,expectedChance)",ui)
         self.assertIn("if(!game.toJson().toString().equals(saved))",ui)

@@ -40,7 +40,7 @@ class StreamingLocalAi(unittest.TestCase):
         self.assertNotIn('now - lastDraw >= 160',(SRC/"AiStoryClient.java").read_text())
         self.assertIn("AiGameTurn.previewScene(accumulated)",ui)
         self.assertIn("aiTurnText.setText(SceneTypography.render(visible",ui)
-        self.assertIn("AiGameTurn completed=AiGameTurn.parse(answer)",ui)
+        self.assertIn("AiGameTurn completed=AiGameTurn.parseModel(answer,expectedChance)",ui)
         self.assertIn("completed.apply(next,actionResolved)",ui)
         self.assertIn("next.aiTurn=completed",ui)
         self.assertIn("game.choose(c.action)",ui)
