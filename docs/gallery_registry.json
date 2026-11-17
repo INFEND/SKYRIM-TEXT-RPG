@@ -1143,5 +1143,289 @@
     "aliases": [
       "Abandoned Prison"
     ]
+  },
+  {
+    "name": "Драконий курган 1",
+    "slug": "dragon_mound_01",
+    "captions": [
+      "Курган в лесах Осенней башни"
+    ],
+    "aliases": [
+      "Dragon Mound 1",
+      "Dragon Mound: Autumnwatch Woods",
+      "Курган в лесах Осенней башни"
+    ]
+  },
+  {
+    "name": "Драконий курган 2",
+    "slug": "dragon_mound_02",
+    "captions": [
+      "Курган в лесах Осенней Поляны"
+    ],
+    "aliases": [
+      "Dragon Mound 2",
+      "Dragon Mound: Autumnshade Woods",
+      "Курган в лесах Осенней Поляны"
+    ]
+  },
+  {
+    "name": "Драконий курган 3",
+    "slug": "dragon_mound_03",
+    "captions": [
+      "Курган у перевала Потерянного Языка"
+    ],
+    "aliases": [
+      "Dragon Mound 3",
+      "Dragon Mound: Lost Tongue Pass",
+      "Курган у перевала Потерянного Языка"
+    ]
+  },
+  {
+    "name": "Драконий курган 4",
+    "slug": "dragon_mound_04",
+    "captions": [
+      "Курган на холмах Мерцающего тумана"
+    ],
+    "aliases": [
+      "Dragon Mound 4",
+      "Dragon Mound: Shimmermist Hills",
+      "Курган на холмах Мерцающего тумана"
+    ]
+  },
+  {
+    "name": "Драконий курган 5",
+    "slug": "dragon_mound_05",
+    "captions": [
+      "Курган в прибрежных предгорьях"
+    ],
+    "aliases": [
+      "Dragon Mound 5",
+      "Dragon Mound: Sea Shore Foothills",
+      "Курган в прибрежных предгорьях"
+    ]
+  },
+  {
+    "name": "Драконий курган 6",
+    "slug": "dragon_mound_06",
+    "captions": [
+      "Курган среди пиков Лабиринтиана"
+    ],
+    "aliases": [
+      "Dragon Mound 6",
+      "Dragon Mound: Labyrinthian Peaks",
+      "Курган среди пиков Лабиринтиана"
+    ]
+  },
+  {
+    "name": "Драконий курган 7",
+    "slug": "dragon_mound_07",
+    "captions": [
+      "Курган у подножия Мзулфта"
+    ],
+    "aliases": [
+      "Dragon Mound 7",
+      "Dragon Mound: Mzulft Foothills",
+      "Курган у подножия Мзулфта"
+    ]
+  },
+  {
+    "name": "Драконий курган 8",
+    "slug": "dragon_mound_08",
+    "captions": [
+      "Курган на равнинах Костяного гребня"
+    ],
+    "aliases": [
+      "Dragon Mound 8",
+      "Dragon Mound: Bonestrewn Flats",
+      "Курган на равнинах Костяного гребня",
+      "Dragon Mound: Bonestrewn Crest"
+    ]
+  },
+  {
+    "name": "Драконий курган 9",
+    "slug": "dragon_mound_09",
+    "captions": [
+      "Курган на склоне Ведьминой рощи"
+    ],
+    "aliases": [
+      "Dragon Mound 9",
+      "Dragon Mound: Witchmist Slope",
+      "Курган на склоне Ведьминой рощи",
+      "Dragon Mound: Witchmist Grove"
+    ]
+  },
+  {
+    "name": "Драконий курган 10",
+    "slug": "dragon_mound_10",
+    "captions": [
+      "Курган Салокнира у Кинсгроува"
+    ],
+    "aliases": [
+      "Dragon Mound 10",
+      "Dragon Mound: Kynesgrove Resurrection",
+      "Курган Салокнира у Кинсгроува",
+      "Sahloknir's Dragon Mound",
+      "Курган Салокнира"
+    ]
+  },
+  {
+    "name": "Драконий курган Желчный хребет",
+    "slug": "dragon_mound_bilegulch",
+    "captions": [
+      "Курган Желчного хребта"
+    ],
+    "aliases": [
+      "Dragon Mound: Bilegulch Ridge",
+      "Курган Желчного хребта"
+    ]
+  },
+  {
+    "name": "Драконий курган Кровавые пики",
+    "slug": "dragon_mound_bloodlet",
+    "captions": [
+      "Курган среди Кровавых пиков"
+    ],
+    "aliases": [
+      "Dragon Mound: Bloodlet Peaks",
+      "Курган среди Кровавых пиков"
+    ]
+  },
+  {
+    "name": "Драконий курган Вечнозелёные леса",
+    "slug": "dragon_mound_evergreen",
+    "captions": [
+      "Курган в Вечнозелёных лесах"
+    ],
+    "aliases": [
+      "Dragon Mound: Evergreen Woods",
+      "Курган в Вечнозелёных лесах"
+    ]
+  },
+  {
+    "name": "Драконий курган Большой кромлех",
+    "slug": "dragon_mound_great_henge",
+    "captions": [
+      "Курган Вулйотнака у Большого кромлеха"
+    ],
+    "aliases": [
+      "Dragon Mound: Great Henge Resurrection",
+      "Курган Вулйотнака у Большого кромлеха",
+      "Vuljotnaak's Dragon Mound",
+      "Курган Вулйотнака"
+    ]
+  },
+  {
+    "name": "Драконий курган Лес у реки Карт",
+    "slug": "dragon_mound_karth_forest",
+    "captions": [
+      "Курган в лесу у реки Карт"
+    ],
+    "aliases": [
+      "Dragon Mound: Karth River Forest",
+      "Курган в лесу у реки Карт"
+    ]
+  },
+  {
+    "name": "Драконий курган Утёсы Картспайра",
+    "slug": "dragon_mound_karthspire",
+    "captions": [
+      "Курган на утёсах Картспайра"
+    ],
+    "aliases": [
+      "Dragon Mound: Karthspire Bluffs",
+      "Курган на утёсах Картспайра"
+    ]
+  },
+  {
+    "name": "Драконий курган Одинокая гора",
+    "slug": "dragon_mound_lone_mountain",
+    "captions": [
+      "Курган у Одинокой горы"
+    ],
+    "aliases": [
+      "Dragon Mound: Lone Mountain",
+      "Курган у Одинокой горы"
+    ]
+  },
+  {
+    "name": "Драконий курган Долина Рагнвальда",
+    "slug": "dragon_mound_ragnvald",
+    "captions": [
+      "Курган в долине Рагнвальда"
+    ],
+    "aliases": [
+      "Dragon Mound: Ragnvald Vale",
+      "Курган в долине Рагнвальда"
+    ]
+  },
+  {
+    "name": "Драконий курган Озёрный перевал",
+    "slug": "dragon_mound_reachwater",
+    "captions": [
+      "Курган у Озёрного перевала"
+    ],
+    "aliases": [
+      "Dragon Mound: Reachwater Pass",
+      "Курган у Озёрного перевала"
+    ]
+  },
+  {
+    "name": "Драконий курган Утёсы Теснины грабителя",
+    "slug": "dragon_mound_robbers_gorge",
+    "captions": [
+      "Курган на утёсах Теснины грабителя"
+    ],
+    "aliases": [
+      "Dragon Mound: Robber's Gorge Bluffs",
+      "Курган на утёсах Теснины грабителя"
+    ]
+  },
+  {
+    "name": "Драконий курган Рорикстед",
+    "slug": "dragon_mound_rorikstead",
+    "captions": [
+      "Курган Нахаглива у Рорикстеда"
+    ],
+    "aliases": [
+      "Dragon Mound: Rorikstead Resurrection",
+      "Курган Нахаглива у Рорикстеда",
+      "Nahagliiv's Dragon Mound",
+      "Курган Нахаглива"
+    ]
+  },
+  {
+    "name": "Драконий курган Йоргрим",
+    "slug": "dragon_mound_yorgrim",
+    "captions": [
+      "Курган Винтурута у Йоргрима"
+    ],
+    "aliases": [
+      "Dragon Mound: Yorgrim Resurrection",
+      "Курган Винтурута у Йоргрима",
+      "Viinturuth's Dragon Mound",
+      "Курган Винтурута"
+    ]
+  },
+  {
+    "name": "Драконий курган Замёрзшие отмели",
+    "slug": "dragon_mound_frozen_shoals",
+    "captions": [
+      "Курган у Замёрзших отмелей"
+    ],
+    "aliases": [
+      "Dragon Mound: Frozen Shoals",
+      "Курган у Замёрзших отмелей"
+    ]
+  },
+  {
+    "name": "Драконий курган Подножие храма",
+    "slug": "dragon_mound_temple_foothills",
+    "captions": [
+      "Курган у Подножия храма"
+    ],
+    "aliases": [
+      "Dragon Mound: Temple Foothills",
+      "Курган у Подножия храма"
+    ]
   }
 ]
