@@ -1909,7 +1909,18 @@ public final class MainActivity extends Activity {
                 requestAiTurn("Начни историю моего героя в текущем месте. Это первый ход: не меняй параметры, предоставь ten choices.",false));
             return;
         }
-        String pending=pendingAiAction();if(!pending.isEmpty())actionButton("ПОВТОРИТЬ ЗАФИКСИРОВАННОЕ ДЕЙСТВИЕ","Сохранённый бросок не изменится",true,()->retryLockedAction());
+        String pending=pendingAiAction();
+        if(!pending.isEmpty()){
+            actionButton("ПОВТОРИТЬ ДЕЙСТВИЕ","Продолжить с прежним броском",true,()->retryLockedAction());
+            actionButton("ОТМЕНИТЬ НЕЗАВЕРШЁННОЕ ДЕЙСТВИЕ","Вернуться к выбору без применения эффектов",false,()->{
+                new android.app.AlertDialog.Builder(this).setTitle("Отменить действие?")
+                    .setMessage("Незавершённая ИИ-сцена и её бросок будут отброшены. Состояние героя не изменится.")
+                    .setNegativeButton("Назад",null).setPositiveButton("Отменить",(d,w)->{
+                        clearAiPending();selectedAiChoices.clear();aiOwnDraft="";clearAiDraft();
+                        aiTurnStatus="";render();
+                    }).show();
+            });
+        }
         LinearLayout narrative=card();
         aiTurnText=text("",18,TEXT,false);
         aiTurnText.setTypeface(SovngardeTypeface.face(this,false));
@@ -1997,7 +2008,7 @@ public final class MainActivity extends Activity {
                 .append(value).append("\n");
             String compound=combined.toString();
             persistAiDraft();
-            String locked=pendingAiAction();if(!locked.isEmpty()&&!compound.equals(locked)){toast("Исход уже зафиксирован. Повтори исходный выбор без изменений.");return;}
+            String locked=pendingAiAction();if(!locked.isEmpty()&&!compound.equals(locked)){toast("Сначала повтори или отмени незавершённое действие вверху сцены.");return;}
             if(!value.isEmpty()){
                 if(compound.equals(pendingAiAction())){
                     int chance=prefs.getInt(AI_PENDING_CHANCE,-1);
@@ -2200,6 +2211,10 @@ public final class MainActivity extends Activity {
      * until the model has committed to a probability. -2 means no fixed chance. */
     private void requestAiTurn(String instruction,boolean actionResolved,
                                boolean proposalOnly,int expectedChance,String customAction){
+        requestAiTurn(instruction,actionResolved,proposalOnly,expectedChance,customAction,0);
+    }
+    private void requestAiTurn(String instruction,boolean actionResolved,
+                               boolean proposalOnly,int expectedChance,String customAction,int repairAttempt){
         if(aiTurnBusy||aiClient.isRunning()||localAiClient.isRunning()||!game.started)return;
         final String source=resolvedAiProvider();
         final boolean local="local".equals(source),chat="chatgpt".equals(source);
@@ -2274,7 +2289,7 @@ public final class MainActivity extends Activity {
                             true,false,fixedChance,null);
                         return;
                     }
-                    AiGameTurn completed=AiGameTurn.parse(answer);
+                    AiGameTurn completed=AiGameTurn.parseModel(answer,expectedChance);
                     if(expectedChance!=-2&&completed.customChance!=expectedChance)
                         throw new IllegalStateException("ИИ изменил шанс после броска");
                     GameEngine next=GameEngine.fromJson(saved);
@@ -2296,8 +2311,16 @@ public final class MainActivity extends Activity {
                     aiMemory.add(aiSession,"master",completed.scene);
                     if(!completed.journal.isEmpty())aiMemory.add(aiSession,"event",completed.journal);
                     aiTurnStatus="";
-                }catch(Exception ex){
-                    aiTurnStatus="ИИ-сцена не принята: "+ex.getMessage()+". Повтори выбор, сохранение не изменилось.";
+                 }catch(Exception ex){
+                    if(repairAttempt==0&&ex instanceof org.json.JSONException){
+                        aiTurnBusy=false;aiTurnPreview="";
+                        String fix=proposalOnly?
+                            "\nИсправление: верни только JSON {\"customChance\":42} либо {\"customChance\":null}; число без кавычек.":
+                            "\nИсправление формата: ровно десять разных действий с непустыми title/detail, chance числом либо null. Не помещай effects или customChance в scene. Сохрани уже установленный исход. Не повторяй предыдущие варианты.";
+                        requestAiTurn(instruction+fix,actionResolved,proposalOnly,expectedChance,customAction,1);
+                        if(aiTurnBusy)return;
+                    }
+                    aiTurnStatus="Не удалось завершить ИИ-сцену: "+ex.getMessage()+". Повтори или отмени действие; сохранение не изменилось.";
                 }
                 aiTurnBusy=false;aiTurnPreview="";
                 if(tab==0)render();
