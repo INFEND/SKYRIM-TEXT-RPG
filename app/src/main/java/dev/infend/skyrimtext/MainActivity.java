@@ -2222,6 +2222,7 @@ public final class MainActivity extends Activity {
                 chat?"":AiModelCatalog.DEFAULT_API);
         if(model.isEmpty()){aiTurnStatus="Сначала выбери модель в настройках";render();return;}
         final String effort=selectedReasoningEffort(),history=aiMemory.context(aiSession)+(local?"":"\n"+game.katherine.aiContext(game)+"\n"+game.alma.aiContext())+"\n"+game.livia.aiContext(game)+"\n"+game.itachi.aiContext(game);
+        final GameEngine originalGame=game;
         final String saved;
         try{saved=game.toJson().toString();}
         catch(Exception ex){aiTurnStatus="Не удалось прочитать состояние героя";render();return;}
@@ -2312,7 +2313,7 @@ public final class MainActivity extends Activity {
                     if(!completed.journal.isEmpty())aiMemory.add(aiSession,"event",completed.journal);
                     aiTurnStatus="";
                  }catch(Exception ex){
-                    if(repairAttempt==0&&ex instanceof org.json.JSONException){
+                    if(repairAttempt==0&&game==originalGame&&ex instanceof org.json.JSONException){
                         aiTurnBusy=false;aiTurnPreview="";
                         String fix=proposalOnly?
                             "\nИсправление: верни только JSON {\"customChance\":42} либо {\"customChance\":null}; число без кавычек.":
