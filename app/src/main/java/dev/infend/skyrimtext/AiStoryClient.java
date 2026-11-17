@@ -185,6 +185,7 @@ public final class AiStoryClient {
             localSection(b,"Кэтрин: ",game.katherine.compactContext(game),220,budget);
         if(game.alma.enabled)
             localSection(b,"Альма: ",game.alma.compactContext(game),220,budget);
+        localSection(b,"Авторский спутник: ",game.fixShop.world.context(),240,budget);
         String facts=game.sceneState==null?"":game.sceneState.confirmedContext();
         if(!game.alma.enabled){
             StringBuilder filtered=new StringBuilder();
@@ -480,6 +481,7 @@ public final class AiStoryClient {
         if(game.enemyHp>0)
             out.append("ПРОТИВНИК: ").append(game.enemyName).append(", HP ").append(game.enemyHp)
                     .append('/').append(game.enemyMaxHp).append(", урон ").append(game.enemyDamage).append('\n');
+        out.append("\\n").append(game.fixShop.world.context());
         String confirmedFacts=game.sceneState==null?"":game.sceneState.confirmedContext();
         if(!game.alma.enabled){StringBuilder allowed=new StringBuilder();for(String line:confirmedFacts.split("\\n"))if(!line.contains(AlmaStory.ID)&&!line.contains("alma_serana"))allowed.append(line).append('\n');confirmedFacts=allowed.toString();}
         out.append("ПОДТВЕРЖДЁННЫЕ ФАКТЫ СЦЕНЫ (только записи движка):\n");

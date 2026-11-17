@@ -224,7 +224,7 @@ public final class GameEngine {
         if(started&&KatherineStory.MODE.equals(mode))return katherine.scene(this);
         if(started&&"CANON".equals(mode))return CanonicalCampaign.scene(this);
         Scene s=baseScene();
-        if(started){progress.fillChoices(this,s);FixShopAdventure.choices(this,s);FixShopAdventure.endings(this,s);}
+        if(started){progress.fillChoices(this,s);FixShopAdventure.choices(this,s);FixShopAdventure.endings(this,s);FixShopWorld.choices(this,s);}
         if(itachi.available(this))s.add("ITACHI:open","Поговорить с Итачи",itachi.objective(this));
         if(livia.available(this))s.add("LIVIA:open","Поговорить с Ливией",livia.objective());
         if(alma.available(this))s.add("ALMA:open","Поговорить с Альмой","Алая Бессмертная | "+alma.status());
@@ -380,6 +380,7 @@ public final class GameEngine {
         lastCheckChance=lastCheckRoll=-1;
         if(RoadEvents.MODE.equals(mode)){road.choose(this,action);return;}
         if(road.pending()&&!"COMBAT".equals(mode)){if("GO_WORLD".equals(action))road.resume(this);return;}
+        if(action.startsWith("FIXPLACE:")||action.startsWith("FIXHOME:")){FixShopWorld.choose(this,action);return;}
         if(action.startsWith("FIXQUEST:")){FixShopAdventure.choose(this,action);return;}
         if(action.startsWith("ROAD:"))return;
         if(action.startsWith("ROAD_TARGET:")){road.selectTarget(this,action);return;}
@@ -461,7 +462,7 @@ public final class GameEngine {
             } catch (JSONException ignored) {
                 // Optional scene metadata cannot invalidate a completed journey.
             }
-            stamina=Math.max(1,stamina-Math.min(Math.max(0,stamina-1),route.days*Math.max(1,(progress.advanced.has(AdvancedPerks.STEALTH)?5:6)-(road.hasMount(this)?2:0))));
+            stamina=Math.max(1,stamina-Math.min(Math.max(0,stamina-1),route.days*Math.max(1,(progress.advanced.has(AdvancedPerks.STEALTH)?5:6)-Math.max(road.hasMount(this)?2:0,fixShop.world.travelBonus()))));
             magicka=Math.max(1,magicka-Math.min(Math.max(0,magicka-1),route.days*2));
             String roadEvent=road.resuming?road.outcome:"";
             message="Ты преодолеваешь дорогу, постепенно оставляя за спиной стоянки, перевалы и чужие костры. "+
@@ -690,6 +691,8 @@ public final class GameEngine {
         if(kathDamage>0){damage+=kathDamage;actionText+="\nКэтрин: "+katherine.companion.lastSpell+", −"+kathDamage+" здоровья врагу.";}
         if(damage>0&&("ATTACK".equals(action)||"HEAVY".equals(action))&&progress.equipped("Бритва Мерунеса")&&"WILD".equals(battleKind)&&!enemyName.toLowerCase(java.util.Locale.ROOT).contains("карстааг")&&random.nextInt(10000)<198){damage=enemyHp;actionText+="\nБритва Мерунеса срабатывает: противник падает замертво.";}
         if(road.hasDog(this)&&enemyHp>damage&&(battleTurns+1)%3==0){damage+=3;actionText+="\nБродячий пёс помогает в бою: −3 здоровья врагу.";}
+        int petDamage=fixShop.world.petDamage(battleTurns+1,Math.max(0,enemyHp-damage));if(petDamage>0){damage+=petDamage;actionText+="\n"+fixShop.world.petName()+": −"+petDamage+" здоровья врагу.";}
+        int customDamage=fixShop.world.companionDamage(battleTurns+1,Math.max(0,enemyHp-damage));if(customDamage>0){damage+=customDamage;actionText+="\n"+fixShop.world.companionName()+": −"+customDamage+" здоровья врагу.";}
         int itachiDamage=itachi.assist(battleTurns+1,Math.max(0,enemyHp-damage));if(itachiDamage>0){damage+=itachiDamage;actionText+="\nИтачи: "+itachi.lastPower+", −"+itachiDamage+" здоровья врагу.";} 
         int liviaDamage=livia.assist(battleTurns+1,Math.max(0,enemyHp-damage));if(liviaDamage>0){damage+=liviaDamage;actionText+="\nЛивия: удар мечом, −"+liviaDamage+" здоровья врагу.";}
         int almaDamage=alma.assist(this,battleTurns+1,Math.max(0,enemyHp-damage));if(almaDamage>0){damage+=almaDamage;actionText+="\nАльма: "+alma.powerLabel()+", −"+almaDamage+" здоровья врагу.";}
