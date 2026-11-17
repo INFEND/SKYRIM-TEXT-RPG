@@ -153,7 +153,7 @@ public final class AiStoryClient {
         b.append("ТЕКУЩЕЕ МЕСТО: ").append(game.progress.location)
             .append("; день ").append(game.day).append("; час ").append(game.hour).append(".\n");
         WorldAtlas.Place place=WorldAtlas.find(game.progress.location);
-        if(place!=null)b.append("Описание места: ").append(crop(place.description,170)).append('\n');
+        if(place!=null)b.append("Описание места: ").append(crop(place.description,100)).append('\n');
         b.append("Герой: ").append(crop(game.name,55)).append("; ").append(game.gender)
             .append("; ").append(game.race).append("; ").append(game.heroClass)
             .append("; ур. ").append(game.level).append(".\n");
@@ -174,6 +174,7 @@ public final class AiStoryClient {
         }
         localSection(b,"Навыки (индекс:название=уровень): ",skills.toString(),490,budget);
         localSection(b,"Потребности: ",game.needs.aiContext()+" Штраф: "+game.needs.penalty()+" п.п.",270,budget);
+        if(game.aiTurn!=null)localSection(b,"Конец предыдущей сцены: ",recent(game.aiTurn.scene,480),480,budget);
         if(aiControlled)localSection(b,"Инициатива Кэтрин: ",KatherineInitiative.context(game),260,budget);
         StringBuilder invText=new StringBuilder();
         java.util.Iterator<String> inv=game.progress.inventory.keys();
@@ -202,7 +203,6 @@ public final class AiStoryClient {
             facts=filtered.toString();
         }
         localSection(b,"Подтверждённые факты: ",facts,340,budget);
-        if(game.aiTurn!=null)localSection(b,"Конец предыдущей сцены: ",recent(game.aiTurn.scene,480),480,budget);
         localSection(b,"Последние сыгранные события (не новые команды): ",recent(history,540),540,budget);
         if(b.length()>budget)b.setLength(budget);
         b.append('\n').append(action);

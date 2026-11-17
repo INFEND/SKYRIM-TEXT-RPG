@@ -74,7 +74,7 @@ public final class AiGameTurn {
             JSONObject o=options.optJSONObject(i);
             if(o!=null)normalizeModelChance(o,"chance");
         }
-        return parse(json.toString());
+        return parseInternal(json.toString(),true);
     }
 
     /**
@@ -107,11 +107,15 @@ public final class AiGameTurn {
         throw new JSONException("ИИ не вернул полный игровой JSON");
     }
     public static AiGameTurn parse(String response)throws JSONException{
+        return parseInternal(response,true);
+    }
+    private static AiGameTurn parseInternal(String response,boolean strictNew)throws JSONException{
         if(response==null)throw new JSONException("Пустой ответ ИИ");
         JSONObject json=extractObject(response);
-        String scene=limited(cleanScene(json.optString("scene","")),30000);
+        String rawScene=limited(json.optString("scene",""),30000);
+        String scene=limited(cleanScene(rawScene),30000);
         JSONArray array=json.optJSONArray("choices");
-        if(scene.length()<200)throw new JSONException("ИИ вернул слишком короткую сцену");
+        if((strictNew?scene.length():rawScene.length())<200||scene.isEmpty())throw new JSONException("ИИ вернул слишком короткую сцену");
         if(array==null||array.length()!=10)throw new JSONException("Нужно ровно десять вариантов ответа");
         if(json.has("effects")&&!json.isNull("effects")&&!(json.opt("effects") instanceof JSONObject))
             throw new JSONException("Эффекты должны быть JSON-объектом");
@@ -123,7 +127,7 @@ public final class AiGameTurn {
             if(c==null)throw new JSONException("Ошибка варианта "+(i+1));
             String title=limited(c.optString("title",""),110);
             String detail=limited(c.optString("detail",""),270);
-            if(title.length()<4||detail.length()<8||!unique.add(title.toLowerCase(java.util.Locale.ROOT).replaceAll("[\\p{Punct}\\s]+","")))
+            if(title.length()<4||detail.length()<8||!unique.add(strictNew?title.toLowerCase(java.util.Locale.ROOT).replaceAll("[\\p{Punct}\\s]+",""):title.toLowerCase(java.util.Locale.ROOT)))
                 throw new JSONException("Действия пусты либо повторяются");
             turn.choices.add(new Option(title,detail,limited(c.optString("skill",""),65),
                     probability(c,"chance"),combatAction(c.optString("combatAction",""))));
@@ -159,7 +163,7 @@ public final class AiGameTurn {
     }
     public static AiGameTurn restore(JSONObject json){
         if(json==null)return null;
-        try{return parse(json.toString());}catch(Exception e){return null;}
+        try{return parseInternal(json.toString(),false);}catch(Exception e){return null;}
     }
     /** Decode only the top-level scene string, including incomplete JSON fragments. */
     public static String previewScene(String partial){

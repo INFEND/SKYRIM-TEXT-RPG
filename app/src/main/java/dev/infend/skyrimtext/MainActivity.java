@@ -204,6 +204,7 @@ public final class MainActivity extends Activity {
         recentItemGains.clear();
         selectedAiChoices.clear();aiOwnDraft="";clearAiDraft();
         cancelAiForSourceChange();
+        clearAiPending();
         aiSession=java.util.UUID.randomUUID().toString();
         prefs.edit().putString("ai_session",aiSession).apply();
     }
@@ -1782,6 +1783,16 @@ public final class MainActivity extends Activity {
             .remove(AI_PENDING_DIE).remove(AI_PENDING_SCENE)
             .remove(AI_PENDING_SESSION).remove(AI_PENDING_INSTRUCTION).remove(AI_PENDING_CHECKS).apply();
     }
+    /** Commit the next scene and remove its pending roll in one preferences transaction. */
+    private void commitAiSave(GameEngine next)throws org.json.JSONException{
+        String serialized=next.toJson().toString();
+        if(!prefs.edit().putString("save",serialized)
+            .remove(AI_PENDING_ACTION).remove(AI_PENDING_CHANCE).remove(AI_PENDING_DIE)
+            .remove(AI_PENDING_SCENE).remove(AI_PENDING_SESSION)
+            .remove(AI_PENDING_INSTRUCTION).remove(AI_PENDING_CHECKS)
+            .remove("ai_draft_scene").remove("ai_draft_selected").remove("ai_draft_text").commit())
+            throw new IllegalStateException("Не удалось записать сохранение на устройство");
+    }
     private boolean storeAiPending(String action,int chance,int die){
         return prefs.edit().putString(AI_PENDING_ACTION,action)
             .putInt(AI_PENDING_CHANCE,chance).putInt(AI_PENDING_DIE,die)
@@ -2312,16 +2323,15 @@ public final class MainActivity extends Activity {
                     completed.apply(next,actionResolved);
                     next.progress.sync(next);
                     next.katherine.observeTravel(next);next.katherine.autonomous(next);next.alma.observeTravel(next);
-                    captureItemGains(before,next,!actionResolved);
                     if(actionResolved){if(expectedChance>=0){next.lastCheckChance=expectedChance;next.lastCheckRoll=prefs.getInt(AI_PENDING_DIE,-1);}recordVisual(visualBefore,next,completed.journal.isEmpty()?"Продолжение истории":completed.journal);LockedChecks lockedChecks=LockedChecks.restore(prefs.getString(AI_PENDING_CHECKS,""));if(lockedChecks!=null)next.lastLivingResult.put("checks",lockedChecks.snapshot());}
                     else next.recordVisualEvent(completed.journal.isEmpty()?"Продолжение истории":completed.journal);
                     next.aiTurn=completed;
+                    commitAiSave(next);
                     game=next;
                     lastNarrative=completed.scene;
-                    selectedAiChoices.clear();aiOwnDraft="";clearAiDraft();
-                    save();
+                    selectedAiChoices.clear();aiOwnDraft="";
+                    captureItemGains(before,next,!actionResolved);
                     if(actionResolved)enqueueLivingResult(game.lastLivingResult);
-                    clearAiPending();
                     aiMemory.add(aiSession,"user",instruction);
                     aiMemory.add(aiSession,"master",completed.scene);
                     if(!completed.journal.isEmpty())aiMemory.add(aiSession,"event",completed.journal);
@@ -2335,7 +2345,7 @@ public final class MainActivity extends Activity {
                         requestAiTurn(instruction+fix,actionResolved,proposalOnly,expectedChance,customAction,1);
                         if(aiTurnBusy)return;
                     }
-                    aiTurnStatus="Не удалось завершить ИИ-сцену: "+ex.getMessage()+". Повтори или отмени действие; сохранение не изменилось.";
+                    aiTurnStatus=game==originalGame?"Не удалось завершить ИИ-сцену: "+ex.getMessage()+". Повтори или отмени действие; сохранение не изменилось.":"Сцена сохранена, но не удалось обновить её отображение.";
                 }
                 aiTurnBusy=false;aiTurnPreview="";
                 if(tab==0)render();
