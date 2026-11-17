@@ -12,6 +12,7 @@ public final class FixShopWorld {
     static final int MAX_CHARACTERS=12, MAX_PLACES=12;
     int mount=0,pet=0,active=-1,mountOwned=0,petOwned=0;
     boolean stable=false;
+    String queuedEncounter="";
     final ArrayList<JSONObject> characters=new ArrayList<>(),places=new ArrayList<>(),quests=new ArrayList<>();
     final JSONObject storage=new JSONObject();
     static String clean(String s,int max){return s==null?"":s.trim().length()>max?s.trim().substring(0,max):s.trim();}
@@ -84,10 +85,10 @@ public final class FixShopWorld {
         return false;
     }
     String context(){JSONObject c=activeCharacter();return c==null?"":"Авторский спутник: "+c.optString("name")+"; "+ROLES[c.optInt("role",0)]+"; "+c.optString("description")+"; отношение "+c.optInt("relation",50)+"/100.";}
-    JSONObject save(){JSONObject j=new JSONObject();try{j.put("mount",mount).put("pet",pet).put("mountOwned",mountOwned).put("petOwned",petOwned).put("quests",new JSONArray(quests)).put("active",active).put("stable",stable).put("storage",storage).put("characters",new JSONArray(characters)).put("places",new JSONArray(places));}catch(Exception ignored){}return j;}
+    JSONObject save(){JSONObject j=new JSONObject();try{j.put("queuedEncounter",queuedEncounter).put("mount",mount).put("pet",pet).put("mountOwned",mountOwned).put("petOwned",petOwned).put("quests",new JSONArray(quests)).put("active",active).put("stable",stable).put("storage",storage).put("characters",new JSONArray(characters)).put("places",new JSONArray(places));}catch(Exception ignored){}return j;}
     static FixShopWorld restore(JSONObject j){
         FixShopWorld w=new FixShopWorld();if(j==null)return w;
-        w.mount=Math.max(0,Math.min(MOUNTS.length,j.optInt("mount")));w.pet=Math.max(0,Math.min(PETS.length,j.optInt("pet")));w.stable=j.optBoolean("stable");w.mountOwned=(j.optInt("mountOwned")&3)|(w.mount>0?1<<(w.mount-1):0);w.petOwned=(j.optInt("petOwned")&3)|(w.pet>0?1<<(w.pet-1):0);
+        w.mount=Math.max(0,Math.min(MOUNTS.length,j.optInt("mount")));w.pet=Math.max(0,Math.min(PETS.length,j.optInt("pet")));w.stable=j.optBoolean("stable");String encounter=j.optString("queuedEncounter","");if(RoadEvents.fixEventAllowed(encounter))w.queuedEncounter=encounter;w.mountOwned=(j.optInt("mountOwned")&3)|(w.mount>0?1<<(w.mount-1):0);w.petOwned=(j.optInt("petOwned")&3)|(w.pet>0?1<<(w.pet-1):0);
         JSONArray a=j.optJSONArray("characters");if(a!=null)for(int i=0;i<Math.min(a.length(),MAX_CHARACTERS);i++){JSONObject c=a.optJSONObject(i);if(c!=null&&w.addCharacter(c.optString("name"),c.optString("description"),c.optInt("role",-1),c.optBoolean("companion"),c.optString("home","Вайтран"))){JSONObject n=w.characters.get(w.characters.size()-1);try{n.put("relation",Math.max(0,Math.min(100,c.optInt("relation",50)))).put("lastTalk",c.optInt("lastTalk",-1));}catch(Exception ignored){}}}
         int active=j.optInt("active",-1);if(active>=0&&active<w.characters.size()&&w.characters.get(active).optBoolean("companion"))w.active=active;
         a=j.optJSONArray("places");if(a!=null)for(int i=0;i<Math.min(a.length(),MAX_PLACES);i++){JSONObject c=a.optJSONObject(i);if(c!=null&&w.addPlace(c.optString("name"),c.optString("description"),c.optString("anchor")))try{w.places.get(w.places.size()-1).put("visits",Math.max(0,c.optInt("visits")));}catch(Exception ignored){}}

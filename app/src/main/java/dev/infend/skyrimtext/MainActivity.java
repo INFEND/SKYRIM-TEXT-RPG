@@ -4321,7 +4321,8 @@ public final class MainActivity extends Activity {
             fixOffer(a,"Создать NPC","Имя, характер, класс и отношения","Редактор мира","hero",5,300,()->fixCreateCharacter(false));
             fixOffer(a,"Создать локацию","Авторское место внутри текущей локации карты","Редактор мира","map",5,500,this::fixCreatePlace);
             fixOffer(a,"Создать задание","Собственное поручение с двумя местами и целью","Редактор мира","journal",5,300,this::fixCreateQuest);
-            fixOffer(a,"Нити судьбы","Изменить финал купленного приключения без повторной награды","Редактор мира","journal",5,250,this::fixRewriteEnding);
+            fixOffer(a,"Нити судьбы","Изменить финал приключения или выбранное решение главной истории","Редактор мира","journal",5,250,this::fixRewriteEnding);
+            fixOffer(a,"Дорожное предзнаменование",game.fixShop.world.queuedEncounter.isEmpty()?"Выбрать повторяемую встречу на подходящем маршруте":"Ожидает: "+RoadEvents.fixEventName(game.fixShop.world.queuedEncounter),"Редактор мира","map",3,100,this::fixQueueEncounter);
             if("Последний поединок".equals(game.livia.ending))fixDirect(a,"Воскресить Ливию","Возвращение после гибели в поединке; без повторного опыта","Редактор мира","health",5,300,()->game.livia.fixRestore(game));
             fixOffer(a,"Врата странника","Мгновенный переход в посещённую локацию","Редактор мира","map",4,100,this::fixTeleportChoice);
             fixDirect(a,"Слава героя","+10 репутации","Редактор мира","hero",2,50,()->{if(game.reputation>Integer.MAX_VALUE-10)return false;game.reputation+=10;return true;});
@@ -4388,11 +4389,24 @@ public final class MainActivity extends Activity {
         choose.setOnClickListener(v->new RuneDialogBuilder(this,accent()).setTitle("Место назначения").setItems(places.toArray(new String[0]),(d,i)->{target[0]=places.get(i);choose.setText(target[0]);}).setNegativeButton("Отмена",null).show());
         AlertDialog d=new RuneDialogBuilder(this,accent()).setTitle("Создать задание | 300 F").setView(panel).setNegativeButton("Отмена",null).setPositiveButton("Создать",null).create();d.show();d.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v->{String n=name.getText().toString();if(fixApply("Создать задание",n,300,()->game.fixShop.world.addQuest(n,desc.getText().toString(),start,target[0]))){d.dismiss();livingFixShop();}});
     }
+    private void fixQueueEncounter(){
+        if(livingBusy()||!game.fixShop.editorEnabled)return;
+        if(!game.fixShop.world.queuedEncounter.isEmpty()){toast("Встреча уже ожидает подходящего маршрута");return;}
+        java.util.ArrayList<String> ids=new java.util.ArrayList<>(RoadEvents.fixEventIds());java.util.ArrayList<String> labels=new java.util.ArrayList<>();
+        for(String id:ids)labels.add(RoadEvents.fixEventName(id));
+        new RuneDialogBuilder(this,accent()).setTitle("Дорожное предзнаменование | 100 F").setItems(labels.toArray(new String[0]),(d,i)->fixConfirm("Дорожное предзнаменование",labels.get(i)+" | Сработает на подходящем маршруте при выполнении условий; уникальные встречи не отменяются",100,()->RoadEvents.fixQueue(game,ids.get(i)),this::livingFixShop)).setNegativeButton("Отмена",null).show();
+    }
     private void fixRewriteEnding(){
-        if(livingBusy()||!game.fixShop.editorEnabled)return;java.util.ArrayList<Integer> ids=new java.util.ArrayList<>();java.util.ArrayList<String> names=new java.util.ArrayList<>();
-        for(int i=0;i<FixShopAdventure.TITLES.length;i++)if(FixShopAdventure.stage(game,i)>=4){ids.add(i);names.add(FixShopAdventure.TITLES[i]+" | "+FixShopAdventure.objective(game,i));}
-        if(ids.isEmpty()){toast("Нет завершённых приключений магазина");return;}
-        new RuneDialogBuilder(this,accent()).setTitle("Нити судьбы | 250 F").setItems(names.toArray(new String[0]),(d,i)->{int n=ids.get(i);fixConfirm("Нити судьбы",FixShopAdventure.TITLES[n]+" | смена финала, без повторной награды",250,()->FixShopAdventure.rewriteEnding(game,n),this::livingFixShop);}).setNegativeButton("Отмена",null).show();
+        if(livingBusy()||!game.fixShop.editorEnabled)return;java.util.ArrayList<Runnable> actions=new java.util.ArrayList<>();java.util.ArrayList<String> names=new java.util.ArrayList<>();
+        for(int i=0;i<FixShopAdventure.TITLES.length;i++)if(FixShopAdventure.stage(game,i)>=4){final int n=i;names.add(FixShopAdventure.TITLES[i]+" | "+FixShopAdventure.objective(game,i));actions.add(()->fixConfirm("Нити судьбы",FixShopAdventure.TITLES[n]+" | смена финала, без повторной награды",250,()->FixShopAdventure.rewriteEnding(game,n),this::livingFixShop));}
+        if(game.canonicalStage>25&&game.canonicalTreaty>0){names.add("Мирный совет | изменить решение");actions.add(()->fixCanonicalDecision(true));}
+        if(game.canonicalStage>26&&game.canonicalPaarthurnax>0){names.add("Партурнакс | изменить решение");actions.add(()->fixCanonicalDecision(false));}
+        if(names.isEmpty()){toast("Нет доступных завершённых решений");return;}
+        new RuneDialogBuilder(this,accent()).setTitle("Нити судьбы | 250 F").setItems(names.toArray(new String[0]),(d,i)->actions.get(i).run()).setNegativeButton("Отмена",null).show();
+    }
+    private void fixCanonicalDecision(boolean treaty){
+        String[] names=treaty?new String[]{"Равный обмен","Поддержать Империю","Поддержать Братьев Бури"}:new String[]{"Пощадить Партурнакса","Отложить решение"};
+        new RuneDialogBuilder(this,accent()).setTitle("Новое решение").setItems(names,(d,i)->fixConfirm("Нити судьбы",names[i]+" | Изменяется только запись выбора. Прогресс главы, награды и уже накопленная репутация остаются прежними.",250,()->CanonicalCampaign.fixDecision(game,treaty,i+1),this::livingFixShop)).setNegativeButton("Отмена",null).show();
     }
     private void fixStorage(){
         if(livingBusy()||!FixShopWorld.estateHere(game)){toast("Хранилище доступно в собственном поместье");return;}

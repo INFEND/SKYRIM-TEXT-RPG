@@ -252,6 +252,13 @@ public final class CanonicalCampaign {
             advance(g);
         }
     }
+    /** Explicit paid editor: change only a recorded choice, not completed chapter progress or rewards. */
+    static boolean fixDecision(GameEngine g,boolean treaty,int value){
+        if(!FixShopWorld.safe(g)||!g.fixShop.editorEnabled)return false;
+        if(treaty){if(g.canonicalStage<=25||g.canonicalTreaty==0||value<1||value>3||g.canonicalTreaty==value)return false;g.canonicalTreaty=value;g.canonicalRecent="Условия мирного совета пересмотрены магией фикскоинов.";}
+        else {if(g.canonicalStage<=26||g.canonicalPaarthurnax==0||value<1||value>2||g.canonicalPaarthurnax==value)return false;g.canonicalPaarthurnax=value;g.canonicalRecent=value==1?"Решение пересмотрено: Партурнакс помилован.":"Решение пересмотрено: судьба Партурнакса отложена.";}
+        g.recordVisualEvent(g.canonicalRecent);return true;
+    }
     public static int chance(GameEngine g,String action){
         if(g.canonicalStage!=2&&g.canonicalStage!=12)return -1;
         if(g.canonicalPhase!=0||g.canonicalPrepared||!action.equals(action(g,"ALT")))return -1;

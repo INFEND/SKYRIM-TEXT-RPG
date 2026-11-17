@@ -299,6 +299,21 @@ final class RoadEvents {
     }
     private static boolean oneTime(Event e){return e.rule.endsWith("once")||Arrays.asList("arvak","letter_septimus","letter_brotherhood","hakar","saliah","lynoit","taron_dreth","maven_revenge","louis_revenge","false_vigilants","island_torkild","island_torkild_dead").contains(e.id);}
     static boolean availableAt(GameEngine g,String event,int region){Event e=find(event);return e!=null&&eligible(g,e,region);}
+    static boolean fixEventAllowed(String key){Event e=find(key);return e!=null&&!oneTime(e)&&!"unique".equals(e.rule)&&!"soul_cairn".equals(e.rule)&&Arrays.asList("","talk","rescue","plains","reach","forest","north","night","day","city","island","dragon","dragonplains").contains(e.rule);}
+    static String fixEventName(String key){Event e=find(key);return e==null?key:e.title;}
+    static java.util.List<String> fixEventIds(){ArrayList<String> ids=new ArrayList<>();for(Event e:EVENTS)if(fixEventAllowed(e.id))ids.add(e.id);return ids;}
+    static boolean fixQueue(GameEngine g,String key){if(!FixShopWorld.safe(g)||!g.fixShop.editorEnabled||!fixEventAllowed(key)||!g.fixShop.world.queuedEncounter.isEmpty())return false;g.fixShop.world.queuedEncounter=key;return true;}
+    private boolean tryFixEncounter(GameEngine g,TravelPlanner.Route route,WorldAtlas.Place target){
+        String queued=g.fixShop.world.queuedEncounter;if(!g.fixShop.editorEnabled||queued.isEmpty())return false;
+        Event e=find(queued);if(e==null||!fixEventAllowed(queued))return false;
+        for(int i=1;i<route.stops.size();i++){
+            String a=route.stops.get(i-1),b=route.stops.get(i);WorldAtlas.Place p1=WorldAtlas.find(a),p2=WorldAtlas.find(b);
+            if(p1!=null&&p2!=null&&((p1.region==9)!=(p2.region==9)))continue;
+            int region=p2==null?target.region:p2.region;
+            if(!eligible(g,e,region)||!locationAllowed(g,e,a,b,target)||!cooled(g,e))continue;
+            prepare(region);id=queued;segmentFrom=a;segmentTo=b;g.fixShop.world.queuedEncounter="";return true;
+        }return false;
+    }
     static int eventCount(){return EVENTS.length;}
     boolean hasDog(GameEngine g){return "COMPLETED".equals(g.progress.questOutcome("road_dog_companion"));}
     boolean hasMount(GameEngine g){return "COMPLETED".equals(g.progress.questOutcome("road_mount"))||"COMPLETED".equals(g.progress.questOutcome("road_arvak_mount"));}
@@ -372,7 +387,7 @@ final class RoadEvents {
         if(pending()||route==null||!route.allowed||route.days<=0||route.stops.size()<2)return false;
         String forced=unique(g,route);
         if(!forced.isEmpty()){prepare(0);id=forced;segmentFrom=g.progress.location;segmentTo="giant".equals(id)?"Ферма Пелагио":"Ферма Лорея";}
-        else{
+        else if(!tryFixEncounter(g,route,target)){
             if(rng.nextInt(100)>=Math.min(60,25+route.days*8))return false;
             ArrayList<Event> pool=new ArrayList<>();int total=0;
             ArrayList<Integer> land=new ArrayList<>();for(int i=1;i<route.stops.size();i++){WorldAtlas.Place p1=WorldAtlas.find(route.stops.get(i-1)),p2=WorldAtlas.find(route.stops.get(i));if(p1!=null&&p2!=null&&((p1.region==9)!=(p2.region==9)))continue;land.add(i);}if(land.isEmpty())return false;
