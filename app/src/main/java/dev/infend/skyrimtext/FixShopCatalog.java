@@ -19,6 +19,25 @@ public final class FixShopCatalog {
           ("Оружие".equals(i.category)||"Броня".equals(i.category)||"Украшения".equals(i.category)||"Одежда".equals(i.category)||"Боеприпасы".equals(i.category))&&
           !"Походный клинок".equals(o.item)&&!"Дорожная одежда".equals(o.item)&&!"Стальной меч".equals(o.item)&&!"Стальная кираса".equals(o.item);
     }
+    static final class Bundle {
+        final String name;final int price;final String[] items;
+        Bundle(String name,int price,String... items){this.name=name;this.price=price;this.items=items;}
+        String description(){return String.join(", ",items);}
+    }
+    static final Bundle[] BUNDLES={
+        new Bundle("Облачение Чёрной крепости",650,"Эбонитовый меч","Эбонитовая кираса","Эбонитовый шлем","Эбонитовые перчатки","Эбонитовые сапоги"),
+        new Bundle("Снаряжение Лунной стражи",450,"Стеклянный меч","Стеклянная кираса","Стеклянный шлем","Стеклянные перчатки","Стеклянные сапоги"),
+        new Bundle("Клинки Обливиона",500,"Даэдрический меч","Даэдрический кинжал","Даэдрическая булава"),
+        new Bundle("Северный охотник",200,"Кожаная кираса","Кожаный шлем","Кожаные сапоги","Стальной лук")
+    };
+    static boolean validBundle(Bundle b){if(b==null||b.price<1||b.items.length<2||b.items.length>12)return false;java.util.HashSet<String> unique=new java.util.HashSet<>();for(String id:b.items)if(!unique.add(id)||!valid(new Offer(id,1,b.price)))return false;return true;}
+    static Bundle bundle(String name){for(Bundle b:BUNDLES)if(b.name.equals(name))return b;return null;}
+    static boolean redeemBundle(GameEngine g,Bundle b){
+        if(!validBundle(b))return false;
+        double weight=0;for(String id:b.items){ItemCatalog.Item item=ItemCatalog.find(id);weight+=item.weight;if(g.progress.quantity(id)==Integer.MAX_VALUE)return false;}
+        if(g.progress.carryWeight()+weight>g.progress.carryLimit()+0.00001)return false;
+        for(String id:b.items)g.progress.quantity(id,g.progress.quantity(id)+1);return true;
+    }
     public static ArrayList<Offer> featured(){
         ArrayList<Offer> a=new ArrayList<>();
         for(ItemCatalog.Item i:ItemCatalog.all()){

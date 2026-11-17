@@ -18,11 +18,16 @@ public final class FixShopState {
         if(!g.started||"COMBAT".equals(g.mode)||g.road.pending()||!FixShopCatalog.valid(o)||g.fixSpent>Long.MAX_VALUE-o.price||pendingVouchers()>=200)return false;
         try{JSONObject e=new JSONObject().put("id",key(o.title(),o.price)).put("title",o.title()).put("detail","Товар ожидает получения").put("price",o.price).put("day",g.day).put("state","PENDING").put("item",o.item).put("quantity",o.quantity);history.put(e);g.fixSpent+=o.price;return true;}catch(Exception ex){return false;}
     }
+    public boolean reserveBundle(GameEngine g,FixShopCatalog.Bundle b){
+        if(!g.started||"COMBAT".equals(g.mode)||g.road.pending()||!FixShopCatalog.validBundle(b)||g.fixSpent>Long.MAX_VALUE-b.price||pendingVouchers()>=200)return false;
+        try{history.put(new JSONObject().put("id",key(b.name,b.price)).put("title",b.name).put("detail",b.description()).put("price",b.price).put("day",g.day).put("state","PENDING").put("bundle",b.name));g.fixSpent+=b.price;return true;}catch(Exception ex){return false;}
+    }
     public boolean redeem(GameEngine g,int index){
         JSONObject e=history.optJSONObject(index);if(!g.started||"COMBAT".equals(g.mode)||g.road.pending()||e==null||!"PENDING".equals(e.optString("state")))return false;
-        FixShopCatalog.Offer o=new FixShopCatalog.Offer(e.optString("item"),e.optInt("quantity"),e.optInt("price"));
-        if(!FixShopCatalog.redeem(g,o))return false;
-        try{e.put("state","APPLIED").put("detail","Получено: "+o.title());}catch(Exception ignored){}return true;
+        String bundle=e.optString("bundle"),title;
+        if(!bundle.isEmpty()){FixShopCatalog.Bundle b=FixShopCatalog.bundle(bundle);if(b==null||b.price!=e.optInt("price")||!FixShopCatalog.redeemBundle(g,b))return false;title=b.name;}
+        else{FixShopCatalog.Offer o=new FixShopCatalog.Offer(e.optString("item"),e.optInt("quantity"),e.optInt("price"));if(!FixShopCatalog.redeem(g,o))return false;title=o.title();}
+        try{e.put("state","APPLIED").put("detail","Получено: "+title);}catch(Exception ignored){}return true;
     }
     public boolean refund(GameEngine g,int index){
         JSONObject e=history.optJSONObject(index);if(!g.started||"COMBAT".equals(g.mode)||g.road.pending()||e==null||!"PENDING".equals(e.optString("state"))||g.fixSpent<e.optInt("price"))return false;

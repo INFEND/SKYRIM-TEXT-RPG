@@ -4318,6 +4318,7 @@ public final class MainActivity extends Activity {
         try{gear.addAll(FixShopCatalog.parse(game.fixShop.customCatalog));}catch(Exception ignored){}
         try(java.io.InputStream in=ResourceStore.open(this,"media/shop/catalog.json")){java.io.ByteArrayOutputStream out=new java.io.ByteArrayOutputStream();byte[] data=new byte[4096];int n;while((n=in.read(data))!=-1){if(out.size()+n>65536)throw new java.io.IOException("catalog too large");out.write(data,0,n);}gear.addAll(FixShopCatalog.parse(out.toString("UTF-8")));}catch(Exception ignored){}
         java.util.HashSet<String> gearSeen=new java.util.HashSet<>();
+        for(FixShopCatalog.Bundle bundle:FixShopCatalog.BUNDLES)if(FixShopCatalog.validBundle(bundle))fixOffer(a,bundle.name,bundle.description(),"Наборы","armor",4,bundle.price,()->fixReserveBundle(bundle));
         for(FixShopCatalog.Offer offer:gear){if(!gearSeen.add(offer.key()))continue;ItemCatalog.Item item=ItemCatalog.find(offer.item);if(item==null)continue;fixOffer(a,offer.title(),item.category+" | "+item.weight+" кг | получить позднее","Снаряжение",item.icon,3,offer.price,()->fixReserve(offer));}
         if(game.fixShop.editorEnabled){
             fixOffer(a,"Создать NPC","Имя, характер, класс и отношения","Редактор мира","hero",5,300,()->fixCreateCharacter(false));
@@ -4326,6 +4327,7 @@ public final class MainActivity extends Activity {
             fixOffer(a,"Нити судьбы","Изменить финал приключения или выбранное решение главной истории","Редактор мира","journal",5,250,this::fixRewriteEnding);
             fixOffer(a,"Дорожное предзнаменование",game.fixShop.world.queuedEncounter.isEmpty()?"Выбрать повторяемую встречу на подходящем маршруте":"Ожидает: "+RoadEvents.fixEventName(game.fixShop.world.queuedEncounter),"Редактор мира","map",3,100,this::fixQueueEncounter);
             if("Последний поединок".equals(game.livia.ending))fixDirect(a,"Воскресить Ливию","Возвращение после гибели в поединке; без повторного опыта","Редактор мира","health",5,300,()->game.livia.fixRestore(game));
+            fixOffer(a,"Печать принадлежности","Вступление или выход из фракции до сюжетных наград","Редактор мира","shield",3,150,this::fixMembership);
             fixOffer(a,"Врата странника","Мгновенный переход в посещённую локацию","Редактор мира","map",4,100,this::fixTeleportChoice);
             fixDirect(a,"Слава героя","+10 репутации","Редактор мира","hero",2,50,()->{if(game.reputation>Integer.MAX_VALUE-10)return false;game.reputation+=10;return true;});
             fixOffer(a,"Второй шанс","Воскресить NPC из журнала ИИ-сцен; не откатывает сюжетные квесты","Редактор мира","health",2,300,()->fixNpcChoice(true,false));
@@ -4417,6 +4419,16 @@ public final class MainActivity extends Activity {
         java.util.Iterator<String> keys=w.storage.keys();while(keys.hasNext()){String id=keys.next();int n=w.storage.optInt(id);if(n>0)livingLink(panel,"Забрать: "+id,"×"+n,"armor",()->{if(!livingBusy()&&w.transfer(game,id,1,false)){save();fixStorage();}else toast("Нет места в инвентаре");});}
         livingDialog("Хранилище поместий",panel);
     }
+    private void fixMembership(){
+        if(livingBusy()||!game.fixShop.editorEnabled)return;
+        java.util.ArrayList<String> names=new java.util.ArrayList<>();java.util.ArrayList<Integer> ids=new java.util.ArrayList<>();
+        for(int f=0;f<FactionCampaign.NAMES.length;f++){boolean join=game.factions.stage(f)==0;if(game.factions.canFixMembership(game,f,join)){names.add((join?"Вступить: ":"Покинуть: ")+FactionCampaign.NAMES[f]);ids.add(f);}}
+        if(ids.isEmpty()){toast("Нет безопасных изменений принадлежности");return;}
+        new RuneDialogBuilder(this,accent()).setTitle("Печать принадлежности | 150 F").setItems(names.toArray(new String[0]),(d,i)->{int f=ids.get(i);boolean join=game.factions.stage(f)==0;fixConfirm("Печать принадлежности",names.get(i),150,()->game.factions.fixMembership(game,f,join),this::livingFixShop);}).setNegativeButton("Отмена",null).show();
+    }
+    private void fixReserveBundle(FixShopCatalog.Bundle b){
+        if(livingBusy())return;new RuneDialogBuilder(this,accent()).setTitle(b.name).setMessage(b.description()+"\n\nЦена: "+b.price+" F. Весь комплект выдаётся одновременно через покупки. До выдачи возможен возврат.").setNegativeButton("Отмена",null).setPositiveButton("Купить",(d,w)->{if(livingBusy()||!game.fixShop.reserveBundle(game,b)){toast("Покупка недоступна");return;}save();livingFixShop();toast("Комплект ожидает получения");}).show();
+    }
     private void fixReserve(FixShopCatalog.Offer offer){
         ItemCatalog.Item item=ItemCatalog.find(offer.item);if(item==null||livingBusy())return;
         new RuneDialogBuilder(this,accent()).setTitle(offer.title()).setMessage(item.description+"\n"+item.effect+"\nЦена: "+offer.price+" F. Получение во вкладке «Покупки». До получения доступен возврат.").setNegativeButton("Отмена",null).setPositiveButton("Купить",(d,w)->{if(livingBusy()||!game.fixShop.reserve(game,offer)){toast("Покупка недоступна");return;}save();livingFixShop();toast("Товар ожидает получения");}).show();
@@ -4485,11 +4497,11 @@ public final class MainActivity extends Activity {
         ScrollView scroll=new ScrollView(this);scroll.setFillViewport(false);LinearLayout items=column();scroll.addView(items);root.addView(scroll,new LinearLayout.LayoutParams(-1,0,1));
         LinearLayout nav=row();root.addView(nav,lp(-1,56));String[] names={"Каталог","Избранное","Покупки","История"};String[] glyphs={"inventory","heart","armor","journal"};
         for(int i=0;i<names.length;i++){final int index=i;LinearLayout cell=column();cell.setGravity(Gravity.CENTER);nav.addView(cell,new LinearLayout.LayoutParams(0,-1,1));
-            cell.addView(new SkyrimIconView(this,glyphs[i],fixShopPage==i?accent():MUTED),lp(22,22));TextView label=text(names[i],11,fixShopPage==i?accent():MUTED,true);label.setGravity(Gravity.CENTER);cell.addView(label,lp(-1,-2));cell.setOnClickListener(v->{fixShopPage=index;livingFixShop();});
+            cell.addView(new SkyrimIconView(this,glyphs[i],fixShopPage==i?accent():MUTED),lp(22,22));TextView label=text(names[i],11,fixShopPage==i?accent():MUTED,true);label.setGravity(Gravity.CENTER);cell.addView(label,lp(-1,-2));cell.setOnClickListener(v->{fixShopPage=index;fixShopCategory="Все";fixShopQuery="";livingFixShop();});
         }
         if(fixShopPage<2){
             HorizontalScrollView categories=new HorizontalScrollView(this);categories.setHorizontalScrollBarEnabled(false);LinearLayout strip=row();categories.addView(strip);filters.addView(categories,lp(-1,-2));
-            for(String cat:FIX_CATEGORIES){TextView chip=text(cat,13,cat.equals(fixShopCategory)?TEXT:MUTED,true);chip.setPadding(dp(12),dp(9),dp(12),dp(9));chip.setBackground(bg(cat.equals(fixShopCategory)?0xff303030:Color.BLACK,Color.TRANSPARENT,20));strip.addView(chip,lp(-2,-2));chip.setOnClickListener(v->{fixShopCategory=cat;livingFixShop();});}
+            for(String cat:FIX_CATEGORIES){TextView chip=text(cat,13,cat.equals(fixShopCategory)?TEXT:MUTED,true);chip.setPadding(dp(12),dp(9),dp(12),dp(9));chip.setBackground(bg(cat.equals(fixShopCategory)?0xff303030:Color.BLACK,Color.TRANSPARENT,20));strip.addView(chip,lp(-2,-2));if(cat.equals(fixShopCategory))categories.post(()->categories.smoothScrollTo(Math.max(0,chip.getLeft()-dp(12)),0));chip.setOnClickListener(v->{fixShopCategory=cat;livingFixShop();});}
             LinearLayout searchRow=row();EditText search=new EditText(this);search.setSingleLine(true);search.setTextColor(TEXT);search.setHintTextColor(MUTED);search.setTextSize(sp(13));search.setHint("Поиск товаров");search.setText(fixShopQuery);search.setPadding(dp(10),dp(4),dp(10),dp(4));search.setBackground(bg(0xff141414,Color.TRANSPARENT,14));searchRow.addView(search,new LinearLayout.LayoutParams(0,dp(42),1));
             TextView sort=text(new String[]{"По умолчанию","Цена ↑","Цена ↓","А–Я"}[fixShopSort],12,accent(),true);sort.setPadding(dp(10),dp(10),dp(4),dp(10));searchRow.addView(sort,lp(-2,-2));sort.setOnClickListener(v->{fixShopSort=(fixShopSort+1)%4;livingFixShop();});filters.addView(searchRow,lp(-1,-2));space(filters,8);
             search.addTextChangedListener(new android.text.TextWatcher(){public void beforeTextChanged(CharSequence s,int st,int c,int a){}public void onTextChanged(CharSequence s,int st,int before,int count){fixShopQuery=s.toString();fixRenderOffers(items);}public void afterTextChanged(android.text.Editable e){}});

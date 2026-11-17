@@ -53,6 +53,20 @@ final class FactionCampaign {
         if(stage[f]>0&&g.stamina<10)return "Нужно 10 выносливости";
         return "";
     }
+    /** Explicit editor action: no completed chapters or earned rewards can be replayed. */
+    boolean canFixMembership(GameEngine g,int f,boolean join){
+        if(!valid(f)||!g.started||!g.fixShop.editorEnabled||g.road.pending()||!("WORLD".equals(g.mode)||"RESULT".equals(g.mode)))return false;
+        if(join)return stage[f]==0&&!"COMPLETED".equals(g.progress.questOutcome("faction_"+f))&&
+            !((f==4&&(stage[5]>0||g.factionStories.started(5)))||(f==5&&(stage[4]>0||g.factionStories.started(4))));
+        return stage[f]==1&&!g.factionStories.started(f)&&!"COMPLETED".equals(g.progress.questOutcome("faction_"+f));
+    }
+    boolean fixMembership(GameEngine g,int f,boolean join){
+        if(!canFixMembership(g,f,join))return false;
+        if(join){stage[f]=1;g.progress.setQuestOutcome("faction_"+f,"ACTIVE");}
+        else{stage[f]=0;g.progress.questOutcomes.remove("faction_"+f);}
+        // Keep reputation and previous attempt date; neither is a purchasable reset.
+        g.recordVisualEvent((join?"Вступление: ":"Выход: ")+NAMES[f]);return true;
+    }
     boolean perform(GameEngine g,int f){return perform(g,f,false);}
     boolean perform(GameEngine g,int f,boolean talk){
         if(!block(g,f).isEmpty())return false;
