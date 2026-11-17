@@ -4206,5 +4206,1348 @@
     "captions": [
       "Заброшенная ферма среди пепла Солстейма"
     ]
+  },
+  {
+    "slug": "bilegulch_mine",
+    "name": "Желчная шахта",
+    "captions": [
+      "Желчная шахта"
+    ],
+    "aliases": [
+      "Bilegulch Mine"
+    ],
+    "artwork": {
+      "generated_with": "built-in image_gen",
+      "generated_on": "2026-11-17",
+      "prompt": "Use case: stylized-concept. Asset type: a single finished landscape location illustration for the Android game SKYRIM TEXT RPG. Create one coherent 16:9 wide image, 1672x941 or similar landscape. Style: cinematic photorealistic Skyrim environment art, grounded Nordic medieval architecture, finely detailed weathered timber, gray rock and restrained natural colors, crisp readable detail, realistic daylight and rich but readable shadows, matching the established realistic location illustrations. No UI, no lettering, no captions, no watermark, no collage, no decorative frame, no modern objects, no industrial railway. Camera: immersive eye-level establishing view, environment is the subject; do not add prominent people or creatures. Bilegulch Mine in Falkreath Hold, Skyrim. Exterior of an orichalcum mine in a steep rocky hillside. Show a rough timber palisade and small fortified bandit mining camp, a wooden stair and raised plank approach leading to a dark timber-braced mine doorway, a squat stone smelter and working forge near the entrance, worn barrels and ore sacks. Rocky western Falkreath highlands, sparse pines and brown grasses, distant rugged peaks. Main focal point is the fortified mine entrance, not a castle or village. Clear cool mountain daylight with a little warm forge glow; entire entrance legible.",
+      "original_sha256": "f04b9fe849a88a22770d348f78d3cc298f037100e432e64978a7d32da433d972",
+      "original_bytes": 3914122,
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "dimensions": [
+        1672,
+        941
+      ],
+      "format": "WebP",
+      "quality": 84,
+      "method": 6,
+      "encoded_bytes": 530850,
+      "sha256": "377ae8f5c32af3d943a6e2612fdd739eeef5b4fc4c81b0653cb10bf9934b5a16",
+      "archive_bytes": 530962,
+      "archive_sha256": "0216774a330f92a2cbfb9a2d80b8db0b70b906c1e3bfbec135ae9ab5d010158a",
+      "quality_floor": {
+        "full_resolution_luma_ssim": 0.985,
+        "worst_128px_luma_ssim": 0.965,
+        "maximum_chroma_mean_absolute_error": 2.5,
+        "maximum_chroma_95th_percentile_error": 7
+      },
+      "metrics": {
+        "full_resolution_luma_ssim": 0.9853863716125488,
+        "worst_128px_luma_ssim": 0.9771771430969238,
+        "chroma_mean_absolute_error": 1.9109630267098525,
+        "chroma_95th_percentile_error": 5
+      },
+      "trials": [
+        {
+          "quality": 60,
+          "bytes": 315702,
+          "full_resolution_luma_ssim": 0.953883945941925,
+          "worst_128px_luma_ssim": 0.9327747225761414,
+          "chroma_mean_absolute_error": 2.377995197514606,
+          "chroma_95th_percentile_error": 7
+        },
+        {
+          "quality": 64,
+          "bytes": 331406,
+          "full_resolution_luma_ssim": 0.9578819870948792,
+          "worst_128px_luma_ssim": 0.939500093460083,
+          "chroma_mean_absolute_error": 2.348235804829434,
+          "chroma_95th_percentile_error": 7
+        },
+        {
+          "quality": 68,
+          "bytes": 345332,
+          "full_resolution_luma_ssim": 0.9610535502433777,
+          "worst_128px_luma_ssim": 0.9456830024719238,
+          "chroma_mean_absolute_error": 2.3002080907514655,
+          "chroma_95th_percentile_error": 7
+        },
+        {
+          "quality": 72,
+          "bytes": 366538,
+          "full_resolution_luma_ssim": 0.9653090238571167,
+          "worst_128px_luma_ssim": 0.9512859582901001,
+          "chroma_mean_absolute_error": 2.2467445301496425,
+          "chroma_95th_percentile_error": 6
+        },
+        {
+          "quality": 76,
+          "bytes": 394802,
+          "full_resolution_luma_ssim": 0.9702734351158142,
+          "worst_128px_luma_ssim": 0.9584378004074097,
+          "chroma_mean_absolute_error": 2.176752881745471,
+          "chroma_95th_percentile_error": 6
+        },
+        {
+          "quality": 80,
+          "bytes": 452280,
+          "full_resolution_luma_ssim": 0.9782943725585938,
+          "worst_128px_luma_ssim": 0.968296468257904,
+          "chroma_mean_absolute_error": 2.063495644966924,
+          "chroma_95th_percentile_error": 6
+        },
+        {
+          "quality": 84,
+          "bytes": 530850,
+          "full_resolution_luma_ssim": 0.9853863716125488,
+          "worst_128px_luma_ssim": 0.9771771430969238,
+          "chroma_mean_absolute_error": 1.9109630267098525,
+          "chroma_95th_percentile_error": 5
+        },
+        {
+          "quality": 81,
+          "bytes": 473240,
+          "full_resolution_luma_ssim": 0.9803271889686584,
+          "worst_128px_luma_ssim": 0.9706792831420898,
+          "chroma_mean_absolute_error": 2.009764185001195,
+          "chroma_95th_percentile_error": 6
+        },
+        {
+          "quality": 82,
+          "bytes": 484678,
+          "full_resolution_luma_ssim": 0.9815477728843689,
+          "worst_128px_luma_ssim": 0.9730075597763062,
+          "chroma_mean_absolute_error": 1.9862131932333007,
+          "chroma_95th_percentile_error": 6
+        },
+        {
+          "quality": 83,
+          "bytes": 514182,
+          "full_resolution_luma_ssim": 0.9839741587638855,
+          "worst_128px_luma_ssim": 0.9758491516113281,
+          "chroma_mean_absolute_error": 1.9165866888019973,
+          "chroma_95th_percentile_error": 5
+        }
+      ],
+      "note": "Lossy WebP unless quality is lossless. No resizing or upscaling. Smallest measured passing result in the searched quality interval. SSIM and chroma checks do not prove perceptual identity."
+    }
+  },
+  {
+    "slug": "embershard_mine",
+    "name": "Факельная шахта",
+    "captions": [
+      "Факельная шахта"
+    ],
+    "aliases": [
+      "Embershard Mine"
+    ],
+    "artwork": {
+      "generated_with": "built-in image_gen",
+      "generated_on": "2026-11-17",
+      "prompt": "Use case: stylized-concept. Asset type: a single finished landscape location illustration for the Android game SKYRIM TEXT RPG. Create one coherent 16:9 wide image, 1672x941 or similar landscape. Style: cinematic photorealistic Skyrim environment art, grounded Nordic medieval architecture, finely detailed weathered timber, gray rock and restrained natural colors, crisp readable detail, realistic daylight and rich but readable shadows, matching the established realistic location illustrations. No UI, no lettering, no captions, no watermark, no collage, no decorative frame, no modern objects, no industrial railway. Camera: immersive eye-level establishing view, environment is the subject; do not add prominent people or creatures. Embershard Mine near Riverwood in Falkreath Hold, Skyrim. A small concealed iron-mine entrance cut into a mossy gray rock face in dense green pine forest, massive rough timber supports and an iron-banded wooden mine door recessed into the hillside. A narrow dirt approach curves through roots and ferns, a small campfire and humble bedroll/ore crates near the entrance, two restrained torch flames illuminating the wood. Recognizable Riverwood forest landscape: lush conifers, rugged granite, no snow. Oblique view at human eye level; entrance and nearby forest fill frame. Soft late-afternoon daylight, calm atmosphere.",
+      "original_sha256": "763e9a451fedd2bf1d5317bdb852159c61b67b730ca7118aefbffbd56ad41efe",
+      "original_bytes": 3717131,
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "dimensions": [
+        1672,
+        941
+      ],
+      "format": "WebP",
+      "quality": 88,
+      "method": 6,
+      "encoded_bytes": 561572,
+      "sha256": "ee7ec746a475eeaa123feec09a9034390c3192a276f35ecfc2d29ce45f3e477e",
+      "archive_bytes": 561684,
+      "archive_sha256": "2a40010f2b4c3cbd6862df2903b14d852a283ea80d411065f0241aeb5001dae8",
+      "quality_floor": {
+        "full_resolution_luma_ssim": 0.985,
+        "worst_128px_luma_ssim": 0.965,
+        "maximum_chroma_mean_absolute_error": 2.5,
+        "maximum_chroma_95th_percentile_error": 7
+      },
+      "metrics": {
+        "full_resolution_luma_ssim": 0.9862304925918579,
+        "worst_128px_luma_ssim": 0.9787970781326294,
+        "chroma_mean_absolute_error": 1.6297154101561506,
+        "chroma_95th_percentile_error": 5
+      },
+      "trials": [
+        {
+          "quality": 60,
+          "bytes": 267014,
+          "full_resolution_luma_ssim": 0.9362693428993225,
+          "worst_128px_luma_ssim": 0.9151919484138489,
+          "chroma_mean_absolute_error": 2.1559695478189242,
+          "chroma_95th_percentile_error": 6
+        },
+        {
+          "quality": 64,
+          "bytes": 285018,
+          "full_resolution_luma_ssim": 0.9422177076339722,
+          "worst_128px_luma_ssim": 0.9256953001022339,
+          "chroma_mean_absolute_error": 2.099247021645506,
+          "chroma_95th_percentile_error": 6
+        },
+        {
+          "quality": 68,
+          "bytes": 296970,
+          "full_resolution_luma_ssim": 0.9463327527046204,
+          "worst_128px_luma_ssim": 0.9307072162628174,
+          "chroma_mean_absolute_error": 2.0764205975522323,
+          "chroma_95th_percentile_error": 6
+        },
+        {
+          "quality": 72,
+          "bytes": 313806,
+          "full_resolution_luma_ssim": 0.9510031342506409,
+          "worst_128px_luma_ssim": 0.9372948408126831,
+          "chroma_mean_absolute_error": 2.0454192704493335,
+          "chroma_95th_percentile_error": 6
+        },
+        {
+          "quality": 76,
+          "bytes": 340048,
+          "full_resolution_luma_ssim": 0.9576779007911682,
+          "worst_128px_luma_ssim": 0.9463924169540405,
+          "chroma_mean_absolute_error": 1.9877684713910173,
+          "chroma_95th_percentile_error": 6
+        },
+        {
+          "quality": 80,
+          "bytes": 401458,
+          "full_resolution_luma_ssim": 0.9694304466247559,
+          "worst_128px_luma_ssim": 0.9584381580352783,
+          "chroma_mean_absolute_error": 1.876954108171598,
+          "chroma_95th_percentile_error": 5
+        },
+        {
+          "quality": 84,
+          "bytes": 469480,
+          "full_resolution_luma_ssim": 0.9783952236175537,
+          "worst_128px_luma_ssim": 0.9694790840148926,
+          "chroma_mean_absolute_error": 1.7658899597801383,
+          "chroma_95th_percentile_error": 5
+        },
+        {
+          "quality": 88,
+          "bytes": 561572,
+          "full_resolution_luma_ssim": 0.9862304925918579,
+          "worst_128px_luma_ssim": 0.9787970781326294,
+          "chroma_mean_absolute_error": 1.6297154101561506,
+          "chroma_95th_percentile_error": 5
+        },
+        {
+          "quality": 85,
+          "bytes": 488034,
+          "full_resolution_luma_ssim": 0.9803301095962524,
+          "worst_128px_luma_ssim": 0.9712693691253662,
+          "chroma_mean_absolute_error": 1.7343131098444595,
+          "chroma_95th_percentile_error": 5
+        },
+        {
+          "quality": 86,
+          "bytes": 511310,
+          "full_resolution_luma_ssim": 0.9824545979499817,
+          "worst_128px_luma_ssim": 0.9745224714279175,
+          "chroma_mean_absolute_error": 1.698284935602459,
+          "chroma_95th_percentile_error": 5
+        },
+        {
+          "quality": 87,
+          "bytes": 535096,
+          "full_resolution_luma_ssim": 0.9844074845314026,
+          "worst_128px_luma_ssim": 0.9774829745292664,
+          "chroma_mean_absolute_error": 1.6722484860349114,
+          "chroma_95th_percentile_error": 5
+        }
+      ],
+      "note": "Lossy WebP unless quality is lossless. No resizing or upscaling. Smallest measured passing result in the searched quality interval. SSIM and chroma checks do not prove perceptual identity."
+    }
+  },
+  {
+    "slug": "gloombound_mine",
+    "name": "Сумрачная шахта",
+    "captions": [
+      "Сумрачная шахта"
+    ],
+    "aliases": [
+      "Gloombound Mine"
+    ],
+    "artwork": {
+      "generated_with": "built-in image_gen",
+      "generated_on": "2026-11-17",
+      "prompt": "Use case: stylized-concept. Asset type: a single finished landscape location illustration for the Android game SKYRIM TEXT RPG. Create one coherent 16:9 wide image, 1672x941 or similar landscape. Style: cinematic photorealistic Skyrim environment art, grounded Nordic medieval architecture, finely detailed weathered timber, gray rock and restrained natural colors, crisp readable detail, realistic daylight and rich but readable shadows, matching the established realistic location illustrations. No UI, no lettering, no captions, no watermark, no collage, no decorative frame, no modern objects, no industrial railway. Camera: immersive eye-level establishing view, environment is the subject; do not add prominent people or creatures. Gloombound Mine at the Orc stronghold Narzulbur, Eastmarch, Skyrim. Exterior of a productive ebony mine sunk into a massive dark rock cliff behind a rugged Orcish stockade. A heavy rough-hewn timber mine doorway embedded in the cliff, a smoking stone smelter and stockpiles of dark ebony ore, simple wooden scaffolding and platforms, an Orcish longhouse roof and sharpened log fence visible off to one side. Snow patches among dark fir trees and barren stony earth, cold Eastmarch mountains. Make the mine doorway the main subject; no monumental castle, no magical glowing crystal. Cold overcast morning with warm furnace light and clear details.",
+      "original_sha256": "65d6bc07be9aca59470f4f267f24d21061222fd79ea19084146a0bee1b74a526",
+      "original_bytes": 3559411,
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "dimensions": [
+        1672,
+        941
+      ],
+      "format": "WebP",
+      "quality": 88,
+      "method": 6,
+      "encoded_bytes": 516344,
+      "sha256": "7fc8a99993dd7b8e18448d32ff2b91fb816207ab662fa1e95a3cda75d9521306",
+      "archive_bytes": 516456,
+      "archive_sha256": "3294f0e21f5d2466eb532e6b285d04e95c15b0fdee30f8d4f428f877d8f49847",
+      "quality_floor": {
+        "full_resolution_luma_ssim": 0.985,
+        "worst_128px_luma_ssim": 0.965,
+        "maximum_chroma_mean_absolute_error": 2.5,
+        "maximum_chroma_95th_percentile_error": 7
+      },
+      "metrics": {
+        "full_resolution_luma_ssim": 0.986106812953949,
+        "worst_128px_luma_ssim": 0.9776330590248108,
+        "chroma_mean_absolute_error": 1.3937526376805698,
+        "chroma_95th_percentile_error": 4
+      },
+      "trials": [
+        {
+          "quality": 60,
+          "bytes": 246128,
+          "full_resolution_luma_ssim": 0.9401971697807312,
+          "worst_128px_luma_ssim": 0.9141573905944824,
+          "chroma_mean_absolute_error": 1.838848522136178,
+          "chroma_95th_percentile_error": 5
+        },
+        {
+          "quality": 64,
+          "bytes": 259650,
+          "full_resolution_luma_ssim": 0.9446145296096802,
+          "worst_128px_luma_ssim": 0.9189190864562988,
+          "chroma_mean_absolute_error": 1.8026474685893557,
+          "chroma_95th_percentile_error": 5
+        },
+        {
+          "quality": 68,
+          "bytes": 272518,
+          "full_resolution_luma_ssim": 0.9487230181694031,
+          "worst_128px_luma_ssim": 0.9260756969451904,
+          "chroma_mean_absolute_error": 1.781239989525548,
+          "chroma_95th_percentile_error": 5
+        },
+        {
+          "quality": 72,
+          "bytes": 288084,
+          "full_resolution_luma_ssim": 0.9529861807823181,
+          "worst_128px_luma_ssim": 0.9311872720718384,
+          "chroma_mean_absolute_error": 1.7457571477965517,
+          "chroma_95th_percentile_error": 5
+        },
+        {
+          "quality": 76,
+          "bytes": 310992,
+          "full_resolution_luma_ssim": 0.9593984484672546,
+          "worst_128px_luma_ssim": 0.9422608613967896,
+          "chroma_mean_absolute_error": 1.6989135298394764,
+          "chroma_95th_percentile_error": 5
+        },
+        {
+          "quality": 80,
+          "bytes": 363282,
+          "full_resolution_luma_ssim": 0.9690239429473877,
+          "worst_128px_luma_ssim": 0.953344464302063,
+          "chroma_mean_absolute_error": 1.6113886148808403,
+          "chroma_95th_percentile_error": 5
+        },
+        {
+          "quality": 84,
+          "bytes": 424904,
+          "full_resolution_luma_ssim": 0.9781931042671204,
+          "worst_128px_luma_ssim": 0.9679292440414429,
+          "chroma_mean_absolute_error": 1.5190370622721425,
+          "chroma_95th_percentile_error": 4
+        },
+        {
+          "quality": 88,
+          "bytes": 516344,
+          "full_resolution_luma_ssim": 0.986106812953949,
+          "worst_128px_luma_ssim": 0.9776330590248108,
+          "chroma_mean_absolute_error": 1.3937526376805698,
+          "chroma_95th_percentile_error": 4
+        },
+        {
+          "quality": 85,
+          "bytes": 442040,
+          "full_resolution_luma_ssim": 0.979476809501648,
+          "worst_128px_luma_ssim": 0.9687195420265198,
+          "chroma_mean_absolute_error": 1.4891178197885788,
+          "chroma_95th_percentile_error": 4
+        },
+        {
+          "quality": 86,
+          "bytes": 470970,
+          "full_resolution_luma_ssim": 0.9822737574577332,
+          "worst_128px_luma_ssim": 0.9724841117858887,
+          "chroma_mean_absolute_error": 1.4515146642327972,
+          "chroma_95th_percentile_error": 4
+        },
+        {
+          "quality": 87,
+          "bytes": 490876,
+          "full_resolution_luma_ssim": 0.9838694334030151,
+          "worst_128px_luma_ssim": 0.973599910736084,
+          "chroma_mean_absolute_error": 1.4268510797329523,
+          "chroma_95th_percentile_error": 4
+        }
+      ],
+      "note": "Lossy WebP unless quality is lossless. No resizing or upscaling. Smallest measured passing result in the searched quality interval. SSIM and chroma checks do not prove perceptual identity."
+    }
+  },
+  {
+    "slug": "kolskeggr_mine",
+    "name": "Шахта Колскеггр",
+    "captions": [
+      "Шахта Колскеггр"
+    ],
+    "aliases": [
+      "Kolskeggr Mine"
+    ],
+    "artwork": {
+      "generated_with": "built-in image_gen",
+      "generated_on": "2026-11-17",
+      "prompt": "Use case: stylized-concept. Asset type: a single finished landscape location illustration for the Android game SKYRIM TEXT RPG. Create one coherent 16:9 wide image, 1672x941 or similar landscape. Style: cinematic photorealistic Skyrim environment art, grounded Nordic medieval architecture, finely detailed weathered timber, gray rock and restrained natural colors, crisp readable detail, realistic daylight and rich but readable shadows, matching the established realistic location illustrations. No UI, no lettering, no captions, no watermark, no collage, no decorative frame, no modern objects, no industrial railway. Camera: immersive eye-level establishing view, environment is the subject; do not add prominent people or creatures. Kolskeggr Mine in the Reach, Skyrim. Exterior establishing view of the gold mine on a rocky shelf above the Karth River east of Markarth. A modest timber-framed mine opening recessed into pale weathered rock dominates the upper right middle ground; a stone smelter beside the entrance, miners' sacks and wooden ore barrow; a humble Nordic timber-and-stone miner's cottage down the slope, river and a small rough wooden crossing visible below at left. The Reach's characteristic rugged pale stone crags, gold-brown scrub, juniper, open canyon landscape, no dense forest and no snow at the entrance. Clear mild afternoon sunlight, green-blue river and ocher land, no piles of gold treasure and no large fort.",
+      "original_sha256": "f7e337670fd96d01e2ac91654d495cd26d7c3e3a4c345d4e97531f25dde57742",
+      "original_bytes": 3997767,
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "dimensions": [
+        1672,
+        941
+      ],
+      "format": "WebP",
+      "quality": 84,
+      "method": 6,
+      "encoded_bytes": 535380,
+      "sha256": "346fc88eba81a199116a17e20472ec924db18c27ba56c05ce2568c650bbd3d3a",
+      "archive_bytes": 535492,
+      "archive_sha256": "8dc53a1bab63bccf73ed1c596189f5af8700ae55df79aad43f07723143ec4fd3",
+      "quality_floor": {
+        "full_resolution_luma_ssim": 0.985,
+        "worst_128px_luma_ssim": 0.965,
+        "maximum_chroma_mean_absolute_error": 2.5,
+        "maximum_chroma_95th_percentile_error": 7
+      },
+      "metrics": {
+        "full_resolution_luma_ssim": 0.9852978587150574,
+        "worst_128px_luma_ssim": 0.9747799038887024,
+        "chroma_mean_absolute_error": 1.933102700476435,
+        "chroma_95th_percentile_error": 5
+      },
+      "trials": [
+        {
+          "quality": 60,
+          "bytes": 322462,
+          "full_resolution_luma_ssim": 0.9547162652015686,
+          "worst_128px_luma_ssim": 0.938410758972168,
+          "chroma_mean_absolute_error": 2.4172918711133935,
+          "chroma_95th_percentile_error": 7
+        },
+        {
+          "quality": 64,
+          "bytes": 338188,
+          "full_resolution_luma_ssim": 0.9585579037666321,
+          "worst_128px_luma_ssim": 0.9445185661315918,
+          "chroma_mean_absolute_error": 2.3815052194296,
+          "chroma_95th_percentile_error": 7
+        },
+        {
+          "quality": 68,
+          "bytes": 352580,
+          "full_resolution_luma_ssim": 0.9618015289306641,
+          "worst_128px_luma_ssim": 0.9485503435134888,
+          "chroma_mean_absolute_error": 2.3487986159486245,
+          "chroma_95th_percentile_error": 7
+        },
+        {
+          "quality": 72,
+          "bytes": 374334,
+          "full_resolution_luma_ssim": 0.9661048650741577,
+          "worst_128px_luma_ssim": 0.9540834426879883,
+          "chroma_mean_absolute_error": 2.283558288291495,
+          "chroma_95th_percentile_error": 6
+        },
+        {
+          "quality": 76,
+          "bytes": 398366,
+          "full_resolution_luma_ssim": 0.97028648853302,
+          "worst_128px_luma_ssim": 0.9588055610656738,
+          "chroma_mean_absolute_error": 2.221888680981751,
+          "chroma_95th_percentile_error": 6
+        },
+        {
+          "quality": 80,
+          "bytes": 460636,
+          "full_resolution_luma_ssim": 0.9788085222244263,
+          "worst_128px_luma_ssim": 0.9703747034072876,
+          "chroma_mean_absolute_error": 2.08905890099609,
+          "chroma_95th_percentile_error": 6
+        },
+        {
+          "quality": 84,
+          "bytes": 535380,
+          "full_resolution_luma_ssim": 0.9852978587150574,
+          "worst_128px_luma_ssim": 0.9747799038887024,
+          "chroma_mean_absolute_error": 1.933102700476435,
+          "chroma_95th_percentile_error": 5
+        },
+        {
+          "quality": 81,
+          "bytes": 478518,
+          "full_resolution_luma_ssim": 0.980609655380249,
+          "worst_128px_luma_ssim": 0.9725133180618286,
+          "chroma_mean_absolute_error": 2.0474846061148426,
+          "chroma_95th_percentile_error": 6
+        },
+        {
+          "quality": 82,
+          "bytes": 494364,
+          "full_resolution_luma_ssim": 0.9821666479110718,
+          "worst_128px_luma_ssim": 0.9733057022094727,
+          "chroma_mean_absolute_error": 2.013492848389934,
+          "chroma_95th_percentile_error": 6
+        },
+        {
+          "quality": 83,
+          "bytes": 510318,
+          "full_resolution_luma_ssim": 0.9836761951446533,
+          "worst_128px_luma_ssim": 0.9756413102149963,
+          "chroma_mean_absolute_error": 1.9952642511021055,
+          "chroma_95th_percentile_error": 6
+        }
+      ],
+      "note": "Lossy WebP unless quality is lossless. No resizing or upscaling. Smallest measured passing result in the searched quality interval. SSIM and chroma checks do not prove perceptual identity."
+    }
+  },
+  {
+    "slug": "left_hand_mine",
+    "name": "Шахта Левая Рука",
+    "captions": [
+      "Шахта Левая Рука"
+    ],
+    "aliases": [
+      "Left Hand Mine"
+    ],
+    "artwork": {
+      "generated_with": "built-in image_gen",
+      "generated_on": "2026-11-17",
+      "prompt": "Use case: stylized-concept. Asset type: a single finished landscape location illustration for the Android game SKYRIM TEXT RPG. Create one coherent 16:9 wide image, 1672x941 or similar landscape. Style: cinematic photorealistic Skyrim environment art, grounded Nordic medieval architecture, finely detailed weathered timber, gray rock and restrained natural colors, crisp readable detail, realistic daylight and rich but readable shadows, matching the established realistic location illustrations. No UI, no lettering, no captions, no watermark, no collage, no decorative frame, no modern objects, no industrial railway. Camera: immersive eye-level establishing view, environment is the subject; do not add prominent people or creatures. Left Hand Mine just outside Markarth, Skyrim. A working small iron mine cut into the gray limestone hillside southeast of the city. Main focal point: a sturdy rectangular timber-braced mine doorway at ground level, stone smelter in front, stacked rough ore, pickaxes, sacks and wooden wheelbarrow, a few low stone-and-timber workers' barracks with simple wooden roofs nearby. In the distant upper-left background only, faint massive weathered Dwemer stone walls of Markarth built into cliffs. The Reach's bare limestone, yellow grasses and sparse juniper; dry road foreground with a small footbridge approach. Wide eye-level view in cool late morning sun, believable humble industrial medieval activity, no modern mine machinery, no castle at the entrance.",
+      "original_sha256": "40bddf39f49a7d879a4131726c27d9947626beccc489e85334d33b8d169cc13d",
+      "original_bytes": 3956724,
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "dimensions": [
+        1672,
+        941
+      ],
+      "format": "WebP",
+      "quality": 84,
+      "method": 6,
+      "encoded_bytes": 523486,
+      "sha256": "a88d7136f159abb6e90dc207b530a4923b807d1b241839e871d13b3febfe1cb3",
+      "archive_bytes": 523598,
+      "archive_sha256": "38d37cea1f67ed4a7adddba4eb2b337c9282709c0406ea48efbb31734275edd2",
+      "quality_floor": {
+        "full_resolution_luma_ssim": 0.985,
+        "worst_128px_luma_ssim": 0.965,
+        "maximum_chroma_mean_absolute_error": 2.5,
+        "maximum_chroma_95th_percentile_error": 7
+      },
+      "metrics": {
+        "full_resolution_luma_ssim": 0.9854937791824341,
+        "worst_128px_luma_ssim": 0.9730676412582397,
+        "chroma_mean_absolute_error": 1.8058825996979697,
+        "chroma_95th_percentile_error": 5
+      },
+      "trials": [
+        {
+          "quality": 60,
+          "bytes": 312640,
+          "full_resolution_luma_ssim": 0.95456862449646,
+          "worst_128px_luma_ssim": 0.9357658624649048,
+          "chroma_mean_absolute_error": 2.2106000437282947,
+          "chroma_95th_percentile_error": 6
+        },
+        {
+          "quality": 64,
+          "bytes": 326262,
+          "full_resolution_luma_ssim": 0.9582599401473999,
+          "worst_128px_luma_ssim": 0.9417396187782288,
+          "chroma_mean_absolute_error": 2.184511476135029,
+          "chroma_95th_percentile_error": 6
+        },
+        {
+          "quality": 68,
+          "bytes": 342468,
+          "full_resolution_luma_ssim": 0.9618242979049683,
+          "worst_128px_luma_ssim": 0.9433135986328125,
+          "chroma_mean_absolute_error": 2.136889583513416,
+          "chroma_95th_percentile_error": 6
+        },
+        {
+          "quality": 72,
+          "bytes": 360812,
+          "full_resolution_luma_ssim": 0.9655449390411377,
+          "worst_128px_luma_ssim": 0.9487335681915283,
+          "chroma_mean_absolute_error": 2.0990614306270943,
+          "chroma_95th_percentile_error": 6
+        },
+        {
+          "quality": 76,
+          "bytes": 389062,
+          "full_resolution_luma_ssim": 0.9704033136367798,
+          "worst_128px_luma_ssim": 0.9545379877090454,
+          "chroma_mean_absolute_error": 2.0388644753367333,
+          "chroma_95th_percentile_error": 6
+        },
+        {
+          "quality": 80,
+          "bytes": 445862,
+          "full_resolution_luma_ssim": 0.9782899618148804,
+          "worst_128px_luma_ssim": 0.9638335704803467,
+          "chroma_mean_absolute_error": 1.939805587052357,
+          "chroma_95th_percentile_error": 5
+        },
+        {
+          "quality": 84,
+          "bytes": 523486,
+          "full_resolution_luma_ssim": 0.9854937791824341,
+          "worst_128px_luma_ssim": 0.9730676412582397,
+          "chroma_mean_absolute_error": 1.8058825996979697,
+          "chroma_95th_percentile_error": 5
+        },
+        {
+          "quality": 81,
+          "bytes": 466404,
+          "full_resolution_luma_ssim": 0.9804298877716064,
+          "worst_128px_luma_ssim": 0.9666497707366943,
+          "chroma_mean_absolute_error": 1.8907005552476497,
+          "chroma_95th_percentile_error": 5
+        },
+        {
+          "quality": 82,
+          "bytes": 477484,
+          "full_resolution_luma_ssim": 0.9816091656684875,
+          "worst_128px_luma_ssim": 0.9677966833114624,
+          "chroma_mean_absolute_error": 1.8726025708169565,
+          "chroma_95th_percentile_error": 5
+        },
+        {
+          "quality": 83,
+          "bytes": 499772,
+          "full_resolution_luma_ssim": 0.9835367798805237,
+          "worst_128px_luma_ssim": 0.9707199931144714,
+          "chroma_mean_absolute_error": 1.8281042640172065,
+          "chroma_95th_percentile_error": 5
+        }
+      ],
+      "note": "Lossy WebP unless quality is lossless. No resizing or upscaling. Smallest measured passing result in the searched quality interval. SSIM and chroma checks do not prove perceptual identity."
+    }
+  },
+  {
+    "slug": "lost_prospect_mine",
+    "name": "Шахта Потерянный Шанс",
+    "captions": [
+      "Шахта Потерянный Шанс"
+    ],
+    "aliases": [
+      "Lost Prospect Mine"
+    ],
+    "artwork": {
+      "generated_with": "built-in image_gen",
+      "generated_on": "2026-11-17",
+      "prompt": "Use case: stylized-concept. Asset type: a single finished landscape location illustration for the Android game SKYRIM TEXT RPG. Create one coherent 16:9 wide image, 1672x941 or similar landscape. Style: cinematic photorealistic Skyrim environment art, grounded Nordic medieval architecture, finely detailed weathered timber, gray rock and restrained natural colors, crisp readable detail, realistic daylight and rich but readable shadows, matching the established realistic location illustrations. No UI, no lettering, no captions, no watermark, no collage, no decorative frame, no modern objects, no industrial railway. Camera: immersive eye-level establishing view, environment is the subject; do not add prominent people or creatures. Lost Prospect Mine in the Rift, Skyrim. A quiet abandoned gold mine nestled in a low rocky cliff among luminous golden autumn birch trees and a few dark conifers. A humble timber-framed dark mine entrance surrounded by gray stone, a neglected wooden handcart full of rocks with a pickaxe leaning against it on the left, a shovel propped beside an old wooden crate, two weathered sacks on the right of the doorway. Fallen yellow leaves on the winding dirt path and grass, subtle moss and ferns, atmosphere of long abandonment. Make it a small lonely mine, not a village or fortified camp. Warm soft autumn afternoon, crisp naturally lit detail, an inviting but mysterious dark entrance; no gold treasure and no exterior waterfall.",
+      "original_sha256": "dadb1c082b4e446e04eca565fd622ef257b77e14f8b575c8023e716024e3d5df",
+      "original_bytes": 3835505,
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "dimensions": [
+        1672,
+        941
+      ],
+      "format": "WebP",
+      "quality": 88,
+      "method": 6,
+      "encoded_bytes": 621762,
+      "sha256": "50af16038f72e4950f58e673f76fe75db9f31845258f6e672b7568e5831a73d4",
+      "archive_bytes": 621874,
+      "archive_sha256": "2b7d4f7fb0306926429733dfad5059729fd2357837d4564fa104a5feea90d2b3",
+      "quality_floor": {
+        "full_resolution_luma_ssim": 0.985,
+        "worst_128px_luma_ssim": 0.965,
+        "maximum_chroma_mean_absolute_error": 2.5,
+        "maximum_chroma_95th_percentile_error": 7
+      },
+      "metrics": {
+        "full_resolution_luma_ssim": 0.9891672730445862,
+        "worst_128px_luma_ssim": 0.9812123775482178,
+        "chroma_mean_absolute_error": 2.3336913799327803,
+        "chroma_95th_percentile_error": 7
+      },
+      "trials": [
+        {
+          "quality": 60,
+          "bytes": 313252,
+          "full_resolution_luma_ssim": 0.946346640586853,
+          "worst_128px_luma_ssim": 0.9171777963638306,
+          "chroma_mean_absolute_error": 3.0600841388322513,
+          "chroma_95th_percentile_error": 10
+        },
+        {
+          "quality": 64,
+          "bytes": 333456,
+          "full_resolution_luma_ssim": 0.9512485265731812,
+          "worst_128px_luma_ssim": 0.9274168610572815,
+          "chroma_mean_absolute_error": 2.993028260681653,
+          "chroma_95th_percentile_error": 10
+        },
+        {
+          "quality": 68,
+          "bytes": 347612,
+          "full_resolution_luma_ssim": 0.955054521560669,
+          "worst_128px_luma_ssim": 0.9324312210083008,
+          "chroma_mean_absolute_error": 2.9546579532107247,
+          "chroma_95th_percentile_error": 9
+        },
+        {
+          "quality": 72,
+          "bytes": 362446,
+          "full_resolution_luma_ssim": 0.9604731202125549,
+          "worst_128px_luma_ssim": 0.9421680569648743,
+          "chroma_mean_absolute_error": 2.9064621267205304,
+          "chroma_95th_percentile_error": 9
+        },
+        {
+          "quality": 76,
+          "bytes": 395670,
+          "full_resolution_luma_ssim": 0.9665230512619019,
+          "worst_128px_luma_ssim": 0.9521439075469971,
+          "chroma_mean_absolute_error": 2.7892569494938195,
+          "chroma_95th_percentile_error": 9
+        },
+        {
+          "quality": 80,
+          "bytes": 456882,
+          "full_resolution_luma_ssim": 0.9755672216415405,
+          "worst_128px_luma_ssim": 0.9654253125190735,
+          "chroma_mean_absolute_error": 2.6460661695539205,
+          "chroma_95th_percentile_error": 8
+        },
+        {
+          "quality": 84,
+          "bytes": 535666,
+          "full_resolution_luma_ssim": 0.9837133884429932,
+          "worst_128px_luma_ssim": 0.9759845733642578,
+          "chroma_mean_absolute_error": 2.496099410684958,
+          "chroma_95th_percentile_error": 8
+        },
+        {
+          "quality": 88,
+          "bytes": 621762,
+          "full_resolution_luma_ssim": 0.9891672730445862,
+          "worst_128px_luma_ssim": 0.9812123775482178,
+          "chroma_mean_absolute_error": 2.3336913799327803,
+          "chroma_95th_percentile_error": 7
+        },
+        {
+          "quality": 85,
+          "bytes": 548612,
+          "full_resolution_luma_ssim": 0.9845249652862549,
+          "worst_128px_luma_ssim": 0.9763720631599426,
+          "chroma_mean_absolute_error": 2.4430404003681314,
+          "chroma_95th_percentile_error": 8
+        },
+        {
+          "quality": 86,
+          "bytes": 569996,
+          "full_resolution_luma_ssim": 0.9861428737640381,
+          "worst_128px_luma_ssim": 0.9786633253097534,
+          "chroma_mean_absolute_error": 2.4262828661354865,
+          "chroma_95th_percentile_error": 8
+        },
+        {
+          "quality": 87,
+          "bytes": 598528,
+          "full_resolution_luma_ssim": 0.9879917502403259,
+          "worst_128px_luma_ssim": 0.9808322191238403,
+          "chroma_mean_absolute_error": 2.386299124417168,
+          "chroma_95th_percentile_error": 8
+        }
+      ],
+      "note": "Lossy WebP unless quality is lossless. No resizing or upscaling. Smallest measured passing result in the searched quality interval. SSIM and chroma checks do not prove perceptual identity."
+    }
+  },
+  {
+    "slug": "northwind_mine",
+    "name": "Шахта Северный Ветер",
+    "captions": [
+      "Шахта Северный Ветер"
+    ],
+    "aliases": [
+      "Northwind Mine"
+    ],
+    "artwork": {
+      "generated_with": "built-in image_gen",
+      "generated_on": "2026-11-17",
+      "prompt": "Use case: stylized-concept. Asset type: a single finished landscape location illustration for the Android game SKYRIM TEXT RPG. Create one coherent 16:9 wide image, 1672x941 or similar landscape. Style: cinematic photorealistic Skyrim environment art, grounded Nordic medieval architecture, finely detailed weathered timber, gray rock and restrained natural colors, crisp readable detail, realistic daylight and rich but readable shadows, matching the established realistic location illustrations. No UI, no lettering, no captions, no watermark, no collage, no decorative frame, no modern objects, no industrial railway. Camera: immersive eye-level establishing view, environment is the subject; do not add prominent people or creatures. Northwind Mine lower entrance in the Rift, Skyrim. A narrow weatherbeaten iron-mine portal set in a steep mountain rockface, a few heavy timber braces and a simple plank door partly recessed into the rock. Show the small ledge approached by an ascending stony path, a crude wooden barricade and modest old mining supplies, a few bleached animal bones half hidden beside rocks, but no gore. Cold high slope above the Rift with a mix of distant golden birches below, dark pines and light snow dusting upper ledges; mountainous background under a pale windy sky. View angled upward from the approach, imposing rock mass around a small human-sized entrance, isolated eerie abandoned place, readable cool daylight. Do not depict the dragon summit or a dragon.",
+      "original_sha256": "bcd92b0a3c94194db3359f7dca364c0fbbe2175e0747908885df7e2046055c82",
+      "original_bytes": 3484164,
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "dimensions": [
+        1672,
+        941
+      ],
+      "format": "WebP",
+      "quality": 89,
+      "method": 6,
+      "encoded_bytes": 503094,
+      "sha256": "37c5fe45043e9e6bf9fc97ecf13ae5e9e1dd82a0895d4cfc7743709cc453ef9e",
+      "archive_bytes": 503206,
+      "archive_sha256": "7cf74174b61b67c29364b5909dd7e41dad4c16c296ffcdfa390d4f7e1530bde3",
+      "quality_floor": {
+        "full_resolution_luma_ssim": 0.985,
+        "worst_128px_luma_ssim": 0.965,
+        "maximum_chroma_mean_absolute_error": 2.5,
+        "maximum_chroma_95th_percentile_error": 7
+      },
+      "metrics": {
+        "full_resolution_luma_ssim": 0.9860503673553467,
+        "worst_128px_luma_ssim": 0.9807860851287842,
+        "chroma_mean_absolute_error": 1.1979912950185336,
+        "chroma_95th_percentile_error": 3
+      },
+      "trials": [
+        {
+          "quality": 60,
+          "bytes": 219414,
+          "full_resolution_luma_ssim": 0.9336298108100891,
+          "worst_128px_luma_ssim": 0.9071072340011597,
+          "chroma_mean_absolute_error": 1.6410873091336204,
+          "chroma_95th_percentile_error": 5
+        },
+        {
+          "quality": 64,
+          "bytes": 231680,
+          "full_resolution_luma_ssim": 0.9391582608222961,
+          "worst_128px_luma_ssim": 0.9152014255523682,
+          "chroma_mean_absolute_error": 1.6088767802754882,
+          "chroma_95th_percentile_error": 5
+        },
+        {
+          "quality": 68,
+          "bytes": 243382,
+          "full_resolution_luma_ssim": 0.942952573299408,
+          "worst_128px_luma_ssim": 0.9192389249801636,
+          "chroma_mean_absolute_error": 1.5810257335929914,
+          "chroma_95th_percentile_error": 5
+        },
+        {
+          "quality": 72,
+          "bytes": 258194,
+          "full_resolution_luma_ssim": 0.9479893445968628,
+          "worst_128px_luma_ssim": 0.9263274073600769,
+          "chroma_mean_absolute_error": 1.5545440562569597,
+          "chroma_95th_percentile_error": 5
+        },
+        {
+          "quality": 76,
+          "bytes": 278768,
+          "full_resolution_luma_ssim": 0.9538046717643738,
+          "worst_128px_luma_ssim": 0.9341180324554443,
+          "chroma_mean_absolute_error": 1.515257234236204,
+          "chroma_95th_percentile_error": 4
+        },
+        {
+          "quality": 80,
+          "bytes": 333240,
+          "full_resolution_luma_ssim": 0.9665096998214722,
+          "worst_128px_luma_ssim": 0.9508138298988342,
+          "chroma_mean_absolute_error": 1.4177075441477813,
+          "chroma_95th_percentile_error": 4
+        },
+        {
+          "quality": 84,
+          "bytes": 395924,
+          "full_resolution_luma_ssim": 0.9761806726455688,
+          "worst_128px_luma_ssim": 0.9658365249633789,
+          "chroma_mean_absolute_error": 1.327182982574783,
+          "chroma_95th_percentile_error": 4
+        },
+        {
+          "quality": 88,
+          "bytes": 483004,
+          "full_resolution_luma_ssim": 0.9846674203872681,
+          "worst_128px_luma_ssim": 0.977916955947876,
+          "chroma_mean_absolute_error": 1.2232370760007931,
+          "chroma_95th_percentile_error": 4
+        },
+        {
+          "quality": 92,
+          "bytes": 591974,
+          "full_resolution_luma_ssim": 0.9902111887931824,
+          "worst_128px_luma_ssim": 0.9841721653938293,
+          "chroma_mean_absolute_error": 1.102480881582761,
+          "chroma_95th_percentile_error": 3
+        },
+        {
+          "quality": 89,
+          "bytes": 503094,
+          "full_resolution_luma_ssim": 0.9860503673553467,
+          "worst_128px_luma_ssim": 0.9807860851287842,
+          "chroma_mean_absolute_error": 1.1979912950185336,
+          "chroma_95th_percentile_error": 3
+        },
+        {
+          "quality": 90,
+          "bytes": 527494,
+          "full_resolution_luma_ssim": 0.9874807000160217,
+          "worst_128px_luma_ssim": 0.9818719029426575,
+          "chroma_mean_absolute_error": 1.1800591984501878,
+          "chroma_95th_percentile_error": 3
+        },
+        {
+          "quality": 91,
+          "bytes": 564690,
+          "full_resolution_luma_ssim": 0.9893305897712708,
+          "worst_128px_luma_ssim": 0.9841779470443726,
+          "chroma_mean_absolute_error": 1.1365085498985605,
+          "chroma_95th_percentile_error": 3
+        }
+      ],
+      "note": "Lossy WebP unless quality is lossless. No resizing or upscaling. Smallest measured passing result in the searched quality interval. SSIM and chroma checks do not prove perceptual identity."
+    }
+  },
+  {
+    "slug": "whistling_mine",
+    "name": "Свистящая шахта",
+    "captions": [
+      "Свистящая шахта"
+    ],
+    "aliases": [
+      "Whistling Mine"
+    ],
+    "artwork": {
+      "generated_with": "built-in image_gen",
+      "generated_on": "2026-11-17",
+      "prompt": "Use case: stylized-concept. Asset type: a single finished landscape location illustration for the Android game SKYRIM TEXT RPG. Create one coherent 16:9 wide image, 1672x941 or similar landscape. Style: cinematic photorealistic Skyrim environment art, grounded Nordic medieval architecture, finely detailed weathered timber, gray rock and restrained natural colors, crisp readable detail, realistic daylight and rich but readable shadows, matching the established realistic location illustrations. No UI, no lettering, no captions, no watermark, no collage, no decorative frame, no modern objects, no industrial railway. Camera: immersive eye-level establishing view, environment is the subject; do not add prominent people or creatures. Whistling Mine south of Winterhold, Skyrim. A small working iron mine entrance in a snow-covered rocky hillside beside the lonely Winterhold road, simple weathered timber framing and a low recessed wooden doorway, stone smelter directly to the right of the mine entrance with a modest orange furnace glow, two ore barrels and a pile of firewood. Stark snowy tundra, wind-sculpted drifts, sparse stunted dark conifers, distant pale frozen mountain silhouettes and cold blue-gray sky. Snow blowing gently across the road and around the smelter; mine doorway clear and readable. Wide eye-level view framed more openly than the other forest mines. No village, no large lodge, no towering portal, no oversized forge.",
+      "original_sha256": "a437477296d5d5df5f2ba8682cf76d837b69ba5270d3877d76468a64bbb28fa9",
+      "original_bytes": 3335797,
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "dimensions": [
+        1672,
+        941
+      ],
+      "format": "WebP",
+      "quality": 90,
+      "method": 6,
+      "encoded_bytes": 493332,
+      "sha256": "72c530f805c78bb06a3857846f20d4e17b708cdd2101035d25a96bc33668df04",
+      "archive_bytes": 493444,
+      "archive_sha256": "2947f2e694a5f4810124904589b74fab60a4530459fdb5c29973aa8a9cf1c616",
+      "quality_floor": {
+        "full_resolution_luma_ssim": 0.985,
+        "worst_128px_luma_ssim": 0.965,
+        "maximum_chroma_mean_absolute_error": 2.5,
+        "maximum_chroma_95th_percentile_error": 7
+      },
+      "metrics": {
+        "full_resolution_luma_ssim": 0.987058162689209,
+        "worst_128px_luma_ssim": 0.9813384413719177,
+        "chroma_mean_absolute_error": 1.050434041460525,
+        "chroma_95th_percentile_error": 3
+      },
+      "trials": [
+        {
+          "quality": 60,
+          "bytes": 203792,
+          "full_resolution_luma_ssim": 0.9366867542266846,
+          "worst_128px_luma_ssim": 0.9096022248268127,
+          "chroma_mean_absolute_error": 1.45041033411468,
+          "chroma_95th_percentile_error": 4
+        },
+        {
+          "quality": 64,
+          "bytes": 213750,
+          "full_resolution_luma_ssim": 0.9406020045280457,
+          "worst_128px_luma_ssim": 0.9146361947059631,
+          "chroma_mean_absolute_error": 1.429755070702551,
+          "chroma_95th_percentile_error": 4
+        },
+        {
+          "quality": 68,
+          "bytes": 223150,
+          "full_resolution_luma_ssim": 0.9441261291503906,
+          "worst_128px_luma_ssim": 0.9204123616218567,
+          "chroma_mean_absolute_error": 1.4076738708184817,
+          "chroma_95th_percentile_error": 4
+        },
+        {
+          "quality": 72,
+          "bytes": 234892,
+          "full_resolution_luma_ssim": 0.9479134678840637,
+          "worst_128px_luma_ssim": 0.9245960712432861,
+          "chroma_mean_absolute_error": 1.3857995540730872,
+          "chroma_95th_percentile_error": 4
+        },
+        {
+          "quality": 76,
+          "bytes": 254776,
+          "full_resolution_luma_ssim": 0.9547953009605408,
+          "worst_128px_luma_ssim": 0.9361512660980225,
+          "chroma_mean_absolute_error": 1.3534380736160758,
+          "chroma_95th_percentile_error": 4
+        },
+        {
+          "quality": 80,
+          "bytes": 300214,
+          "full_resolution_luma_ssim": 0.9648154377937317,
+          "worst_128px_luma_ssim": 0.9492225646972656,
+          "chroma_mean_absolute_error": 1.2784243449653987,
+          "chroma_95th_percentile_error": 4
+        },
+        {
+          "quality": 84,
+          "bytes": 351980,
+          "full_resolution_luma_ssim": 0.9742143154144287,
+          "worst_128px_luma_ssim": 0.963311493396759,
+          "chroma_mean_absolute_error": 1.2080141633912818,
+          "chroma_95th_percentile_error": 3
+        },
+        {
+          "quality": 88,
+          "bytes": 430954,
+          "full_resolution_luma_ssim": 0.9826695919036865,
+          "worst_128px_luma_ssim": 0.9755277037620544,
+          "chroma_mean_absolute_error": 1.1065495833100285,
+          "chroma_95th_percentile_error": 3
+        },
+        {
+          "quality": 92,
+          "bytes": 554132,
+          "full_resolution_luma_ssim": 0.9896308779716492,
+          "worst_128px_luma_ssim": 0.9834092259407043,
+          "chroma_mean_absolute_error": 0.9825264784994077,
+          "chroma_95th_percentile_error": 3
+        },
+        {
+          "quality": 89,
+          "bytes": 453924,
+          "full_resolution_luma_ssim": 0.984530508518219,
+          "worst_128px_luma_ssim": 0.9776711463928223,
+          "chroma_mean_absolute_error": 1.0850740965785153,
+          "chroma_95th_percentile_error": 3
+        },
+        {
+          "quality": 90,
+          "bytes": 493332,
+          "full_resolution_luma_ssim": 0.987058162689209,
+          "worst_128px_luma_ssim": 0.9813384413719177,
+          "chroma_mean_absolute_error": 1.050434041460525,
+          "chroma_95th_percentile_error": 3
+        },
+        {
+          "quality": 91,
+          "bytes": 521688,
+          "full_resolution_luma_ssim": 0.988558828830719,
+          "worst_128px_luma_ssim": 0.9821054339408875,
+          "chroma_mean_absolute_error": 1.0210385215768627,
+          "chroma_95th_percentile_error": 3
+        }
+      ],
+      "note": "Lossy WebP unless quality is lossless. No resizing or upscaling. Smallest measured passing result in the searched quality interval. SSIM and chroma checks do not prove perceptual identity."
+    }
+  },
+  {
+    "slug": "broken_tusk_mine",
+    "name": "Шахта Сломанный Бивень",
+    "captions": [
+      "Шахта Сломанный Бивень"
+    ],
+    "aliases": [
+      "Broken Tusk Mine"
+    ],
+    "artwork": {
+      "generated_with": "built-in image_gen",
+      "generated_on": "2026-11-17",
+      "prompt": "Use case: stylized-concept. Asset type: a single finished landscape location illustration for the Android game SKYRIM TEXT RPG. Create one coherent 16:9 wide image, 1672x941 or similar landscape. Style: cinematic photorealistic Skyrim environment art, grounded Nordic medieval architecture, finely detailed weathered timber, gray rock and restrained natural colors, crisp readable detail, realistic daylight and rich but readable shadows, matching the established realistic location illustrations. No UI, no lettering, no captions, no watermark, no collage, no decorative frame, no modern objects, no industrial railway. Camera: immersive eye-level establishing view, environment is the subject; do not add prominent people or creatures. Broken Tusk Mine on the snowy northwest of Solstheim, Dragonborn Skyrim. A rough small mine entrance cut into dark weathered volcanic rock on a snow-covered slope, occupied by a Riekling camp. Weathered timber braces around the doorway, a small crooked wooden lookout platform on poles near the entrance, primitive hide shelters and tied bone-and-stick camp decorations, crudely sharpened stakes. A locked iron-banded company strongbox tucked underneath the little lookout, half-covered ore crates. Rime and snow, sparse gnarled conifers, black rock and a glint of distant icy sea beyond the slope. Hints of dull red heart-stone ore in rock, no bright magical crystals and no giant mammoth skull gateway. No prominent creatures; the camp itself communicates occupation. Cool clear northern daylight with a small campfire glow, mine opening remains the main subject.",
+      "original_sha256": "b8daaa3289e4b5dbdb5de16b79bc4f20a1f820532fb368dc30cb5b62ee1bfa51",
+      "original_bytes": 3603810,
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "dimensions": [
+        1672,
+        941
+      ],
+      "format": "WebP",
+      "quality": 86,
+      "method": 6,
+      "encoded_bytes": 473050,
+      "sha256": "5b6fbbdfd09fd866bdbd2101deb5cd7567275271c52e450be94b755819df5199",
+      "archive_bytes": 473162,
+      "archive_sha256": "5bc302b25591edac370fd8ddca1c17c946a0fd902f5ee4d533eed1db8f3eb859",
+      "quality_floor": {
+        "full_resolution_luma_ssim": 0.985,
+        "worst_128px_luma_ssim": 0.965,
+        "maximum_chroma_mean_absolute_error": 2.5,
+        "maximum_chroma_95th_percentile_error": 7
+      },
+      "metrics": {
+        "full_resolution_luma_ssim": 0.9854382276535034,
+        "worst_128px_luma_ssim": 0.9755322337150574,
+        "chroma_mean_absolute_error": 1.4659958483543416,
+        "chroma_95th_percentile_error": 4
+      },
+      "trials": [
+        {
+          "quality": 60,
+          "bytes": 259798,
+          "full_resolution_luma_ssim": 0.9537113904953003,
+          "worst_128px_luma_ssim": 0.9248404502868652,
+          "chroma_mean_absolute_error": 1.9462087949803986,
+          "chroma_95th_percentile_error": 6
+        },
+        {
+          "quality": 64,
+          "bytes": 271840,
+          "full_resolution_luma_ssim": 0.9569718837738037,
+          "worst_128px_luma_ssim": 0.9304496049880981,
+          "chroma_mean_absolute_error": 1.906689030808109,
+          "chroma_95th_percentile_error": 6
+        },
+        {
+          "quality": 68,
+          "bytes": 285692,
+          "full_resolution_luma_ssim": 0.9603191018104553,
+          "worst_128px_luma_ssim": 0.9371031522750854,
+          "chroma_mean_absolute_error": 1.8677425649187214,
+          "chroma_95th_percentile_error": 5
+        },
+        {
+          "quality": 72,
+          "bytes": 299218,
+          "full_resolution_luma_ssim": 0.9632528424263,
+          "worst_128px_luma_ssim": 0.9423292279243469,
+          "chroma_mean_absolute_error": 1.8317172508122785,
+          "chroma_95th_percentile_error": 5
+        },
+        {
+          "quality": 76,
+          "bytes": 323300,
+          "full_resolution_luma_ssim": 0.9680953621864319,
+          "worst_128px_luma_ssim": 0.9496526122093201,
+          "chroma_mean_absolute_error": 1.7640454901382525,
+          "chroma_95th_percentile_error": 5
+        },
+        {
+          "quality": 80,
+          "bytes": 374408,
+          "full_resolution_luma_ssim": 0.9758695960044861,
+          "worst_128px_luma_ssim": 0.9615208506584167,
+          "chroma_mean_absolute_error": 1.6484060782329701,
+          "chroma_95th_percentile_error": 5
+        },
+        {
+          "quality": 84,
+          "bytes": 437628,
+          "full_resolution_luma_ssim": 0.9826205968856812,
+          "worst_128px_luma_ssim": 0.971466064453125,
+          "chroma_mean_absolute_error": 1.5252009721918554,
+          "chroma_95th_percentile_error": 4
+        },
+        {
+          "quality": 88,
+          "bytes": 517166,
+          "full_resolution_luma_ssim": 0.9881457090377808,
+          "worst_128px_luma_ssim": 0.9787461161613464,
+          "chroma_mean_absolute_error": 1.3951585532036062,
+          "chroma_95th_percentile_error": 4
+        },
+        {
+          "quality": 85,
+          "bytes": 454932,
+          "full_resolution_luma_ssim": 0.9839631915092468,
+          "worst_128px_luma_ssim": 0.9721687436103821,
+          "chroma_mean_absolute_error": 1.4939145849117044,
+          "chroma_95th_percentile_error": 4
+        },
+        {
+          "quality": 86,
+          "bytes": 473050,
+          "full_resolution_luma_ssim": 0.9854382276535034,
+          "worst_128px_luma_ssim": 0.9755322337150574,
+          "chroma_mean_absolute_error": 1.4659958483543416,
+          "chroma_95th_percentile_error": 4
+        },
+        {
+          "quality": 87,
+          "bytes": 497820,
+          "full_resolution_luma_ssim": 0.9870050549507141,
+          "worst_128px_luma_ssim": 0.9779453873634338,
+          "chroma_mean_absolute_error": 1.4198278579745665,
+          "chroma_95th_percentile_error": 4
+        }
+      ],
+      "note": "Lossy WebP unless quality is lossless. No resizing or upscaling. Smallest measured passing result in the searched quality interval. SSIM and chroma checks do not prove perceptual identity."
+    }
+  },
+  {
+    "slug": "damphall_mine",
+    "name": "Дамфолл",
+    "captions": [
+      "Дамфолл"
+    ],
+    "aliases": [
+      "Damphall Mine",
+      "Шахта Дамфолл"
+    ],
+    "artwork": {
+      "generated_with": "built-in image_gen",
+      "generated_on": "2026-11-17",
+      "prompt": "Use case: stylized-concept. Asset type: a single finished landscape location illustration for the Android game SKYRIM TEXT RPG. Create one coherent 16:9 wide image, 1672x941 or similar landscape. Style: cinematic photorealistic Skyrim environment art, grounded Nordic medieval architecture, finely detailed weathered timber, gray rock and restrained natural colors, crisp readable detail, realistic daylight and rich but readable shadows, matching the established realistic location illustrations. No UI, no lettering, no captions, no watermark, no collage, no decorative frame, no modern objects, no industrial railway. Camera: immersive eye-level establishing view, environment is the subject; do not add prominent people or creatures. Damphall Mine on western Solstheim north of Bloodskal Barrow, Dragonborn Skyrim. Exterior of an old partially flooded iron mine used by Reavers. A large dark natural cave mouth reinforced by worn heavy timber beams in a rugged gray-black coastal rock outcrop, a crude elevated wooden platform and small storage crates above and beside the opening, an iron-banded strongbox on a crate near the platform, sparse improvised canvas shelter. Damp stony approach with shallow puddles, thin stream of water trickling from the mine, coastal grasses, moss and sparse crooked northern conifers; pale cold sky, sea mist and distant rocky shoreline below. Show a rugged maritime Solstheim environment, little scattered snow on higher rocks, not a deep winter ice cave and not an ash desert. Three-quarter establishing angle with the dark mine entrance and water in foreground, diffuse bright overcast light, no warships or modern mining machinery.",
+      "original_sha256": "8da33c6fc828db6dac251a2fb2cbb4ada1e3d715673df79ae90e132b3a0774c8",
+      "original_bytes": 3378902,
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "dimensions": [
+        1672,
+        941
+      ],
+      "format": "WebP",
+      "quality": 88,
+      "method": 6,
+      "encoded_bytes": 463778,
+      "sha256": "774e6a429834616f3b7da1e7def9f098c20ce19bca9affb98a6f77b01eb5fdb0",
+      "archive_bytes": 463890,
+      "archive_sha256": "a7f924f3121c6883ebb87ef231f15bbee31e900fe211433bb1cdeccc213bde2d",
+      "quality_floor": {
+        "full_resolution_luma_ssim": 0.985,
+        "worst_128px_luma_ssim": 0.965,
+        "maximum_chroma_mean_absolute_error": 2.5,
+        "maximum_chroma_95th_percentile_error": 7
+      },
+      "metrics": {
+        "full_resolution_luma_ssim": 0.9853115081787109,
+        "worst_128px_luma_ssim": 0.9750897884368896,
+        "chroma_mean_absolute_error": 1.3607682832576562,
+        "chroma_95th_percentile_error": 4
+      },
+      "trials": [
+        {
+          "quality": 60,
+          "bytes": 220118,
+          "full_resolution_luma_ssim": 0.9429380893707275,
+          "worst_128px_luma_ssim": 0.9150203466415405,
+          "chroma_mean_absolute_error": 1.8630751414813722,
+          "chroma_95th_percentile_error": 6
+        },
+        {
+          "quality": 64,
+          "bytes": 232258,
+          "full_resolution_luma_ssim": 0.9471310973167419,
+          "worst_128px_luma_ssim": 0.9207988381385803,
+          "chroma_mean_absolute_error": 1.827542088483696,
+          "chroma_95th_percentile_error": 6
+        },
+        {
+          "quality": 68,
+          "bytes": 245714,
+          "full_resolution_luma_ssim": 0.9516562819480896,
+          "worst_128px_luma_ssim": 0.9275981783866882,
+          "chroma_mean_absolute_error": 1.7978297291388068,
+          "chroma_95th_percentile_error": 5
+        },
+        {
+          "quality": 72,
+          "bytes": 258364,
+          "full_resolution_luma_ssim": 0.9550641775131226,
+          "worst_128px_luma_ssim": 0.9305331110954285,
+          "chroma_mean_absolute_error": 1.7627711408508713,
+          "chroma_95th_percentile_error": 5
+        },
+        {
+          "quality": 76,
+          "bytes": 280310,
+          "full_resolution_luma_ssim": 0.9608580470085144,
+          "worst_128px_luma_ssim": 0.9405795335769653,
+          "chroma_mean_absolute_error": 1.7093117115559646,
+          "chroma_95th_percentile_error": 5
+        },
+        {
+          "quality": 80,
+          "bytes": 323848,
+          "full_resolution_luma_ssim": 0.9690479040145874,
+          "worst_128px_luma_ssim": 0.9510940313339233,
+          "chroma_mean_absolute_error": 1.615747461470796,
+          "chroma_95th_percentile_error": 5
+        },
+        {
+          "quality": 84,
+          "bytes": 387972,
+          "full_resolution_luma_ssim": 0.9780331254005432,
+          "worst_128px_luma_ssim": 0.9631540775299072,
+          "chroma_mean_absolute_error": 1.4993488424713606,
+          "chroma_95th_percentile_error": 4
+        },
+        {
+          "quality": 88,
+          "bytes": 463778,
+          "full_resolution_luma_ssim": 0.9853115081787109,
+          "worst_128px_luma_ssim": 0.9750897884368896,
+          "chroma_mean_absolute_error": 1.3607682832576562,
+          "chroma_95th_percentile_error": 4
+        },
+        {
+          "quality": 85,
+          "bytes": 403548,
+          "full_resolution_luma_ssim": 0.9804849624633789,
+          "worst_128px_luma_ssim": 0.9690247178077698,
+          "chroma_mean_absolute_error": 1.466569464430083,
+          "chroma_95th_percentile_error": 4
+        },
+        {
+          "quality": 86,
+          "bytes": 423646,
+          "full_resolution_luma_ssim": 0.9826236367225647,
+          "worst_128px_luma_ssim": 0.9723267555236816,
+          "chroma_mean_absolute_error": 1.440731317594537,
+          "chroma_95th_percentile_error": 4
+        },
+        {
+          "quality": 87,
+          "bytes": 434006,
+          "full_resolution_luma_ssim": 0.9832368493080139,
+          "worst_128px_luma_ssim": 0.9726305603981018,
+          "chroma_mean_absolute_error": 1.4103318901301172,
+          "chroma_95th_percentile_error": 4
+        }
+      ],
+      "note": "Lossy WebP unless quality is lossless. No resizing or upscaling. Smallest measured passing result in the searched quality interval. SSIM and chroma checks do not prove perceptual identity."
+    }
   }
 ]
