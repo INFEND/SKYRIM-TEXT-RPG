@@ -20,6 +20,7 @@ class LocalAiProgressContract(unittest.TestCase):
         self.assertIn("Генерация ответа, токены появятся",worker)
         self.assertIn('val maxTokens=if(chanceOnly)128 else if(controlled)2304 else 768',client)
         self.assertIn('ui.postDelayed(expiry,12L*60L*1000L)',client)
+        self.assertIn('if(tokens>lastTokens)armWatchdog(id)',client)
         self.assertIn('this::testLocalModel',ui)
         self.assertIn('aiLocalPhase',ui)
         self.assertIn('Прошло ',ui)

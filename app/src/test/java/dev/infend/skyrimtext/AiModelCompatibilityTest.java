@@ -42,6 +42,11 @@ public class AiModelCompatibilityTest {
         json.getJSONArray("choices").getJSONObject(1).put("title","Действие 0!");
         AiGameTurn.parseModel(json.toString(),15);
     }
+    @Test(expected=JSONException.class) public void malformedEffectsRejected() throws Exception {
+        JSONObject json=scene();
+        json.put("effects","goldDelta=500");
+        AiGameTurn.parseModel(json.toString(),15);
+    }
     @Test public void metadataIsNotStory() throws Exception {
         JSONObject json=scene();
         String original=json.getString("scene").trim();
