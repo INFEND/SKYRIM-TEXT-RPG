@@ -2352,7 +2352,7 @@
         "full_resolution_luma_ssim": 0.9865989089012146,
         "worst_128px_luma_ssim": 0.9796178340911865,
         "chroma_mean_absolute_error": 1.9341469677478402,
-        "chroma_95th_percentile_error": 6.0,
+        "chroma_95th_percentile_error": 6,
         "trials": [
           {
             "quality": 76,
@@ -2360,7 +2360,7 @@
             "full_resolution_luma_ssim": 0.9600974917411804,
             "worst_128px_luma_ssim": 0.9431657791137695,
             "chroma_mean_absolute_error": 2.3915338080734636,
-            "chroma_95th_percentile_error": 8.0
+            "chroma_95th_percentile_error": 8
           },
           {
             "quality": 80,
@@ -2368,7 +2368,7 @@
             "full_resolution_luma_ssim": 0.969936192035675,
             "worst_128px_luma_ssim": 0.9588757157325745,
             "chroma_mean_absolute_error": 2.2597222363463483,
-            "chroma_95th_percentile_error": 7.0
+            "chroma_95th_percentile_error": 7
           },
           {
             "quality": 84,
@@ -2376,7 +2376,7 @@
             "full_resolution_luma_ssim": 0.9785495400428772,
             "worst_128px_luma_ssim": 0.9702674150466919,
             "chroma_mean_absolute_error": 2.104029486090843,
-            "chroma_95th_percentile_error": 7.0
+            "chroma_95th_percentile_error": 7
           },
           {
             "quality": 88,
@@ -2384,7 +2384,7 @@
             "full_resolution_luma_ssim": 0.9865989089012146,
             "worst_128px_luma_ssim": 0.9796178340911865,
             "chroma_mean_absolute_error": 1.9341469677478402,
-            "chroma_95th_percentile_error": 6.0
+            "chroma_95th_percentile_error": 6
           }
         ]
       }
@@ -2423,7 +2423,7 @@
         "full_resolution_luma_ssim": 0.990458607673645,
         "worst_128px_luma_ssim": 0.9857858419418335,
         "chroma_mean_absolute_error": 1.1393566093283638,
-        "chroma_95th_percentile_error": 4.0,
+        "chroma_95th_percentile_error": 4,
         "trials": [
           {
             "quality": 76,
@@ -2431,7 +2431,7 @@
             "full_resolution_luma_ssim": 0.943902850151062,
             "worst_128px_luma_ssim": 0.9207128286361694,
             "chroma_mean_absolute_error": 1.6757645460138608,
-            "chroma_95th_percentile_error": 6.0
+            "chroma_95th_percentile_error": 6
           },
           {
             "quality": 80,
@@ -2439,7 +2439,7 @@
             "full_resolution_luma_ssim": 0.9548133015632629,
             "worst_128px_luma_ssim": 0.932963490486145,
             "chroma_mean_absolute_error": 1.5696951476846885,
-            "chroma_95th_percentile_error": 5.0
+            "chroma_95th_percentile_error": 5
           },
           {
             "quality": 84,
@@ -2447,7 +2447,7 @@
             "full_resolution_luma_ssim": 0.963982105255127,
             "worst_128px_luma_ssim": 0.9460441470146179,
             "chroma_mean_absolute_error": 1.4655979717189795,
-            "chroma_95th_percentile_error": 5.0
+            "chroma_95th_percentile_error": 5
           },
           {
             "quality": 88,
@@ -2455,7 +2455,7 @@
             "full_resolution_luma_ssim": 0.9752913117408752,
             "worst_128px_luma_ssim": 0.9641561508178711,
             "chroma_mean_absolute_error": 1.3593029404735877,
-            "chroma_95th_percentile_error": 4.0
+            "chroma_95th_percentile_error": 4
           },
           {
             "quality": 92,
@@ -2463,7 +2463,7 @@
             "full_resolution_luma_ssim": 0.9844633340835571,
             "worst_128px_luma_ssim": 0.9793088436126709,
             "chroma_mean_absolute_error": 1.253547839262924,
-            "chroma_95th_percentile_error": 4.0
+            "chroma_95th_percentile_error": 4
           },
           {
             "quality": 96,
@@ -2471,7 +2471,7 @@
             "full_resolution_luma_ssim": 0.990458607673645,
             "worst_128px_luma_ssim": 0.9857858419418335,
             "chroma_mean_absolute_error": 1.1393566093283638,
-            "chroma_95th_percentile_error": 4.0
+            "chroma_95th_percentile_error": 4
           }
         ]
       }
@@ -2510,7 +2510,7 @@
         "full_resolution_luma_ssim": 0.9898954629898071,
         "worst_128px_luma_ssim": 0.9858267307281494,
         "chroma_mean_absolute_error": 1.220661365034652,
-        "chroma_95th_percentile_error": 4.0,
+        "chroma_95th_percentile_error": 4,
         "trials": [
           {
             "quality": 76,
@@ -2518,7 +2518,7 @@
             "full_resolution_luma_ssim": 0.953167736530304,
             "worst_128px_luma_ssim": 0.9308119416236877,
             "chroma_mean_absolute_error": 1.6719192526529347,
-            "chroma_95th_percentile_error": 5.0
+            "chroma_95th_percentile_error": 5
           },
           {
             "quality": 80,
@@ -2526,7 +2526,7 @@
             "full_resolution_luma_ssim": 0.9632338881492615,
             "worst_128px_luma_ssim": 0.9441209435462952,
             "chroma_mean_absolute_error": 1.5829696723937174,
-            "chroma_95th_percentile_error": 5.0
+            "chroma_95th_percentile_error": 5
           },
           {
             "quality": 84,
@@ -2534,7 +2534,7 @@
             "full_resolution_luma_ssim": 0.9753065705299377,
             "worst_128px_luma_ssim": 0.9652614593505859,
             "chroma_mean_absolute_error": 1.4640528629321348,
-            "chroma_95th_percentile_error": 4.0
+            "chroma_95th_percentile_error": 4
           },
           {
             "quality": 88,
@@ -2542,7 +2542,7 @@
             "full_resolution_luma_ssim": 0.9830235242843628,
             "worst_128px_luma_ssim": 0.9761374592781067,
             "chroma_mean_absolute_error": 1.3428695549374838,
-            "chroma_95th_percentile_error": 4.0
+            "chroma_95th_percentile_error": 4
           },
           {
             "quality": 92,
@@ -2550,7 +2550,7 @@
             "full_resolution_luma_ssim": 0.9898954629898071,
             "worst_128px_luma_ssim": 0.9858267307281494,
             "chroma_mean_absolute_error": 1.220661365034652,
-            "chroma_95th_percentile_error": 4.0
+            "chroma_95th_percentile_error": 4
           }
         ]
       }
@@ -2589,7 +2589,7 @@
         "full_resolution_luma_ssim": 0.9852557182312012,
         "worst_128px_luma_ssim": 0.9710562825202942,
         "chroma_mean_absolute_error": 1.3609443404908754,
-        "chroma_95th_percentile_error": 4.0,
+        "chroma_95th_percentile_error": 4,
         "trials": [
           {
             "quality": 76,
@@ -2597,7 +2597,7 @@
             "full_resolution_luma_ssim": 0.9589317440986633,
             "worst_128px_luma_ssim": 0.9431109428405762,
             "chroma_mean_absolute_error": 1.66186714733893,
-            "chroma_95th_percentile_error": 5.0
+            "chroma_95th_percentile_error": 5
           },
           {
             "quality": 80,
@@ -2605,7 +2605,7 @@
             "full_resolution_luma_ssim": 0.9697356224060059,
             "worst_128px_luma_ssim": 0.9549614191055298,
             "chroma_mean_absolute_error": 1.5662788746574192,
-            "chroma_95th_percentile_error": 5.0
+            "chroma_95th_percentile_error": 5
           },
           {
             "quality": 84,
@@ -2613,7 +2613,7 @@
             "full_resolution_luma_ssim": 0.9780294895172119,
             "worst_128px_luma_ssim": 0.9640803933143616,
             "chroma_mean_absolute_error": 1.4784600013220182,
-            "chroma_95th_percentile_error": 5.0
+            "chroma_95th_percentile_error": 5
           },
           {
             "quality": 88,
@@ -2621,7 +2621,7 @@
             "full_resolution_luma_ssim": 0.9852557182312012,
             "worst_128px_luma_ssim": 0.9710562825202942,
             "chroma_mean_absolute_error": 1.3609443404908754,
-            "chroma_95th_percentile_error": 4.0
+            "chroma_95th_percentile_error": 4
           }
         ]
       }
@@ -2661,7 +2661,7 @@
         "full_resolution_luma_ssim": 0.9871535897254944,
         "worst_128px_luma_ssim": 0.9801188707351685,
         "chroma_mean_absolute_error": 0.9195062516207435,
-        "chroma_95th_percentile_error": 3.0,
+        "chroma_95th_percentile_error": 3,
         "trials": [
           {
             "quality": 76,
@@ -2669,7 +2669,7 @@
             "full_resolution_luma_ssim": 0.9476692080497742,
             "worst_128px_luma_ssim": 0.9259767532348633,
             "chroma_mean_absolute_error": 1.2217224753265639,
-            "chroma_95th_percentile_error": 4.0
+            "chroma_95th_percentile_error": 4
           },
           {
             "quality": 80,
@@ -2677,7 +2677,7 @@
             "full_resolution_luma_ssim": 0.9594883322715759,
             "worst_128px_luma_ssim": 0.9438680410385132,
             "chroma_mean_absolute_error": 1.1567939024452252,
-            "chroma_95th_percentile_error": 4.0
+            "chroma_95th_percentile_error": 4
           },
           {
             "quality": 84,
@@ -2685,7 +2685,7 @@
             "full_resolution_luma_ssim": 0.9702548980712891,
             "worst_128px_luma_ssim": 0.9590758681297302,
             "chroma_mean_absolute_error": 1.0891567811907317,
-            "chroma_95th_percentile_error": 3.0
+            "chroma_95th_percentile_error": 3
           },
           {
             "quality": 88,
@@ -2693,7 +2693,7 @@
             "full_resolution_luma_ssim": 0.9789782166481018,
             "worst_128px_luma_ssim": 0.970663845539093,
             "chroma_mean_absolute_error": 1.0034798315952183,
-            "chroma_95th_percentile_error": 3.0
+            "chroma_95th_percentile_error": 3
           },
           {
             "quality": 92,
@@ -2701,7 +2701,7 @@
             "full_resolution_luma_ssim": 0.9871535897254944,
             "worst_128px_luma_ssim": 0.9801188707351685,
             "chroma_mean_absolute_error": 0.9195062516207435,
-            "chroma_95th_percentile_error": 3.0
+            "chroma_95th_percentile_error": 3
           }
         ]
       }
@@ -2740,7 +2740,7 @@
         "full_resolution_luma_ssim": 0.9904125928878784,
         "worst_128px_luma_ssim": 0.9861080646514893,
         "chroma_mean_absolute_error": 1.1000090888752168,
-        "chroma_95th_percentile_error": 3.0,
+        "chroma_95th_percentile_error": 3,
         "trials": [
           {
             "quality": 76,
@@ -2748,7 +2748,7 @@
             "full_resolution_luma_ssim": 0.9598022103309631,
             "worst_128px_luma_ssim": 0.9383255839347839,
             "chroma_mean_absolute_error": 1.5959114679995323,
-            "chroma_95th_percentile_error": 5.0
+            "chroma_95th_percentile_error": 5
           },
           {
             "quality": 80,
@@ -2756,7 +2756,7 @@
             "full_resolution_luma_ssim": 0.9687360525131226,
             "worst_128px_luma_ssim": 0.9519672393798828,
             "chroma_mean_absolute_error": 1.4854044104561472,
-            "chroma_95th_percentile_error": 4.0
+            "chroma_95th_percentile_error": 4
           },
           {
             "quality": 84,
@@ -2764,7 +2764,7 @@
             "full_resolution_luma_ssim": 0.9769452810287476,
             "worst_128px_luma_ssim": 0.9642045497894287,
             "chroma_mean_absolute_error": 1.38258094819214,
-            "chroma_95th_percentile_error": 4.0
+            "chroma_95th_percentile_error": 4
           },
           {
             "quality": 88,
@@ -2772,7 +2772,7 @@
             "full_resolution_luma_ssim": 0.984717607498169,
             "worst_128px_luma_ssim": 0.9763884544372559,
             "chroma_mean_absolute_error": 1.2483570110185134,
-            "chroma_95th_percentile_error": 4.0
+            "chroma_95th_percentile_error": 4
           },
           {
             "quality": 92,
@@ -2780,7 +2780,7 @@
             "full_resolution_luma_ssim": 0.9904125928878784,
             "worst_128px_luma_ssim": 0.9861080646514893,
             "chroma_mean_absolute_error": 1.1000090888752168,
-            "chroma_95th_percentile_error": 3.0
+            "chroma_95th_percentile_error": 3
           }
         ]
       },
@@ -2820,7 +2820,7 @@
         "full_resolution_luma_ssim": 0.9909814596176147,
         "worst_128px_luma_ssim": 0.9850001335144043,
         "chroma_mean_absolute_error": 1.1153394154645624,
-        "chroma_95th_percentile_error": 3.0,
+        "chroma_95th_percentile_error": 3,
         "trials": [
           {
             "quality": 76,
@@ -2828,7 +2828,7 @@
             "full_resolution_luma_ssim": 0.9572696089744568,
             "worst_128px_luma_ssim": 0.9325006604194641,
             "chroma_mean_absolute_error": 1.5059401837605317,
-            "chroma_95th_percentile_error": 5.0
+            "chroma_95th_percentile_error": 5
           },
           {
             "quality": 80,
@@ -2836,7 +2836,7 @@
             "full_resolution_luma_ssim": 0.967674970626831,
             "worst_128px_luma_ssim": 0.9456162452697754,
             "chroma_mean_absolute_error": 1.4236632997574605,
-            "chroma_95th_percentile_error": 4.0
+            "chroma_95th_percentile_error": 4
           },
           {
             "quality": 84,
@@ -2844,7 +2844,7 @@
             "full_resolution_luma_ssim": 0.9766621589660645,
             "worst_128px_luma_ssim": 0.9584071636199951,
             "chroma_mean_absolute_error": 1.3371378432798255,
-            "chroma_95th_percentile_error": 4.0
+            "chroma_95th_percentile_error": 4
           },
           {
             "quality": 88,
@@ -2852,7 +2852,7 @@
             "full_resolution_luma_ssim": 0.9849790930747986,
             "worst_128px_luma_ssim": 0.9721680879592896,
             "chroma_mean_absolute_error": 1.2350951980230742,
-            "chroma_95th_percentile_error": 4.0
+            "chroma_95th_percentile_error": 4
           },
           {
             "quality": 92,
@@ -2860,7 +2860,7 @@
             "full_resolution_luma_ssim": 0.9909814596176147,
             "worst_128px_luma_ssim": 0.9850001335144043,
             "chroma_mean_absolute_error": 1.1153394154645624,
-            "chroma_95th_percentile_error": 3.0
+            "chroma_95th_percentile_error": 3
           }
         ]
       }
@@ -2900,7 +2900,7 @@
         "full_resolution_luma_ssim": 0.9895981550216675,
         "worst_128px_luma_ssim": 0.9832198619842529,
         "chroma_mean_absolute_error": 1.0387516588786234,
-        "chroma_95th_percentile_error": 3.0,
+        "chroma_95th_percentile_error": 3,
         "trials": [
           {
             "quality": 76,
@@ -2908,7 +2908,7 @@
             "full_resolution_luma_ssim": 0.9541957378387451,
             "worst_128px_luma_ssim": 0.9267361164093018,
             "chroma_mean_absolute_error": 1.4436127452725138,
-            "chroma_95th_percentile_error": 4.0
+            "chroma_95th_percentile_error": 4
           },
           {
             "quality": 80,
@@ -2916,7 +2916,7 @@
             "full_resolution_luma_ssim": 0.9648061394691467,
             "worst_128px_luma_ssim": 0.945486307144165,
             "chroma_mean_absolute_error": 1.3745700262878238,
-            "chroma_95th_percentile_error": 4.0
+            "chroma_95th_percentile_error": 4
           },
           {
             "quality": 84,
@@ -2924,7 +2924,7 @@
             "full_resolution_luma_ssim": 0.974250078201294,
             "worst_128px_luma_ssim": 0.960603654384613,
             "chroma_mean_absolute_error": 1.288966169045452,
-            "chroma_95th_percentile_error": 4.0
+            "chroma_95th_percentile_error": 4
           },
           {
             "quality": 88,
@@ -2932,7 +2932,7 @@
             "full_resolution_luma_ssim": 0.9831812381744385,
             "worst_128px_luma_ssim": 0.9741262197494507,
             "chroma_mean_absolute_error": 1.175470269844256,
-            "chroma_95th_percentile_error": 3.0
+            "chroma_95th_percentile_error": 3
           },
           {
             "quality": 92,
@@ -2940,7 +2940,7 @@
             "full_resolution_luma_ssim": 0.9895981550216675,
             "worst_128px_luma_ssim": 0.9832198619842529,
             "chroma_mean_absolute_error": 1.0387516588786234,
-            "chroma_95th_percentile_error": 3.0
+            "chroma_95th_percentile_error": 3
           }
         ]
       }
@@ -2979,7 +2979,7 @@
         "full_resolution_luma_ssim": 0.9857370853424072,
         "worst_128px_luma_ssim": 0.974044919013977,
         "chroma_mean_absolute_error": 1.8068124615470664,
-        "chroma_95th_percentile_error": 6.0,
+        "chroma_95th_percentile_error": 6,
         "trials": [
           {
             "quality": 76,
@@ -2987,7 +2987,7 @@
             "full_resolution_luma_ssim": 0.9606592059135437,
             "worst_128px_luma_ssim": 0.9378418922424316,
             "chroma_mean_absolute_error": 2.216163007388048,
-            "chroma_95th_percentile_error": 7.0
+            "chroma_95th_percentile_error": 7
           },
           {
             "quality": 80,
@@ -2995,7 +2995,7 @@
             "full_resolution_luma_ssim": 0.9704868197441101,
             "worst_128px_luma_ssim": 0.9534908533096313,
             "chroma_mean_absolute_error": 2.0965677102136078,
-            "chroma_95th_percentile_error": 7.0
+            "chroma_95th_percentile_error": 7
           },
           {
             "quality": 84,
@@ -3003,7 +3003,7 @@
             "full_resolution_luma_ssim": 0.9785954356193542,
             "worst_128px_luma_ssim": 0.9646588563919067,
             "chroma_mean_absolute_error": 1.940846358602525,
-            "chroma_95th_percentile_error": 6.0
+            "chroma_95th_percentile_error": 6
           },
           {
             "quality": 88,
@@ -3011,7 +3011,7 @@
             "full_resolution_luma_ssim": 0.9857370853424072,
             "worst_128px_luma_ssim": 0.974044919013977,
             "chroma_mean_absolute_error": 1.8068124615470664,
-            "chroma_95th_percentile_error": 6.0
+            "chroma_95th_percentile_error": 6
           }
         ]
       }
@@ -3050,7 +3050,7 @@
         "full_resolution_luma_ssim": 0.9910780787467957,
         "worst_128px_luma_ssim": 0.9834598302841187,
         "chroma_mean_absolute_error": 1.308529178467374,
-        "chroma_95th_percentile_error": 4.0,
+        "chroma_95th_percentile_error": 4,
         "trials": [
           {
             "quality": 76,
@@ -3058,7 +3058,7 @@
             "full_resolution_luma_ssim": 0.9564737677574158,
             "worst_128px_luma_ssim": 0.9406926035881042,
             "chroma_mean_absolute_error": 1.7465319267398522,
-            "chroma_95th_percentile_error": 5.0
+            "chroma_95th_percentile_error": 5
           },
           {
             "quality": 80,
@@ -3066,7 +3066,7 @@
             "full_resolution_luma_ssim": 0.9680618047714233,
             "worst_128px_luma_ssim": 0.9557859301567078,
             "chroma_mean_absolute_error": 1.6478359578784658,
-            "chroma_95th_percentile_error": 5.0
+            "chroma_95th_percentile_error": 5
           },
           {
             "quality": 84,
@@ -3074,7 +3074,7 @@
             "full_resolution_luma_ssim": 0.9775511622428894,
             "worst_128px_luma_ssim": 0.9683917760848999,
             "chroma_mean_absolute_error": 1.5463243444569301,
-            "chroma_95th_percentile_error": 5.0
+            "chroma_95th_percentile_error": 5
           },
           {
             "quality": 88,
@@ -3082,7 +3082,7 @@
             "full_resolution_luma_ssim": 0.9848574995994568,
             "worst_128px_luma_ssim": 0.9765030741691589,
             "chroma_mean_absolute_error": 1.450639144959297,
-            "chroma_95th_percentile_error": 4.0
+            "chroma_95th_percentile_error": 4
           },
           {
             "quality": 92,
@@ -3090,7 +3090,7 @@
             "full_resolution_luma_ssim": 0.9910780787467957,
             "worst_128px_luma_ssim": 0.9834598302841187,
             "chroma_mean_absolute_error": 1.308529178467374,
-            "chroma_95th_percentile_error": 4.0
+            "chroma_95th_percentile_error": 4
           }
         ]
       }
@@ -3129,7 +3129,7 @@
         "full_resolution_luma_ssim": 0.9902860522270203,
         "worst_128px_luma_ssim": 0.9839213490486145,
         "chroma_mean_absolute_error": 0.9879639139874612,
-        "chroma_95th_percentile_error": 3.0,
+        "chroma_95th_percentile_error": 3,
         "trials": [
           {
             "quality": 76,
@@ -3137,7 +3137,7 @@
             "full_resolution_luma_ssim": 0.9570779800415039,
             "worst_128px_luma_ssim": 0.9371142387390137,
             "chroma_mean_absolute_error": 1.320918014532031,
-            "chroma_95th_percentile_error": 4.0
+            "chroma_95th_percentile_error": 4
           },
           {
             "quality": 80,
@@ -3145,7 +3145,7 @@
             "full_resolution_luma_ssim": 0.9675669074058533,
             "worst_128px_luma_ssim": 0.9532763957977295,
             "chroma_mean_absolute_error": 1.2553462289430464,
-            "chroma_95th_percentile_error": 4.0
+            "chroma_95th_percentile_error": 4
           },
           {
             "quality": 84,
@@ -3153,7 +3153,7 @@
             "full_resolution_luma_ssim": 0.9762973189353943,
             "worst_128px_luma_ssim": 0.9656116366386414,
             "chroma_mean_absolute_error": 1.1855999166111588,
-            "chroma_95th_percentile_error": 4.0
+            "chroma_95th_percentile_error": 4
           },
           {
             "quality": 88,
@@ -3161,7 +3161,7 @@
             "full_resolution_luma_ssim": 0.9841164946556091,
             "worst_128px_luma_ssim": 0.9759202599525452,
             "chroma_mean_absolute_error": 1.088252978354494,
-            "chroma_95th_percentile_error": 3.0
+            "chroma_95th_percentile_error": 3
           },
           {
             "quality": 92,
@@ -3169,7 +3169,7 @@
             "full_resolution_luma_ssim": 0.9902860522270203,
             "worst_128px_luma_ssim": 0.9839213490486145,
             "chroma_mean_absolute_error": 0.9879639139874612,
-            "chroma_95th_percentile_error": 3.0
+            "chroma_95th_percentile_error": 3
           }
         ]
       }
@@ -3208,7 +3208,7 @@
         "full_resolution_luma_ssim": 0.9901562333106995,
         "worst_128px_luma_ssim": 0.9833322167396545,
         "chroma_mean_absolute_error": 1.2586703420467893,
-        "chroma_95th_percentile_error": 4.0,
+        "chroma_95th_percentile_error": 4,
         "trials": [
           {
             "quality": 76,
@@ -3216,7 +3216,7 @@
             "full_resolution_luma_ssim": 0.9557408094406128,
             "worst_128px_luma_ssim": 0.9336581230163574,
             "chroma_mean_absolute_error": 1.8305134515353207,
-            "chroma_95th_percentile_error": 6.0
+            "chroma_95th_percentile_error": 6
           },
           {
             "quality": 80,
@@ -3224,7 +3224,7 @@
             "full_resolution_luma_ssim": 0.9666191935539246,
             "worst_128px_luma_ssim": 0.9498627781867981,
             "chroma_mean_absolute_error": 1.697002641494084,
-            "chroma_95th_percentile_error": 5.0
+            "chroma_95th_percentile_error": 5
           },
           {
             "quality": 84,
@@ -3232,7 +3232,7 @@
             "full_resolution_luma_ssim": 0.9760633707046509,
             "worst_128px_luma_ssim": 0.9646193981170654,
             "chroma_mean_absolute_error": 1.5707597536978375,
-            "chroma_95th_percentile_error": 5.0
+            "chroma_95th_percentile_error": 5
           },
           {
             "quality": 88,
@@ -3240,7 +3240,7 @@
             "full_resolution_luma_ssim": 0.9836571216583252,
             "worst_128px_luma_ssim": 0.9734359979629517,
             "chroma_mean_absolute_error": 1.4213866318535204,
-            "chroma_95th_percentile_error": 4.0
+            "chroma_95th_percentile_error": 4
           },
           {
             "quality": 92,
@@ -3248,7 +3248,7 @@
             "full_resolution_luma_ssim": 0.9901562333106995,
             "worst_128px_luma_ssim": 0.9833322167396545,
             "chroma_mean_absolute_error": 1.2586703420467893,
-            "chroma_95th_percentile_error": 4.0
+            "chroma_95th_percentile_error": 4
           }
         ]
       }
@@ -3287,7 +3287,7 @@
         "full_resolution_luma_ssim": 0.985647976398468,
         "worst_128px_luma_ssim": 0.9781144857406616,
         "chroma_mean_absolute_error": 1.4488506068572067,
-        "chroma_95th_percentile_error": 4.0,
+        "chroma_95th_percentile_error": 4,
         "trials": [
           {
             "quality": 76,
@@ -3295,7 +3295,7 @@
             "full_resolution_luma_ssim": 0.9579562544822693,
             "worst_128px_luma_ssim": 0.9325969219207764,
             "chroma_mean_absolute_error": 1.83838327341879,
-            "chroma_95th_percentile_error": 5.0
+            "chroma_95th_percentile_error": 5
           },
           {
             "quality": 80,
@@ -3303,7 +3303,7 @@
             "full_resolution_luma_ssim": 0.9687304496765137,
             "worst_128px_luma_ssim": 0.9475952982902527,
             "chroma_mean_absolute_error": 1.7178072675408935,
-            "chroma_95th_percentile_error": 5.0
+            "chroma_95th_percentile_error": 5
           },
           {
             "quality": 84,
@@ -3311,7 +3311,7 @@
             "full_resolution_luma_ssim": 0.9775065779685974,
             "worst_128px_luma_ssim": 0.963415265083313,
             "chroma_mean_absolute_error": 1.5961247069950018,
-            "chroma_95th_percentile_error": 5.0
+            "chroma_95th_percentile_error": 5
           },
           {
             "quality": 88,
@@ -3319,7 +3319,7 @@
             "full_resolution_luma_ssim": 0.985647976398468,
             "worst_128px_luma_ssim": 0.9781144857406616,
             "chroma_mean_absolute_error": 1.4488506068572067,
-            "chroma_95th_percentile_error": 4.0
+            "chroma_95th_percentile_error": 4
           }
         ]
       }
@@ -3359,7 +3359,7 @@
         "full_resolution_luma_ssim": 0.9896867275238037,
         "worst_128px_luma_ssim": 0.9838946461677551,
         "chroma_mean_absolute_error": 1.1595631492507716,
-        "chroma_95th_percentile_error": 3.0,
+        "chroma_95th_percentile_error": 3,
         "trials": [
           {
             "quality": 76,
@@ -3367,7 +3367,7 @@
             "full_resolution_luma_ssim": 0.952673077583313,
             "worst_128px_luma_ssim": 0.9373376369476318,
             "chroma_mean_absolute_error": 1.5613756489329789,
-            "chroma_95th_percentile_error": 5.0
+            "chroma_95th_percentile_error": 5
           },
           {
             "quality": 80,
@@ -3375,7 +3375,7 @@
             "full_resolution_luma_ssim": 0.9622620940208435,
             "worst_128px_luma_ssim": 0.9472432136535645,
             "chroma_mean_absolute_error": 1.4856977332472328,
-            "chroma_95th_percentile_error": 4.0
+            "chroma_95th_percentile_error": 4
           },
           {
             "quality": 84,
@@ -3383,7 +3383,7 @@
             "full_resolution_luma_ssim": 0.9749165177345276,
             "worst_128px_luma_ssim": 0.9660685062408447,
             "chroma_mean_absolute_error": 1.3828695040906294,
-            "chroma_95th_percentile_error": 4.0
+            "chroma_95th_percentile_error": 4
           },
           {
             "quality": 88,
@@ -3391,7 +3391,7 @@
             "full_resolution_luma_ssim": 0.9828032851219177,
             "worst_128px_luma_ssim": 0.9752504825592041,
             "chroma_mean_absolute_error": 1.2746708937351592,
-            "chroma_95th_percentile_error": 4.0
+            "chroma_95th_percentile_error": 4
           },
           {
             "quality": 92,
@@ -3399,7 +3399,7 @@
             "full_resolution_luma_ssim": 0.9896867275238037,
             "worst_128px_luma_ssim": 0.9838946461677551,
             "chroma_mean_absolute_error": 1.1595631492507716,
-            "chroma_95th_percentile_error": 3.0
+            "chroma_95th_percentile_error": 3
           }
         ]
       }
@@ -3438,7 +3438,7 @@
         "full_resolution_luma_ssim": 0.990716814994812,
         "worst_128px_luma_ssim": 0.9837215542793274,
         "chroma_mean_absolute_error": 1.0070495985640848,
-        "chroma_95th_percentile_error": 3.0,
+        "chroma_95th_percentile_error": 3,
         "trials": [
           {
             "quality": 76,
@@ -3446,7 +3446,7 @@
             "full_resolution_luma_ssim": 0.9600217938423157,
             "worst_128px_luma_ssim": 0.9344291687011719,
             "chroma_mean_absolute_error": 1.4169388032684358,
-            "chroma_95th_percentile_error": 4.0
+            "chroma_95th_percentile_error": 4
           },
           {
             "quality": 80,
@@ -3454,7 +3454,7 @@
             "full_resolution_luma_ssim": 0.9689416289329529,
             "worst_128px_luma_ssim": 0.9483322501182556,
             "chroma_mean_absolute_error": 1.344578327036798,
-            "chroma_95th_percentile_error": 4.0
+            "chroma_95th_percentile_error": 4
           },
           {
             "quality": 84,
@@ -3462,7 +3462,7 @@
             "full_resolution_luma_ssim": 0.9784854054450989,
             "worst_128px_luma_ssim": 0.9663114547729492,
             "chroma_mean_absolute_error": 1.2428525212412733,
-            "chroma_95th_percentile_error": 4.0
+            "chroma_95th_percentile_error": 4
           },
           {
             "quality": 88,
@@ -3470,7 +3470,7 @@
             "full_resolution_luma_ssim": 0.9848382472991943,
             "worst_128px_luma_ssim": 0.9745551943778992,
             "chroma_mean_absolute_error": 1.1547260244369981,
-            "chroma_95th_percentile_error": 3.0
+            "chroma_95th_percentile_error": 3
           },
           {
             "quality": 92,
@@ -3478,7 +3478,7 @@
             "full_resolution_luma_ssim": 0.990716814994812,
             "worst_128px_luma_ssim": 0.9837215542793274,
             "chroma_mean_absolute_error": 1.0070495985640848,
-            "chroma_95th_percentile_error": 3.0
+            "chroma_95th_percentile_error": 3
           }
         ]
       }
@@ -3517,7 +3517,7 @@
         "full_resolution_luma_ssim": 0.9870984554290771,
         "worst_128px_luma_ssim": 0.977443277835846,
         "chroma_mean_absolute_error": 1.1704405625695966,
-        "chroma_95th_percentile_error": 3.0,
+        "chroma_95th_percentile_error": 3,
         "trials": [
           {
             "quality": 76,
@@ -3525,7 +3525,7 @@
             "full_resolution_luma_ssim": 0.9649710655212402,
             "worst_128px_luma_ssim": 0.940322995185852,
             "chroma_mean_absolute_error": 1.484206331450305,
-            "chroma_95th_percentile_error": 5.0
+            "chroma_95th_percentile_error": 5
           },
           {
             "quality": 80,
@@ -3533,7 +3533,7 @@
             "full_resolution_luma_ssim": 0.9734458327293396,
             "worst_128px_luma_ssim": 0.9530279636383057,
             "chroma_mean_absolute_error": 1.398380019220111,
-            "chroma_95th_percentile_error": 4.0
+            "chroma_95th_percentile_error": 4
           },
           {
             "quality": 84,
@@ -3541,7 +3541,7 @@
             "full_resolution_luma_ssim": 0.9809089303016663,
             "worst_128px_luma_ssim": 0.9656997323036194,
             "chroma_mean_absolute_error": 1.2879158637100916,
-            "chroma_95th_percentile_error": 4.0
+            "chroma_95th_percentile_error": 4
           },
           {
             "quality": 88,
@@ -3549,7 +3549,7 @@
             "full_resolution_luma_ssim": 0.9870984554290771,
             "worst_128px_luma_ssim": 0.977443277835846,
             "chroma_mean_absolute_error": 1.1704405625695966,
-            "chroma_95th_percentile_error": 3.0
+            "chroma_95th_percentile_error": 3
           }
         ]
       }
@@ -3588,7 +3588,7 @@
         "full_resolution_luma_ssim": 0.9933580756187439,
         "worst_128px_luma_ssim": 0.9841621518135071,
         "chroma_mean_absolute_error": 2.3112513919326383,
-        "chroma_95th_percentile_error": 7.0,
+        "chroma_95th_percentile_error": 7,
         "trials": [
           {
             "quality": 76,
@@ -3596,7 +3596,7 @@
             "full_resolution_luma_ssim": 0.9640406966209412,
             "worst_128px_luma_ssim": 0.9409544467926025,
             "chroma_mean_absolute_error": 3.011994772943372,
-            "chroma_95th_percentile_error": 9.0
+            "chroma_95th_percentile_error": 9
           },
           {
             "quality": 80,
@@ -3604,7 +3604,7 @@
             "full_resolution_luma_ssim": 0.974764883518219,
             "worst_128px_luma_ssim": 0.9600355625152588,
             "chroma_mean_absolute_error": 2.825328979147705,
-            "chroma_95th_percentile_error": 9.0
+            "chroma_95th_percentile_error": 9
           },
           {
             "quality": 84,
@@ -3612,7 +3612,7 @@
             "full_resolution_luma_ssim": 0.9828422665596008,
             "worst_128px_luma_ssim": 0.9693654775619507,
             "chroma_mean_absolute_error": 2.6565771677285186,
-            "chroma_95th_percentile_error": 8.0
+            "chroma_95th_percentile_error": 8
           },
           {
             "quality": 88,
@@ -3620,7 +3620,7 @@
             "full_resolution_luma_ssim": 0.9884001016616821,
             "worst_128px_luma_ssim": 0.9773544073104858,
             "chroma_mean_absolute_error": 2.479813798819336,
-            "chroma_95th_percentile_error": 8.0
+            "chroma_95th_percentile_error": 8
           },
           {
             "quality": 92,
@@ -3628,7 +3628,7 @@
             "full_resolution_luma_ssim": 0.9933580756187439,
             "worst_128px_luma_ssim": 0.9841621518135071,
             "chroma_mean_absolute_error": 2.3112513919326383,
-            "chroma_95th_percentile_error": 7.0
+            "chroma_95th_percentile_error": 7
           }
         ]
       }
@@ -3667,7 +3667,7 @@
         "full_resolution_luma_ssim": 0.9880148768424988,
         "worst_128px_luma_ssim": 0.9773322343826294,
         "chroma_mean_absolute_error": 1.8589241314086105,
-        "chroma_95th_percentile_error": 6.0,
+        "chroma_95th_percentile_error": 6,
         "trials": [
           {
             "quality": 76,
@@ -3675,7 +3675,7 @@
             "full_resolution_luma_ssim": 0.9640505313873291,
             "worst_128px_luma_ssim": 0.9478444457054138,
             "chroma_mean_absolute_error": 2.294977220609247,
-            "chroma_95th_percentile_error": 7.0
+            "chroma_95th_percentile_error": 7
           },
           {
             "quality": 80,
@@ -3683,7 +3683,7 @@
             "full_resolution_luma_ssim": 0.9737737774848938,
             "worst_128px_luma_ssim": 0.9598963260650635,
             "chroma_mean_absolute_error": 2.15788838098531,
-            "chroma_95th_percentile_error": 7.0
+            "chroma_95th_percentile_error": 7
           },
           {
             "quality": 84,
@@ -3691,7 +3691,7 @@
             "full_resolution_luma_ssim": 0.9812562465667725,
             "worst_128px_luma_ssim": 0.9698399305343628,
             "chroma_mean_absolute_error": 2.033598012396463,
-            "chroma_95th_percentile_error": 6.0
+            "chroma_95th_percentile_error": 6
           },
           {
             "quality": 88,
@@ -3699,7 +3699,7 @@
             "full_resolution_luma_ssim": 0.9880148768424988,
             "worst_128px_luma_ssim": 0.9773322343826294,
             "chroma_mean_absolute_error": 1.8589241314086105,
-            "chroma_95th_percentile_error": 6.0
+            "chroma_95th_percentile_error": 6
           }
         ]
       }
@@ -3738,7 +3738,7 @@
         "full_resolution_luma_ssim": 0.9855754971504211,
         "worst_128px_luma_ssim": 0.9734694957733154,
         "chroma_mean_absolute_error": 1.1158758497780534,
-        "chroma_95th_percentile_error": 3.0,
+        "chroma_95th_percentile_error": 3,
         "trials": [
           {
             "quality": 76,
@@ -3746,7 +3746,7 @@
             "full_resolution_luma_ssim": 0.9625526666641235,
             "worst_128px_luma_ssim": 0.9248436689376831,
             "chroma_mean_absolute_error": 1.391753402925728,
-            "chroma_95th_percentile_error": 4.0
+            "chroma_95th_percentile_error": 4
           },
           {
             "quality": 80,
@@ -3754,7 +3754,7 @@
             "full_resolution_luma_ssim": 0.9709326028823853,
             "worst_128px_luma_ssim": 0.9408714175224304,
             "chroma_mean_absolute_error": 1.3156633099268313,
-            "chroma_95th_percentile_error": 4.0
+            "chroma_95th_percentile_error": 4
           },
           {
             "quality": 84,
@@ -3762,7 +3762,7 @@
             "full_resolution_luma_ssim": 0.9768518209457397,
             "worst_128px_luma_ssim": 0.9524438381195068,
             "chroma_mean_absolute_error": 1.2417319836883292,
-            "chroma_95th_percentile_error": 4.0
+            "chroma_95th_percentile_error": 4
           },
           {
             "quality": 88,
@@ -3770,7 +3770,7 @@
             "full_resolution_luma_ssim": 0.9855754971504211,
             "worst_128px_luma_ssim": 0.9734694957733154,
             "chroma_mean_absolute_error": 1.1158758497780534,
-            "chroma_95th_percentile_error": 3.0
+            "chroma_95th_percentile_error": 3
           }
         ]
       }
@@ -3809,7 +3809,7 @@
         "full_resolution_luma_ssim": 0.9902880191802979,
         "worst_128px_luma_ssim": 0.9850804805755615,
         "chroma_mean_absolute_error": 1.7210827583401553,
-        "chroma_95th_percentile_error": 6.0,
+        "chroma_95th_percentile_error": 6,
         "trials": [
           {
             "quality": 76,
@@ -3817,7 +3817,7 @@
             "full_resolution_luma_ssim": 0.955639660358429,
             "worst_128px_luma_ssim": 0.9391473531723022,
             "chroma_mean_absolute_error": 2.280156315942014,
-            "chroma_95th_percentile_error": 7.0
+            "chroma_95th_percentile_error": 7
           },
           {
             "quality": 80,
@@ -3825,7 +3825,7 @@
             "full_resolution_luma_ssim": 0.9665836095809937,
             "worst_128px_luma_ssim": 0.9538623690605164,
             "chroma_mean_absolute_error": 2.1490597781043275,
-            "chroma_95th_percentile_error": 7.0
+            "chroma_95th_percentile_error": 7
           },
           {
             "quality": 84,
@@ -3833,7 +3833,7 @@
             "full_resolution_luma_ssim": 0.9758296012878418,
             "worst_128px_luma_ssim": 0.9671469926834106,
             "chroma_mean_absolute_error": 2.0047379734477726,
-            "chroma_95th_percentile_error": 6.0
+            "chroma_95th_percentile_error": 6
           },
           {
             "quality": 88,
@@ -3841,7 +3841,7 @@
             "full_resolution_luma_ssim": 0.9847403764724731,
             "worst_128px_luma_ssim": 0.9780170917510986,
             "chroma_mean_absolute_error": 1.8560595467511403,
-            "chroma_95th_percentile_error": 6.0
+            "chroma_95th_percentile_error": 6
           },
           {
             "quality": 92,
@@ -3849,7 +3849,7 @@
             "full_resolution_luma_ssim": 0.9902880191802979,
             "worst_128px_luma_ssim": 0.9850804805755615,
             "chroma_mean_absolute_error": 1.7210827583401553,
-            "chroma_95th_percentile_error": 6.0
+            "chroma_95th_percentile_error": 6
           }
         ]
       }
@@ -3888,7 +3888,7 @@
         "full_resolution_luma_ssim": 0.988855242729187,
         "worst_128px_luma_ssim": 0.9829367399215698,
         "chroma_mean_absolute_error": 1.7117498182224957,
-        "chroma_95th_percentile_error": 5.0,
+        "chroma_95th_percentile_error": 5,
         "trials": [
           {
             "quality": 76,
@@ -3896,7 +3896,7 @@
             "full_resolution_luma_ssim": 0.9681578874588013,
             "worst_128px_luma_ssim": 0.9486165046691895,
             "chroma_mean_absolute_error": 2.1285424367846484,
-            "chroma_95th_percentile_error": 7.0
+            "chroma_95th_percentile_error": 7
           },
           {
             "quality": 80,
@@ -3904,7 +3904,7 @@
             "full_resolution_luma_ssim": 0.976409912109375,
             "worst_128px_luma_ssim": 0.9607654809951782,
             "chroma_mean_absolute_error": 2.01084658741337,
-            "chroma_95th_percentile_error": 6.0
+            "chroma_95th_percentile_error": 6
           },
           {
             "quality": 84,
@@ -3912,7 +3912,7 @@
             "full_resolution_luma_ssim": 0.9837123155593872,
             "worst_128px_luma_ssim": 0.9731168746948242,
             "chroma_mean_absolute_error": 1.8559556284925434,
-            "chroma_95th_percentile_error": 6.0
+            "chroma_95th_percentile_error": 6
           },
           {
             "quality": 88,
@@ -3920,7 +3920,7 @@
             "full_resolution_luma_ssim": 0.988855242729187,
             "worst_128px_luma_ssim": 0.9829367399215698,
             "chroma_mean_absolute_error": 1.7117498182224957,
-            "chroma_95th_percentile_error": 5.0
+            "chroma_95th_percentile_error": 5
           }
         ]
       }
@@ -3959,7 +3959,7 @@
         "full_resolution_luma_ssim": 0.9895209670066833,
         "worst_128px_luma_ssim": 0.9832313060760498,
         "chroma_mean_absolute_error": 0.9763787760145218,
-        "chroma_95th_percentile_error": 3.0,
+        "chroma_95th_percentile_error": 3,
         "trials": [
           {
             "quality": 76,
@@ -3967,7 +3967,7 @@
             "full_resolution_luma_ssim": 0.9560264348983765,
             "worst_128px_luma_ssim": 0.9241801500320435,
             "chroma_mean_absolute_error": 1.3431968815624222,
-            "chroma_95th_percentile_error": 4.0
+            "chroma_95th_percentile_error": 4
           },
           {
             "quality": 80,
@@ -3975,7 +3975,7 @@
             "full_resolution_luma_ssim": 0.9668685793876648,
             "worst_128px_luma_ssim": 0.9423812627792358,
             "chroma_mean_absolute_error": 1.2672196050216353,
-            "chroma_95th_percentile_error": 4.0
+            "chroma_95th_percentile_error": 4
           },
           {
             "quality": 84,
@@ -3983,7 +3983,7 @@
             "full_resolution_luma_ssim": 0.9759683012962341,
             "worst_128px_luma_ssim": 0.9579193592071533,
             "chroma_mean_absolute_error": 1.1848718532153009,
-            "chroma_95th_percentile_error": 4.0
+            "chroma_95th_percentile_error": 4
           },
           {
             "quality": 88,
@@ -3991,7 +3991,7 @@
             "full_resolution_luma_ssim": 0.9834381341934204,
             "worst_128px_luma_ssim": 0.9732741117477417,
             "chroma_mean_absolute_error": 1.0781579710071236,
-            "chroma_95th_percentile_error": 3.0
+            "chroma_95th_percentile_error": 3
           },
           {
             "quality": 92,
@@ -3999,7 +3999,7 @@
             "full_resolution_luma_ssim": 0.9895209670066833,
             "worst_128px_luma_ssim": 0.9832313060760498,
             "chroma_mean_absolute_error": 0.9763787760145218,
-            "chroma_95th_percentile_error": 3.0
+            "chroma_95th_percentile_error": 3
           }
         ]
       }
@@ -4038,7 +4038,7 @@
         "full_resolution_luma_ssim": 0.9853521585464478,
         "worst_128px_luma_ssim": 0.9758909940719604,
         "chroma_mean_absolute_error": 1.3602839669698834,
-        "chroma_95th_percentile_error": 4.0,
+        "chroma_95th_percentile_error": 4,
         "trials": [
           {
             "quality": 76,
@@ -4046,7 +4046,7 @@
             "full_resolution_luma_ssim": 0.9582638144493103,
             "worst_128px_luma_ssim": 0.9434856176376343,
             "chroma_mean_absolute_error": 1.6860016067605978,
-            "chroma_95th_percentile_error": 5.0
+            "chroma_95th_percentile_error": 5
           },
           {
             "quality": 80,
@@ -4054,7 +4054,7 @@
             "full_resolution_luma_ssim": 0.9680947661399841,
             "worst_128px_luma_ssim": 0.9563072919845581,
             "chroma_mean_absolute_error": 1.5976634599250517,
-            "chroma_95th_percentile_error": 5.0
+            "chroma_95th_percentile_error": 5
           },
           {
             "quality": 84,
@@ -4062,7 +4062,7 @@
             "full_resolution_luma_ssim": 0.9770453572273254,
             "worst_128px_luma_ssim": 0.9667402505874634,
             "chroma_mean_absolute_error": 1.493806535346191,
-            "chroma_95th_percentile_error": 4.0
+            "chroma_95th_percentile_error": 4
           },
           {
             "quality": 88,
@@ -4070,10 +4070,141 @@
             "full_resolution_luma_ssim": 0.9853521585464478,
             "worst_128px_luma_ssim": 0.9758909940719604,
             "chroma_mean_absolute_error": 1.3602839669698834,
-            "chroma_95th_percentile_error": 4.0
+            "chroma_95th_percentile_error": 4
           }
         ]
       }
     }
+  },
+  {
+    "name": "Плантация Золотые Холмы",
+    "slug": "goldenhillsplantation",
+    "aliases": [
+      "Goldenhills Plantation",
+      "Goldenhills Plantation (CC)"
+    ],
+    "captions": [
+      "Плантация и поля среди золотистой тундры"
+    ]
+  },
+  {
+    "name": "Ферма Хлаалу",
+    "slug": "hlaalufarm",
+    "aliases": [
+      "Hlaalu Farm"
+    ],
+    "captions": [
+      "Дом и пшеничное поле к востоку от Виндхельма"
+    ]
+  },
+  {
+    "name": "Ферма Остролист",
+    "slug": "hollyfrostfarm",
+    "aliases": [
+      "Hollyfrost Farm",
+      "Ферма \"Остролист\"",
+      "Ферма «Остролист»"
+    ],
+    "captions": [
+      "Поля и снежноягодник фермы Остролист"
+    ]
+  },
+  {
+    "name": "Весёлая ферма",
+    "slug": "merryfairfarm",
+    "aliases": [
+      "Merryfair Farm"
+    ],
+    "captions": [
+      "Фермерский дом у озера Хонрик"
+    ]
+  },
+  {
+    "name": "Ферма Сынов Битвы",
+    "slug": "battlebornfarm",
+    "aliases": [
+      "Battle-Born Farm",
+      "Battle Born Farm"
+    ],
+    "captions": [
+      "Мельница и поля Сынов Битвы у Вайтрана"
+    ]
+  },
+  {
+    "name": "Ферма Холодная борозда",
+    "slug": "chillfurrowfarm",
+    "aliases": [
+      "Chillfurrow Farm",
+      "Ферма \"Холодная борозда\"",
+      "Ферма «Холодная борозда»"
+    ],
+    "captions": [
+      "Пшеничные поля Холодной борозды у Белой реки"
+    ]
+  },
+  {
+    "name": "Ферма Лорея",
+    "slug": "loreiusfarm",
+    "aliases": [
+      "Loreius Farm"
+    ],
+    "captions": [
+      "Ферма и мельница над дорогой на Данстар"
+    ]
+  },
+  {
+    "name": "Ферма Пелагио",
+    "slug": "pelagiafarm",
+    "aliases": [
+      "Pelagia Farm",
+      "Pelagia's Farm"
+    ],
+    "captions": [
+      "Дом, мельница и поля у южного подступа к Вайтрану"
+    ]
+  },
+  {
+    "name": "Ферма Салвиев",
+    "slug": "salviusfarm",
+    "aliases": [
+      "Salvius Farm",
+      "Salvius' Farm"
+    ],
+    "captions": [
+      "Ферма и мельница под скалами Маркарта"
+    ]
+  },
+  {
+    "name": "Саретийская ферма",
+    "slug": "sarethifarm",
+    "aliases": [
+      "Sarethi Farm",
+      "Ферма Сарети"
+    ],
+    "captions": [
+      "Сад корня Нирна и дом сестёр Сарети"
+    ]
+  },
+  {
+    "name": "Ферма Снегоходов",
+    "slug": "snowshodfarm",
+    "aliases": [
+      "Snow-Shod Farm",
+      "Snow Shod Farm"
+    ],
+    "captions": [
+      "Мельница и осенние поля к югу от Рифтена"
+    ]
+  },
+  {
+    "name": "Старая ферма Аттия",
+    "slug": "oldattiusfarm",
+    "aliases": [
+      "Old Attius Farm",
+      "Old Attius's Farm"
+    ],
+    "captions": [
+      "Заброшенная ферма среди пепла Солстейма"
+    ]
   }
 ]
