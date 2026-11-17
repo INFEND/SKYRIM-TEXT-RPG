@@ -83,6 +83,7 @@ final class SolitudeCity {
         if(d==6)s.add(PREFIX+"rest","Снять комнату","20 септимов | существующий отдых в трактире");
         if(d==1){String old=g.mode;g.mode="WORLD";boolean available=g.livia.available(g);g.mode=old;
             if(available)s.add(PREFIX+"livia","Поговорить с Ливией",g.livia.objective());}
+        SolitudeEncounters.choices(g,s,d);
         return s.add(PREFIX+"back","На улицы Солитьюда","Вернуться к выбору районов").add("GO_WORLD","Завершить прогулку","Вернуться к приключению");
     }
     private GameEngine.Scene newBlocked(GameEngine.Scene s,GameEngine g,int i){
@@ -100,6 +101,7 @@ final class SolitudeCity {
             for(int i=0;i<PLACES.length;i++)if((PREFIX+"visit:"+i).equals(action)){g.mode=PREFIX+i;g.message="";return;}
             return;
         }
+        if(SolitudeEncounters.choose(g,d,action))return;
         if((PREFIX+"shop").equals(action)&&(d==0||d==5)){g.mode="WORLD";g.choose("SHOP");return;}
         if((PREFIX+"rest").equals(action)&&d==6){g.mode="WORLD";g.choose("REST");return;}
         if((PREFIX+"livia").equals(action)&&d==1){g.mode="WORLD";if(g.livia.available(g))g.choose("LIVIA:open");else g.mode=PREFIX+d;return;}
