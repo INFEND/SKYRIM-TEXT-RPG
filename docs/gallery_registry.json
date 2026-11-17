@@ -2318,5 +2318,1762 @@
     "aliases": [
       "Cragwallow Slope"
     ]
+  },
+  {
+    "slug": "autumnwatch_tower",
+    "name": "Осенняя сторожевая башня",
+    "captions": [
+      "Осенняя сторожевая башня"
+    ],
+    "aliases": [
+      "Autumnwatch Tower"
+    ],
+    "artwork": {
+      "kind": "original_generated_illustration",
+      "generator": "built_in_imagegen",
+      "final_prompt": "Use case: stylized-concept. Asset type: one finished location illustration for SKYRIM TEXT RPG. Scene: Two roofless ancient round Nordic stone towers of unequal height at the mountain foot south of Ivarstead, the taller tower with an open parapet and a short stone arch leading toward a curved ancient Word Wall. Autumnal Rift foothills, ochre grasses and scattered golden birches, rocky peaks rising immediately behind, soft morning cloud. View from the approach path showing BOTH ruined towers as a modest remote outpost. Style: detailed cinematic realistic fantasy environment, physically believable Nordic Skyrim architecture and materials, rich natural textures, restrained natural colors, deep spatial composition, clear readable lighting; match the established realistic landscape gallery. Wide horizontal 16:9, 1920x1080 composition, full bleed. Single uninterrupted scene, no collage, no labels, no captions, no UI, no text, no logos, no watermark, no borders. No oversized invented city, no dragons, no foreground heroes.",
+      "source_file": "exec-7d7382bb-4592-42c4-b7ff-95b4f190cf10.png",
+      "source_sha256": "e9110c2a51c6b360b0505834619b0015d11fd18c03590fb0d0246e3cca75add7",
+      "source_bytes": 3634924,
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "compression": {
+        "quality": 88,
+        "dimensions": [
+          1672,
+          941
+        ],
+        "encoded_bytes": 563196,
+        "sha256": "1909fbf0906cc6dee16e8a63165bfcad50f0a79e0963ddfbb8b24a60fa25ebf5",
+        "archive_bytes": 563308,
+        "archive_sha256": "7e821fbcde023e68a420435535c66b3b2f6012c92fb3a30810d961b396099b7c",
+        "full_resolution_luma_ssim": 0.9865989089012146,
+        "worst_128px_luma_ssim": 0.9796178340911865,
+        "chroma_mean_absolute_error": 1.9341469677478402,
+        "chroma_95th_percentile_error": 6.0,
+        "trials": [
+          {
+            "quality": 76,
+            "bytes": 341220,
+            "full_resolution_luma_ssim": 0.9600974917411804,
+            "worst_128px_luma_ssim": 0.9431657791137695,
+            "chroma_mean_absolute_error": 2.3915338080734636,
+            "chroma_95th_percentile_error": 8.0
+          },
+          {
+            "quality": 80,
+            "bytes": 394984,
+            "full_resolution_luma_ssim": 0.969936192035675,
+            "worst_128px_luma_ssim": 0.9588757157325745,
+            "chroma_mean_absolute_error": 2.2597222363463483,
+            "chroma_95th_percentile_error": 7.0
+          },
+          {
+            "quality": 84,
+            "bytes": 466732,
+            "full_resolution_luma_ssim": 0.9785495400428772,
+            "worst_128px_luma_ssim": 0.9702674150466919,
+            "chroma_mean_absolute_error": 2.104029486090843,
+            "chroma_95th_percentile_error": 7.0
+          },
+          {
+            "quality": 88,
+            "bytes": 563196,
+            "full_resolution_luma_ssim": 0.9865989089012146,
+            "worst_128px_luma_ssim": 0.9796178340911865,
+            "chroma_mean_absolute_error": 1.9341469677478402,
+            "chroma_95th_percentile_error": 6.0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "tower_of_mzark",
+    "name": "Башня Мзарк",
+    "captions": [
+      "Башня Мзарк"
+    ],
+    "aliases": [
+      "Tower of Mzark"
+    ],
+    "artwork": {
+      "kind": "original_generated_illustration",
+      "generator": "built_in_imagegen",
+      "final_prompt": "Use case: stylized-concept. Asset type: one finished location illustration for SKYRIM TEXT RPG. Scene: Tower of Mzark in Blackreach: a heavy cylindrical ancient Dwemer stone-and-bronze tower with a domed mechanical roof and geometric metal door, occupying a rocky rise inside an enormous underground cavern. Giant dim bioluminescent blue mushrooms and rocky cave pillars around it, distant amber Dwemer lamps and deep cavern ceiling, no open sky. Wide exterior establishing view making the single Dwemer tower unmistakable, restrained readable turquoise and amber lighting. Style: detailed cinematic realistic fantasy environment, physically believable Nordic Skyrim architecture and materials, rich natural textures, restrained natural colors, deep spatial composition, clear readable lighting; match the established realistic landscape gallery. Wide horizontal 16:9, 1920x1080 composition, full bleed. Single uninterrupted scene, no collage, no labels, no captions, no UI, no text, no logos, no watermark, no borders. No oversized invented city, no dragons, no foreground heroes.",
+      "source_file": "exec-3901574a-a54c-4554-908b-65b85ff05d6a.png",
+      "source_sha256": "057968f42afeca5f82e4aad76d6631e84739c65a996edf82cd2dbd542c7a2c85",
+      "source_bytes": 2739370,
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "compression": {
+        "quality": 96,
+        "dimensions": [
+          1672,
+          941
+        ],
+        "encoded_bytes": 581842,
+        "sha256": "dab1c6f6b4c119ee67366684363ed3cf6f0511655be2f3ca22d3fc2a7608947a",
+        "archive_bytes": 581954,
+        "archive_sha256": "ed5b08856d198621c538b15ef7dbac5c5c4ac059d33d904e0638acdd541d791c",
+        "full_resolution_luma_ssim": 0.990458607673645,
+        "worst_128px_luma_ssim": 0.9857858419418335,
+        "chroma_mean_absolute_error": 1.1393566093283638,
+        "chroma_95th_percentile_error": 4.0,
+        "trials": [
+          {
+            "quality": 76,
+            "bytes": 173294,
+            "full_resolution_luma_ssim": 0.943902850151062,
+            "worst_128px_luma_ssim": 0.9207128286361694,
+            "chroma_mean_absolute_error": 1.6757645460138608,
+            "chroma_95th_percentile_error": 6.0
+          },
+          {
+            "quality": 80,
+            "bytes": 210106,
+            "full_resolution_luma_ssim": 0.9548133015632629,
+            "worst_128px_luma_ssim": 0.932963490486145,
+            "chroma_mean_absolute_error": 1.5696951476846885,
+            "chroma_95th_percentile_error": 5.0
+          },
+          {
+            "quality": 84,
+            "bytes": 255160,
+            "full_resolution_luma_ssim": 0.963982105255127,
+            "worst_128px_luma_ssim": 0.9460441470146179,
+            "chroma_mean_absolute_error": 1.4655979717189795,
+            "chroma_95th_percentile_error": 5.0
+          },
+          {
+            "quality": 88,
+            "bytes": 318576,
+            "full_resolution_luma_ssim": 0.9752913117408752,
+            "worst_128px_luma_ssim": 0.9641561508178711,
+            "chroma_mean_absolute_error": 1.3593029404735877,
+            "chroma_95th_percentile_error": 4.0
+          },
+          {
+            "quality": 92,
+            "bytes": 426854,
+            "full_resolution_luma_ssim": 0.9844633340835571,
+            "worst_128px_luma_ssim": 0.9793088436126709,
+            "chroma_mean_absolute_error": 1.253547839262924,
+            "chroma_95th_percentile_error": 4.0
+          },
+          {
+            "quality": 96,
+            "bytes": 581842,
+            "full_resolution_luma_ssim": 0.990458607673645,
+            "worst_128px_luma_ssim": 0.9857858419418335,
+            "chroma_mean_absolute_error": 1.1393566093283638,
+            "chroma_95th_percentile_error": 4.0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "bannermist_tower",
+    "name": "Башня Баннермист",
+    "captions": [
+      "Башня Баннермист"
+    ],
+    "aliases": [
+      "Bannermist Tower"
+    ],
+    "artwork": {
+      "kind": "original_generated_illustration",
+      "generator": "built_in_imagegen",
+      "final_prompt": "Use case: stylized-concept. Asset type: one finished location illustration for SKYRIM TEXT RPG. Scene: Bannermist Tower in Falkreath hold: one half-ruined cylindrical Nordic watchtower made of large rough mossy stones, with a broken roofless parapet and simple external wooden ramp and stairs reaching an upper doorway. Secluded forested hillside with dense tall pines, ferns, damp rock and small bandit supplies at the base, narrow winding path in the foreground. Muted forest daylight, close-wide view with entire tower visible. Style: detailed cinematic realistic fantasy environment, physically believable Nordic Skyrim architecture and materials, rich natural textures, restrained natural colors, deep spatial composition, clear readable lighting; match the established realistic landscape gallery. Wide horizontal 16:9, 1920x1080 composition, full bleed. Single uninterrupted scene, no collage, no labels, no captions, no UI, no text, no logos, no watermark, no borders. No oversized invented city, no dragons, no foreground heroes.",
+      "source_file": "exec-a58e5277-0711-4ccf-a21f-7c2e39609282.png",
+      "source_sha256": "e7c16bb654e5c405bd460f70f0736913a866e2d1545fb06477b65028155437f2",
+      "source_bytes": 3437841,
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "compression": {
+        "quality": 92,
+        "dimensions": [
+          1672,
+          941
+        ],
+        "encoded_bytes": 606408,
+        "sha256": "1041596a782cdd4733aec0726d44b8b5b55294468aeae866b5468a72f648a5ac",
+        "archive_bytes": 606520,
+        "archive_sha256": "2127adcb07e36062aea6b72c846bb404bdbaecd959ba73566ac0e45e0633cbb6",
+        "full_resolution_luma_ssim": 0.9898954629898071,
+        "worst_128px_luma_ssim": 0.9858267307281494,
+        "chroma_mean_absolute_error": 1.220661365034652,
+        "chroma_95th_percentile_error": 4.0,
+        "trials": [
+          {
+            "quality": 76,
+            "bytes": 289468,
+            "full_resolution_luma_ssim": 0.953167736530304,
+            "worst_128px_luma_ssim": 0.9308119416236877,
+            "chroma_mean_absolute_error": 1.6719192526529347,
+            "chroma_95th_percentile_error": 5.0
+          },
+          {
+            "quality": 80,
+            "bytes": 337262,
+            "full_resolution_luma_ssim": 0.9632338881492615,
+            "worst_128px_luma_ssim": 0.9441209435462952,
+            "chroma_mean_absolute_error": 1.5829696723937174,
+            "chroma_95th_percentile_error": 5.0
+          },
+          {
+            "quality": 84,
+            "bytes": 407750,
+            "full_resolution_luma_ssim": 0.9753065705299377,
+            "worst_128px_luma_ssim": 0.9652614593505859,
+            "chroma_mean_absolute_error": 1.4640528629321348,
+            "chroma_95th_percentile_error": 4.0
+          },
+          {
+            "quality": 88,
+            "bytes": 489520,
+            "full_resolution_luma_ssim": 0.9830235242843628,
+            "worst_128px_luma_ssim": 0.9761374592781067,
+            "chroma_mean_absolute_error": 1.3428695549374838,
+            "chroma_95th_percentile_error": 4.0
+          },
+          {
+            "quality": 92,
+            "bytes": 606408,
+            "full_resolution_luma_ssim": 0.9898954629898071,
+            "worst_128px_luma_ssim": 0.9858267307281494,
+            "chroma_mean_absolute_error": 1.220661365034652,
+            "chroma_95th_percentile_error": 4.0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "bleakwind_bluff",
+    "name": "Утес Холодный Ветер",
+    "captions": [
+      "Утес Холодный Ветер"
+    ],
+    "aliases": [
+      "Bleakwind Bluff"
+    ],
+    "artwork": {
+      "kind": "original_generated_illustration",
+      "generator": "built_in_imagegen",
+      "final_prompt": "Use case: stylized-concept. Asset type: one finished location illustration for SKYRIM TEXT RPG. Scene: Bleakwind Bluff west of Rorikstead: a small ruined round Nordic stone tower and broken low fortification on a bare windswept rocky bluff in the Reach. Rough Forsworn wooden stakes and a few hide shelters, juniper bushes among dry heath, rugged cliffs and distant misty mountains. View slightly below the bluff emphasizing the weathered compact tower, broken parapets and steep approach. Windy gray afternoon, no city or ornate castle. Style: detailed cinematic realistic fantasy environment, physically believable Nordic Skyrim architecture and materials, rich natural textures, restrained natural colors, deep spatial composition, clear readable lighting; match the established realistic landscape gallery. Wide horizontal 16:9, 1920x1080 composition, full bleed. Single uninterrupted scene, no collage, no labels, no captions, no UI, no text, no logos, no watermark, no borders. No oversized invented city, no dragons, no foreground heroes.",
+      "source_file": "exec-25232294-1d05-484d-8767-f78b7e47698f.png",
+      "source_sha256": "66c7c5e00f32f70812d6044f939b5bc3600ea162f278c8d7f66b91b70706c54e",
+      "source_bytes": 3362675,
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "compression": {
+        "quality": 88,
+        "dimensions": [
+          1672,
+          941
+        ],
+        "encoded_bytes": 461728,
+        "sha256": "2c39821776105d771db44d725db3d83f2b9fe67258e487e90cfed48af9ff107b",
+        "archive_bytes": 461840,
+        "archive_sha256": "e178f015d77c8069fb7862aa7629461a5acbc38ded7ffea78c8f7a6f95de3e93",
+        "full_resolution_luma_ssim": 0.9852557182312012,
+        "worst_128px_luma_ssim": 0.9710562825202942,
+        "chroma_mean_absolute_error": 1.3609443404908754,
+        "chroma_95th_percentile_error": 4.0,
+        "trials": [
+          {
+            "quality": 76,
+            "bytes": 271830,
+            "full_resolution_luma_ssim": 0.9589317440986633,
+            "worst_128px_luma_ssim": 0.9431109428405762,
+            "chroma_mean_absolute_error": 1.66186714733893,
+            "chroma_95th_percentile_error": 5.0
+          },
+          {
+            "quality": 80,
+            "bytes": 323636,
+            "full_resolution_luma_ssim": 0.9697356224060059,
+            "worst_128px_luma_ssim": 0.9549614191055298,
+            "chroma_mean_absolute_error": 1.5662788746574192,
+            "chroma_95th_percentile_error": 5.0
+          },
+          {
+            "quality": 84,
+            "bytes": 382272,
+            "full_resolution_luma_ssim": 0.9780294895172119,
+            "worst_128px_luma_ssim": 0.9640803933143616,
+            "chroma_mean_absolute_error": 1.4784600013220182,
+            "chroma_95th_percentile_error": 5.0
+          },
+          {
+            "quality": 88,
+            "bytes": 461728,
+            "full_resolution_luma_ssim": 0.9852557182312012,
+            "worst_128px_luma_ssim": 0.9710562825202942,
+            "chroma_mean_absolute_error": 1.3609443404908754,
+            "chroma_95th_percentile_error": 4.0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "volkihar_balcony",
+    "name": "Балкон замка Волкихар",
+    "captions": [
+      "Балкон замка Волкихар"
+    ],
+    "aliases": [
+      "Castle Volkihar Balcony",
+      "Castle Volkihar Balcony (DG)"
+    ],
+    "artwork": {
+      "kind": "original_generated_illustration",
+      "generator": "built_in_imagegen",
+      "final_prompt": "Use case: stylized-concept. Asset type: one finished location illustration for SKYRIM TEXT RPG. Scene: Castle Volkihar Balcony on Skyrim's northern island: view along the weathered elevated exterior stone balcony of the ancient vampire castle, with its adjoining dark Gothic tower clearly visible, pointed arches, iron railing, broken masonry and ivy. A doorway returns into the tower and a sea-facing edge overlooks cold dark water and foggy distant ice mountains. Storm-gray sky, a small restrained warm brazier, richly detailed heavy stone rather than a fantasy palace. No vampires, no giant moon, no red sky. Style: detailed cinematic realistic fantasy environment, physically believable Nordic Skyrim architecture and materials, rich natural textures, restrained natural colors, deep spatial composition, clear readable lighting; match the established realistic landscape gallery. Wide horizontal 16:9, 1920x1080 composition, full bleed. Single uninterrupted scene, no collage, no labels, no captions, no UI, no text, no logos, no watermark, no borders. No oversized invented city, no dragons, no foreground heroes.",
+      "source_file": "exec-b732bf5b-49d4-45ec-8c67-1449f3af55e1.png",
+      "source_sha256": "f10f8c3748d44220d4a0516307721e1dab9470ed41c339c0f2f3669e341b935c",
+      "source_bytes": 2982404,
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "compression": {
+        "quality": 92,
+        "dimensions": [
+          1672,
+          941
+        ],
+        "encoded_bytes": 456350,
+        "sha256": "8171bca86cd7e7e25cae3cd830170356373810593b87ca1707169ebdd7234379",
+        "archive_bytes": 456462,
+        "archive_sha256": "9fb291d085750ec6ae0c31fe12cd3c8ccb8ce02ba1916406b5149776a5980ac0",
+        "full_resolution_luma_ssim": 0.9871535897254944,
+        "worst_128px_luma_ssim": 0.9801188707351685,
+        "chroma_mean_absolute_error": 0.9195062516207435,
+        "chroma_95th_percentile_error": 3.0,
+        "trials": [
+          {
+            "quality": 76,
+            "bytes": 196268,
+            "full_resolution_luma_ssim": 0.9476692080497742,
+            "worst_128px_luma_ssim": 0.9259767532348633,
+            "chroma_mean_absolute_error": 1.2217224753265639,
+            "chroma_95th_percentile_error": 4.0
+          },
+          {
+            "quality": 80,
+            "bytes": 237582,
+            "full_resolution_luma_ssim": 0.9594883322715759,
+            "worst_128px_luma_ssim": 0.9438680410385132,
+            "chroma_mean_absolute_error": 1.1567939024452252,
+            "chroma_95th_percentile_error": 4.0
+          },
+          {
+            "quality": 84,
+            "bytes": 285110,
+            "full_resolution_luma_ssim": 0.9702548980712891,
+            "worst_128px_luma_ssim": 0.9590758681297302,
+            "chroma_mean_absolute_error": 1.0891567811907317,
+            "chroma_95th_percentile_error": 3.0
+          },
+          {
+            "quality": 88,
+            "bytes": 349514,
+            "full_resolution_luma_ssim": 0.9789782166481018,
+            "worst_128px_luma_ssim": 0.970663845539093,
+            "chroma_mean_absolute_error": 1.0034798315952183,
+            "chroma_95th_percentile_error": 3.0
+          },
+          {
+            "quality": 92,
+            "bytes": 456350,
+            "full_resolution_luma_ssim": 0.9871535897254944,
+            "worst_128px_luma_ssim": 0.9801188707351685,
+            "chroma_mean_absolute_error": 0.9195062516207435,
+            "chroma_95th_percentile_error": 3.0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "cradle_stone_tower",
+    "name": "Башня Кредлстоун",
+    "captions": [
+      "Башня Кредлстоун"
+    ],
+    "aliases": [
+      "Cradle Stone Tower"
+    ],
+    "artwork": {
+      "kind": "original_generated_illustration",
+      "generator": "built_in_imagegen",
+      "final_prompt": "Use case: stylized-concept. Asset type: one finished location illustration for SKYRIM TEXT RPG. Scene: Cradle Stone Tower in the Reach, a lonely ruined round Nordic tower of massive pale weathered stones on a bare rocky ridge, three broken open levels and a jagged roofless upper rim. Simple timber landing and spiked rough barricade near the base, a few feathers and a bird nest on the upper masonry; rugged grassy crags with juniper and distant Markarth-region mountains. Wide approach shot under diffuse high cloud, small isolated ruin, no giant fortress. Style: detailed cinematic realistic fantasy environment, physically believable Nordic Skyrim architecture and materials, rich natural textures, restrained natural colors, deep spatial composition, clear readable lighting; match the established realistic landscape gallery. Wide horizontal 16:9, 1920x1080 composition, full bleed. Single uninterrupted scene, no collage, no labels, no captions, no UI, no text, no logos, no watermark, no borders. No oversized invented city, no dragons, no foreground heroes.",
+      "source_file": "exec-8f803923-7848-4f88-930e-10539d1bf24d.png",
+      "source_sha256": "b5ff569058beb2fa27789dc6036cb1d7f2cc22ca90028900ab263402be82017b",
+      "source_bytes": 3141130,
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "compression": {
+        "quality": 92,
+        "dimensions": [
+          1672,
+          941
+        ],
+        "encoded_bytes": 509858,
+        "sha256": "e12572e8eee00b81aa1d372e85b05432312895f76875513e5c7d62cfb0448e71",
+        "archive_bytes": 509970,
+        "archive_sha256": "40ebdcba17a76e62fc8a19b723c19f9fb0a268ac80e3e9db75a8055f87b294a4",
+        "full_resolution_luma_ssim": 0.9904125928878784,
+        "worst_128px_luma_ssim": 0.9861080646514893,
+        "chroma_mean_absolute_error": 1.1000090888752168,
+        "chroma_95th_percentile_error": 3.0,
+        "trials": [
+          {
+            "quality": 76,
+            "bytes": 234816,
+            "full_resolution_luma_ssim": 0.9598022103309631,
+            "worst_128px_luma_ssim": 0.9383255839347839,
+            "chroma_mean_absolute_error": 1.5959114679995323,
+            "chroma_95th_percentile_error": 5.0
+          },
+          {
+            "quality": 80,
+            "bytes": 275920,
+            "full_resolution_luma_ssim": 0.9687360525131226,
+            "worst_128px_luma_ssim": 0.9519672393798828,
+            "chroma_mean_absolute_error": 1.4854044104561472,
+            "chroma_95th_percentile_error": 4.0
+          },
+          {
+            "quality": 84,
+            "bytes": 328348,
+            "full_resolution_luma_ssim": 0.9769452810287476,
+            "worst_128px_luma_ssim": 0.9642045497894287,
+            "chroma_mean_absolute_error": 1.38258094819214,
+            "chroma_95th_percentile_error": 4.0
+          },
+          {
+            "quality": 88,
+            "bytes": 402188,
+            "full_resolution_luma_ssim": 0.984717607498169,
+            "worst_128px_luma_ssim": 0.9763884544372559,
+            "chroma_mean_absolute_error": 1.2483570110185134,
+            "chroma_95th_percentile_error": 4.0
+          },
+          {
+            "quality": 92,
+            "bytes": 509858,
+            "full_resolution_luma_ssim": 0.9904125928878784,
+            "worst_128px_luma_ssim": 0.9861080646514893,
+            "chroma_mean_absolute_error": 1.1000090888752168,
+            "chroma_95th_percentile_error": 3.0
+          }
+        ]
+      },
+      "edit_prompt": "Edit this generated Cradle Stone Tower illustration. Change ONLY the distant background on the left: remove the gigantic temple doorway, all distant monumental buildings, carved mountain facade and the bridge entirely. Replace those structures with uninterrupted natural rugged Reach mountain cliffs, rocky gullies, dry juniper-covered slopes and misty distant mountains consistent with the rest of this image. Preserve the foreground ruined round tower, its damaged upper crown, nest, wooden platform, rocks, composition, lighting, textures and 16:9 dimensions exactly. No new buildings anywhere in the background, no text, no watermark."
+    }
+  },
+  {
+    "slug": "dead_crone_rock",
+    "name": "Старушечья скала",
+    "captions": [
+      "Старушечья скала"
+    ],
+    "aliases": [
+      "Dead Crone Rock"
+    ],
+    "artwork": {
+      "kind": "original_generated_illustration",
+      "generator": "built_in_imagegen",
+      "final_prompt": "Use case: stylized-concept. Asset type: one finished location illustration for SKYRIM TEXT RPG. Scene: Dead Crone Rock southwest of Markarth: a ruined Nordic tower fortress perched high on a steep crag, rough round tower with jagged stone walls, winding stone stairs climbing the rock toward an exposed summit terrace and an ancient curved Word Wall. Reach mountains, juniper, sparse dry grass and rough Forsworn palisades below. Low wide view from the stone approach emphasizes a compact vertical stronghold integrated with the mountain. Cold afternoon cloud, no giant statues or dragons. Style: detailed cinematic realistic fantasy environment, physically believable Nordic Skyrim architecture and materials, rich natural textures, restrained natural colors, deep spatial composition, clear readable lighting; match the established realistic landscape gallery. Wide horizontal 16:9, 1920x1080 composition, full bleed. Single uninterrupted scene, no collage, no labels, no captions, no UI, no text, no logos, no watermark, no borders. No oversized invented city, no dragons, no foreground heroes.",
+      "source_file": "exec-77762d66-e9a0-4e14-8ad0-2ef528292a25.png",
+      "source_sha256": "9743d3bbd838f30b7446deec20412ec388f13ba7036578412b2ea75b0b890af3",
+      "source_bytes": 3449985,
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "compression": {
+        "quality": 92,
+        "dimensions": [
+          1672,
+          941
+        ],
+        "encoded_bytes": 581414,
+        "sha256": "494369157ae26ecc4248927a6e00b4198938c739439ebd87bd10dcce817e4f17",
+        "archive_bytes": 581526,
+        "archive_sha256": "c0168b89cdc5bff4d15e216f81e139667c65c64093d5906d3a7e33387cc6dfdb",
+        "full_resolution_luma_ssim": 0.9909814596176147,
+        "worst_128px_luma_ssim": 0.9850001335144043,
+        "chroma_mean_absolute_error": 1.1153394154645624,
+        "chroma_95th_percentile_error": 3.0,
+        "trials": [
+          {
+            "quality": 76,
+            "bytes": 280490,
+            "full_resolution_luma_ssim": 0.9572696089744568,
+            "worst_128px_luma_ssim": 0.9325006604194641,
+            "chroma_mean_absolute_error": 1.5059401837605317,
+            "chroma_95th_percentile_error": 5.0
+          },
+          {
+            "quality": 80,
+            "bytes": 328980,
+            "full_resolution_luma_ssim": 0.967674970626831,
+            "worst_128px_luma_ssim": 0.9456162452697754,
+            "chroma_mean_absolute_error": 1.4236632997574605,
+            "chroma_95th_percentile_error": 4.0
+          },
+          {
+            "quality": 84,
+            "bytes": 388170,
+            "full_resolution_luma_ssim": 0.9766621589660645,
+            "worst_128px_luma_ssim": 0.9584071636199951,
+            "chroma_mean_absolute_error": 1.3371378432798255,
+            "chroma_95th_percentile_error": 4.0
+          },
+          {
+            "quality": 88,
+            "bytes": 467484,
+            "full_resolution_luma_ssim": 0.9849790930747986,
+            "worst_128px_luma_ssim": 0.9721680879592896,
+            "chroma_mean_absolute_error": 1.2350951980230742,
+            "chroma_95th_percentile_error": 4.0
+          },
+          {
+            "quality": 92,
+            "bytes": 581414,
+            "full_resolution_luma_ssim": 0.9909814596176147,
+            "worst_128px_luma_ssim": 0.9850001335144043,
+            "chroma_mean_absolute_error": 1.1153394154645624,
+            "chroma_95th_percentile_error": 3.0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "myrwatch",
+    "name": "Мирвотч",
+    "captions": [
+      "Мирвотч"
+    ],
+    "aliases": [
+      "Myrwatch",
+      "Myrwatch (CC)"
+    ],
+    "artwork": {
+      "kind": "original_generated_illustration",
+      "generator": "built_in_imagegen",
+      "final_prompt": "Use case: stylized-concept. Asset type: one finished location illustration for SKYRIM TEXT RPG. Scene: Myrwatch east of Morthal: the isolated magical round stone tower rising from a foggy marsh clearing, broad cylindrical weathered gray stone walls, a steep dark conical roof, a recessed arched entry with a small robed guardian statue above it and subtle blue magical sconces flanking the door. Shallow marsh pools, sedges, dead slender trees, a few purple flowers and distant gray crags. Clear exterior establishing view with full tower, cool mist and readable natural dusk light, restrained magic only at the entry. Style: detailed cinematic realistic fantasy environment, physically believable Nordic Skyrim architecture and materials, rich natural textures, restrained natural colors, deep spatial composition, clear readable lighting; match the established realistic landscape gallery. Wide horizontal 16:9, 1920x1080 composition, full bleed. Single uninterrupted scene, no collage, no labels, no captions, no UI, no text, no logos, no watermark, no borders. No oversized invented city, no dragons, no foreground heroes.",
+      "source_file": "exec-dcfb3892-dd8c-4a19-929f-ff04d69f08ef.png",
+      "source_sha256": "6e7a6cd1b59161491215d1e53a92830bc6f39773f6c131a1075388ef0728d13b",
+      "source_bytes": 3140967,
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "compression": {
+        "quality": 92,
+        "dimensions": [
+          1672,
+          941
+        ],
+        "encoded_bytes": 521876,
+        "sha256": "cac62f93bfd285c8c2ef28b763e5fd84d66941762f6549858d0cfdb979212e53",
+        "archive_bytes": 521988,
+        "archive_sha256": "49661d2cecfdd342dff801021e1f2b7f0a790e2369ef65e5302125150c0a9c70",
+        "full_resolution_luma_ssim": 0.9895981550216675,
+        "worst_128px_luma_ssim": 0.9832198619842529,
+        "chroma_mean_absolute_error": 1.0387516588786234,
+        "chroma_95th_percentile_error": 3.0,
+        "trials": [
+          {
+            "quality": 76,
+            "bytes": 233698,
+            "full_resolution_luma_ssim": 0.9541957378387451,
+            "worst_128px_luma_ssim": 0.9267361164093018,
+            "chroma_mean_absolute_error": 1.4436127452725138,
+            "chroma_95th_percentile_error": 4.0
+          },
+          {
+            "quality": 80,
+            "bytes": 274906,
+            "full_resolution_luma_ssim": 0.9648061394691467,
+            "worst_128px_luma_ssim": 0.945486307144165,
+            "chroma_mean_absolute_error": 1.3745700262878238,
+            "chroma_95th_percentile_error": 4.0
+          },
+          {
+            "quality": 84,
+            "bytes": 329388,
+            "full_resolution_luma_ssim": 0.974250078201294,
+            "worst_128px_luma_ssim": 0.960603654384613,
+            "chroma_mean_absolute_error": 1.288966169045452,
+            "chroma_95th_percentile_error": 4.0
+          },
+          {
+            "quality": 88,
+            "bytes": 404562,
+            "full_resolution_luma_ssim": 0.9831812381744385,
+            "worst_128px_luma_ssim": 0.9741262197494507,
+            "chroma_mean_absolute_error": 1.175470269844256,
+            "chroma_95th_percentile_error": 3.0
+          },
+          {
+            "quality": 92,
+            "bytes": 521876,
+            "full_resolution_luma_ssim": 0.9895981550216675,
+            "worst_128px_luma_ssim": 0.9832198619842529,
+            "chroma_mean_absolute_error": 1.0387516588786234,
+            "chroma_95th_percentile_error": 3.0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "nilheim",
+    "name": "Нилхейм",
+    "captions": [
+      "Нилхейм"
+    ],
+    "aliases": [
+      "Nilheim"
+    ],
+    "artwork": {
+      "kind": "original_generated_illustration",
+      "generator": "built_in_imagegen",
+      "final_prompt": "Use case: stylized-concept. Asset type: one finished location illustration for SKYRIM TEXT RPG. Scene: Nilheim east of Ivarstead: a single ancient round ruined Nordic watchtower occupying a small elevated rocky peninsula overlooking a broad Rift lake. Broken crown of huge weathered stones, wooden upper lookout platform, small bandit camp supplies at the foot. Foreground narrow path climbs between gray boulders and golden birches, water and layered mountains visible beyond. Bright soft morning light and calm water, tower is dominant, no long bridge or castle. Style: detailed cinematic realistic fantasy environment, physically believable Nordic Skyrim architecture and materials, rich natural textures, restrained natural colors, deep spatial composition, clear readable lighting; match the established realistic landscape gallery. Wide horizontal 16:9, 1920x1080 composition, full bleed. Single uninterrupted scene, no collage, no labels, no captions, no UI, no text, no logos, no watermark, no borders. No oversized invented city, no dragons, no foreground heroes.",
+      "source_file": "exec-baa3c652-2ba0-43c6-a10d-7597bf59895d.png",
+      "source_sha256": "c3d884b6868965289ee2915077ad711f11e0070aefe23da31b96af5187c822ac",
+      "source_bytes": 3415725,
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "compression": {
+        "quality": 88,
+        "dimensions": [
+          1672,
+          941
+        ],
+        "encoded_bytes": 500774,
+        "sha256": "043001a77788b8f72c054db5d67bba097031cc660293a5ddc38d26ccc34861cb",
+        "archive_bytes": 500886,
+        "archive_sha256": "67149640d72eb25a63fe8ec641d69db41c7dbc24f926b2130018a17f98e9c9dc",
+        "full_resolution_luma_ssim": 0.9857370853424072,
+        "worst_128px_luma_ssim": 0.974044919013977,
+        "chroma_mean_absolute_error": 1.8068124615470664,
+        "chroma_95th_percentile_error": 6.0,
+        "trials": [
+          {
+            "quality": 76,
+            "bytes": 305286,
+            "full_resolution_luma_ssim": 0.9606592059135437,
+            "worst_128px_luma_ssim": 0.9378418922424316,
+            "chroma_mean_absolute_error": 2.216163007388048,
+            "chroma_95th_percentile_error": 7.0
+          },
+          {
+            "quality": 80,
+            "bytes": 354234,
+            "full_resolution_luma_ssim": 0.9704868197441101,
+            "worst_128px_luma_ssim": 0.9534908533096313,
+            "chroma_mean_absolute_error": 2.0965677102136078,
+            "chroma_95th_percentile_error": 7.0
+          },
+          {
+            "quality": 84,
+            "bytes": 417594,
+            "full_resolution_luma_ssim": 0.9785954356193542,
+            "worst_128px_luma_ssim": 0.9646588563919067,
+            "chroma_mean_absolute_error": 1.940846358602525,
+            "chroma_95th_percentile_error": 6.0
+          },
+          {
+            "quality": 88,
+            "bytes": 500774,
+            "full_resolution_luma_ssim": 0.9857370853424072,
+            "worst_128px_luma_ssim": 0.974044919013977,
+            "chroma_mean_absolute_error": 1.8068124615470664,
+            "chroma_95th_percentile_error": 6.0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "peaks_shade_tower",
+    "name": "Теневая башня",
+    "captions": [
+      "Теневая башня"
+    ],
+    "aliases": [
+      "Peak's Shade Tower"
+    ],
+    "artwork": {
+      "kind": "original_generated_illustration",
+      "generator": "built_in_imagegen",
+      "final_prompt": "Use case: stylized-concept. Asset type: one finished location illustration for SKYRIM TEXT RPG. Scene: Peak's Shade Tower east of Falkreath: a low crumbling round Nordic tower deep among dense tall pine trees, collapsed wall exposes its hollow interior, a partial stone stair and moss-covered broken blocks. Roots, ferns, mushrooms and lush damp undergrowth reclaim the ruin, soft shafts of light filter through the trees. Intimate wide exterior at walking height, secluded overgrown forest outpost, no tall intact spire or inhabited settlement. Style: detailed cinematic realistic fantasy environment, physically believable Nordic Skyrim architecture and materials, rich natural textures, restrained natural colors, deep spatial composition, clear readable lighting; match the established realistic landscape gallery. Wide horizontal 16:9, 1920x1080 composition, full bleed. Single uninterrupted scene, no collage, no labels, no captions, no UI, no text, no logos, no watermark, no borders. No oversized invented city, no dragons, no foreground heroes.",
+      "source_file": "exec-72a9fcd8-9142-4238-84a4-1a9686440e76.png",
+      "source_sha256": "989e092d3126b1916e4d88aaa223a9c833ad95258d79add2d638f99f53fc67f5",
+      "source_bytes": 3646431,
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "compression": {
+        "quality": 92,
+        "dimensions": [
+          1672,
+          941
+        ],
+        "encoded_bytes": 675112,
+        "sha256": "3d13d7682b02d55c7d23847684ab8394e8dd290fd666d2186bc825187dd7d33e",
+        "archive_bytes": 675224,
+        "archive_sha256": "8e6190c6b2be6ac23538478d5b270edd26f11f1b084b577975dfbac07a7e05bb",
+        "full_resolution_luma_ssim": 0.9910780787467957,
+        "worst_128px_luma_ssim": 0.9834598302841187,
+        "chroma_mean_absolute_error": 1.308529178467374,
+        "chroma_95th_percentile_error": 4.0,
+        "trials": [
+          {
+            "quality": 76,
+            "bytes": 333510,
+            "full_resolution_luma_ssim": 0.9564737677574158,
+            "worst_128px_luma_ssim": 0.9406926035881042,
+            "chroma_mean_absolute_error": 1.7465319267398522,
+            "chroma_95th_percentile_error": 5.0
+          },
+          {
+            "quality": 80,
+            "bytes": 392442,
+            "full_resolution_luma_ssim": 0.9680618047714233,
+            "worst_128px_luma_ssim": 0.9557859301567078,
+            "chroma_mean_absolute_error": 1.6478359578784658,
+            "chroma_95th_percentile_error": 5.0
+          },
+          {
+            "quality": 84,
+            "bytes": 463050,
+            "full_resolution_luma_ssim": 0.9775511622428894,
+            "worst_128px_luma_ssim": 0.9683917760848999,
+            "chroma_mean_absolute_error": 1.5463243444569301,
+            "chroma_95th_percentile_error": 5.0
+          },
+          {
+            "quality": 88,
+            "bytes": 544522,
+            "full_resolution_luma_ssim": 0.9848574995994568,
+            "worst_128px_luma_ssim": 0.9765030741691589,
+            "chroma_mean_absolute_error": 1.450639144959297,
+            "chroma_95th_percentile_error": 4.0
+          },
+          {
+            "quality": 92,
+            "bytes": 675112,
+            "full_resolution_luma_ssim": 0.9910780787467957,
+            "worst_128px_luma_ssim": 0.9834598302841187,
+            "chroma_mean_absolute_error": 1.308529178467374,
+            "chroma_95th_percentile_error": 4.0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "south_skybound_watch",
+    "name": "Южная горная застава",
+    "captions": [
+      "Южная горная застава"
+    ],
+    "aliases": [
+      "South Skybound Watch"
+    ],
+    "artwork": {
+      "kind": "original_generated_illustration",
+      "generator": "built_in_imagegen",
+      "final_prompt": "Use case: stylized-concept. Asset type: one finished location illustration for SKYRIM TEXT RPG. Scene: South Skybound Watch above Helgen: a mostly destroyed ancient round Nordic watchtower on a cold rocky mountain shoulder, broken heavy stone walls and simple wooden stairs climbing to the surviving open lookout. A dark stone door leading into the mountain pass sits among the ruins, sparse snowy pines and immense misty mountains surround it. View up the rugged approach under overcast daylight, modest ancient ruin with snow patches, no giant city. Style: detailed cinematic realistic fantasy environment, physically believable Nordic Skyrim architecture and materials, rich natural textures, restrained natural colors, deep spatial composition, clear readable lighting; match the established realistic landscape gallery. Wide horizontal 16:9, 1920x1080 composition, full bleed. Single uninterrupted scene, no collage, no labels, no captions, no UI, no text, no logos, no watermark, no borders. No oversized invented city, no dragons, no foreground heroes.",
+      "source_file": "exec-f8709ff0-2528-4283-a2a3-d011e0e7fd60.png",
+      "source_sha256": "f4397bcebd6fa4faf0ed40677a8d3cd8761284fc4180fa199526529aaf88e9d0",
+      "source_bytes": 3291272,
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "compression": {
+        "quality": 92,
+        "dimensions": [
+          1672,
+          941
+        ],
+        "encoded_bytes": 532282,
+        "sha256": "e946bef23049089945693d5c9fa0d84634fef1f4644805c9274389056403322b",
+        "archive_bytes": 532394,
+        "archive_sha256": "82a7e660cdfaa120a2d44818df9105a9f20358ef640070ee87587affce3931b0",
+        "full_resolution_luma_ssim": 0.9902860522270203,
+        "worst_128px_luma_ssim": 0.9839213490486145,
+        "chroma_mean_absolute_error": 0.9879639139874612,
+        "chroma_95th_percentile_error": 3.0,
+        "trials": [
+          {
+            "quality": 76,
+            "bytes": 250486,
+            "full_resolution_luma_ssim": 0.9570779800415039,
+            "worst_128px_luma_ssim": 0.9371142387390137,
+            "chroma_mean_absolute_error": 1.320918014532031,
+            "chroma_95th_percentile_error": 4.0
+          },
+          {
+            "quality": 80,
+            "bytes": 294788,
+            "full_resolution_luma_ssim": 0.9675669074058533,
+            "worst_128px_luma_ssim": 0.9532763957977295,
+            "chroma_mean_absolute_error": 1.2553462289430464,
+            "chroma_95th_percentile_error": 4.0
+          },
+          {
+            "quality": 84,
+            "bytes": 346892,
+            "full_resolution_luma_ssim": 0.9762973189353943,
+            "worst_128px_luma_ssim": 0.9656116366386414,
+            "chroma_mean_absolute_error": 1.1855999166111588,
+            "chroma_95th_percentile_error": 4.0
+          },
+          {
+            "quality": 88,
+            "bytes": 421630,
+            "full_resolution_luma_ssim": 0.9841164946556091,
+            "worst_128px_luma_ssim": 0.9759202599525452,
+            "chroma_mean_absolute_error": 1.088252978354494,
+            "chroma_95th_percentile_error": 3.0
+          },
+          {
+            "quality": 92,
+            "bytes": 532282,
+            "full_resolution_luma_ssim": 0.9902860522270203,
+            "worst_128px_luma_ssim": 0.9839213490486145,
+            "chroma_mean_absolute_error": 0.9879639139874612,
+            "chroma_95th_percentile_error": 3.0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "sundered_towers",
+    "name": "Разделенные башни",
+    "captions": [
+      "Разделенные башни"
+    ],
+    "aliases": [
+      "Sundered Towers"
+    ],
+    "artwork": {
+      "kind": "original_generated_illustration",
+      "generator": "built_in_imagegen",
+      "final_prompt": "Use case: stylized-concept. Asset type: one finished location illustration for SKYRIM TEXT RPG. Scene: Sundered Towers southeast of Karthwasten: two distinct broken round Nordic stone towers on a rocky Reach hillside, one taller and one partially collapsed, separated by a gap and ruined low walls, with a rough elevated connecting walkway between their upper structures. Jagged parapets, steep stone approach, simple Forsworn wooden stakes and hides, dry grass and juniper. Wide view showing both towers and the cliff country, crisp cool late-afternoon lighting. Style: detailed cinematic realistic fantasy environment, physically believable Nordic Skyrim architecture and materials, rich natural textures, restrained natural colors, deep spatial composition, clear readable lighting; match the established realistic landscape gallery. Wide horizontal 16:9, 1920x1080 composition, full bleed. Single uninterrupted scene, no collage, no labels, no captions, no UI, no text, no logos, no watermark, no borders. No oversized invented city, no dragons, no foreground heroes.",
+      "source_file": "exec-599f4171-a413-4c5b-8131-f7113ec2314a.png",
+      "source_sha256": "210dda71bcbc31b1ef65e7afe9fbb857b582e5edc0fe212c80529aa319237260",
+      "source_bytes": 3209111,
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "compression": {
+        "quality": 92,
+        "dimensions": [
+          1672,
+          941
+        ],
+        "encoded_bytes": 549912,
+        "sha256": "e708b59c12462f9fdafbd63d9974301215dcac80cfa16a9970199143102616de",
+        "archive_bytes": 550024,
+        "archive_sha256": "376d5a36831c242ba499ee02172a107e7dcbb81a543813e553d225a0b496b5eb",
+        "full_resolution_luma_ssim": 0.9901562333106995,
+        "worst_128px_luma_ssim": 0.9833322167396545,
+        "chroma_mean_absolute_error": 1.2586703420467893,
+        "chroma_95th_percentile_error": 4.0,
+        "trials": [
+          {
+            "quality": 76,
+            "bytes": 248884,
+            "full_resolution_luma_ssim": 0.9557408094406128,
+            "worst_128px_luma_ssim": 0.9336581230163574,
+            "chroma_mean_absolute_error": 1.8305134515353207,
+            "chroma_95th_percentile_error": 6.0
+          },
+          {
+            "quality": 80,
+            "bytes": 298316,
+            "full_resolution_luma_ssim": 0.9666191935539246,
+            "worst_128px_luma_ssim": 0.9498627781867981,
+            "chroma_mean_absolute_error": 1.697002641494084,
+            "chroma_95th_percentile_error": 5.0
+          },
+          {
+            "quality": 84,
+            "bytes": 355198,
+            "full_resolution_luma_ssim": 0.9760633707046509,
+            "worst_128px_luma_ssim": 0.9646193981170654,
+            "chroma_mean_absolute_error": 1.5707597536978375,
+            "chroma_95th_percentile_error": 5.0
+          },
+          {
+            "quality": 88,
+            "bytes": 433062,
+            "full_resolution_luma_ssim": 0.9836571216583252,
+            "worst_128px_luma_ssim": 0.9734359979629517,
+            "chroma_mean_absolute_error": 1.4213866318535204,
+            "chroma_95th_percentile_error": 4.0
+          },
+          {
+            "quality": 92,
+            "bytes": 549912,
+            "full_resolution_luma_ssim": 0.9901562333106995,
+            "worst_128px_luma_ssim": 0.9833322167396545,
+            "chroma_mean_absolute_error": 1.2586703420467893,
+            "chroma_95th_percentile_error": 4.0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "valtheim_towers",
+    "name": "Башни Валтейм",
+    "captions": [
+      "Башни Валтейм"
+    ],
+    "aliases": [
+      "Valtheim Towers"
+    ],
+    "artwork": {
+      "kind": "original_generated_illustration",
+      "generator": "built_in_imagegen",
+      "final_prompt": "Use case: stylized-concept. Asset type: one finished location illustration for SKYRIM TEXT RPG. Scene: Valtheim Towers east of Whiterun: two round roofless Nordic stone watchtowers standing on OPPOSITE BANKS of the White River, joined by the recognizable high narrow STONE bridge above the river. Broad rushing river and a waterfall drop in the valley nearby, steep rocky slopes, tundra grasses and scattered pines, the road passes the foot of the nearer southern tower. Wide three-quarter landscape framing shows both towers and their high bridge, soft clear afternoon, no modern suspension bridge. Style: detailed cinematic realistic fantasy environment, physically believable Nordic Skyrim architecture and materials, rich natural textures, restrained natural colors, deep spatial composition, clear readable lighting; match the established realistic landscape gallery. Wide horizontal 16:9, 1920x1080 composition, full bleed. Single uninterrupted scene, no collage, no labels, no captions, no UI, no text, no logos, no watermark, no borders. No oversized invented city, no dragons, no foreground heroes.",
+      "source_file": "exec-2f650ac7-17c5-45ea-81f9-b1d586d856b5.png",
+      "source_sha256": "c9e421e185a99a9397927be4dc7c4e1a8b50c7746a928e3cd75e01dceb1a7532",
+      "source_bytes": 3457936,
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "compression": {
+        "quality": 88,
+        "dimensions": [
+          1672,
+          941
+        ],
+        "encoded_bytes": 501818,
+        "sha256": "9e070fc6712e462ded53590b0fd3d7199744454c54ae6e25cea00ee1631e07d1",
+        "archive_bytes": 501930,
+        "archive_sha256": "3c55a20bccecead2bf1486268089ad75185c7cf85d31ed05e3ffd2d145d8eba2",
+        "full_resolution_luma_ssim": 0.985647976398468,
+        "worst_128px_luma_ssim": 0.9781144857406616,
+        "chroma_mean_absolute_error": 1.4488506068572067,
+        "chroma_95th_percentile_error": 4.0,
+        "trials": [
+          {
+            "quality": 76,
+            "bytes": 296836,
+            "full_resolution_luma_ssim": 0.9579562544822693,
+            "worst_128px_luma_ssim": 0.9325969219207764,
+            "chroma_mean_absolute_error": 1.83838327341879,
+            "chroma_95th_percentile_error": 5.0
+          },
+          {
+            "quality": 80,
+            "bytes": 348154,
+            "full_resolution_luma_ssim": 0.9687304496765137,
+            "worst_128px_luma_ssim": 0.9475952982902527,
+            "chroma_mean_absolute_error": 1.7178072675408935,
+            "chroma_95th_percentile_error": 5.0
+          },
+          {
+            "quality": 84,
+            "bytes": 412072,
+            "full_resolution_luma_ssim": 0.9775065779685974,
+            "worst_128px_luma_ssim": 0.963415265083313,
+            "chroma_mean_absolute_error": 1.5961247069950018,
+            "chroma_95th_percentile_error": 5.0
+          },
+          {
+            "quality": 88,
+            "bytes": 501818,
+            "full_resolution_luma_ssim": 0.985647976398468,
+            "worst_128px_luma_ssim": 0.9781144857406616,
+            "chroma_mean_absolute_error": 1.4488506068572067,
+            "chroma_95th_percentile_error": 4.0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "falkreath_watchtower",
+    "name": "Фолкрит - Сторожевая башня",
+    "captions": [
+      "Фолкрит - Сторожевая башня"
+    ],
+    "aliases": [
+      "Falkreath Watchtower",
+      "Сторожевая башня Фолкрита"
+    ],
+    "artwork": {
+      "kind": "original_generated_illustration",
+      "generator": "built_in_imagegen",
+      "final_prompt": "Use case: stylized-concept. Asset type: one finished location illustration for SKYRIM TEXT RPG. Scene: Falkreath Watchtower northwest of Falkreath: a ruined cylindrical Imperial stone tower in a secluded pine forest, roofless jagged upper rim, a surviving arched doorway and broken low surrounding wall. Rough stone steps and scattered rubble, damp brown earth, thick ferns and moss, pale gray rock and looming conifers behind. Wide eye-level forest approach with full tower visible, cool morning mist, faint torch warmth inside, no large fortress or village. Style: detailed cinematic realistic fantasy environment, physically believable Nordic Skyrim architecture and materials, rich natural textures, restrained natural colors, deep spatial composition, clear readable lighting; match the established realistic landscape gallery. Wide horizontal 16:9, 1920x1080 composition, full bleed. Single uninterrupted scene, no collage, no labels, no captions, no UI, no text, no logos, no watermark, no borders. No oversized invented city, no dragons, no foreground heroes.",
+      "source_file": "exec-27ffee92-88c4-4726-9586-b8a3927dc4f4.png",
+      "source_sha256": "3b9855b5649e0ceb1e8792a4ec8c85adf4dff0bbf17e0d0ce20e19a1455d33f8",
+      "source_bytes": 3439137,
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "compression": {
+        "quality": 92,
+        "dimensions": [
+          1672,
+          941
+        ],
+        "encoded_bytes": 592634,
+        "sha256": "169e0bb37be76a204ec3a4ce3450060379dd9005900b80385e7bab600869f996",
+        "archive_bytes": 592746,
+        "archive_sha256": "ca410464ed28b882caa3a57d5f19adab36ffb86c273af7e3774b1a6fc1aeb729",
+        "full_resolution_luma_ssim": 0.9896867275238037,
+        "worst_128px_luma_ssim": 0.9838946461677551,
+        "chroma_mean_absolute_error": 1.1595631492507716,
+        "chroma_95th_percentile_error": 3.0,
+        "trials": [
+          {
+            "quality": 76,
+            "bytes": 283112,
+            "full_resolution_luma_ssim": 0.952673077583313,
+            "worst_128px_luma_ssim": 0.9373376369476318,
+            "chroma_mean_absolute_error": 1.5613756489329789,
+            "chroma_95th_percentile_error": 5.0
+          },
+          {
+            "quality": 80,
+            "bytes": 331224,
+            "full_resolution_luma_ssim": 0.9622620940208435,
+            "worst_128px_luma_ssim": 0.9472432136535645,
+            "chroma_mean_absolute_error": 1.4856977332472328,
+            "chroma_95th_percentile_error": 4.0
+          },
+          {
+            "quality": 84,
+            "bytes": 399784,
+            "full_resolution_luma_ssim": 0.9749165177345276,
+            "worst_128px_luma_ssim": 0.9660685062408447,
+            "chroma_mean_absolute_error": 1.3828695040906294,
+            "chroma_95th_percentile_error": 4.0
+          },
+          {
+            "quality": 88,
+            "bytes": 479654,
+            "full_resolution_luma_ssim": 0.9828032851219177,
+            "worst_128px_luma_ssim": 0.9752504825592041,
+            "chroma_mean_absolute_error": 1.2746708937351592,
+            "chroma_95th_percentile_error": 4.0
+          },
+          {
+            "quality": 92,
+            "bytes": 592634,
+            "full_resolution_luma_ssim": 0.9896867275238037,
+            "worst_128px_luma_ssim": 0.9838946461677551,
+            "chroma_mean_absolute_error": 1.1595631492507716,
+            "chroma_95th_percentile_error": 3.0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "pinefrost_tower",
+    "name": "Башня Белая Сосна",
+    "captions": [
+      "Башня Белая Сосна"
+    ],
+    "aliases": [
+      "Pinefrost Tower"
+    ],
+    "artwork": {
+      "kind": "original_generated_illustration",
+      "generator": "built_in_imagegen",
+      "final_prompt": "Use case: stylized-concept. Asset type: one finished location illustration for SKYRIM TEXT RPG. Scene: Pinefrost Tower in northwestern Haafingar: a collapsed Imperial watchtower, only a low broken round stone base remains standing while a long section of fallen cylindrical masonry lies sideways downhill across snowy rocks. Deep pine forest, snow-covered branches, icy stone, cold mountain haze. Wide landscape clearly showing the FALLEN tower and remaining base together, bright diffuse winter daylight, no intact tall watchtower, no trolls or battle. Style: detailed cinematic realistic fantasy environment, physically believable Nordic Skyrim architecture and materials, rich natural textures, restrained natural colors, deep spatial composition, clear readable lighting; match the established realistic landscape gallery. Wide horizontal 16:9, 1920x1080 composition, full bleed. Single uninterrupted scene, no collage, no labels, no captions, no UI, no text, no logos, no watermark, no borders. No oversized invented city, no dragons, no foreground heroes.",
+      "source_file": "exec-a76868d4-b595-4389-b76f-5454ff5ab27d.png",
+      "source_sha256": "7b1dde0aafb9afa5ed9bc74d48786bf44bafbcf0438242fc4fed1457c0cbc44a",
+      "source_bytes": 3472179,
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "compression": {
+        "quality": 92,
+        "dimensions": [
+          1672,
+          941
+        ],
+        "encoded_bytes": 583428,
+        "sha256": "cf95e03cb9fd8bf1781bebc8aeffd1736a0b502a57478f5aadfab4bc18d3b66d",
+        "archive_bytes": 583540,
+        "archive_sha256": "a44c9be8f2c4cf49a32a7a7e1b41fb9bcbf6c482dc5166d1780cd5bd5340890e",
+        "full_resolution_luma_ssim": 0.990716814994812,
+        "worst_128px_luma_ssim": 0.9837215542793274,
+        "chroma_mean_absolute_error": 1.0070495985640848,
+        "chroma_95th_percentile_error": 3.0,
+        "trials": [
+          {
+            "quality": 76,
+            "bytes": 282768,
+            "full_resolution_luma_ssim": 0.9600217938423157,
+            "worst_128px_luma_ssim": 0.9344291687011719,
+            "chroma_mean_absolute_error": 1.4169388032684358,
+            "chroma_95th_percentile_error": 4.0
+          },
+          {
+            "quality": 80,
+            "bytes": 329748,
+            "full_resolution_luma_ssim": 0.9689416289329529,
+            "worst_128px_luma_ssim": 0.9483322501182556,
+            "chroma_mean_absolute_error": 1.344578327036798,
+            "chroma_95th_percentile_error": 4.0
+          },
+          {
+            "quality": 84,
+            "bytes": 394012,
+            "full_resolution_luma_ssim": 0.9784854054450989,
+            "worst_128px_luma_ssim": 0.9663114547729492,
+            "chroma_mean_absolute_error": 1.2428525212412733,
+            "chroma_95th_percentile_error": 4.0
+          },
+          {
+            "quality": 88,
+            "bytes": 465598,
+            "full_resolution_luma_ssim": 0.9848382472991943,
+            "worst_128px_luma_ssim": 0.9745551943778992,
+            "chroma_mean_absolute_error": 1.1547260244369981,
+            "chroma_95th_percentile_error": 3.0
+          },
+          {
+            "quality": 92,
+            "bytes": 583428,
+            "full_resolution_luma_ssim": 0.990716814994812,
+            "worst_128px_luma_ssim": 0.9837215542793274,
+            "chroma_mean_absolute_error": 1.0070495985640848,
+            "chroma_95th_percentile_error": 3.0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "refugees_rest",
+    "name": "Привал Беженцев",
+    "captions": [
+      "Привал Беженцев"
+    ],
+    "aliases": [
+      "Refugees' Rest"
+    ],
+    "artwork": {
+      "kind": "original_generated_illustration",
+      "generator": "built_in_imagegen",
+      "final_prompt": "Use case: stylized-concept. Asset type: one finished location illustration for SKYRIM TEXT RPG. Scene: Refugees' Rest east of Windhelm: a ruined low Imperial stone watchtower and broken walls by a lonely snow-covered mountain road near the Morrowind border. A modest weathered rectangular memorial pedestal with a blank eroded stone tablet stands by the ruins, cold barren hills and sparse snowy pines, distant rocky pass. Somber establishing view with the road leading to the tower, pale winter sky, readable gray stone, no readable writing, no crowd. Style: detailed cinematic realistic fantasy environment, physically believable Nordic Skyrim architecture and materials, rich natural textures, restrained natural colors, deep spatial composition, clear readable lighting; match the established realistic landscape gallery. Wide horizontal 16:9, 1920x1080 composition, full bleed. Single uninterrupted scene, no collage, no labels, no captions, no UI, no text, no logos, no watermark, no borders. No oversized invented city, no dragons, no foreground heroes.",
+      "source_file": "exec-36da5c85-d866-42b6-abb6-a1fa3f5dd1d6.png",
+      "source_sha256": "529c52220dd1de8d35bbd734de8a5d1d5265ad913cbdf45b3f937e3ab2ccab23",
+      "source_bytes": 3351865,
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "compression": {
+        "quality": 88,
+        "dimensions": [
+          1672,
+          941
+        ],
+        "encoded_bytes": 447102,
+        "sha256": "44b41896807aabe72c2159ce48230355eb2fe806b0113579379057f095e96e84",
+        "archive_bytes": 447214,
+        "archive_sha256": "2af312be5adf057ee6c18d7adf7086cd5e8dc9e86d6de00843dc26b1e0839951",
+        "full_resolution_luma_ssim": 0.9870984554290771,
+        "worst_128px_luma_ssim": 0.977443277835846,
+        "chroma_mean_absolute_error": 1.1704405625695966,
+        "chroma_95th_percentile_error": 3.0,
+        "trials": [
+          {
+            "quality": 76,
+            "bytes": 267916,
+            "full_resolution_luma_ssim": 0.9649710655212402,
+            "worst_128px_luma_ssim": 0.940322995185852,
+            "chroma_mean_absolute_error": 1.484206331450305,
+            "chroma_95th_percentile_error": 5.0
+          },
+          {
+            "quality": 80,
+            "bytes": 313328,
+            "full_resolution_luma_ssim": 0.9734458327293396,
+            "worst_128px_luma_ssim": 0.9530279636383057,
+            "chroma_mean_absolute_error": 1.398380019220111,
+            "chroma_95th_percentile_error": 4.0
+          },
+          {
+            "quality": 84,
+            "bytes": 370516,
+            "full_resolution_luma_ssim": 0.9809089303016663,
+            "worst_128px_luma_ssim": 0.9656997323036194,
+            "chroma_mean_absolute_error": 1.2879158637100916,
+            "chroma_95th_percentile_error": 4.0
+          },
+          {
+            "quality": 88,
+            "bytes": 447102,
+            "full_resolution_luma_ssim": 0.9870984554290771,
+            "worst_128px_luma_ssim": 0.977443277835846,
+            "chroma_mean_absolute_error": 1.1704405625695966,
+            "chroma_95th_percentile_error": 3.0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "rift_watchtower",
+    "name": "Сторожевая башня Рифта",
+    "captions": [
+      "Сторожевая башня Рифта"
+    ],
+    "aliases": [
+      "Rift Watchtower"
+    ],
+    "artwork": {
+      "kind": "original_generated_illustration",
+      "generator": "built_in_imagegen",
+      "final_prompt": "Use case: stylized-concept. Asset type: one finished location illustration for SKYRIM TEXT RPG. Scene: Rift Watchtower northwest of Riften: a tall weathered round Imperial watchtower with an open crenellated top, a rough exterior wooden stair and small bandit supplies near the entrance, standing alone among the Rift's golden-leaf birches. Rocky ground, autumn grass, small broken outer walls, distant blue mountain ridge. Wide exterior from the woodland path in soft golden afternoon daylight, full compact tower, no city. Style: detailed cinematic realistic fantasy environment, physically believable Nordic Skyrim architecture and materials, rich natural textures, restrained natural colors, deep spatial composition, clear readable lighting; match the established realistic landscape gallery. Wide horizontal 16:9, 1920x1080 composition, full bleed. Single uninterrupted scene, no collage, no labels, no captions, no UI, no text, no logos, no watermark, no borders. No oversized invented city, no dragons, no foreground heroes.",
+      "source_file": "exec-fa77643f-47a5-4f6f-b322-7fa9e79464d6.png",
+      "source_sha256": "ba9bf64850700ca32aefcc09614b96a23b8a627f6c01305af92ef7ced23a61fd",
+      "source_bytes": 3750320,
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "compression": {
+        "quality": 92,
+        "dimensions": [
+          1672,
+          941
+        ],
+        "encoded_bytes": 753698,
+        "sha256": "d1069f8a7b87895a8a2cb46e87a136887d3120eafa12bd93f20352de94c5cd8f",
+        "archive_bytes": 753810,
+        "archive_sha256": "4568980d67b14778264d4591ab7061d04864ca5b0d2f1a89df77be4a1484c135",
+        "full_resolution_luma_ssim": 0.9933580756187439,
+        "worst_128px_luma_ssim": 0.9841621518135071,
+        "chroma_mean_absolute_error": 2.3112513919326383,
+        "chroma_95th_percentile_error": 7.0,
+        "trials": [
+          {
+            "quality": 76,
+            "bytes": 395758,
+            "full_resolution_luma_ssim": 0.9640406966209412,
+            "worst_128px_luma_ssim": 0.9409544467926025,
+            "chroma_mean_absolute_error": 3.011994772943372,
+            "chroma_95th_percentile_error": 9.0
+          },
+          {
+            "quality": 80,
+            "bytes": 457444,
+            "full_resolution_luma_ssim": 0.974764883518219,
+            "worst_128px_luma_ssim": 0.9600355625152588,
+            "chroma_mean_absolute_error": 2.825328979147705,
+            "chroma_95th_percentile_error": 9.0
+          },
+          {
+            "quality": 84,
+            "bytes": 536550,
+            "full_resolution_luma_ssim": 0.9828422665596008,
+            "worst_128px_luma_ssim": 0.9693654775619507,
+            "chroma_mean_absolute_error": 2.6565771677285186,
+            "chroma_95th_percentile_error": 8.0
+          },
+          {
+            "quality": 88,
+            "bytes": 622704,
+            "full_resolution_luma_ssim": 0.9884001016616821,
+            "worst_128px_luma_ssim": 0.9773544073104858,
+            "chroma_mean_absolute_error": 2.479813798819336,
+            "chroma_95th_percentile_error": 8.0
+          },
+          {
+            "quality": 92,
+            "bytes": 753698,
+            "full_resolution_luma_ssim": 0.9933580756187439,
+            "worst_128px_luma_ssim": 0.9841621518135071,
+            "chroma_mean_absolute_error": 2.3112513919326383,
+            "chroma_95th_percentile_error": 7.0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "shors_watchtower",
+    "name": "Сторожевая башня Шора",
+    "captions": [
+      "Сторожевая башня Шора"
+    ],
+    "aliases": [
+      "Shor's Watchtower"
+    ],
+    "artwork": {
+      "kind": "original_generated_illustration",
+      "generator": "built_in_imagegen",
+      "final_prompt": "Use case: stylized-concept. Asset type: one finished location illustration for SKYRIM TEXT RPG. Scene: Shor's Watchtower north of Riften near Shor's Stone: a battered round Imperial stone watchtower beside a rough road in the autumnal Rift, partly broken roofless crenellations, dark open entrance and a simple low stone guard wall, remnants of burned wood and scattered supplies. Golden aspens and dark pines with tall mountain slopes behind. Low three-quarter establishing view, cool clouded daylight, quiet abandoned outpost, no combat or bodies. Style: detailed cinematic realistic fantasy environment, physically believable Nordic Skyrim architecture and materials, rich natural textures, restrained natural colors, deep spatial composition, clear readable lighting; match the established realistic landscape gallery. Wide horizontal 16:9, 1920x1080 composition, full bleed. Single uninterrupted scene, no collage, no labels, no captions, no UI, no text, no logos, no watermark, no borders. No oversized invented city, no dragons, no foreground heroes.",
+      "source_file": "exec-e6c3167a-3084-4718-9856-0e8123d05953.png",
+      "source_sha256": "e987dd99d9978075c17fdfe55b387c7b5bb26f8de9b749b460c5e11288c6de6b",
+      "source_bytes": 3677603,
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "compression": {
+        "quality": 88,
+        "dimensions": [
+          1672,
+          941
+        ],
+        "encoded_bytes": 565842,
+        "sha256": "5cbb4531df049a414956e1ebadebc977a8c431d1d2215a500764ef7180cc7e95",
+        "archive_bytes": 565954,
+        "archive_sha256": "3def01f1ebd22fe81ac3e5ced3ca3b51048dc221dc69b08bb6d6a54925054483",
+        "full_resolution_luma_ssim": 0.9880148768424988,
+        "worst_128px_luma_ssim": 0.9773322343826294,
+        "chroma_mean_absolute_error": 1.8589241314086105,
+        "chroma_95th_percentile_error": 6.0,
+        "trials": [
+          {
+            "quality": 76,
+            "bytes": 348110,
+            "full_resolution_luma_ssim": 0.9640505313873291,
+            "worst_128px_luma_ssim": 0.9478444457054138,
+            "chroma_mean_absolute_error": 2.294977220609247,
+            "chroma_95th_percentile_error": 7.0
+          },
+          {
+            "quality": 80,
+            "bytes": 406588,
+            "full_resolution_luma_ssim": 0.9737737774848938,
+            "worst_128px_luma_ssim": 0.9598963260650635,
+            "chroma_mean_absolute_error": 2.15788838098531,
+            "chroma_95th_percentile_error": 7.0
+          },
+          {
+            "quality": 84,
+            "bytes": 471954,
+            "full_resolution_luma_ssim": 0.9812562465667725,
+            "worst_128px_luma_ssim": 0.9698399305343628,
+            "chroma_mean_absolute_error": 2.033598012396463,
+            "chroma_95th_percentile_error": 6.0
+          },
+          {
+            "quality": 88,
+            "bytes": 565842,
+            "full_resolution_luma_ssim": 0.9880148768424988,
+            "worst_128px_luma_ssim": 0.9773322343826294,
+            "chroma_mean_absolute_error": 1.8589241314086105,
+            "chroma_95th_percentile_error": 6.0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "snowpoint_beacon",
+    "name": "Сигнальная башня Снежная",
+    "captions": [
+      "Сигнальная башня Снежная"
+    ],
+    "aliases": [
+      "Snowpoint Beacon"
+    ],
+    "artwork": {
+      "kind": "original_generated_illustration",
+      "generator": "built_in_imagegen",
+      "final_prompt": "Use case: stylized-concept. Asset type: one finished location illustration for SKYRIM TEXT RPG. Scene: Snowpoint Beacon in the snowy Pale: a reasonably intact round Imperial stone watchtower with open crenellations, exposed wooden stairs and a brazier at the upper lookout, isolated on a snow-covered hill. Wind-carved snow, scattered frost-covered pines, gray mountain ridges and a pale steel-blue sky, a few barrels at its base. Wide three-quarter view from the ascent path, bright readable winter light and restrained orange beacon flame, no ornate palace. Style: detailed cinematic realistic fantasy environment, physically believable Nordic Skyrim architecture and materials, rich natural textures, restrained natural colors, deep spatial composition, clear readable lighting; match the established realistic landscape gallery. Wide horizontal 16:9, 1920x1080 composition, full bleed. Single uninterrupted scene, no collage, no labels, no captions, no UI, no text, no logos, no watermark, no borders. No oversized invented city, no dragons, no foreground heroes.",
+      "source_file": "exec-e255781d-a5d0-4a5b-bf50-c54612d4ad99.png",
+      "source_sha256": "1baa872719e8881556efe7e996ac5cd620eac3ecb0ebb03502128b6575599007",
+      "source_bytes": 3274909,
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "compression": {
+        "quality": 88,
+        "dimensions": [
+          1672,
+          941
+        ],
+        "encoded_bytes": 423066,
+        "sha256": "3dd5d1f97d4e8549e89cea872eb02c81cc724ed8cb95770796ff1bce4a7a6a91",
+        "archive_bytes": 423178,
+        "archive_sha256": "5f46db7ea5976ef49082d9d451dfb81420ec89674f8e81849b44fa61933aba09",
+        "full_resolution_luma_ssim": 0.9855754971504211,
+        "worst_128px_luma_ssim": 0.9734694957733154,
+        "chroma_mean_absolute_error": 1.1158758497780534,
+        "chroma_95th_percentile_error": 3.0,
+        "trials": [
+          {
+            "quality": 76,
+            "bytes": 256204,
+            "full_resolution_luma_ssim": 0.9625526666641235,
+            "worst_128px_luma_ssim": 0.9248436689376831,
+            "chroma_mean_absolute_error": 1.391753402925728,
+            "chroma_95th_percentile_error": 4.0
+          },
+          {
+            "quality": 80,
+            "bytes": 299414,
+            "full_resolution_luma_ssim": 0.9709326028823853,
+            "worst_128px_luma_ssim": 0.9408714175224304,
+            "chroma_mean_absolute_error": 1.3156633099268313,
+            "chroma_95th_percentile_error": 4.0
+          },
+          {
+            "quality": 84,
+            "bytes": 350232,
+            "full_resolution_luma_ssim": 0.9768518209457397,
+            "worst_128px_luma_ssim": 0.9524438381195068,
+            "chroma_mean_absolute_error": 1.2417319836883292,
+            "chroma_95th_percentile_error": 4.0
+          },
+          {
+            "quality": 88,
+            "bytes": 423066,
+            "full_resolution_luma_ssim": 0.9855754971504211,
+            "worst_128px_luma_ssim": 0.9734694957733154,
+            "chroma_mean_absolute_error": 1.1158758497780534,
+            "chroma_95th_percentile_error": 3.0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "stendarrs_beacon",
+    "name": "Сигнальная башня Стендарра",
+    "captions": [
+      "Сигнальная башня Стендарра"
+    ],
+    "aliases": [
+      "Stendarr's Beacon"
+    ],
+    "artwork": {
+      "kind": "original_generated_illustration",
+      "generator": "built_in_imagegen",
+      "final_prompt": "Use case: stylized-concept. Asset type: one finished location illustration for SKYRIM TEXT RPG. Scene: Stendarr's Beacon southeast of Riften: a round Imperial stone beacon tower perched on a steep rocky ridge near the southern mountain border, an OPEN upper platform and a clearly visible large iron fire brazier, arched doorway and stone approach steps. Golden birches and dark pines in the lower valley, gray jagged mountains immediately behind, soft late-afternoon sun, warm beacon fire. Wide exterior from the ridge path, weathered modest watchtower, no church or giant statue. Style: detailed cinematic realistic fantasy environment, physically believable Nordic Skyrim architecture and materials, rich natural textures, restrained natural colors, deep spatial composition, clear readable lighting; match the established realistic landscape gallery. Wide horizontal 16:9, 1920x1080 composition, full bleed. Single uninterrupted scene, no collage, no labels, no captions, no UI, no text, no logos, no watermark, no borders. No oversized invented city, no dragons, no foreground heroes.",
+      "source_file": "exec-e6072c73-e540-490e-a3a4-8ca7f1ea483a.png",
+      "source_sha256": "e192ee05ab56a71327703bd18204d3816d0cd88f3af9501469ad5debf1f843fe",
+      "source_bytes": 3492720,
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "compression": {
+        "quality": 92,
+        "dimensions": [
+          1672,
+          941
+        ],
+        "encoded_bytes": 636704,
+        "sha256": "f594237fc61a6e5383d8ed51571a5b23090e357cca05d1d28996862b7947fe2f",
+        "archive_bytes": 636816,
+        "archive_sha256": "554bf58902f48de39fa9c0ac9253a8c7911f9398c28d69b5b37e10366182b261",
+        "full_resolution_luma_ssim": 0.9902880191802979,
+        "worst_128px_luma_ssim": 0.9850804805755615,
+        "chroma_mean_absolute_error": 1.7210827583401553,
+        "chroma_95th_percentile_error": 6.0,
+        "trials": [
+          {
+            "quality": 76,
+            "bytes": 317126,
+            "full_resolution_luma_ssim": 0.955639660358429,
+            "worst_128px_luma_ssim": 0.9391473531723022,
+            "chroma_mean_absolute_error": 2.280156315942014,
+            "chroma_95th_percentile_error": 7.0
+          },
+          {
+            "quality": 80,
+            "bytes": 370488,
+            "full_resolution_luma_ssim": 0.9665836095809937,
+            "worst_128px_luma_ssim": 0.9538623690605164,
+            "chroma_mean_absolute_error": 2.1490597781043275,
+            "chroma_95th_percentile_error": 7.0
+          },
+          {
+            "quality": 84,
+            "bytes": 437100,
+            "full_resolution_luma_ssim": 0.9758296012878418,
+            "worst_128px_luma_ssim": 0.9671469926834106,
+            "chroma_mean_absolute_error": 2.0047379734477726,
+            "chroma_95th_percentile_error": 6.0
+          },
+          {
+            "quality": 88,
+            "bytes": 531444,
+            "full_resolution_luma_ssim": 0.9847403764724731,
+            "worst_128px_luma_ssim": 0.9780170917510986,
+            "chroma_mean_absolute_error": 1.8560595467511403,
+            "chroma_95th_percentile_error": 6.0
+          },
+          {
+            "quality": 92,
+            "bytes": 636704,
+            "full_resolution_luma_ssim": 0.9902880191802979,
+            "worst_128px_luma_ssim": 0.9850804805755615,
+            "chroma_mean_absolute_error": 1.7210827583401553,
+            "chroma_95th_percentile_error": 6.0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "whitewatch_tower",
+    "name": "Белая сторожевая башня",
+    "captions": [
+      "Белая сторожевая башня"
+    ],
+    "aliases": [
+      "Whitewatch Tower"
+    ],
+    "artwork": {
+      "kind": "original_generated_illustration",
+      "generator": "built_in_imagegen",
+      "final_prompt": "Use case: stylized-concept. Asset type: one finished location illustration for SKYRIM TEXT RPG. Scene: Whitewatch Tower north of Whiterun: a stout pale-gray round Imperial stone guard tower with an open battlement lookout, a short low defensive wall and small wooden barricades, standing on a gentle hill in the broad open Whiterun tundra. Yellow grasses, scrub, scattered gray boulders and distant snow peaks; a narrow road in foreground. Wide eye-level approach under clear cool daylight, well-defined rough stone, no town or large fortress. Style: detailed cinematic realistic fantasy environment, physically believable Nordic Skyrim architecture and materials, rich natural textures, restrained natural colors, deep spatial composition, clear readable lighting; match the established realistic landscape gallery. Wide horizontal 16:9, 1920x1080 composition, full bleed. Single uninterrupted scene, no collage, no labels, no captions, no UI, no text, no logos, no watermark, no borders. No oversized invented city, no dragons, no foreground heroes.",
+      "source_file": "exec-d46eb5c3-bb14-432e-af90-ee87038ff030.png",
+      "source_sha256": "8672e9446ad57e85315686894b19bb06e0446e220868148ddd64ab86ce868554",
+      "source_bytes": 3499561,
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "compression": {
+        "quality": 88,
+        "dimensions": [
+          1672,
+          941
+        ],
+        "encoded_bytes": 504280,
+        "sha256": "4c5c98f0436dc6288c363a2793ed8d686801be28341d1481f5906aeb5857a583",
+        "archive_bytes": 504392,
+        "archive_sha256": "85a2660b3b6e49428c6030134d8cc71e5d9c2742af9dd6835704bd02e89eddf4",
+        "full_resolution_luma_ssim": 0.988855242729187,
+        "worst_128px_luma_ssim": 0.9829367399215698,
+        "chroma_mean_absolute_error": 1.7117498182224957,
+        "chroma_95th_percentile_error": 5.0,
+        "trials": [
+          {
+            "quality": 76,
+            "bytes": 313026,
+            "full_resolution_luma_ssim": 0.9681578874588013,
+            "worst_128px_luma_ssim": 0.9486165046691895,
+            "chroma_mean_absolute_error": 2.1285424367846484,
+            "chroma_95th_percentile_error": 7.0
+          },
+          {
+            "quality": 80,
+            "bytes": 362818,
+            "full_resolution_luma_ssim": 0.976409912109375,
+            "worst_128px_luma_ssim": 0.9607654809951782,
+            "chroma_mean_absolute_error": 2.01084658741337,
+            "chroma_95th_percentile_error": 6.0
+          },
+          {
+            "quality": 84,
+            "bytes": 430528,
+            "full_resolution_luma_ssim": 0.9837123155593872,
+            "worst_128px_luma_ssim": 0.9731168746948242,
+            "chroma_mean_absolute_error": 1.8559556284925434,
+            "chroma_95th_percentile_error": 6.0
+          },
+          {
+            "quality": 88,
+            "bytes": 504280,
+            "full_resolution_luma_ssim": 0.988855242729187,
+            "worst_128px_luma_ssim": 0.9829367399215698,
+            "chroma_mean_absolute_error": 1.7117498182224957,
+            "chroma_95th_percentile_error": 5.0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "widows_watch_ruins",
+    "name": "Руины Вдовьей заставы",
+    "captions": [
+      "Руины Вдовьей заставы"
+    ],
+    "aliases": [
+      "Widow's Watch Ruins"
+    ],
+    "artwork": {
+      "kind": "original_generated_illustration",
+      "generator": "built_in_imagegen",
+      "final_prompt": "Use case: stylized-concept. Asset type: one finished location illustration for SKYRIM TEXT RPG. Scene: Widow's Watch Ruins on the northern Haafingar coast: a small heavily collapsed round Imperial stone watchtower with broken arches and crumbling low outer walls atop a bleak rocky headland. Sea of Ghosts visible beyond, cold blue water, sea fog, pale gray sky and sparse snow patches around hardy grasses, scattered blocks and a small old campfire site. Wide coastal establishing shot, melancholy readable daylight, no intact castle. Style: detailed cinematic realistic fantasy environment, physically believable Nordic Skyrim architecture and materials, rich natural textures, restrained natural colors, deep spatial composition, clear readable lighting; match the established realistic landscape gallery. Wide horizontal 16:9, 1920x1080 composition, full bleed. Single uninterrupted scene, no collage, no labels, no captions, no UI, no text, no logos, no watermark, no borders. No oversized invented city, no dragons, no foreground heroes.",
+      "source_file": "exec-df82e546-bb42-4f0f-8079-998c15c50df8.png",
+      "source_sha256": "c55b39f112c1907b77782b78200eefe1f0f3b91a579f1fe3c4a108da6c720ab6",
+      "source_bytes": 3057617,
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "compression": {
+        "quality": 92,
+        "dimensions": [
+          1672,
+          941
+        ],
+        "encoded_bytes": 476170,
+        "sha256": "8dfd4598892cc7319e09350ada216fc6e6bc93449b9a67b36d354d573d20d15c",
+        "archive_bytes": 476282,
+        "archive_sha256": "50f3366cf71ceeb468e89cce56e205bb2cd5e1913c861eb4e090b18acb3b028a",
+        "full_resolution_luma_ssim": 0.9895209670066833,
+        "worst_128px_luma_ssim": 0.9832313060760498,
+        "chroma_mean_absolute_error": 0.9763787760145218,
+        "chroma_95th_percentile_error": 3.0,
+        "trials": [
+          {
+            "quality": 76,
+            "bytes": 213146,
+            "full_resolution_luma_ssim": 0.9560264348983765,
+            "worst_128px_luma_ssim": 0.9241801500320435,
+            "chroma_mean_absolute_error": 1.3431968815624222,
+            "chroma_95th_percentile_error": 4.0
+          },
+          {
+            "quality": 80,
+            "bytes": 254154,
+            "full_resolution_luma_ssim": 0.9668685793876648,
+            "worst_128px_luma_ssim": 0.9423812627792358,
+            "chroma_mean_absolute_error": 1.2672196050216353,
+            "chroma_95th_percentile_error": 4.0
+          },
+          {
+            "quality": 84,
+            "bytes": 305480,
+            "full_resolution_luma_ssim": 0.9759683012962341,
+            "worst_128px_luma_ssim": 0.9579193592071533,
+            "chroma_mean_absolute_error": 1.1848718532153009,
+            "chroma_95th_percentile_error": 4.0
+          },
+          {
+            "quality": 88,
+            "bytes": 376186,
+            "full_resolution_luma_ssim": 0.9834381341934204,
+            "worst_128px_luma_ssim": 0.9732741117477417,
+            "chroma_mean_absolute_error": 1.0781579710071236,
+            "chroma_95th_percentile_error": 3.0
+          },
+          {
+            "quality": 92,
+            "bytes": 476170,
+            "full_resolution_luma_ssim": 0.9895209670066833,
+            "worst_128px_luma_ssim": 0.9832313060760498,
+            "chroma_mean_absolute_error": 0.9763787760145218,
+            "chroma_95th_percentile_error": 3.0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "north_skybound_watch",
+    "name": "Северная горная застава",
+    "captions": [
+      "Северная горная застава"
+    ],
+    "aliases": [
+      "North Skybound Watch"
+    ],
+    "artwork": {
+      "kind": "original_generated_illustration",
+      "generator": "built_in_imagegen",
+      "final_prompt": "Use case: stylized-concept. Asset type: one finished location illustration for SKYRIM TEXT RPG. Scene: North Skybound Watch above Riverwood: a substantial ancient Nordic stone watchpost integrated into a steep mountain face, round ruined lookout and heavy carved stone arches, an exposed northern balcony overlooking the pine-covered river valley far below. A stone door leads into Skybound Watch Pass and an unmarked ancient stone pedestal stands on the terrace. View from an adjacent rock ledge showing the ruin and the sweeping northern valley, cold clear daylight with snow patches, no giant fortress. Style: detailed cinematic realistic fantasy environment, physically believable Nordic Skyrim architecture and materials, rich natural textures, restrained natural colors, deep spatial composition, clear readable lighting; match the established realistic landscape gallery. Wide horizontal 16:9, 1920x1080 composition, full bleed. Single uninterrupted scene, no collage, no labels, no captions, no UI, no text, no logos, no watermark, no borders. No oversized invented city, no dragons, no foreground heroes.",
+      "source_file": "exec-74c05bc5-29be-4261-a6c2-d45f974b6840.png",
+      "source_sha256": "e6a08118b21b8b7eeca8cedc44ca156b98683fee9cc21f957544ce7484c8766d",
+      "source_bytes": 3566947,
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "compression": {
+        "quality": 88,
+        "dimensions": [
+          1672,
+          941
+        ],
+        "encoded_bytes": 513014,
+        "sha256": "725a5cff819c6d296ad1785aa305dd581e3db64186a81071429cdd3475eca32e",
+        "archive_bytes": 513126,
+        "archive_sha256": "c38eb558adc413f7b6240a9801bd619bcab164456aaf4100a6ceb9d283d5bbf6",
+        "full_resolution_luma_ssim": 0.9853521585464478,
+        "worst_128px_luma_ssim": 0.9758909940719604,
+        "chroma_mean_absolute_error": 1.3602839669698834,
+        "chroma_95th_percentile_error": 4.0,
+        "trials": [
+          {
+            "quality": 76,
+            "bytes": 310988,
+            "full_resolution_luma_ssim": 0.9582638144493103,
+            "worst_128px_luma_ssim": 0.9434856176376343,
+            "chroma_mean_absolute_error": 1.6860016067605978,
+            "chroma_95th_percentile_error": 5.0
+          },
+          {
+            "quality": 80,
+            "bytes": 360770,
+            "full_resolution_luma_ssim": 0.9680947661399841,
+            "worst_128px_luma_ssim": 0.9563072919845581,
+            "chroma_mean_absolute_error": 1.5976634599250517,
+            "chroma_95th_percentile_error": 5.0
+          },
+          {
+            "quality": 84,
+            "bytes": 422410,
+            "full_resolution_luma_ssim": 0.9770453572273254,
+            "worst_128px_luma_ssim": 0.9667402505874634,
+            "chroma_mean_absolute_error": 1.493806535346191,
+            "chroma_95th_percentile_error": 4.0
+          },
+          {
+            "quality": 88,
+            "bytes": 513014,
+            "full_resolution_luma_ssim": 0.9853521585464478,
+            "worst_128px_luma_ssim": 0.9758909940719604,
+            "chroma_mean_absolute_error": 1.3602839669698834,
+            "chroma_95th_percentile_error": 4.0
+          }
+        ]
+      }
+    }
   }
 ]
