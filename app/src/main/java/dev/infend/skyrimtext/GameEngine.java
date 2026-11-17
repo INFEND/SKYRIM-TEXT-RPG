@@ -68,7 +68,7 @@ public final class GameEngine {
     public LivingEconomy economy=new LivingEconomy();
     public final int[] regenBonus=new int[3];
     public boolean regenIgnorePenalty;
-    public void syncLivingSystems(){needs.sync(day,hour);economy.sync(day);}
+    public void syncLivingSystems(){needs.sync(day,hour);economy.sync(day);if(started&&itachi!=null&&!"COMBAT".equals(mode))itachi.daily(this);}
     public int regenRate(int index){return Math.max(0,1+regenBonus[index]+(index==1?compensation.passiveBonus(this,2):0)+progress.artifacts.regen(progress,index)); }
     private void regenerateCombat(){if(hp<=0||!"COMBAT".equals(mode))return;int penalty=regenIgnorePenalty?0:needs.penalty();hp=(int)Math.min(maxHp,(long)hp+(poisonTurns>0&&!regenIgnorePenalty?regenBonus[0]:Math.max(0,regenRate(0)-(penalty>0?1:0))));magicka=(int)Math.min(maxMagicka,(long)magicka+Math.max(regenBonus[1],regenRate(1)-(penalty>0?1:0)));stamina=(int)Math.min(maxStamina,(long)stamina+(frostTurns>0&&!regenIgnorePenalty?regenBonus[2]:Math.max(0,regenRate(2)-(penalty>0?1:0))));}
     public AiGameTurn aiTurn;
@@ -643,7 +643,7 @@ public final class GameEngine {
     void beginKatherineBattle(){startBattle("Агент Круга Трёх Когтей",75+level*8,8+level*2,"KATHERINE","Кэтрин поднимает барьер. Агент Круга требует, чтобы она сдалась.");}
     void beginFixShopBattle(int i,String name,String intro){startBattle(name,65+level*6,7+level*2,"FIX_QUEST:"+i,intro);}
     private void startBattle(String name,int health,int dmg,String kind,String intro) {
-        resetBattleVisuals();fixShop.gifts.beginBattle();progress.artifacts.trapTurns=0;alma.beginBattle();katherine.companion.beginBattle();enemyName=name;enemyHp=health;enemyMaxHp=health;enemyDamage=dmg;battleKind=kind;enemyIntro=intro;
+        resetBattleVisuals();fixShop.gifts.beginBattle();progress.artifacts.trapTurns=0;alma.beginBattle();itachi.beginBattle();katherine.companion.beginBattle();enemyName=name;enemyHp=health;enemyMaxHp=health;enemyDamage=dmg;battleKind=kind;enemyIntro=intro;
         battleLog="В бою важна тактика. Следи за запасом сил и магии.";mode="COMBAT";
     }
     // Retain class/quest/AI bonuses in old saves without counting the legacy
@@ -714,7 +714,9 @@ public final class GameEngine {
         if(road.hasDog(this)&&enemyHp>damage&&(battleTurns+1)%3==0){damage+=3;actionText+="\nБродячий пёс помогает в бою: −3 здоровья врагу.";}
         int petDamage=fixShop.world.petDamage(battleTurns+1,Math.max(0,enemyHp-damage));if(petDamage>0){damage+=petDamage;actionText+="\n"+fixShop.world.petName()+": −"+petDamage+" здоровья врагу.";}
         int customDamage=fixShop.world.companionDamage(battleTurns+1,Math.max(0,enemyHp-damage));if(customDamage>0){damage+=customDamage;actionText+="\n"+fixShop.world.companionName()+": −"+customDamage+" здоровья врагу.";}
-        int itachiDamage=itachi.assist(battleTurns+1,Math.max(0,enemyHp-damage));if(itachiDamage>0){damage+=itachiDamage;actionText+="\nИтачи: "+itachi.lastPower+", −"+itachiDamage+" здоровья врагу.";} 
+        int itachiOngoing=itachi.ongoingDamage(Math.max(0,enemyHp-damage));if(itachiOngoing>0){damage+=itachiOngoing;actionText+="\nИтачи: остаточное пламя, клоны или отражение, −"+itachiOngoing+" здоровья врагу.";}
+        boolean itachiWild="WILD".equals(battleKind)&&!road.groupActive(this)&&!enemyName.toLowerCase(java.util.Locale.ROOT).contains("карстааг")&&!enemyName.toLowerCase(java.util.Locale.ROOT).contains("дракон");
+        int itachiDamage=itachi.assist(battleTurns+1,Math.max(0,enemyHp-damage),itachiWild);if(itachiDamage>0){damage+=itachiDamage;actionText+="\nИтачи: "+itachi.lastPower+", −"+itachiDamage+" здоровья врагу.";} 
         int liviaDamage=livia.assist(battleTurns+1,Math.max(0,enemyHp-damage));if(liviaDamage>0){damage+=liviaDamage;actionText+="\nЛивия: удар мечом, −"+liviaDamage+" здоровья врагу.";}
         int almaDamage=alma.assist(this,battleTurns+1,Math.max(0,enemyHp-damage));if(almaDamage>0){damage+=almaDamage;actionText+="\nАльма: "+alma.powerLabel()+", −"+almaDamage+" здоровья врагу.";}
         int almaCombo=alma.combo(Math.max(0,enemyHp-damage),"MAGIC".equals(action));if(almaCombo>0){damage+=almaCombo;actionText+="\nАльма: Кровавая связка, −"+almaCombo+" здоровья врагу.";}
@@ -724,7 +726,7 @@ public final class GameEngine {
         lastDealt=Math.min(enemyHp,damage);lastHeavyHit="HEAVY".equals(action)&&lastDealt>0;lastMiss="HEAVY".equals(action)&&lastDealt==0;battleDealt+=lastDealt;battleTurns++;
         enemyHp=Math.max(0,enemyHp-damage);road.syncGroup(this);
         boolean defeatedTarget=false;
-        if(enemyHp==0) {road.recordRoadKill(this);if(!("CANONICAL".equals(battleKind)&&(canonicalStage==22||canonicalStage==27||canonicalStage==30)))actionText+=progress.artifacts.capture(this,enemyName);poisonTurns=frostTurns=0;if(road.nextOpponent(this,actionText)){actionText=battleLog;defeatedTarget=true;}else{winBattle(actionText);return;}}
+        if(enemyHp==0) {road.recordRoadKill(this);if(!("CANONICAL".equals(battleKind)&&(canonicalStage==22||canonicalStage==27||canonicalStage==30)))actionText+=progress.artifacts.capture(this,enemyName);poisonTurns=frostTurns=0;if(road.nextOpponent(this,actionText)){actionText=battleLog;defeatedTarget=true;itachi.nextTarget();}else{winBattle(actionText);return;}}
         int baseIncoming=enemyDamage+random.nextInt(8)-Math.max(0,armor-(armorUpgraded?4:0))-(defeatedTarget?0:artifactWeakness);
         baseIncoming=Math.max(1,baseIncoming-compensation.passiveBonus(this,1));
         int rawIncoming=Math.max(1,baseIncoming-(defending?enemyDamage/2+3+2*progress.branches.rank(3)+(progress.advanced.has(AdvancedPerks.QUICK_REFLEXES)?2:0)+(progress.advanced.has(AdvancedPerks.SHIELD_WALL)&&!"Не надето".equals(progress.equippedName("shield"))?3:0)+(progress.advanced.has(AdvancedPerks.SHIELD_CHARGE)&&!"Не надето".equals(progress.equippedName("shield"))?4:0):0));
@@ -740,7 +742,7 @@ public final class GameEngine {
         if(kathWeakness>0){lastBlocked+=kathWeakness;actionText+="\nКэтрин: ослабление противника, −"+kathWeakness+" входящего урона.";}
         int kathProtection=katherine.protect(incoming);incoming-=kathProtection;
         if(kathProtection>0){lastBlocked+=kathProtection;actionText+="\nКэтрин: защитный барьер, −"+kathProtection+" входящего урона.";}
-        int itachiProtection=itachi.protect(incoming);incoming-=itachiProtection;if(itachiProtection>0){lastBlocked+=itachiProtection;actionText+="\nИтачи: Шаринган / духовная защита, −"+itachiProtection+" входящего урона.";}
+        int itachiProtection=itachi.protect(incoming,itachiWild&&!defeatedTarget);incoming-=itachiProtection;if(itachiProtection>0){lastBlocked+=itachiProtection;actionText+="\nИтачи: "+itachi.lastDefense+", −"+itachiProtection+" входящего урона.";}
         int liviaProtection=livia.protect(incoming);incoming-=liviaProtection;if(liviaProtection>0){lastBlocked+=liviaProtection;actionText+="\nЛивия: прикрывает щитом, −"+liviaProtection+" входящего урона.";}
         int almaWeakness=alma.weaken(incoming);incoming-=almaWeakness;if(almaWeakness>0){lastBlocked+=almaWeakness;actionText+="\nАльма: Алая тень / Метка смерти, −"+almaWeakness+" входящего урона.";}
         int almaProtection=alma.protect(incoming);incoming-=almaProtection;if(almaProtection>0){lastBlocked+=almaProtection;actionText+="\nАльма: защитная магия, −"+almaProtection+" входящего урона.";}
@@ -908,7 +910,7 @@ public final class GameEngine {
             g.sceneState=SceneState.fromJson(j.optJSONObject("sceneState"));
             g.road=RoadEvents.restore(j.optJSONObject("road"));if(RoadEvents.MODE.equals(g.mode)&&!g.road.pending())g.mode="WORLD";
              g.katherine=KatherineStory.restore(j.optJSONObject("katherine"));
-             g.itachi=ItachiStory.restore(j.optJSONObject("itachi"));if(ItachiStory.MODE.equals(g.mode)&&!g.itachi.present(g))g.mode="WORLD";
+             g.itachi=ItachiStory.restore(j.optJSONObject("itachi"));if(!"COMBAT".equals(g.mode))g.itachi.beginBattle();if(ItachiStory.MODE.equals(g.mode)&&!g.itachi.present(g))g.mode="WORLD";
              g.livia=LiviaStory.restore(j.optJSONObject("livia"));if(LiviaStory.MODE.equals(g.mode)&&!g.livia.present(g))g.mode="WORLD";
              g.alma=AlmaStory.restore(j.optJSONObject("alma"));if(!g.alma.enabled&&AlmaStory.MODE.equals(g.mode))g.mode="WORLD";
             // Reconcile legacy schema-1 saves with the authoritative quest stage.
