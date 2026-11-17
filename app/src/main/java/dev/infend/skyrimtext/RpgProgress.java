@@ -59,7 +59,7 @@ public final class RpgProgress {
         String material=item.temperMaterial();
         if(material.isEmpty())return "Улучшение этого предмета пока недоступно";
         if(quantity(item.id)!=1)return "Для улучшения нужен одиночный экземпляр";
-        if("COMBAT".equals(g.mode)||(!atForge()&&!(g.fixShop.home.room(3)&&!g.fixShop.home.here(g).isEmpty())))return "Нужна кузница в поселении или собственном доме, вне боя";
+        if("COMBAT".equals(g.mode)||(!atForge()&&!(g.fixShop.home.room(3)&&!g.fixShop.home.here(g).isEmpty())&&!(g.fixShop.gifts.on(FixShopGifts.FORGE)&&FixShopWorld.safe(g))))return "Нужна кузница в поселении или собственном доме, вне боя";
         if(temperTarget(item)<=temperQuality(item.id))return "Нужен более высокий навык кузнечного дела";
         if(quantity(material)<1)return "Не хватает материала: "+material;
         return "";

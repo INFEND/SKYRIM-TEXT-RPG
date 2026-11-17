@@ -4497,6 +4497,8 @@ public final class MainActivity extends Activity {
         if(f.on(n)&&n==FixShopGifts.ANCHOR){livingLink(panel,"Установить якорь",game.progress.location,"map",()->{if(!livingBusy()&&f.mark(game)){save();render();fixGiftDialog(n);}else toast("Якорь здесь уже установлен или место недоступно");});livingLink(panel,"Вернуться к якорю",f.anchor,"map",()->{if(!livingBusy()&&f.recall(game)){save();render();closeLivingDialog();}else toast("Возвращение недоступно");});}
         if(f.on(n)&&n==FixShopGifts.POCKET)livingLink(panel,"Открыть хранилище","","armor",this::fixStorage);
         if(f.on(n)&&n==FixShopGifts.PURIFY)livingLink(panel,"Применить","","health",()->{if(!livingBusy()&&f.purify(game)){save();render();fixGiftDialog(n);}else toast("Восстановление не требуется или дар уже использован");});
+        if(f.on(n)&&n==FixShopGifts.BREATH)livingLink(panel,"Применить","","health",()->{if(!livingBusy()&&f.breath(game)){save();render();fixGiftDialog(n);}else toast("Дар уже использован или восстановление не требуется");});
+        if(f.on(n)&&n==FixShopGifts.PARDON)livingLink(panel,"Погасить штраф","","shield",()->{if(!livingBusy()&&f.pardon(game)){save();render();fixGiftDialog(n);}else toast("Нужен штраф в текущей столице; дар доступен раз в день");});
         livingDialog(FixShopGifts.NAME[n],panel);
     }
     private void fixCollections(){

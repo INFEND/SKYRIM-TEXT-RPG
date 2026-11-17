@@ -113,7 +113,7 @@ public final class TravelPlanner {
             stops.add(target.name);
             days++;
         }
-        days=Math.max(1,days);
+        days=game.fixShop.gifts.days(Math.max(1,days));fare=game.fixShop.gifts.fare(fare);
         if(game.progress.carryWeight()>game.progress.carryLimit())
             return blocked("Снаряжение весит больше 50 кг. Освободи часть места в инвентаре.");
         if(game.gold<fare)

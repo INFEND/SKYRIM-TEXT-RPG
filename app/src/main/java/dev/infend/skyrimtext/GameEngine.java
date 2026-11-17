@@ -339,6 +339,9 @@ public final class GameEngine {
         if(roadSummonTurns==0&&progress.equipped("Этериевый посох"))s.add("ROAD_SUMMON_AETHER","Призвать автоматон","20 магии | три хода помощи");
         if("WILD".equals(battleKind))s.add("FLEE","Отступить","Шанс выйти из боя без награды");
         if("CANONICAL".equals(battleKind)&&canonicalShouts!=0&&canonicalShoutCooldown==0)s.add("CANON_SHOUT",CanonicalCampaign.combatShout(this),"Урон и ослабление врага | Восстановление 3 хода");
+        if(fixShop.gifts.availableBattle(FixShopGifts.TIME))s.add("FIXGIFT:time","Пески времени","Пропуск ответного удара | раз за бой");
+        if(fixShop.gifts.canBalance(this))s.add("FIXGIFT:balance","Равновесие стихий","Магия → выносливость | раз за бой");
+        if(fixShop.gifts.canEscape(this))s.add("FIXGIFT:escape","Тропа призрака","Гарантированное отступление без трофеев");
         if(fixShop.gifts.canBlood(this))s.add("FIXGIFT:blood","Кровавый обмен","Здоровье → магия | раз за бой");
         for(int i=0;i<CompensationPowers.SLOTS;i++)if(compensation.available(this,i))s.add("FIX_POWER:"+i,compensation.powerName(i),compensation.detail(i));
         return s;
@@ -381,7 +384,7 @@ public final class GameEngine {
         lastCheckChance=lastCheckRoll=-1;
         if(RoadEvents.MODE.equals(mode)){road.choose(this,action);return;}
         if(road.pending()&&!"COMBAT".equals(mode)){if("GO_WORLD".equals(action))road.resume(this);return;}
-        if(action.startsWith("FIXGIFT:")){if("FIXGIFT:blood".equals(action)){if(fixShop.gifts.canBlood(this))combatTurn(action);}else FixShopGifts.choose(this,action);return;}
+        if(action.startsWith("FIXGIFT:")){if("FIXGIFT:escape".equals(action)){if(fixShop.gifts.escape(this))recordVisualEvent(message);}else if("FIXGIFT:blood".equals(action)||"FIXGIFT:time".equals(action)||"FIXGIFT:balance".equals(action)){if("COMBAT".equals(mode))combatTurn(action);}else FixShopGifts.choose(this,action);return;}
         if(action.startsWith("FIXRESIDENCE:")){FixShopHome.choose(this,action);return;}
         if(action.startsWith("FIXPLACE:")||action.startsWith("FIXHOME:")||action.startsWith("FIXNPC:")||action.startsWith("FIXCUSTOM:")){FixShopWorld.choose(this,action);return;}
         if(action.startsWith("FIXQUEST:")){FixShopAdventure.choose(this,action);return;}
@@ -652,8 +655,8 @@ public final class GameEngine {
     public int effectiveArmor(){
         return Math.max(0,armor-(armorUpgraded?4:0))+(int)Math.round(progress.equippedArmor());
     }
-    public int heavyCost(){int skill=progress.equippedWeaponSkill();return (skill==0&&progress.advanced.has(AdvancedPerks.FIGHTING)||skill==1&&progress.advanced.has(AdvancedPerks.CHAMPION)?7:10)-(factionStories.beast()==1?1:0);}
-    public int magicCost(){return (progress.advanced.has(AdvancedPerks.NOVICE_DESTRUCTION)?9:12)-(progress.advanced.has(AdvancedPerks.MASTER_DESTRUCTION)?3:0);}
+    public int heavyCost(){int skill=progress.equippedWeaponSkill();return fixShop.gifts.cost((skill==0&&progress.advanced.has(AdvancedPerks.FIGHTING)||skill==1&&progress.advanced.has(AdvancedPerks.CHAMPION)?7:10)-(factionStories.beast()==1?1:0),FixShopGifts.ENDURANCE);}
+    public int magicCost(){return fixShop.gifts.cost((progress.advanced.has(AdvancedPerks.NOVICE_DESTRUCTION)?9:12)-(progress.advanced.has(AdvancedPerks.MASTER_DESTRUCTION)?3:0),FixShopGifts.ARCHMAGE);}
     public int criticalChance(){int skill=progress.equippedWeaponSkill();return 8+(skill==2&&progress.advanced.has(AdvancedPerks.CRITICAL_SHOT)?10:0)+(skill==0&&progress.advanced.has(AdvancedPerks.BLADESMAN)||skill==1&&progress.advanced.has(AdvancedPerks.GREAT_CRITICAL)?8:0)+(skill==2&&progress.advanced.has(AdvancedPerks.BULLSEYE)?12:0);}
     private void combatTurn(String action) {
         if(!mode.equals("COMBAT"))return;
@@ -669,6 +672,8 @@ public final class GameEngine {
             case "ROADSTAR_TRAP":if(progress.artifacts.trapTurns>0||magicka<10||!((progress.artifacts.whiteSoul==0&&progress.quantity("Звезда Азуры")>0)||(progress.artifacts.blackSoul==0&&progress.quantity("Звезда Чёрной Азуры")>0)))return;magicka-=10;progress.artifacts.trapTurns=3;actionText="Наложен захват души на три хода.";break;
             case "ROADSTAR_WHITE":case "ROADSTAR_BLACK":int mana=progress.artifacts.release(this,"ROADSTAR_WHITE".equals(action)?1:2);if(mana==0)return;actionText="Душа высвобождена: +"+mana+" магии.";break;
             case "ROAD_SUMMON_ROSE":case "ROAD_SUMMON_AETHER":if(roadSummonTurns>0||magicka<20||!progress.equipped("ROAD_SUMMON_ROSE".equals(action)?"Роза Сангвина":"Этериевый посох"))return;magicka-=20;roadSummonKind="ROAD_SUMMON_ROSE".equals(action)?1:2;roadSummonTurns=3;actionText=roadSummonKind==1?"Роза Сангвина призывает дремора.":"Этериевый посох призывает автоматон.";break;
+            case "FIXGIFT:time":if(!fixShop.gifts.useBattle(FixShopGifts.TIME))return;shadow=true;actionText="Пески времени останавливают ответную атаку.";break;
+            case "FIXGIFT:balance":if(!fixShop.gifts.balance(this))return;defending=true;actionText="Равновесие стихий превращает магию в выносливость.";break;
             case "FIXGIFT:blood":if(!fixShop.gifts.blood(this))return;defending=true;actionText="Кровавый обмен: жизненная сила обращена в магию.";break;
             case "ATTACK": damage=Math.max(1,effectiveAttack()+random.nextInt(9)-3);actionText="Ты наносишь удар: −"+damage+" здоровья врагу.";break;
             case "HEAVY":if(stamina<heavyCost()){battleLog="Недостаточно выносливости для сильного удара.";return;}
@@ -686,6 +691,8 @@ public final class GameEngine {
         if("ATTACK".equals(action)&&damage>0&&random.nextInt(100)<criticalChance()){
             lastCritical=true;damage=Math.max(1,(int)Math.round(damage*1.5));actionText="Критический удар! −"+damage+" здоровья врагу.";
         }
+        if(damage>0&&("ATTACK".equals(action)||"HEAVY".equals(action)||"MAGIC".equals(action))){int ambush=fixShop.gifts.ambush(damage);if(ambush>0){damage=nonnegativeAdd(damage,ambush);actionText+="\nЗасада ночного клинка: +"+ambush+" урона.";}}
+        if(defending&&"DEFEND".equals(action)&&stamina<maxStamina&&fixShop.gifts.useBattle(FixShopGifts.RESOLVE)){stamina=Math.min(maxStamina,nonnegativeAdd(stamina,Math.max(1,maxStamina/10)));actionText+="\nПечать решимости восстанавливает выносливость.";}
         compensation.tick();
         if(!"CANON_SHOUT".equals(action)&&canonicalShoutCooldown>0)canonicalShoutCooldown--;
         String kathSupply=katherine.companion.useSupplies(katherine);if(!kathSupply.isEmpty())actionText+="\n"+kathSupply;
@@ -713,6 +720,7 @@ public final class GameEngine {
         int almaCombo=alma.combo(Math.max(0,enemyHp-damage),"MAGIC".equals(action));if(almaCombo>0){damage+=almaCombo;actionText+="\nАльма: Кровавая связка, −"+almaCombo+" здоровья врагу.";}
         if(roadSummonTurns>0){int summon=Math.min(Math.max(0,enemyHp-damage),roadSummonKind==1?10+level/2:7+level/3);if(summon>0){damage+=summon;actionText+="\n"+(roadSummonKind==1?"Дремора":roadSummonKind==3?"Поднятый мертвец":"Двемерский автоматон")+" наносит "+summon+" урона.";}if(--roadSummonTurns==0){roadSummonKind=0;actionText+="\nПризыв рассеивается.";}}
         int roadAssist=road.allyDamage(this,damage);if(roadAssist>0){damage+=roadAssist;actionText+="\nСоратники атакуют великана: −"+roadAssist+" здоровья.";}
+        if("ATTACK".equals(action)||"HEAVY".equals(action)){int heal=fixShop.gifts.drain(Math.min(enemyHp,damage),maxHp-hp);if(heal>0){hp+=heal;lastHealing+=heal;actionText+="\nПохититель жизненной силы: +"+heal+" здоровья.";}}
         lastDealt=Math.min(enemyHp,damage);lastHeavyHit="HEAVY".equals(action)&&lastDealt>0;lastMiss="HEAVY".equals(action)&&lastDealt==0;battleDealt+=lastDealt;battleTurns++;
         enemyHp=Math.max(0,enemyHp-damage);road.syncGroup(this);
         boolean defeatedTarget=false;
@@ -737,6 +745,7 @@ public final class GameEngine {
         int almaWeakness=alma.weaken(incoming);incoming-=almaWeakness;if(almaWeakness>0){lastBlocked+=almaWeakness;actionText+="\nАльма: Алая тень / Метка смерти, −"+almaWeakness+" входящего урона.";}
         int almaProtection=alma.protect(incoming);incoming-=almaProtection;if(almaProtection>0){lastBlocked+=almaProtection;actionText+="\nАльма: защитная магия, −"+almaProtection+" входящего урона.";}
         if(fixShop.gifts.on(FixShopGifts.WARD)){poisonTurns=frostTurns=0;}
+        int aegis=fixShop.gifts.absorb(incoming);if(aegis>0){incoming-=aegis;lastBlocked+=aegis;actionText+="\nЭгида Этериуса поглощает "+aegis+" урона.";}
         int poisoned=poisonTurns>0?Math.max(1,maxHp/40):0;
         if(poisonTurns>0)poisonTurns--;if(frostTurns>0){frostTurns--;stamina=Math.max(0,stamina-4);}
         String foe=enemyName.toLowerCase(java.util.Locale.ROOT);
@@ -756,7 +765,7 @@ public final class GameEngine {
     private void winBattle(String lastHit) {
         int reward=25+random.nextInt(26)+level*4;int gain=30+level*9;
         boolean nonlethal="CANONICAL".equals(battleKind)&&(canonicalStage==22||canonicalStage==27||canonicalStage==30);
-        if(nonlethal)reward=0;
+        if(nonlethal)reward=0;else reward+=fixShop.gifts.loot(reward);
         gold=nonnegativeAdd(gold,reward);victories++;if(!nonlethal&&"WILD".equals(battleKind)&&sideQuest==1&&sideKills<3)sideKills++;
         if("QUEST".equals(battleKind)) {questStage=3;reward+=50;gold=nonnegativeAdd(gold,50);gain+=65;}
         if("DRAGON".equals(battleKind)&&progress.dragonStage==3){
