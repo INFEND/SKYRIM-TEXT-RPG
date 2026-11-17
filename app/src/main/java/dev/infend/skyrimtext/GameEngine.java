@@ -224,7 +224,7 @@ public final class GameEngine {
         if(started&&KatherineStory.MODE.equals(mode))return katherine.scene(this);
         if(started&&"CANON".equals(mode))return CanonicalCampaign.scene(this);
         Scene s=baseScene();
-        if(started){progress.fillChoices(this,s);FixShopAdventure.choices(this,s);FixShopAdventure.endings(this,s);FixShopWorld.choices(this,s);}
+        if(started){progress.fillChoices(this,s);FixShopAdventure.choices(this,s);FixShopAdventure.endings(this,s);FixShopWorld.choices(this,s);FixShopHome.choices(this,s);}
         if(itachi.available(this))s.add("ITACHI:open","Поговорить с Итачи",itachi.objective(this));
         if(livia.available(this))s.add("LIVIA:open","Поговорить с Ливией",livia.objective());
         if(alma.available(this))s.add("ALMA:open","Поговорить с Альмой","Алая Бессмертная | "+alma.status());
@@ -380,6 +380,7 @@ public final class GameEngine {
         lastCheckChance=lastCheckRoll=-1;
         if(RoadEvents.MODE.equals(mode)){road.choose(this,action);return;}
         if(road.pending()&&!"COMBAT".equals(mode)){if("GO_WORLD".equals(action))road.resume(this);return;}
+        if(action.startsWith("FIXRESIDENCE:")){FixShopHome.choose(this,action);return;}
         if(action.startsWith("FIXPLACE:")||action.startsWith("FIXHOME:")||action.startsWith("FIXNPC:")||action.startsWith("FIXCUSTOM:")){FixShopWorld.choose(this,action);return;}
         if(action.startsWith("FIXQUEST:")){FixShopAdventure.choose(this,action);return;}
         if(action.startsWith("ROAD:"))return;
@@ -865,7 +866,7 @@ public final class GameEngine {
             g.enemyHp=Math.max(0,j.optInt("enemyHp",0));g.enemyMaxHp=Math.max(0,j.optInt("enemyMaxHp",0));g.enemyDamage=Math.max(0,j.optInt("enemyDamage",0));
             g.compensation=CompensationPowers.fromJson(j.optJSONObject("compensation"));g.compensation.installCatalog();
             g.progress=RpgProgress.fromJson(j.optJSONObject("progress"));
-             g.needs=LivingNeeds.fromJson(j.optJSONObject("needs"));g.economy=LivingEconomy.fromJson(j.optJSONObject("economy"));g.syncLivingSystems();g.fixSpent=Math.max(0,j.optLong("fixSpent",0));g.fixShop=FixShopState.fromJson(j.optJSONObject("fixShop"));org.json.JSONArray rates=j.optJSONArray("regenBonus");if(rates!=null)for(int i=0;i<3;i++)g.regenBonus[i]=Math.max(0,Math.min(1000000,rates.optInt(i)));g.regenIgnorePenalty=j.optBoolean("regenIgnorePenalty");g.compensation.reconcile(g);JSONObject result=j.optJSONObject("lastLivingResult");if(result!=null)g.lastLivingResult=result;
+             g.needs=LivingNeeds.fromJson(j.optJSONObject("needs"));g.economy=LivingEconomy.fromJson(j.optJSONObject("economy"));g.syncLivingSystems();g.fixSpent=Math.max(0,j.optLong("fixSpent",0));g.fixShop=FixShopState.fromJson(j.optJSONObject("fixShop"));g.fixShop.migrateRemoved(g);org.json.JSONArray rates=j.optJSONArray("regenBonus");if(rates!=null)for(int i=0;i<3;i++)g.regenBonus[i]=Math.max(0,Math.min(1000000,rates.optInt(i)));g.regenIgnorePenalty=j.optBoolean("regenIgnorePenalty");g.compensation.reconcile(g);JSONObject result=j.optJSONObject("lastLivingResult");if(result!=null)g.lastLivingResult=result;
             g.merchants=MerchantLedger.fromJson(j.optJSONObject("merchants"));g.factions=FactionCampaign.fromJson(j.optJSONObject("factions"));g.factionStories=FactionStories.fromJson(j.optJSONObject("factionStories"));g.factionBattle=Math.max(-1,Math.min(6,j.optInt("factionBattle",-1)));
             org.json.JSONArray holds=j.optJSONArray("holdReputation");if(holds!=null)for(int i=0;i<g.holdReputation.length;i++)g.holdReputation[i]=Math.max(-100,Math.min(100,holds.optInt(i,0)));
             if("COMBAT".equals(g.mode)){g.poisonTurns=Math.max(0,Math.min(2,j.optInt("poisonTurns")));g.frostTurns=Math.max(0,Math.min(2,j.optInt("frostTurns")));}

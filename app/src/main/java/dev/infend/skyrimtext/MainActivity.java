@@ -3698,12 +3698,16 @@ public final class MainActivity extends Activity {
         panel.setPadding(dp(14),dp(10),dp(14),dp(10));ScrollView sc=new ScrollView(this);sc.setFillViewport(false);sc.addView(panel);
         activeLivingDialog=new RuneDialogBuilder(this,accent()).setTitle(title).setView(sc).setNegativeButton("Закрыть",null).show();
     }
+    private View fixHeroPortrait(){
+        CharacterPortraitView portrait=new CharacterPortraitView(this,game.race,game.gender,game.portrait);int color=game.fixShop.cosmetics.color();if(color==0)return portrait;
+        LinearLayout frame=column();frame.setPadding(dp(3),dp(3),dp(3),dp(3));frame.setBackground(bg(Color.BLACK,color,12));frame.addView(portrait,lp(-1,-2));return frame;
+    }
     private void renderHero(){
         if(heroDetailed){renderHeroLegacy();return;}
         skyrimTopTabs(3);game.syncLivingSystems();
-        LinearLayout head=row();head.setGravity(Gravity.CENTER_VERTICAL);head.addView(new CharacterPortraitView(this,game.race,game.gender,game.portrait),lp(92,-2));
+        LinearLayout head=row();head.setGravity(Gravity.CENTER_VERTICAL);head.addView(fixHeroPortrait(),lp(92,-2));
         LinearLayout identity=column();identity.setPadding(dp(13),0,0,0);head.addView(identity,new LinearLayout.LayoutParams(0,-2,1));
-        addText(identity,game.name,24,heroColor(),true,4);addText(identity,game.race+" · "+game.heroClass,13,MUTED,false,8);
+        addText(identity,game.name,24,heroColor(),true,4);if(!game.fixShop.cosmetics.title().isEmpty())addText(identity,game.fixShop.cosmetics.title(),13,accent(),true,4);addText(identity,game.race+" · "+game.heroClass,13,MUTED,false,8);
         livingLine(identity,"Уровень "+game.level,game.level>=100?"MAX":game.xp+" / "+game.experienceRequired(),accent());livingBar(identity,game.level>=100?1:game.xp,game.level>=100?1:game.experienceRequired(),accent());
         content.addView(head,lp(-1,-2));space(content,12);
         String portraitPath=CharacterIdentity.portraitPath(game.race,game.gender,game.portrait);
@@ -3786,7 +3790,7 @@ public final class MainActivity extends Activity {
         skyrimTopTabs(3);
         livingLink(content,"К обзору героя","","hero",()->{heroDetailed=false;render();});
         section("ЛИЧНОЕ ДЕЛО",""+game.name,game.race+" | "+game.heroClass+" | уровень "+game.level);
-        CharacterPortraitView portrait=new CharacterPortraitView(this,game.race,game.gender,game.portrait);
+        View portrait=fixHeroPortrait();
         LinearLayout.LayoutParams portraitParams=lp(150,-2);portraitParams.gravity=Gravity.CENTER_HORIZONTAL;
         content.addView(portrait,portraitParams);space(content,12);
         String portraitPath=CharacterIdentity.portraitPath(game.race,game.gender,game.portrait);
@@ -4362,6 +4366,8 @@ public final class MainActivity extends Activity {
         fixDirect(a,"Очки талантов","+5 свободных очков","Навыки","skills",2,50,()->{if(game.progress.perkPoints>Integer.MAX_VALUE-5)return false;game.progress.perkPoints+=5;return true;});
         fixOffer(a,"Новое имя","Переименовать героя","Внешность","hero",1,25,this::fixRename);
         fixOffer(a,"Новый облик","Выбрать портрет героя","Внешность","hero",2,50,this::fixPortrait);
+        for(int i=0;i<4;i++){final int n=i;for(boolean frame:new boolean[]{false,true}){String name=frame?FixShopCosmetics.FRAMES[i]:FixShopCosmetics.TITLES[i];String detail=frame?"Декоративная рамка портрета":"Титул на странице героя";if(game.fixShop.cosmetics.owns(frame,i))fixOffer(a,name,detail+" | "+((frame?game.fixShop.cosmetics.frame:game.fixShop.cosmetics.title)==i?"Выбрано":"Приобретено"),"Внешность","hero",3,0,()->{if(!livingBusy()&&game.fixShop.cosmetics.select(frame,n)){save();render();livingFixShop();}});else fixDirect(a,name,detail,"Внешность","hero",3,frame?80:60,()->game.fixShop.cosmetics.buy(frame,n));}}
+        if(game.fixShop.cosmetics.title>=0||game.fixShop.cosmetics.frame>=0)fixOffer(a,"Стандартное оформление","Снять титул и рамку без потери покупок","Внешность","hero",0,0,()->{if(!livingBusy()){game.fixShop.cosmetics.select(false,-1);game.fixShop.cosmetics.select(true,-1);save();render();livingFixShop();}});
         fixOffer(a,"Новое наследие","Сменить расу; сохранить характеристики и навыки","Внешность","hero",3,150,this::fixRace);
         fixDirect(a,"Благословение исцеления","Полностью восстановить здоровье, магию и силы","Улучшения","health",2,25,()->{if(game.hp==game.maxHp&&game.magicka==game.maxMagicka&&game.stamina==game.maxStamina)return false;game.hp=game.maxHp;game.magicka=game.maxMagicka;game.stamina=game.maxStamina;return true;});
         fixDirect(a,"Сердце Довакина","+5 к регенерации здоровья, магии и выносливости. Однократно.","Магия","health",4,500,()->{if(game.fixShop.count(FixShopState.key("Сердце Довакина",500))>0)return false;for(int v:game.regenBonus)if(v>999995)return false;for(int i=0;i<3;i++)game.regenBonus[i]+=5;return true;});
@@ -4382,9 +4388,11 @@ public final class MainActivity extends Activity {
         fixOffer(a,"Создать спутника","Имя, характер и боевой класс | 12 общих слотов персонажей","Персонажи","hero",5,750,()->fixCreateCharacter(true));
         fixOffer(a,"Мои персонажи","Управление авторскими NPC и спутниками","Персонажи","hero",3,0,this::fixCharacters);
         if(game.fixShop.world.companionSlots<4)fixDirect(a,"Расширение отряда","+1 слот авторского спутника | до 4 одновременно","Персонажи","hero",3,250,()->game.fixShop.world.buySlot());
-        for(int i=0;i<FixShopWorld.UNIQUE_NAMES.length;i++){final int n=i;String name=FixShopWorld.UNIQUE_NAMES[i];if(game.fixShop.world.ownsUnique(i))fixOffer(a,name,"Приобретено | "+FixShopWorld.UNIQUE_HOME[i],"Персонажи","hero",4,0,this::fixCharacters);else fixDirect(a,name,FixShopWorld.UNIQUE_BIO[i]+" | Встреча: "+FixShopWorld.UNIQUE_HOME[i],"Персонажи","hero",4,450,()->game.fixShop.world.buyUnique(n));}
+
         for(int i=1;i<=FixShopWorld.MOUNTS.length;i++){final int n=i;if(game.fixShop.world.ownMount(i))fixOffer(a,FixShopWorld.MOUNTS[i-1],game.fixShop.world.mount==i?"Активен":"Приобретено | выбрать","Транспорт","map",4,0,()->{if(!livingBusy()&&game.fixShop.world.selectMount(n)){save();livingFixShop();}});else fixDirect(a,FixShopWorld.MOUNTS[i-1],"Снижение расхода сил в дороге","Транспорт","map",4,350,()->game.fixShop.world.buyMount(n));}
         for(int i=1;i<=FixShopWorld.PETS.length;i++){final int n=i;if(game.fixShop.world.ownPet(i))fixOffer(a,FixShopWorld.PETS[i-1],game.fixShop.world.pet==i?"Активен":"Приобретено | выбрать","Питомцы","hero",4,0,()->{if(!livingBusy()&&game.fixShop.world.selectPet(n)){save();livingFixShop();}});else fixDirect(a,FixShopWorld.PETS[i-1],"Помощь в бою каждый третий ход","Питомцы","hero",4,250,()->game.fixShop.world.buyPet(n));}
+        for(int i=0;i<FixShopHome.NAME.length;i++){final int n=i;if(game.fixShop.home.owns(i))fixOffer(a,FixShopHome.NAME[i],"Приобретено | "+FixShopHome.CITY[i],"Недвижимость","map",3,0,()->fixResidence(n));else fixDirect(a,FixShopHome.NAME[i],"Городской дом | "+FixShopHome.CITY[i]+" | отдых и обустройство","Недвижимость","map",4,FixShopHome.PRICE[i],()->game.fixShop.home.buy(n));}
+        for(int i=0;i<FixShopHome.ROOM.length;i++){final int n=i;if(!game.fixShop.home.room(i))fixDirect(a,FixShopHome.ROOM[i],"Улучшение всех принадлежащих герою домов","Недвижимость","armor",3,FixShopHome.ROOM_PRICE[i],()->game.fixShop.home.buyRoom(game,n));}
         fixDirect(a,"Личное хранилище","Общий сундук для принадлежащих герою поместий","Недвижимость","armor",3,200,()->{if(game.fixShop.world.stable)return false;game.fixShop.world.stable=true;return true;});
         if(game.fixShop.world.stable)fixOffer(a,"Открыть хранилище","Доступно в собственном поместье","Недвижимость","armor",3,0,this::fixStorage);
 
@@ -4479,12 +4487,21 @@ public final class MainActivity extends Activity {
         for(int i=0;i<FixShopAdventure.TITLES.length;i++)if(FixShopAdventure.stage(game,i)>=4){final int n=i;names.add(FixShopAdventure.TITLES[i]+" | "+FixShopAdventure.objective(game,i));actions.add(()->fixConfirm("Нити судьбы",FixShopAdventure.TITLES[n]+" | смена финала, без повторной награды",250,()->FixShopAdventure.rewriteEnding(game,n),this::livingFixShop));}
         if(game.canonicalStage>25&&game.canonicalTreaty>0){names.add("Мирный совет | изменить решение");actions.add(()->fixCanonicalDecision(true));}
         if(game.canonicalStage>26&&game.canonicalPaarthurnax>0){names.add("Партурнакс | изменить решение");actions.add(()->fixCanonicalDecision(false));}
+        if(game.factionStories.canRewrite(game,3)){names.add("Цицерон | изменить судьбу");actions.add(()->fixConfirm("Нити судьбы","Цицерон | изменить судьбу без повторной награды",250,()->game.factionStories.rewrite(game,3),this::livingFixShop));}
+        if(game.factionStories.canRewrite(game,0)){names.add("Дар зверя | изменить решение");actions.add(()->fixConfirm("Нити судьбы","Ликантропия | изменить решение без повторной награды",250,()->game.factionStories.rewrite(game,0),this::livingFixShop));}
         if(names.isEmpty()){toast("Нет доступных завершённых решений");return;}
         new RuneDialogBuilder(this,accent()).setTitle("Нити судьбы | 250 F").setItems(names.toArray(new String[0]),(d,i)->actions.get(i).run()).setNegativeButton("Отмена",null).show();
     }
     private void fixCanonicalDecision(boolean treaty){
         String[] names=treaty?new String[]{"Равный обмен","Поддержать Империю","Поддержать Братьев Бури"}:new String[]{"Пощадить Партурнакса","Отложить решение"};
         new RuneDialogBuilder(this,accent()).setTitle("Новое решение").setItems(names,(d,i)->fixConfirm("Нити судьбы",names[i]+" | Изменяется только запись выбора. Прогресс главы, награды и уже накопленная репутация остаются прежними.",250,()->CanonicalCampaign.fixDecision(game,treaty,i+1),this::livingFixShop)).setNegativeButton("Отмена",null).show();
+    }
+    private void fixResidence(int i){
+        if(livingBusy())return;String name=FixShopHome.NAME[i],city=FixShopHome.CITY[i];LinearLayout panel=column();addText(panel,city+" | "+name,18,accent(),true,8);
+        if(city.equals(game.progress.location)){livingLink(panel,"Отдохнуть","8 часов","health",()->{if(!livingBusy()&&FixShopHome.choose(game,"FIXRESIDENCE:rest")){save();render();closeLivingDialog();}});if(game.fixShop.world.stable)livingLink(panel,"Хранилище","","armor",this::fixStorage);}
+        else addText(panel,"Прибуди в "+city+", чтобы воспользоваться домом.",14,MUTED,false,8);
+        for(int n=0;n<FixShopHome.ROOM.length;n++)livingLine(panel,FixShopHome.ROOM[n],game.fixShop.home.room(n)?"Обустроено":"Не приобретено",accent());
+        livingDialog(name,panel);
     }
     private void fixStorage(){
         if(livingBusy()||!FixShopWorld.estateHere(game)){toast("Хранилище доступно в собственном поместье");return;}

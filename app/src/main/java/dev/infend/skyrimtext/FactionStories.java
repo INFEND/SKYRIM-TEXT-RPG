@@ -88,7 +88,7 @@ final class FactionStories {
     String dialogue(int f){
         if(completed(f))return "";
         String line=FactionDialogue.scene(f,index[f]);
-        if(f==3&&index[f]>8&&cicero!=0)line+="\n\n"+(cicero==1?"[Событие] Цицерон остался в живых. Твоя милость сохранена в летописи.":"[Событие] Цицерон не пережил встречу. Это решение уже не изменить.");
+        if(f==3&&index[f]>8&&cicero!=0)line+="\n\n"+(cicero==1?"[Событие] Цицерон остался в живых. Твоя милость сохранена в летописи.":"[Событие] Цицерон не пережил встречу. Его судьба записана в летописи.");
         return line;
     }
     int cicero(){return cicero;}
@@ -99,6 +99,13 @@ final class FactionStories {
         if(!hasDecision(f)||!block(g,f).isEmpty()||choice<0||choice>1)return false;
         if(f==3){cicero=choice+1;g.progress.setQuestOutcome("cicero_"+(choice==0?"spared":"slain"),"COMPLETED");g.message=choice==0?"Цицерон пощажён.":"Цицерон погиб.";}
         else{beastDecision=true;beast=choice+1;g.progress.setQuestOutcome(choice==0?"werewolf_retained":"werewolf_cured","COMPLETED");g.message=choice==0?"Ты сохранил дар зверя.":"Ты отказался от дара зверя.";}
+        g.recordVisualEvent(g.message);return true;
+    }
+    boolean canRewrite(GameEngine g,int f){return g.fixShop.editorEnabled&&FixShopWorld.safe(g)&&(f==3&&cicero>0&&index[3]>8||f==0&&beastDecision&&index[0]>5);}
+    boolean rewrite(GameEngine g,int f){
+        if(!canRewrite(g,f))return false;
+        if(f==3){cicero=3-cicero;g.progress.questOutcomes.remove("cicero_spared");g.progress.questOutcomes.remove("cicero_slain");g.progress.setQuestOutcome(cicero==1?"cicero_spared":"cicero_slain","COMPLETED");g.message=cicero==1?"Судьба Цицерона изменена: жив.":"Судьба Цицерона изменена: погиб.";}
+        else{beast=3-beast;g.progress.questOutcomes.remove("werewolf_retained");g.progress.questOutcomes.remove("werewolf_cured");g.progress.setQuestOutcome(beast==1?"werewolf_retained":"werewolf_cured","COMPLETED");g.message=beast==1?"Дар зверя восстановлен.":"Дар зверя снят.";}
         g.recordVisualEvent(g.message);return true;
     }
     int skill(int f){return approach[f]==2?12:chapter(f).skill;}
