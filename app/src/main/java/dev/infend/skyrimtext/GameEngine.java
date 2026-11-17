@@ -768,6 +768,10 @@ public final class GameEngine {
         while(level<100 && xp>=experienceRequired()){xp-=experienceRequired();level++;maxHp=nonnegativeAdd(maxHp,10);maxStamina=nonnegativeAdd(maxStamina,10);maxMagicka=nonnegativeAdd(maxMagicka,10);progress.perkPoints=nonnegativeAdd(progress.perkPoints,1);hp=maxHp;stamina=maxStamina;magicka=maxMagicka;}
     }
     /** Time-limited rest available outside combat, tracked in the old save schema. */
+    public boolean fixTeleport(String name){
+        if(!started||!fixShop.editorEnabled||road.pending()||!"WORLD".equals(mode)&&!"RESULT".equals(mode)||!visitedVisual.contains(name)||name.equals(progress.location))return false;
+        WorldAtlas.Place target=WorldAtlas.find(name);if(target==null)return false;region=target.region;progress.location=target.name;mode="WORLD";message="Магический переход: "+target.name;recordVisualEvent(message);return true;
+    }
     public boolean waitHours(int hours){return restHours(hours,hours>=6);}
     public boolean restHours(int hours,boolean sleep){
         if(!started||"COMBAT".equals(mode)||road.pending()||hours<1||hours>24)return false;
