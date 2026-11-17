@@ -53,6 +53,8 @@ class LocalAiClient(private val context: Context) {
                 val partial=reply.data.getString("text").orEmpty()
                 val tokens=reply.data.getInt("tokens",0)
                 if(partial.isNotEmpty()) {
+                    // Reset the inactivity watchdog only when generation advances.
+                    if(tokens>lastTokens)armWatchdog(id)
                     lastPartial=partial
                     lastTokens=tokens
                     listener.onText(partial)
