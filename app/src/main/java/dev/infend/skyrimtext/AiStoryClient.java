@@ -95,7 +95,7 @@ public final class AiStoryClient {
     static String localSystemPrompt(boolean aiControlled,boolean chanceOnly){
         if(chanceOnly)
             return "Ты мастер Skyrim. Верни только JSON, например {\"customChance\":42} или {\"customChance\":null}. "
-                +"Это оценка сложности свободного действия на основе навыка героя и ситуации, "
+                +"Это оценка сложности свободного действия на основе реальных уровней навыков героя, ресурсов и ситуации. Простые действия без риска: null. Не назначай всем действиям низкий шанс, "
                 +"без броска, без эффектов, без дополнительного текста.";
         if(aiControlled)
             return "Ты каноничный мастер текстовой RPG Skyrim. Пиши от второго лица по-русски, "
@@ -109,7 +109,7 @@ public final class AiStoryClient {
                 +"В примере один объект choices: создай РОВНО 10 разных. title минимум 4 знака, detail минимум 8. chance — число 0..100 без кавычек или null. Закрой строку scene перед choices. effects, journal и customChance только отдельные ключи JSON, не часть рассказа. "
                 +"В активном бою каждый вариант должен содержать combatAction: ATTACK, HEAVY, MAGIC, DEFEND, POTION или FLEE (только WILD). Не предлагай недоступные ресурсы. Движок сам рассчитывает урон и шанс, не применяй боевые effects. Вне боя combatAction не указывай. "
                 +"В effects разрешены лишь последствия подтверждённого предыдущего действия "
-                +"(hpDelta,goldDelta,xpDelta,staminaDelta,magickaDelta,location,inventory). "
+                +"(hpDelta,goldDelta,xpDelta,staminaDelta,magickaDelta,hourDelta,dayDelta,location,inventory,skills:[{index,xp}]). "
                 +"Если разрешено во входе, effects.katherineIntent — один код инициативы Кэтрин. Не меняй её статус. Вероятности и бросок из данных игры нельзя менять. customChance повтори из команды Android, иначе null. На первом ходе effects={}. "
                 +"Текущая локация и подтверждённый исход важнее старой памяти. Продолжай непосредственно с последнего события, не начинай заново. "
                 +"Не переноси героя в другой город без выбранного перехода. Не подменяй названия, факты, NPC, пол героя или результаты бросков. "
@@ -166,6 +166,13 @@ public final class AiStoryClient {
             .append(" HP ").append(game.enemyHp).append('/').append(game.enemyMaxHp)
             .append("; тип боя ").append(game.battleKind).append(".\n");
         else b.append("Активного боя нет.\n");
+        // Skill levels must reach the probability model before optional companion/history text.
+        StringBuilder skills=new StringBuilder();
+        for(int i=0;i<RpgContent.SKILLS.length;i++){
+            if(i>0)skills.append("; ");
+            skills.append(i).append(':').append(RpgContent.SKILLS[i]).append('=').append(game.progress.skillLevel(i));
+        }
+        localSection(b,"Навыки (индекс:название=уровень): ",skills.toString(),490,budget);
         if(aiControlled)localSection(b,"Инициатива Кэтрин: ",KatherineInitiative.context(game),260,budget);
         StringBuilder invText=new StringBuilder();
         java.util.Iterator<String> inv=game.progress.inventory.keys();
