@@ -4190,6 +4190,80 @@ public final class MainActivity extends Activity {
         content.addView(panel,from,p);
     }
 
+    // Dedicated AMOLED accordion for the Add-ons screen; other settings retain their style.
+    private GradientDrawable addonShape(int fill,int radius,boolean outline){
+        GradientDrawable shape=new GradientDrawable();shape.setColor(fill);shape.setCornerRadius(dp(radius));
+        if(outline)shape.setStroke(dp(1),0xff242424);
+        return shape;
+    }
+    private View addonIcon(String kind,int tint){
+        return new View(this){
+            private final android.graphics.Paint paint=new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
+            @Override protected void onDraw(android.graphics.Canvas canvas){
+                super.onDraw(canvas);
+                float scale=Math.min(getWidth(),getHeight())/24f;
+                canvas.save();canvas.translate((getWidth()-24*scale)/2f,(getHeight()-24*scale)/2f);canvas.scale(scale,scale);
+                paint.setColor(tint);paint.setStyle(android.graphics.Paint.Style.STROKE);
+                paint.setStrokeWidth(1.7f);paint.setStrokeCap(android.graphics.Paint.Cap.ROUND);paint.setStrokeJoin(android.graphics.Paint.Join.ROUND);
+                android.graphics.Path p=new android.graphics.Path();
+                if("person".equals(kind)){
+                    canvas.drawCircle(12,7,3.5f,paint);p.moveTo(5,21);p.cubicTo(5,12,19,12,19,21);
+                }else if("coins".equals(kind)){
+                    canvas.drawCircle(9,8,5.7f,paint);
+                    p.moveTo(15.5f,10);p.cubicTo(23,11,23,21,16,22);p.cubicTo(13,22,10,20,10,17);
+                    canvas.drawLine(9,6,9,10,paint);canvas.drawLine(16,15,16,18,paint);
+                }else if("puzzle".equals(kind)){
+                    p.moveTo(3,9);p.lineTo(7,9);p.cubicTo(7,5,10,4,12,7);p.lineTo(14,9);
+                    p.lineTo(18,5);p.cubicTo(20,3,23,6,21,8);p.lineTo(18,11);
+                    p.cubicTo(22,11,22,15,19,16);p.lineTo(16,16);p.lineTo(16,20);p.lineTo(11,20);
+                    p.cubicTo(11,16,7,16,7,20);p.lineTo(3,20);p.lineTo(3,15);
+                    p.cubicTo(7,15,7,11,3,12);p.close();
+                }else{
+                    boolean up="up".equals(kind);p.moveTo(6,up?15:9);p.lineTo(12,up?9:15);p.lineTo(18,up?15:9);
+                }
+                canvas.drawPath(p,paint);canvas.restore();
+            }
+        };
+    }
+    private void foldAddonSection(String key,String name,int from,boolean parent){
+        LinearLayout body=column();
+        while(content.getChildCount()>from){
+            View child=content.getChildAt(from);ViewGroup.LayoutParams params=child.getLayoutParams();
+            content.removeViewAt(from);body.addView(child,params);
+        }
+        LinearLayout panel=column();panel.setBackground(addonShape(parent?0xff000000:0xff242424,parent?20:15,parent));
+        if(parent)panel.setPadding(dp(12),0,dp(12),dp(4));
+        LinearLayout heading=row();heading.setMinimumHeight(dp(parent?58:56));
+        heading.setPadding(dp(parent?2:12),dp(10),dp(parent?2:12),dp(10));
+        boolean open=prefs.getBoolean("settings_group_"+key,false);
+        String glyph=parent?"puzzle":("addon_fixshop".equals(key)?"coins":"person");
+        heading.addView(addonIcon(glyph,accent()),lp(24,24));
+        TextView title=text(name,parent?19:16,TEXT,parent);
+        title.setTypeface(Typeface.DEFAULT,parent?Typeface.BOLD:Typeface.NORMAL);
+        LinearLayout.LayoutParams titleParams=new LinearLayout.LayoutParams(0,-2,1);titleParams.leftMargin=dp(12);titleParams.rightMargin=dp(8);
+        heading.addView(title,titleParams);
+        FrameLayout arrow=new FrameLayout(this);heading.addView(arrow,lp(22,24));
+        View chevron=addonIcon("down",parent?TEXT:0xffb3b3b3);chevron.setRotation(open?180f:0f);
+        arrow.addView(chevron,new FrameLayout.LayoutParams(-1,-1));
+        panel.addView(heading,lp(-1,-2));
+        if(parent){
+            View divider=new View(this);divider.setBackgroundColor(0xff242424);body.addView(divider,0,lp(-1,1));
+            View gap=new View(this);body.addView(gap,1,lp(-1,12));
+        }else body.setPadding(dp(12),0,dp(12),dp(12));
+        body.setVisibility(open?View.VISIBLE:View.GONE);panel.addView(body,lp(-1,-2));
+        heading.setClickable(true);heading.setFocusable(true);
+        heading.setContentDescription(name+", "+(open?"раскрыто":"свёрнуто"));
+        heading.setOnClickListener(v->{
+            boolean expanded=body.getVisibility()!=View.VISIBLE;
+            if(animations)android.transition.TransitionManager.beginDelayedTransition(panel,new android.transition.AutoTransition().setDuration(230));
+            body.setVisibility(expanded?View.VISIBLE:View.GONE);
+            if(animations)chevron.animate().rotation(expanded?180f:0f).setDuration(180).start();else chevron.setRotation(expanded?180f:0f);
+            heading.setContentDescription(name+", "+(expanded?"раскрыто":"свёрнуто"));
+            prefs.edit().putBoolean("settings_group_"+key,expanded).apply();
+        });
+        LinearLayout.LayoutParams params=lp(-1,-2);params.bottomMargin=dp(parent?9:8);content.addView(panel,from,params);
+    }
+
     private void chooseGameFont(){
         ScrollView scroller=new ScrollView(this);
         LinearLayout list=column();list.setPadding(dp(10),dp(4),dp(10),dp(12));scroller.addView(list);
@@ -4631,29 +4705,29 @@ public final class MainActivity extends Activity {
         Switch kathAI=new Switch(this);kathAI.setText("Самостоятельные инициативы Кэтрин через ИИ");kathAI.setTextColor(TEXT);kathAI.setThumbTintList(ColorStateList.valueOf(accent()));kathAI.setChecked(game.katherine.companion.aiInitiatives);kathAI.setOnCheckedChangeListener((v,on)->{if(livingBusy()){v.setChecked(game.katherine.companion.aiInitiatives);return;}game.katherine.companion.aiInitiatives=on;prefs.edit().putBoolean("katherine_ai_initiatives",on).apply();save();});expansion.addView(kathAI,lp(-1,52));
         TextView kathProfile=text("Начальное состояние Кэтрин | "+game.katherine.companion.profileName(),14,accent(),true);kathProfile.setPadding(dp(10),dp(12),dp(10),dp(12));expansion.addView(kathProfile,lp(-1,-2));kathProfile.setOnClickListener(v->{if(livingBusy()||game.katherine.stage>0){toast("Начальное состояние доступно до первой встречи с Кэтрин");return;}game.katherine.companion.profile=(game.katherine.companion.profile+1)%3;prefs.edit().putInt("katherine_profile",game.katherine.companion.profile).apply();save();render();});
         addText(expansion,"Влияет на стартовую магию спутницы, а не на создание героя.",11,MUTED,false,6);
-        foldSettingsSection("addon_katherine","Кэтрин | Нулевой Предел",addonStart);
+        foldAddonSection("addon_katherine","Кэтрин | Нулевой Предел",addonStart,false);
         addonStart=content.getChildCount();
         expansion=column();content.addView(expansion,lp(-1,-2));
         Switch itachiToggle=new Switch(this);itachiToggle.setText("Итачи | Алая Ворона");itachiToggle.setTextColor(TEXT);itachiToggle.setThumbTintList(ColorStateList.valueOf(accent()));itachiToggle.setChecked(game.itachi.enabled);itachiToggle.setOnCheckedChangeListener((v,on)->{if(livingBusy()||!game.itachi.setEnabled(game,on)){v.setChecked(game.itachi.enabled);return;}prefs.edit().putBoolean("itachi_enabled",on).apply();save();});expansion.addView(itachiToggle,lp(-1,47));addText(expansion,"Итачи: авторская история, спутница, духовные техники и отношения.",12,MUTED,false,8);
         TextView itachiArt=text("Управление фотографиями Итачи",14,accent(),true);itachiArt.setPadding(dp(10),dp(12),dp(10),dp(12));itachiArt.setOnClickListener(v->itachiLocalGallery(0));expansion.addView(itachiArt,lp(-1,-2));
-        foldSettingsSection("addon_itachi","Итачи | Алая Ворона",addonStart);
+        foldAddonSection("addon_itachi","Итачи | Алая Ворона",addonStart,false);
         addonStart=content.getChildCount();
         expansion=column();content.addView(expansion,lp(-1,-2));
         Switch liviaToggle=new Switch(this);liviaToggle.setText("Ливия | Пепел Хелгена");liviaToggle.setTextColor(TEXT);liviaToggle.setThumbTintList(ColorStateList.valueOf(accent()));liviaToggle.setChecked(game.livia.enabled);liviaToggle.setOnCheckedChangeListener((v,on)->{if(livingBusy()||!game.livia.setEnabled(game,on)){v.setChecked(game.livia.enabled);return;}prefs.edit().putBoolean("livia_enabled",on).apply();save();});expansion.addView(liviaToggle,lp(-1,47));addText(expansion,"Ливия: авторское выживание после Хелгена, месть, прощение, искупление и отношения.",12,MUTED,false,8);
         livingLink(expansion,"Портрет Ливии","Импорт","hero",this::liviaPortrait);
-        foldSettingsSection("addon_livia","Ливия | Пепел Хелгена",addonStart);
+        foldAddonSection("addon_livia","Ливия | Пепел Хелгена",addonStart,false);
         addonStart=content.getChildCount();
         expansion=column();content.addView(expansion,lp(-1,-2));
         Switch almaToggle=new Switch(this);almaToggle.setText("Альма | Алая Бессмертная");almaToggle.setTextColor(TEXT);almaToggle.setThumbTintList(ColorStateList.valueOf(accent()));almaToggle.setChecked(game.alma.enabled);
         almaToggle.setOnCheckedChangeListener((v,on)->{if(livingBusy()){v.setChecked(game.alma.enabled);return;}if(!game.alma.setEnabled(game,on)){v.setChecked(game.alma.enabled);return;}prefs.edit().putBoolean("alma_enabled",on).apply();save();});expansion.addView(almaToggle,lp(-1,47));addText(expansion,"Альма: отключение скрывает сюжет, отношения и боевую поддержку. Прогресс и галерея сохраняются.",12,MUTED,false,8);
         addText(expansion,"Необязательная авторская история вне канона TES.",12,MUTED,false,0);
-        foldSettingsSection("addon_alma","Альма | Алая Бессмертная",addonStart);
+        foldAddonSection("addon_alma","Альма | Алая Бессмертная",addonStart,false);
         addonStart=content.getChildCount();
         expansion=column();content.addView(expansion,lp(-1,-2));
         if(game.started)livingLink(expansion,"Открыть магазин","∞ F","skills",this::livingFixShop);
         else addText(expansion,"Магазин доступен после начала игры.",13,MUTED,false,0);
-        foldSettingsSection("addon_fixshop","Магазин фикскоинов",addonStart);
-        foldSettingsSection("additions","Дополнения",additionsStart);
+        foldAddonSection("addon_fixshop","Магазин фикскоинов",addonStart,false);
+        foldAddonSection("additions","Дополнения",additionsStart,true);
         content.addView(new NordicArtView(this,NordicArtView.STORY),lp(-1,105));space(content,12);
         int appearanceStart=content.getChildCount();
         LinearLayout palette=card();addText(palette,"ЦВЕТ АКЦЕНТА",11,accent(),true,12);
