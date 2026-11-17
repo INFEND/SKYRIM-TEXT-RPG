@@ -113,6 +113,8 @@ public final class AiGameTurn {
         JSONArray array=json.optJSONArray("choices");
         if(scene.length()<200)throw new JSONException("ИИ вернул слишком короткую сцену");
         if(array==null||array.length()!=10)throw new JSONException("Нужно ровно десять вариантов ответа");
+        if(json.has("effects")&&!json.isNull("effects")&&!(json.opt("effects") instanceof JSONObject))
+            throw new JSONException("Эффекты должны быть JSON-объектом");
         AiGameTurn turn=new AiGameTurn(scene,limited(json.optString("journal",""),500),
                 probability(json,"customChance"),json.optJSONObject("effects"));
         HashSet<String> unique=new HashSet<>();
