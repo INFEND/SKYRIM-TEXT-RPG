@@ -38,6 +38,10 @@ public final class FixShopCatalog {
         if(g.progress.carryWeight()+weight>g.progress.carryLimit()+0.00001)return false;
         for(String id:b.items)g.progress.quantity(id,g.progress.quantity(id)+1);return true;
     }
+    static ArrayList<Offer> clothing(){
+        ArrayList<Offer> offers=new ArrayList<>();for(ItemCatalog.Item i:ItemCatalog.all())if("Одежда".equals(i.category)||"Украшения".equals(i.category)){Offer o=new Offer(i.id,1,Math.max(10,Math.min(150,i.value/5)));if(valid(o)&&i.id.equals(i.name))offers.add(o);}return offers;
+    }
+    static String artPath(String title){return "media/shop/art_"+java.util.UUID.nameUUIDFromBytes(title.getBytes(java.nio.charset.StandardCharsets.UTF_8)).toString().replace("-","")+".webp";}
     public static ArrayList<Offer> featured(){
         ArrayList<Offer> a=new ArrayList<>();
         for(ItemCatalog.Item i:ItemCatalog.all()){

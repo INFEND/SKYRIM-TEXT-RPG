@@ -3789,7 +3789,7 @@ public final class MainActivity extends Activity {
     private void renderHeroLegacy(){
         skyrimTopTabs(3);
         livingLink(content,"К обзору героя","","hero",()->{heroDetailed=false;render();});
-        section("ЛИЧНОЕ ДЕЛО",""+game.name,game.race+" | "+game.heroClass+" | уровень "+game.level);
+        section("ЛИЧНОЕ ДЕЛО",""+game.name,game.race+" | "+game.heroClass+" | уровень "+game.level);if(!game.fixShop.cosmetics.title().isEmpty())addText(content,game.fixShop.cosmetics.title(),15,accent(),true,8);
         View portrait=fixHeroPortrait();
         LinearLayout.LayoutParams portraitParams=lp(150,-2);portraitParams.gravity=Gravity.CENTER_HORIZONTAL;
         content.addView(portrait,portraitParams);space(content,12);
@@ -4339,7 +4339,7 @@ public final class MainActivity extends Activity {
 
     private int fixShopPage=0,fixShopSort=0;
     private String fixShopCategory="Все",fixShopQuery="";
-    private static final String[] FIX_CATEGORIES={"Все","Снаряжение","Магия","Улучшения","Навыки","Септимы","Внешность","Редактор мира","Наборы","Недвижимость","Транспорт","Питомцы","Персонажи","Дополнения","Коллекции"};
+    private static final String[] FIX_CATEGORIES={"Все","Снаряжение","Магия","Улучшения","Навыки","Септимы","Внешность","Оформление","Редактор мира","Наборы","Недвижимость","Транспорт","Питомцы","Персонажи","Дополнения","Коллекции"};
     private static final class FixOffer {
         final String title,detail,category,glyph,rarity;final int price,color;final Runnable action;
         FixOffer(String t,String d,String c,String g,String rr,int col,int p,Runnable a){title=t;detail=d;category=c;glyph=g;rarity=rr;color=col;price=p;action=a;}
@@ -4366,8 +4366,8 @@ public final class MainActivity extends Activity {
         fixDirect(a,"Очки талантов","+5 свободных очков","Навыки","skills",2,50,()->{if(game.progress.perkPoints>Integer.MAX_VALUE-5)return false;game.progress.perkPoints+=5;return true;});
         fixOffer(a,"Новое имя","Переименовать героя","Внешность","hero",1,25,this::fixRename);
         fixOffer(a,"Новый облик","Выбрать портрет героя","Внешность","hero",2,50,this::fixPortrait);
-        for(int i=0;i<4;i++){final int n=i;for(boolean frame:new boolean[]{false,true}){String name=frame?FixShopCosmetics.FRAMES[i]:FixShopCosmetics.TITLES[i];String detail=frame?"Декоративная рамка портрета":"Титул на странице героя";if(game.fixShop.cosmetics.owns(frame,i))fixOffer(a,name,detail+" | "+((frame?game.fixShop.cosmetics.frame:game.fixShop.cosmetics.title)==i?"Выбрано":"Приобретено"),"Внешность","hero",3,0,()->{if(!livingBusy()&&game.fixShop.cosmetics.select(frame,n)){save();render();livingFixShop();}});else fixDirect(a,name,detail,"Внешность","hero",3,frame?80:60,()->game.fixShop.cosmetics.buy(frame,n));}}
-        if(game.fixShop.cosmetics.title>=0||game.fixShop.cosmetics.frame>=0)fixOffer(a,"Стандартное оформление","Снять титул и рамку без потери покупок","Внешность","hero",0,0,()->{if(!livingBusy()){game.fixShop.cosmetics.select(false,-1);game.fixShop.cosmetics.select(true,-1);save();render();livingFixShop();}});
+        for(int i=0;i<4;i++){final int n=i;for(boolean frame:new boolean[]{false,true}){String name=frame?FixShopCosmetics.FRAMES[i]:FixShopCosmetics.TITLES[i];String detail=frame?"Декоративная рамка портрета":"Титул на странице героя";if(game.fixShop.cosmetics.owns(frame,i))fixOffer(a,name,detail+" | "+((frame?game.fixShop.cosmetics.frame:game.fixShop.cosmetics.title)==i?"Выбрано":"Приобретено"),"Оформление","hero",3,0,()->{if(!livingBusy()&&game.fixShop.cosmetics.select(frame,n)){save();render();livingFixShop();}});else fixDirect(a,name,detail,"Оформление","hero",3,frame?80:60,()->game.fixShop.cosmetics.buy(frame,n));}}
+        if(game.fixShop.cosmetics.title>=0||game.fixShop.cosmetics.frame>=0)fixOffer(a,"Стандартное оформление","Снять титул и рамку без потери покупок","Оформление","hero",0,0,()->{if(!livingBusy()){game.fixShop.cosmetics.select(false,-1);game.fixShop.cosmetics.select(true,-1);save();render();livingFixShop();}});
         fixOffer(a,"Новое наследие","Сменить расу; сохранить характеристики и навыки","Внешность","hero",3,150,this::fixRace);
         fixDirect(a,"Благословение исцеления","Полностью восстановить здоровье, магию и силы","Улучшения","health",2,25,()->{if(game.hp==game.maxHp&&game.magicka==game.maxMagicka&&game.stamina==game.maxStamina)return false;game.hp=game.maxHp;game.magicka=game.maxMagicka;game.stamina=game.maxStamina;return true;});
         fixDirect(a,"Сердце Довакина","+5 к регенерации здоровья, магии и выносливости. Однократно.","Магия","health",4,500,()->{if(game.fixShop.count(FixShopState.key("Сердце Довакина",500))>0)return false;for(int v:game.regenBonus)if(v>999995)return false;for(int i=0;i<3;i++)game.regenBonus[i]+=5;return true;});
@@ -4394,14 +4394,17 @@ public final class MainActivity extends Activity {
         for(int i=0;i<FixShopHome.NAME.length;i++){final int n=i;if(game.fixShop.home.owns(i))fixOffer(a,FixShopHome.NAME[i],"Приобретено | "+FixShopHome.CITY[i],"Недвижимость","map",3,0,()->fixResidence(n));else fixDirect(a,FixShopHome.NAME[i],"Городской дом | "+FixShopHome.CITY[i]+" | отдых и обустройство","Недвижимость","map",4,FixShopHome.PRICE[i],()->game.fixShop.home.buy(n));}
         for(int i=0;i<FixShopHome.ROOM.length;i++){final int n=i;if(!game.fixShop.home.room(i))fixDirect(a,FixShopHome.ROOM[i],"Улучшение всех принадлежащих герою домов","Недвижимость","armor",3,FixShopHome.ROOM_PRICE[i],()->game.fixShop.home.buyRoom(game,n));}
         fixDirect(a,"Личное хранилище","Общий сундук для принадлежащих герою поместий","Недвижимость","armor",3,200,()->{if(game.fixShop.world.stable)return false;game.fixShop.world.stable=true;return true;});
+        if(game.fixShop.world.mount>0)fixOffer(a,"Оставить особого скакуна","Вернуть обычный режим передвижения","Транспорт","map",0,0,()->{if(!livingBusy()&&game.fixShop.world.selectMount(0)){save();livingFixShop();}});
+        if(game.fixShop.world.pet>0)fixOffer(a,"Отпустить особого питомца","Отключить боевую помощь без потери покупки","Питомцы","hero",0,0,()->{if(!livingBusy()&&game.fixShop.world.selectPet(0)){save();livingFixShop();}});
         if(game.fixShop.world.stable)fixOffer(a,"Открыть хранилище","Доступно в собственном поместье","Недвижимость","armor",3,0,this::fixStorage);
 
         java.util.ArrayList<FixShopCatalog.Offer> gear=FixShopCatalog.featured();
         try{gear.addAll(FixShopCatalog.parse(game.fixShop.customCatalog));}catch(Exception ignored){}
         try(java.io.InputStream in=ResourceStore.open(this,"media/shop/catalog.json")){java.io.ByteArrayOutputStream out=new java.io.ByteArrayOutputStream();byte[] data=new byte[4096];int n;while((n=in.read(data))!=-1){if(out.size()+n>65536)throw new java.io.IOException("catalog too large");out.write(data,0,n);}gear.addAll(FixShopCatalog.parse(out.toString("UTF-8")));}catch(Exception ignored){}
+        gear.addAll(FixShopCatalog.clothing());
         java.util.HashSet<String> gearSeen=new java.util.HashSet<>();
         for(FixShopCatalog.Bundle bundle:FixShopCatalog.BUNDLES)if(FixShopCatalog.validBundle(bundle))fixOffer(a,bundle.name,bundle.description(),"Наборы","armor",4,bundle.price,()->fixReserveBundle(bundle));
-        for(FixShopCatalog.Offer offer:gear){if(!gearSeen.add(offer.key()))continue;ItemCatalog.Item item=ItemCatalog.find(offer.item);if(item==null)continue;fixOffer(a,offer.title(),item.category+" | "+item.weight+" кг | получить позднее","Снаряжение",item.icon,3,offer.price,()->fixReserve(offer));}
+        for(FixShopCatalog.Offer offer:gear){if(!gearSeen.add(offer.key()))continue;ItemCatalog.Item item=ItemCatalog.find(offer.item);if(item==null)continue;fixOffer(a,offer.title(),item.category+" | "+item.weight+" кг | получить позднее",("Одежда".equals(item.category)||"Украшения".equals(item.category))?"Внешность":"Снаряжение",item.icon,3,offer.price,()->fixReserve(offer));}
         if(game.fixShop.editorEnabled){
             fixOffer(a,"Создать NPC","Имя, характер, класс и отношения","Редактор мира","hero",5,300,()->fixCreateCharacter(false));
             fixOffer(a,"Создать локацию","Авторское место внутри текущей локации карты","Редактор мира","map",5,500,this::fixCreatePlace);
@@ -4614,6 +4617,7 @@ public final class MainActivity extends Activity {
     }
     private View fixArtwork(FixOffer offer){
         String path="";String title=offer.title;
+        String customArt=FixShopCatalog.artPath(title);if(ResourceStore.has(this,customArt))try(java.io.InputStream in=ResourceStore.open(this,customArt)){android.graphics.Bitmap bitmap=android.graphics.BitmapFactory.decodeStream(in);if(bitmap!=null){android.widget.ImageView image=new android.widget.ImageView(this);image.setImageBitmap(bitmap);image.setScaleType(android.widget.ImageView.ScaleType.CENTER_CROP);return image;}}catch(Exception ignored){}
         if(title.startsWith("Даэдрический меч"))path="media/items/daedric_sword.webp";
         else if(title.startsWith("Эбонитовый меч"))path="media/items/ebony_sword.webp";
         else if(title.startsWith("Эбонитовая броня")||title.startsWith("Эбонитовая кираса"))path="media/items/ebony_armor.webp";
