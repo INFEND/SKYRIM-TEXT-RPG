@@ -808,7 +808,7 @@ public final class GameEngine {
         return true;
     }
     public static boolean needItem(ItemCatalog.Item item,boolean water){if(item==null)return false;String cat=item.category.toLowerCase(java.util.Locale.ROOT);boolean drink=cat.contains("напит")||cat.contains("вода");return water?drink:cat.equals("еда")||cat.contains("пища");}
-    public boolean consumeNeed(String id,boolean water){if(!started||"COMBAT".equals(mode)||!needItem(ItemCatalog.find(id),water))return false;syncLivingSystems();if((water?needs.water:needs.food)>=100)return false;if(!progress.removeItem(id,1))return false;lastCheckChance=lastCheckRoll=-1;if(water)needs.drink();else needs.eat();return true;}
+    public boolean consumeNeed(String id,boolean water){if(!started||"COMBAT".equals(mode)||!needItem(ItemCatalog.find(id),water))return false;syncLivingSystems();if(!needs.enabled(water?LivingNeeds.WATER:LivingNeeds.FOOD)||(water?needs.water:needs.food)>=100)return false;if(!progress.removeItem(id,1))return false;lastCheckChance=lastCheckRoll=-1;if(water)needs.drink();else needs.eat();return true;}
     public int healingAmount(){return 45+5*progress.branches.rank(14)+(progress.advanced.has(AdvancedPerks.PHYSICIAN)?10:0)+(progress.advanced.has(AdvancedPerks.BENEFACTOR)?10:0)+(progress.advanced.has(AdvancedPerks.PURE_MIXTURE)?10:0)+(progress.advanced.has(AdvancedPerks.REGENERATION)?10:0);}
     private void restoreRespite(){if(progress.advanced.has(AdvancedPerks.RESPITE))stamina=Math.min(maxStamina,nonnegativeAdd(stamina,10));}
     public int staminaPotionAmount(){return 50+(progress.advanced.has(AdvancedPerks.PHYSICIAN)?10:0)+(progress.advanced.has(AdvancedPerks.BENEFACTOR)?10:0)+(progress.advanced.has(AdvancedPerks.PURE_MIXTURE)?10:0);}

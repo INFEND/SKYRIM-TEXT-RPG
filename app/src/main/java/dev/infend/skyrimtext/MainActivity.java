@@ -684,7 +684,7 @@ public final class MainActivity extends Activity {
         livingDelta("Золото",(long)after.gold-before.gold);livingDelta("Опыт персонажа",gained);livingDelta("Здоровье",after.hp-before.hp);livingDelta("Магия",after.magicka-before.magicka);livingDelta("Выносливость",after.stamina-before.stamina);livingDelta("Уровень",after.level-before.level);
         for(int i=0;i<before.skillXp.length;i++){long earned=(long)after.progress.skillXp[i]-before.skillXp[i];for(int l=before.skillLevels[i];l<after.progress.skillLevels[i];l++)earned+=Math.max(100,100*l);if(after.progress.skillLevels[i]==100&&before.skillLevels[i]<100)livingDelta(RpgContent.SKILLS[i]+" (уровни)",after.progress.skillLevels[i]-before.skillLevels[i]);else livingDelta(RpgContent.SKILLS[i]+" (опыт)",earned);}
         livingDelta("Игровое время, ч.",((long)after.day-before.day)*24+after.hour-before.hour);
-        int[] values={after.needs.food,after.needs.water,after.needs.awake,after.needs.rest};String[] names={"Сытость","Запас воды","Бодрость","Отдых"};for(int k=0;k<4;k++)livingDelta(names[k],values[k]-before.needs[k]);
+        int[] values={after.needs.food,after.needs.water,after.needs.awake,after.needs.rest};String[] names={"Сытость","Запас воды","Бодрость","Отдых"};for(int k=0;k<4;k++)if(after.needs.enabled(k))livingDelta(names[k],values[k]-before.needs[k]);
         JSONObject inventoryChanges=new JSONObject();java.util.LinkedHashSet<String> allIds=new java.util.LinkedHashSet<>();java.util.Iterator<String> oldIds=before.inventory.keys(),newIds=after.progress.inventory.keys();while(oldIds.hasNext())allIds.add(oldIds.next());while(newIds.hasNext())allIds.add(newIds.next());for(String id:allIds){if("Септимы".equals(id))continue;long change=(long)after.progress.quantity(id)-before.inventory.optInt(id);ItemCatalog.Item item=ItemCatalog.find(id);if(change!=0&&item!=null)try{inventoryChanges.put(id,change);}catch(Exception ignored){}}
         try{after.lastLivingResult=new JSONObject().put("title",livingResultTitle).put("chance",after.lastCheckChance>=0?after.lastCheckChance:livingResultChance).put("roll",after.lastCheckRoll).put("deltas",new JSONObject(livingDeltas)).put("items",inventoryChanges);}catch(Exception ignored){}
         after.needs.sync(after.day,after.hour);combatLabels.clear();combatColors.clear();battleSummaryPending=false;
@@ -1505,6 +1505,7 @@ public final class MainActivity extends Activity {
             if(n!=5){toast("Распредели все 5 свободных очков");return;}
             newAiSession();game.start(nameField.getText().toString(),selectedRace,selectedClass,selectedStart,
                 initialPoints,selectedGender,selectedPortrait);
+            game.needs.setEnabledMask(prefs.getInt("needs_enabled_mask",LivingNeeds.ALL),game.day,game.hour);
             game.katherine.enabled=prefs.getBoolean("katherine_enabled",true);
             game.katherine.companion.profile=Math.max(0,Math.min(2,prefs.getInt("katherine_profile",0)));
             game.katherine.companion.aiInitiatives=prefs.getBoolean("katherine_ai_initiatives",true);
@@ -3742,7 +3743,7 @@ public final class MainActivity extends Activity {
         LinearLayout money=livingTile(content);LinearLayout columns=row();money.addView(columns,lp(-1,-2));
         String[] labels={"На руках","В обороте","Доход / день"};String[] values={livingNumber(game.gold),livingNumber(game.economy.capital),livingNumber(game.economy.income())};money.setOnClickListener(v->livingEconomyDialog());
         for(int i=0;i<3;i++){LinearLayout cell=column();columns.addView(cell,new LinearLayout.LayoutParams(0,-2,1));addText(cell,labels[i],11,MUTED,false,4);addText(cell,values[i],20,i==0?ITEM_GOLD:TEXT,true,0);}
-        livingLink(content,"Потребности",game.needs.penalty()==0?"В норме":"Требуют внимания","health",this::livingNeedsDialog);
+        if(game.needs.anyEnabled())livingLink(content,"Потребности",game.needs.penalty()==0?"В норме":"Требуют внимания","health",this::livingNeedsDialog);
         livingLink(content,"Навыки","18","skills",this::livingSkillsDialog);
         livingLink(content,"Способности","","magic",()->livingHeroDetails("Способности",game.progress.racePower(game)+"\n\nКрики: "+CanonicalCampaign.shouts(game)));
         livingLink(content,"Пассивные эффекты","","shield",()->livingHeroDetails("Пассивные эффекты",game.progress.racePassive(game)+(game.poisonTurns>0?"\nОтравление: "+game.poisonTurns+" х.":"")+(game.frostTurns>0?"\nОбморожение: "+game.frostTurns+" х.":"")));
@@ -3787,23 +3788,23 @@ public final class MainActivity extends Activity {
         refresh.run();livingDialog("Навыки",panel);
     }
     private void livingNeedsDialog(){
-        game.needs.sync(game.day,game.hour);LinearLayout panel=column();
+        if(!game.needs.anyEnabled())return;game.needs.sync(game.day,game.hour);LinearLayout panel=column();
         String[] names={"Сытость","Запас воды","Бодрость","Отдых"};String[] glyphs={"food","potion","magic","stamina"};int[] values={game.needs.food,game.needs.water,game.needs.awake,game.needs.rest};int[] colors={ITEM_GOLD,0xff75a2dd,ITEM_MAGIC,ITEM_UP};
-        for(int k=0;k<2;k++){LinearLayout line=row();panel.addView(line,lp(-1,-2));for(int j=0;j<2;j++){final int i=k*2+j;LinearLayout tile=column();tile.setPadding(dp(12),dp(12),dp(12),dp(12));tile.setBackground(bg(0xff141414,Color.TRANSPARENT,18));LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(0,-2,1);p.setMargins(dp(3),dp(3),dp(3),dp(3));line.addView(tile,p);
-            LinearLayout top=row();top.addView(new SkyrimIconView(this,glyphs[i],colors[i]),lp(28,30));TextView number=text(values[i]+"%",21,colors[i],true);number.setGravity(Gravity.END);top.addView(number,new LinearLayout.LayoutParams(0,-2,1));tile.addView(top);space(tile,10);addText(tile,names[i],14,TEXT,false,8);livingBar(tile,values[i],100,colors[i]);tile.setOnClickListener(v->{if(i<2)livingConsumeDialog(i==1);else livingRestDialog(i==2);});}}
+        LinearLayout line=null;int count=0;for(int k=0;k<4;k++){if(!game.needs.enabled(k))continue;final int i=k;if(count++%2==0){line=row();panel.addView(line,lp(-1,-2));}LinearLayout tile=column();tile.setPadding(dp(12),dp(12),dp(12),dp(12));tile.setBackground(bg(0xff141414,Color.TRANSPARENT,18));LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(0,-2,1);p.setMargins(dp(3),dp(3),dp(3),dp(3));line.addView(tile,p);
+            LinearLayout top=row();top.addView(new SkyrimIconView(this,glyphs[i],colors[i]),lp(28,30));TextView number=text(values[i]+"%",21,colors[i],true);number.setGravity(Gravity.END);top.addView(number,new LinearLayout.LayoutParams(0,-2,1));tile.addView(top);space(tile,10);addText(tile,names[i],14,TEXT,false,8);livingBar(tile,values[i],100,colors[i]);tile.setOnClickListener(v->{if(i<2)livingConsumeDialog(i==1);else livingRestDialog(i==2);});}
         space(panel,8);addText(panel,game.needs.penalty()>0?"Штраф обычных проверок: −"+game.needs.penalty()+" п.п.":"Состояние в норме",13,game.needs.penalty()>0?ITEM_GOLD:MUTED,false,8);
         if(game.needs.penalty()>0)addText(panel,game.needs.penaltyDetails(),12,MUTED,false,8);
         addText(panel,"Показатели меняются только с игровым временем. Нажми на карточку для восстановления.",12,MUTED,false,8);
         livingDialog("Состояние персонажа",panel);
     }
     private void livingRestDialog(boolean sleep){
-        if(livingBusy()){toast("Сейчас действие недоступно");return;}LinearLayout panel=column();panel.setPadding(dp(14),dp(10),dp(14),dp(10));
+        if(!game.needs.enabled(sleep?LivingNeeds.AWAKE:LivingNeeds.REST)||livingBusy()){toast("Сейчас действие недоступно");return;}LinearLayout panel=column();panel.setPadding(dp(14),dp(10),dp(14),dp(10));
         TextView amount=text("1 ч.",22,accent(),true);panel.addView(amount);android.widget.SeekBar slider=new android.widget.SeekBar(this);slider.setMax(23);panel.addView(slider,lp(-1,48));slider.setOnSeekBarChangeListener(new android.widget.SeekBar.OnSeekBarChangeListener(){public void onStartTrackingTouch(android.widget.SeekBar b){}public void onStopTrackingTouch(android.widget.SeekBar b){}public void onProgressChanged(android.widget.SeekBar b,int value,boolean user){amount.setText((value+1)+" ч.");}});
         addText(panel,sleep?"Сон восстанавливает бодрость и отдых.":"Ожидание восстанавливает отдых, но не заменяет сон.",13,MUTED,false,8);
         new RuneDialogBuilder(this,accent()).setTitle(sleep?"Сон":"Отдых").setView(panel).setNegativeButton("Отмена",null).setPositiveButton("Начать",(d,w)->{if(livingBusy())return;VisualSnapshot before=new VisualSnapshot(game);if(game.restHours(slider.getProgress()+1,sleep)){recordVisual(before,game,sleep?"Сон":"Отдых");save();render();livingNeedsDialog();toast("Готово");}}).show();
     }
     private void livingConsumeDialog(boolean water){
-        if(livingBusy()){toast("Сейчас действие недоступно");return;}
+        if(!game.needs.enabled(water?LivingNeeds.WATER:LivingNeeds.FOOD)||livingBusy()){toast("Сейчас действие недоступно");return;}
         java.util.ArrayList<ItemCatalog.Item> choices=new java.util.ArrayList<>();java.util.Iterator<String> it=game.progress.inventory.keys();
         while(it.hasNext()){ItemCatalog.Item item=ItemCatalog.find(it.next());if(GameEngine.needItem(item,water)&&game.progress.quantity(item.id)>0)choices.add(item);}
         if(choices.isEmpty()){toast(water?"Нет напитков в инвентаре":"Нет еды в инвентаре");return;}
@@ -4234,7 +4235,9 @@ public final class MainActivity extends Activity {
                 paint.setColor(tint);paint.setStyle(android.graphics.Paint.Style.STROKE);
                 paint.setStrokeWidth(1.7f);paint.setStrokeCap(android.graphics.Paint.Cap.ROUND);paint.setStrokeJoin(android.graphics.Paint.Join.ROUND);
                 android.graphics.Path p=new android.graphics.Path();
-                if("person".equals(kind)){
+                if("health".equals(kind)){
+                    p.moveTo(12,21);p.cubicTo(8,17,3,13,3,8);p.cubicTo(3,3,9,2,12,7);p.cubicTo(15,2,21,3,21,8);p.cubicTo(21,13,16,17,12,21);p.close();
+                }else if("person".equals(kind)){
                     canvas.drawCircle(12,7,3.5f,paint);p.moveTo(5,21);p.cubicTo(5,12,19,12,19,21);
                 }else if("coins".equals(kind)){
                     canvas.drawCircle(9,8,5.7f,paint);
@@ -4264,7 +4267,7 @@ public final class MainActivity extends Activity {
         LinearLayout heading=row();heading.setMinimumHeight(dp(parent?58:56));
         heading.setPadding(dp(parent?2:12),dp(10),dp(parent?2:12),dp(10));
         boolean open=prefs.getBoolean("settings_group_"+key,false);
-        String glyph=parent?"puzzle":("addon_fixshop".equals(key)?"coins":"person");
+        String glyph=parent?"puzzle":("addon_fixshop".equals(key)?"coins":"addon_needs".equals(key)?"health":"person");
         heading.addView(addonIcon(glyph,accent()),lp(24,24));
         TextView title=text(name,parent?19:16,TEXT,parent);
         title.setTypeface(Typeface.DEFAULT,parent?Typeface.BOLD:Typeface.NORMAL);
@@ -4734,6 +4737,18 @@ public final class MainActivity extends Activity {
         LinearLayout tile=livingTile(host);livingLine(tile,title,price+" F",ITEM_MAGIC);addText(tile,detail,13,MUTED,false,0);
         tile.setOnClickListener(v->fixConfirm(title,detail,price,purchase,refresh));
     }
+    private void renderNeedsAddon(LinearLayout host){
+        final Switch[] toggles=new Switch[4];
+        Switch all=new Switch(this);all.setText("Все потребности");all.setTextColor(TEXT);all.setThumbTintList(ColorStateList.valueOf(accent()));host.addView(all,lp(-1,47));
+        final boolean[] refreshing={false};
+        Runnable refresh=()->{refreshing[0]=true;all.setChecked(game.needs.enabledMask()==LivingNeeds.ALL);for(int i=0;i<4;i++)if(toggles[i]!=null)toggles[i].setChecked(game.needs.enabled(i));refreshing[0]=false;};
+        java.util.function.IntConsumer apply=mask->{if(livingBusy()){toast("Сейчас изменение недоступно");refresh.run();return;}game.needs.setEnabledMask(mask,game.day,game.hour);prefs.edit().putInt("needs_enabled_mask",game.needs.enabledMask()).apply();save();refresh.run();};
+        all.setOnCheckedChangeListener((v,on)->{if(!refreshing[0])apply.accept(on?LivingNeeds.ALL:0);});
+        for(int i=0;i<4;i++){final int index=i;Switch toggle=new Switch(this);toggles[i]=toggle;toggle.setText(LivingNeeds.label(i));toggle.setTextColor(TEXT);toggle.setThumbTintList(ColorStateList.valueOf(accent()));host.addView(toggle,lp(-1,47));toggle.setOnCheckedChangeListener((v,on)->{if(!refreshing[0]){int mask=game.needs.enabledMask();apply.accept(on?mask|(1<<index):mask&~(1<<index));}});}
+        TextView disable=text("Отключить все",14,accent(),true);disable.setPadding(dp(10),dp(12),dp(10),dp(12));disable.setOnClickListener(v->apply.accept(0));host.addView(disable,lp(-1,-2));
+        addText(host,"Отключённые потребности не расходуются и не накладывают штрафы. Значения сохраняются до повторного включения. При отключении всех раздел героя скрывается.",12,MUTED,false,8);
+        refresh.run();
+    }
     private void renderSettings(){
         section("ПАРАМЕТРЫ","Настройки","Твоя история, твои правила.");
         int additionsStart=content.getChildCount();
@@ -4772,6 +4787,9 @@ public final class MainActivity extends Activity {
         if(game.started)livingLink(expansion,"Открыть магазин","∞ F","skills",this::livingFixShop);
         else addText(expansion,"Магазин доступен после начала игры.",13,MUTED,false,0);
         foldAddonSection("addon_fixshop","Магазин фикскоинов",addonStart,false);
+        addonStart=content.getChildCount();
+        expansion=column();content.addView(expansion,lp(-1,-2));renderNeedsAddon(expansion);
+        foldAddonSection("addon_needs","Потребности",addonStart,false);
         foldAddonSection("additions","Дополнения",additionsStart,true);
         content.addView(new NordicArtView(this,NordicArtView.STORY),lp(-1,105));space(content,12);
         int appearanceStart=content.getChildCount();
