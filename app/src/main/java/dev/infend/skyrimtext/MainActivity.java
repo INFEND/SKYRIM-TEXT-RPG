@@ -1609,7 +1609,7 @@ public final class MainActivity extends Activity {
         boolean canonical="CANON".equals(game.mode)||("COMBAT".equals(game.mode)&&("CANONICAL".equals(game.battleKind)||"FACTION".equals(game.battleKind)));
         canonical=canonical||ItachiStory.MODE.equals(game.mode)||LiviaStory.MODE.equals(game.mode)||("COMBAT".equals(game.mode)&&"LIVIA_DUEL".equals(game.battleKind))||KatherineStory.MODE.equals(game.mode)||AlmaStory.MODE.equals(game.mode)||("COMBAT".equals(game.mode)&&("KATHERINE".equals(game.battleKind)||"ALMA".equals(game.battleKind)));
         canonical=canonical||game.road.pending()||RoadEvents.MODE.equals(game.mode)||("COMBAT".equals(game.mode)&&game.battleKind.startsWith("ROAD_QUEST:"));
-        if(prefs.getBoolean("ai_enabled",false)&&!canonical){renderAiGame();return;}
+        if(prefs.getBoolean("ai_enabled",false)&&!canonical){if("WORLD".equals(game.mode)&&!game.road.pending())renderCityArchitecture();renderAiGame();return;}
         GameEngine.Scene s=game.scene();section(s.kicker,s.title,"");
         if(LocationGalleryView.hasGallery(game.progress.location)){
             content.addView(sceneGallery(game.progress.location),lp(-1,-2));
@@ -1634,6 +1634,7 @@ public final class MainActivity extends Activity {
         renderStoryJournal();
         if(prefs.getBoolean("ai_enabled",false)&&!game.road.pending()) renderAiStoryPanel();
         space(content,12);
+        if("WORLD".equals(game.mode)&&!game.road.pending())renderCityArchitecture();
         addText(content,"Что ты предпримешь?",22,TEXT,true,7);
         addText(content,s.choices.size()+" доступных вариантов. Вероятность показана только для настоящих проверок.",12,MUTED,false,15);
         int number=0;
@@ -1656,6 +1657,89 @@ public final class MainActivity extends Activity {
         }
         space(content,5);
         addText(content,"Каждое действие сохраняется автоматически",11,MUTED,false,0);
+    }
+
+    /** Five independent, compact groups; preserve expansion state per city. */
+    private void renderCityArchitecture(){
+        if(!CityArchitecture.here(game))return;
+        String city=game.progress.location;
+        java.util.List<java.util.List<String>> groups=CityArchitecture.groups(city);
+        addText(content,"Городские локации",20,TEXT,true,10);
+        for(int category=0;category<groups.size();category++){
+            final int index=category;java.util.List<String> places=groups.get(index);
+            if(places.isEmpty())continue;
+            LinearLayout panel=column();panel.setBackground(bg(0xff141414,Color.TRANSPARENT,18));
+            LinearLayout heading=row();heading.setMinimumHeight(dp(62));heading.setPadding(dp(16),dp(12),dp(16),dp(12));
+            heading.addView(citySectionIcon(index),lp(28,28));
+            TextView title=text(CityArchitecture.CATEGORIES[index],17,accent(),true);title.setTypeface(Typeface.DEFAULT,Typeface.BOLD);
+            LinearLayout.LayoutParams titleSize=new LinearLayout.LayoutParams(0,-2,1);titleSize.leftMargin=dp(12);heading.addView(title,titleSize);
+            View arrow=addonIcon("down",accent());heading.addView(arrow,lp(24,24));
+            panel.addView(heading,lp(-1,-2));
+            LinearLayout entries=column();entries.setPadding(dp(12),0,dp(12),dp(10));
+            for(String place:places){
+                TextView entry=text(place,16,TEXT,false);entry.setPadding(dp(12),dp(12),dp(12),dp(12));entry.setBackground(bg(0xff1b1b1b,Color.TRANSPARENT,10));
+                LinearLayout.LayoutParams itemSize=lp(-1,-2);itemSize.bottomMargin=dp(4);entries.addView(entry,itemSize);
+                entry.setOnClickListener(v->cityPlaceDialog(city,index,place));entry.setFocusable(true);
+            }
+            String key="city_architecture_"+city+"_"+index;
+            boolean opened=prefs.getBoolean(key,false);entries.setVisibility(opened?View.VISIBLE:View.GONE);arrow.setRotation(opened?180f:0f);
+            panel.addView(entries,lp(-1,-2));heading.setFocusable(true);heading.setClickable(true);
+            heading.setContentDescription(CityArchitecture.CATEGORIES[index]+(opened?", раскрыто":", свёрнуто"));
+            heading.setOnClickListener(v->{
+                boolean open=entries.getVisibility()!=View.VISIBLE;
+                if(animations)android.transition.TransitionManager.beginDelayedTransition(panel,new android.transition.AutoTransition().setDuration(180));
+                entries.setVisibility(open?View.VISIBLE:View.GONE);
+                if(animations)arrow.animate().rotation(open?180f:0f).setDuration(180).start();else arrow.setRotation(open?180f:0f);
+                heading.setContentDescription(CityArchitecture.CATEGORIES[index]+(open?", раскрыто":", свёрнуто"));
+                prefs.edit().putBoolean(key,open).apply();
+            });
+            LinearLayout.LayoutParams size=lp(-1,-2);size.bottomMargin=dp(10);content.addView(panel,size);
+        }
+        space(content,10);
+    }
+    private View citySectionIcon(int kind){
+        final int tint=accent();
+        return new View(this){
+            final android.graphics.Paint paint=new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
+            private void line(android.graphics.Canvas c,float... a){
+                android.graphics.Path path=new android.graphics.Path();path.moveTo(a[0],a[1]);for(int i=2;i<a.length;i+=2)path.lineTo(a[i],a[i+1]);c.drawPath(path,paint);
+            }
+            @Override protected void onDraw(android.graphics.Canvas c){
+                super.onDraw(c);c.save();float scale=Math.min(getWidth(),getHeight())/24f;c.translate((getWidth()-24*scale)/2,(getHeight()-24*scale)/2);c.scale(scale,scale);
+                paint.setColor(tint);paint.setStyle(android.graphics.Paint.Style.STROKE);paint.setStrokeWidth(1.7f);paint.setStrokeCap(android.graphics.Paint.Cap.ROUND);paint.setStrokeJoin(android.graphics.Paint.Join.ROUND);
+                switch(kind){
+                    case 0:line(c,3,5,9,3,15,5,21,3,21,19,15,21,9,19,3,21,3,5);line(c,9,3,9,19);line(c,15,5,15,21);break;
+                    case 1:line(c,3,21,3,9,6,9,6,3,9,3,9,6,12,6,12,3,15,3,15,6,18,6,18,3,21,3,21,21,3,21);line(c,3,12,21,12);line(c,9,21,9,17,12,15,15,17,15,21);break;
+                    case 2:line(c,3,10,12,2,21,10,21,21,3,21,3,10);line(c,9,21,9,13,15,13,15,21);break;
+                    case 3:line(c,3,19,12,10,9,7,12,3,17,5,21,9,18,12,15,9,6,22,3,19);break;
+                    default:line(c,3,8,12,3,21,8,3,8);line(c,4,20,20,20);line(c,3,22,21,22);for(int x=6;x<=18;x+=4)line(c,x,10,x,18);break;
+                }c.restore();
+            }
+        };
+    }
+    private void cityPlaceDialog(String city,int category,String place){
+        LinearLayout panel=column();addText(panel,city+" | "+CityArchitecture.CATEGORIES[category],14,MUTED,false,8);
+        if(LocationGalleryView.hasGallery(place))panel.addView(new LocationGalleryView(this,place,accent(),false),lp(-1,-2));
+        int d=-1;
+        if("Солитьюд".equals(city)){
+            String[] names={"Главные ворота","Мрачный замок","Синий дворец","Коллегия бардов","Храм Богов","Кузница Солитьюда","Смеющаяся крыса","Гавань Солитьюда"};
+            for(int i=0;i<names.length;i++)if(names[i].equals(place))d=i;
+            if("Рыночная площадь".equals(place))d=0;
+        }
+        final int district=d;
+        if(district>=0){
+            new RuneDialogBuilder(this,accent()).setTitle(place).setView(panel).setPositiveButton("Местные занятия",(dialog,w)->{
+                if(!city.equals(game.progress.location)||!"WORLD".equals(game.mode)||game.road.pending())return;
+                if(aiClient!=null)aiClient.cancel();if(localAiClient!=null)localAiClient.cancel();
+                game.choose("SOLITUDE:open");game.choose("SOLITUDE:visit:"+district);save();tab=0;render();
+            }).setNegativeButton("Закрыть",null).show();return;
+        }
+        WorldAtlas.Place target=WorldAtlas.find(place);
+        if(target!=null&&!city.equals(target.name)){
+            new RuneDialogBuilder(this,accent()).setTitle(place).setView(panel).setPositiveButton("На карте",(dialog,w)->locationDialog(target)).setNegativeButton("Закрыть",null).show();return;
+        }
+        addText(panel,"Локация оригинального города. Индивидуальные действия пока не добавлены.",14,TEXT,false,4);
+        new RuneDialogBuilder(this,accent()).setTitle(place).setView(panel).setPositiveButton("Закрыть",null).show();
     }
 
     private void renderStoryJournal(){
