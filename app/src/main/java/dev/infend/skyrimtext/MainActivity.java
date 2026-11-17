@@ -4049,6 +4049,7 @@ public final class MainActivity extends Activity {
         section("ЛЕТОПИСЬ СЕВЕРА","Журнал","Выбирай задание, чтобы увидеть описание и текущую цель.");
         renderFactionJournal();
         renderRoadQuestJournal();
+        for(int i=0;i<FixShopAdventure.TITLES.length;i++)if(FixShopAdventure.stage(game,i)>0){final int n=i;actionButton(FixShopAdventure.TITLES[i],FixShopAdventure.objective(game,i),false,()->{if(livingBusy())return;closeLivingDialog();tab=0;render();});}
         if(game.katherine.enabled&&game.katherine.stage>0){LinearLayout k=card();addText(k,"НУЛЕВОЙ ПРЕДЕЛ | КРУГ ТРЁХ КОГТЕЙ",13,accent(),true,8);addText(k,game.katherine.objective(),15,TEXT,false,8);if(game.katherine.available(game))actionButton("Поговорить с Кэтрин","Продолжить расследование",false,()->{if(livingBusy())return;game.choose("KATH:open");save();tab=0;render();});}
         if(game.itachi.enabled&&game.itachi.stage>0)actionButton("Итачи | "+game.itachi.relation(),game.itachi.objective(game),false,()->npcDetails(ItachiStory.NAME));
         if(game.livia.enabled&&game.livia.stage>0)actionButton(LiviaStory.TITLE,game.livia.status(),false,()->npcDetails(LiviaStory.NAME));
@@ -4298,6 +4299,7 @@ public final class MainActivity extends Activity {
         fixOffer(a,"Алая Ворона","Итачи | "+(game.itachi.enabled?"Включено":"Отключено"),"Дополнения","magic",4,0,()->{if(livingBusy())return;if(game.itachi.setEnabled(game,!game.itachi.enabled)){save();render();livingFixShop();}});
         fixOffer(a,"Пепел Хелгена","Ливия | "+(game.livia.enabled?"Включено":"Отключено"),"Дополнения","hero",4,0,()->{if(livingBusy())return;if(game.livia.setEnabled(game,!game.livia.enabled)){save();render();livingFixShop();}});
         fixOffer(a,"Алая Бессмертная","Альма | "+(game.alma.enabled?"Включено":"Отключено"),"Дополнения","hero",4,0,()->{if(livingBusy())return;if(game.alma.setEnabled(game,!game.alma.enabled)){save();render();livingFixShop();}});
+        for(int i=0;i<FixShopAdventure.TITLES.length;i++){final int n=i;String title=FixShopAdventure.TITLES[i];if(FixShopAdventure.stage(game,i)==0)fixDirect(a,title,"Авторское приключение: расследование, бой и два финала","Дополнения","journal",4,250,()->FixShopAdventure.unlock(game,n));else fixOffer(a,title,FixShopAdventure.objective(game,i),"Дополнения","journal",4,0,()->{closeLivingDialog();tab=4;render();});}
         fixOffer(a,"Галерея спутников","Кэтрин, Итачи, Ливия и Альма: портреты и истории","Персонажи","hero",4,0,this::fixCompanions);
         fixOffer(a,"Коллекция покупок","Уникальных применённых товаров: "+game.fixShop.distinctApplied(),"Коллекции","armor",3,0,()->{fixShopPage=2;livingFixShop();});
         java.util.ArrayList<FixShopCatalog.Offer> gear=FixShopCatalog.featured();

@@ -9,6 +9,7 @@ public final class FixShopState {
     private final LinkedHashSet<String> favorites=new LinkedHashSet<>();
     private final JSONArray history=new JSONArray();
     public boolean editorEnabled=false;
+    final int[] adventureStage=new int[2];
     public String customCatalog="[]";
     public int pendingVouchers(){int n=0;for(int i=0;i<history.length();i++){JSONObject e=history.optJSONObject(i);if(e!=null&&"PENDING".equals(e.optString("state")))n++;}return n;}
     public boolean reserve(GameEngine g,FixShopCatalog.Offer o){
@@ -35,9 +36,9 @@ public final class FixShopState {
         try{history.put(new JSONObject().put("id",key(title,price)).put("title",title).put("detail",detail).put("price",price).put("day",day));}catch(Exception ignored){}
     }
     public JSONArray history(){return history;}
-    public JSONObject toJson(){JSONObject j=new JSONObject();try{j.put("customCatalog",customCatalog).put("editorEnabled",editorEnabled).put("favorites",new JSONArray(favorites)).put("history",history);}catch(Exception ignored){}return j;}
+    public JSONObject toJson(){JSONObject j=new JSONObject();try{j.put("adventureStage",new JSONArray(adventureStage)).put("customCatalog",customCatalog).put("editorEnabled",editorEnabled).put("favorites",new JSONArray(favorites)).put("history",history);}catch(Exception ignored){}return j;}
     public static FixShopState fromJson(JSONObject j){
-        FixShopState s=new FixShopState();if(j==null)return s;s.editorEnabled=j.optBoolean("editorEnabled",false);String custom=j.optString("customCatalog","[]");try{s.customCatalog=FixShopCatalog.encode(FixShopCatalog.parse(custom)).toString();}catch(Exception ignored){}
+        FixShopState s=new FixShopState();if(j==null)return s;s.editorEnabled=j.optBoolean("editorEnabled",false);JSONArray stages=j.optJSONArray("adventureStage");if(stages!=null)for(int i=0;i<s.adventureStage.length;i++)s.adventureStage[i]=Math.max(0,Math.min(5,stages.optInt(i,0)));String custom=j.optString("customCatalog","[]");try{s.customCatalog=FixShopCatalog.encode(FixShopCatalog.parse(custom)).toString();}catch(Exception ignored){}
         JSONArray a=j.optJSONArray("favorites");if(a!=null)for(int i=0;i<a.length();i++){String id=a.optString(i);if(!id.isEmpty())s.favorites.add(id);}
         a=j.optJSONArray("history");if(a!=null)for(int i=0;i<a.length();i++){JSONObject e=a.optJSONObject(i);if(e!=null&&e.optInt("price")>0)s.history.put(e);}
         return s;

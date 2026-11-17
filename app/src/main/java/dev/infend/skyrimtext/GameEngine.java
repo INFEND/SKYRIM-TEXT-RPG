@@ -224,7 +224,7 @@ public final class GameEngine {
         if(started&&KatherineStory.MODE.equals(mode))return katherine.scene(this);
         if(started&&"CANON".equals(mode))return CanonicalCampaign.scene(this);
         Scene s=baseScene();
-        if(started)progress.fillChoices(this,s);
+        if(started){progress.fillChoices(this,s);FixShopAdventure.choices(this,s);FixShopAdventure.endings(this,s);}
         if(itachi.available(this))s.add("ITACHI:open","Поговорить с Итачи",itachi.objective(this));
         if(livia.available(this))s.add("LIVIA:open","Поговорить с Ливией",livia.objective());
         if(alma.available(this))s.add("ALMA:open","Поговорить с Альмой","Алая Бессмертная | "+alma.status());
@@ -380,6 +380,7 @@ public final class GameEngine {
         lastCheckChance=lastCheckRoll=-1;
         if(RoadEvents.MODE.equals(mode)){road.choose(this,action);return;}
         if(road.pending()&&!"COMBAT".equals(mode)){if("GO_WORLD".equals(action))road.resume(this);return;}
+        if(action.startsWith("FIXQUEST:")){FixShopAdventure.choose(this,action);return;}
         if(action.startsWith("ROAD:"))return;
         if(action.startsWith("ROAD_TARGET:")){road.selectTarget(this,action);return;}
         if("ROAD_SUMMON_ROSE".equals(action)||"ROAD_SUMMON_AETHER".equals(action)){combatTurn(action);return;}
@@ -633,6 +634,7 @@ public final class GameEngine {
     void beginLiviaDuel(){startBattle("Ливия",100+level*9,10+level*2,"LIVIA_DUEL","Ливия обнажает меч. Этот поединок может завершиться её гибелью.");}
     void beginAlmaBattle(){startBattle("Убийца Тёмного Братства",75+level*8,8+level*2,"ALMA","Преследователь преграждает дорогу. Альма предупреждает о засаде.");}
     void beginKatherineBattle(){startBattle("Агент Круга Трёх Когтей",75+level*8,8+level*2,"KATHERINE","Кэтрин поднимает барьер. Агент Круга требует, чтобы она сдалась.");}
+    void beginFixShopBattle(int i,String name,String intro){startBattle(name,65+level*6,7+level*2,"FIX_QUEST:"+i,intro);}
     private void startBattle(String name,int health,int dmg,String kind,String intro) {
         resetBattleVisuals();progress.artifacts.trapTurns=0;alma.beginBattle();katherine.companion.beginBattle();enemyName=name;enemyHp=health;enemyMaxHp=health;enemyDamage=dmg;battleKind=kind;enemyIntro=intro;
         battleLog="В бою важна тактика. Следи за запасом сил и магии.";mode="COMBAT";
@@ -750,6 +752,7 @@ public final class GameEngine {
         if("QUEST".equals(battleKind))message+="\n\nЗа стражем ты находишь журнал хранителя. Следующая цель: Солитьюд.";
         if("DRAGON".equals(battleKind))message+="\n\n"+progress.dragonRecent;
         if(sideQuest==1)message+="\nЗаказ доски: "+sideKills+"/3.";
+        if(battleKind.startsWith("FIX_QUEST:"))FixShopAdventure.victory(this,battleKind);
         if(battleKind.startsWith("ROAD_QUEST:"))RoadQuests.victory(this,battleKind);
         if("WILD".equals(battleKind)&&road.pending())road.applyVictory(this);
         if("FACTION".equals(battleKind)){factionStories.victory(factionBattle);factionBattle=-1;message+="\n\nОткрой сюжет фракции, чтобы завершить главу.";}
