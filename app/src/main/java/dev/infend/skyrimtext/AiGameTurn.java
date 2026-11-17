@@ -31,6 +31,52 @@ public final class AiGameTurn {
         if(n<0||n>100||n!=Math.rint(n))throw new JSONException("Неверный шанс действия");
         return (int)n;
     }
+    /** Model-only compatibility: accept explicit numeric strings/percentages and
+     * known null aliases; never invent a chance or weaken effects validation. */
+    private static void normalizeModelChance(JSONObject o,String key)throws JSONException{
+        Object raw=o.opt(key);
+        if(!(raw instanceof String))return;
+        String value=((String)raw).trim().toLowerCase(java.util.Locale.ROOT);
+        if(value.equals("null")||value.equals("без проверки")||value.equals("none")||
+                value.equals("без броска")||value.equals("n/a")){
+            o.put(key,JSONObject.NULL);return;
+        }
+        if(value.matches("[0-9]{1,3}\\s*%?")){
+            int n=Integer.parseInt(value.replace("%","").trim());
+            if(n<=100)o.put(key,n);
+        }
+    }
+
+    /** Strip model protocol accidentally emitted inside the story. Never apply
+     * effects found in prose; only the validated top-level object is authoritative. */
+    static String cleanScene(String text){
+        if(text==null)return "";
+        java.util.regex.Matcher m=java.util.regex.Pattern.compile(
+            "(?iu)(?:^|\\s)[\"']?(?:effects|customChance|choices|journal)[\"']?\\s*(?:=|:)\\s*(?=\\{|\\[|[0-9]|null|\"|$)"
+        ).matcher(text);
+        return m.find()?text.substring(0,m.start()).trim():text;
+    }
+
+    public static AiGameTurn parseModel(String response,int lockedChance)throws JSONException{
+        if(response==null)throw new JSONException("Пустой ответ ИИ");
+        JSONObject json=extractObject(response);
+        json.put("scene",cleanScene(json.optString("scene","")));
+        normalizeModelChance(json,"customChance");
+        if(lockedChance!=-2){
+            // The engine owns the chance. Missing echo or known null is not a new roll.
+            if(json.has("customChance")&&!json.isNull("customChance")&&
+                    probability(json,"customChance")!=lockedChance)
+                throw new JSONException("ИИ изменил шанс после броска");
+            json.put("customChance",lockedChance<0?JSONObject.NULL:lockedChance);
+        }
+        JSONArray options=json.optJSONArray("choices");
+        if(options!=null)for(int i=0;i<options.length();i++){
+            JSONObject o=options.optJSONObject(i);
+            if(o!=null)normalizeModelChance(o,"chance");
+        }
+        return parse(json.toString());
+    }
+
     /**
      * Recover a complete JSON object from fenced or interrupted model output.
      * Braces inside quoted narrative text do not terminate the object.
@@ -63,7 +109,7 @@ public final class AiGameTurn {
     public static AiGameTurn parse(String response)throws JSONException{
         if(response==null)throw new JSONException("Пустой ответ ИИ");
         JSONObject json=extractObject(response);
-        String scene=limited(json.optString("scene",""),30000);
+        String scene=limited(cleanScene(json.optString("scene","")),30000);
         JSONArray array=json.optJSONArray("choices");
         if(scene.length()<200)throw new JSONException("ИИ вернул слишком короткую сцену");
         if(array==null||array.length()!=10)throw new JSONException("Нужно ровно десять вариантов ответа");
@@ -75,7 +121,7 @@ public final class AiGameTurn {
             if(c==null)throw new JSONException("Ошибка варианта "+(i+1));
             String title=limited(c.optString("title",""),110);
             String detail=limited(c.optString("detail",""),270);
-            if(title.length()<4||detail.length()<8||!unique.add(title.toLowerCase(java.util.Locale.ROOT)))
+            if(title.length()<4||detail.length()<8||!unique.add(title.toLowerCase(java.util.Locale.ROOT).replaceAll("[\\p{Punct}\\s]+","")))
                 throw new JSONException("Действия пусты либо повторяются");
             turn.choices.add(new Option(title,detail,limited(c.optString("skill",""),65),
                     probability(c,"chance"),combatAction(c.optString("combatAction",""))));
@@ -93,6 +139,7 @@ public final class AiGameTurn {
         if(begin<0||end<=begin)throw new JSONException("ИИ не прислал шанс JSON");
         JSONObject obj=new JSONObject(s.substring(begin,end+1));
         if(!obj.has("customChance"))throw new JSONException("В ответе нет customChance");
+        normalizeModelChance(obj,"customChance");
         return probability(obj,"customChance");
     }
     public static int roll(){return DICE.nextInt(100)+1;}
@@ -114,7 +161,7 @@ public final class AiGameTurn {
     }
     /** Decode only the top-level scene string, including incomplete JSON fragments. */
     public static String previewScene(String partial){
-        return AiScenePreview.read(partial);
+        return cleanScene(AiScenePreview.read(partial));
     }
 
     /** Read choices directly from the accumulated JSON, even while title/detail are
@@ -142,6 +189,7 @@ public final class AiGameTurn {
             if(end>=0){
                 try{
                     JSONObject c=new JSONObject(raw);
+                    normalizeModelChance(c,"chance");
                     chance=probability(c,"chance");
                     action=combatAction(c.optString("combatAction",""));
                 }catch(JSONException ignored){}
