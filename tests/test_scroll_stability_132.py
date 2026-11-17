@@ -23,9 +23,11 @@ class OverlayScrollContracts(unittest.TestCase):
                       "topChrome.setTranslationY", "scroll.setClipBounds", "updateChromeScrollClip"):
             self.assertNotIn(token,UI)
 
-    def test_level_notice_and_bars_scroll_with_header(self):
+    def test_level_notice_is_queued_and_bars_scroll_with_header(self):
         level=UI.split("private void renderSkillLevelNotice()",1)[1].split("private void renderBars()",1)[0]
-        self.assertIn("topChrome.addView(panel,area)",level)
+        self.assertIn("rewardNotice(RpgContent.SKILLS[i]",level)
+        self.assertNotIn("topChrome.addView(panel,area)",level)
+        self.assertIn("attachActiveNotice();scheduleNotice();",UI)
         self.assertIn("if(game.started)renderBars();",UI)
         self.assertIn("resumeViewport(oldScroll,scroll,thisPage)",UI)
 
