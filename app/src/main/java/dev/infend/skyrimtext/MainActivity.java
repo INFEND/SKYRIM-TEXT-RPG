@@ -166,7 +166,7 @@ public final class MainActivity extends Activity {
             ResourceStore.UI.postDelayed(this,ResourceStore.CHECK_INTERVAL_MS);
         }
     };
-    @Override protected void onResume(){super.onResume();
+    @Override protected void onResume(){super.onResume();scheduleNotice();
         ResourceStore.UI.removeCallbacks(resourceRefreshTick);
         ResourceStore.UI.post(resourceRefreshTick);
         if(updater!=null && prefs!=null){
@@ -188,6 +188,7 @@ public final class MainActivity extends Activity {
     @Override protected void onNewIntent(Intent intent){super.onNewIntent(intent);setIntent(intent);if(updater!=null&&intent.getBooleanExtra("ota_open_from_notification",false))updater.onNotificationIntent();}
     @Override protected void onDestroy(){
         ResourceStore.UI.removeCallbacks(resourceRefreshTick);
+        clearNotices();
         clearAiLiveViews();
         aiRequestSerial++;
         if(updater!=null)updater.onHostDestroy();
@@ -198,6 +199,7 @@ public final class MainActivity extends Activity {
         super.onDestroy();
     }
     private void newAiSession(){
+        clearNotices();
         combatVisual="";victoryVisual="";travelVisual="";livingDeltas.clear();livingResultTitle="";livingResultChance=-1;combatLabels.clear();combatColors.clear();battleSummaryPending=false;travelStops=java.util.Collections.emptyList();lastNarrative="";
         recentItemGains.clear();
         selectedAiChoices.clear();aiOwnDraft="";clearAiDraft();
@@ -723,21 +725,39 @@ public final class MainActivity extends Activity {
             if(moved&&!before.stops.isEmpty()&&after.progress.location.equals(before.stops.get(before.stops.size()-1)))detail.put("route",new org.json.JSONArray(before.stops));
             after.recordVisualEvent(event,detail);
         }catch(org.json.JSONException ignored){after.recordVisualEvent(event);}
+        if(after==game)enqueueLivingResult(after.lastLivingResult);
     }
     private void livingDelta(String label,long delta){if(delta!=0)livingDeltas.put(label,delta);}
-    private void renderLivingResult(){
-        JSONObject result=game.lastLivingResult;JSONObject deltas=result.optJSONObject("deltas");int chance=result.optInt("chance",-1),roll=result.optInt("roll",-1);
-        JSONObject items=result.optJSONObject("items");org.json.JSONArray checks=result.optJSONArray("checks");if((deltas==null||deltas.length()==0)&&(items==null||items.length()==0)&&(checks==null||checks.length()==0)&&roll<0)return;
-        LinearLayout tile=livingTile(content);String title=roll>=1?(roll<=chance?"Успех":"Неудача"):"Результат действия";
-        livingLine(tile,title,chance>=0?chance+"%":"",roll>=1?(roll<=chance?ITEM_UP:ITEM_DOWN):accent());
-        String label=result.optString("title","");if(!label.isEmpty())addText(tile,label,13,MUTED,false,5);
-        if(roll>=1)livingLine(tile,"Бросок",roll+" / 100",MUTED);
-        if(checks!=null)for(int i=0;i<checks.length();i++){JSONObject check=checks.optJSONObject(i);if(check==null)continue;int probability=check.optInt("chance",-1),die=check.optInt("roll",-1);boolean success=AiGameTurn.success(probability,die);addText(tile,check.optString("title"),13,TEXT,true,4);livingLine(tile,probability<0?"Без проверки":success?"Успех":"Неудача",probability<0?"":die+" / 100 · "+probability+"%",success?ITEM_UP:ITEM_DOWN);}
-        if(deltas!=null){java.util.Iterator<String> keys=deltas.keys();while(keys.hasNext()){String key=keys.next();long n=deltas.optLong(key);if(n==0)continue;int color=key.equals("Золото")?ITEM_GOLD:key.startsWith("Игровое время")?MUTED:n>0?ITEM_UP:ITEM_DOWN;livingLine(tile,key,(n>0?"+":"−")+livingNumber(Math.abs(n)),color);}}
-        if(items!=null&&items.length()>0){java.util.Iterator<String> ids=items.keys();while(ids.hasNext()){String id=ids.next();ItemCatalog.Item item=ItemCatalog.find(id);long count=items.optLong(id);livingLine(tile,item==null?id:item.name,(count>0?"+":"−")+Math.abs(count),count>0?ITEM_UP:ITEM_DOWN);}livingLink(content,"Инвентарь обновлён","","bag",()->{tab=2;render();});}
+    // New committed actions only; saved historical results are never replayed.
+    private void enqueueLivingResult(JSONObject result){
+        if(result==null)return;
+        JSONObject deltas=result.optJSONObject("deltas"),items=result.optJSONObject("items");
+        org.json.JSONArray checks=result.optJSONArray("checks");
+        int chance=result.optInt("chance",-1),roll=result.optInt("roll",-1);
+        if(checks!=null&&checks.length()>0){
+            for(int i=0;i<checks.length();i++){
+                JSONObject check=checks.optJSONObject(i);if(check==null)continue;
+                int probability=check.optInt("chance",-1),die=check.optInt("roll",-1);
+                if(probability<0||die<1)continue;
+                boolean success=AiGameTurn.success(probability,die);
+                rewardNotice((success?"Успех":"Неудача")+" · "+die+" / 100 · "+probability+"%",success?ITEM_UP:ITEM_DOWN);
+            }
+        }else if(roll>=1&&chance>=0){
+            boolean success=roll<=chance;
+            rewardNotice((success?"Успех":"Неудача")+" · "+roll+" / 100 · "+chance+"%",success?ITEM_UP:ITEM_DOWN);
+        }
+        if(deltas!=null){java.util.Iterator<String> keys=deltas.keys();while(keys.hasNext()){
+            String key=keys.next();long n=deltas.optLong(key);if(n==0)continue;
+            int color=key.equals("Золото")?ITEM_GOLD:key.startsWith("Игровое время")?MUTED:n>0?ITEM_UP:ITEM_DOWN;
+            rewardNotice(key+"  "+(n>0?"+":"−")+livingNumber(Math.abs(n)),color);
+        }}
+        if(items!=null){java.util.Iterator<String> ids=items.keys();while(ids.hasNext()){
+            String id=ids.next();long count=items.optLong(id);if(count==0)continue;
+            ItemCatalog.Item item=ItemCatalog.find(id);
+            rewardNotice((item==null?id:item.name)+"  "+(count>0?"+":"−")+livingNumber(Math.abs(count)),count>0?ITEM_UP:ITEM_DOWN);
+        }}
     }
     private void renderVisualResults(){
-        renderLivingResult();
         if(visual("damage")&&!combatLabels.isEmpty()){
             LinearLayout box=card();
             for(int i=0;i<combatLabels.size();i++){
@@ -1073,28 +1093,56 @@ public final class MainActivity extends Activity {
         if(items.isEmpty())dialog.setMessage("Нет доступных для продажи предметов.");else dialog.setItems(labels.toArray(new String[0]),(d,i)->confirmSale(items.get(i)));
         dialog.show();
     }
-    private final java.util.ArrayDeque<String> noticeQueue=new java.util.ArrayDeque<>();
-    private boolean noticeShowing;
+    private static final long NOTICE_INTERVAL_MS=3000L;
+    private static final class GameNotice {
+        final String message;final int color;final boolean reward;
+        GameNotice(String message,int color,boolean reward){this.message=message;this.color=color;this.reward=reward;}
+    }
+    private final java.util.ArrayDeque<GameNotice> noticeQueue=new java.util.ArrayDeque<>();
+    private final android.os.Handler noticeHandler=new android.os.Handler(android.os.Looper.getMainLooper());
+    private TextView activeNotice;
+    private final Runnable noticeNext=this::showNextNotice;
+    private final Runnable noticeEnd=()->{removeActiveNotice();showNextNotice();};
     private void themedNotice(String message){
-        if(!visual("notice")||root==null||!root.isAttachedToWindow()){Toast.makeText(this,message,Toast.LENGTH_SHORT).show();return;}
-        if(noticeQueue.size()>=8)noticeQueue.removeFirst();
-        noticeQueue.addLast(message);showNextNotice();
+        if(!visual("notice")){Toast.makeText(this,message,Toast.LENGTH_SHORT).show();return;}
+        noticeQueue.addLast(new GameNotice(message,TEXT,false));scheduleNotice();
+    }
+    private void rewardNotice(String message,int color){
+        noticeQueue.addLast(new GameNotice(message,color,true));scheduleNotice();
+    }
+    private void scheduleNotice(){
+        noticeHandler.removeCallbacks(noticeNext);noticeHandler.post(noticeNext);
+    }
+    private void removeActiveNotice(){
+        if(activeNotice==null)return;
+        activeNotice.animate().cancel();
+        if(activeNotice.getParent() instanceof ViewGroup)((ViewGroup)activeNotice.getParent()).removeView(activeNotice);
+        activeNotice=null;
+    }
+    private void clearNotices(){
+        noticeHandler.removeCallbacks(noticeNext);noticeHandler.removeCallbacks(noticeEnd);
+        noticeQueue.clear();removeActiveNotice();
+    }
+    private void attachActiveNotice(){
+        if(activeNotice==null)return;
+        ViewGroup decor=findViewById(android.R.id.content);
+        if(!(decor instanceof FrameLayout)||activeNotice.getParent()==decor)return;
+        if(activeNotice.getParent() instanceof ViewGroup)((ViewGroup)activeNotice.getParent()).removeView(activeNotice);
+        FrameLayout.LayoutParams p=new FrameLayout.LayoutParams(-1,-2,Gravity.TOP);
+        p.setMargins(dp(15),dp(12),dp(15),0);decor.addView(activeNotice,p);
     }
     private void showNextNotice(){
-        if(noticeShowing||noticeQueue.isEmpty()||isFinishing()||isDestroyed())return;
-        if(!visual("notice")){noticeQueue.clear();return;}
-        android.view.ViewGroup decor=findViewById(android.R.id.content);
-        String message=noticeQueue.removeFirst();
-        if(!(decor instanceof FrameLayout)){Toast.makeText(this,message,Toast.LENGTH_SHORT).show();return;}
-        noticeShowing=true;
-        TextView notice=text(message,14,TEXT,true);notice.setGravity(Gravity.CENTER);notice.setPadding(dp(16),dp(12),dp(16),dp(12));
-        notice.setBackground(new RuneFrameDrawable(0xff101315,accent(),false));
-        FrameLayout.LayoutParams p=new FrameLayout.LayoutParams(-1,-2,Gravity.TOP);
-        p.setMargins(dp(15),dp(12),dp(15),0);decor.addView(notice,p);
-        if(animations){notice.setTranslationY(-dp(12));notice.setAlpha(0f);notice.animate().translationY(0).alpha(1f).setDuration(180).start();}
-        new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(()->{
-            if(notice.getParent()==decor)decor.removeView(notice);noticeShowing=false;showNextNotice();
-        },2400);
+        if(activeNotice!=null||isFinishing()||isDestroyed()||root==null||!root.isAttachedToWindow())return;
+        while(!noticeQueue.isEmpty()){
+            GameNotice next=noticeQueue.removeFirst();
+            if(!next.reward&&!visual("notice")){Toast.makeText(this,next.message,Toast.LENGTH_SHORT).show();continue;}
+            activeNotice=text(next.message,14,next.color,true);
+            activeNotice.setGravity(Gravity.CENTER);activeNotice.setPadding(dp(16),dp(12),dp(16),dp(12));
+            activeNotice.setBackground(new RuneFrameDrawable(0xff101315,accent(),false));
+            attachActiveNotice();
+            if(animations){activeNotice.setTranslationY(-dp(12));activeNotice.setAlpha(0f);activeNotice.animate().translationY(0).alpha(1f).setDuration(180).start();}
+            noticeHandler.postDelayed(noticeEnd,NOTICE_INTERVAL_MS);return;
+        }
     }
 
     private void render(){
@@ -1140,6 +1188,7 @@ public final class MainActivity extends Activity {
         SovngardeTypeface.watchTree(root);
         renderedPage=thisPage;
         resumeViewport(oldScroll,scroll,thisPage);
+        attachActiveNotice();scheduleNotice();
         if(animations){content.setAlpha(0.8f);content.animate().alpha(1f).setDuration(210).setInterpolator(new DecelerateInterpolator()).start();}
     }
     private void renderHeader(){
@@ -1186,51 +1235,14 @@ public final class MainActivity extends Activity {
         if(prior.isEmpty()||!owner.equals(previousOwner))return;
         String[] previous=prior.split(",",-1);
         if(previous.length!=RpgContent.SKILLS.length)return;
-        int raised=-1;
         for(int i=0;i<previous.length;i++){
             int oldLevel;
             try{oldLevel=Integer.parseInt(previous[i]);}
             catch(NumberFormatException ex){return;}
-            if(oldLevel>0&&game.progress.skillLevel(i)>oldLevel&&raised<0)raised=i;
+            int level=game.progress.skillLevel(i);
+            if(oldLevel>0&&level>oldLevel&&level<100)
+                rewardNotice(RpgContent.SKILLS[i]+" · уровень "+level,ITEM_UP);
         }
-        if(raised<0||!visual("notice"))return;
-        int i=raised;
-        LinearLayout panel=column();
-        panel.setPadding(dp(13),dp(11),dp(13),dp(11));
-        panel.setBackground(new RuneFrameDrawable(0xf0090c0d,0xffbac5c9,true));
-        LinearLayout.LayoutParams area=lp(-1,-2);
-        area.setMargins(dp(10),dp(2),dp(10),dp(6));
-        topChrome.addView(panel,area);
-        LinearLayout top=row();panel.addView(top,lp(-1,-2));
-        top.addView(new SkyrimIconView(this,"armor",accent()),lp(37,40));
-        LinearLayout words=column();
-        LinearLayout.LayoutParams wp=new LinearLayout.LayoutParams(0,-2,1);
-        wp.leftMargin=dp(12);top.addView(words,wp);
-        TextView label=text(RpgContent.SKILLS[i].toUpperCase(java.util.Locale.ROOT),14,TEXT,true);
-        label.setLetterSpacing(.11f);words.addView(label);
-        addText(words,"НАВЫК ПОВЫШЕН ДО "+game.progress.skillLevel(i),11,MUTED,false,0);
-        TextView seal=text(String.valueOf(game.progress.skillLevel(i)),21,accent(),true);
-        seal.setGravity(Gravity.CENTER);
-        seal.setBackground(new RuneFrameDrawable(0x33000000,accent(),true));
-        top.addView(seal,lp(39,39));
-        ProgressBar line=new ProgressBar(this,null,android.R.attr.progressBarStyleHorizontal);
-        line.setMax(Math.max(1,game.progress.skillNeed(i)));
-        line.setProgress(Math.max(0,game.progress.skillXp[i]));
-        line.setProgressTintList(ColorStateList.valueOf(accent()));
-        line.setProgressBackgroundTintList(ColorStateList.valueOf(0xff30383c));
-        LinearLayout.LayoutParams lineParams=lp(-1,3);
-        lineParams.topMargin=dp(9);panel.addView(line,lineParams);
-        panel.setContentDescription(RpgContent.SKILLS[i]+" повышен до уровня "+game.progress.skillLevel(i));
-        if(animations){
-            panel.setAlpha(0f);
-            panel.animate().alpha(1f).setDuration(250).start();
-        }
-        panel.postDelayed(()->{
-            panel.animate().alpha(0f).setDuration(420).withEndAction(()->{
-                if(panel.getParent() instanceof android.view.ViewGroup)
-                    ((android.view.ViewGroup)panel.getParent()).removeView(panel);
-            }).start();
-        },3400);
     }
 
     // One compact HUD, shared by every started-game tab and both story modes.
@@ -2308,6 +2320,7 @@ public final class MainActivity extends Activity {
                     lastNarrative=completed.scene;
                     selectedAiChoices.clear();aiOwnDraft="";clearAiDraft();
                     save();
+                    if(actionResolved)enqueueLivingResult(game.lastLivingResult);
                     clearAiPending();
                     aiMemory.add(aiSession,"user",instruction);
                     aiMemory.add(aiSession,"master",completed.scene);
