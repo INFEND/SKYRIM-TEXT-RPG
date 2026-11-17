@@ -173,6 +173,7 @@ public final class AiStoryClient {
             skills.append(i).append(':').append(RpgContent.SKILLS[i]).append('=').append(game.progress.skillLevel(i));
         }
         localSection(b,"Навыки (индекс:название=уровень): ",skills.toString(),490,budget);
+        localSection(b,"Потребности: ",game.needs.aiContext()+" Штраф: "+game.needs.penalty()+" п.п.",270,budget);
         if(aiControlled)localSection(b,"Инициатива Кэтрин: ",KatherineInitiative.context(game),260,budget);
         StringBuilder invText=new StringBuilder();
         java.util.Iterator<String> inv=game.progress.inventory.keys();
