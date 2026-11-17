@@ -241,7 +241,7 @@ public final class RpgProgress {
     public void skillExperience(GameEngine g,int index,int amount){
         if(index<0||index>=skillLevels.length||amount<=0)return;
         if(skillLevels[index]<100){
-            skillXp[index]+=amount+artifacts.skillBonus(this,index,amount)+branches.experienceBonus(index,amount)+(index==8&&advanced.has(AdvancedPerks.ENCHANTER)?amount/5:0)+(index==6&&advanced.has(AdvancedPerks.ARCANE_SMITH)?amount/5:0)+(index==8&&advanced.has(AdvancedPerks.EXTRA_EFFECT)||index==17&&advanced.has(AdvancedPerks.TWIN_SOULS)?amount*3/10:0);
+            skillXp[index]+=amount+g.fixShop.gifts.skillBonus(amount)+artifacts.skillBonus(this,index,amount)+branches.experienceBonus(index,amount)+(index==8&&advanced.has(AdvancedPerks.ENCHANTER)?amount/5:0)+(index==6&&advanced.has(AdvancedPerks.ARCANE_SMITH)?amount/5:0)+(index==8&&advanced.has(AdvancedPerks.EXTRA_EFFECT)||index==17&&advanced.has(AdvancedPerks.TWIN_SOULS)?amount*3/10:0);
             while(skillLevels[index]<100&&skillXp[index]>=skillNeed(index)){
                 skillXp[index]-=skillNeed(index);skillLevels[index]++;
                 if(skillLevels[index]==100)skillXp[index]=0;

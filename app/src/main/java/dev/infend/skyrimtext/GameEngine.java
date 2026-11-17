@@ -64,7 +64,7 @@ public final class GameEngine {
     public CompensationPowers compensation=new CompensationPowers();
     public JSONObject lastLivingResult=new JSONObject();
     public int lastCheckChance=-1,lastCheckRoll=-1;
-    public boolean rollCheck(int chance){lastCheckChance=Math.max(0,Math.min(100,chance));lastCheckRoll=random.nextInt(100)+1;return lastCheckRoll<=lastCheckChance;}
+    public boolean rollCheck(int chance){lastCheckChance=Math.max(0,Math.min(100,chance));lastCheckRoll=random.nextInt(100)+1;if(fixShop.gifts.retry(day,lastCheckChance,lastCheckRoll)){lastCheckRoll=random.nextInt(100)+1;recordVisualEvent("Благосклонность судьбы: повтор проверки");}return lastCheckRoll<=lastCheckChance;}
     public LivingEconomy economy=new LivingEconomy();
     public final int[] regenBonus=new int[3];
     public boolean regenIgnorePenalty;
@@ -224,7 +224,7 @@ public final class GameEngine {
         if(started&&KatherineStory.MODE.equals(mode))return katherine.scene(this);
         if(started&&"CANON".equals(mode))return CanonicalCampaign.scene(this);
         Scene s=baseScene();
-        if(started){progress.fillChoices(this,s);FixShopAdventure.choices(this,s);FixShopAdventure.endings(this,s);FixShopWorld.choices(this,s);FixShopHome.choices(this,s);}
+        if(started){progress.fillChoices(this,s);FixShopAdventure.choices(this,s);FixShopAdventure.endings(this,s);FixShopWorld.choices(this,s);FixShopHome.choices(this,s);FixShopGifts.choices(this,s);}
         if(itachi.available(this))s.add("ITACHI:open","Поговорить с Итачи",itachi.objective(this));
         if(livia.available(this))s.add("LIVIA:open","Поговорить с Ливией",livia.objective());
         if(alma.available(this))s.add("ALMA:open","Поговорить с Альмой","Алая Бессмертная | "+alma.status());
@@ -339,6 +339,7 @@ public final class GameEngine {
         if(roadSummonTurns==0&&progress.equipped("Этериевый посох"))s.add("ROAD_SUMMON_AETHER","Призвать автоматон","20 магии | три хода помощи");
         if("WILD".equals(battleKind))s.add("FLEE","Отступить","Шанс выйти из боя без награды");
         if("CANONICAL".equals(battleKind)&&canonicalShouts!=0&&canonicalShoutCooldown==0)s.add("CANON_SHOUT",CanonicalCampaign.combatShout(this),"Урон и ослабление врага | Восстановление 3 хода");
+        if(fixShop.gifts.canBlood(this))s.add("FIXGIFT:blood","Кровавый обмен","Здоровье → магия | раз за бой");
         for(int i=0;i<CompensationPowers.SLOTS;i++)if(compensation.available(this,i))s.add("FIX_POWER:"+i,compensation.powerName(i),compensation.detail(i));
         return s;
     }
@@ -380,6 +381,7 @@ public final class GameEngine {
         lastCheckChance=lastCheckRoll=-1;
         if(RoadEvents.MODE.equals(mode)){road.choose(this,action);return;}
         if(road.pending()&&!"COMBAT".equals(mode)){if("GO_WORLD".equals(action))road.resume(this);return;}
+        if(action.startsWith("FIXGIFT:")){if("FIXGIFT:blood".equals(action)){if(fixShop.gifts.canBlood(this))combatTurn(action);}else FixShopGifts.choose(this,action);return;}
         if(action.startsWith("FIXRESIDENCE:")){FixShopHome.choose(this,action);return;}
         if(action.startsWith("FIXPLACE:")||action.startsWith("FIXHOME:")||action.startsWith("FIXNPC:")||action.startsWith("FIXCUSTOM:")){FixShopWorld.choose(this,action);return;}
         if(action.startsWith("FIXQUEST:")){FixShopAdventure.choose(this,action);return;}
@@ -638,7 +640,7 @@ public final class GameEngine {
     void beginKatherineBattle(){startBattle("Агент Круга Трёх Когтей",75+level*8,8+level*2,"KATHERINE","Кэтрин поднимает барьер. Агент Круга требует, чтобы она сдалась.");}
     void beginFixShopBattle(int i,String name,String intro){startBattle(name,65+level*6,7+level*2,"FIX_QUEST:"+i,intro);}
     private void startBattle(String name,int health,int dmg,String kind,String intro) {
-        resetBattleVisuals();progress.artifacts.trapTurns=0;alma.beginBattle();katherine.companion.beginBattle();enemyName=name;enemyHp=health;enemyMaxHp=health;enemyDamage=dmg;battleKind=kind;enemyIntro=intro;
+        resetBattleVisuals();fixShop.gifts.beginBattle();progress.artifacts.trapTurns=0;alma.beginBattle();katherine.companion.beginBattle();enemyName=name;enemyHp=health;enemyMaxHp=health;enemyDamage=dmg;battleKind=kind;enemyIntro=intro;
         battleLog="В бою важна тактика. Следи за запасом сил и магии.";mode="COMBAT";
     }
     // Retain class/quest/AI bonuses in old saves without counting the legacy
@@ -667,6 +669,7 @@ public final class GameEngine {
             case "ROADSTAR_TRAP":if(progress.artifacts.trapTurns>0||magicka<10||!((progress.artifacts.whiteSoul==0&&progress.quantity("Звезда Азуры")>0)||(progress.artifacts.blackSoul==0&&progress.quantity("Звезда Чёрной Азуры")>0)))return;magicka-=10;progress.artifacts.trapTurns=3;actionText="Наложен захват души на три хода.";break;
             case "ROADSTAR_WHITE":case "ROADSTAR_BLACK":int mana=progress.artifacts.release(this,"ROADSTAR_WHITE".equals(action)?1:2);if(mana==0)return;actionText="Душа высвобождена: +"+mana+" магии.";break;
             case "ROAD_SUMMON_ROSE":case "ROAD_SUMMON_AETHER":if(roadSummonTurns>0||magicka<20||!progress.equipped("ROAD_SUMMON_ROSE".equals(action)?"Роза Сангвина":"Этериевый посох"))return;magicka-=20;roadSummonKind="ROAD_SUMMON_ROSE".equals(action)?1:2;roadSummonTurns=3;actionText=roadSummonKind==1?"Роза Сангвина призывает дремора.":"Этериевый посох призывает автоматон.";break;
+            case "FIXGIFT:blood":if(!fixShop.gifts.blood(this))return;defending=true;actionText="Кровавый обмен: жизненная сила обращена в магию.";break;
             case "ATTACK": damage=Math.max(1,effectiveAttack()+random.nextInt(9)-3);actionText="Ты наносишь удар: −"+damage+" здоровья врагу.";break;
             case "HEAVY":if(stamina<heavyCost()){battleLog="Недостаточно выносливости для сильного удара.";return;}
                 int hitChance=progress.chance(this,"HEAVY");stamina-=heavyCost();
@@ -733,18 +736,20 @@ public final class GameEngine {
         int liviaProtection=livia.protect(incoming);incoming-=liviaProtection;if(liviaProtection>0){lastBlocked+=liviaProtection;actionText+="\nЛивия: прикрывает щитом, −"+liviaProtection+" входящего урона.";}
         int almaWeakness=alma.weaken(incoming);incoming-=almaWeakness;if(almaWeakness>0){lastBlocked+=almaWeakness;actionText+="\nАльма: Алая тень / Метка смерти, −"+almaWeakness+" входящего урона.";}
         int almaProtection=alma.protect(incoming);incoming-=almaProtection;if(almaProtection>0){lastBlocked+=almaProtection;actionText+="\nАльма: защитная магия, −"+almaProtection+" входящего урона.";}
+        if(fixShop.gifts.on(FixShopGifts.WARD)){poisonTurns=frostTurns=0;}
         int poisoned=poisonTurns>0?Math.max(1,maxHp/40):0;
         if(poisonTurns>0)poisonTurns--;if(frostTurns>0){frostTurns--;stamina=Math.max(0,stamina-4);}
         String foe=enemyName.toLowerCase(java.util.Locale.ROOT);
-        if(!defending&&foe.contains("морозный паук"))poisonTurns=2;
-        if(!defending&&foe.contains("ледяной призрак"))frostTurns=2;
+        if(!fixShop.gifts.on(FixShopGifts.WARD)&&!defending&&foe.contains("морозный паук"))poisonTurns=2;
+        if(!fixShop.gifts.on(FixShopGifts.WARD)&&!defending&&foe.contains("ледяной призрак"))frostTurns=2;
         lastTaken=Math.min(hp,incoming+poisoned);battleTaken+=lastTaken;
         hp=Math.max(0,hp-incoming-poisoned);stamina=Math.min(maxStamina,nonnegativeAdd(stamina,3+(progress.hasArmorType(5)&&progress.advanced.has(AdvancedPerks.WIND_WALKER)?2:0)));
         battleLog=actionText+"\n"+(road.groupActive(this)?"Отряд противников":enemyName)+" отвечает: −"+incoming+" здоровья."+(poisoned>0?"\nЯд: −"+poisoned+" здоровья.":"")+(poisonTurns>0?"\nОтравление: "+poisonTurns+" хода.":"")+(frostTurns>0?"\nОбморожение: "+frostTurns+" хода.":"");
         if(hp>0){int link=alma.bloodLink(this);if(link>0){lastHealing+=link;battleLog+="\nАльма: Связь душ, +"+link+" здоровья." ;}}
         if(hp==0&&alma.rescue(this))battleLog+="\nАльма: Алая клятва спасла героя.";
+        if(hp==0&&fixShop.gifts.rescue(this)){lastHealing+=hp;battleLog+="\nКлятва Феникса возвращает героя к жизни.";}
         if(hp==0) {
-            int penalty=gold/3;gold-=penalty;hp=Math.max(1,maxHp/2);stamina=Math.max(1,maxStamina/2);
+            int penalty=gold>0&&fixShop.gifts.insure(day)?0:gold/3;gold-=penalty;hp=Math.max(1,maxHp/2);stamina=Math.max(1,maxStamina/2);
             poisonTurns=frostTurns=0;mode="DEFEAT";message="Ты приходишь в себя у дороги. Прохожие спасли тебя, но потеряно "+penalty+" септимов. Теперь можно подготовиться и вернуться.";livia.defeatedInDuel(this);
         }else regenerateCombat();
     }
@@ -786,7 +791,10 @@ public final class GameEngine {
     }
     /** Time-limited rest available outside combat, tracked in the old save schema. */
     public boolean fixTeleport(String name){
-        if(!started||!fixShop.editorEnabled||road.pending()||!"WORLD".equals(mode)&&!"RESULT".equals(mode)||!visitedVisual.contains(name)||name.equals(progress.location))return false;
+        return fixShop.editorEnabled&&fixTravelToVisited(name);
+    }
+    boolean fixTravelToVisited(String name){
+        if(!started||road.pending()||!"WORLD".equals(mode)&&!"RESULT".equals(mode)||!visitedVisual.contains(name)||name.equals(progress.location))return false;
         WorldAtlas.Place target=WorldAtlas.find(name);if(target==null)return false;region=target.region;progress.location=target.name;katherine.observeTravel(this);alma.observeTravel(this);mode="WORLD";message="Магический переход: "+target.name;recordVisualEvent(message);return true;
     }
     public boolean waitHours(int hours){return restHours(hours,hours>=6);}

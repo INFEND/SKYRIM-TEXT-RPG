@@ -56,9 +56,10 @@ public final class FixShopWorld {
     boolean visit(GameEngine g,int i){if(!safe(g)||i<0||i>=places.size())return false;JSONObject c=places.get(i);if(!g.progress.location.equals(c.optString("anchor")))return false;try{c.put("visits",Math.min(1000000,c.optInt("visits")+1));}catch(Exception e){return false;}g.message=c.optString("name")+"\n\n"+c.optString("description");g.mode="RESULT";g.recordVisualEvent("Посещение: "+c.optString("name"));return true;}
     static boolean safe(GameEngine g){return g.started&&!g.road.pending()&&("WORLD".equals(g.mode)||"RESULT".equals(g.mode));}
     static boolean estateHere(GameEngine g){return !g.fixShop.home.here(g).isEmpty();}
+    boolean storageAccess(GameEngine g){return g.fixShop.gifts.on(FixShopGifts.POCKET)||(stable&&estateHere(g));}
     boolean canStore(String id){ItemCatalog.Item item=ItemCatalog.find(id);return item!=null&&CompensationPowers.itemIndex(id)<0&&("Оружие".equals(item.category)||"Броня".equals(item.category)||"Украшения".equals(item.category)||"Одежда".equals(item.category)||"Боеприпасы".equals(item.category))&&!"Походный клинок".equals(id)&&!"Дорожная одежда".equals(id)&&!"Стальной меч".equals(id)&&!"Стальная кираса".equals(id);}
     boolean transfer(GameEngine g,String id,int n,boolean deposit){
-        if(!safe(g)||!stable||!estateHere(g)||n<1||!canStore(id))return false;
+        if(!safe(g)||!storageAccess(g)||n<1||!canStore(id))return false;
         int old=storage.optInt(id);
         if(deposit){if(g.progress.equipped(id)||g.progress.temperQuality(id)>0||old>Integer.MAX_VALUE-n||!g.progress.removeItem(id,n))return false;}
         else if(old<n||!g.progress.addItem(id,n))return false;

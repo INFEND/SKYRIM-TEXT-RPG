@@ -3759,6 +3759,7 @@ public final class MainActivity extends Activity {
         if(game.needs.anyEnabled())livingLink(content,"Потребности",game.needs.penalty()==0?"В норме":"Требуют внимания","health",this::livingNeedsDialog);
         livingLink(content,"Навыки","18","skills",this::livingSkillsDialog);
         livingLink(content,"Способности","","magic",()->livingHeroDetails("Способности",game.progress.racePower(game)+"\n\nКрики: "+CanonicalCampaign.shouts(game)));
+        if(game.fixShop.gifts.owned!=0)livingLink(content,"Дары судьбы","","magic",()->{fixShopCategory="Дары судьбы";fixShopPage=0;fixCatalogPage=0;fixShopQuery="";fixRarity=-1;livingFixShop();});
         livingLink(content,"Пассивные эффекты","","shield",()->livingHeroDetails("Пассивные эффекты",game.progress.racePassive(game)+(game.poisonTurns>0?"\nОтравление: "+game.poisonTurns+" х.":"")+(game.frostTurns>0?"\nОбморожение: "+game.frostTurns+" х.":"")));
         livingLink(content,"Экипировка","","armor",()->{tab=2;render();});
         livingLink(content,"Сопротивления","","shield",()->livingHeroDetails("Сопротивления",game.progress.racePassive(game)+"\nСнижение физического урона: "+String.format(java.util.Locale.ROOT,"%.1f%%",100*game.progress.damageReduction())));
@@ -4093,7 +4094,7 @@ public final class MainActivity extends Activity {
         renderRoadQuestJournal();
         for(JSONObject q:game.fixShop.world.quests){String status=q.optInt("stage")==0?"Начало: "+q.optString("start"):q.optInt("stage")==1?"Цель: "+q.optString("destination"):"Завершено";actionButton(q.optString("title"),status,false,()->{if(!livingBusy()){tab=0;render();}});}
         if(!game.fixShop.world.characters.isEmpty())actionButton("Авторские персонажи","Спутники и отношения",false,this::fixCharacters);
-        if(game.fixShop.world.stable&&FixShopWorld.estateHere(game))actionButton("Хранилище поместий","Личный сундук",false,this::fixStorage);
+        if(game.fixShop.world.storageAccess(game))actionButton("Хранилище поместий","Личный сундук",false,this::fixStorage);
         for(int i=0;i<FixShopAdventure.TITLES.length;i++)if(FixShopAdventure.stage(game,i)>0){final int n=i;actionButton(FixShopAdventure.TITLES[i],FixShopAdventure.objective(game,i),false,()->{if(livingBusy())return;closeLivingDialog();tab=0;render();});}
         if(game.katherine.enabled&&game.katherine.stage>0){LinearLayout k=card();addText(k,"НУЛЕВОЙ ПРЕДЕЛ | КРУГ ТРЁХ КОГТЕЙ",13,accent(),true,8);addText(k,game.katherine.objective(),15,TEXT,false,8);if(game.katherine.available(game))actionButton("Поговорить с Кэтрин","Продолжить расследование",false,()->{if(livingBusy())return;game.choose("KATH:open");save();tab=0;render();});}
         if(game.itachi.enabled&&game.itachi.stage>0)actionButton("Итачи | "+game.itachi.relation(),game.itachi.objective(game),false,()->npcDetails(ItachiStory.NAME));
@@ -4380,7 +4381,7 @@ public final class MainActivity extends Activity {
     private int fixShopPage=0,fixShopSort=0,fixCatalogPage=0,fixRarity=-1;
     private static final int FIX_PAGE_SIZE=30;
     private String fixShopCategory="Все",fixShopQuery="";
-    private static final String[] FIX_CATEGORIES={"Все","Снаряжение","Оружие","Броня","Боеприпасы","Материалы","Ингредиенты","Зелья и яды","Провизия","Инструменты","Драгоценности","Магия","Улучшения","Навыки","Септимы","Внешность","Оформление","Редактор мира","Наборы","Недвижимость","Транспорт","Питомцы","Персонажи","Дополнения","Коллекции"};
+    private static final String[] FIX_CATEGORIES={"Все","Снаряжение","Оружие","Броня","Боеприпасы","Материалы","Ингредиенты","Зелья и яды","Провизия","Инструменты","Драгоценности","Магия","Улучшения","Навыки","Септимы","Внешность","Оформление","Редактор мира","Наборы","Недвижимость","Транспорт","Питомцы","Персонажи","Дополнения","Коллекции","Дары судьбы"};
     private static final class FixOffer {
         final String title,detail,category,glyph,rarity;final int price,color;final Runnable action;String itemId="";int tier;
         FixOffer(String t,String d,String c,String g,String rr,int col,int p,Runnable a){title=t;detail=d;category=c;glyph=g;rarity=rr;color=col;price=p;action=a;}
@@ -4388,6 +4389,7 @@ public final class MainActivity extends Activity {
     }
     private java.util.ArrayList<FixOffer> fixOffers(){
         java.util.ArrayList<FixOffer> a=new java.util.ArrayList<>();
+        for(int i=0;i<FixShopGifts.NAME.length;i++){final int n=i;String title=FixShopGifts.NAME[i];if(game.fixShop.gifts.owns(i))fixOffer(a,title,game.fixShop.gifts.status(i,game)+" | "+FixShopGifts.DESC[i],"Дары судьбы","magic",5,0,()->fixGiftDialog(n));else fixDirect(a,title,FixShopGifts.DESC[i],"Дары судьбы","magic",5,FixShopGifts.PRICE[i],()->game.fixShop.gifts.buy(n));}
         fixOffer(a,"Уникальные предметы","Создание, привязка к душе и пассивные эффекты","Снаряжение","armor",4,50,this::livingArtifactShop);
         fixOffer(a,"Уникальные способности","Создание и улучшение собственной магии","Магия","magic",4,50,this::livingPowerShop);
         fixDirect(a,"Безграничная ноша","+50 кг вместимости","Улучшения","armor",3,150,()->{if(game.progress.fixCarryBonus>999950)return false;game.progress.fixCarryBonus+=50;return true;});
@@ -4479,6 +4481,14 @@ public final class MainActivity extends Activity {
         new RuneDialogBuilder(this,accent()).setTitle(title).setMessage(detail+" | "+price+" F. Только для текущего сохранения.")
             .setNegativeButton("Отмена",null).setPositiveButton("Купить",(d,w)->{if(fixApply(title,detail,price,effect))refresh.run();}).show();
     }
+    private void fixGiftDialog(int n){
+        if(livingBusy())return;FixShopGifts f=game.fixShop.gifts;LinearLayout panel=column();addText(panel,FixShopGifts.DESC[n],15,TEXT,false,10);addText(panel,f.status(n,game),14,accent(),true,8);
+        livingLink(panel,f.on(n)?"Выключить":"Включить","Без повторной покупки","magic",()->{if(!livingBusy()&&f.toggle(n)){save();render();fixGiftDialog(n);}});
+        if(f.on(n)&&n==FixShopGifts.ANCHOR){livingLink(panel,"Установить якорь",game.progress.location,"map",()->{if(!livingBusy()&&f.mark(game)){save();render();fixGiftDialog(n);}else toast("Якорь здесь уже установлен или место недоступно");});livingLink(panel,"Вернуться к якорю",f.anchor,"map",()->{if(!livingBusy()&&f.recall(game)){save();render();closeLivingDialog();}else toast("Возвращение недоступно");});}
+        if(f.on(n)&&n==FixShopGifts.POCKET)livingLink(panel,"Открыть хранилище","","armor",this::fixStorage);
+        if(f.on(n)&&n==FixShopGifts.PURIFY)livingLink(panel,"Применить","","health",()->{if(!livingBusy()&&f.purify(game)){save();render();fixGiftDialog(n);}else toast("Восстановление не требуется или дар уже использован");});
+        livingDialog(FixShopGifts.NAME[n],panel);
+    }
     private void fixCollections(){
         LinearLayout panel=column();int count=game.fixShop.distinctApplied();addText(panel,"Уникальные товары: "+count,18,accent(),true,10);
         for(int goal:new int[]{5,15,30,50}){final int n=goal;LinearLayout tile=livingTile(panel);livingLine(tile,"Коллекционер | "+goal,count>=goal?"Достигнуто":count+" / "+goal,accent());
@@ -4548,7 +4558,7 @@ public final class MainActivity extends Activity {
         livingDialog(name,panel);
     }
     private void fixStorage(){
-        if(livingBusy()||!FixShopWorld.estateHere(game)){toast("Хранилище доступно в собственном поместье");return;}
+        if(livingBusy()||!game.fixShop.world.storageAccess(game)){toast("Нужен собственный дом с хранилищем или Карман Обливиона");return;}
         LinearLayout panel=column();FixShopWorld w=game.fixShop.world;addText(panel,"В сундук можно положить неэкипированное и неулучшенное снаряжение.",13,MUTED,false,8);
         for(ItemCatalog.Item item:game.progress.owned("Все","Название"))if(w.canStore(item.id)&&!game.progress.equipped(item.id)&&game.progress.temperQuality(item.id)==0)livingLink(panel,"Положить: "+item.name,"×"+game.progress.quantity(item.id),"armor",()->{if(!livingBusy()&&w.transfer(game,item.id,1,true)){save();fixStorage();}});
         java.util.Iterator<String> keys=w.storage.keys();while(keys.hasNext()){String id=keys.next();int n=w.storage.optInt(id);if(n>0)livingLink(panel,"Забрать: "+id,"×"+n,"armor",()->{if(!livingBusy()&&w.transfer(game,id,1,false)){save();fixStorage();}else toast("Нет места в инвентаре");});}
