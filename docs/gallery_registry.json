@@ -5549,5 +5549,207 @@
       ],
       "note": "Lossy WebP unless quality is lossless. No resizing or upscaling. Smallest measured passing result in the searched quality interval. SSIM and chroma checks do not prove perceptual identity."
     }
+  },
+  {
+    "slug": "abandoned_shack",
+    "name": "Заброшенная хижина",
+    "captions": [
+      "Заброшенная хижина среди болот Хьялмарка"
+    ],
+    "aliases": [
+      "Abandoned Shack"
+    ]
+  },
+  {
+    "slug": "alchemists_shack",
+    "name": "Хижина алхимика",
+    "captions": [
+      "Открытая хижина алхимика у горной дороги"
+    ],
+    "aliases": [
+      "Alchemist's Shack"
+    ]
+  },
+  {
+    "slug": "angis_camp",
+    "name": "Лагерь Анги",
+    "captions": [
+      "Горный лагерь Анги и мишени для стрельбы"
+    ],
+    "aliases": [
+      "Angi's Camp"
+    ]
+  },
+  {
+    "slug": "anises_cabin",
+    "name": "Хижина Анис",
+    "captions": [
+      "Лесная хижина Анис неподалёку от Ривервуда"
+    ],
+    "aliases": [
+      "Anise's Cabin"
+    ]
+  },
+  {
+    "slug": "cliffside_retreat",
+    "name": "Горный приют",
+    "captions": [
+      "Охотничий приют над долиной Предела"
+    ],
+    "aliases": [
+      "Cliffside Retreat"
+    ]
+  },
+  {
+    "slug": "crabbers_shanty",
+    "name": "Хибара краболова",
+    "captions": [
+      "Хибара краболова на берегу Хьяла"
+    ],
+    "aliases": [
+      "Crabber's Shanty"
+    ]
+  },
+  {
+    "slug": "drelas_cottage",
+    "name": "Дом Дреласа",
+    "captions": [
+      "Уединённый дом Дреласа в горной долине"
+    ],
+    "aliases": [
+      "Drelas' Cottage"
+    ]
+  },
+  {
+    "slug": "frokis_shack",
+    "name": "Хижина Фроки",
+    "captions": [
+      "Хижина Фроки на склоне гор Рифта"
+    ],
+    "aliases": [
+      "Froki's Shack"
+    ]
+  },
+  {
+    "slug": "hall_of_the_vigilant",
+    "name": "Зал Дозора",
+    "captions": [
+      "Зал Дозора до разрушения"
+    ],
+    "aliases": [
+      "Hall of the Vigilant"
+    ]
+  },
+  {
+    "slug": "hunters_rest",
+    "name": "Охотничий привал",
+    "captions": [
+      "Охотничий привал в лесах Фолкрита"
+    ],
+    "aliases": [
+      "Hunter's Rest"
+    ]
+  },
+  {
+    "slug": "ironback_hideout",
+    "name": "Железное убежище",
+    "captions": [
+      "Разрушенная хижина Железного убежища"
+    ],
+    "aliases": [
+      "Ironback Hideout"
+    ]
+  },
+  {
+    "slug": "lunds_hut",
+    "name": "Хижина Лунда",
+    "captions": [
+      "Хижина Лунда над полями Рорикстеда"
+    ],
+    "aliases": [
+      "Lund's Hut"
+    ]
+  },
+  {
+    "slug": "meekos_shack",
+    "name": "Хижина Мико",
+    "captions": [
+      "Хижина Мико в тихом лесу"
+    ],
+    "aliases": [
+      "Meeko's Shack"
+    ]
+  },
+  {
+    "slug": "pinewatch",
+    "name": "Сосновая застава",
+    "captions": [
+      "Сосновая застава среди лесов Фолкрита"
+    ],
+    "aliases": [
+      "Pinewatch"
+    ]
+  },
+  {
+    "slug": "redwater_den",
+    "name": "Логово Красная Вода",
+    "captions": [
+      "Разрушенная хижина над Логовом Красная Вода"
+    ],
+    "aliases": [
+      "Redwater Den (DG)",
+      "Redwater Den",
+      "Логово «Красная Вода»"
+    ]
+  },
+  {
+    "slug": "riverside_shack",
+    "name": "Речная хижина",
+    "captions": [
+      "Речная хижина над Белой рекой"
+    ],
+    "aliases": [
+      "Riverside Shack"
+    ]
+  },
+  {
+    "slug": "traitors_post",
+    "name": "Пост Предателя",
+    "captions": [
+      "Пост Предателя у дороги Виндхельма"
+    ],
+    "aliases": [
+      "Traitor's Post"
+    ]
+  },
+  {
+    "slug": "abandoned_lodge",
+    "name": "Заброшенный дом",
+    "captions": [
+      "Закрытый заброшенный дом на севере Солстхейма"
+    ],
+    "aliases": [
+      "Abandoned Lodge"
+    ]
+  },
+  {
+    "slug": "hrodulfs_house",
+    "name": "Дом Хродульфа",
+    "captions": [
+      "Пепельные руины дома Хродульфа"
+    ],
+    "aliases": [
+      "Hrodulf's House"
+    ]
+  },
+  {
+    "slug": "ramshackle_trading_post",
+    "name": "Полуразрушенный торговый пост",
+    "captions": [
+      "Развалины торгового поста в пеплах Солстхейма"
+    ],
+    "aliases": [
+      "Ramshackle Trading Post"
+    ]
   }
 ]
