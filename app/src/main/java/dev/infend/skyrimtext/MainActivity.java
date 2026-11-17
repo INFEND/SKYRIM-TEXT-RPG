@@ -4377,11 +4377,12 @@ public final class MainActivity extends Activity {
         foldSettingsSection("amoled","AMOLED | КНОПКИ И ОКНА",start);
     }
 
-    private int fixShopPage=0,fixShopSort=0;
+    private int fixShopPage=0,fixShopSort=0,fixCatalogPage=0,fixRarity=-1;
+    private static final int FIX_PAGE_SIZE=30;
     private String fixShopCategory="Все",fixShopQuery="";
-    private static final String[] FIX_CATEGORIES={"Все","Снаряжение","Магия","Улучшения","Навыки","Септимы","Внешность","Оформление","Редактор мира","Наборы","Недвижимость","Транспорт","Питомцы","Персонажи","Дополнения","Коллекции"};
+    private static final String[] FIX_CATEGORIES={"Все","Снаряжение","Оружие","Броня","Боеприпасы","Материалы","Ингредиенты","Зелья и яды","Провизия","Инструменты","Драгоценности","Магия","Улучшения","Навыки","Септимы","Внешность","Оформление","Редактор мира","Наборы","Недвижимость","Транспорт","Питомцы","Персонажи","Дополнения","Коллекции"};
     private static final class FixOffer {
-        final String title,detail,category,glyph,rarity;final int price,color;final Runnable action;
+        final String title,detail,category,glyph,rarity;final int price,color;final Runnable action;String itemId="";int tier;
         FixOffer(String t,String d,String c,String g,String rr,int col,int p,Runnable a){title=t;detail=d;category=c;glyph=g;rarity=rr;color=col;price=p;action=a;}
         String id(){return FixShopState.key(title,price);}
     }
@@ -4441,10 +4442,10 @@ public final class MainActivity extends Activity {
         java.util.ArrayList<FixShopCatalog.Offer> gear=FixShopCatalog.featured();
         try{gear.addAll(FixShopCatalog.parse(game.fixShop.customCatalog));}catch(Exception ignored){}
         try(java.io.InputStream in=ResourceStore.open(this,"media/shop/catalog.json")){java.io.ByteArrayOutputStream out=new java.io.ByteArrayOutputStream();byte[] data=new byte[4096];int n;while((n=in.read(data))!=-1){if(out.size()+n>65536)throw new java.io.IOException("catalog too large");out.write(data,0,n);}gear.addAll(FixShopCatalog.parse(out.toString("UTF-8")));}catch(Exception ignored){}
-        gear.addAll(FixShopCatalog.clothing());
+        // Built-in catalogue already includes clothing and jewelry.
         java.util.HashSet<String> gearSeen=new java.util.HashSet<>();
         for(FixShopCatalog.Bundle bundle:FixShopCatalog.BUNDLES)if(FixShopCatalog.validBundle(bundle))fixOffer(a,bundle.name,bundle.description(),"Наборы","armor",4,bundle.price,()->fixReserveBundle(bundle));
-        for(FixShopCatalog.Offer offer:gear){if(!gearSeen.add(offer.key()))continue;ItemCatalog.Item item=ItemCatalog.find(offer.item);if(item==null)continue;fixOffer(a,offer.title(),item.category+" | "+item.weight+" кг | получить позднее",("Одежда".equals(item.category)||"Украшения".equals(item.category))?"Внешность":"Снаряжение",item.icon,3,offer.price,()->fixReserve(offer));}
+        for(FixShopCatalog.Offer offer:gear){if(!gearSeen.add(offer.key()))continue;ItemCatalog.Item item=ItemCatalog.find(offer.item);if(item==null)continue;fixOffer(a,offer.title(),item.category+" | "+item.weight*offer.quantity+" кг | "+(offer.quantity>1?"набор "+offer.quantity+" шт.":"за 1 шт."),FixShopCatalog.category(item),item.icon,FixShopCatalog.rarity(item),offer.price,()->fixReserve(offer));a.get(a.size()-1).itemId=offer.item;}
         if(game.fixShop.editorEnabled){
             fixOffer(a,"Создать NPC","Имя, характер, класс и отношения","Редактор мира","hero",5,300,()->fixCreateCharacter(false));
             fixOffer(a,"Создать локацию","Авторское место внутри текущей локации карты","Редактор мира","map",5,500,this::fixCreatePlace);
@@ -4464,7 +4465,7 @@ public final class MainActivity extends Activity {
     private void fixOffer(java.util.ArrayList<FixOffer> a,String t,String d,String c,String g,int tier,int price,Runnable action){
         String[] rarity={"ОБЫЧНЫЙ","НЕОБЫЧНЫЙ","РЕДКИЙ","ЭПИЧЕСКИЙ","ЛЕГЕНДАРНЫЙ","МИФИЧЕСКИЙ","БОЖЕСТВЕННЫЙ"};
         int[] colors={0xffa1a1aa,0xff65d68a,0xff5599ff,0xffb078e8,0xffe8b044,0xffef5555,0xffeabfff};
-        a.add(new FixOffer(t,d,c,g,rarity[tier],colors[tier],price,action));
+        FixOffer offer=new FixOffer(t,d,c,g,rarity[tier],colors[tier],price,action);offer.tier=tier;a.add(offer);
     }
     private void fixDirect(java.util.ArrayList<FixOffer> a,String t,String d,String c,String g,int tier,int price,java.util.function.BooleanSupplier effect){
         fixOffer(a,t,d,c,g,tier,price,()->fixConfirm(t,d,price,effect,this::livingFixShop));
@@ -4563,9 +4564,24 @@ public final class MainActivity extends Activity {
     private void fixReserveBundle(FixShopCatalog.Bundle b){
         if(livingBusy())return;new RuneDialogBuilder(this,accent()).setTitle(b.name).setMessage(b.description()+"\n\nЦена: "+b.price+" F. Весь комплект выдаётся одновременно через покупки. До выдачи возможен возврат.").setNegativeButton("Отмена",null).setPositiveButton("Купить",(d,w)->{if(livingBusy()||!game.fixShop.reserveBundle(game,b)){toast("Покупка недоступна");return;}save();livingFixShop();toast("Комплект ожидает получения");}).show();
     }
+    private String fixWeight(double n){return String.format(java.util.Locale.forLanguageTag("ru"),"%.2f",n);}
     private void fixReserve(FixShopCatalog.Offer offer){
-        ItemCatalog.Item item=ItemCatalog.find(offer.item);if(item==null||livingBusy())return;
-        new RuneDialogBuilder(this,accent()).setTitle(offer.title()).setMessage(item.description+"\n"+item.effect+"\nЦена: "+offer.price+" F. Получение во вкладке «Покупки». До получения доступен возврат.").setNegativeButton("Отмена",null).setPositiveButton("Купить",(d,w)->{if(livingBusy()||!game.fixShop.reserve(game,offer)){toast("Покупка недоступна");return;}save();livingFixShop();toast("Товар ожидает получения");}).show();
+        ItemCatalog.Item item=ItemCatalog.find(offer.item);int max=FixShopCatalog.maxPacks(offer);if(item==null||livingBusy()||max<1)return;
+        LinearLayout panel=column();panel.setPadding(dp(16),dp(8),dp(16),dp(8));
+        addText(panel,item.description,14,TEXT,false,6);if(!item.effect.isEmpty())addText(panel,item.effect,13,MUTED,false,8);
+        if(offer.quantity>1)addText(panel,"Цена за набор из "+offer.quantity+" шт.: "+offer.price+" F",13,MUTED,false,8);
+        LinearLayout amountRow=row();panel.addView(amountRow,lp(-1,-2));
+        TextView minus=text("−",25,accent(),true),amount=text("",20,TEXT,true),plus=text("+",25,accent(),true);
+        minus.setGravity(Gravity.CENTER);plus.setGravity(Gravity.CENTER);amount.setGravity(Gravity.CENTER);
+        amountRow.addView(minus,lp(48,44));amountRow.addView(amount,new LinearLayout.LayoutParams(0,dp(44),1));amountRow.addView(plus,lp(48,44));
+        android.widget.SeekBar slider=new android.widget.SeekBar(this);slider.setMax(max-1);slider.setProgressTintList(ColorStateList.valueOf(accent()));slider.setThumbTintList(ColorStateList.valueOf(accent()));slider.setContentDescription("Количество товаров");slider.setEnabled(max>1);panel.addView(slider,lp(-1,44));
+        LinearLayout quick=row();panel.addView(quick,lp(-1,36));for(int q:new int[]{1,5,10,25,50,max}){if(q>max)continue;TextView chip=text(q==max?"МАКС":Integer.toString(q),12,accent(),true);chip.setGravity(Gravity.CENTER);quick.addView(chip,new LinearLayout.LayoutParams(0,-1,1));chip.setOnClickListener(v->slider.setProgress(q-1));}
+        TextView total=text("",18,accent(),true),weight=text("",13,MUTED,false),notice=text("",12,MUTED,false);panel.addView(total,lp(-1,-2));panel.addView(weight,lp(-1,-2));panel.addView(notice,lp(-1,-2));space(panel,8);
+        ScrollView scroll=new ScrollView(this);scroll.addView(panel);AlertDialog dialog=new RuneDialogBuilder(this,accent()).setTitle(item.name).setView(scroll).setNegativeButton("Отмена",null).setPositiveButton("Купить",null).create();
+        Runnable refresh=()->{FixShopCatalog.Offer order=FixShopCatalog.multiply(offer,slider.getProgress()+1);if(order==null)return;amount.setText(order.quantity+" шт.");total.setText("Итого: "+livingNumber(order.price)+" F");weight.setText("Вес: "+fixWeight(item.weight*order.quantity)+" кг | свободно: "+fixWeight(Math.max(0,game.progress.carryLimit()-game.progress.carryWeight()))+" кг");notice.setText(FixShopCatalog.fits(game,order)?"Получение во вкладке «Покупки». До выдачи возможен возврат.":"Не хватит места для полной выдачи. Можно купить сейчас и получить после освобождения инвентаря.");if(dialog.isShowing())dialog.getButton(AlertDialog.BUTTON_POSITIVE).setText("Купить за "+livingNumber(order.price)+" F");};
+        minus.setOnClickListener(v->slider.setProgress(Math.max(0,slider.getProgress()-1)));plus.setOnClickListener(v->slider.setProgress(Math.min(max-1,slider.getProgress()+1)));
+        slider.setOnSeekBarChangeListener(new android.widget.SeekBar.OnSeekBarChangeListener(){public void onStartTrackingTouch(android.widget.SeekBar b){}public void onStopTrackingTouch(android.widget.SeekBar b){}public void onProgressChanged(android.widget.SeekBar b,int value,boolean user){refresh.run();}});
+        dialog.show();refresh.run();dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v->{if(livingBusy()||!game.fixShop.reserve(game,offer,slider.getProgress()+1)){toast("Покупка недоступна");return;}save();dialog.dismiss();livingFixShop();toast("Товар ожидает получения");});
     }
     private void fixImport(){
         LinearLayout panel=column();panel.setPadding(dp(12),dp(8),dp(12),dp(8));
@@ -4631,14 +4647,15 @@ public final class MainActivity extends Activity {
         ScrollView scroll=new ScrollView(this);scroll.setFillViewport(false);LinearLayout items=column();scroll.addView(items);root.addView(scroll,new LinearLayout.LayoutParams(-1,0,1));
         LinearLayout nav=row();root.addView(nav,lp(-1,56));String[] names={"Каталог","Избранное","Покупки","История"};String[] glyphs={"inventory","heart","armor","journal"};
         for(int i=0;i<names.length;i++){final int index=i;LinearLayout cell=column();cell.setGravity(Gravity.CENTER);nav.addView(cell,new LinearLayout.LayoutParams(0,-1,1));
-            cell.addView(new SkyrimIconView(this,glyphs[i],fixShopPage==i?accent():MUTED),lp(22,22));TextView label=text(names[i],11,fixShopPage==i?accent():MUTED,true);label.setGravity(Gravity.CENTER);cell.addView(label,lp(-1,-2));cell.setOnClickListener(v->{fixShopPage=index;fixShopCategory="Все";fixShopQuery="";livingFixShop();});
+            cell.addView(new SkyrimIconView(this,glyphs[i],fixShopPage==i?accent():MUTED),lp(22,22));TextView label=text(names[i],11,fixShopPage==i?accent():MUTED,true);label.setGravity(Gravity.CENTER);cell.addView(label,lp(-1,-2));cell.setOnClickListener(v->{fixShopPage=index;fixShopCategory="Все";fixShopQuery="";fixCatalogPage=0;fixRarity=-1;livingFixShop();});
         }
         if(fixShopPage<2){
             HorizontalScrollView categories=new HorizontalScrollView(this);categories.setHorizontalScrollBarEnabled(false);LinearLayout strip=row();categories.addView(strip);filters.addView(categories,lp(-1,-2));
-            for(String cat:FIX_CATEGORIES){TextView chip=text(cat,13,cat.equals(fixShopCategory)?TEXT:MUTED,true);chip.setPadding(dp(12),dp(9),dp(12),dp(9));chip.setBackground(bg(cat.equals(fixShopCategory)?0xff303030:Color.BLACK,Color.TRANSPARENT,20));strip.addView(chip,lp(-2,-2));if(cat.equals(fixShopCategory))categories.post(()->categories.smoothScrollTo(Math.max(0,chip.getLeft()-dp(12)),0));chip.setOnClickListener(v->{fixShopCategory=cat;livingFixShop();});}
+            for(String cat:FIX_CATEGORIES){TextView chip=text(cat,13,cat.equals(fixShopCategory)?TEXT:MUTED,true);chip.setPadding(dp(12),dp(9),dp(12),dp(9));chip.setBackground(bg(cat.equals(fixShopCategory)?0xff303030:Color.BLACK,Color.TRANSPARENT,20));strip.addView(chip,lp(-2,-2));if(cat.equals(fixShopCategory))categories.post(()->categories.smoothScrollTo(Math.max(0,chip.getLeft()-dp(12)),0));chip.setOnClickListener(v->{fixShopCategory=cat;fixCatalogPage=0;livingFixShop();});}
             LinearLayout searchRow=row();EditText search=new EditText(this);search.setSingleLine(true);search.setTextColor(TEXT);search.setHintTextColor(MUTED);search.setTextSize(sp(13));search.setHint("Поиск товаров");search.setText(fixShopQuery);search.setPadding(dp(10),dp(4),dp(10),dp(4));search.setBackground(bg(0xff141414,Color.TRANSPARENT,14));searchRow.addView(search,new LinearLayout.LayoutParams(0,dp(42),1));
-            TextView sort=text(new String[]{"По умолчанию","Цена ↑","Цена ↓","А–Я"}[fixShopSort],12,accent(),true);sort.setPadding(dp(10),dp(10),dp(4),dp(10));searchRow.addView(sort,lp(-2,-2));sort.setOnClickListener(v->{fixShopSort=(fixShopSort+1)%4;livingFixShop();});filters.addView(searchRow,lp(-1,-2));space(filters,8);
-            search.addTextChangedListener(new android.text.TextWatcher(){public void beforeTextChanged(CharSequence s,int st,int c,int a){}public void onTextChanged(CharSequence s,int st,int before,int count){fixShopQuery=s.toString();fixRenderOffers(items);}public void afterTextChanged(android.text.Editable e){}});
+            TextView sort=text(new String[]{"По умолчанию","Цена ↑","Цена ↓","А–Я"}[fixShopSort],12,accent(),true);sort.setPadding(dp(10),dp(10),dp(4),dp(10));searchRow.addView(sort,lp(-2,-2));sort.setOnClickListener(v->{fixShopSort=(fixShopSort+1)%4;fixCatalogPage=0;livingFixShop();});filters.addView(searchRow,lp(-1,-2));space(filters,8);
+            search.addTextChangedListener(new android.text.TextWatcher(){public void beforeTextChanged(CharSequence s,int st,int c,int a){}public void onTextChanged(CharSequence s,int st,int before,int count){fixShopQuery=s.toString();fixCatalogPage=0;fixRenderOffers(items);}public void afterTextChanged(android.text.Editable e){}});
+            TextView rarity=text("Редкость: "+(fixRarity<0?"Все":new String[]{"Обычный","Необычный","Редкий","Эпический","Легендарный","Мифический","Божественный"}[fixRarity]),12,accent(),true);rarity.setPadding(dp(8),dp(4),dp(8),dp(6));filters.addView(rarity,lp(-1,-2));rarity.setOnClickListener(v->new RuneDialogBuilder(this,accent()).setTitle("Редкость").setItems(new String[]{"Все","Обычный","Необычный","Редкий","Эпический","Легендарный","Мифический","Божественный"},(d,i)->{fixRarity=i-1;fixCatalogPage=0;livingFixShop();}).show());
             fixRenderOffers(items);
         }else fixRenderLedger(items);
         activeLivingDialog=new RuneDialogBuilder(this,accent()).setView(root).create();activeLivingDialog.show();
@@ -4647,13 +4664,16 @@ public final class MainActivity extends Activity {
     private void fixRenderOffers(LinearLayout items){
         items.removeAllViews();java.util.ArrayList<FixOffer> offers=fixOffers();
         String q=fixShopQuery.trim().toLowerCase(java.util.Locale.ROOT);
-        offers.removeIf(o->(!"Все".equals(fixShopCategory)&&!fixShopCategory.equals(o.category))||(fixShopPage==1&&!game.fixShop.favorite(o.id()))||!(o.title+" "+o.detail+" "+o.category).toLowerCase(java.util.Locale.ROOT).contains(q));
+        offers.removeIf(o->(!"Все".equals(fixShopCategory)&&!fixShopCategory.equals(o.category)&&!("Снаряжение".equals(fixShopCategory)&&("Оружие".equals(o.category)||"Броня".equals(o.category)||"Боеприпасы".equals(o.category))))||(fixRarity>=0&&o.tier!=fixRarity)||(fixShopPage==1&&!game.fixShop.favorite(o.id()))||!(o.title+" "+o.detail+" "+o.category).toLowerCase(java.util.Locale.ROOT).contains(q));
         if(fixShopSort==1)offers.sort(java.util.Comparator.comparingInt(o->o.price));
         else if(fixShopSort==2)offers.sort((a,b)->Integer.compare(b.price,a.price));
         else if(fixShopSort==3)offers.sort((a,b)->a.title.compareToIgnoreCase(b.title));
         if(offers.isEmpty()){addText(items,"Нет подходящих товаров.",15,MUTED,false,10);return;}
-        for(int i=0;i<offers.size();i+=2){LinearLayout line=row();line.setGravity(Gravity.TOP);LinearLayout.LayoutParams size=lp(-1,-2);size.bottomMargin=dp(8);items.addView(line,size);fixCard(line,offers.get(i),items);
-            if(i+1<offers.size()){View gap=new View(this);line.addView(gap,lp(8,1));fixCard(line,offers.get(i+1),items);}else{View empty=new View(this);line.addView(empty,new LinearLayout.LayoutParams(0,1,1));}}
+        int pages=(offers.size()+FIX_PAGE_SIZE-1)/FIX_PAGE_SIZE;fixCatalogPage=Math.max(0,Math.min(pages-1,fixCatalogPage));int start=fixCatalogPage*FIX_PAGE_SIZE,end=Math.min(offers.size(),start+FIX_PAGE_SIZE);
+        addText(items,"Товары "+(start+1)+"–"+end+" из "+offers.size(),12,MUTED,false,8);
+        for(int i=start;i<end;i+=2){LinearLayout line=row();line.setGravity(Gravity.TOP);line.setBaselineAligned(false);LinearLayout.LayoutParams size=lp(-1,-2);size.bottomMargin=dp(8);items.addView(line,size);fixCard(line,offers.get(i),items);View gap=new View(this);line.addView(gap,lp(8,1));
+            if(i+1<end)fixCard(line,offers.get(i+1),items);else{View empty=new View(this);line.addView(empty,new LinearLayout.LayoutParams(0,1,1));}}
+        if(pages>1){LinearLayout pager=row();items.addView(pager,lp(-1,48));TextView previous=text("‹ Назад",14,fixCatalogPage>0?accent():MUTED,true),next=text("Далее ›",14,fixCatalogPage+1<pages?accent():MUTED,true),page=text((fixCatalogPage+1)+" / "+pages,13,TEXT,true);for(TextView v:new TextView[]{previous,page,next}){v.setGravity(Gravity.CENTER);pager.addView(v,new LinearLayout.LayoutParams(0,-1,1));}previous.setOnClickListener(v->{if(fixCatalogPage>0){fixCatalogPage--;fixRenderOffers(items);((ScrollView)items.getParent()).scrollTo(0,0);}});next.setOnClickListener(v->{if(fixCatalogPage+1<pages){fixCatalogPage++;fixRenderOffers(items);((ScrollView)items.getParent()).scrollTo(0,0);}});}
     }
     private View fixArtwork(FixOffer offer){
         String path="";String title=offer.title;
@@ -4673,14 +4693,14 @@ public final class MainActivity extends Activity {
         return new FixShopArtwork(this,title,offer.glyph,offer.color,offer.category);
     }
     private void fixCard(LinearLayout line,FixOffer offer,LinearLayout items){
-        LinearLayout tile=column();tile.setPadding(dp(10),dp(9),dp(10),dp(10));tile.setBackground(bg(0xff121212,Color.TRANSPARENT,18));line.addView(tile,new LinearLayout.LayoutParams(0,-2,1));
+        LinearLayout tile=column();tile.setPadding(dp(10),dp(9),dp(10),dp(10));tile.setBackground(bg(0xff121212,Color.TRANSPARENT,18));line.addView(tile,new LinearLayout.LayoutParams(0,dp(324),1));
         LinearLayout art=row();art.setGravity(Gravity.CENTER);art.setBackground(bg(0xff1a1a1a,Color.TRANSPARENT,14));art.setClipToOutline(true);tile.addView(art,lp(-1,108));art.addView(fixArtwork(offer),lp(-1,-1));
         LinearLayout label=row();TextView rare=text(offer.rarity,10,offer.color,true);label.addView(rare,new LinearLayout.LayoutParams(0,-2,1));
-        TextView fav=text(game.fixShop.favorite(offer.id())?"♥":"♡",22,accent(),true);fav.setContentDescription("Избранное: "+offer.title);fav.setOnClickListener(v->{game.fixShop.toggle(offer.id());save();fixRenderOffers(items);});label.addView(fav,lp(-2,-2));tile.addView(label,lp(-1,-2));
-        TextView name=text(offer.title,16,TEXT,true);name.setMaxLines(2);name.setMinHeight(dp(44));tile.addView(name,lp(-1,-2));
-        TextView desc=text(offer.detail,12,MUTED,false);desc.setMaxLines(3);desc.setMinHeight(dp(48));tile.addView(desc,lp(-1,-2));
-        int n=game.fixShop.count(offer.id());addText(tile,n>0?"Куплено: "+n:" ",11,accent(),false,3);
-        TextView buy=text(offer.price==0?"Открыть":"◇ "+offer.price+" F",15,TEXT,true);buy.setGravity(Gravity.CENTER);buy.setBackground(bg(0xff151515,0xff454545,22));tile.addView(buy,lp(-1,40));buy.setOnClickListener(v->offer.action.run());art.setOnClickListener(v->new RuneDialogBuilder(this,accent()).setTitle(offer.title).setMessage(offer.rarity+"\n"+offer.detail+"\nСтоимость: "+offer.price+" F").setNegativeButton("Закрыть",null).setPositiveButton("Далее",(d,w)->offer.action.run()).show());
+        TextView fav=text(game.fixShop.favorite(offer.id())?"♥":"♡",22,accent(),true);fav.setContentDescription("Избранное: "+offer.title);fav.setOnClickListener(v->{game.fixShop.toggle(offer.id());save();fixRenderOffers(items);});label.addView(fav,lp(-2,-2));tile.addView(label,lp(-1,30));rare.setSingleLine(true);rare.setEllipsize(android.text.TextUtils.TruncateAt.END);
+        TextView name=text(offer.title,15,TEXT,true);name.setMaxLines(2);name.setEllipsize(android.text.TextUtils.TruncateAt.END);name.setGravity(Gravity.TOP);tile.addView(name,lp(-1,48));
+        TextView desc=text(offer.detail,12,MUTED,false);desc.setMaxLines(3);desc.setEllipsize(android.text.TextUtils.TruncateAt.END);desc.setGravity(Gravity.TOP);tile.addView(desc,new LinearLayout.LayoutParams(-1,0,1));
+        long n=offer.itemId.isEmpty()?game.fixShop.count(offer.id()):game.fixShop.purchasedQuantity(offer.itemId);TextView bought=text(n>0?"Куплено: "+n:" ",11,accent(),false);bought.setSingleLine(true);tile.addView(bought,lp(-1,20));
+        TextView buy=text(offer.price==0?"Открыть":"◇ "+offer.price+" F",15,TEXT,true);buy.setGravity(Gravity.CENTER);buy.setBackground(bg(0xff151515,0xff454545,22));tile.addView(buy,lp(-1,40));buy.setOnClickListener(v->offer.action.run());art.setOnClickListener(v->offer.action.run());
     }
     private void fixRenderLedger(LinearLayout items){
         org.json.JSONArray history=game.fixShop.history();

@@ -12,11 +12,31 @@ public final class FixShopCatalog {
         public String key(){return item+" / "+quantity+" / "+price;}
         public String title(){ItemCatalog.Item i=ItemCatalog.find(item);return (i==null?item:i.name)+(quantity>1?" ×"+quantity:"");}
     }
+    static final int MAX_QUANTITY=100,MAX_PRICE=100000;
+    static String category(ItemCatalog.Item i){
+        switch(i.category){
+            case "Оружие":return "Оружие";
+            case "Броня":return "Броня";
+            case "Одежда":case "Украшения":return "Внешность";
+            case "Боеприпасы":return "Боеприпасы";
+            case "Материалы":return "Материалы";
+            case "Ингредиенты":return "Ингредиенты";
+            case "Еда":case "Напитки":return "Провизия";
+            case "Зелья":case "Яды":return "Зелья и яды";
+            case "Инструменты":return "Инструменты";
+            case "Драгоценности":case "Драгоценные камни":return "Драгоценности";
+            default:return "";
+        }
+    }
+    static int rarity(ItemCatalog.Item i){if(i.value>=2000)return 4;if(i.value>=600)return 3;if(i.value>=150)return 2;if(i.value>=40)return 1;return 0;}
+    static int maxPacks(Offer o){return valid(o)?Math.min(MAX_QUANTITY/o.quantity,MAX_PRICE/o.price):0;}
+    static Offer multiply(Offer o,int packs){if(packs<1||packs>maxPacks(o))return null;return new Offer(o.item,o.quantity*packs,o.price*packs);}
+    static String productId(Offer o){return FixShopState.key(o.title(),o.price);}
     public static boolean valid(Offer o){
-        if(o==null||o.quantity<1||o.quantity>100||o.price<1||o.price>100000||o.item.length()>150)return false;
+        if(o==null||o.quantity<1||o.quantity>100||o.price<1||o.price>100000||o.item==null||o.item.length()>150)return false;
         ItemCatalog.Item i=ItemCatalog.find(o.item);
         return i!=null&&CompensationPowers.itemIndex(o.item)<0&&i.value>0&&
-          ("Оружие".equals(i.category)||"Броня".equals(i.category)||"Украшения".equals(i.category)||"Одежда".equals(i.category)||"Боеприпасы".equals(i.category))&&
+          !category(i).isEmpty()&&!"Этериевый щит".equals(o.item)&&!"Этериевый посох".equals(o.item)&&!"Зачарованное ожерелье".equals(o.item)&&!"Ингредиенты Балбуса".equals(o.item)&&
           !"Походный клинок".equals(o.item)&&!"Дорожная одежда".equals(o.item)&&!"Стальной меч".equals(o.item)&&!"Стальная кираса".equals(o.item);
     }
     static final class Bundle {
@@ -45,13 +65,17 @@ public final class FixShopCatalog {
     public static ArrayList<Offer> featured(){
         ArrayList<Offer> a=new ArrayList<>();
         for(ItemCatalog.Item i:ItemCatalog.all()){
-            if(a.size()>=24)break;
+            if(!i.id.equals(i.name)||category(i).isEmpty())continue;
+            // Preserve the original price for high-tier goods already in existing saves.
             String n=i.name.toLowerCase(java.util.Locale.ROOT);
-            // Ordinary equipment only: quest artefacts keep their normal acquisition path.
-            if(!("Оружие".equals(i.category)||"Броня".equals(i.category)||"Украшения".equals(i.category)))continue;
-            if(!(n.startsWith("даэдр")||n.startsWith("эбонит")||n.startsWith("дракон")||n.startsWith("сталгрим")))continue;
-            Offer o=new Offer(i.id,1,Math.max(50,Math.min(500,i.value/10)));if(valid(o))a.add(o);
+            boolean elite=("Оружие".equals(i.category)||"Броня".equals(i.category))&&(n.startsWith("даэдр")||n.startsWith("эбонит")||n.startsWith("дракон")||n.startsWith("сталгрим"));
+            int price=elite?Math.max(50,Math.min(500,i.value/10)):"Внешность".equals(category(i))?Math.max(10,Math.min(150,i.value/5)):Math.max(1,Math.min(500,(i.value+9)/10));
+            Offer o=new Offer(i.id,1,price);if(valid(o))a.add(o);
         }return a;
+    }
+    static boolean fits(GameEngine g,Offer o){
+        if(!valid(o))return false;ItemCatalog.Item i=ItemCatalog.find(o.item);
+        return g.progress.quantity(o.item)<=Integer.MAX_VALUE-o.quantity&&(i.weight<=0||g.progress.carryWeight()+i.weight*o.quantity<=g.progress.carryLimit()+0.00001);
     }
     public static ArrayList<Offer> parse(String json) throws Exception{
         if(json==null||json.length()>65536)throw new IllegalArgumentException("Слишком большой каталог");
@@ -64,6 +88,10 @@ public final class FixShopCatalog {
     }
     public static JSONArray encode(java.util.List<Offer> offers){JSONArray a=new JSONArray();for(Offer o:offers)try{a.put(new JSONObject().put("item",o.item).put("quantity",o.quantity).put("price",o.price));}catch(Exception ignored){}return a;}
     public static boolean redeem(GameEngine g,Offer o){
-        return valid(o)&&g.progress.addItem(o.item,o.quantity);
+        if(!fits(g,o))return false;
+        // These inventory entries are mirrors of the engine counters.
+        if("Лечебное зелье".equals(o.item)){if(g.potions>Integer.MAX_VALUE-o.quantity)return false;g.potions+=o.quantity;g.progress.sync(g);return true;}
+        if("Зелье магии".equals(o.item)){if(g.manaPotions>Integer.MAX_VALUE-o.quantity)return false;g.manaPotions+=o.quantity;g.progress.sync(g);return true;}
+        return g.progress.addItem(o.item,o.quantity);
     }
 }

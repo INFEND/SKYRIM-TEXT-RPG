@@ -16,9 +16,11 @@ public final class FixShopState {
     final java.util.HashSet<Integer> collectionRewards=new java.util.HashSet<>();
     public String customCatalog="[]";
     public int pendingVouchers(){int n=0;for(int i=0;i<history.length();i++){JSONObject e=history.optJSONObject(i);if(e!=null&&"PENDING".equals(e.optString("state")))n++;}return n;}
-    public boolean reserve(GameEngine g,FixShopCatalog.Offer o){
+    public boolean reserve(GameEngine g,FixShopCatalog.Offer o){return reserve(g,o,1);}
+    public boolean reserve(GameEngine g,FixShopCatalog.Offer base,int packs){
+        FixShopCatalog.Offer o=FixShopCatalog.multiply(base,packs);
         if(!g.started||"COMBAT".equals(g.mode)||g.road.pending()||!FixShopCatalog.valid(o)||g.fixSpent>Long.MAX_VALUE-o.price||pendingVouchers()>=200)return false;
-        try{JSONObject e=new JSONObject().put("id",key(o.title(),o.price)).put("title",o.title()).put("detail","Товар ожидает получения").put("price",o.price).put("day",g.day).put("state","PENDING").put("item",o.item).put("quantity",o.quantity);history.put(e);g.fixSpent+=o.price;return true;}catch(Exception ex){return false;}
+        try{JSONObject e=new JSONObject().put("id",FixShopCatalog.productId(base)).put("title",o.title()).put("detail","Товар ожидает получения").put("packs",packs).put("unitQuantity",base.quantity).put("unitPrice",base.price).put("price",o.price).put("day",g.day).put("state","PENDING").put("item",o.item).put("quantity",o.quantity);history.put(e);g.fixSpent+=o.price;return true;}catch(Exception ex){return false;}
     }
     public boolean reserveBundle(GameEngine g,FixShopCatalog.Bundle b){
         if(!g.started||"COMBAT".equals(g.mode)||g.road.pending()||!FixShopCatalog.validBundle(b)||g.fixSpent>Long.MAX_VALUE-b.price||pendingVouchers()>=200)return false;
@@ -35,12 +37,13 @@ public final class FixShopState {
         JSONObject e=history.optJSONObject(index);if(!g.started||"COMBAT".equals(g.mode)||g.road.pending()||e==null||!"PENDING".equals(e.optString("state"))||g.fixSpent<e.optInt("price"))return false;
         try{e.put("state","REFUNDED").put("detail","Возврат до получения");g.fixSpent-=e.optInt("price");return true;}catch(Exception ex){return false;}
     }
-    public int distinctApplied(){java.util.HashSet<String> ids=new java.util.HashSet<>();for(int i=0;i<history.length();i++){JSONObject e=history.optJSONObject(i);if(e!=null&&!"PENDING".equals(e.optString("state"))&&!"REFUNDED".equals(e.optString("state")))ids.add(e.optString("id"));}return ids.size();}
+    public int distinctApplied(){java.util.HashSet<String> ids=new java.util.HashSet<>();for(int i=0;i<history.length();i++){JSONObject e=history.optJSONObject(i);if(e!=null&&!"PENDING".equals(e.optString("state"))&&!"REFUNDED".equals(e.optString("state")))ids.add(e.optString("item").isEmpty()?e.optString("id"):"item:"+e.optString("item"));}return ids.size();}
 
     public boolean claimCollection(GameEngine g,int threshold){
         if(threshold!=5&&threshold!=15&&threshold!=30&&threshold!=50||distinctApplied()<threshold||!collectionRewards.add(threshold))return false;
         g.addXp(threshold*10);return true;
     }
+    public long purchasedQuantity(String item){long n=0;for(int i=0;i<history.length();i++){JSONObject e=history.optJSONObject(i);if(e!=null&&item.equals(e.optString("item"))&&!"REFUNDED".equals(e.optString("state")))n+=Math.max(0,e.optInt("quantity"));}return n;}
     public boolean favorite(String id){return favorites.contains(id);}
     public void toggle(String id){if(!favorites.remove(id))favorites.add(id);}
     public int count(String id){int n=0;for(int i=0;i<history.length();i++){JSONObject e=history.optJSONObject(i);if(e!=null&&id.equals(e.optString("id"))&&!"REFUNDED".equals(e.optString("state")))n++;}return n;}
