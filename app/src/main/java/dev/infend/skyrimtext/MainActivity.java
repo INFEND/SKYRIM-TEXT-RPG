@@ -1609,7 +1609,9 @@ public final class MainActivity extends Activity {
         boolean canonical="CANON".equals(game.mode)||("COMBAT".equals(game.mode)&&("CANONICAL".equals(game.battleKind)||"FACTION".equals(game.battleKind)));
         canonical=canonical||ItachiStory.MODE.equals(game.mode)||LiviaStory.MODE.equals(game.mode)||("COMBAT".equals(game.mode)&&"LIVIA_DUEL".equals(game.battleKind))||KatherineStory.MODE.equals(game.mode)||AlmaStory.MODE.equals(game.mode)||("COMBAT".equals(game.mode)&&("KATHERINE".equals(game.battleKind)||"ALMA".equals(game.battleKind)));
         canonical=canonical||game.road.pending()||RoadEvents.MODE.equals(game.mode)||("COMBAT".equals(game.mode)&&game.battleKind.startsWith("ROAD_QUEST:"));
-        if(prefs.getBoolean("ai_enabled",false)&&!canonical){if("WORLD".equals(game.mode)&&!game.road.pending())renderCityArchitecture();renderAiGame();return;}
+        canonical=canonical||SolitudeCity.isMode(game.mode);
+        if(prefs.getBoolean("ai_enabled",false)&&!canonical&&"WORLD".equals(game.mode)&&!game.road.pending())renderCityArchitecture();
+        if(prefs.getBoolean("ai_enabled",false)&&!canonical){renderAiGame();return;}
         GameEngine.Scene s=game.scene();section(s.kicker,s.title,"");
         if(LocationGalleryView.hasGallery(game.progress.location)){
             content.addView(sceneGallery(game.progress.location),lp(-1,-2));
@@ -1727,6 +1729,13 @@ public final class MainActivity extends Activity {
             if("Рыночная площадь".equals(place))d=0;
         }
         final int district=d;
+        int shop=-1;if("Солитьюд".equals(city))for(int i=0;i<SolitudeShops.NAMES.length;i++)if(SolitudeShops.NAMES[i].equals(place))shop=i;
+        final int localShop=shop;
+        if(localShop>=0){new RuneDialogBuilder(this,accent()).setTitle(place).setView(panel).setPositiveButton("Посетить лавку",(dialog,w)->{
+            if(!city.equals(game.progress.location)||!"WORLD".equals(game.mode)||game.road.pending())return;
+            if(aiClient!=null)aiClient.cancel();if(localAiClient!=null)localAiClient.cancel();
+            game.choose("SOLITUDE:open");game.choose("SOLITUDE:visit:"+SolitudeShops.district(localShop));game.choose("SOLITUDE:store:"+localShop);save();tab=0;render();
+        }).setNegativeButton("Закрыть",null).show();return;}
         if(district>=0){
             new RuneDialogBuilder(this,accent()).setTitle(place).setView(panel).setPositiveButton("Местные занятия",(dialog,w)->{
                 if(!city.equals(game.progress.location)||!"WORLD".equals(game.mode)||game.road.pending())return;

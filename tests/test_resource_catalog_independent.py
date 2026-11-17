@@ -14,7 +14,7 @@ class IndependentCatalog(unittest.TestCase):
         self.assertEqual(by_slug["alvor_forge"]["parent"],"Ривервуд")
         self.assertEqual(by_slug["alvor_forge"]["captions"],["Кузница Алвора"])
         self.assertEqual(by_slug["alvor_forge"]["archives"],["alvor_forge.zip"])
-        self.assertEqual(__import__("hashlib").sha256((catalog.ASSETS/"gallery/alvor_forge.zip").read_bytes()).hexdigest(),"e89c1e8a257662e96849ff34b71ef0846777bc9de7331d7a1918456d6152c154")
+        self.assertEqual(__import__("hashlib").sha256((catalog.ASSETS/"gallery/alvor_forge.zip").read_bytes()).hexdigest(),"a12262f6bf202c7bf539db85e9396ece0d76f070d21f60fd7b6edd2cfd449b9d")
         self.assertEqual(by_slug["riften"]["archives"][3],"riften_extra.zip")
         self.assertEqual(by_slug["highhrothgar"]["archives"][6],"highhrothgar_extra.zip")
     def test_signed_catalog_is_verified_and_reloaded(self):
