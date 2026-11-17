@@ -75,6 +75,12 @@ final class LiviaStory {
         else {memory="Искупление".equals(result)?"Ливия сложила полномочия и обязалась помогать семьям погибших.":"Ливия приняла прощение и обязалась отвечать за свои приказы.";g.mode=MODE;}
         g.addXp(100);
     }
+    boolean fixRestore(GameEngine g){
+        if(!g.fixShop.editorEnabled||stage!=4||!"Последний поединок".equals(ending)||!"WORLD".equals(g.mode)&&!"RESULT".equals(g.mode))return false;
+        ending="Прощение";following=false;romance=false;trust=Math.max(35,trust);memory="Ливия возвращена к жизни магией фикскоинов. Она свободна, но отношения предстоит восстановить.";
+        try{g.sceneState.setContext(g.day,g.hour,g.progress.location);org.json.JSONArray facts=g.sceneState.npcFacts();for(int i=0;i<facts.length();i++){org.json.JSONObject n=facts.optJSONObject(i);if(n!=null&&matches(n.optString("title"))&&"DEAD".equals(n.optString("status")))g.sceneState.fixNpc(n.optString("id"),50,true);}}catch(Exception ignored){}
+        return true;
+    }
     void defeatedInDuel(GameEngine g){if(stage==3&&"LIVIA_DUEL".equals(g.battleKind)){memory="Ливия остановила поединок, когда ты упал. Она не нанесла последнего удара. Ты можешь вернуться и принять решение.";g.message+="\n\n"+memory;}}
     int assist(int turn,int remaining){return active()&&turn%2==0?Math.min(Math.max(0,remaining),8+Math.min(12,victories/3)):0;}
     int protect(int incoming){return active()?Math.min(Math.max(0,incoming-1),3+Math.min(4,victories/5)):0;}

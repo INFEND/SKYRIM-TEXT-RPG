@@ -4049,6 +4049,7 @@ public final class MainActivity extends Activity {
         section("ЛЕТОПИСЬ СЕВЕРА","Журнал","Выбирай задание, чтобы увидеть описание и текущую цель.");
         renderFactionJournal();
         renderRoadQuestJournal();
+        for(JSONObject q:game.fixShop.world.quests){String status=q.optInt("stage")==0?"Начало: "+q.optString("start"):q.optInt("stage")==1?"Цель: "+q.optString("destination"):"Завершено";actionButton(q.optString("title"),status,false,()->{if(!livingBusy()){tab=0;render();}});}
         if(!game.fixShop.world.characters.isEmpty())actionButton("Авторские персонажи","Спутники и отношения",false,this::fixCharacters);
         if(game.fixShop.world.stable&&FixShopWorld.estateHere(game))actionButton("Хранилище поместий","Личный сундук",false,this::fixStorage);
         for(int i=0;i<FixShopAdventure.TITLES.length;i++)if(FixShopAdventure.stage(game,i)>0){final int n=i;actionButton(FixShopAdventure.TITLES[i],FixShopAdventure.objective(game,i),false,()->{if(livingBusy())return;closeLivingDialog();tab=0;render();});}
@@ -4306,8 +4307,8 @@ public final class MainActivity extends Activity {
         fixOffer(a,"Коллекция покупок","Уникальных применённых товаров: "+game.fixShop.distinctApplied(),"Коллекции","armor",3,0,this::fixCollections);
         fixOffer(a,"Создать спутника","Имя, характер и боевой класс | 12 общих слотов персонажей","Персонажи","hero",5,750,()->fixCreateCharacter(true));
         fixOffer(a,"Мои персонажи","Управление авторскими NPC и спутниками","Персонажи","hero",3,0,this::fixCharacters);
-        for(int i=1;i<=FixShopWorld.MOUNTS.length;i++){final int n=i;fixDirect(a,FixShopWorld.MOUNTS[i-1],"Снижение расхода сил в дороге; заменяет активный особый транспорт","Транспорт","map",4,350,()->game.fixShop.world.buyMount(n));}
-        for(int i=1;i<=FixShopWorld.PETS.length;i++){final int n=i;fixDirect(a,FixShopWorld.PETS[i-1],"Помощь в бою каждый третий ход; заменяет активного особого питомца","Питомцы","hero",4,250,()->game.fixShop.world.buyPet(n));}
+        for(int i=1;i<=FixShopWorld.MOUNTS.length;i++){final int n=i;if(game.fixShop.world.ownMount(i))fixOffer(a,FixShopWorld.MOUNTS[i-1],game.fixShop.world.mount==i?"Активен":"Приобретено | выбрать","Транспорт","map",4,0,()->{if(!livingBusy()&&game.fixShop.world.selectMount(n)){save();livingFixShop();}});else fixDirect(a,FixShopWorld.MOUNTS[i-1],"Снижение расхода сил в дороге","Транспорт","map",4,350,()->game.fixShop.world.buyMount(n));}
+        for(int i=1;i<=FixShopWorld.PETS.length;i++){final int n=i;if(game.fixShop.world.ownPet(i))fixOffer(a,FixShopWorld.PETS[i-1],game.fixShop.world.pet==i?"Активен":"Приобретено | выбрать","Питомцы","hero",4,0,()->{if(!livingBusy()&&game.fixShop.world.selectPet(n)){save();livingFixShop();}});else fixDirect(a,FixShopWorld.PETS[i-1],"Помощь в бою каждый третий ход","Питомцы","hero",4,250,()->game.fixShop.world.buyPet(n));}
         fixDirect(a,"Личное хранилище","Общий сундук для принадлежащих герою поместий","Недвижимость","armor",3,200,()->{if(game.fixShop.world.stable)return false;game.fixShop.world.stable=true;return true;});
         if(game.fixShop.world.stable)fixOffer(a,"Открыть хранилище","Доступно в собственном поместье","Недвижимость","armor",3,0,this::fixStorage);
 
@@ -4319,6 +4320,9 @@ public final class MainActivity extends Activity {
         if(game.fixShop.editorEnabled){
             fixOffer(a,"Создать NPC","Имя, характер, класс и отношения","Редактор мира","hero",5,300,()->fixCreateCharacter(false));
             fixOffer(a,"Создать локацию","Авторское место внутри текущей локации карты","Редактор мира","map",5,500,this::fixCreatePlace);
+            fixOffer(a,"Создать задание","Собственное поручение с двумя местами и целью","Редактор мира","journal",5,300,this::fixCreateQuest);
+            fixOffer(a,"Нити судьбы","Изменить финал купленного приключения без повторной награды","Редактор мира","journal",5,250,this::fixRewriteEnding);
+            if("Последний поединок".equals(game.livia.ending))fixDirect(a,"Воскресить Ливию","Возвращение после гибели в поединке; без повторного опыта","Редактор мира","health",5,300,()->game.livia.fixRestore(game));
             fixOffer(a,"Врата странника","Мгновенный переход в посещённую локацию","Редактор мира","map",4,100,this::fixTeleportChoice);
             fixDirect(a,"Слава героя","+10 репутации","Редактор мира","hero",2,50,()->{if(game.reputation>Integer.MAX_VALUE-10)return false;game.reputation+=10;return true;});
             fixOffer(a,"Второй шанс","Воскресить NPC из журнала ИИ-сцен; не откатывает сюжетные квесты","Редактор мира","health",2,300,()->fixNpcChoice(true,false));
@@ -4358,14 +4362,14 @@ public final class MainActivity extends Activity {
         final int[] role={0};TextView roleView=text("Класс: "+FixShopWorld.ROLES[0],15,accent(),true);roleView.setPadding(0,dp(10),0,dp(10));panel.addView(roleView);roleView.setOnClickListener(v->new RuneDialogBuilder(this,accent()).setTitle("Класс").setItems(FixShopWorld.ROLES,(d,i)->{role[0]=i;roleView.setText("Класс: "+FixShopWorld.ROLES[i]);}).show());
         int price=companion?750:300;String title=companion?"Создать спутника":"Создать NPC";
         AlertDialog d=new RuneDialogBuilder(this,accent()).setTitle(title+" | "+price+" F").setView(panel).setNegativeButton("Отмена",null).setPositiveButton("Создать",null).create();d.show();
-        d.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v->{String n=name.getText().toString(),bio=desc.getText().toString();if(fixApply(title,n,price,()->game.fixShop.world.addCharacter(n,bio,role[0],companion))){d.dismiss();fixCharacters();}});
+        d.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v->{String n=name.getText().toString(),bio=desc.getText().toString();if(fixApply(title,n,price,()->game.fixShop.world.addCharacter(n,bio,role[0],companion,game.progress.location))){d.dismiss();fixCharacters();}});
     }
     private void fixCharacters(){
         LinearLayout panel=column();FixShopWorld w=game.fixShop.world;
         if(w.characters.isEmpty())addText(panel,"Авторских персонажей пока нет.",14,MUTED,false,8);
-        for(int i=0;i<w.characters.size();i++){final int index=i;JSONObject c=w.characters.get(i);LinearLayout tile=livingTile(panel);addText(tile,c.optString("name"),18,accent(),true,4);addText(tile,FixShopWorld.ROLES[c.optInt("role")]+(w.active==i?" | В отряде":""),13,MUTED,false,6);addText(tile,c.optString("description"),14,TEXT,false,6);livingLine(tile,"Отношения",c.optInt("relation")+" / 100",accent());
-            livingLink(tile,"Поговорить","+5 отношения / день","hero",()->{if(!livingBusy()&&w.talk(index,game.day)){save();fixCharacters();}else toast("Сегодня разговор уже состоялся");});
-            if(c.optBoolean("companion"))livingLink(tile,w.active==i?"Отпустить":"Взять в отряд","","hero",()->{if(livingBusy())return;if(w.active==index?w.dismiss():w.recruit(index)){save();render();fixCharacters();}});
+        for(int i=0;i<w.characters.size();i++){final int index=i;JSONObject c=w.characters.get(i);LinearLayout tile=livingTile(panel);addText(tile,c.optString("name"),18,accent(),true,4);addText(tile,FixShopWorld.ROLES[c.optInt("role")]+(w.active==i?" | В отряде":""),13,MUTED,false,6);addText(tile,c.optString("description"),14,TEXT,false,6);addText(tile,"Место: "+c.optString("home"),12,MUTED,false,6);livingLine(tile,"Отношения",c.optInt("relation")+" / 100",accent());
+            livingLink(tile,"Поговорить","+5 отношения / день","hero",()->{if(!livingBusy()&&w.present(game,index)&&w.talk(index,game.day)){save();fixCharacters();}else toast("Сегодня разговор уже состоялся");});
+            if(c.optBoolean("companion"))livingLink(tile,w.active==i?"Отпустить":"Взять в отряд","","hero",()->{if(livingBusy())return;if(w.active==index?w.dismiss():w.present(game,index)&&w.recruit(index)){save();render();fixCharacters();}});
         }livingDialog("Авторские персонажи",panel);
     }
     private void fixCreatePlace(){
@@ -4374,6 +4378,21 @@ public final class MainActivity extends Activity {
         EditText name=livingField(panel,"Название","До 60 символов",false),desc=livingField(panel,"Описание","До 400 символов",false);
         AlertDialog d=new RuneDialogBuilder(this,accent()).setTitle("Создать локацию | 500 F").setView(panel).setNegativeButton("Отмена",null).setPositiveButton("Создать",null).create();d.show();
         d.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v->{String n=name.getText().toString();if(fixApply("Создать локацию",n,500,()->game.fixShop.world.addPlace(n,desc.getText().toString(),anchor))){d.dismiss();livingFixShop();}});
+    }
+    private void fixCreateQuest(){
+        if(livingBusy()||!game.fixShop.editorEnabled)return;
+        LinearLayout panel=column();panel.setPadding(dp(12),dp(8),dp(12),dp(8));String start=game.progress.location;
+        addText(panel,"Начало: "+start,14,accent(),true,8);EditText name=livingField(panel,"Название","До 60 символов",false),desc=livingField(panel,"Сюжет поручения","До 400 символов",false);
+        final String[] target={""};TextView choose=text("Выбрать место назначения",14,accent(),true);choose.setPadding(0,dp(10),0,dp(10));panel.addView(choose);
+        java.util.ArrayList<String> places=new java.util.ArrayList<>();for(WorldAtlas.Place place:WorldAtlas.all())if(!start.equals(place.name))places.add(place.name);java.util.Collections.sort(places);
+        choose.setOnClickListener(v->new RuneDialogBuilder(this,accent()).setTitle("Место назначения").setItems(places.toArray(new String[0]),(d,i)->{target[0]=places.get(i);choose.setText(target[0]);}).setNegativeButton("Отмена",null).show());
+        AlertDialog d=new RuneDialogBuilder(this,accent()).setTitle("Создать задание | 300 F").setView(panel).setNegativeButton("Отмена",null).setPositiveButton("Создать",null).create();d.show();d.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v->{String n=name.getText().toString();if(fixApply("Создать задание",n,300,()->game.fixShop.world.addQuest(n,desc.getText().toString(),start,target[0]))){d.dismiss();livingFixShop();}});
+    }
+    private void fixRewriteEnding(){
+        if(livingBusy()||!game.fixShop.editorEnabled)return;java.util.ArrayList<Integer> ids=new java.util.ArrayList<>();java.util.ArrayList<String> names=new java.util.ArrayList<>();
+        for(int i=0;i<FixShopAdventure.TITLES.length;i++)if(FixShopAdventure.stage(game,i)>=4){ids.add(i);names.add(FixShopAdventure.TITLES[i]+" | "+FixShopAdventure.objective(game,i));}
+        if(ids.isEmpty()){toast("Нет завершённых приключений магазина");return;}
+        new RuneDialogBuilder(this,accent()).setTitle("Нити судьбы | 250 F").setItems(names.toArray(new String[0]),(d,i)->{int n=ids.get(i);fixConfirm("Нити судьбы",FixShopAdventure.TITLES[n]+" | смена финала, без повторной награды",250,()->FixShopAdventure.rewriteEnding(game,n),this::livingFixShop);}).setNegativeButton("Отмена",null).show();
     }
     private void fixStorage(){
         if(livingBusy()||!FixShopWorld.estateHere(game)){toast("Хранилище доступно в собственном поместье");return;}

@@ -472,7 +472,7 @@ public final class AiStoryClient {
                 .append(", магия ").append(game.magicka).append('/').append(game.maxMagicka)
                 .append(", септимы ").append(game.gold).append(", атака ").append(game.effectiveAttack())
                 .append(", защита ").append(game.effectiveArmor()).append(", репутация ").append(game.reputation)
-                .append(", вес ").append(game.progress.carryWeight()).append("/50 кг\n");
+                .append(", вес ").append(game.progress.carryWeight()).append("/").append(game.progress.carryLimit()).append(" кг\n");
         out.append("Лечебные зелья ").append(game.potions).append(", зелья магии ").append(game.manaPotions).append('\n');
         out.append("Потребности (100 — норма): сытость ").append(game.needs.food).append(", вода ").append(game.needs.water).append(", бодрость ").append(game.needs.awake).append(", отдых ").append(game.needs.rest).append(". Штраф проверок: ").append(game.needs.penalty()).append(" п.п. Учитывай его при оценке риска.\n");
         out.append("Торговый капитал ").append(game.economy.capital).append(", доход за день ").append(game.economy.income()).append(", накоплено ").append(game.economy.accrued).append(". Эти поля и фикскоины управляются только движком.\n");
@@ -481,7 +481,7 @@ public final class AiStoryClient {
         if(game.enemyHp>0)
             out.append("ПРОТИВНИК: ").append(game.enemyName).append(", HP ").append(game.enemyHp)
                     .append('/').append(game.enemyMaxHp).append(", урон ").append(game.enemyDamage).append('\n');
-        out.append("\\n").append(game.fixShop.world.context());
+        out.append('\n').append(game.fixShop.world.context()).append('\n');
         String confirmedFacts=game.sceneState==null?"":game.sceneState.confirmedContext();
         if(!game.alma.enabled){StringBuilder allowed=new StringBuilder();for(String line:confirmedFacts.split("\\n"))if(!line.contains(AlmaStory.ID)&&!line.contains("alma_serana"))allowed.append(line).append('\n');confirmedFacts=allowed.toString();}
         out.append("ПОДТВЕРЖДЁННЫЕ ФАКТЫ СЦЕНЫ (только записи движка):\n");

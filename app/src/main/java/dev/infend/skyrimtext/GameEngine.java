@@ -380,7 +380,7 @@ public final class GameEngine {
         lastCheckChance=lastCheckRoll=-1;
         if(RoadEvents.MODE.equals(mode)){road.choose(this,action);return;}
         if(road.pending()&&!"COMBAT".equals(mode)){if("GO_WORLD".equals(action))road.resume(this);return;}
-        if(action.startsWith("FIXPLACE:")||action.startsWith("FIXHOME:")){FixShopWorld.choose(this,action);return;}
+        if(action.startsWith("FIXPLACE:")||action.startsWith("FIXHOME:")||action.startsWith("FIXNPC:")||action.startsWith("FIXCUSTOM:")){FixShopWorld.choose(this,action);return;}
         if(action.startsWith("FIXQUEST:")){FixShopAdventure.choose(this,action);return;}
         if(action.startsWith("ROAD:"))return;
         if(action.startsWith("ROAD_TARGET:")){road.selectTarget(this,action);return;}

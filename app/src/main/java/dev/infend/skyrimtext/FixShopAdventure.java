@@ -40,5 +40,10 @@ public final class FixShopAdventure {
       }return false;
     }
     static void endings(GameEngine g,GameEngine.Scene scene){if(!safe(g))return;for(int i=0;i<TITLES.length;i++)if(stage(g,i)==3){scene.add("FIXQUEST:"+i+":reward","Передать заказчику | "+TITLES[i],"+500 септимов");scene.add("FIXQUEST:"+i+":truth","Открыть правду | "+TITLES[i],"+15 репутации и +100 септимов");}}
+    static boolean rewriteEnding(GameEngine g,int i){
+        if(!safe(g)||!g.fixShop.editorEnabled||stage(g,i)<4)return false;
+        int old=stage(g,i);g.fixShop.adventureStage[i]=old==4?5:4;
+        g.message="Нити судьбы: "+TITLES[i]+". "+objective(g,i)+". Награды не начисляются повторно, уже полученные не изымаются.";g.recordVisualEvent(g.message);return true;
+    }
     static void victory(GameEngine g,String kind){for(int i=0;i<TITLES.length;i++)if(kind.equals("FIX_QUEST:"+i)&&stage(g,i)==2){g.fixShop.adventureStage[i]=3;g.message+="\n\n"+LOOT[i];}}
 }
