@@ -4307,6 +4307,8 @@ public final class MainActivity extends Activity {
         fixOffer(a,"Коллекция покупок","Уникальных применённых товаров: "+game.fixShop.distinctApplied(),"Коллекции","armor",3,0,this::fixCollections);
         fixOffer(a,"Создать спутника","Имя, характер и боевой класс | 12 общих слотов персонажей","Персонажи","hero",5,750,()->fixCreateCharacter(true));
         fixOffer(a,"Мои персонажи","Управление авторскими NPC и спутниками","Персонажи","hero",3,0,this::fixCharacters);
+        if(game.fixShop.world.companionSlots<4)fixDirect(a,"Расширение отряда","+1 слот авторского спутника | до 4 одновременно","Персонажи","hero",3,250,()->game.fixShop.world.buySlot());
+        for(int i=0;i<FixShopWorld.UNIQUE_NAMES.length;i++){final int n=i;String name=FixShopWorld.UNIQUE_NAMES[i];if(game.fixShop.world.ownsUnique(i))fixOffer(a,name,"Приобретено | "+FixShopWorld.UNIQUE_HOME[i],"Персонажи","hero",4,0,this::fixCharacters);else fixDirect(a,name,FixShopWorld.UNIQUE_BIO[i]+" | Встреча: "+FixShopWorld.UNIQUE_HOME[i],"Персонажи","hero",4,450,()->game.fixShop.world.buyUnique(n));}
         for(int i=1;i<=FixShopWorld.MOUNTS.length;i++){final int n=i;if(game.fixShop.world.ownMount(i))fixOffer(a,FixShopWorld.MOUNTS[i-1],game.fixShop.world.mount==i?"Активен":"Приобретено | выбрать","Транспорт","map",4,0,()->{if(!livingBusy()&&game.fixShop.world.selectMount(n)){save();livingFixShop();}});else fixDirect(a,FixShopWorld.MOUNTS[i-1],"Снижение расхода сил в дороге","Транспорт","map",4,350,()->game.fixShop.world.buyMount(n));}
         for(int i=1;i<=FixShopWorld.PETS.length;i++){final int n=i;if(game.fixShop.world.ownPet(i))fixOffer(a,FixShopWorld.PETS[i-1],game.fixShop.world.pet==i?"Активен":"Приобретено | выбрать","Питомцы","hero",4,0,()->{if(!livingBusy()&&game.fixShop.world.selectPet(n)){save();livingFixShop();}});else fixDirect(a,FixShopWorld.PETS[i-1],"Помощь в бою каждый третий ход","Питомцы","hero",4,250,()->game.fixShop.world.buyPet(n));}
         fixDirect(a,"Личное хранилище","Общий сундук для принадлежащих герою поместий","Недвижимость","armor",3,200,()->{if(game.fixShop.world.stable)return false;game.fixShop.world.stable=true;return true;});
@@ -4366,11 +4368,11 @@ public final class MainActivity extends Activity {
         d.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v->{String n=name.getText().toString(),bio=desc.getText().toString();if(fixApply(title,n,price,()->game.fixShop.world.addCharacter(n,bio,role[0],companion,game.progress.location))){d.dismiss();fixCharacters();}});
     }
     private void fixCharacters(){
-        LinearLayout panel=column();FixShopWorld w=game.fixShop.world;
+        LinearLayout panel=column();FixShopWorld w=game.fixShop.world;addText(panel,"Отряд: "+w.partySize()+" / "+w.companionSlots,16,accent(),true,8);
         if(w.characters.isEmpty())addText(panel,"Авторских персонажей пока нет.",14,MUTED,false,8);
-        for(int i=0;i<w.characters.size();i++){final int index=i;JSONObject c=w.characters.get(i);LinearLayout tile=livingTile(panel);addText(tile,c.optString("name"),18,accent(),true,4);addText(tile,FixShopWorld.ROLES[c.optInt("role")]+(w.active==i?" | В отряде":""),13,MUTED,false,6);addText(tile,c.optString("description"),14,TEXT,false,6);addText(tile,"Место: "+c.optString("home"),12,MUTED,false,6);livingLine(tile,"Отношения",c.optInt("relation")+" / 100",accent());
+        for(int i=0;i<w.characters.size();i++){final int index=i;JSONObject c=w.characters.get(i);LinearLayout tile=livingTile(panel);addText(tile,c.optString("name"),18,accent(),true,4);addText(tile,FixShopWorld.ROLES[c.optInt("role")]+(w.inParty(i)?" | В отряде":""),13,MUTED,false,6);addText(tile,c.optString("description"),14,TEXT,false,6);addText(tile,"Место: "+c.optString("home"),12,MUTED,false,6);livingLine(tile,"Отношения",c.optInt("relation")+" / 100",accent());
             livingLink(tile,"Поговорить","+5 отношения / день","hero",()->{if(!livingBusy()&&w.present(game,index)&&w.talk(index,game.day)){save();fixCharacters();}else toast("Сегодня разговор уже состоялся");});
-            if(c.optBoolean("companion"))livingLink(tile,w.active==i?"Отпустить":"Взять в отряд","","hero",()->{if(livingBusy())return;if(w.active==index?w.dismiss():w.present(game,index)&&w.recruit(index)){save();render();fixCharacters();}});
+            if(c.optBoolean("companion"))livingLink(tile,w.inParty(i)?"Отпустить":"Взять в отряд","","hero",()->{if(livingBusy())return;if(w.inParty(index)?w.dismiss(index):w.present(game,index)&&w.recruit(index)){save();render();fixCharacters();}else toast("Спутник не рядом или отряд заполнен");});
         }livingDialog("Авторские персонажи",panel);
     }
     private void fixCreatePlace(){
@@ -4521,7 +4523,7 @@ public final class MainActivity extends Activity {
             android.graphics.Bitmap bitmap=android.graphics.BitmapFactory.decodeStream(in);
             if(bitmap!=null){android.widget.ImageView view=new android.widget.ImageView(this);view.setImageBitmap(bitmap);view.setScaleType(android.widget.ImageView.ScaleType.FIT_CENTER);return view;}
         }catch(Exception ignored){}
-        return new FixShopArtwork(this,title,offer.glyph,offer.color);
+        return new FixShopArtwork(this,title,offer.glyph,offer.color,offer.category);
     }
     private void fixCard(LinearLayout line,FixOffer offer,LinearLayout items){
         LinearLayout tile=column();tile.setPadding(dp(10),dp(9),dp(10),dp(10));tile.setBackground(bg(0xff121212,Color.TRANSPARENT,18));line.addView(tile,new LinearLayout.LayoutParams(0,-2,1));

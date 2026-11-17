@@ -12,6 +12,8 @@ public final class FixShopWorld {
     static final int MAX_CHARACTERS=12, MAX_PLACES=12;
     int mount=0,pet=0,active=-1,mountOwned=0,petOwned=0;
     boolean stable=false;
+    int companionSlots=1;
+    final java.util.LinkedHashSet<Integer> extraActive=new java.util.LinkedHashSet<>();
     String queuedEncounter="";
     final ArrayList<JSONObject> characters=new ArrayList<>(),places=new ArrayList<>(),quests=new ArrayList<>();
     final JSONObject storage=new JSONObject();
@@ -26,8 +28,16 @@ public final class FixShopWorld {
     int petDamage(int turn,int remaining){return pet>0&&turn%3==0?Math.min(Math.max(0,remaining),pet==2?7:5):0;}
     String petName(){return pet>0?PETS[pet-1]:"";}
     JSONObject activeCharacter(){return active>=0&&active<characters.size()?characters.get(active):null;}
-    String companionName(){JSONObject c=activeCharacter();return c==null?"":c.optString("name");}
-    int companionDamage(int turn,int remaining){JSONObject c=activeCharacter();return c==null||turn%2!=0?0:Math.min(Math.max(0,remaining),c.optInt("power",8));}
+    boolean inParty(int i){return i>=0&&(active==i||extraActive.contains(i));}
+    int partySize(){return (active>=0?1:0)+extraActive.size();}
+    boolean buySlot(){if(companionSlots>=4)return false;companionSlots++;return true;}
+    String companionName(){StringBuilder out=new StringBuilder();for(int i=0;i<characters.size();i++)if(inParty(i)){if(out.length()>0)out.append(", ");out.append(characters.get(i).optString("name"));}return out.toString();}
+    int companionDamage(int turn,int remaining){if(turn%2!=0)return 0;int damage=0;for(int i=0;i<characters.size();i++)if(inParty(i))damage+=characters.get(i).optInt("power",8);return Math.min(Math.max(0,remaining),damage);}
+    static final String[] UNIQUE_NAMES={"Эйра Снежная Клятва","Рунар Пепельный Страж","Мирель Лунная Стрела"};
+    static final String[] UNIQUE_HOME={"Вайтран","Винтерхолд","Рифтен"};
+    static final String[] UNIQUE_BIO={"Нордская наёмница, оставившая службу после гибели своего отряда. Сдержанна, верна обещаниям, не терпит предательства. В бою предпочитает меч и щит.","Бретонский маг, изучавший руны древних нордов. Ищет следы пропавшего наставника и осторожен с запретной магией. В бою использует разрушение.","Босмерская следопытка, проводившая караваны через Рифт. Ценит свободу, хороший юмор и честные сделки. Поддерживает героя точными выстрелами."};
+    boolean ownsUnique(int i){if(i<0||i>=UNIQUE_NAMES.length)return false;for(JSONObject c:characters)if(UNIQUE_NAMES[i].equals(c.optString("name")))return true;return false;}
+    boolean buyUnique(int i){return i>=0&&i<UNIQUE_NAMES.length&&!ownsUnique(i)&&addCharacter(UNIQUE_NAMES[i],UNIQUE_BIO[i],i,true,UNIQUE_HOME[i]);}
     boolean addCharacter(String name,String description,int role,boolean companion){return addCharacter(name,description,role,companion,"Вайтран");}
     boolean addCharacter(String name,String description,int role,boolean companion,String home){
         name=clean(name,60);description=clean(description,400);
@@ -35,9 +45,10 @@ public final class FixShopWorld {
         for(JSONObject c:characters)if(name.equalsIgnoreCase(c.optString("name")))return false;
         try{characters.add(new JSONObject().put("name",name).put("description",description).put("role",role).put("companion",companion).put("home",home).put("power",role==1?12:role==2?10:8).put("relation",50).put("lastTalk",-1));return true;}catch(Exception e){return false;}
     }
-    boolean present(GameEngine g,int i){return i>=0&&i<characters.size()&&(active==i||g.progress.location.equals(characters.get(i).optString("home")));}
-    boolean recruit(int i){if(i<0||i>=characters.size()||!characters.get(i).optBoolean("companion")||active==i)return false;active=i;return true;}
-    boolean dismiss(){if(active<0)return false;active=-1;return true;}
+    boolean present(GameEngine g,int i){return i>=0&&i<characters.size()&&(inParty(i)||g.progress.location.equals(characters.get(i).optString("home")));}
+    boolean recruit(int i){if(i<0||i>=characters.size()||!characters.get(i).optBoolean("companion")||inParty(i)||partySize()>=companionSlots)return false;if(active<0)active=i;else extraActive.add(i);return true;}
+    boolean dismiss(int i){if(i==active&&active>=0){active=-1;if(!extraActive.isEmpty()){java.util.Iterator<Integer> it=extraActive.iterator();active=it.next();it.remove();}return true;}return extraActive.remove(i);}
+    boolean dismiss(){return dismiss(active);}
     boolean talk(int i,int day){if(i<0||i>=characters.size())return false;JSONObject c=characters.get(i);if(c.optInt("lastTalk",-1)==day||c.optInt("relation")>=100)return false;try{c.put("lastTalk",day).put("relation",Math.min(100,c.optInt("relation",50)+5));return true;}catch(Exception e){return false;}}
     boolean addPlace(String name,String description,String anchor){
         name=clean(name,60);description=clean(description,400);
@@ -84,13 +95,15 @@ public final class FixShopWorld {
         if(action.matches("FIXPLACE:[0-9]{1,2}"))return g.fixShop.world.visit(g,Integer.parseInt(action.substring(9)));
         return false;
     }
-    String context(){JSONObject c=activeCharacter();return c==null?"":"Авторский спутник: "+c.optString("name")+"; "+ROLES[c.optInt("role",0)]+"; "+c.optString("description")+"; отношение "+c.optInt("relation",50)+"/100.";}
-    JSONObject save(){JSONObject j=new JSONObject();try{j.put("queuedEncounter",queuedEncounter).put("mount",mount).put("pet",pet).put("mountOwned",mountOwned).put("petOwned",petOwned).put("quests",new JSONArray(quests)).put("active",active).put("stable",stable).put("storage",storage).put("characters",new JSONArray(characters)).put("places",new JSONArray(places));}catch(Exception ignored){}return j;}
+    String context(){StringBuilder out=new StringBuilder();for(int i=0;i<characters.size();i++)if(inParty(i)){JSONObject c=characters.get(i);if(out.length()>0)out.append('\n');out.append("Авторский спутник: ").append(c.optString("name")).append("; ").append(ROLES[c.optInt("role",0)]).append("; ").append(c.optString("description")).append("; отношение ").append(c.optInt("relation",50)).append("/100.");}return out.toString();}
+    JSONObject save(){JSONObject j=new JSONObject();try{j.put("queuedEncounter",queuedEncounter).put("mount",mount).put("pet",pet).put("mountOwned",mountOwned).put("petOwned",petOwned).put("quests",new JSONArray(quests)).put("active",active).put("companionSlots",companionSlots).put("extraActive",new JSONArray(extraActive)).put("stable",stable).put("storage",storage).put("characters",new JSONArray(characters)).put("places",new JSONArray(places));}catch(Exception ignored){}return j;}
     static FixShopWorld restore(JSONObject j){
         FixShopWorld w=new FixShopWorld();if(j==null)return w;
         w.mount=Math.max(0,Math.min(MOUNTS.length,j.optInt("mount")));w.pet=Math.max(0,Math.min(PETS.length,j.optInt("pet")));w.stable=j.optBoolean("stable");String encounter=j.optString("queuedEncounter","");if(RoadEvents.fixEventAllowed(encounter))w.queuedEncounter=encounter;w.mountOwned=(j.optInt("mountOwned")&3)|(w.mount>0?1<<(w.mount-1):0);w.petOwned=(j.optInt("petOwned")&3)|(w.pet>0?1<<(w.pet-1):0);
         JSONArray a=j.optJSONArray("characters");if(a!=null)for(int i=0;i<Math.min(a.length(),MAX_CHARACTERS);i++){JSONObject c=a.optJSONObject(i);if(c!=null&&w.addCharacter(c.optString("name"),c.optString("description"),c.optInt("role",-1),c.optBoolean("companion"),c.optString("home","Вайтран"))){JSONObject n=w.characters.get(w.characters.size()-1);try{n.put("relation",Math.max(0,Math.min(100,c.optInt("relation",50)))).put("lastTalk",c.optInt("lastTalk",-1));}catch(Exception ignored){}}}
+        w.companionSlots=Math.max(1,Math.min(4,j.optInt("companionSlots",1)));
         int active=j.optInt("active",-1);if(active>=0&&active<w.characters.size()&&w.characters.get(active).optBoolean("companion"))w.active=active;
+        JSONArray party=j.optJSONArray("extraActive");if(party!=null)for(int i=0;i<Math.min(12,party.length());i++)w.recruit(party.optInt(i,-1));
         a=j.optJSONArray("places");if(a!=null)for(int i=0;i<Math.min(a.length(),MAX_PLACES);i++){JSONObject c=a.optJSONObject(i);if(c!=null&&w.addPlace(c.optString("name"),c.optString("description"),c.optString("anchor")))try{w.places.get(w.places.size()-1).put("visits",Math.max(0,c.optInt("visits")));}catch(Exception ignored){}}
         a=j.optJSONArray("quests");if(a!=null)for(int i=0;i<Math.min(a.length(),12);i++){JSONObject q=a.optJSONObject(i);if(q!=null&&w.addQuest(q.optString("title"),q.optString("description"),q.optString("start"),q.optString("destination")))try{w.quests.get(w.quests.size()-1).put("stage",Math.max(0,Math.min(2,q.optInt("stage"))));}catch(Exception ignored){}}
         JSONObject stored=j.optJSONObject("storage");if(stored!=null){Iterator<String> keys=stored.keys();while(keys.hasNext()){String id=keys.next();if(w.canStore(id)&&stored.optInt(id)>0)try{w.storage.put(id,stored.optInt(id));}catch(Exception ignored){}}}return w;
