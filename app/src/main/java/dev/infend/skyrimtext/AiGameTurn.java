@@ -115,7 +115,7 @@ public final class AiGameTurn {
         String rawScene=limited(json.optString("scene",""),30000);
         String scene=limited(cleanScene(rawScene),30000);
         JSONArray array=json.optJSONArray("choices");
-        if((strictNew?scene.length():rawScene.length())<200||scene.isEmpty())throw new JSONException("ИИ вернул слишком короткую сцену");
+        if((strictNew&&scene.length()<200)||scene.isEmpty())throw new JSONException("ИИ вернул слишком короткую сцену");
         if(array==null||array.length()!=10)throw new JSONException("Нужно ровно десять вариантов ответа");
         if(json.has("effects")&&!json.isNull("effects")&&!(json.opt("effects") instanceof JSONObject))
             throw new JSONException("Эффекты должны быть JSON-объектом");

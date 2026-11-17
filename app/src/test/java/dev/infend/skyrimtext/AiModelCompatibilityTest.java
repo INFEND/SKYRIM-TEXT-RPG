@@ -47,6 +47,16 @@ public class AiModelCompatibilityTest {
         json.put("effects","goldDelta=500");
         AiGameTurn.parseModel(json.toString(),15);
     }
+    @Test public void legacySaveSurvivesStricterModelValidation() throws Exception {
+        JSONObject saved=AiGameTurn.parseModel(scene().toString(),15).save();
+        saved.getJSONArray("choices").getJSONObject(1).put("title","Действие 0!");
+        saved.put("scene","Ты замечаешь следы. effects={\"goldDelta\":0}");
+        AiGameTurn restored=AiGameTurn.restore(saved);
+        assertNotNull(restored);
+        assertEquals("Ты замечаешь следы.",restored.scene);
+        assertNotNull(AiGameTurn.restore(restored.save()));
+        assertEquals(10,restored.choices.size());
+    }
     @Test public void metadataIsNotStory() throws Exception {
         JSONObject json=scene();
         String original=json.getString("scene").trim();
