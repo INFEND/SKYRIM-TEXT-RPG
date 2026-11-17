@@ -1789,5 +1789,184 @@
         ]
       }
     }
+  },
+  {
+    "slug": "apprentice_stone",
+    "name": "Камень Ученика",
+    "captions": [
+      "Камень Ученика среди болот Хьялмарка"
+    ],
+    "aliases": [
+      "The Apprentice Stone",
+      "Apprentice Stone"
+    ]
+  },
+  {
+    "slug": "atronach_stone",
+    "name": "Камень Атронаха",
+    "captions": [
+      "Камень Атронаха в горячих источниках Истмарка"
+    ],
+    "aliases": [
+      "The Atronach Stone",
+      "Atronach Stone"
+    ]
+  },
+  {
+    "slug": "guardian_stones",
+    "name": "Камни-хранители",
+    "captions": [
+      "Три Камня-хранителя над Белой рекой"
+    ],
+    "aliases": [
+      "The Guardian Stones",
+      "Guardian Stones",
+      "Камни хранители",
+      "Камень Хранитель",
+      "Камень-хранитель"
+    ]
+  },
+  {
+    "slug": "lady_stone",
+    "name": "Камень Леди",
+    "captions": [
+      "Камень Леди на острове озера Илиналта"
+    ],
+    "aliases": [
+      "The Lady Stone",
+      "Lady Stone"
+    ]
+  },
+  {
+    "slug": "lord_stone",
+    "name": "Камень Лорда",
+    "captions": [
+      "Камень Лорда на снежном горном уступе"
+    ],
+    "aliases": [
+      "The Lord Stone",
+      "Lord Stone"
+    ]
+  },
+  {
+    "slug": "lover_stone",
+    "name": "Камень Любовника",
+    "captions": [
+      "Камень Любовника над долиной Предела"
+    ],
+    "aliases": [
+      "The Lover Stone",
+      "Lover Stone"
+    ]
+  },
+  {
+    "slug": "ritual_stone",
+    "name": "Камень Ритуала",
+    "captions": [
+      "Камень Ритуала над Белой рекой"
+    ],
+    "aliases": [
+      "The Ritual Stone",
+      "Ritual Stone"
+    ]
+  },
+  {
+    "slug": "serpent_stone",
+    "name": "Камень Змея",
+    "captions": [
+      "Камень Змея на ледяном острове"
+    ],
+    "aliases": [
+      "The Serpent Stone",
+      "Serpent Stone"
+    ]
+  },
+  {
+    "slug": "shadow_stone",
+    "name": "Камень Тени",
+    "captions": [
+      "Камень Тени на лесном холме к югу от Рифтена"
+    ],
+    "aliases": [
+      "The Shadow Stone",
+      "Shadow Stone"
+    ]
+  },
+  {
+    "slug": "steed_stone",
+    "name": "Камень Коня",
+    "captions": [
+      "Камень Коня в скалах Хаафингара"
+    ],
+    "aliases": [
+      "The Steed Stone",
+      "Steed Stone"
+    ]
+  },
+  {
+    "slug": "tower_stone",
+    "name": "Камень Башни",
+    "captions": [
+      "Камень Башни на заснеженном утёсе"
+    ],
+    "aliases": [
+      "The Tower Stone",
+      "Tower Stone"
+    ]
+  },
+  {
+    "slug": "beast_stone",
+    "name": "Камень Зверя",
+    "captions": [
+      "Камень Зверя у заснеженного леса Солстейма"
+    ],
+    "aliases": [
+      "The Beast Stone",
+      "Beast Stone"
+    ]
+  },
+  {
+    "slug": "earth_stone",
+    "name": "Камень Земли",
+    "captions": [
+      "Камень Земли у побережья Вороньей Скалы"
+    ],
+    "aliases": [
+      "The Earth Stone",
+      "Earth Stone"
+    ]
+  },
+  {
+    "slug": "sun_stone",
+    "name": "Камень Солнца",
+    "captions": [
+      "Камень Солнца среди пепельных холмов"
+    ],
+    "aliases": [
+      "The Sun Stone",
+      "Sun Stone"
+    ]
+  },
+  {
+    "slug": "water_stone",
+    "name": "Камень Воды",
+    "captions": [
+      "Камень Воды на западном берегу Солстейма"
+    ],
+    "aliases": [
+      "The Water Stone",
+      "Water Stone"
+    ]
+  },
+  {
+    "slug": "wind_stone",
+    "name": "Камень Ветра",
+    "captions": [
+      "Камень Ветра в снежной долине скаалов"
+    ],
+    "aliases": [
+      "The Wind Stone",
+      "Wind Stone"
+    ]
   }
 ]
