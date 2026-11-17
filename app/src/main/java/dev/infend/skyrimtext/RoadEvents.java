@@ -206,7 +206,8 @@ final class RoadEvents {
     private final LinkedHashMap<String,Integer> recentDays=new LinkedHashMap<>();
     private final int[] roadBounties=new int[10];
     private String decision="";
-    private int dialogueStep=0,uniqueStep=0;
+    private int dialogueStep=0,uniqueStep=0,tradeMask=0;
+    private String tradeNotice="";
     private String[] combatGroup=new String[0];
     private int combatIndex=0, encounterRegion=-1;
     private int[] groupHp=new int[0],groupMax=new int[0],groupDamage=new int[0];
@@ -259,6 +260,11 @@ final class RoadEvents {
         case "forsworn_merchant":return new String[]{"Изгой","Изгой-лучник","Изгой"};
         case "peddler_forsworn":return new String[]{"Изгой","Изгой-лучник","Изгой"};
         case "home_bandits":return new String[]{"Бандит","Бандит"};
+        case "spriggan":return new String[]{"Спригган","Спригган"};
+        case "skeevers":return new String[]{"Злокрыс","Злокрыс","Злокрыс"};
+        case "thalmor_storm":return new String[]{"Талморский солдат","Талморский лучник","Талморский юстициар"};
+        case "alikir":return new String[]{"Алик'рский воин","Алик'рский воин"};
+        case "solstheim_reavers":return new String[]{"Разбойник Солстейма","Разбойник Солстейма"};
         case "love_triangle":return new String[]{"Наёмный головорез","Наёмный головорез","Главарь головорезов"};
         case "necromancers":return new String[]{"Некромант","Некромант"};
         case "vigilant_skeletons":return new String[]{"Скелет","Скелет"};
@@ -298,7 +304,7 @@ final class RoadEvents {
     private static boolean member(GameEngine g,int faction){return g.factions.stage(faction)>0||g.factionStories.started(faction);}
     private void remember(GameEngine g){recentDays.put(id,g.day);while(recentDays.size()>EVENTS.length)recentDays.remove(recentDays.keySet().iterator().next());}
     private boolean cooled(GameEngine g,Event e){Integer day=recentDays.get(e.id);return day==null||g.day-day>=3||g.day<day;}
-    private void prepare(int region){encounterRegion=region;decision="";dialogueStep=0;uniqueStep=0;clearGroup();victoryApplied=false;chargedKills=0;}
+    private void prepare(int region){encounterRegion=region;decision="";dialogueStep=0;uniqueStep=0;tradeMask=0;tradeNotice="";clearGroup();victoryApplied=false;chargedKills=0;}
     private static Event find(String id){for(Event e:EVENTS)if(e.id.equals(id))return e;return null;}
     boolean pending(){return !destination.isEmpty()&&find(id)!=null;}
     static boolean pair(String a,String b,String x,String y){return (a.equals(x)&&b.equals(y))||(a.equals(y)&&b.equals(x));}
@@ -427,7 +433,48 @@ final class RoadEvents {
     }
     boolean beginArvak(GameEngine g){if(pending()||g.progress.questOutcome("road_arvak")!=null)return false;prepare(g.region);id="arvak";destination=g.progress.location;segmentFrom="Каирн Душ";segmentTo="Каирн Душ";outcome="";canonicalResume=false;serial=serial==Integer.MAX_VALUE?1:serial+1;g.mode=MODE;g.message=find(id).body;return true;}
     private String action(String verb){return "ROAD:"+serial+":"+id+":"+verb;}
-    GameEngine.Scene scene(GameEngine g){GameEngine.Scene s=baseScene(g);RoadDialogue.Profile p=RoadDialogue.find(id);if(p!=null&&dialogueStep==0)s.add(action("ask"),p.question,p.observation?"Осмотреть ситуацию, не завершая встречу":"Выслушать ответ, не завершая встречу");return s;}
+    GameEngine.Scene scene(GameEngine g){
+        GameEngine.Scene s=baseScene(g);
+        if(!tradeNotice.isEmpty()){GameEngine.Scene copy=new GameEngine.Scene(s.kicker,s.title,s.body+"\n\n"+tradeNotice);copy.choices.addAll(s.choices);s=copy;}
+        RoadDialogue.Profile p=RoadDialogue.find(id);if(p!=null&&dialogueStep==0)s.add(action("ask"),p.question,p.observation?"Осмотреть ситуацию, не завершая встречу":"Выслушать ответ, не завершая встречу");
+        String[][] offers=tradeOffers(id);
+        for(int i=0;i<offers.length;i++)if((tradeMask&(1<<i))==0){String[] o=offers[i];s.add(action("trade_"+i),("buy".equals(o[0])?"Купить: ":"Продать: ")+o[1],o[2]+" септимов | "+("buy".equals(o[0])?"1 шт.":"В сумке: "+g.progress.quantity(o[1])));}
+        switch(id){
+            case "farmer_refugee":s.add(action("guide"),"Указать безопасную дорогу","Помочь добраться до поселения");break;
+            case "recruit_empire":case "recruit_storm":s.add(action("recruit_advice"),"Рассказать о выбранной стороне","Поделиться опытом гражданской войны");break;
+            case "vigilants":s.add(action("blessing"),"Попросить благословение","Восстановить немного здоровья");break;
+            case "giant_cow":s.add(action("cow_escort"),"Проводить фермера до безопасного места","Помочь, не тревожа великана");break;
+            case "dragon_aftermath":s.add(action("search_wreck"),"Осмотреть обгоревшую телегу","Узнать о судьбе путников");break;
+            case "maiq":s.add(action("maiq_story"),"Спросить о странностях Скайрима","Ещё одна история М'Айка");break;
+            case "adventurer":case "mercenary":s.add(action("road_tip"),"Обменяться сведениями о дороге","Опыт красноречия");break;
+            case "alikir":s.add(action("defend_woman"),"Встать на сторону женщины","Попытаться убедить воинов оставить её в покое");break;
+            case "old_orc":s.add(action("respect_orc"),"Отказаться с уважением","Не оскорблять желание орка");break;
+            default:break;
+        }
+        return s;
+    }
+    private static String[][] tradeOffers(String key){switch(key){
+        case "peddler":return new String[][]{{"buy","Лечебное зелье","35"},{"buy","Зелье магии","30"},{"buy","Кожаные полоски","4"},{"sell","Железный слиток","4"}};
+        case "hunter":case "hunter_dog":case "mounted_hunter":case "orc_hunters":case "island_elk":case "island_hunter_dog":return new String[][]{{"buy","Кожа","12"},{"buy","Кожаные полоски","4"},{"sell","Кожа","6"}};
+        default:return new String[0][];
+    }}
+    private void trade(GameEngine g,String verb){
+        int i=Integer.parseInt(verb.substring(6));String[][] offers=tradeOffers(id);
+        if(i<0||i>=offers.length||(tradeMask&(1<<i))!=0)return;
+        String[] offer=offers[i];String item=offer[1];int price=Integer.parseInt(offer[2]);
+        g.progress.sync(g);
+        if("buy".equals(offer[0])){
+            if(g.gold<price){tradeNotice="Не хватает септимов.";return;}
+            if(!g.progress.addItem(item,1)){tradeNotice="В сумке нет места для покупки.";return;}
+            if("Лечебное зелье".equals(item))g.potions++;
+            if("Зелье магии".equals(item))g.manaPotions++;
+            g.gold-=price;tradeNotice="Куплено: "+item+" за "+price+" септимов.";
+        }else{
+            if(!g.progress.removeItem(item,1)){tradeNotice="В сумке нет товара для продажи.";return;}
+            g.gold=GameEngine.nonnegativeAdd(g.gold,price);tradeNotice="Продано: "+item+" за "+price+" септимов.";
+        }
+        tradeMask|=1<<i;g.progress.sync(g);g.recordVisualEvent(tradeNotice);
+    }
     private GameEngine.Scene baseScene(GameEngine g){
         Event e=find(id);
         if(e==null)return new GameEngine.Scene("В ДОРОГЕ","Переход","Событие недоступно.").primary("GO_WORLD","Продолжить путь","");
@@ -516,7 +563,7 @@ final class RoadEvents {
         if(!pending()||!MODE.equals(g.mode))return;
         Event e=find(id);String verb=null;
         for(GameEngine.Choice c:scene(g).choices)if(c.action.equals(action)){verb=action.substring(action.lastIndexOf(':')+1);break;}
-        if(verb==null)return;if("ask".equals(verb)){RoadDialogue.Profile p=RoadDialogue.find(id);if(p!=null&&dialogueStep==0){dialogueStep=1;g.message=RoadDialogue.line(p,p.answer);if(!p.observation)g.progress.skillExperience(g,12,3);g.progress.sync(g);}return;}decision=verb;
+        if(verb==null)return;if(verb.startsWith("trade_")){trade(g,verb);return;}if("ask".equals(verb)){RoadDialogue.Profile p=RoadDialogue.find(id);if(p!=null&&dialogueStep==0){dialogueStep=1;g.message=RoadDialogue.line(p,p.answer);if(!p.observation)g.progress.skillExperience(g,12,3);g.progress.sync(g);}return;}decision=verb;
         if("giant".equals(id)){
             uniqueOutcome(g,"COMPLETED");
             if("fight".equals(verb)){fact(g,"road_aela","Эйла Охотница","MET");fight(g,e.enemy);}
@@ -534,6 +581,15 @@ final class RoadEvents {
             return;
         }
         switch(verb){
+            case "guide":g.reputation++;finish(g,"Ты объясняешь, как добраться до ближайшего поселения. Путница благодарит и продолжает путь.");return;
+            case "recruit_advice":int side="recruit_empire".equals(id)?4:5;g.progress.skillExperience(g,12,10);if(member(g,side))g.factions.roadTrust(side,1);finish(g,"Доброволец внимательно слушает тебя и благодарит за совет.");return;
+            case "blessing":g.hp=Math.min(g.maxHp,GameEngine.nonnegativeAdd(g.hp,15));finish(g,"Дозорный благословляет тебя именем Стендарра. Восстановлено до 15 здоровья.");return;
+            case "cow_escort":g.reputation++;finish(g,"Ты провожаешь фермера до поворота к его цели. Великан спокойно принимает дар; вы расходитесь без боя.");return;
+            case "search_wreck":g.progress.skillExperience(g,9,10);finish(g,"Среди обломков видны следы драконьего огня. Ты запоминаешь опасный участок и продолжаешь путь.");return;
+            case "maiq_story":g.progress.skillExperience(g,12,8);finish(g,"М'Айк: «Некоторые ищут тайны в древних книгах. М'Айк находит их там, где люди забывают смотреть под ноги».");return;
+            case "road_tip":g.progress.skillExperience(g,12,12);finish(g,"Вы обмениваетесь сведениями о безопасных тропах. Путник отмечает, что дорога меняется быстрее слухов.");return;
+            case "defend_woman":if(g.rollCheck(g.progress.chance(g,2,12,35))){g.reputation++;g.progress.skillExperience(g,12,20);finish(g,"Воины признают, что обознались, и оставляют женщину в покое.");}else fight(g,e.enemy);return;
+            case "respect_orc":finish(g,"Старый орк кивает. Он не станет навязывать тебе поединок и продолжит искать достойного противника.");return;
             case "arvak":g.progress.setQuestOutcome("road_arvak_skull","ACTIVE");g.message="Душа просит отыскать череп своего коня. Ты замечаешь алтарь среди серых камней.";return;
             case "arvak_skull":if(!RoadQuests.item(g,"Череп Арвака")){finish(g,"В сумке нет места. Вернись к поискам позже.");return;}uniqueOutcome(g,"COMPLETED");g.progress.setQuestOutcome("road_arvak_skull","COMPLETED");g.progress.setQuestOutcome("road_arvak_mount","COMPLETED");g.progress.removeItem("Череп Арвака",1);g.addXp(40);finish(g,"Ты возвращаешь череп хозяину. Арвак становится доступен для путешествий: расход запаса сил уменьшен. +40 опыта.");return;
             case "follow":RoadQuests.offer(g,"headless");finish(g,"Всадник исчезает в сторону Привала Хамвира. Цель отмечена в журнале.");return;
@@ -601,10 +657,10 @@ final class RoadEvents {
         if(!pending())return;
         String target=destination,previous=id;
         if(outcome.startsWith("Встреча: ")&&"WILD".equals(g.battleKind)&&"RESULT".equals(g.mode)&&g.enemyHp==0){applyVictory(g);outcome=g.message;}else if(outcome.startsWith("Встреча: "))outcome=g.message;
-        destination="";id="";segmentFrom="";segmentTo="";last=previous;clearGroup();dialogueStep=0;uniqueStep=0;decision="";victoryApplied=false;chargedKills=0;resuming=true;
+        destination="";id="";segmentFrom="";segmentTo="";last=previous;clearGroup();dialogueStep=0;uniqueStep=0;tradeMask=0;tradeNotice="";decision="";victoryApplied=false;chargedKills=0;resuming=true;
         boolean canonical=canonicalResume;canonicalResume=false;
         try{if("arvak".equals(previous)){g.mode="WORLD";g.message=outcome;}else if(canonical){CanonicalCampaign.open(g);g.canonicalRecent=outcome;g.recordVisualEvent(outcome);}else g.choose("LOC:"+target);}finally{resuming=false;outcome="";}
     }
-    JSONObject save(){JSONObject j=new JSONObject();try{j.put("id",id).put("destination",destination).put("outcome",outcome).put("last",last).put("serial",serial).put("canonicalResume",canonicalResume).put("segmentFrom",segmentFrom).put("segmentTo",segmentTo).put("decision",decision).put("dialogueStep",dialogueStep).put("uniqueStep",uniqueStep).put("group",new JSONArray(Arrays.asList(combatGroup))).put("groupIndex",combatIndex).put("groupHp",new JSONArray(groupHp)).put("groupMax",new JSONArray(groupMax)).put("groupDamage",new JSONArray(groupDamage)).put("encounterRegion",encounterRegion).put("victoryApplied",victoryApplied).put("chargedKills",chargedKills).put("recentDays",new JSONObject(recentDays)).put("roadBounties",new JSONArray(roadBounties));}catch(Exception ignored){}return j;}
-    static RoadEvents restore(JSONObject j){RoadEvents r=new RoadEvents();if(j!=null){r.id=j.optString("id","");r.destination=j.optString("destination","");r.outcome=j.optString("outcome","");r.last=j.optString("last","");r.serial=Math.max(0,j.optInt("serial"));r.canonicalResume=j.optBoolean("canonicalResume");r.segmentFrom=j.optString("segmentFrom","");r.segmentTo=j.optString("segmentTo","");r.decision=j.optString("decision","");r.dialogueStep=Math.max(0,Math.min(1,j.optInt("dialogueStep")));r.uniqueStep=Math.max(0,Math.min(4,j.optInt("uniqueStep")));r.encounterRegion=Math.max(-1,Math.min(9,j.optInt("encounterRegion",-1)));r.victoryApplied=j.optBoolean("victoryApplied");r.chargedKills=Math.max(0,Math.min(8,j.optInt("chargedKills")));JSONArray group=j.optJSONArray("group");if(group!=null&&group.length()>0&&group.length()<=8){ArrayList<String> names=new ArrayList<>();for(int i=0;i<group.length();i++){String n=group.optString(i);if(!n.isEmpty()&&n.length()<=100)names.add(n);}r.combatGroup=names.toArray(new String[0]);}r.combatIndex=Math.max(0,Math.min(Math.max(0,r.combatGroup.length-1),j.optInt("groupIndex")));JSONArray hp=j.optJSONArray("groupHp"),max=j.optJSONArray("groupMax"),dmg=j.optJSONArray("groupDamage");int n=r.combatGroup.length;if(n>0&&hp!=null&&max!=null&&dmg!=null&&hp.length()==n&&max.length()==n&&dmg.length()==n){r.groupHp=new int[n];r.groupMax=new int[n];r.groupDamage=new int[n];for(int i=0;i<n;i++){r.groupMax[i]=Math.max(1,Math.min(100000,max.optInt(i)));r.groupHp[i]=Math.max(0,Math.min(r.groupMax[i],hp.optInt(i)));r.groupDamage[i]=Math.max(1,Math.min(100000,dmg.optInt(i)));}}JSONObject recent=j.optJSONObject("recentDays");if(recent!=null)for(Event e:EVENTS)if(recent.has(e.id))r.recentDays.put(e.id,Math.max(0,recent.optInt(e.id)));JSONArray fines=j.optJSONArray("roadBounties");if(fines!=null)for(int i=0;i<10;i++)r.roadBounties[i]=Math.max(0,fines.optInt(i));if(!r.pending()){r.id="";r.destination="";}}return r;}
+    JSONObject save(){JSONObject j=new JSONObject();try{j.put("id",id).put("destination",destination).put("outcome",outcome).put("last",last).put("serial",serial).put("canonicalResume",canonicalResume).put("segmentFrom",segmentFrom).put("segmentTo",segmentTo).put("decision",decision).put("dialogueStep",dialogueStep).put("uniqueStep",uniqueStep).put("tradeMask",tradeMask).put("tradeNotice",tradeNotice).put("group",new JSONArray(Arrays.asList(combatGroup))).put("groupIndex",combatIndex).put("groupHp",new JSONArray(groupHp)).put("groupMax",new JSONArray(groupMax)).put("groupDamage",new JSONArray(groupDamage)).put("encounterRegion",encounterRegion).put("victoryApplied",victoryApplied).put("chargedKills",chargedKills).put("recentDays",new JSONObject(recentDays)).put("roadBounties",new JSONArray(roadBounties));}catch(Exception ignored){}return j;}
+    static RoadEvents restore(JSONObject j){RoadEvents r=new RoadEvents();if(j!=null){r.id=j.optString("id","");r.destination=j.optString("destination","");r.outcome=j.optString("outcome","");r.last=j.optString("last","");r.serial=Math.max(0,j.optInt("serial"));r.canonicalResume=j.optBoolean("canonicalResume");r.segmentFrom=j.optString("segmentFrom","");r.segmentTo=j.optString("segmentTo","");r.decision=j.optString("decision","");r.dialogueStep=Math.max(0,Math.min(1,j.optInt("dialogueStep")));r.uniqueStep=Math.max(0,Math.min(4,j.optInt("uniqueStep")));r.tradeMask=j.optInt("tradeMask")&15;r.tradeNotice=j.optString("tradeNotice","");if(r.tradeNotice.length()>300)r.tradeNotice="";r.encounterRegion=Math.max(-1,Math.min(9,j.optInt("encounterRegion",-1)));r.victoryApplied=j.optBoolean("victoryApplied");r.chargedKills=Math.max(0,Math.min(8,j.optInt("chargedKills")));JSONArray group=j.optJSONArray("group");if(group!=null&&group.length()>0&&group.length()<=8){ArrayList<String> names=new ArrayList<>();for(int i=0;i<group.length();i++){String n=group.optString(i);if(!n.isEmpty()&&n.length()<=100)names.add(n);}r.combatGroup=names.toArray(new String[0]);}r.combatIndex=Math.max(0,Math.min(Math.max(0,r.combatGroup.length-1),j.optInt("groupIndex")));JSONArray hp=j.optJSONArray("groupHp"),max=j.optJSONArray("groupMax"),dmg=j.optJSONArray("groupDamage");int n=r.combatGroup.length;if(n>0&&hp!=null&&max!=null&&dmg!=null&&hp.length()==n&&max.length()==n&&dmg.length()==n){r.groupHp=new int[n];r.groupMax=new int[n];r.groupDamage=new int[n];for(int i=0;i<n;i++){r.groupMax[i]=Math.max(1,Math.min(100000,max.optInt(i)));r.groupHp[i]=Math.max(0,Math.min(r.groupMax[i],hp.optInt(i)));r.groupDamage[i]=Math.max(1,Math.min(100000,dmg.optInt(i)));}}JSONObject recent=j.optJSONObject("recentDays");if(recent!=null)for(Event e:EVENTS)if(recent.has(e.id))r.recentDays.put(e.id,Math.max(0,recent.optInt(e.id)));JSONArray fines=j.optJSONArray("roadBounties");if(fines!=null)for(int i=0;i<10;i++)r.roadBounties[i]=Math.max(0,fines.optInt(i));if(!r.pending()){r.id="";r.destination="";}}return r;}
 }
