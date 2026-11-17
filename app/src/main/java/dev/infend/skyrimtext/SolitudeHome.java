@@ -10,7 +10,7 @@ final class SolitudeHome {
     private int rooms,lastMeal=-1,lastStudy=-1;
     // Only fungible, non-quest goods; equipment and engine-backed counters are excluded.
     private final JSONObject chest=new JSONObject();
-    private static final String[] GOODS={"Железный слиток","Стальной слиток","Кожаные полоски","Пшеница","Голубой горноцвет","Красный горноцвет","Пурпурный горноцвет","Соль","Факел","Отмычка","Железная стрела","Стальная стрела"};
+    private static final String[] GOODS={"Железный слиток","Стальной слиток","Кожаные полоски","Пшеница","Голубой горноцвет","Красный горноцвет","Пурпурный горноцвет","Соль","Факел","Отмычка","Железная стрела","Стальная стрела","Серебряный слиток","Золотой слиток","Эбонитовый слиток","Ртутный слиток","Двемерский металлический слиток","Орихалковый слиток","Корундовый слиток","Кожа","Лунный сахар","Стальной болт"};
     private static final int LIMIT=10000;
     int stored(String id){return chest.optInt(id,0);}
     private void setStored(String id,int n){try{if(n==0)chest.remove(id);else chest.put(id,n);}catch(Exception e){throw new IllegalStateException(e);}}
@@ -19,6 +19,18 @@ final class SolitudeHome {
             String id=GOODS[i];int n=stored(id);
             if(a.equals("SOLITUDE:home:deposit:"+i)){
                 if(n<LIMIT&&g.progress.removeItem(id,1)){setStored(id,n+1);report(g,"В сундук: "+id);}
+                return true;
+            }
+            if(a.equals("SOLITUDE:home:depositAll:"+i)){
+                int amount=Math.min(LIMIT-n,g.progress.quantity(id));
+                if(amount>0&&g.progress.removeItem(id,amount)){setStored(id,n+amount);report(g,"В сундук: "+id+" ×"+amount);}
+                return true;
+            }
+            if(a.equals("SOLITUDE:home:withdrawAll:"+i)){
+                ItemCatalog.Item item=ItemCatalog.find(id);if(item==null)return true;
+                int capacity=item.weight<=0?n:(int)Math.max(0,Math.floor((g.progress.carryLimit()-g.progress.carryWeight()+0.00001)/item.weight));
+                int amount=Math.min(n,Math.min(capacity,Integer.MAX_VALUE-g.progress.quantity(id)));
+                if(amount>0&&g.progress.addItem(id,amount)){setStored(id,n-amount);report(g,"Из сундука: "+id+" ×"+amount);}
                 return true;
             }
             if(a.equals("SOLITUDE:home:withdraw:"+i)){
@@ -58,7 +70,9 @@ final class SolitudeHome {
             for(int i=0;i<GOODS.length;i++){
                 String id=GOODS[i];int n=stored(id);
                 if(g.progress.quantity(id)>0&&n<LIMIT)s.add("SOLITUDE:home:deposit:"+i,"Положить: "+id,"В сумке: "+g.progress.quantity(id)+" | В сундуке: "+n);
+                if(g.progress.quantity(id)>1&&n<LIMIT)s.add("SOLITUDE:home:depositAll:"+i,"Положить всё: "+id,"До "+Math.min(LIMIT-n,g.progress.quantity(id))+" шт.");
                 if(n>0)s.add("SOLITUDE:home:withdraw:"+i,"Забрать: "+id,"В сундуке: "+n);
+                if(n>1)s.add("SOLITUDE:home:withdrawAll:"+i,"Забрать всё: "+id,"До "+n+" шт. | С учётом веса");
             }
             if(room(3)&&FixShopHome.canBrew(g))s.add("SOLITUDE:home:brew","Сварить лечебное зелье","Пшеница + голубой горноцвет");
             s.add("SOLITUDE:home:sleep","Поспать","8 часов | бесплатно");

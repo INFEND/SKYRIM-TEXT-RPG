@@ -20,7 +20,7 @@ public class SolitudeHomeTest {
         GameEngine g=city();g.choose("SOLITUDE:home");g.choose("SOLITUDE:home:sleep");assertEquals(10,g.hour);
         g.fixShop.home.buy(4);g.choose("SOLITUDE:home:sleep");assertEquals(18,g.hour);
     }
-    @Test public void chestPersistsAndCannotDuplicate() {
+    @Test public void chestPersistsAndCannotDuplicate() throws Exception {
         GameEngine g=city();g.fixShop.home.buy(4);g.choose("SOLITUDE:home");
         assertTrue(g.progress.addItem("Железный слиток",1));
         g.choose("SOLITUDE:home:deposit:0");assertEquals(0,g.progress.quantity("Железный слиток"));
@@ -37,5 +37,18 @@ public class SolitudeHomeTest {
         g.choose("SOLITUDE:back");g.choose("SOLITUDE:home");g.choose("SOLITUDE:home:brew");
         assertEquals(potions+1,g.potions);assertEquals(0,g.progress.quantity("Пшеница"));assertEquals(SolitudeHome.MODE,g.mode);
         g.choose("SOLITUDE:home:brew");assertEquals(potions+1,g.potions);
+    }
+    @Test public void bulkChestPreservesGoodsAndRespectsWeight() throws Exception {
+        GameEngine g=city();g.fixShop.home.buy(4);g.choose("SOLITUDE:home");
+        assertTrue(g.progress.addItem("Золотой слиток",5));
+        g.choose("SOLITUDE:home:depositAll:13");assertEquals(0,g.progress.quantity("Золотой слиток"));
+        g=GameEngine.fromJson(g.toJson().toString());
+        while(g.progress.addItem("Железный слиток",1)){}
+        g.choose("SOLITUDE:home:withdrawAll:13");assertEquals(0,g.progress.quantity("Золотой слиток"));
+        assertTrue(g.progress.removeItem("Железный слиток",3));
+        g.choose("SOLITUDE:home:withdrawAll:13");assertEquals(3,g.progress.quantity("Золотой слиток"));
+        assertTrue(g.progress.removeItem("Железный слиток",2));
+        g.choose("SOLITUDE:home:withdrawAll:13");assertEquals(5,g.progress.quantity("Золотой слиток"));
+        g.choose("SOLITUDE:home:withdrawAll:13");assertEquals(5,g.progress.quantity("Золотой слиток"));
     }
 }
