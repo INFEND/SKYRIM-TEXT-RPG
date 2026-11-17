@@ -1,0 +1,1844 @@
+{
+  "format": "WebP",
+  "generation": "Built-in image generation, one independent call per location",
+  "artwork": "Original cinematic environment illustrations interpreting Skyrim locations; not game screenshots.",
+  "image_count": 20,
+  "max_dimensions": [
+    1920,
+    1080
+  ],
+  "quality_floor": {
+    "full_resolution_luma_ssim": 0.985,
+    "worst_128px_luma_ssim": 0.965,
+    "maximum_chroma_mean_absolute_error": 2.5,
+    "maximum_chroma_95th_percentile_error": 7
+  },
+  "original_bytes": 70502019,
+  "archive_bytes": 10205542,
+  "reduction_percent": 85.52,
+  "note": "No upscaling. No previous shipped assets recompressed. Choose the smallest tested WebP passing the project detail and color floors. SSIM is a measured proxy, not proof of perceptual identity.",
+  "locations": [
+    {
+      "slug": "abandoned_shack",
+      "id": "skyrim-299",
+      "name": "Заброшенная хижина",
+      "english": "Abandoned Shack",
+      "caption": "Заброшенная хижина среди болот Хьялмарка",
+      "scene": "Abandoned Shack northwest of Morthal in Skyrim: a single isolated weather-beaten timber cabin, intact steep patchy thatched roof and a closed wooden door, standing low on a marsh island beside shallow still water. Dead twisted trees, sedge and reeds, muddy Hjaalmarch ground, distant gray mountains. Three-quarter exterior from the muddy approach, pale misty morning with readable soft light. This is a closed hut, not a ruin, no execution scene.",
+      "number": 1,
+      "prompt": "Use case: stylized-concept. Asset type: one finished environment illustration for the SKYRIM TEXT RPG optional location gallery. Scene: Abandoned Shack northwest of Morthal in Skyrim: a single isolated weather-beaten timber cabin, intact steep patchy thatched roof and a closed wooden door, standing low on a marsh island beside shallow still water. Dead twisted trees, sedge and reeds, muddy Hjaalmarch ground, distant gray mountains. Three-quarter exterior from the muddy approach, pale misty morning with readable soft light. This is a closed hut, not a ruin, no execution scene. Style: detailed cinematic realistic Nordic fantasy environment consistent with the existing Riverwood landscape gallery, believable rough wood, stone, thatch and vegetation, restrained natural colors, strong spatial depth, clear small details without oversharpening, photorealistic environment illustration. Wide horizontal 16:9 composition, 1920x1080 if possible, full bleed, exactly ONE image of ONE location. Show the whole modest building and its immediate setting. No caption, no title, no lettering, no UI, no logo, no watermark, no border, no collage, no dragons, no modern materials.",
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "dimensions": [
+        1672,
+        941
+      ],
+      "original_bytes": 3324487,
+      "original_sha256": "355da9cd34c172eb7a9cf8b6c6e416a6cc9144d126b61e6ac2e8cdc05a626101",
+      "webp_bytes": 473842,
+      "webp_sha256": "ea9c90e3e46a65167864eee774c2ab082db494757684b388deccbadb8c26a81e",
+      "archive_bytes": 473954,
+      "archive_sha256": "f0bb5497d2667c9d6c51a8af98cc2b1b55600d214f47e38c33f0ebc914e5329c",
+      "quality": 89,
+      "bytes": 473842,
+      "full_resolution_luma_ssim": 0.985144317150116,
+      "worst_128px_luma_ssim": 0.9750320911407471,
+      "chroma_mean_absolute_error": 1.207674760638433,
+      "chroma_95th_percentile_error": 4,
+      "trials": [
+        {
+          "quality": 76,
+          "bytes": 259620,
+          "full_resolution_luma_ssim": 0.9531105160713196,
+          "worst_128px_luma_ssim": 0.9232009053230286,
+          "chroma_mean_absolute_error": 1.5481144715232191,
+          "chroma_95th_percentile_error": 5
+        },
+        {
+          "quality": 80,
+          "bytes": 308298,
+          "full_resolution_luma_ssim": 0.9657554030418396,
+          "worst_128px_luma_ssim": 0.9474680423736572,
+          "chroma_mean_absolute_error": 1.4609833018930285,
+          "chroma_95th_percentile_error": 5
+        },
+        {
+          "quality": 84,
+          "bytes": 364856,
+          "full_resolution_luma_ssim": 0.9750303030014038,
+          "worst_128px_luma_ssim": 0.9621251821517944,
+          "chroma_mean_absolute_error": 1.371363496534787,
+          "chroma_95th_percentile_error": 4
+        },
+        {
+          "quality": 88,
+          "bytes": 441826,
+          "full_resolution_luma_ssim": 0.9827426671981812,
+          "worst_128px_luma_ssim": 0.9712993502616882,
+          "chroma_mean_absolute_error": 1.2520662890440284,
+          "chroma_95th_percentile_error": 4
+        },
+        {
+          "quality": 89,
+          "bytes": 473842,
+          "full_resolution_luma_ssim": 0.985144317150116,
+          "worst_128px_luma_ssim": 0.9750320911407471,
+          "chroma_mean_absolute_error": 1.207674760638433,
+          "chroma_95th_percentile_error": 4
+        },
+        {
+          "quality": 90,
+          "bytes": 504924,
+          "full_resolution_luma_ssim": 0.9871521592140198,
+          "worst_128px_luma_ssim": 0.9788600206375122,
+          "chroma_mean_absolute_error": 1.187841627302727,
+          "chroma_95th_percentile_error": 4
+        },
+        {
+          "quality": 91,
+          "bytes": 534550,
+          "full_resolution_luma_ssim": 0.988630473613739,
+          "worst_128px_luma_ssim": 0.9808432459831238,
+          "chroma_mean_absolute_error": 1.146782474614708,
+          "chroma_95th_percentile_error": 3
+        },
+        {
+          "quality": 92,
+          "bytes": 566878,
+          "full_resolution_luma_ssim": 0.9894592761993408,
+          "worst_128px_luma_ssim": 0.9816558957099915,
+          "chroma_mean_absolute_error": 1.1062889931814368,
+          "chroma_95th_percentile_error": 3
+        }
+      ],
+      "generator_output_filename": "exec-5673ebe2-0af1-4028-a655-9ebee281a062.png"
+    },
+    {
+      "slug": "alchemists_shack",
+      "id": "skyrim-296",
+      "name": "Хижина алхимика",
+      "english": "Alchemist's Shack",
+      "caption": "Открытая хижина алхимика у горной дороги",
+      "scene": "Alchemist's Shack south of Ivarstead in the Rift, Skyrim: one very small open-front rough wooden shelter with a sagging thatched roof, rear timber wall, an alchemy table holding simple glass flasks and a mortar under the shelter, bed at the back, a little herb garden and barrels nearby. Sheltered clearing beside the mountain road, grasses, blue flowers, golden birches and pine-covered slopes. Eye level three-quarter exterior, warm gentle afternoon daylight. No giant mushrooms, no magical glow.",
+      "number": 1,
+      "prompt": "Use case: stylized-concept. Asset type: one finished environment illustration for the SKYRIM TEXT RPG optional location gallery. Scene: Alchemist's Shack south of Ivarstead in the Rift, Skyrim: one very small open-front rough wooden shelter with a sagging thatched roof, rear timber wall, an alchemy table holding simple glass flasks and a mortar under the shelter, bed at the back, a little herb garden and barrels nearby. Sheltered clearing beside the mountain road, grasses, blue flowers, golden birches and pine-covered slopes. Eye level three-quarter exterior, warm gentle afternoon daylight. No giant mushrooms, no magical glow. Style: detailed cinematic realistic Nordic fantasy environment consistent with the existing Riverwood landscape gallery, believable rough wood, stone, thatch and vegetation, restrained natural colors, strong spatial depth, clear small details without oversharpening, photorealistic environment illustration. Wide horizontal 16:9 composition, 1920x1080 if possible, full bleed, exactly ONE image of ONE location. Show the whole modest building and its immediate setting. No caption, no title, no lettering, no UI, no logo, no watermark, no border, no collage, no dragons, no modern materials.",
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "dimensions": [
+        1672,
+        941
+      ],
+      "original_bytes": 3667156,
+      "original_sha256": "440142d214c4b1c36ee686bd796614f54306c005d13a53c6074d40310425c621",
+      "webp_bytes": 568024,
+      "webp_sha256": "816c9fb4ebeb286da117b591e0265d0aca767ee6521444abb3904a3bbb145f1f",
+      "archive_bytes": 568136,
+      "archive_sha256": "ba93bba2fdfb4441fc20f03e767a62ffb0de9c08bc1d8c49774a1dae3671b6fb",
+      "quality": 88,
+      "bytes": 568024,
+      "full_resolution_luma_ssim": 0.9869809746742249,
+      "worst_128px_luma_ssim": 0.9783805012702942,
+      "chroma_mean_absolute_error": 1.9495662763323147,
+      "chroma_95th_percentile_error": 6,
+      "trials": [
+        {
+          "quality": 76,
+          "bytes": 347210,
+          "full_resolution_luma_ssim": 0.962041974067688,
+          "worst_128px_luma_ssim": 0.9338874816894531,
+          "chroma_mean_absolute_error": 2.3916393152962594,
+          "chroma_95th_percentile_error": 7
+        },
+        {
+          "quality": 80,
+          "bytes": 403382,
+          "full_resolution_luma_ssim": 0.9716954827308655,
+          "worst_128px_luma_ssim": 0.9496525526046753,
+          "chroma_mean_absolute_error": 2.2648914546776564,
+          "chroma_95th_percentile_error": 7
+        },
+        {
+          "quality": 84,
+          "bytes": 475754,
+          "full_resolution_luma_ssim": 0.9800435304641724,
+          "worst_128px_luma_ssim": 0.96589195728302,
+          "chroma_mean_absolute_error": 2.09945422257702,
+          "chroma_95th_percentile_error": 6
+        },
+        {
+          "quality": 85,
+          "bytes": 497038,
+          "full_resolution_luma_ssim": 0.9818970561027527,
+          "worst_128px_luma_ssim": 0.9699944257736206,
+          "chroma_mean_absolute_error": 2.0527103915716256,
+          "chroma_95th_percentile_error": 6
+        },
+        {
+          "quality": 86,
+          "bytes": 519028,
+          "full_resolution_luma_ssim": 0.983801543712616,
+          "worst_128px_luma_ssim": 0.974206805229187,
+          "chroma_mean_absolute_error": 2.0182247837737517,
+          "chroma_95th_percentile_error": 6
+        },
+        {
+          "quality": 87,
+          "bytes": 534136,
+          "full_resolution_luma_ssim": 0.9848073124885559,
+          "worst_128px_luma_ssim": 0.9751417636871338,
+          "chroma_mean_absolute_error": 1.9862780229726087,
+          "chroma_95th_percentile_error": 6
+        },
+        {
+          "quality": 88,
+          "bytes": 568024,
+          "full_resolution_luma_ssim": 0.9869809746742249,
+          "worst_128px_luma_ssim": 0.9783805012702942,
+          "chroma_mean_absolute_error": 1.9495662763323147,
+          "chroma_95th_percentile_error": 6
+        }
+      ],
+      "generator_output_filename": "exec-a394e5a7-c1dd-4418-9ce1-c8a873271a9e.png"
+    },
+    {
+      "slug": "angis_camp",
+      "id": "skyrim-298",
+      "name": "Лагерь Анги",
+      "english": "Angi's Camp",
+      "caption": "Горный лагерь Анги и мишени для стрельбы",
+      "scene": "Angi's Camp high in the Jerall Mountains south of Falkreath, Skyrim: a modest Nordic timber cabin with steep thatched roof on a narrow wooded mountainside terrace. Beside the hut a clear archery practice lane with several round straw targets at differing distances, a tanning rack and rough workbench. Snow-dusted boulders, dark fir trees, immense valley opening beyond the terrace. Wide three-quarter establishing view that clearly includes both cabin and practice targets, crisp soft morning light. No people, no modern archery equipment.",
+      "number": 1,
+      "prompt": "Use case: stylized-concept. Asset type: one finished environment illustration for the SKYRIM TEXT RPG optional location gallery. Scene: Angi's Camp high in the Jerall Mountains south of Falkreath, Skyrim: a modest Nordic timber cabin with steep thatched roof on a narrow wooded mountainside terrace. Beside the hut a clear archery practice lane with several round straw targets at differing distances, a tanning rack and rough workbench. Snow-dusted boulders, dark fir trees, immense valley opening beyond the terrace. Wide three-quarter establishing view that clearly includes both cabin and practice targets, crisp soft morning light. No people, no modern archery equipment. Style: detailed cinematic realistic Nordic fantasy environment consistent with the existing Riverwood landscape gallery, believable rough wood, stone, thatch and vegetation, restrained natural colors, strong spatial depth, clear small details without oversharpening, photorealistic environment illustration. Wide horizontal 16:9 composition, 1920x1080 if possible, full bleed, exactly ONE image of ONE location. Show the whole modest building and its immediate setting. No caption, no title, no lettering, no UI, no logo, no watermark, no border, no collage, no dragons, no modern materials.",
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "dimensions": [
+        1672,
+        941
+      ],
+      "original_bytes": 3598159,
+      "original_sha256": "2da08ce8767951dc6203b741bebe7fb71633b5400bea010022f48d34a666015c",
+      "webp_bytes": 526500,
+      "webp_sha256": "4386a13129e0ed469d7da79797ee8033d34fd68eabbacd1f9c2b5cf0392abce6",
+      "archive_bytes": 526612,
+      "archive_sha256": "4b0e0c8cfdde5644de00321deb246d25480ff6940ea2337f3a9e5d47d43fd994",
+      "quality": 88,
+      "bytes": 526500,
+      "full_resolution_luma_ssim": 0.9857672452926636,
+      "worst_128px_luma_ssim": 0.9777418375015259,
+      "chroma_mean_absolute_error": 1.448610037677519,
+      "chroma_95th_percentile_error": 4,
+      "trials": [
+        {
+          "quality": 76,
+          "bytes": 317094,
+          "full_resolution_luma_ssim": 0.9584394097328186,
+          "worst_128px_luma_ssim": 0.9317294359207153,
+          "chroma_mean_absolute_error": 1.833425387325913,
+          "chroma_95th_percentile_error": 5
+        },
+        {
+          "quality": 80,
+          "bytes": 372850,
+          "full_resolution_luma_ssim": 0.9687588214874268,
+          "worst_128px_luma_ssim": 0.9539645314216614,
+          "chroma_mean_absolute_error": 1.7185966649548226,
+          "chroma_95th_percentile_error": 5
+        },
+        {
+          "quality": 84,
+          "bytes": 441116,
+          "full_resolution_luma_ssim": 0.9774214029312134,
+          "worst_128px_luma_ssim": 0.9645973443984985,
+          "chroma_mean_absolute_error": 1.5884481031580981,
+          "chroma_95th_percentile_error": 5
+        },
+        {
+          "quality": 85,
+          "bytes": 455302,
+          "full_resolution_luma_ssim": 0.9789476990699768,
+          "worst_128px_luma_ssim": 0.9651263952255249,
+          "chroma_mean_absolute_error": 1.5726976544346083,
+          "chroma_95th_percentile_error": 5
+        },
+        {
+          "quality": 86,
+          "bytes": 479922,
+          "full_resolution_luma_ssim": 0.9822648763656616,
+          "worst_128px_luma_ssim": 0.9747554063796997,
+          "chroma_mean_absolute_error": 1.5198652304125206,
+          "chroma_95th_percentile_error": 4
+        },
+        {
+          "quality": 87,
+          "bytes": 501886,
+          "full_resolution_luma_ssim": 0.9840806722640991,
+          "worst_128px_luma_ssim": 0.9767520427703857,
+          "chroma_mean_absolute_error": 1.4883713244080155,
+          "chroma_95th_percentile_error": 4
+        },
+        {
+          "quality": 88,
+          "bytes": 526500,
+          "full_resolution_luma_ssim": 0.9857672452926636,
+          "worst_128px_luma_ssim": 0.9777418375015259,
+          "chroma_mean_absolute_error": 1.448610037677519,
+          "chroma_95th_percentile_error": 4
+        }
+      ],
+      "generator_output_filename": "exec-c33511d2-f013-48db-b0ca-87db22e4b64d.png"
+    },
+    {
+      "slug": "anises_cabin",
+      "id": "skyrim-292",
+      "name": "Хижина Анис",
+      "english": "Anise's Cabin",
+      "caption": "Лесная хижина Анис неподалёку от Ривервуда",
+      "scene": "Anise's Cabin west of Riverwood and south of Bleak Falls Barrow in Skyrim: a tiny open-sided, ramshackle Nordic wooden cabin under a weathered thatched roof in a quiet pine forest clearing near the White River. Simple bed and a wooden table in the dim open interior, a modest herb garden outside, a closed wooden cellar hatch near the cabin floor. Mossy stones, ferns, tall pines, glimpse of river between trunks. Intimate three-quarter exterior, natural dappled midday light. No witch stereotype decorations, no glowing magic, no people.",
+      "number": 1,
+      "prompt": "Use case: stylized-concept. Asset type: one finished environment illustration for the SKYRIM TEXT RPG optional location gallery. Scene: Anise's Cabin west of Riverwood and south of Bleak Falls Barrow in Skyrim: a tiny open-sided, ramshackle Nordic wooden cabin under a weathered thatched roof in a quiet pine forest clearing near the White River. Simple bed and a wooden table in the dim open interior, a modest herb garden outside, a closed wooden cellar hatch near the cabin floor. Mossy stones, ferns, tall pines, glimpse of river between trunks. Intimate three-quarter exterior, natural dappled midday light. No witch stereotype decorations, no glowing magic, no people. Style: detailed cinematic realistic Nordic fantasy environment consistent with the existing Riverwood landscape gallery, believable rough wood, stone, thatch and vegetation, restrained natural colors, strong spatial depth, clear small details without oversharpening, photorealistic environment illustration. Wide horizontal 16:9 composition, 1920x1080 if possible, full bleed, exactly ONE image of ONE location. Show the whole modest building and its immediate setting. No caption, no title, no lettering, no UI, no logo, no watermark, no border, no collage, no dragons, no modern materials.",
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "dimensions": [
+        1672,
+        941
+      ],
+      "original_bytes": 3725708,
+      "original_sha256": "618061f74860b1f40ec6b896c9a5430b1e89cf29d5f56b433ae167a191206384",
+      "webp_bytes": 562078,
+      "webp_sha256": "fa8714fa2ab56baa8cd97e51d6e65998e023a7dcd554cbb0f088b7deb40aaaf4",
+      "archive_bytes": 562190,
+      "archive_sha256": "734998ae9106efe1109b3f1e00449134e58f7bd0bce24f598ad28e854d12a853",
+      "quality": 88,
+      "bytes": 562078,
+      "full_resolution_luma_ssim": 0.9870640635490417,
+      "worst_128px_luma_ssim": 0.979049026966095,
+      "chroma_mean_absolute_error": 1.5467263523992087,
+      "chroma_95th_percentile_error": 4,
+      "trials": [
+        {
+          "quality": 76,
+          "bytes": 338228,
+          "full_resolution_luma_ssim": 0.9599143266677856,
+          "worst_128px_luma_ssim": 0.9434381127357483,
+          "chroma_mean_absolute_error": 1.8935765804473506,
+          "chroma_95th_percentile_error": 6
+        },
+        {
+          "quality": 80,
+          "bytes": 398780,
+          "full_resolution_luma_ssim": 0.9707963466644287,
+          "worst_128px_luma_ssim": 0.9574723243713379,
+          "chroma_mean_absolute_error": 1.778705273835734,
+          "chroma_95th_percentile_error": 5
+        },
+        {
+          "quality": 84,
+          "bytes": 471010,
+          "full_resolution_luma_ssim": 0.9797496795654297,
+          "worst_128px_luma_ssim": 0.9694992899894714,
+          "chroma_mean_absolute_error": 1.6588738565813625,
+          "chroma_95th_percentile_error": 5
+        },
+        {
+          "quality": 85,
+          "bytes": 483196,
+          "full_resolution_luma_ssim": 0.9808671474456787,
+          "worst_128px_luma_ssim": 0.9703572392463684,
+          "chroma_mean_absolute_error": 1.6453314325084278,
+          "chroma_95th_percentile_error": 5
+        },
+        {
+          "quality": 86,
+          "bytes": 504382,
+          "full_resolution_luma_ssim": 0.9828764200210571,
+          "worst_128px_luma_ssim": 0.9734973311424255,
+          "chroma_mean_absolute_error": 1.6142497038170733,
+          "chroma_95th_percentile_error": 5
+        },
+        {
+          "quality": 87,
+          "bytes": 527476,
+          "full_resolution_luma_ssim": 0.9846968054771423,
+          "worst_128px_luma_ssim": 0.9764045476913452,
+          "chroma_mean_absolute_error": 1.5858504644860145,
+          "chroma_95th_percentile_error": 5
+        },
+        {
+          "quality": 88,
+          "bytes": 562078,
+          "full_resolution_luma_ssim": 0.9870640635490417,
+          "worst_128px_luma_ssim": 0.979049026966095,
+          "chroma_mean_absolute_error": 1.5467263523992087,
+          "chroma_95th_percentile_error": 4
+        }
+      ],
+      "generator_output_filename": "exec-749988d5-8e47-407e-85c0-ca1aeea0de43.png"
+    },
+    {
+      "slug": "cliffside_retreat",
+      "id": "skyrim-301",
+      "name": "Горный приют",
+      "english": "Cliffside Retreat",
+      "caption": "Охотничий приют над долиной Предела",
+      "scene": "Cliffside Retreat southwest of Dragon Bridge in the Reach, Skyrim: a tiny open-front hunter's wooden shelter with a rough thatched roof on a high rocky ledge, a bedroll under its roof, a tanning rack immediately beside it. Sweeping elevated panorama over the Karth valley, layered limestone crags, sparse juniper and conifers; far-off Haafingar ridge in cool haze. View from the stony approach, shelter foreground but expansive valley visible, clear late afternoon light. Modest open shack, no hanging cabin, no fortress, no big settlement.",
+      "number": 1,
+      "prompt": "Use case: stylized-concept. Asset type: one finished environment illustration for the SKYRIM TEXT RPG optional location gallery. Scene: Cliffside Retreat southwest of Dragon Bridge in the Reach, Skyrim: a tiny open-front hunter's wooden shelter with a rough thatched roof on a high rocky ledge, a bedroll under its roof, a tanning rack immediately beside it. Sweeping elevated panorama over the Karth valley, layered limestone crags, sparse juniper and conifers; far-off Haafingar ridge in cool haze. View from the stony approach, shelter foreground but expansive valley visible, clear late afternoon light. Modest open shack, no hanging cabin, no fortress, no big settlement. Style: detailed cinematic realistic Nordic fantasy environment consistent with the existing Riverwood landscape gallery, believable rough wood, stone, thatch and vegetation, restrained natural colors, strong spatial depth, clear small details without oversharpening, photorealistic environment illustration. Wide horizontal 16:9 composition, 1920x1080 if possible, full bleed, exactly ONE image of ONE location. Show the whole modest building and its immediate setting. No caption, no title, no lettering, no UI, no logo, no watermark, no border, no collage, no dragons, no modern materials.",
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "dimensions": [
+        1672,
+        941
+      ],
+      "original_bytes": 3546903,
+      "original_sha256": "964a9ddf064afbba7615fcf0ff9816bbde3ae4a0f2d89bd8bdeec7978aecd5c2",
+      "webp_bytes": 516676,
+      "webp_sha256": "dcb5967d1e8cccf01dcaf8c73445400001b70defd65e3db4dcc5c2e44c94d5bb",
+      "archive_bytes": 516788,
+      "archive_sha256": "bc48bf1aef4453dfc7003eb82b479b443455d7dd2b8134e65a61fe465cf79fab",
+      "quality": 88,
+      "bytes": 516676,
+      "full_resolution_luma_ssim": 0.9861836433410645,
+      "worst_128px_luma_ssim": 0.9773482084274292,
+      "chroma_mean_absolute_error": 1.6133910275640797,
+      "chroma_95th_percentile_error": 5,
+      "trials": [
+        {
+          "quality": 76,
+          "bytes": 314250,
+          "full_resolution_luma_ssim": 0.9615781307220459,
+          "worst_128px_luma_ssim": 0.9467524290084839,
+          "chroma_mean_absolute_error": 2.0511389059790814,
+          "chroma_95th_percentile_error": 6
+        },
+        {
+          "quality": 80,
+          "bytes": 370900,
+          "full_resolution_luma_ssim": 0.9710787534713745,
+          "worst_128px_luma_ssim": 0.9561657905578613,
+          "chroma_mean_absolute_error": 1.9005438706659412,
+          "chroma_95th_percentile_error": 6
+        },
+        {
+          "quality": 84,
+          "bytes": 438722,
+          "full_resolution_luma_ssim": 0.9800838232040405,
+          "worst_128px_luma_ssim": 0.9703501462936401,
+          "chroma_mean_absolute_error": 1.746796012589681,
+          "chroma_95th_percentile_error": 5
+        },
+        {
+          "quality": 85,
+          "bytes": 456878,
+          "full_resolution_luma_ssim": 0.9818044900894165,
+          "worst_128px_luma_ssim": 0.9721648693084717,
+          "chroma_mean_absolute_error": 1.7195271623895987,
+          "chroma_95th_percentile_error": 5
+        },
+        {
+          "quality": 86,
+          "bytes": 470672,
+          "full_resolution_luma_ssim": 0.9827885031700134,
+          "worst_128px_luma_ssim": 0.9728885889053345,
+          "chroma_mean_absolute_error": 1.6985798473577431,
+          "chroma_95th_percentile_error": 5
+        },
+        {
+          "quality": 87,
+          "bytes": 497636,
+          "full_resolution_luma_ssim": 0.9847769141197205,
+          "worst_128px_luma_ssim": 0.976148784160614,
+          "chroma_mean_absolute_error": 1.6373541966451246,
+          "chroma_95th_percentile_error": 5
+        },
+        {
+          "quality": 88,
+          "bytes": 516676,
+          "full_resolution_luma_ssim": 0.9861836433410645,
+          "worst_128px_luma_ssim": 0.9773482084274292,
+          "chroma_mean_absolute_error": 1.6133910275640797,
+          "chroma_95th_percentile_error": 5
+        }
+      ],
+      "generator_output_filename": "exec-965d6268-44f9-49d2-a6c7-7f0836eb525e.png"
+    },
+    {
+      "slug": "crabbers_shanty",
+      "id": "skyrim-294",
+      "name": "Хибара краболова",
+      "english": "Crabber's Shanty",
+      "caption": "Хибара краболова на берегу Хьяла",
+      "scene": "Crabber's Shanty southwest of Morthal beside the River Hjaal, Skyrim: a small ramshackle open timber shelter with a broken low thatched roof on the riverbank, rough bed and wooden table under its roof. Wicker crab baskets, simple fishing net and a bucket beside the calm shallow river, one inconspicuous mudcrab among shoreline stones. Reed beds, gray-green marsh plants, scattered birches, pine hills. Three-quarter exterior from the riverbank at eye level, soft cool daylight with water reflections. No pier village, no ocean, no giant crab.",
+      "number": 1,
+      "prompt": "Use case: stylized-concept. Asset type: one finished environment illustration for the SKYRIM TEXT RPG optional location gallery. Scene: Crabber's Shanty southwest of Morthal beside the River Hjaal, Skyrim: a small ramshackle open timber shelter with a broken low thatched roof on the riverbank, rough bed and wooden table under its roof. Wicker crab baskets, simple fishing net and a bucket beside the calm shallow river, one inconspicuous mudcrab among shoreline stones. Reed beds, gray-green marsh plants, scattered birches, pine hills. Three-quarter exterior from the riverbank at eye level, soft cool daylight with water reflections. No pier village, no ocean, no giant crab. Style: detailed cinematic realistic Nordic fantasy environment consistent with the existing Riverwood landscape gallery, believable rough wood, stone, thatch and vegetation, restrained natural colors, strong spatial depth, clear small details without oversharpening, photorealistic environment illustration. Wide horizontal 16:9 composition, 1920x1080 if possible, full bleed, exactly ONE image of ONE location. Show the whole modest building and its immediate setting. No caption, no title, no lettering, no UI, no logo, no watermark, no border, no collage, no dragons, no modern materials.",
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "dimensions": [
+        1672,
+        941
+      ],
+      "original_bytes": 3625219,
+      "original_sha256": "75bc03d52cac2e87c200febd7420a8bdc366687bd3118531d724fb80f017ba1e",
+      "webp_bytes": 514742,
+      "webp_sha256": "f8ca7b173e77d2a4bb217b1deafde9ea965f1f6db9d33c6bdcf504cb348bfe95",
+      "archive_bytes": 514854,
+      "archive_sha256": "7e894f294532739e60c8c5eb31dabe3410b7238d3365acb28d9115a9802d4aee",
+      "quality": 87,
+      "bytes": 514742,
+      "full_resolution_luma_ssim": 0.985456645488739,
+      "worst_128px_luma_ssim": 0.9751619100570679,
+      "chroma_mean_absolute_error": 1.7278504746553855,
+      "chroma_95th_percentile_error": 5,
+      "trials": [
+        {
+          "quality": 76,
+          "bytes": 333310,
+          "full_resolution_luma_ssim": 0.9625638127326965,
+          "worst_128px_luma_ssim": 0.9403247237205505,
+          "chroma_mean_absolute_error": 2.083019883662397,
+          "chroma_95th_percentile_error": 6
+        },
+        {
+          "quality": 80,
+          "bytes": 390858,
+          "full_resolution_luma_ssim": 0.9721057415008545,
+          "worst_128px_luma_ssim": 0.9546247720718384,
+          "chroma_mean_absolute_error": 1.95515148549085,
+          "chroma_95th_percentile_error": 6
+        },
+        {
+          "quality": 84,
+          "bytes": 458800,
+          "full_resolution_luma_ssim": 0.9810479879379272,
+          "worst_128px_luma_ssim": 0.9684710502624512,
+          "chroma_mean_absolute_error": 1.8286947231134545,
+          "chroma_95th_percentile_error": 5
+        },
+        {
+          "quality": 85,
+          "bytes": 477808,
+          "full_resolution_luma_ssim": 0.9825211763381958,
+          "worst_128px_luma_ssim": 0.9702884554862976,
+          "chroma_mean_absolute_error": 1.7757297794771927,
+          "chroma_95th_percentile_error": 5
+        },
+        {
+          "quality": 86,
+          "bytes": 500156,
+          "full_resolution_luma_ssim": 0.984578549861908,
+          "worst_128px_luma_ssim": 0.9734683036804199,
+          "chroma_mean_absolute_error": 1.7562227015950658,
+          "chroma_95th_percentile_error": 5
+        },
+        {
+          "quality": 87,
+          "bytes": 514742,
+          "full_resolution_luma_ssim": 0.985456645488739,
+          "worst_128px_luma_ssim": 0.9751619100570679,
+          "chroma_mean_absolute_error": 1.7278504746553855,
+          "chroma_95th_percentile_error": 5
+        },
+        {
+          "quality": 88,
+          "bytes": 541978,
+          "full_resolution_luma_ssim": 0.9870784282684326,
+          "worst_128px_luma_ssim": 0.9768306612968445,
+          "chroma_mean_absolute_error": 1.6716068622914644,
+          "chroma_95th_percentile_error": 5
+        }
+      ],
+      "generator_output_filename": "exec-6316db1a-b694-4d85-a013-98ec474e5e9b.png"
+    },
+    {
+      "slug": "drelas_cottage",
+      "id": "skyrim-293",
+      "name": "Дом Дреласа",
+      "english": "Drelas' Cottage",
+      "caption": "Уединённый дом Дреласа в горной долине",
+      "scene": "Drelas' Cottage in Skyrim: a solitary compact enclosed Nordic cottage in a narrow green rocky valley south of Morthal and northwest of Whiterun. Intact steep thatched roof, sturdy dark timber frame, pale plaster infill on a rough low stone base, wooden entry door and small windows, chimney, little fenced herb patch and one chicken outside. Rocky mountain walls and conifers rise around the secluded house. Eye-level three-quarter exterior, gentle overcast daylight, detailed weathered materials. Not a ruined shack, not a tower, no magical effects, no people.",
+      "number": 1,
+      "prompt": "Use case: stylized-concept. Asset type: one finished environment illustration for the SKYRIM TEXT RPG optional location gallery. Scene: Drelas' Cottage in Skyrim: a solitary compact enclosed Nordic cottage in a narrow green rocky valley south of Morthal and northwest of Whiterun. Intact steep thatched roof, sturdy dark timber frame, pale plaster infill on a rough low stone base, wooden entry door and small windows, chimney, little fenced herb patch and one chicken outside. Rocky mountain walls and conifers rise around the secluded house. Eye-level three-quarter exterior, gentle overcast daylight, detailed weathered materials. Not a ruined shack, not a tower, no magical effects, no people. Style: detailed cinematic realistic Nordic fantasy environment consistent with the existing Riverwood landscape gallery, believable rough wood, stone, thatch and vegetation, restrained natural colors, strong spatial depth, clear small details without oversharpening, photorealistic environment illustration. Wide horizontal 16:9 composition, 1920x1080 if possible, full bleed, exactly ONE image of ONE location. Show the whole modest building and its immediate setting. No caption, no title, no lettering, no UI, no logo, no watermark, no border, no collage, no dragons, no modern materials.",
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "dimensions": [
+        1672,
+        941
+      ],
+      "original_bytes": 3678470,
+      "original_sha256": "e0ddac9be30266ed801ead1a8003049ad3b9a47682537d2e9dc9b15121c643ce",
+      "webp_bytes": 526226,
+      "webp_sha256": "1a7f3cc2014864b6aa3afed0a26beac5f264fcb5e1a188ecbaa66f89279c9e8a",
+      "archive_bytes": 526338,
+      "archive_sha256": "7c625a644be302123362391d80c7c9bdcd07cb91bc84eab17a03f69933158ced",
+      "quality": 88,
+      "bytes": 526226,
+      "full_resolution_luma_ssim": 0.9866127371788025,
+      "worst_128px_luma_ssim": 0.9772964715957642,
+      "chroma_mean_absolute_error": 1.3283155962556377,
+      "chroma_95th_percentile_error": 4,
+      "trials": [
+        {
+          "quality": 76,
+          "bytes": 318542,
+          "full_resolution_luma_ssim": 0.9596341848373413,
+          "worst_128px_luma_ssim": 0.9400115013122559,
+          "chroma_mean_absolute_error": 1.595956594582776,
+          "chroma_95th_percentile_error": 5
+        },
+        {
+          "quality": 80,
+          "bytes": 378220,
+          "full_resolution_luma_ssim": 0.9711832404136658,
+          "worst_128px_luma_ssim": 0.9540598392486572,
+          "chroma_mean_absolute_error": 1.513953648007566,
+          "chroma_95th_percentile_error": 4
+        },
+        {
+          "quality": 84,
+          "bytes": 440574,
+          "full_resolution_luma_ssim": 0.9788931012153625,
+          "worst_128px_luma_ssim": 0.9634367227554321,
+          "chroma_mean_absolute_error": 1.4315436088046414,
+          "chroma_95th_percentile_error": 4
+        },
+        {
+          "quality": 85,
+          "bytes": 455434,
+          "full_resolution_luma_ssim": 0.9804447889328003,
+          "worst_128px_luma_ssim": 0.9649430513381958,
+          "chroma_mean_absolute_error": 1.4097004357575418,
+          "chroma_95th_percentile_error": 4
+        },
+        {
+          "quality": 86,
+          "bytes": 477726,
+          "full_resolution_luma_ssim": 0.9829720258712769,
+          "worst_128px_luma_ssim": 0.9711376428604126,
+          "chroma_mean_absolute_error": 1.380603005557561,
+          "chroma_95th_percentile_error": 4
+        },
+        {
+          "quality": 87,
+          "bytes": 501030,
+          "full_resolution_luma_ssim": 0.984811544418335,
+          "worst_128px_luma_ssim": 0.9750086665153503,
+          "chroma_mean_absolute_error": 1.3524116027436963,
+          "chroma_95th_percentile_error": 4
+        },
+        {
+          "quality": 88,
+          "bytes": 526226,
+          "full_resolution_luma_ssim": 0.9866127371788025,
+          "worst_128px_luma_ssim": 0.9772964715957642,
+          "chroma_mean_absolute_error": 1.3283155962556377,
+          "chroma_95th_percentile_error": 4
+        }
+      ],
+      "generator_output_filename": "exec-d68bcc69-0b13-460c-a11c-02346c39f62a.png"
+    },
+    {
+      "slug": "frokis_shack",
+      "id": "skyrim-297",
+      "name": "Хижина Фроки",
+      "english": "Froki's Shack",
+      "caption": "Хижина Фроки на склоне гор Рифта",
+      "scene": "Froki's Shack on the southern mountain slopes of the Rift, Skyrim: a small enclosed rustic Nordic log cabin with steep thatched roof and a plain wooden door, on a rock shelf looking down through golden autumn birches. Outdoor cooking pot over a small stone hearth, split logs and rough chopping block, a few hunting supplies beside the door. Rugged gray mountains, autumn woodland below, a little frost on shaded rocks. Three-quarter exterior from the uphill path, cool clear daylight. One humble cabin, no people, no temple, no city.",
+      "number": 1,
+      "prompt": "Use case: stylized-concept. Asset type: one finished environment illustration for the SKYRIM TEXT RPG optional location gallery. Scene: Froki's Shack on the southern mountain slopes of the Rift, Skyrim: a small enclosed rustic Nordic log cabin with steep thatched roof and a plain wooden door, on a rock shelf looking down through golden autumn birches. Outdoor cooking pot over a small stone hearth, split logs and rough chopping block, a few hunting supplies beside the door. Rugged gray mountains, autumn woodland below, a little frost on shaded rocks. Three-quarter exterior from the uphill path, cool clear daylight. One humble cabin, no people, no temple, no city. Style: detailed cinematic realistic Nordic fantasy environment consistent with the existing Riverwood landscape gallery, believable rough wood, stone, thatch and vegetation, restrained natural colors, strong spatial depth, clear small details without oversharpening, photorealistic environment illustration. Wide horizontal 16:9 composition, 1920x1080 if possible, full bleed, exactly ONE image of ONE location. Show the whole modest building and its immediate setting. No caption, no title, no lettering, no UI, no logo, no watermark, no border, no collage, no dragons, no modern materials.",
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "dimensions": [
+        1672,
+        941
+      ],
+      "original_bytes": 3892548,
+      "original_sha256": "fbbee21d193d0809096f63f761ad1341a40d4a5b149cd10171bdbccfdc7d89ef",
+      "webp_bytes": 577036,
+      "webp_sha256": "ff46bcc3e2baaca4976e6c96d071d94e703b14337c68f61d0aebb8ebbac6710d",
+      "archive_bytes": 577148,
+      "archive_sha256": "60ff59f2c373ca1401842177cd04aaf72865f84cdbc9d137412e76887291f249",
+      "quality": 86,
+      "bytes": 577036,
+      "full_resolution_luma_ssim": 0.9861876964569092,
+      "worst_128px_luma_ssim": 0.9816147089004517,
+      "chroma_mean_absolute_error": 2.155613302045569,
+      "chroma_95th_percentile_error": 7,
+      "trials": [
+        {
+          "quality": 76,
+          "bytes": 396668,
+          "full_resolution_luma_ssim": 0.965828001499176,
+          "worst_128px_luma_ssim": 0.9517436623573303,
+          "chroma_mean_absolute_error": 2.5354993669566634,
+          "chroma_95th_percentile_error": 8
+        },
+        {
+          "quality": 80,
+          "bytes": 456158,
+          "full_resolution_luma_ssim": 0.9749618172645569,
+          "worst_128px_luma_ssim": 0.9650346636772156,
+          "chroma_mean_absolute_error": 2.405102608952097,
+          "chroma_95th_percentile_error": 7
+        },
+        {
+          "quality": 84,
+          "bytes": 536452,
+          "full_resolution_luma_ssim": 0.9830310344696045,
+          "worst_128px_luma_ssim": 0.9772058725357056,
+          "chroma_mean_absolute_error": 2.2481784114425762,
+          "chroma_95th_percentile_error": 7
+        },
+        {
+          "quality": 85,
+          "bytes": 553352,
+          "full_resolution_luma_ssim": 0.984164297580719,
+          "worst_128px_luma_ssim": 0.9770990014076233,
+          "chroma_mean_absolute_error": 2.1969718155886286,
+          "chroma_95th_percentile_error": 7
+        },
+        {
+          "quality": 86,
+          "bytes": 577036,
+          "full_resolution_luma_ssim": 0.9861876964569092,
+          "worst_128px_luma_ssim": 0.9816147089004517,
+          "chroma_mean_absolute_error": 2.155613302045569,
+          "chroma_95th_percentile_error": 7
+        },
+        {
+          "quality": 87,
+          "bytes": 599576,
+          "full_resolution_luma_ssim": 0.987716019153595,
+          "worst_128px_luma_ssim": 0.9835208654403687,
+          "chroma_mean_absolute_error": 2.13450740838668,
+          "chroma_95th_percentile_error": 7
+        },
+        {
+          "quality": 88,
+          "bytes": 630180,
+          "full_resolution_luma_ssim": 0.9892101883888245,
+          "worst_128px_luma_ssim": 0.9852482080459595,
+          "chroma_mean_absolute_error": 2.065200603552161,
+          "chroma_95th_percentile_error": 6
+        }
+      ],
+      "generator_output_filename": "exec-d69924ea-4ea8-4c6b-9bfd-d6d80b639895.png"
+    },
+    {
+      "slug": "hall_of_the_vigilant",
+      "id": "skyrim-303",
+      "name": "Зал Дозора",
+      "english": "Hall of the Vigilant",
+      "caption": "Зал Дозора до разрушения",
+      "scene": "Hall of the Vigilant south of Dawnstar in Skyrim, intact BEFORE its destruction by vampires: a modest but broad Nordic timber hall on stone foundations, low projecting porch, steep thatched gable roof, rough wooden door, small narrow windows and smoking stone chimney. An empty small stable lean-to, tanning rack and chopping block beside the main hall. Snowy rocky upland, sparse firs, pale mountains, quiet winter morning with readable natural light. Establishing three-quarter exterior. This is a rural headquarters, not a castle or cathedral. No fire damage, no vampire attack, no people.",
+      "number": 1,
+      "prompt": "Use case: stylized-concept. Asset type: one finished environment illustration for the SKYRIM TEXT RPG optional location gallery. Scene: Hall of the Vigilant south of Dawnstar in Skyrim, intact BEFORE its destruction by vampires: a modest but broad Nordic timber hall on stone foundations, low projecting porch, steep thatched gable roof, rough wooden door, small narrow windows and smoking stone chimney. An empty small stable lean-to, tanning rack and chopping block beside the main hall. Snowy rocky upland, sparse firs, pale mountains, quiet winter morning with readable natural light. Establishing three-quarter exterior. This is a rural headquarters, not a castle or cathedral. No fire damage, no vampire attack, no people. Style: detailed cinematic realistic Nordic fantasy environment consistent with the existing Riverwood landscape gallery, believable rough wood, stone, thatch and vegetation, restrained natural colors, strong spatial depth, clear small details without oversharpening, photorealistic environment illustration. Wide horizontal 16:9 composition, 1920x1080 if possible, full bleed, exactly ONE image of ONE location. Show the whole modest building and its immediate setting. No caption, no title, no lettering, no UI, no logo, no watermark, no border, no collage, no dragons, no modern materials.",
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "dimensions": [
+        1672,
+        941
+      ],
+      "original_bytes": 3645988,
+      "original_sha256": "3f5ac8411e0a07a3e2c774f285ae0bd55613cd72916a34b00c4300be7404a9a3",
+      "webp_bytes": 484998,
+      "webp_sha256": "bd15b6d3821a60090fbb3e9968a37a77d80641cfc867ade7277d3f43f54e3351",
+      "archive_bytes": 485110,
+      "archive_sha256": "298fd924057f2db2eff769ca2d4437e8e08bb9d613dbadd766c056f95287358e",
+      "quality": 86,
+      "bytes": 484998,
+      "full_resolution_luma_ssim": 0.9856248497962952,
+      "worst_128px_luma_ssim": 0.9765119552612305,
+      "chroma_mean_absolute_error": 1.545839392583478,
+      "chroma_95th_percentile_error": 4,
+      "trials": [
+        {
+          "quality": 76,
+          "bytes": 328526,
+          "full_resolution_luma_ssim": 0.9673029184341431,
+          "worst_128px_luma_ssim": 0.9396324157714844,
+          "chroma_mean_absolute_error": 1.911499143230504,
+          "chroma_95th_percentile_error": 6
+        },
+        {
+          "quality": 80,
+          "bytes": 384928,
+          "full_resolution_luma_ssim": 0.9757217764854431,
+          "worst_128px_luma_ssim": 0.9590198397636414,
+          "chroma_mean_absolute_error": 1.7704966847850958,
+          "chroma_95th_percentile_error": 5
+        },
+        {
+          "quality": 84,
+          "bytes": 446784,
+          "full_resolution_luma_ssim": 0.9826281070709229,
+          "worst_128px_luma_ssim": 0.9719641208648682,
+          "chroma_mean_absolute_error": 1.6388576745699628,
+          "chroma_95th_percentile_error": 5
+        },
+        {
+          "quality": 85,
+          "bytes": 461884,
+          "full_resolution_luma_ssim": 0.983906626701355,
+          "worst_128px_luma_ssim": 0.9737647175788879,
+          "chroma_mean_absolute_error": 1.5989206483990868,
+          "chroma_95th_percentile_error": 5
+        },
+        {
+          "quality": 86,
+          "bytes": 484998,
+          "full_resolution_luma_ssim": 0.9856248497962952,
+          "worst_128px_luma_ssim": 0.9765119552612305,
+          "chroma_mean_absolute_error": 1.545839392583478,
+          "chroma_95th_percentile_error": 4
+        },
+        {
+          "quality": 87,
+          "bytes": 505838,
+          "full_resolution_luma_ssim": 0.9869918823242188,
+          "worst_128px_luma_ssim": 0.9786122441291809,
+          "chroma_mean_absolute_error": 1.5117764492624663,
+          "chroma_95th_percentile_error": 4
+        },
+        {
+          "quality": 88,
+          "bytes": 524974,
+          "full_resolution_luma_ssim": 0.9882396459579468,
+          "worst_128px_luma_ssim": 0.9810280203819275,
+          "chroma_mean_absolute_error": 1.4856389415718796,
+          "chroma_95th_percentile_error": 4
+        }
+      ],
+      "generator_output_filename": "exec-d026e74c-da14-41ec-a7f5-faec276ed0ac.png"
+    },
+    {
+      "slug": "hunters_rest",
+      "id": "skyrim-289",
+      "name": "Охотничий привал",
+      "english": "Hunter's Rest",
+      "caption": "Охотничий привал в лесах Фолкрита",
+      "scene": "Hunter's Rest in the woods of Falkreath Hold, Skyrim: a small rough open-front shelter made of timber and thatch, two rolled wool bedrolls and a wooden chest tucked under its roof, a cooking spit over a small campfire outside, tanning rack, chopping block and a beehive hanging on a pole nearby. Sheltered grassy clearing amid dense tall pine forest, mossy boulders and ferns. Eye-level wide three-quarter exterior, inviting late afternoon shafts of sunlight, calm natural colors. No people, no modern camping equipment.",
+      "number": 1,
+      "prompt": "Use case: stylized-concept. Asset type: one finished environment illustration for the SKYRIM TEXT RPG optional location gallery. Scene: Hunter's Rest in the woods of Falkreath Hold, Skyrim: a small rough open-front shelter made of timber and thatch, two rolled wool bedrolls and a wooden chest tucked under its roof, a cooking spit over a small campfire outside, tanning rack, chopping block and a beehive hanging on a pole nearby. Sheltered grassy clearing amid dense tall pine forest, mossy boulders and ferns. Eye-level wide three-quarter exterior, inviting late afternoon shafts of sunlight, calm natural colors. No people, no modern camping equipment. Style: detailed cinematic realistic Nordic fantasy environment consistent with the existing Riverwood landscape gallery, believable rough wood, stone, thatch and vegetation, restrained natural colors, strong spatial depth, clear small details without oversharpening, photorealistic environment illustration. Wide horizontal 16:9 composition, 1920x1080 if possible, full bleed, exactly ONE image of ONE location. Show the whole modest building and its immediate setting. No caption, no title, no lettering, no UI, no logo, no watermark, no border, no collage, no dragons, no modern materials.",
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "dimensions": [
+        1672,
+        941
+      ],
+      "original_bytes": 3510987,
+      "original_sha256": "7f90b5100bda7d87ec2b23be80881ab61e0e1c9c3ec821ac06ec0eb2c1c8ffc3",
+      "webp_bytes": 546618,
+      "webp_sha256": "71aff79383210c83a93c833fb17d97ecb5686ef853ae57bd2f161c091647a343",
+      "archive_bytes": 546730,
+      "archive_sha256": "aa8ee79a10ba126e300c704e61f76e301be79f8fb23d8f42a9e51876d25f02a4",
+      "quality": 89,
+      "bytes": 546618,
+      "full_resolution_luma_ssim": 0.9854637980461121,
+      "worst_128px_luma_ssim": 0.9748197793960571,
+      "chroma_mean_absolute_error": 1.575992212804255,
+      "chroma_95th_percentile_error": 5,
+      "trials": [
+        {
+          "quality": 76,
+          "bytes": 307134,
+          "full_resolution_luma_ssim": 0.9542466998100281,
+          "worst_128px_luma_ssim": 0.933221161365509,
+          "chroma_mean_absolute_error": 2.002574757587622,
+          "chroma_95th_percentile_error": 6
+        },
+        {
+          "quality": 80,
+          "bytes": 359298,
+          "full_resolution_luma_ssim": 0.9651249051094055,
+          "worst_128px_luma_ssim": 0.946740984916687,
+          "chroma_mean_absolute_error": 1.8870907463809752,
+          "chroma_95th_percentile_error": 6
+        },
+        {
+          "quality": 84,
+          "bytes": 428372,
+          "full_resolution_luma_ssim": 0.9752249121665955,
+          "worst_128px_luma_ssim": 0.9621615409851074,
+          "chroma_mean_absolute_error": 1.762646248264851,
+          "chroma_95th_percentile_error": 5
+        },
+        {
+          "quality": 88,
+          "bytes": 527608,
+          "full_resolution_luma_ssim": 0.9842424988746643,
+          "worst_128px_luma_ssim": 0.9742016792297363,
+          "chroma_mean_absolute_error": 1.5962276718750794,
+          "chroma_95th_percentile_error": 5
+        },
+        {
+          "quality": 89,
+          "bytes": 546618,
+          "full_resolution_luma_ssim": 0.9854637980461121,
+          "worst_128px_luma_ssim": 0.9748197793960571,
+          "chroma_mean_absolute_error": 1.575992212804255,
+          "chroma_95th_percentile_error": 5
+        },
+        {
+          "quality": 90,
+          "bytes": 571664,
+          "full_resolution_luma_ssim": 0.987095057964325,
+          "worst_128px_luma_ssim": 0.9795926809310913,
+          "chroma_mean_absolute_error": 1.5669916839969695,
+          "chroma_95th_percentile_error": 5
+        },
+        {
+          "quality": 91,
+          "bytes": 607344,
+          "full_resolution_luma_ssim": 0.988762617111206,
+          "worst_128px_luma_ssim": 0.9803742170333862,
+          "chroma_mean_absolute_error": 1.5046464491099258,
+          "chroma_95th_percentile_error": 4
+        },
+        {
+          "quality": 92,
+          "bytes": 636690,
+          "full_resolution_luma_ssim": 0.9899596571922302,
+          "worst_128px_luma_ssim": 0.9826131463050842,
+          "chroma_mean_absolute_error": 1.4748117395217344,
+          "chroma_95th_percentile_error": 4
+        }
+      ],
+      "generator_output_filename": "exec-9e0c21aa-235f-4dbc-a231-76f1500ff82a.png"
+    },
+    {
+      "slug": "ironback_hideout",
+      "id": "skyrim-290",
+      "name": "Железное убежище",
+      "english": "Ironback Hideout",
+      "caption": "Разрушенная хижина Железного убежища",
+      "scene": "Ironback Hideout northwest of Solitude, Skyrim: roofless ruins of a small Nordic timber house on rocky upland, broken angled beams and partial plank walls on a low stone foundation. A small bandit camp occupies the ruins with simple hide bedrolls, a chest and a sheltered cooking fire, tanning rack and chopping block just outside. Snow patches, wind-bent conifers, gray rocky ridge and distant Haafingar mountains. Three-quarter exterior, cool overcast light with readable ruined architecture. No people, no castle, no metal bunker, no large tents.",
+      "number": 1,
+      "prompt": "Use case: stylized-concept. Asset type: one finished environment illustration for the SKYRIM TEXT RPG optional location gallery. Scene: Ironback Hideout northwest of Solitude, Skyrim: roofless ruins of a small Nordic timber house on rocky upland, broken angled beams and partial plank walls on a low stone foundation. A small bandit camp occupies the ruins with simple hide bedrolls, a chest and a sheltered cooking fire, tanning rack and chopping block just outside. Snow patches, wind-bent conifers, gray rocky ridge and distant Haafingar mountains. Three-quarter exterior, cool overcast light with readable ruined architecture. No people, no castle, no metal bunker, no large tents. Style: detailed cinematic realistic Nordic fantasy environment consistent with the existing Riverwood landscape gallery, believable rough wood, stone, thatch and vegetation, restrained natural colors, strong spatial depth, clear small details without oversharpening, photorealistic environment illustration. Wide horizontal 16:9 composition, 1920x1080 if possible, full bleed, exactly ONE image of ONE location. Show the whole modest building and its immediate setting. No caption, no title, no lettering, no UI, no logo, no watermark, no border, no collage, no dragons, no modern materials.",
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "dimensions": [
+        1672,
+        941
+      ],
+      "original_bytes": 3481683,
+      "original_sha256": "36c6ddba14bff1dfba063ef0f868ab6a3ee83d35fac76ccd2eb11f52fd9a11d0",
+      "webp_bytes": 491328,
+      "webp_sha256": "863275e6da25650224aabcf5b9b3471bc13552af9138d1166d39c758de4c57d5",
+      "archive_bytes": 491440,
+      "archive_sha256": "441e647fba2641ad16231807b7f4633479c848182e19674aaca4711d795a3014",
+      "quality": 88,
+      "bytes": 491328,
+      "full_resolution_luma_ssim": 0.9860066771507263,
+      "worst_128px_luma_ssim": 0.9771326184272766,
+      "chroma_mean_absolute_error": 1.3243142666103962,
+      "chroma_95th_percentile_error": 4,
+      "trials": [
+        {
+          "quality": 76,
+          "bytes": 288670,
+          "full_resolution_luma_ssim": 0.957472562789917,
+          "worst_128px_luma_ssim": 0.9381923079490662,
+          "chroma_mean_absolute_error": 1.6659520565010246,
+          "chroma_95th_percentile_error": 5
+        },
+        {
+          "quality": 80,
+          "bytes": 342948,
+          "full_resolution_luma_ssim": 0.969192624092102,
+          "worst_128px_luma_ssim": 0.9549557566642761,
+          "chroma_mean_absolute_error": 1.560231912502733,
+          "chroma_95th_percentile_error": 5
+        },
+        {
+          "quality": 84,
+          "bytes": 404646,
+          "full_resolution_luma_ssim": 0.9779018759727478,
+          "worst_128px_luma_ssim": 0.965846598148346,
+          "chroma_mean_absolute_error": 1.4561318764014664,
+          "chroma_95th_percentile_error": 4
+        },
+        {
+          "quality": 85,
+          "bytes": 418946,
+          "full_resolution_luma_ssim": 0.9793576598167419,
+          "worst_128px_luma_ssim": 0.9673437476158142,
+          "chroma_mean_absolute_error": 1.4276013886275924,
+          "chroma_95th_percentile_error": 4
+        },
+        {
+          "quality": 86,
+          "bytes": 439260,
+          "full_resolution_luma_ssim": 0.9820004105567932,
+          "worst_128px_luma_ssim": 0.9733976125717163,
+          "chroma_mean_absolute_error": 1.406346450126863,
+          "chroma_95th_percentile_error": 4
+        },
+        {
+          "quality": 87,
+          "bytes": 467952,
+          "full_resolution_luma_ssim": 0.9843125343322754,
+          "worst_128px_luma_ssim": 0.9758318662643433,
+          "chroma_mean_absolute_error": 1.3599525090380284,
+          "chroma_95th_percentile_error": 4
+        },
+        {
+          "quality": 88,
+          "bytes": 491328,
+          "full_resolution_luma_ssim": 0.9860066771507263,
+          "worst_128px_luma_ssim": 0.9771326184272766,
+          "chroma_mean_absolute_error": 1.3243142666103962,
+          "chroma_95th_percentile_error": 4
+        }
+      ],
+      "generator_output_filename": "exec-14572faf-35c1-4f61-82c3-306e902412f9.png"
+    },
+    {
+      "slug": "lunds_hut",
+      "id": "skyrim-295",
+      "name": "Хижина Лунда",
+      "english": "Lund's Hut",
+      "caption": "Хижина Лунда над полями Рорикстеда",
+      "scene": "Lund's Hut northwest of Rorikstead in Whiterun Hold, Skyrim: a small intact enclosed Nordic cottage with weathered timber framing, plaster panels, a worn thatched roof and one wooden door, standing alone on a low grassy knoll. Sparse scrub, tawny tundra grass and scattered rocks, distant cultivated fields and rolling open Whiterun plains, gray mountain ridge far away. A small outdoor cooking spit and chopping block; one small dark skeever near the hut, subtle not the main subject. Quiet three-quarter exterior in cloudy afternoon light. No dense forest, no snow blanket, no people.",
+      "number": 1,
+      "prompt": "Use case: stylized-concept. Asset type: one finished environment illustration for the SKYRIM TEXT RPG optional location gallery. Scene: Lund's Hut northwest of Rorikstead in Whiterun Hold, Skyrim: a small intact enclosed Nordic cottage with weathered timber framing, plaster panels, a worn thatched roof and one wooden door, standing alone on a low grassy knoll. Sparse scrub, tawny tundra grass and scattered rocks, distant cultivated fields and rolling open Whiterun plains, gray mountain ridge far away. A small outdoor cooking spit and chopping block; one small dark skeever near the hut, subtle not the main subject. Quiet three-quarter exterior in cloudy afternoon light. No dense forest, no snow blanket, no people. Style: detailed cinematic realistic Nordic fantasy environment consistent with the existing Riverwood landscape gallery, believable rough wood, stone, thatch and vegetation, restrained natural colors, strong spatial depth, clear small details without oversharpening, photorealistic environment illustration. Wide horizontal 16:9 composition, 1920x1080 if possible, full bleed, exactly ONE image of ONE location. Show the whole modest building and its immediate setting. No caption, no title, no lettering, no UI, no logo, no watermark, no border, no collage, no dragons, no modern materials.",
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "dimensions": [
+        1672,
+        941
+      ],
+      "original_bytes": 3411717,
+      "original_sha256": "1d7a00c939e807182f2328d3d4daa8c712838623ba4f7b5f79e9622ab979298e",
+      "webp_bytes": 482026,
+      "webp_sha256": "bf4a1d5b2da4fd82a99d700e22da1c49c99abc50a13f0d94f0c69023ce3b181c",
+      "archive_bytes": 482138,
+      "archive_sha256": "5d603b9ab3972b3f97c65ea784eeafb4ab473eda373a3636c1dc508143865189",
+      "quality": 88,
+      "bytes": 482026,
+      "full_resolution_luma_ssim": 0.9855117201805115,
+      "worst_128px_luma_ssim": 0.9716873168945312,
+      "chroma_mean_absolute_error": 1.4940556849325517,
+      "chroma_95th_percentile_error": 5,
+      "trials": [
+        {
+          "quality": 76,
+          "bytes": 278896,
+          "full_resolution_luma_ssim": 0.9553579688072205,
+          "worst_128px_luma_ssim": 0.929223358631134,
+          "chroma_mean_absolute_error": 1.848363557551012,
+          "chroma_95th_percentile_error": 6
+        },
+        {
+          "quality": 80,
+          "bytes": 334960,
+          "full_resolution_luma_ssim": 0.967616856098175,
+          "worst_128px_luma_ssim": 0.9426717758178711,
+          "chroma_mean_absolute_error": 1.7308714133900107,
+          "chroma_95th_percentile_error": 5
+        },
+        {
+          "quality": 84,
+          "bytes": 394642,
+          "full_resolution_luma_ssim": 0.977096676826477,
+          "worst_128px_luma_ssim": 0.9568604230880737,
+          "chroma_mean_absolute_error": 1.6290880870904922,
+          "chroma_95th_percentile_error": 5
+        },
+        {
+          "quality": 85,
+          "bytes": 410558,
+          "full_resolution_luma_ssim": 0.9786663055419922,
+          "worst_128px_luma_ssim": 0.9586979746818542,
+          "chroma_mean_absolute_error": 1.6019517565045838,
+          "chroma_95th_percentile_error": 5
+        },
+        {
+          "quality": 86,
+          "bytes": 431518,
+          "full_resolution_luma_ssim": 0.9812255501747131,
+          "worst_128px_luma_ssim": 0.9653136134147644,
+          "chroma_mean_absolute_error": 1.5768941088834538,
+          "chroma_95th_percentile_error": 5
+        },
+        {
+          "quality": 87,
+          "bytes": 450910,
+          "full_resolution_luma_ssim": 0.9826170802116394,
+          "worst_128px_luma_ssim": 0.9649766087532043,
+          "chroma_mean_absolute_error": 1.5304410583264267,
+          "chroma_95th_percentile_error": 5
+        },
+        {
+          "quality": 88,
+          "bytes": 482026,
+          "full_resolution_luma_ssim": 0.9855117201805115,
+          "worst_128px_luma_ssim": 0.9716873168945312,
+          "chroma_mean_absolute_error": 1.4940556849325517,
+          "chroma_95th_percentile_error": 5
+        }
+      ],
+      "generator_output_filename": "exec-3afa05f8-311a-4a0b-bc64-4dd655980b5f.png"
+    },
+    {
+      "slug": "meekos_shack",
+      "id": "skyrim-288",
+      "name": "Хижина Мико",
+      "english": "Meeko's Shack",
+      "caption": "Хижина Мико в тихом лесу",
+      "scene": "Meeko's Shack east of Dragon Bridge, Skyrim: a tiny dilapidated open-front timber shack with uneven thatch roof, rough bed and table partly visible inside. A small shaggy gray-brown Nordic dog Meeko waits at the open entrance, natural animal anatomy, looking down the forest path. Tall damp pine trunks, green undergrowth, soft moss and a few fallen birch leaves, secluded northern forest. Eye-level three-quarter exterior, tender quiet diffuse morning light, realistic rustic materials. No people, no visible corpse, no collars with text, no modern objects.",
+      "number": 1,
+      "prompt": "Use case: stylized-concept. Asset type: one finished environment illustration for the SKYRIM TEXT RPG optional location gallery. Scene: Meeko's Shack east of Dragon Bridge, Skyrim: a tiny dilapidated open-front timber shack with uneven thatch roof, rough bed and table partly visible inside. A small shaggy gray-brown Nordic dog Meeko waits at the open entrance, natural animal anatomy, looking down the forest path. Tall damp pine trunks, green undergrowth, soft moss and a few fallen birch leaves, secluded northern forest. Eye-level three-quarter exterior, tender quiet diffuse morning light, realistic rustic materials. No people, no visible corpse, no collars with text, no modern objects. Style: detailed cinematic realistic Nordic fantasy environment consistent with the existing Riverwood landscape gallery, believable rough wood, stone, thatch and vegetation, restrained natural colors, strong spatial depth, clear small details without oversharpening, photorealistic environment illustration. Wide horizontal 16:9 composition, 1920x1080 if possible, full bleed, exactly ONE image of ONE location. Show the whole modest building and its immediate setting. No caption, no title, no lettering, no UI, no logo, no watermark, no border, no collage, no dragons, no modern materials.",
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "dimensions": [
+        1672,
+        941
+      ],
+      "original_bytes": 3626737,
+      "original_sha256": "4cba3079df454d626ccfd31b48cc0cc552b8879f400ddd4ea0afb10ff20a0e7b",
+      "webp_bytes": 522562,
+      "webp_sha256": "2f9d847acf959dd94e8cb6c2157725fc73a6bb6e71d8749aa00f1b4445d01550",
+      "archive_bytes": 522674,
+      "archive_sha256": "a98622029c8b06d829493978f665a3cf49377a56e6e34f86b78ec2153eb7883e",
+      "quality": 88,
+      "bytes": 522562,
+      "full_resolution_luma_ssim": 0.985308051109314,
+      "worst_128px_luma_ssim": 0.9759503602981567,
+      "chroma_mean_absolute_error": 1.4229752782594105,
+      "chroma_95th_percentile_error": 4,
+      "trials": [
+        {
+          "quality": 76,
+          "bytes": 313956,
+          "full_resolution_luma_ssim": 0.9568290114402771,
+          "worst_128px_luma_ssim": 0.9403760433197021,
+          "chroma_mean_absolute_error": 1.7294753494450066,
+          "chroma_95th_percentile_error": 5
+        },
+        {
+          "quality": 80,
+          "bytes": 365240,
+          "full_resolution_luma_ssim": 0.9674936532974243,
+          "worst_128px_luma_ssim": 0.9550179243087769,
+          "chroma_mean_absolute_error": 1.6481181579201603,
+          "chroma_95th_percentile_error": 5
+        },
+        {
+          "quality": 84,
+          "bytes": 431096,
+          "full_resolution_luma_ssim": 0.9769856929779053,
+          "worst_128px_luma_ssim": 0.9677539467811584,
+          "chroma_mean_absolute_error": 1.54548632473852,
+          "chroma_95th_percentile_error": 4
+        },
+        {
+          "quality": 85,
+          "bytes": 451760,
+          "full_resolution_luma_ssim": 0.979210376739502,
+          "worst_128px_luma_ssim": 0.9685605764389038,
+          "chroma_mean_absolute_error": 1.5176295577849077,
+          "chroma_95th_percentile_error": 4
+        },
+        {
+          "quality": 86,
+          "bytes": 476418,
+          "full_resolution_luma_ssim": 0.9816058278083801,
+          "worst_128px_luma_ssim": 0.9724581241607666,
+          "chroma_mean_absolute_error": 1.4788956953053098,
+          "chroma_95th_percentile_error": 4
+        },
+        {
+          "quality": 87,
+          "bytes": 498096,
+          "full_resolution_luma_ssim": 0.9835219383239746,
+          "worst_128px_luma_ssim": 0.9752336740493774,
+          "chroma_mean_absolute_error": 1.453166233620957,
+          "chroma_95th_percentile_error": 4
+        },
+        {
+          "quality": 88,
+          "bytes": 522562,
+          "full_resolution_luma_ssim": 0.985308051109314,
+          "worst_128px_luma_ssim": 0.9759503602981567,
+          "chroma_mean_absolute_error": 1.4229752782594105,
+          "chroma_95th_percentile_error": 4
+        }
+      ],
+      "generator_output_filename": "exec-f0603c95-9c06-4a8f-a00f-cc2cb09987d2.png"
+    },
+    {
+      "slug": "pinewatch",
+      "id": "skyrim-300",
+      "name": "Сосновая застава",
+      "english": "Pinewatch",
+      "caption": "Сосновая застава среди лесов Фолкрита",
+      "scene": "Pinewatch northeast of Falkreath, Skyrim: an innocent-looking modest enclosed Nordic farmhouse with steep intact thatched roof, dark timber beams and pale plaster, low stone foundation, small windows and wooden entrance. Small garden rows of leeks and potatoes enclosed by rough split-rail fence, chopping block and stacked firewood. Dense Falkreath pine forest surrounds a peaceful clearing, mountains beyond. Three-quarter exterior from garden path, clear gentle morning light. This is a farmhouse hiding a secret, not a watchtower or military checkpoint. No people, no bandit battle.",
+      "number": 1,
+      "prompt": "Use case: stylized-concept. Asset type: one finished environment illustration for the SKYRIM TEXT RPG optional location gallery. Scene: Pinewatch northeast of Falkreath, Skyrim: an innocent-looking modest enclosed Nordic farmhouse with steep intact thatched roof, dark timber beams and pale plaster, low stone foundation, small windows and wooden entrance. Small garden rows of leeks and potatoes enclosed by rough split-rail fence, chopping block and stacked firewood. Dense Falkreath pine forest surrounds a peaceful clearing, mountains beyond. Three-quarter exterior from garden path, clear gentle morning light. This is a farmhouse hiding a secret, not a watchtower or military checkpoint. No people, no bandit battle. Style: detailed cinematic realistic Nordic fantasy environment consistent with the existing Riverwood landscape gallery, believable rough wood, stone, thatch and vegetation, restrained natural colors, strong spatial depth, clear small details without oversharpening, photorealistic environment illustration. Wide horizontal 16:9 composition, 1920x1080 if possible, full bleed, exactly ONE image of ONE location. Show the whole modest building and its immediate setting. No caption, no title, no lettering, no UI, no logo, no watermark, no border, no collage, no dragons, no modern materials.",
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "dimensions": [
+        1672,
+        941
+      ],
+      "original_bytes": 3665100,
+      "original_sha256": "9596f0a8eb50a76e5ac24156f57b89c16df8422976266edfbbacdf13f43f038a",
+      "webp_bytes": 549120,
+      "webp_sha256": "27803925b063a473b3a08c67b7ef21b90dff7ffb6841f08705edc345b0969820",
+      "archive_bytes": 549232,
+      "archive_sha256": "070dacacd7415b90b1ad570d2441f92926c5a104b6fe7ba3e40e853256d8adb6",
+      "quality": 88,
+      "bytes": 549120,
+      "full_resolution_luma_ssim": 0.9854975938796997,
+      "worst_128px_luma_ssim": 0.9773401021957397,
+      "chroma_mean_absolute_error": 1.531461491134851,
+      "chroma_95th_percentile_error": 4,
+      "trials": [
+        {
+          "quality": 76,
+          "bytes": 331354,
+          "full_resolution_luma_ssim": 0.9564882516860962,
+          "worst_128px_luma_ssim": 0.9365742206573486,
+          "chroma_mean_absolute_error": 1.884399994406846,
+          "chroma_95th_percentile_error": 6
+        },
+        {
+          "quality": 80,
+          "bytes": 395252,
+          "full_resolution_luma_ssim": 0.9690392017364502,
+          "worst_128px_luma_ssim": 0.9549156427383423,
+          "chroma_mean_absolute_error": 1.760865019398075,
+          "chroma_95th_percentile_error": 5
+        },
+        {
+          "quality": 84,
+          "bytes": 457686,
+          "full_resolution_luma_ssim": 0.9773761034011841,
+          "worst_128px_luma_ssim": 0.9657971858978271,
+          "chroma_mean_absolute_error": 1.6572378590423504,
+          "chroma_95th_percentile_error": 5
+        },
+        {
+          "quality": 85,
+          "bytes": 474384,
+          "full_resolution_luma_ssim": 0.9792786836624146,
+          "worst_128px_luma_ssim": 0.9688732028007507,
+          "chroma_mean_absolute_error": 1.6400293767701062,
+          "chroma_95th_percentile_error": 5
+        },
+        {
+          "quality": 86,
+          "bytes": 501162,
+          "full_resolution_luma_ssim": 0.9817637205123901,
+          "worst_128px_luma_ssim": 0.9733231067657471,
+          "chroma_mean_absolute_error": 1.5961523549720598,
+          "chroma_95th_percentile_error": 5
+        },
+        {
+          "quality": 87,
+          "bytes": 520928,
+          "full_resolution_luma_ssim": 0.9833981394767761,
+          "worst_128px_luma_ssim": 0.9751731157302856,
+          "chroma_mean_absolute_error": 1.5675297072746595,
+          "chroma_95th_percentile_error": 5
+        },
+        {
+          "quality": 88,
+          "bytes": 549120,
+          "full_resolution_luma_ssim": 0.9854975938796997,
+          "worst_128px_luma_ssim": 0.9773401021957397,
+          "chroma_mean_absolute_error": 1.531461491134851,
+          "chroma_95th_percentile_error": 4
+        }
+      ],
+      "generator_output_filename": "exec-a71b822a-4383-4cef-83f3-fc602a4b8309.png"
+    },
+    {
+      "slug": "redwater_den",
+      "id": "skyrim-2288",
+      "name": "Логово Красная Вода",
+      "english": "Redwater Den (DG)",
+      "caption": "Разрушенная хижина над Логовом Красная Вода",
+      "scene": "Exterior of Redwater Den in the Rift, Skyrim Dawnguard: a small half-burned abandoned wooden cabin in golden autumn birch woodland, much of its roof and one wall missing, charcoal-black broken beams, intact stone hearth and ruined floor, a conspicuous CLOSED wooden trapdoor in the surviving floor leading to the hidden den. Rough cooking spit and a couple barrels among the ruins. Eye-level view through the broken wall from outside, forest and rocky ground surrounding it, muted autumn afternoon light. No red river, no glowing blood pool, no exposed underground scene, no people.",
+      "number": 1,
+      "prompt": "Use case: stylized-concept. Asset type: one finished environment illustration for the SKYRIM TEXT RPG optional location gallery. Scene: Exterior of Redwater Den in the Rift, Skyrim Dawnguard: a small half-burned abandoned wooden cabin in golden autumn birch woodland, much of its roof and one wall missing, charcoal-black broken beams, intact stone hearth and ruined floor, a conspicuous CLOSED wooden trapdoor in the surviving floor leading to the hidden den. Rough cooking spit and a couple barrels among the ruins. Eye-level view through the broken wall from outside, forest and rocky ground surrounding it, muted autumn afternoon light. No red river, no glowing blood pool, no exposed underground scene, no people. Style: detailed cinematic realistic Nordic fantasy environment consistent with the existing Riverwood landscape gallery, believable rough wood, stone, thatch and vegetation, restrained natural colors, strong spatial depth, clear small details without oversharpening, photorealistic environment illustration. Wide horizontal 16:9 composition, 1920x1080 if possible, full bleed, exactly ONE image of ONE location. Show the whole modest building and its immediate setting. No caption, no title, no lettering, no UI, no logo, no watermark, no border, no collage, no dragons, no modern materials.",
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "dimensions": [
+        1672,
+        941
+      ],
+      "original_bytes": 3748343,
+      "original_sha256": "5436e990693158570a1460df57a5ec6fff56ff4d820e7a4bb07f740ecaeb966e",
+      "webp_bytes": 568374,
+      "webp_sha256": "fd6fca582d7eb6a59c76db8afbd7b055e7b790ea8fce3bb8395b3d9f30402b5f",
+      "archive_bytes": 568486,
+      "archive_sha256": "400c3cd09d30ffe6b662720cd09a803ac0143290251d83aac885a86d22a8e86d",
+      "quality": 87,
+      "bytes": 568374,
+      "full_resolution_luma_ssim": 0.9863241314888,
+      "worst_128px_luma_ssim": 0.9784033298492432,
+      "chroma_mean_absolute_error": 2.0440273378112463,
+      "chroma_95th_percentile_error": 6,
+      "trials": [
+        {
+          "quality": 76,
+          "bytes": 361828,
+          "full_resolution_luma_ssim": 0.9609850645065308,
+          "worst_128px_luma_ssim": 0.945191502571106,
+          "chroma_mean_absolute_error": 2.466164278559407,
+          "chroma_95th_percentile_error": 8
+        },
+        {
+          "quality": 80,
+          "bytes": 419268,
+          "full_resolution_luma_ssim": 0.9713287353515625,
+          "worst_128px_luma_ssim": 0.957399308681488,
+          "chroma_mean_absolute_error": 2.3273990817058103,
+          "chroma_95th_percentile_error": 7
+        },
+        {
+          "quality": 84,
+          "bytes": 495394,
+          "full_resolution_luma_ssim": 0.9804776906967163,
+          "worst_128px_luma_ssim": 0.9702619314193726,
+          "chroma_mean_absolute_error": 2.1566559803527756,
+          "chroma_95th_percentile_error": 7
+        },
+        {
+          "quality": 85,
+          "bytes": 517538,
+          "full_resolution_luma_ssim": 0.9823790192604065,
+          "worst_128px_luma_ssim": 0.9737322330474854,
+          "chroma_mean_absolute_error": 2.107386967442759,
+          "chroma_95th_percentile_error": 6
+        },
+        {
+          "quality": 86,
+          "bytes": 540668,
+          "full_resolution_luma_ssim": 0.9842866659164429,
+          "worst_128px_luma_ssim": 0.9751347303390503,
+          "chroma_mean_absolute_error": 2.069044943534568,
+          "chroma_95th_percentile_error": 6
+        },
+        {
+          "quality": 87,
+          "bytes": 568374,
+          "full_resolution_luma_ssim": 0.9863241314888,
+          "worst_128px_luma_ssim": 0.9784033298492432,
+          "chroma_mean_absolute_error": 2.0440273378112463,
+          "chroma_95th_percentile_error": 6
+        },
+        {
+          "quality": 88,
+          "bytes": 582980,
+          "full_resolution_luma_ssim": 0.9870486855506897,
+          "worst_128px_luma_ssim": 0.9797080755233765,
+          "chroma_mean_absolute_error": 1.9970295903268944,
+          "chroma_95th_percentile_error": 6
+        }
+      ],
+      "generator_output_filename": "exec-a0ccb520-4ab1-424b-b96a-a5f5bc0e6dbf.png"
+    },
+    {
+      "slug": "riverside_shack",
+      "id": "skyrim-291",
+      "name": "Речная хижина",
+      "english": "Riverside Shack",
+      "caption": "Речная хижина над Белой рекой",
+      "scene": "Riverside Shack northeast of Mixwater Mill along the White River in Eastmarch, Skyrim: a small abandoned rough timber hut with a partly collapsed thatch roof and missing wall, a simple bed, wooden chest and tanning rack visible inside. Built on a low rocky bank directly beside the broad cold river, water running over stones, sparse reeds and amber grasses, a few autumn birches and dark conifers, misty cliffs beyond. Three-quarter exterior from the bank, river taking part of the foreground, cool cloudy daylight. No modern dock, no village, no people.",
+      "number": 1,
+      "prompt": "Use case: stylized-concept. Asset type: one finished environment illustration for the SKYRIM TEXT RPG optional location gallery. Scene: Riverside Shack northeast of Mixwater Mill along the White River in Eastmarch, Skyrim: a small abandoned rough timber hut with a partly collapsed thatch roof and missing wall, a simple bed, wooden chest and tanning rack visible inside. Built on a low rocky bank directly beside the broad cold river, water running over stones, sparse reeds and amber grasses, a few autumn birches and dark conifers, misty cliffs beyond. Three-quarter exterior from the bank, river taking part of the foreground, cool cloudy daylight. No modern dock, no village, no people. Style: detailed cinematic realistic Nordic fantasy environment consistent with the existing Riverwood landscape gallery, believable rough wood, stone, thatch and vegetation, restrained natural colors, strong spatial depth, clear small details without oversharpening, photorealistic environment illustration. Wide horizontal 16:9 composition, 1920x1080 if possible, full bleed, exactly ONE image of ONE location. Show the whole modest building and its immediate setting. No caption, no title, no lettering, no UI, no logo, no watermark, no border, no collage, no dragons, no modern materials.",
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "dimensions": [
+        1672,
+        941
+      ],
+      "original_bytes": 3478736,
+      "original_sha256": "dff1941e281bc60bf9fac29a66d1661a1c98322d74d9defd78b754609b948742",
+      "webp_bytes": 505680,
+      "webp_sha256": "a2cb20ca007afc2f5367deda492715493bc9e04714b8aa28632343a8660271a6",
+      "archive_bytes": 505792,
+      "archive_sha256": "6af0044b7ce436bbaed171a540f4b3c31c3316bb71ee690176afbdf006b0497b",
+      "quality": 88,
+      "bytes": 505680,
+      "full_resolution_luma_ssim": 0.985441267490387,
+      "worst_128px_luma_ssim": 0.9769967794418335,
+      "chroma_mean_absolute_error": 1.4250523722599902,
+      "chroma_95th_percentile_error": 4,
+      "trials": [
+        {
+          "quality": 76,
+          "bytes": 295776,
+          "full_resolution_luma_ssim": 0.9555667042732239,
+          "worst_128px_luma_ssim": 0.9300763607025146,
+          "chroma_mean_absolute_error": 1.7803336443465925,
+          "chroma_95th_percentile_error": 6
+        },
+        {
+          "quality": 80,
+          "bytes": 350536,
+          "full_resolution_luma_ssim": 0.967120349407196,
+          "worst_128px_luma_ssim": 0.9494941234588623,
+          "chroma_mean_absolute_error": 1.6646351229731173,
+          "chroma_95th_percentile_error": 5
+        },
+        {
+          "quality": 84,
+          "bytes": 414928,
+          "full_resolution_luma_ssim": 0.9771856665611267,
+          "worst_128px_luma_ssim": 0.9673915505409241,
+          "chroma_mean_absolute_error": 1.5517217380471757,
+          "chroma_95th_percentile_error": 5
+        },
+        {
+          "quality": 85,
+          "bytes": 431194,
+          "full_resolution_luma_ssim": 0.9777908325195312,
+          "worst_128px_luma_ssim": 0.9637433290481567,
+          "chroma_mean_absolute_error": 1.527891088580305,
+          "chroma_95th_percentile_error": 5
+        },
+        {
+          "quality": 86,
+          "bytes": 448142,
+          "full_resolution_luma_ssim": 0.9804771542549133,
+          "worst_128px_luma_ssim": 0.9697785377502441,
+          "chroma_mean_absolute_error": 1.5065029948797217,
+          "chroma_95th_percentile_error": 5
+        },
+        {
+          "quality": 87,
+          "bytes": 479584,
+          "full_resolution_luma_ssim": 0.9834240674972534,
+          "worst_128px_luma_ssim": 0.9746654629707336,
+          "chroma_mean_absolute_error": 1.456430283877988,
+          "chroma_95th_percentile_error": 5
+        },
+        {
+          "quality": 88,
+          "bytes": 505680,
+          "full_resolution_luma_ssim": 0.985441267490387,
+          "worst_128px_luma_ssim": 0.9769967794418335,
+          "chroma_mean_absolute_error": 1.4250523722599902,
+          "chroma_95th_percentile_error": 4
+        }
+      ],
+      "generator_output_filename": "exec-64094c83-71f9-4456-adaa-9c1740793daf.png"
+    },
+    {
+      "slug": "traitors_post",
+      "id": "skyrim-302",
+      "name": "Пост Предателя",
+      "english": "Traitor's Post",
+      "caption": "Пост Предателя у дороги Виндхельма",
+      "scene": "Traitor's Post northeast of Windhelm, Skyrim: a derelict roof-damaged Nordic roadside cabin used by bandits, jagged remaining timber rafters, partial plank walls and a broken thatch section, low stone base. Two hay sleeping piles and battered storage chests visible inside, tanning rack and chopping block beside it. Thin snow over frozen ground, sparse dark pines, bleak Eastmarch hills and the nearby rough road. Eye-level three-quarter exterior, overcast blue winter daylight with readable detail. No people, no battle, no fortification, no city.",
+      "number": 1,
+      "prompt": "Use case: stylized-concept. Asset type: one finished environment illustration for the SKYRIM TEXT RPG optional location gallery. Scene: Traitor's Post northeast of Windhelm, Skyrim: a derelict roof-damaged Nordic roadside cabin used by bandits, jagged remaining timber rafters, partial plank walls and a broken thatch section, low stone base. Two hay sleeping piles and battered storage chests visible inside, tanning rack and chopping block beside it. Thin snow over frozen ground, sparse dark pines, bleak Eastmarch hills and the nearby rough road. Eye-level three-quarter exterior, overcast blue winter daylight with readable detail. No people, no battle, no fortification, no city. Style: detailed cinematic realistic Nordic fantasy environment consistent with the existing Riverwood landscape gallery, believable rough wood, stone, thatch and vegetation, restrained natural colors, strong spatial depth, clear small details without oversharpening, photorealistic environment illustration. Wide horizontal 16:9 composition, 1920x1080 if possible, full bleed, exactly ONE image of ONE location. Show the whole modest building and its immediate setting. No caption, no title, no lettering, no UI, no logo, no watermark, no border, no collage, no dragons, no modern materials.",
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "dimensions": [
+        1672,
+        941
+      ],
+      "original_bytes": 3564371,
+      "original_sha256": "c69c4f1bccb20e4d05b7304b3f0cf4b6a691529192edce6358e08cecf283973b",
+      "webp_bytes": 483412,
+      "webp_sha256": "31d16110eb790a22e4b8b1cc86d7f2fecbca02f26fc5a722df1313fb982551ea",
+      "archive_bytes": 483524,
+      "archive_sha256": "6e3f347ad43b0527260619da40dd8bca0db76dd8c7cb86091b86f4d94eb6e941",
+      "quality": 87,
+      "bytes": 483412,
+      "full_resolution_luma_ssim": 0.9864739179611206,
+      "worst_128px_luma_ssim": 0.9770599603652954,
+      "chroma_mean_absolute_error": 1.337842707798382,
+      "chroma_95th_percentile_error": 4,
+      "trials": [
+        {
+          "quality": 76,
+          "bytes": 305276,
+          "full_resolution_luma_ssim": 0.9647338390350342,
+          "worst_128px_luma_ssim": 0.9464117288589478,
+          "chroma_mean_absolute_error": 1.6646901011343933,
+          "chroma_95th_percentile_error": 5
+        },
+        {
+          "quality": 80,
+          "bytes": 359326,
+          "full_resolution_luma_ssim": 0.9740915894508362,
+          "worst_128px_luma_ssim": 0.9574390649795532,
+          "chroma_mean_absolute_error": 1.5571086444737097,
+          "chroma_95th_percentile_error": 5
+        },
+        {
+          "quality": 84,
+          "bytes": 422404,
+          "full_resolution_luma_ssim": 0.9817089438438416,
+          "worst_128px_luma_ssim": 0.9688544273376465,
+          "chroma_mean_absolute_error": 1.4446487499300855,
+          "chroma_95th_percentile_error": 4
+        },
+        {
+          "quality": 85,
+          "bytes": 439770,
+          "full_resolution_luma_ssim": 0.9832025766372681,
+          "worst_128px_luma_ssim": 0.9696643352508545,
+          "chroma_mean_absolute_error": 1.4071800207455165,
+          "chroma_95th_percentile_error": 4
+        },
+        {
+          "quality": 86,
+          "bytes": 458262,
+          "full_resolution_luma_ssim": 0.9846850037574768,
+          "worst_128px_luma_ssim": 0.9719265103340149,
+          "chroma_mean_absolute_error": 1.3739252246159792,
+          "chroma_95th_percentile_error": 4
+        },
+        {
+          "quality": 87,
+          "bytes": 483412,
+          "full_resolution_luma_ssim": 0.9864739179611206,
+          "worst_128px_luma_ssim": 0.9770599603652954,
+          "chroma_mean_absolute_error": 1.337842707798382,
+          "chroma_95th_percentile_error": 4
+        },
+        {
+          "quality": 88,
+          "bytes": 504948,
+          "full_resolution_luma_ssim": 0.9878727197647095,
+          "worst_128px_luma_ssim": 0.9783832430839539,
+          "chroma_mean_absolute_error": 1.305564489065384,
+          "chroma_95th_percentile_error": 4
+        }
+      ],
+      "generator_output_filename": "exec-4e3b7807-b3c8-466b-a031-36c05a238bbc.png"
+    },
+    {
+      "slug": "abandoned_lodge",
+      "id": "solstheim-2516",
+      "name": "Заброшенный дом",
+      "english": "Abandoned Lodge",
+      "caption": "Закрытый заброшенный дом на севере Солстхейма",
+      "scene": "Abandoned Lodge on Solstheim northeast of Bloodskal Barrow, Skyrim Dragonborn: an isolated intact Nordic timber lodge, steep thatched gable roof, dark log supports and pale plaster on stone foundation, a CLOSED locked wooden door, small covered porch with a grindstone and a couple barrels. Snow-streaked rocky northern Solstheim slope, sparse frosted pines and cold mountain horizon, faint distant Red Mountain ash haze to the southeast, not lava. Three-quarter exterior, clear pale winter daylight. Distinguish this intact closed lodge from the burned Hrodulf ruins. No people, no stronghold.",
+      "number": 1,
+      "prompt": "Use case: stylized-concept. Asset type: one finished environment illustration for the SKYRIM TEXT RPG optional location gallery. Scene: Abandoned Lodge on Solstheim northeast of Bloodskal Barrow, Skyrim Dragonborn: an isolated intact Nordic timber lodge, steep thatched gable roof, dark log supports and pale plaster on stone foundation, a CLOSED locked wooden door, small covered porch with a grindstone and a couple barrels. Snow-streaked rocky northern Solstheim slope, sparse frosted pines and cold mountain horizon, faint distant Red Mountain ash haze to the southeast, not lava. Three-quarter exterior, clear pale winter daylight. Distinguish this intact closed lodge from the burned Hrodulf ruins. No people, no stronghold. Style: detailed cinematic realistic Nordic fantasy environment consistent with the existing Riverwood landscape gallery, believable rough wood, stone, thatch and vegetation, restrained natural colors, strong spatial depth, clear small details without oversharpening, photorealistic environment illustration. Wide horizontal 16:9 composition, 1920x1080 if possible, full bleed, exactly ONE image of ONE location. Show the whole modest building and its immediate setting. No caption, no title, no lettering, no UI, no logo, no watermark, no border, no collage, no dragons, no modern materials.",
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "dimensions": [
+        1672,
+        941
+      ],
+      "original_bytes": 3318814,
+      "original_sha256": "163117e39c5c3f389d952f6b00627347a56b437f127e9d24275c75154292191b",
+      "webp_bytes": 431398,
+      "webp_sha256": "b12a9216e86ebc068f94e592918b3bb8ed5b958677f02dc90a236f5d405dc14e",
+      "archive_bytes": 431510,
+      "archive_sha256": "4fe0d2312b2eb78fa3f79343e63f3104dad1162f23115e23a1b8039d158a514e",
+      "quality": 88,
+      "bytes": 431398,
+      "full_resolution_luma_ssim": 0.9850932955741882,
+      "worst_128px_luma_ssim": 0.9745872616767883,
+      "chroma_mean_absolute_error": 1.200947086221011,
+      "chroma_95th_percentile_error": 4,
+      "trials": [
+        {
+          "quality": 76,
+          "bytes": 254558,
+          "full_resolution_luma_ssim": 0.9594520330429077,
+          "worst_128px_luma_ssim": 0.9346990585327148,
+          "chroma_mean_absolute_error": 1.5288889580971072,
+          "chroma_95th_percentile_error": 5
+        },
+        {
+          "quality": 80,
+          "bytes": 302382,
+          "full_resolution_luma_ssim": 0.969527006149292,
+          "worst_128px_luma_ssim": 0.9484783411026001,
+          "chroma_mean_absolute_error": 1.4297306006538906,
+          "chroma_95th_percentile_error": 4
+        },
+        {
+          "quality": 84,
+          "bytes": 353994,
+          "full_resolution_luma_ssim": 0.9777100086212158,
+          "worst_128px_luma_ssim": 0.9623977541923523,
+          "chroma_mean_absolute_error": 1.334632682324108,
+          "chroma_95th_percentile_error": 4
+        },
+        {
+          "quality": 85,
+          "bytes": 374174,
+          "full_resolution_luma_ssim": 0.980080783367157,
+          "worst_128px_luma_ssim": 0.9657810926437378,
+          "chroma_mean_absolute_error": 1.294807201439983,
+          "chroma_95th_percentile_error": 4
+        },
+        {
+          "quality": 86,
+          "bytes": 392162,
+          "full_resolution_luma_ssim": 0.9815871119499207,
+          "worst_128px_luma_ssim": 0.9674873948097229,
+          "chroma_mean_absolute_error": 1.2646553345977252,
+          "chroma_95th_percentile_error": 4
+        },
+        {
+          "quality": 87,
+          "bytes": 407692,
+          "full_resolution_luma_ssim": 0.9829493165016174,
+          "worst_128px_luma_ssim": 0.9694068431854248,
+          "chroma_mean_absolute_error": 1.237128436611769,
+          "chroma_95th_percentile_error": 4
+        },
+        {
+          "quality": 88,
+          "bytes": 431398,
+          "full_resolution_luma_ssim": 0.9850932955741882,
+          "worst_128px_luma_ssim": 0.9745872616767883,
+          "chroma_mean_absolute_error": 1.200947086221011,
+          "chroma_95th_percentile_error": 4
+        }
+      ],
+      "generator_output_filename": "exec-a3d1a699-7e91-4266-b482-cc906c72678f.png"
+    },
+    {
+      "slug": "hrodulfs_house",
+      "id": "solstheim-2555",
+      "name": "Дом Хродульфа",
+      "english": "Hrodulf's House",
+      "caption": "Пепельные руины дома Хродульфа",
+      "scene": "Hrodulf's House southeast of Raven Rock in the southern ashlands of Solstheim, Skyrim Dragonborn: burned-out roofless remains of a modest wooden house, charred beams and broken plank walls protruding from deep gray volcanic ash drifts, surviving low stone foundation, wooden chest and CLOSED cellar trapdoor amid the ruined floor. Red-orange heart-stone mineral patches in nearby rocks, a distant gray sea glimpse beyond the ash coast, sparse dead trees and drifting ash. Three-quarter exterior in pale dusty daylight, restrained colors and readable ruined structure. No intact cozy cottage, no active lava, no people.",
+      "number": 1,
+      "prompt": "Use case: stylized-concept. Asset type: one finished environment illustration for the SKYRIM TEXT RPG optional location gallery. Scene: Hrodulf's House southeast of Raven Rock in the southern ashlands of Solstheim, Skyrim Dragonborn: burned-out roofless remains of a modest wooden house, charred beams and broken plank walls protruding from deep gray volcanic ash drifts, surviving low stone foundation, wooden chest and CLOSED cellar trapdoor amid the ruined floor. Red-orange heart-stone mineral patches in nearby rocks, a distant gray sea glimpse beyond the ash coast, sparse dead trees and drifting ash. Three-quarter exterior in pale dusty daylight, restrained colors and readable ruined structure. No intact cozy cottage, no active lava, no people. Style: detailed cinematic realistic Nordic fantasy environment consistent with the existing Riverwood landscape gallery, believable rough wood, stone, thatch and vegetation, restrained natural colors, strong spatial depth, clear small details without oversharpening, photorealistic environment illustration. Wide horizontal 16:9 composition, 1920x1080 if possible, full bleed, exactly ONE image of ONE location. Show the whole modest building and its immediate setting. No caption, no title, no lettering, no UI, no logo, no watermark, no border, no collage, no dragons, no modern materials.",
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "dimensions": [
+        1672,
+        941
+      ],
+      "original_bytes": 3004440,
+      "original_sha256": "75e35c07300fb59a028ecdbefaa34f3eed009a8f9fcec995798d3c0ecf98738f",
+      "webp_bytes": 453968,
+      "webp_sha256": "f2f460baea7e593a6a337208be49e7f64ab20dbfb79d0244085d39e54c550e8b",
+      "archive_bytes": 454080,
+      "archive_sha256": "4dc60bda8ad489537940f12614558227ae735dec3f74cded155f09eac3da5eda",
+      "quality": 92,
+      "bytes": 453968,
+      "full_resolution_luma_ssim": 0.9860296249389648,
+      "worst_128px_luma_ssim": 0.9762674570083618,
+      "chroma_mean_absolute_error": 0.8825771346780631,
+      "chroma_95th_percentile_error": 2,
+      "trials": [
+        {
+          "quality": 76,
+          "bytes": 191878,
+          "full_resolution_luma_ssim": 0.9432533979415894,
+          "worst_128px_luma_ssim": 0.9049880504608154,
+          "chroma_mean_absolute_error": 1.121574828773218,
+          "chroma_95th_percentile_error": 3
+        },
+        {
+          "quality": 80,
+          "bytes": 232624,
+          "full_resolution_luma_ssim": 0.9571831226348877,
+          "worst_128px_luma_ssim": 0.9310600757598877,
+          "chroma_mean_absolute_error": 1.082747535198735,
+          "chroma_95th_percentile_error": 3
+        },
+        {
+          "quality": 84,
+          "bytes": 278366,
+          "full_resolution_luma_ssim": 0.9679713845252991,
+          "worst_128px_luma_ssim": 0.9496023654937744,
+          "chroma_mean_absolute_error": 1.0336288383019185,
+          "chroma_95th_percentile_error": 3
+        },
+        {
+          "quality": 88,
+          "bytes": 346146,
+          "full_resolution_luma_ssim": 0.977611243724823,
+          "worst_128px_luma_ssim": 0.9629952907562256,
+          "chroma_mean_absolute_error": 0.9614933594008207,
+          "chroma_95th_percentile_error": 3
+        },
+        {
+          "quality": 89,
+          "bytes": 363548,
+          "full_resolution_luma_ssim": 0.9802186489105225,
+          "worst_128px_luma_ssim": 0.9688935279846191,
+          "chroma_mean_absolute_error": 0.9579007113474924,
+          "chroma_95th_percentile_error": 3
+        },
+        {
+          "quality": 90,
+          "bytes": 384750,
+          "full_resolution_luma_ssim": 0.982086718082428,
+          "worst_128px_luma_ssim": 0.9714232683181763,
+          "chroma_mean_absolute_error": 0.927826068165293,
+          "chroma_95th_percentile_error": 3
+        },
+        {
+          "quality": 91,
+          "bytes": 412842,
+          "full_resolution_luma_ssim": 0.9831307530403137,
+          "worst_128px_luma_ssim": 0.9713541269302368,
+          "chroma_mean_absolute_error": 0.9162333031641997,
+          "chroma_95th_percentile_error": 3
+        },
+        {
+          "quality": 92,
+          "bytes": 453968,
+          "full_resolution_luma_ssim": 0.9860296249389648,
+          "worst_128px_luma_ssim": 0.9762674570083618,
+          "chroma_mean_absolute_error": 0.8825771346780631,
+          "chroma_95th_percentile_error": 2
+        }
+      ],
+      "generator_output_filename": "exec-5a51f20c-1fa6-4d70-9a54-e42074c8e1a1.png"
+    },
+    {
+      "slug": "ramshackle_trading_post",
+      "id": "solstheim-2509",
+      "name": "Полуразрушенный торговый пост",
+      "english": "Ramshackle Trading Post",
+      "caption": "Развалины торгового поста в пеплах Солстхейма",
+      "scene": "Ramshackle Trading Post northwest of the Sun Stone on Solstheim, Skyrim Dragonborn: a tiny ruined wooden trading hut in desolate gray ashland, roof mostly fallen in, jagged bare rafters and partial plank walls, one plain battered table and a lone wooden chair inside. An unlettered folded scrap pinned to a surviving upright post with a dark arrow, too small to read. Scattered crates, ash drifts, barren rocks and sparse dead trunks under a cloudy coastal sky. Three-quarter exterior in readable twilight with soft cold ambient light. No market stalls, no village, no intact house, no people, no readable writing.",
+      "number": 1,
+      "prompt": "Use case: stylized-concept. Asset type: one finished environment illustration for the SKYRIM TEXT RPG optional location gallery. Scene: Ramshackle Trading Post northwest of the Sun Stone on Solstheim, Skyrim Dragonborn: a tiny ruined wooden trading hut in desolate gray ashland, roof mostly fallen in, jagged bare rafters and partial plank walls, one plain battered table and a lone wooden chair inside. An unlettered folded scrap pinned to a surviving upright post with a dark arrow, too small to read. Scattered crates, ash drifts, barren rocks and sparse dead trunks under a cloudy coastal sky. Three-quarter exterior in readable twilight with soft cold ambient light. No market stalls, no village, no intact house, no people, no readable writing. Style: detailed cinematic realistic Nordic fantasy environment consistent with the existing Riverwood landscape gallery, believable rough wood, stone, thatch and vegetation, restrained natural colors, strong spatial depth, clear small details without oversharpening, photorealistic environment illustration. Wide horizontal 16:9 composition, 1920x1080 if possible, full bleed, exactly ONE image of ONE location. Show the whole modest building and its immediate setting. No caption, no title, no lettering, no UI, no logo, no watermark, no border, no collage, no dragons, no modern materials.",
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "dimensions": [
+        1672,
+        941
+      ],
+      "original_bytes": 2986453,
+      "original_sha256": "b429d9b004ef53e8077a2bf517ebcda5126948b0866f7911482073503765ec6d",
+      "webp_bytes": 418694,
+      "webp_sha256": "98dfd57b896d950ddcb233570e93697918b396f8b7bca22b749eee62ef5181f7",
+      "archive_bytes": 418806,
+      "archive_sha256": "c20dbe0ce7b2f74340909607b4c44261e9db6e6050d215e10bf43c0e5a009353",
+      "quality": 91,
+      "bytes": 418694,
+      "full_resolution_luma_ssim": 0.9854629635810852,
+      "worst_128px_luma_ssim": 0.979174017906189,
+      "chroma_mean_absolute_error": 0.9290908836674819,
+      "chroma_95th_percentile_error": 3,
+      "trials": [
+        {
+          "quality": 76,
+          "bytes": 196992,
+          "full_resolution_luma_ssim": 0.9456627368927002,
+          "worst_128px_luma_ssim": 0.9044862985610962,
+          "chroma_mean_absolute_error": 1.2134128281528864,
+          "chroma_95th_percentile_error": 4
+        },
+        {
+          "quality": 80,
+          "bytes": 234786,
+          "full_resolution_luma_ssim": 0.9567245841026306,
+          "worst_128px_luma_ssim": 0.9281905889511108,
+          "chroma_mean_absolute_error": 1.1583895402935898,
+          "chroma_95th_percentile_error": 3
+        },
+        {
+          "quality": 84,
+          "bytes": 282682,
+          "full_resolution_luma_ssim": 0.969306468963623,
+          "worst_128px_luma_ssim": 0.9503393173217773,
+          "chroma_mean_absolute_error": 1.0767660383690363,
+          "chroma_95th_percentile_error": 3
+        },
+        {
+          "quality": 88,
+          "bytes": 350378,
+          "full_resolution_luma_ssim": 0.9791128039360046,
+          "worst_128px_luma_ssim": 0.9667581915855408,
+          "chroma_mean_absolute_error": 0.9879362660104033,
+          "chroma_95th_percentile_error": 3
+        },
+        {
+          "quality": 89,
+          "bytes": 363120,
+          "full_resolution_luma_ssim": 0.9806690812110901,
+          "worst_128px_luma_ssim": 0.9684749245643616,
+          "chroma_mean_absolute_error": 0.9878854191560439,
+          "chroma_95th_percentile_error": 3
+        },
+        {
+          "quality": 90,
+          "bytes": 390088,
+          "full_resolution_luma_ssim": 0.9833149909973145,
+          "worst_128px_luma_ssim": 0.9739059805870056,
+          "chroma_mean_absolute_error": 0.948617664705673,
+          "chroma_95th_percentile_error": 3
+        },
+        {
+          "quality": 91,
+          "bytes": 418694,
+          "full_resolution_luma_ssim": 0.9854629635810852,
+          "worst_128px_luma_ssim": 0.979174017906189,
+          "chroma_mean_absolute_error": 0.9290908836674819,
+          "chroma_95th_percentile_error": 3
+        },
+        {
+          "quality": 92,
+          "bytes": 450450,
+          "full_resolution_luma_ssim": 0.9873870611190796,
+          "worst_128px_luma_ssim": 0.9807428121566772,
+          "chroma_mean_absolute_error": 0.9027182092754832,
+          "chroma_95th_percentile_error": 3
+        }
+      ],
+      "generator_output_filename": "exec-4f7b288b-2a8a-42f6-8e69-d5167d14da55.png"
+    }
+  ],
+  "resource_commit": "e9fd01c0796447dde6bd735ea8941ad098f4ca76",
+  "originals_note": "Original PNG outputs are identified by generation filename and SHA-256. Only the compressed optional archives are shipped.",
+  "reference_sources": [
+    "https://skyrim.fandom.com/wiki/Shacks",
+    "https://elderscrolls.fandom.com/wiki/Shacks_(Skyrim)",
+    "https://skyrim.fandom.com/wiki/Redwater_Den",
+    "https://elderscrolls.fandom.com/wiki/Abandoned_Lodge",
+    "https://skyrim.fandom.com/wiki/Hrodulf%27s_House",
+    "https://skyrim.fandom.com/wiki/Ramshackle_Trading_Post"
+  ]
+}
