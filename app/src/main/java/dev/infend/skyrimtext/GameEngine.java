@@ -656,7 +656,7 @@ public final class GameEngine {
     private void combatTurn(String action) {
         if(!mode.equals("COMBAT"))return;
         lastDealt=lastTaken=lastHealing=lastBlocked=0;lastHeavyHit=lastMiss=lastCritical=false;
-        int damage=0;boolean defending=false,shadow=false;String actionText="";
+        int damage=0,artifactWeakness=0;boolean defending=false,shadow=false;String actionText="";
         int custom=CompensationPowers.actionIndex(action);
         if(custom>=0){if(!compensation.available(this,custom))return;magicka-=compensation.cost(custom);if(!compensation.safe[custom])hp-=2;compensation.cooldown[custom]=4;
             int power=compensation.strength(custom);if(compensation.powerType[custom]==1){lastHealing=Math.min(maxHp-hp,power);hp+=lastHealing;actionText=compensation.powerName(custom)+": +"+lastHealing+" здоровья.";}else{damage=power;defending=compensation.powerType[custom]==2;actionText=compensation.powerName(custom)+": −"+damage+" здоровья врагу.";}
@@ -690,6 +690,14 @@ public final class GameEngine {
         if(kathBurn>0){damage+=kathBurn;actionText+="\nКэтрин: остаточное пламя, −"+kathBurn+" здоровья врагу.";}
         int kathDamage=katherine.assist(this,battleTurns+1,Math.max(0,enemyHp-damage));
         if(kathDamage>0){damage+=kathDamage;actionText+="\nКэтрин: "+katherine.companion.lastSpell+", −"+kathDamage+" здоровья врагу.";}
+        if(damage>0&&("ATTACK".equals(action)||"HEAVY".equals(action))){String weapon=progress.equippedName("weapon");int bonus=0;switch(weapon){
+            case "Эбонитовый клинок":case "Клинок Горя":int drain=Math.min(10,Math.min(Math.max(0,maxHp-hp),Math.max(0,enemyHp)));hp+=drain;lastHealing+=drain;bonus=10;actionText+="\n"+weapon+": поглощение здоровья +"+drain+".";break;
+            case "Молот Волендранг":int restoredStamina=Math.min(50,Math.max(0,maxStamina-stamina));stamina+=restoredStamina;actionText+="\nВолендранг: запас сил +"+restoredStamina+".";break;
+            case "Булава Молаг Бала":artifactWeakness=8;progress.artifacts.trapTurns=Math.max(3,progress.artifacts.trapTurns);actionText+="\nБулава Молаг Бала ослабляет ответ врага и накладывает захват души.";break;
+            case "Сияние Рассвета":bonus=RoadArtifacts.undead(enemyName)?20:10;actionText+="\nСияние Рассвета: огненный урон +"+bonus+".";break;
+            case "Лук Ауриэля":bonus=RoadArtifacts.undead(enemyName)?30:10;actionText+="\nСолнечный урон +"+bonus+".";break;
+            case "Вутрад":if(RoadArtifacts.elf(enemyName)){bonus=Math.max(1,damage/2);actionText+="\nВутрад: дополнительный урон эльфам +"+bonus+".";}break;
+        }damage=nonnegativeAdd(damage,bonus);}
         if(damage>0&&("ATTACK".equals(action)||"HEAVY".equals(action))&&progress.equipped("Бритва Мерунеса")&&"WILD".equals(battleKind)&&!enemyName.toLowerCase(java.util.Locale.ROOT).contains("карстааг")&&random.nextInt(10000)<198){damage=enemyHp;actionText+="\nБритва Мерунеса срабатывает: противник падает замертво.";}
         if(progress.equipped("Эбонитовая кольчуга")&&enemyHp>damage){int aura=Math.min(5,enemyHp-damage);damage+=aura;actionText+="\nЯдовитая аура Эбонитовой кольчуги: −"+aura+" здоровья врагу.";}
         if("ACTIVE".equals(progress.questOutcome("road_boethiah_hireling"))&&enemyHp>damage){int assist=Math.min(3,enemyHp-damage);damage+=assist;actionText+="\nНаёмник из Виндхельма помогает в бою: −"+assist+" здоровья врагу.";}
@@ -706,7 +714,7 @@ public final class GameEngine {
         enemyHp=Math.max(0,enemyHp-damage);road.syncGroup(this);
         boolean defeatedTarget=false;
         if(enemyHp==0) {road.recordRoadKill(this);if(!("CANONICAL".equals(battleKind)&&(canonicalStage==22||canonicalStage==27||canonicalStage==30)))actionText+=progress.artifacts.capture(this,enemyName);poisonTurns=frostTurns=0;if(road.nextOpponent(this,actionText)){actionText=battleLog;defeatedTarget=true;}else{winBattle(actionText);return;}}
-        int baseIncoming=enemyDamage+random.nextInt(8)-Math.max(0,armor-(armorUpgraded?4:0));
+        int baseIncoming=enemyDamage+random.nextInt(8)-Math.max(0,armor-(armorUpgraded?4:0))-(defeatedTarget?0:artifactWeakness);
         baseIncoming=Math.max(1,baseIncoming-compensation.passiveBonus(this,1));
         int rawIncoming=Math.max(1,baseIncoming-(defending?enemyDamage/2+3+2*progress.branches.rank(3)+(progress.advanced.has(AdvancedPerks.QUICK_REFLEXES)?2:0)+(progress.advanced.has(AdvancedPerks.SHIELD_WALL)&&!"Не надето".equals(progress.equippedName("shield"))?3:0)+(progress.advanced.has(AdvancedPerks.SHIELD_CHARGE)&&!"Не надето".equals(progress.equippedName("shield"))?4:0):0));
         int incoming=Math.max(1,(int)Math.round(rawIncoming*(1-progress.damageReduction())));
