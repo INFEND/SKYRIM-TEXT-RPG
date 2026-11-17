@@ -59,6 +59,7 @@ public final class GameEngine {
     public int enemyHp = 0, enemyMaxHp = 0, enemyDamage = 0;
     public RpgProgress progress = new RpgProgress();
     public LivingNeeds needs=new LivingNeeds();
+    SolitudeCity solitude=new SolitudeCity();
     public long fixSpent=0;
     public FixShopState fixShop=new FixShopState();
     public CompensationPowers compensation=new CompensationPowers();
@@ -181,7 +182,7 @@ public final class GameEngine {
         if(name.length()>28)name=name.substring(0,28);
         race=contains(RACES,desiredRace)?desiredRace:"Норд";
         heroClass=contains(CLASSES,desiredClass)?desiredClass:"Без класса";
-        started=true;compensation=new CompensationPowers();compensation.installCatalog();lastLivingResult=new JSONObject();lastCheckChance=lastCheckRoll=-1;needs=new LivingNeeds();economy=new LivingEconomy();java.util.Arrays.fill(regenBonus,0);regenIgnorePenalty=false;fixSpent=0;fixShop=new FixShopState();aiTurn=null;sceneState=new SceneState();road=new RoadEvents();katherine=new KatherineStory();alma=new AlmaStory();livia=new LiviaStory();itachi=new ItachiStory();aiJournal="";day=1;hour=8;level=1;xp=0;gold=85;potions=3;manaPotions=1;
+        started=true;solitude=new SolitudeCity();compensation=new CompensationPowers();compensation.installCatalog();lastLivingResult=new JSONObject();lastCheckChance=lastCheckRoll=-1;needs=new LivingNeeds();economy=new LivingEconomy();java.util.Arrays.fill(regenBonus,0);regenIgnorePenalty=false;fixSpent=0;fixShop=new FixShopState();aiTurn=null;sceneState=new SceneState();road=new RoadEvents();katherine=new KatherineStory();alma=new AlmaStory();livia=new LiviaStory();itachi=new ItachiStory();aiJournal="";day=1;hour=8;level=1;xp=0;gold=85;potions=3;manaPotions=1;
         questStage=0;sideQuest=0;sideKills=0;boardCompleted=0;explored=0;victories=0;reputation=0;
         swordUpgraded=false;armorUpgraded=false;
         maxHp=100;maxStamina=100;maxMagicka=100;attack=12;armor=2;
@@ -223,6 +224,7 @@ public final class GameEngine {
         if(started&&AlmaStory.MODE.equals(mode)){if(alma.enabled)return alma.scene(this);mode="WORLD";}
         if(started&&KatherineStory.MODE.equals(mode))return katherine.scene(this);
         if(started&&"CANON".equals(mode))return CanonicalCampaign.scene(this);
+        if(started&&SolitudeCity.isMode(mode)){if(SolitudeCity.here(this))return solitude.scene(this);mode="WORLD";}
         Scene s=baseScene();
         if(started){progress.fillChoices(this,s);FixShopAdventure.choices(this,s);FixShopAdventure.endings(this,s);FixShopWorld.choices(this,s);FixShopHome.choices(this,s);FixShopGifts.choices(this,s);}
         if(itachi.available(this))s.add("ITACHI:open","Поговорить с Итачи",itachi.objective(this));
@@ -259,6 +261,7 @@ public final class GameEngine {
         s.primary("CANON_OPEN","Главная история | Путь Довакина",CanonicalCampaign.objective(this));
         s.add("DRAGON_OPEN","Драконий след",DragonArc.status(this));
         s.add("EXPLORE","Исследовать окрестности","Случайные встречи, тайники и опасности");
+        if(SolitudeCity.here(this))s.add("SOLITUDE:open","Жизнь Солитьюда","Районы столицы, местные занятия, услуги и заработок");
         s.add("QUEST","История хранителей","Пепельные печати | " + questStatus());
         s.add("TALK","Поговорить с местными","Слухи, события и полезные сведения");
         s.add("TRAVEL","Отправиться в путь","Выбрать другой город");
@@ -384,6 +387,7 @@ public final class GameEngine {
         lastCheckChance=lastCheckRoll=-1;
         if(RoadEvents.MODE.equals(mode)){road.choose(this,action);return;}
         if(road.pending()&&!"COMBAT".equals(mode)){if("GO_WORLD".equals(action))road.resume(this);return;}
+        if(action.startsWith("SOLITUDE:")||SolitudeCity.isMode(mode)){solitude.choose(this,action);return;}
         if(action.startsWith("FIXGIFT:")){if("FIXGIFT:escape".equals(action)){if(fixShop.gifts.escape(this))recordVisualEvent(message);}else if("FIXGIFT:blood".equals(action)||"FIXGIFT:time".equals(action)||"FIXGIFT:balance".equals(action)){if("COMBAT".equals(mode))combatTurn(action);}else FixShopGifts.choose(this,action);return;}
         if(action.startsWith("FIXRESIDENCE:")){FixShopHome.choose(this,action);return;}
         if(action.startsWith("FIXPLACE:")||action.startsWith("FIXHOME:")||action.startsWith("FIXNPC:")||action.startsWith("FIXCUSTOM:")){FixShopWorld.choose(this,action);return;}
@@ -841,7 +845,7 @@ public final class GameEngine {
         syncLivingSystems();
         JSONObject j=new JSONObject();
         j.put("needs",needs.toJson()).put("fixSpent",fixSpent).put("fixShop",fixShop.toJson()).put("economy",economy.toJson()).put("regenBonus",new org.json.JSONArray(regenBonus)).put("regenIgnorePenalty",regenIgnorePenalty).put("compensation",compensation.toJson()).put("lastLivingResult",lastLivingResult);
-        j.put("katherine",katherine.save());
+        j.put("katherine",katherine.save()).put("solitudeCity",solitude.save());
         j.put("alma",alma.save());j.put("livia",livia.save());j.put("itachi",itachi.save());
         j.put("schema",1).put("started",started).put("name",name).put("race",race).put("heroClass",heroClass)
          .put("gender",gender).put("portrait",portrait)
@@ -895,6 +899,7 @@ public final class GameEngine {
             g.enemyHp=Math.max(0,j.optInt("enemyHp",0));g.enemyMaxHp=Math.max(0,j.optInt("enemyMaxHp",0));g.enemyDamage=Math.max(0,j.optInt("enemyDamage",0));
             g.compensation=CompensationPowers.fromJson(j.optJSONObject("compensation"));g.compensation.installCatalog();
             g.progress=RpgProgress.fromJson(j.optJSONObject("progress"));
+            g.solitude=SolitudeCity.restore(j.optJSONObject("solitudeCity"));
              g.needs=LivingNeeds.fromJson(j.optJSONObject("needs"));g.economy=LivingEconomy.fromJson(j.optJSONObject("economy"));g.syncLivingSystems();g.fixSpent=Math.max(0,j.optLong("fixSpent",0));g.fixShop=FixShopState.fromJson(j.optJSONObject("fixShop"));g.fixShop.migrateRemoved(g);org.json.JSONArray rates=j.optJSONArray("regenBonus");if(rates!=null)for(int i=0;i<3;i++)g.regenBonus[i]=Math.max(0,Math.min(1000000,rates.optInt(i)));g.regenIgnorePenalty=j.optBoolean("regenIgnorePenalty");g.compensation.reconcile(g);JSONObject result=j.optJSONObject("lastLivingResult");if(result!=null)g.lastLivingResult=result;
             g.merchants=MerchantLedger.fromJson(j.optJSONObject("merchants"));g.factions=FactionCampaign.fromJson(j.optJSONObject("factions"));g.factionStories=FactionStories.fromJson(j.optJSONObject("factionStories"));g.factionBattle=Math.max(-1,Math.min(6,j.optInt("factionBattle",-1)));
             org.json.JSONArray holds=j.optJSONArray("holdReputation");if(holds!=null)for(int i=0;i<g.holdReputation.length;i++)g.holdReputation[i]=Math.max(-100,Math.min(100,holds.optInt(i,0)));
@@ -928,6 +933,7 @@ public final class GameEngine {
                 }
             }
             if(j.optJSONObject("progress")==null)g.progress.location=REGIONS[g.region];
+            if(SolitudeCity.isMode(g.mode)&&(!SolitudeCity.here(g)||!SolitudeCity.validMode(g.mode)))g.mode="WORLD";
             g.progress.sync(g);
             if(g.mode.equals("COMBAT")&&g.enemyHp<=0)g.mode=g.road.pending()?"RESULT":"WORLD";
         }catch(Exception ignore){return new GameEngine();}
