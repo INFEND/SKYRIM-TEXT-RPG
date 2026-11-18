@@ -4665,7 +4665,7 @@ public final class MainActivity extends Activity {
         fixOffer(a,t,d,c,g,tier,price,()->fixConfirm(t,d,price,effect,this::livingFixShop));
     }
     private boolean fixApply(String title,String detail,int price,java.util.function.BooleanSupplier effect){
-        if(!game.started||livingBusy()||price<=0||game.fixSpent>Long.MAX_VALUE-price||!effect.getAsBoolean()){toast("Покупка недоступна");return false;}
+        if(!fixShopCanChange())return false;if(price<=0||game.fixSpent>Long.MAX_VALUE-price||!effect.getAsBoolean()){toast("Покупка недоступна");return false;}
         game.fixSpent+=price;game.fixShop.record(title,detail,price,game.day);game.progress.sync(game);
         game.recordVisualEvent("Системная компенсация: "+title);save();render();toast("Покупка применена");return true;
     }
@@ -4848,14 +4848,35 @@ public final class MainActivity extends Activity {
             cell.setOnClickListener(v->{if(n!=game.portrait)fixConfirm("Новый облик","Портрет "+n,50,()->{game.portrait=n;return true;},this::livingFixShop);});
         }livingDialog("Новый облик | 50 F",panel);
     }
+    private String fixShopLockReason(){
+        if(!game.started)return "Сначала начни игру.";
+        if(game.solitude.custody())return "Герой находится под стражей.";
+        if(aiTurnBusy)return "Выполняется генерация ИИ.";
+        if(!pendingAiAction().isEmpty())return "Заверши, повтори или отмени незавершённое действие ИИ в сцене.";
+        if("COMBAT".equals(game.mode))return "Идёт бой.";
+        if(game.road.pending())return "Не завершена дорожная встреча.";
+        return "";
+    }
+    private boolean fixShopCanChange(){
+        String reason=fixShopLockReason();
+        if(reason.isEmpty())return true;
+        toast(reason+" Изменения Этерниса пока недоступны.");
+        return false;
+    }
+    private void fixOpenOffer(FixOffer offer){
+        if(!livingBusy()){offer.action.run();return;}
+        new RuneDialogBuilder(this,accent()).setTitle(offer.title)
+            .setMessage(offer.detail+"\n\n"+(offer.price>0?"Цена: "+offer.price+" F\n":"")+fixShopLockReason()+"\nПока доступен только просмотр.")
+            .setPositiveButton("Закрыть",null).show();
+    }
     private void livingFixShop(){
-        if(!game.started||livingBusy()){toast("Этернис недоступен во время активного действия");return;}
+        if(!game.started){toast("Этернис доступен после начала игры.");return;}
         closeLivingDialog();ResourceStore.requestAutomaticSync(this);LinearLayout root=column();root.setBackgroundColor(Color.BLACK);root.setPadding(dp(14),dp(12),dp(14),dp(8));
         LinearLayout head=row();head.setGravity(Gravity.CENTER_VERTICAL);head.addView(text("ЭТЕРНИС",23,accent(),true),new LinearLayout.LayoutParams(0,-2,1));
         head.addView(text("∞ F",23,accent(),true),lp(-2,-2));TextView close=text(" × ",28,MUTED,true);close.setOnClickListener(v->closeLivingDialog());head.addView(close,lp(-2,-2));root.addView(head,lp(-1,-2));
-        addText(root,"ФИКСКОИНЫ · ОСОБЫЕ ВОЗМОЖНОСТИ",11,MUTED,false,4);addText(root,"Потрачено в этом сохранении: "+livingNumber(game.fixSpent)+" F",12,MUTED,false,8);
+        addText(root,"ФИКСКОИНЫ · ОСОБЫЕ ВОЗМОЖНОСТИ",11,MUTED,false,4);addText(root,"Потрачено в этом сохранении: "+livingNumber(game.fixSpent)+" F",12,MUTED,false,8);String lock=fixShopLockReason();if(!lock.isEmpty())addText(root,"Режим просмотра · "+lock+" Покупки и изменения станут доступны после завершения действия.",12,accent(),false,8);
         LinearLayout filters=column();root.addView(filters,lp(-1,-2));
-        if(fixShopPage<2){Switch editor=new Switch(this);editor.setText("Редактор мира");editor.setTextColor(MUTED);editor.setTextSize(sp(12));editor.setThumbTintList(ColorStateList.valueOf(accent()));editor.setChecked(game.fixShop.editorEnabled);filters.addView(editor,lp(-1,37));editor.setOnCheckedChangeListener((v,on)->{game.fixShop.editorEnabled=on;save();livingFixShop();});TextView imp=text("Импорт каталога JSON  |  Ресурсы Этерниса",12,accent(),true);imp.setPadding(dp(8),dp(7),dp(8),dp(7));filters.addView(imp,lp(-1,-2));imp.setOnClickListener(v->new RuneDialogBuilder(this,accent()).setTitle("Каталог Этерниса").setItems(new String[]{"Импорт JSON","Обновить ресурсы Этерниса"},(d,i)->{if(i==0)fixImport();else{closeLivingDialog();new ResourceManagerDialog(this,accent(),this::livingFixShop,"media:shop").show();}}).setNegativeButton("Отмена",null).show());}
+        if(fixShopPage<2){Switch editor=new Switch(this);editor.setText("Редактор мира");editor.setTextColor(MUTED);editor.setTextSize(sp(12));editor.setThumbTintList(ColorStateList.valueOf(accent()));editor.setChecked(game.fixShop.editorEnabled);editor.setEnabled(!livingBusy());filters.addView(editor,lp(-1,37));editor.setOnCheckedChangeListener((v,on)->{if(!fixShopCanChange()){livingFixShop();return;}game.fixShop.editorEnabled=on;save();livingFixShop();});TextView imp=text("Импорт каталога JSON  |  Ресурсы Этерниса",12,accent(),true);imp.setPadding(dp(8),dp(7),dp(8),dp(7));filters.addView(imp,lp(-1,-2));imp.setOnClickListener(v->new RuneDialogBuilder(this,accent()).setTitle("Каталог Этерниса").setItems(new String[]{"Импорт JSON","Обновить ресурсы Этерниса"},(d,i)->{if(i==0){if(fixShopCanChange())fixImport();}else{closeLivingDialog();new ResourceManagerDialog(this,accent(),this::livingFixShop,"media:shop").show();}}).setNegativeButton("Отмена",null).show());}
         ScrollView scroll=new ScrollView(this);scroll.setFillViewport(false);LinearLayout items=column();scroll.addView(items);root.addView(scroll,new LinearLayout.LayoutParams(-1,0,1));
         LinearLayout nav=row();root.addView(nav,lp(-1,56));String[] names={"Каталог","Избранное","Покупки","История"};String[] glyphs={"inventory","heart","armor","journal"};
         for(int i=0;i<names.length;i++){final int index=i;LinearLayout cell=column();cell.setGravity(Gravity.CENTER);nav.addView(cell,new LinearLayout.LayoutParams(0,-1,1));
@@ -4908,11 +4929,11 @@ public final class MainActivity extends Activity {
         LinearLayout tile=column();tile.setPadding(dp(10),dp(9),dp(10),dp(10));tile.setBackground(bg(0xff121212,Color.TRANSPARENT,18));line.addView(tile,new LinearLayout.LayoutParams(0,dp(324),1));
         LinearLayout art=row();art.setGravity(Gravity.CENTER);art.setBackground(bg(0xff1a1a1a,Color.TRANSPARENT,14));art.setClipToOutline(true);tile.addView(art,lp(-1,108));art.addView(fixArtwork(offer),lp(-1,-1));
         LinearLayout label=row();TextView rare=text(offer.rarity,10,offer.color,true);label.addView(rare,new LinearLayout.LayoutParams(0,-2,1));
-        TextView fav=text(game.fixShop.favorite(offer.id())?"♥":"♡",22,accent(),true);fav.setContentDescription("Избранное: "+offer.title);fav.setOnClickListener(v->{game.fixShop.toggle(offer.id());save();fixRenderOffers(items);});label.addView(fav,lp(-2,-2));tile.addView(label,lp(-1,30));rare.setSingleLine(true);rare.setEllipsize(android.text.TextUtils.TruncateAt.END);
+        TextView fav=text(game.fixShop.favorite(offer.id())?"♥":"♡",22,accent(),true);fav.setContentDescription("Избранное: "+offer.title);fav.setOnClickListener(v->{if(!fixShopCanChange())return;game.fixShop.toggle(offer.id());save();fixRenderOffers(items);});label.addView(fav,lp(-2,-2));tile.addView(label,lp(-1,30));rare.setSingleLine(true);rare.setEllipsize(android.text.TextUtils.TruncateAt.END);
         TextView name=text(offer.title,15,TEXT,true);name.setMaxLines(2);name.setEllipsize(android.text.TextUtils.TruncateAt.END);name.setGravity(Gravity.TOP);tile.addView(name,lp(-1,48));
         TextView desc=text(offer.detail,12,MUTED,false);desc.setMaxLines(3);desc.setEllipsize(android.text.TextUtils.TruncateAt.END);desc.setGravity(Gravity.TOP);tile.addView(desc,new LinearLayout.LayoutParams(-1,0,1));
         long n=offer.itemId.isEmpty()?game.fixShop.count(offer.id()):game.fixShop.purchasedQuantity(offer.itemId);TextView bought=text(n>0?"Куплено: "+n:" ",11,accent(),false);bought.setSingleLine(true);tile.addView(bought,lp(-1,20));
-        TextView buy=text(offer.price==0?"Открыть":"◇ "+offer.price+" F",15,TEXT,true);buy.setGravity(Gravity.CENTER);buy.setBackground(bg(0xff151515,0xff454545,22));tile.addView(buy,lp(-1,40));buy.setOnClickListener(v->offer.action.run());art.setOnClickListener(v->offer.action.run());
+        TextView buy=text(livingBusy()?(offer.price==0?"Подробнее":"◇ "+offer.price+" F · просмотр"):(offer.price==0?"Открыть":"◇ "+offer.price+" F"),15,TEXT,true);buy.setGravity(Gravity.CENTER);buy.setBackground(bg(0xff151515,0xff454545,22));tile.addView(buy,lp(-1,40));buy.setOnClickListener(v->fixOpenOffer(offer));art.setOnClickListener(v->fixOpenOffer(offer));
     }
     private void fixRenderLedger(LinearLayout items){
         org.json.JSONArray history=game.fixShop.history();
@@ -4925,8 +4946,8 @@ public final class MainActivity extends Activity {
             LinearLayout tile=livingTile(items);livingLine(tile,e.optString("title"),e.optInt("price")+" F",accent());addText(tile,e.optString("detail"),13,MUTED,false,4);
             addText(tile,"День "+e.optInt("day")+" | "+("PENDING".equals(state)?"Ожидает получения":"REFUNDED".equals(state)?"Возвращено":"Применено"),11,MUTED,false,6);
             if("PENDING".equals(state)&&fixShopPage==2){
-                livingLink(tile,"Получить","","armor",()->{if(livingBusy()||!game.fixShop.redeem(game,index)){toast("Нет места или товар недоступен");return;}game.progress.sync(game);save();livingFixShop();});
-                livingLink(tile,"Возврат",e.optInt("price")+" F","septims",()->new RuneDialogBuilder(this,accent()).setTitle("Вернуть покупку?").setMessage("Товар ещё не получен. Расходы будут уменьшены.").setNegativeButton("Отмена",null).setPositiveButton("Вернуть",(d,w)->{if(livingBusy()||!game.fixShop.refund(game,index)){toast("Возврат недоступен");return;}save();livingFixShop();}).show());
+                livingLink(tile,"Получить","","armor",()->{if(!fixShopCanChange())return;if(!game.fixShop.redeem(game,index)){toast("Нет места или товар недоступен");return;}game.progress.sync(game);save();livingFixShop();});
+                livingLink(tile,"Возврат",e.optInt("price")+" F","septims",()->new RuneDialogBuilder(this,accent()).setTitle("Вернуть покупку?").setMessage("Товар ещё не получен. Расходы будут уменьшены.").setNegativeButton("Отмена",null).setPositiveButton("Вернуть",(d,w)->{if(!fixShopCanChange())return;if(!game.fixShop.refund(game,index)){toast("Возврат недоступен");return;}save();livingFixShop();}).show());
             }
         }
     }
