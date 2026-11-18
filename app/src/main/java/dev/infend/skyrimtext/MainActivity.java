@@ -1727,6 +1727,7 @@ public final class MainActivity extends Activity {
             String[] names={"Главные ворота","Мрачный замок","Синий дворец","Коллегия бардов","Храм Богов","Кузница Солитьюда","Смеющаяся крыса","Гавань Солитьюда"};
             for(int i=0;i<names.length;i++)if(names[i].equals(place))d=i;
             if("Рыночная площадь".equals(place))d=0;
+            if("Подземелье Мрачного замка".equals(place))d=1;
         }
         if("Солитьюд".equals(city)&&"Высокий шпиль".equals(place)){
             new RuneDialogBuilder(this,accent()).setTitle(place).setView(panel).setPositiveButton("Посетить",(dialog,w)->{
@@ -1747,7 +1748,7 @@ public final class MainActivity extends Activity {
             new RuneDialogBuilder(this,accent()).setTitle(place).setView(panel).setPositiveButton("Местные занятия",(dialog,w)->{
                 if(!city.equals(game.progress.location)||!"WORLD".equals(game.mode)||game.road.pending())return;
                 if(aiClient!=null)aiClient.cancel();if(localAiClient!=null)localAiClient.cancel();
-                game.choose("SOLITUDE:open");game.choose("SOLITUDE:visit:"+district);save();tab=0;render();
+                game.choose("SOLITUDE:open");game.choose("SOLITUDE:visit:"+district);if("Подземелье Мрачного замка".equals(place))game.choose(SolitudeJustice.MODE);save();tab=0;render();
             }).setNegativeButton("Закрыть",null).show();return;
         }
         WorldAtlas.Place target=WorldAtlas.find(place);
