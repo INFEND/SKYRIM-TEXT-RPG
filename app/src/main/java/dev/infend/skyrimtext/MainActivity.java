@@ -1673,28 +1673,31 @@ public final class MainActivity extends Activity {
         addText(content,"Каждое действие сохраняется автоматически",11,MUTED,false,0);
     }
 
-    /** Five independent, compact groups; preserve expansion state per city. */
+    private static final String CITY_ICONS_ONLY_PREF="city_architecture_icons_only";
+    private boolean cityIconsOnly(){return prefs.getBoolean(CITY_ICONS_ONLY_PREF,false);}
+
+    /** Compact accordion or a single five-icon row; retain state separately for each city. */
     private void renderCityArchitecture(){
         if(!CityArchitecture.here(game))return;
         String city=game.progress.location;
         java.util.List<java.util.List<String>> groups=CityArchitecture.groups(city);
-        addText(content,"Городские локации",20,TEXT,true,10);
+        addText(content,"Городские локации",20,TEXT,true,6);
+        if(cityIconsOnly()){
+            renderCityIconRow(city,groups);
+            space(content,6);
+            return;
+        }
         for(int category=0;category<groups.size();category++){
             final int index=category;java.util.List<String> places=groups.get(index);
             if(places.isEmpty())continue;
-            LinearLayout panel=column();panel.setBackground(bg(0xff141414,Color.TRANSPARENT,18));
-            LinearLayout heading=row();heading.setMinimumHeight(dp(62));heading.setPadding(dp(16),dp(12),dp(16),dp(12));
-            heading.addView(citySectionIcon(index),lp(28,28));
-            TextView title=text(CityArchitecture.CATEGORIES[index],17,accent(),true);title.setTypeface(Typeface.DEFAULT,Typeface.BOLD);
-            LinearLayout.LayoutParams titleSize=new LinearLayout.LayoutParams(0,-2,1);titleSize.leftMargin=dp(12);heading.addView(title,titleSize);
-            View arrow=addonIcon("down",accent());heading.addView(arrow,lp(24,24));
+            LinearLayout panel=column();panel.setBackground(bg(0xff141414,Color.TRANSPARENT,12));
+            LinearLayout heading=row();heading.setMinimumHeight(dp(48));heading.setPadding(dp(12),dp(6),dp(12),dp(6));
+            heading.addView(citySectionIcon(index),lp(24,24));
+            TextView title=text(CityArchitecture.CATEGORIES[index],15,accent(),true);title.setTypeface(Typeface.DEFAULT,Typeface.BOLD);
+            LinearLayout.LayoutParams titleSize=new LinearLayout.LayoutParams(0,-2,1);titleSize.leftMargin=dp(9);heading.addView(title,titleSize);
+            View arrow=addonIcon("down",accent());heading.addView(arrow,lp(20,20));
             panel.addView(heading,lp(-1,-2));
-            LinearLayout entries=column();entries.setPadding(dp(12),0,dp(12),dp(10));
-            for(String place:places){
-                TextView entry=text(place,16,TEXT,false);entry.setPadding(dp(12),dp(12),dp(12),dp(12));entry.setBackground(bg(0xff1b1b1b,Color.TRANSPARENT,10));
-                LinearLayout.LayoutParams itemSize=lp(-1,-2);itemSize.bottomMargin=dp(4);entries.addView(entry,itemSize);
-                entry.setOnClickListener(v->cityPlaceDialog(city,index,place));entry.setFocusable(true);
-            }
+            LinearLayout entries=cityCategoryEntries(city,index,places);
             String key="city_architecture_"+city+"_"+index;
             boolean opened=prefs.getBoolean(key,false);entries.setVisibility(opened?View.VISIBLE:View.GONE);arrow.setRotation(opened?180f:0f);
             panel.addView(entries,lp(-1,-2));heading.setFocusable(true);heading.setClickable(true);
@@ -1707,9 +1710,67 @@ public final class MainActivity extends Activity {
                 heading.setContentDescription(CityArchitecture.CATEGORIES[index]+(open?", раскрыто":", свёрнуто"));
                 prefs.edit().putBoolean(key,open).apply();
             });
-            LinearLayout.LayoutParams size=lp(-1,-2);size.bottomMargin=dp(10);content.addView(panel,size);
+            LinearLayout.LayoutParams size=lp(-1,-2);size.bottomMargin=dp(4);content.addView(panel,size);
         }
-        space(content,10);
+        space(content,6);
+    }
+
+    private LinearLayout cityCategoryEntries(String city,int index,java.util.List<String> places){
+        LinearLayout entries=column();entries.setPadding(dp(8),0,dp(8),dp(6));
+        for(String place:places){
+            TextView entry=text(place,15,TEXT,false);entry.setPadding(dp(10),dp(8),dp(10),dp(8));
+            entry.setMinHeight(dp(48));entry.setGravity(Gravity.CENTER_VERTICAL);
+            entry.setBackground(bg(0xff1b1b1b,Color.TRANSPARENT,10));
+            LinearLayout.LayoutParams itemSize=lp(-1,-2);itemSize.bottomMargin=dp(4);entries.addView(entry,itemSize);
+            entry.setOnClickListener(v->cityPlaceDialog(city,index,place));entry.setFocusable(true);
+        }
+        return entries;
+    }
+
+    private void renderCityIconRow(String city,java.util.List<java.util.List<String>> groups){
+        LinearLayout panel=column();
+        LinearLayout icons=row();panel.addView(icons,lp(-1,48));
+        LinearLayout details=column();panel.addView(details,lp(-1,-2));
+        FrameLayout[] buttons=new FrameLayout[groups.size()];
+        String key="city_architecture_icon_selected_"+city;
+        java.util.function.IntConsumer select=index->{
+            details.removeAllViews();
+            boolean valid=index>=0&&index<groups.size()&&!groups.get(index).isEmpty();
+            for(int i=0;i<buttons.length;i++){
+                FrameLayout button=buttons[i];
+                if(button==null)continue;
+                boolean active=valid&&i==index;
+                button.setSelected(active);
+                button.setBackground(bg(active?PANEL_2:0xff141414,active?accent():Color.TRANSPARENT,10));
+                button.setContentDescription(CityArchitecture.CATEGORIES[i]+(active?", раскрыто":", свёрнуто"));
+            }
+            if(valid){
+                space(details,4);
+                details.addView(cityCategoryEntries(city,index,groups.get(index)),lp(-1,-2));
+            }
+            details.setVisibility(valid?View.VISIBLE:View.GONE);
+        };
+        for(int i=0;i<groups.size();i++){
+            final int index=i;
+            FrameLayout button=new FrameLayout(this);buttons[i]=button;
+            LinearLayout.LayoutParams size=new LinearLayout.LayoutParams(0,-1,1f);
+            if(i>0)size.leftMargin=dp(4);
+            icons.addView(button,size);
+            FrameLayout.LayoutParams glyphSize=new FrameLayout.LayoutParams(dp(24),dp(24),Gravity.CENTER);
+            button.addView(citySectionIcon(index),glyphSize);
+            button.setTooltipText(CityArchitecture.CATEGORIES[index]);
+            button.setFocusable(true);
+            button.setOnClickListener(v->{
+                int next=button.isSelected()?-1:index;
+                if(animations)android.transition.TransitionManager.beginDelayedTransition(panel,new android.transition.AutoTransition().setDuration(180));
+                select.accept(next);
+                prefs.edit().putInt(key,next).apply();
+            });
+            button.setEnabled(!groups.get(index).isEmpty());
+            if(!button.isEnabled())button.setAlpha(0.4f);
+        }
+        select.accept(prefs.getInt(key,-1));
+        content.addView(panel,lp(-1,-2));
     }
     private View citySectionIcon(int kind){
         final int tint=accent();
@@ -5132,6 +5193,16 @@ public final class MainActivity extends Activity {
             render();
         });
         readability.addView(numberToggle,lp(-1,47));
+        space(readability,8);
+        addText(readability,"ГОРОДСКИЕ ЛОКАЦИИ",11,accent(),true,6);
+        TextView cityLayout=text(cityIconsOnly()?"Только иконки | один ряд":"Иконки и текст | компактный список",14,TEXT,true);
+        cityLayout.setGravity(Gravity.CENTER);cityLayout.setMinHeight(dp(48));
+        cityLayout.setBackground(bg(PANEL_2,BORDER,10));readability.addView(cityLayout,lp(-1,-2));
+        cityLayout.setOnClickListener(v->new RuneDialogBuilder(this,accent()).setTitle("Городские локации")
+            .setSingleChoiceItems(new String[]{"Иконки и текст | компактный список","Только иконки | один ряд"},cityIconsOnly()?1:0,(d,i)->{
+                prefs.edit().putBoolean(CITY_ICONS_ONLY_PREF,i==1).apply();d.dismiss();render();
+            }).setNegativeButton("Отмена",null).show());
+
         LinearLayout nameColors=card();
         addText(nameColors,"ЦВЕТ ИМЕНИ ГЕРОЯ В ДИАЛОГАХ",11,accent(),true,10);
         int currentHeroColor=Math.max(0,Math.min(HERO_NAME_COLORS.length-1,
