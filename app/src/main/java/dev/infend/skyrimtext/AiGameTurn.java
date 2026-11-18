@@ -65,8 +65,11 @@ public final class AiGameTurn {
             if(response==null)throw original;
             String tail=response.trim();
             if(!(tail.endsWith("}")||tail.endsWith("]")))throw original;
-            try{return parseModel(tail+"}",lockedChance);}
-            catch(JSONException ignored){throw original;}
+            try{
+                JSONObject repaired=extractObject(tail+"}");
+                if(!repaired.has("effects")||!repaired.has("journal")||!repaired.has("customChance"))throw original;
+                return parseModel(repaired.toString(),lockedChance);
+            }catch(JSONException ignored){throw original;}
         }
     }
 
