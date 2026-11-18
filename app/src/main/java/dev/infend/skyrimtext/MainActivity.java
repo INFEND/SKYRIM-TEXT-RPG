@@ -4205,6 +4205,7 @@ public final class MainActivity extends Activity {
         section("ЛЕТОПИСЬ СЕВЕРА","Журнал","Выбирай задание, чтобы увидеть описание и текущую цель.");
         renderFactionJournal();
         renderRoadQuestJournal();
+        if("ACTIVE".equals(SolitudeCanonical.state(game))){LinearLayout local=card();addText(local,SolitudeCanonical.TITLE,15,TEXT,true,6);addText(local,"Солитьюд | Каноническое поручение (адаптация) | "+SolitudeCanonical.objective(game),13,MUTED,false,6);}
         for(SolitudeEncounters.Quest q:SolitudeEncounters.QUESTS)if("ACTIVE".equals(SolitudeEncounters.state(game,q))){
             LinearLayout local=card();addText(local,q.title,15,TEXT,true,6);addText(local,"Солитьюд | "+SolitudeEncounters.objective(game,q),13,MUTED,false,6);
         }
@@ -4287,7 +4288,8 @@ public final class MainActivity extends Activity {
         }
         if(game.questStage==4)addText(completed,"◇ Пепельные печати",14,TEXT,false,6);
         if(game.boardCompleted>0)addText(completed,"◇ Опасные дороги | заказов: "+game.boardCompleted,14,TEXT,false,6);
-        boolean cityCompleted=false;for(SolitudeEncounters.Quest q:SolitudeEncounters.QUESTS)if("COMPLETED".equals(SolitudeEncounters.state(game,q))){cityCompleted=true;addText(completed,"◇ "+q.title+" | "+SolitudeEncounters.objective(game,q),14,TEXT,false,6);}
+        if("COMPLETED".equals(SolitudeCanonical.state(game)))addText(completed,"◇ "+SolitudeCanonical.TITLE+" | "+SolitudeCanonical.objective(game),14,TEXT,false,6);
+        boolean cityCompleted="COMPLETED".equals(SolitudeCanonical.state(game));for(SolitudeEncounters.Quest q:SolitudeEncounters.QUESTS)if("COMPLETED".equals(SolitudeEncounters.state(game,q))){cityCompleted=true;addText(completed,"◇ "+q.title+" | "+SolitudeEncounters.objective(game,q),14,TEXT,false,6);}
         if(!cityCompleted&&game.progress.completed.isEmpty()&&game.questStage!=4
                 &&game.progress.dragonStage<DragonArc.FINAL_STAGE&&game.boardCompleted==0)
             addText(completed,"Завершённых поручений пока нет.",14,MUTED,false,0);
