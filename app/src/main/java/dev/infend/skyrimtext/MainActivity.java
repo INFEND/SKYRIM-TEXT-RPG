@@ -1697,16 +1697,15 @@ public final class MainActivity extends Activity {
             LinearLayout.LayoutParams titleSize=new LinearLayout.LayoutParams(0,-2,1);titleSize.leftMargin=dp(9);heading.addView(title,titleSize);
             View arrow=addonIcon("down",accent());heading.addView(arrow,lp(20,20));
             panel.addView(heading,lp(-1,-2));
-            LinearLayout entries=cityCategoryEntries(city,index,places);
+            AccordionLayout entries=cityCategoryEntries(city,index,places);
             String key="city_architecture_"+city+"_"+index;
             boolean opened=prefs.getBoolean(key,false);entries.setVisibility(opened?View.VISIBLE:View.GONE);arrow.setRotation(opened?180f:0f);
             panel.addView(entries,lp(-1,-2));heading.setFocusable(true);heading.setClickable(true);
             heading.setContentDescription(CityArchitecture.CATEGORIES[index]+(opened?", раскрыто":", свёрнуто"));
             heading.setOnClickListener(v->{
-                boolean open=entries.getVisibility()!=View.VISIBLE;
-                if(animations)android.transition.TransitionManager.beginDelayedTransition(panel,new android.transition.AutoTransition().setDuration(180));
-                entries.setVisibility(open?View.VISIBLE:View.GONE);
-                if(animations)arrow.animate().rotation(open?180f:0f).setDuration(180).start();else arrow.setRotation(open?180f:0f);
+                boolean open=!entries.isExpanded();
+                entries.setExpanded(open,animations);
+                AccordionLayout.rotateArrow(arrow,open,animations);
                 heading.setContentDescription(CityArchitecture.CATEGORIES[index]+(open?", раскрыто":", свёрнуто"));
                 prefs.edit().putBoolean(key,open).apply();
             });
@@ -1715,8 +1714,8 @@ public final class MainActivity extends Activity {
         space(content,6);
     }
 
-    private LinearLayout cityCategoryEntries(String city,int index,java.util.List<String> places){
-        LinearLayout entries=column();entries.setPadding(dp(8),0,dp(8),dp(6));
+    private AccordionLayout cityCategoryEntries(String city,int index,java.util.List<String> places){
+        AccordionLayout entries=new AccordionLayout(this);entries.setPadding(dp(8),0,dp(8),dp(6));
         for(String place:places){
             TextView entry=text(place,15,TEXT,false);entry.setPadding(dp(10),dp(8),dp(10),dp(8));
             entry.setMinHeight(dp(48));entry.setGravity(Gravity.CENTER_VERTICAL);
@@ -1730,11 +1729,12 @@ public final class MainActivity extends Activity {
     private void renderCityIconRow(String city,java.util.List<java.util.List<String>> groups){
         LinearLayout panel=column();
         LinearLayout icons=row();panel.addView(icons,lp(-1,48));
-        LinearLayout details=column();panel.addView(details,lp(-1,-2));
+        AccordionLayout details=new AccordionLayout(this);panel.addView(details,lp(-1,-2));
+        details.setVisibility(View.GONE);
         FrameLayout[] buttons=new FrameLayout[groups.size()];
         String key="city_architecture_icon_selected_"+city;
         java.util.function.IntConsumer select=index->{
-            details.removeAllViews();
+            boolean wasExpanded=details.isExpanded();
             boolean valid=index>=0&&index<groups.size()&&!groups.get(index).isEmpty();
             for(int i=0;i<buttons.length;i++){
                 FrameLayout button=buttons[i];
@@ -1745,10 +1745,13 @@ public final class MainActivity extends Activity {
                 button.setContentDescription(CityArchitecture.CATEGORIES[i]+(active?", раскрыто":", свёрнуто"));
             }
             if(valid){
+                details.removeAllViews();
                 space(details,4);
                 details.addView(cityCategoryEntries(city,index,groups.get(index)),lp(-1,-2));
             }
-            details.setVisibility(valid?View.VISIBLE:View.GONE);
+            // Switching between two open categories replaces content immediately,
+            // without a blank intermediate frame; opening/closing animates height.
+            details.setExpanded(valid,animations&&(!valid||!wasExpanded));
         };
         for(int i=0;i<groups.size();i++){
             final int index=i;
@@ -1762,7 +1765,6 @@ public final class MainActivity extends Activity {
             button.setFocusable(true);
             button.setOnClickListener(v->{
                 int next=button.isSelected()?-1:index;
-                if(animations)android.transition.TransitionManager.beginDelayedTransition(panel,new android.transition.AutoTransition().setDuration(180));
                 select.accept(next);
                 prefs.edit().putInt(key,next).apply();
             });
@@ -3848,15 +3850,13 @@ public final class MainActivity extends Activity {
                 LinearLayout.LayoutParams hp=lp(-1,-2);
                 hp.bottomMargin=dp(3);
                 sections.addView(header,hp);
-                LinearLayout entries=column();
+                AccordionLayout entries=new AccordionLayout(this);
                 entries.setVisibility(expanded?View.VISIBLE:View.GONE);
                 sections.addView(entries,lp(-1,-2));
                 header.setContentDescription(category+", "+(expanded?"развёрнуто":"свёрнуто"));
                 header.setOnClickListener(v->{
-                    boolean next=entries.getVisibility()!=View.VISIBLE;
-                    if(animations)android.transition.TransitionManager.beginDelayedTransition(
-                        sections,new android.transition.AutoTransition().setDuration(200));
-                    entries.setVisibility(next?View.VISIBLE:View.GONE);
+                    boolean next=!entries.isExpanded();
+                    entries.setExpanded(next,animations);
                     arrow.setText(next?"⌃":"⌄");
                     if(next){opened.add(category);manuallyClosed.remove(category);}
                     else{opened.remove(category);manuallyClosed.add(category);}
@@ -4488,7 +4488,7 @@ public final class MainActivity extends Activity {
         renderChronicle();
     }
     private void foldSettingsSection(String key,String name,int from){
-        LinearLayout body=column();
+        AccordionLayout body=new AccordionLayout(this);
         while(content.getChildCount()>from){
             View child=content.getChildAt(from);
             ViewGroup.LayoutParams params=child.getLayoutParams();
@@ -4511,10 +4511,8 @@ public final class MainActivity extends Activity {
         heading.setClickable(true);
         heading.setContentDescription(name+", "+(open?"раскрыто":"свёрнуто"));
         heading.setOnClickListener(v->{
-            boolean expanded=body.getVisibility()!=View.VISIBLE;
-            if(animations)android.transition.TransitionManager.beginDelayedTransition(
-                panel,new android.transition.AutoTransition().setDuration(230));
-            body.setVisibility(expanded?View.VISIBLE:View.GONE);
+            boolean expanded=!body.isExpanded();
+            body.setExpanded(expanded,animations);
             arrow.setText(expanded?"⌃":"⌄");
             heading.setContentDescription(name+", "+(expanded?"раскрыто":"свёрнуто"));
             prefs.edit().putBoolean("settings_group_"+key,expanded).apply();
@@ -4561,7 +4559,7 @@ public final class MainActivity extends Activity {
         };
     }
     private void foldAddonSection(String key,String name,int from,boolean parent){
-        LinearLayout body=column();
+        AccordionLayout body=new AccordionLayout(this);
         while(content.getChildCount()>from){
             View child=content.getChildAt(from);ViewGroup.LayoutParams params=child.getLayoutParams();
             content.removeViewAt(from);body.addView(child,params);
@@ -4589,10 +4587,9 @@ public final class MainActivity extends Activity {
         heading.setClickable(true);heading.setFocusable(true);
         heading.setContentDescription(name+", "+(open?"раскрыто":"свёрнуто"));
         heading.setOnClickListener(v->{
-            boolean expanded=body.getVisibility()!=View.VISIBLE;
-            if(animations)android.transition.TransitionManager.beginDelayedTransition(panel,new android.transition.AutoTransition().setDuration(230));
-            body.setVisibility(expanded?View.VISIBLE:View.GONE);
-            if(animations)chevron.animate().rotation(expanded?180f:0f).setDuration(180).start();else chevron.setRotation(expanded?180f:0f);
+            boolean expanded=!body.isExpanded();
+            body.setExpanded(expanded,animations);
+            AccordionLayout.rotateArrow(chevron,expanded,animations);
             heading.setContentDescription(name+", "+(expanded?"раскрыто":"свёрнуто"));
             prefs.edit().putBoolean("settings_group_"+key,expanded).apply();
         });

@@ -162,7 +162,8 @@ public final class LocationGalleryView extends LinearLayout {
     private final boolean fullscreen;
     private final ImageView photo;
     private final TextView page,missingPhoto;
-    private final LinearLayout galleryBody,indicators;
+    private final AccordionLayout galleryBody;
+    private final LinearLayout indicators;
     private final View collapseArrow;
     private boolean collapsed=false;
     private int current=0,requested=0;
@@ -237,14 +238,15 @@ public final class LocationGalleryView extends LinearLayout {
         collapseArrow=galleryGlyph(3,0xffa5a5a5);
         header.addView(collapseArrow,new LayoutParams(dp(44),dp(44)));
 
-        galleryBody=new LinearLayout(context);
+        galleryBody=new AccordionLayout(context);
         galleryBody.setOrientation(VERTICAL);
         addView(galleryBody,new LayoutParams(-1,-2));
         header.setContentDescription("Свернуть галерею "+location);
         header.setOnClickListener(v->{
             collapsed=!collapsed;
-            galleryBody.setVisibility(collapsed?View.GONE:View.VISIBLE);
-            collapseArrow.animate().rotation(collapsed?180f:0f).setDuration(160).start();
+            boolean animate=getContext().getSharedPreferences("skyrim_text_v1",Context.MODE_PRIVATE).getBoolean("animations",true);
+            galleryBody.setExpanded(!collapsed,animate);
+            AccordionLayout.rotateArrow(collapseArrow,collapsed,animate);
             header.setContentDescription((collapsed?"Развернуть":"Свернуть")+" галерею "+location);
         });
 
