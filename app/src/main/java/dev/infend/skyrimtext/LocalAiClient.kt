@@ -94,7 +94,7 @@ class LocalAiClient(private val context: Context) {
     fun generate(modelPath:String,game:GameEngine,history:String,command:String,
                  controlled:Boolean,chanceOnly:Boolean,listener:AiStoryClient.Listener):Boolean {
         val system=AiStoryClient.localSystemPrompt(controlled,chanceOnly)
-        val prompt=AiStoryClient.localUserPrompt(game,history,command,controlled)
+        val prompt=if(chanceOnly) AiStoryClient.localChancePrompt(game,command) else AiStoryClient.localUserPrompt(game,history,command,controlled)
         // Full scenes require a structured JSON with ten choices. CPU-only 9B
         // inference is slow: keep the budget finite rather than waiting on 2048 tokens.
         val maxTokens=if(chanceOnly)128 else if(controlled)2304 else 768
