@@ -49,6 +49,18 @@ public class SolitudeJusticeTest {
         g.choose("SOLITUDE:cell:day");int next=g.stamina;g.choose("SOLITUDE:cell:exercise");assertEquals(next-5,g.stamina);
         g.choose("SOLITUDE:cell:day");int free=g.stamina;g.choose("SOLITUDE:cell:exercise");assertEquals(free,g.stamina);
     }
+    @Test public void confiscationAcrossSaveAndWorldFine() throws Exception {
+        GameEngine g=city(250);assertTrue(g.progress.addItem("Похищенный амулет",1));assertTrue(g.progress.addItem("Похищенное кольцо",1));
+        g=GameEngine.fromJson(g.toJson().toString());assertEquals(1,g.progress.quantity("Похищенный амулет"));
+        g.gold=0;g.choose("ROADFINE:3");assertEquals(1,g.progress.quantity("Похищенный амулет"));
+        g.gold=1000;g.choose("ROADFINE:3");assertEquals(0,g.progress.quantity("Похищенный амулет"));assertEquals(0,g.progress.quantity("Похищенное кольцо"));assertEquals(750,g.gold);
+    }
+    @Test public void amuletSharesDailyTheftLimit() throws Exception {
+        GameEngine g=city(0);g.hour=10;g.choose("SOLITUDE:open");g.choose("SOLITUDE:visit:0");
+        int stamina=g.stamina;g.choose("SOLITUDE:crime:amulet");assertEquals(stamina-5,g.stamina);
+        if(g.solitude.custody())assertEquals(50,g.road.bounty(3));else assertEquals(1,g.progress.quantity("Похищенный амулет"));
+        g=GameEngine.fromJson(g.toJson().toString());g.choose("SOLITUDE:crime:steal");assertEquals(stamina-5,g.stamina);
+    }
     @Test public void wrongDistrictAndInsufficientFundsCannotClearFine() throws Exception {
         GameEngine g=city(250);g.choose("SOLITUDE:open");g.choose("SOLITUDE:visit:0");g.choose("SOLITUDE:justice:pay");assertEquals(250,g.road.bounty(3));
         g.choose("SOLITUDE:back");g.choose("SOLITUDE:visit:1");g.choose(SolitudeJustice.MODE);g.gold=0;g.choose("SOLITUDE:justice:pay");assertEquals(250,g.road.bounty(3));assertEquals(0,g.gold);

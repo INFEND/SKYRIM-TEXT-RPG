@@ -5,14 +5,16 @@ final class SolitudeJustice {
     static final String MODE="SOLITUDE:jail", CELL="SOLITUDE:cell";
     private int total,remaining,lastTheftDay; private boolean attempted, detained, exercised;
     boolean detained(){return detained;}
-    void theftChoice(GameEngine g,GameEngine.Scene s){if(lastTheftDay<g.day&&g.hour>=8&&g.hour<20&&g.stamina>=5)s.add("SOLITUDE:crime:steal","Попытаться украсть кольцо","Карманные кражи | 5 запаса сил | риск задержания");}
+    static int confiscate(GameEngine g){int count=0;for(String item:new String[]{"Похищенное кольцо","Похищенный амулет"}){int n=g.progress.quantity(item);if(n>0&&g.progress.removeItem(item,n))count=GameEngine.nonnegativeAdd(count,n);}return count;}
+    void theftChoice(GameEngine g,GameEngine.Scene s){if(lastTheftDay<g.day&&g.hour>=8&&g.hour<20&&g.stamina>=5){s.add("SOLITUDE:crime:steal","Попытаться украсть кольцо","Карманные кражи | 5 запаса сил | риск задержания");s.add("SOLITUDE:crime:amulet","Попытаться украсть амулет","Карманные кражи | 5 запаса сил | повышенный риск");}}
     boolean theft(GameEngine g,String action){
-        if(!"SOLITUDE:crime:steal".equals(action))return false;
+        boolean amulet="SOLITUDE:crime:amulet".equals(action);if(!amulet&&!"SOLITUDE:crime:steal".equals(action))return false;
+        String item=amulet?"Похищенный амулет":"Похищенное кольцо";int fine=amulet?50:25;
         if(!"SOLITUDE:0".equals(g.mode)||lastTheftDay>=g.day||g.hour<8||g.hour>=20||g.stamina<5)return true;
         lastTheftDay=g.day;g.stamina-=5;
-        if(g.rollCheck(g.progress.chance(g,2,11,25))){
-            if(g.progress.addItem("Похищенное кольцо",1)){g.progress.skillExperience(g,11,15);g.message="Ты незаметно прячешь кольцо. Никто не заметил кражу.";}else g.message="В сумке нет места. Ты оставляешь кольцо на прилавке.";
-        }else{g.road.addCityBounty(3,25);detained=true;g.mode=MODE;g.message="Торговец замечает твою руку и зовёт стражу. Штраф за попытку кражи: 25 септимов.";} 
+        if(g.rollCheck(g.progress.chance(g,2,11,amulet?15:25))){
+            if(g.progress.addItem(item,1)){g.progress.skillExperience(g,11,15);g.message="Ты незаметно прячешь добычу. Никто не заметил кражу.";}else g.message="В сумке нет места. Ты оставляешь вещь на прилавке.";
+        }else{g.road.addCityBounty(3,fine);detained=true;g.mode=MODE;g.message="Торговец замечает твою руку и зовёт стражу. Штраф за попытку кражи: "+fine+" септимов.";} 
         g.progress.recent=g.message;g.progress.sync(g);g.recordVisualEvent(g.message);return true;
     }
     boolean confined(){return remaining>0&&total>=remaining&&total<=7;}
@@ -21,8 +23,8 @@ final class SolitudeJustice {
         if(!MODE.equals(g.mode)&&!"WORLD".equals(g.mode)&&!"RESULT".equals(g.mode))return;
         int days=RoadEvents.jailDays(fine);if(g.day>Integer.MAX_VALUE-days)return;
         total=remaining=days;attempted=false;detained=false;exercised=false;
-        int stolen=g.progress.quantity("Похищенное кольцо");if(stolen>0)g.progress.removeItem("Похищенное кольцо",stolen);
-        g.mode=CELL;g.message="Стража запирает камеру. Срок: "+days+" дн."+(stolen>0?" Украденные кольца конфискованы.":"");g.progress.sync(g);g.recordVisualEvent(g.message);
+        int stolen=confiscate(g);
+        g.mode=CELL;g.message="Стража запирает камеру. Срок: "+days+" дн."+(stolen>0?" Украденные вещи конфискованы.":"");g.progress.sync(g);g.recordVisualEvent(g.message);
     }
     GameEngine.Scene cell(GameEngine g){
         GameEngine.Scene s=new GameEngine.Scene("СОЛИТЬЮД | ЗАКЛЮЧЕНИЕ","Камера Мрачного замка","Капли падают с каменного свода. За решёткой слышны шаги караула.\n\nОсталось: "+remaining+" из "+total+" дн. | Штраф: "+g.road.bounty(3)+" септимов.\n\n"+g.message);
@@ -60,7 +62,7 @@ final class SolitudeJustice {
             "За решётками сыро и холодно. Дежурный стражник сверяет записи.\n\n"+(fine>0?"Твой штраф: "+fine+" септимов.":"За тобой не числится штрафов в Хаафингаре.")+"\n"+g.message);
         if(fine>0){
             if(g.gold>=fine)s.add("SOLITUDE:justice:pay","Оплатить штраф",fine+" септимов");
-            s.add("SOLITUDE:justice:serve","Сдаться страже","Наказание: "+RoadEvents.jailDays(fine)+" дн. | Потеря прогресса навыков и конфискация украденных колец");
+            s.add("SOLITUDE:justice:serve","Сдаться страже","Наказание: "+RoadEvents.jailDays(fine)+" дн. | Потеря прогресса навыков и конфискация украденных вещей");
         }
         if(detained&&fine>0)return s;
         return s.add("SOLITUDE:back","На улицы Солитьюда","Покинуть подземелье").add("GO_WORLD","Завершить прогулку","");
@@ -72,6 +74,6 @@ final class SolitudeJustice {
         if(!action.equals("SOLITUDE:justice:pay")&&!action.equals("SOLITUDE:justice:serve"))return false;
         if(g.road.bounty(3)<=0)return true;
         if(action.endsWith(":serve")){begin(g);return true;}
-        g.mode="WORLD";g.road.payFine(g,"ROADFINE:3");if(g.road.bounty(3)==0){detained=false;int stolen=g.progress.quantity("Похищенное кольцо");if(stolen>0){g.progress.removeItem("Похищенное кольцо",stolen);g.progress.sync(g);g.message+=" Украденные кольца конфискованы.";}}g.mode=MODE;return true;
+        g.mode="WORLD";g.road.payFine(g,"ROADFINE:3");if(g.road.bounty(3)==0)detained=false;g.mode=MODE;return true;
     }
 }
