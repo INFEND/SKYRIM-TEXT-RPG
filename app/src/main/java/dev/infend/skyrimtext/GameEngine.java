@@ -262,6 +262,7 @@ public final class GameEngine {
         s.add("DRAGON_OPEN","Драконий след",DragonArc.status(this));
         s.add("EXPLORE","Исследовать окрестности","Случайные встречи, тайники и опасности");
         SolitudeWolf.worldChoices(this,s);
+        SolitudeCourt.worldChoices(this,s);
         if(SolitudeCity.here(this))s.add("SOLITUDE:open","Жизнь Солитьюда","Районы столицы, местные занятия, услуги и заработок");
         s.add("QUEST","История хранителей","Пепельные печати | " + questStatus());
         s.add("TALK","Поговорить с местными","Слухи, события и полезные сведения");
@@ -389,6 +390,7 @@ public final class GameEngine {
         if(solitude.custody()){solitude.choose(this,action);return;}
         if(RoadEvents.MODE.equals(mode)){road.choose(this,action);return;}
         if(road.pending()&&!"COMBAT".equals(mode)){if("GO_WORLD".equals(action))road.resume(this);return;}
+        if(action.startsWith("COURT:")){SolitudeCourt.chooseWorld(this,action);return;}
         if(action.startsWith("WOLF:")){SolitudeWolf.chooseWorld(this,action);return;}
         if(action.startsWith("SOLITUDE:")||SolitudeCity.isMode(mode)){solitude.choose(this,action);return;}
         if(action.startsWith("FIXGIFT:")){if("FIXGIFT:escape".equals(action)){if(fixShop.gifts.escape(this))recordVisualEvent(message);}else if("FIXGIFT:blood".equals(action)||"FIXGIFT:time".equals(action)||"FIXGIFT:balance".equals(action)){if("COMBAT".equals(mode))combatTurn(action);}else FixShopGifts.choose(this,action);return;}
@@ -740,6 +742,10 @@ public final class GameEngine {
         int rawIncoming=Math.max(1,baseIncoming-(defending?enemyDamage/2+3+2*progress.branches.rank(3)+(progress.advanced.has(AdvancedPerks.QUICK_REFLEXES)?2:0)+(progress.advanced.has(AdvancedPerks.SHIELD_WALL)&&!"Не надето".equals(progress.equippedName("shield"))?3:0)+(progress.advanced.has(AdvancedPerks.SHIELD_CHARGE)&&!"Не надето".equals(progress.equippedName("shield"))?4:0):0));
         int incoming=Math.max(1,(int)Math.round(rawIncoming*(1-progress.damageReduction())));
         if(road.magicalEnemy(enemyName))incoming=progress.artifacts.magicAdjust(progress,incoming);
+        if(progress.equipped(SolitudeCourt.SHIELD)){
+            if(road.magicalEnemy(enemyName)||(SolitudeWolf.KIND+"potema_boss").equals(battleKind))incoming=Math.max(1,(int)Math.round(incoming*.80));
+            if(defending)incoming=Math.max(1,(int)Math.round(incoming*.75));
+        }
         int flank=road.extraIncoming(this,defending,random);incoming+=flank;if(flank>0)actionText+="\nОстальные противники атакуют одновременно: −"+flank+" здоровья до защиты спутников.";
         if(defending)lastBlocked=Math.max(0,Math.max(1,(int)Math.round(Math.max(1,baseIncoming)*(1-progress.damageReduction())))-(incoming-flank));
         if(defending&&progress.equipped("Разрушитель Заклинаний")&&road.magicalEnemy(enemyName)){int ward=Math.min(10,incoming);incoming-=ward;lastBlocked+=ward;actionText+="\nРазрушитель Заклинаний: оберег поглощает "+ward+" магического урона.";}
@@ -792,7 +798,7 @@ public final class GameEngine {
         if(sideQuest==1)message+="\nЗаказ доски: "+sideKills+"/3.";
         if(battleKind.startsWith("FIX_QUEST:"))FixShopAdventure.victory(this,battleKind);
         if(battleKind.startsWith("ROAD_QUEST:"))RoadQuests.victory(this,battleKind);
-        if(battleKind.startsWith(SolitudeWolf.KIND))SolitudeWolf.victory(this);
+        if(battleKind.startsWith(SolitudeWolf.KIND)&&!SolitudeCourt.victory(this))SolitudeWolf.victory(this);
         if("WILD".equals(battleKind)&&road.pending())road.applyVictory(this);
         if("FACTION".equals(battleKind)){factionStories.victory(factionBattle);factionBattle=-1;message+="\n\nОткрой сюжет фракции, чтобы завершить главу.";}
         if("CANONICAL".equals(battleKind)){

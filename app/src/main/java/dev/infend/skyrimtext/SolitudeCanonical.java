@@ -23,6 +23,7 @@ final class SolitudeCanonical {
             else if(graceLooted(g)&&g.progress.quantity(GRACE_ITEM)>0&&g.gold<=Integer.MAX_VALUE-rumReward(g))
                 s.add("SOLITUDE:grace:finish","Вернуть амулет Роггвира",rumReward(g)+" септимов");
         }
+        if(!home)SolitudeCourt.styrrChoices(g,s);
         if(!home&&active&&graceTalked(g)&&!graceLooted(g))s.add("SOLITUDE:grace:loot","Найти амулет в гробу Роггвира","Квестовый предмет");
         return s.add("SOLITUDE:back","На улицы Солитьюда","Вернуться к выбору районов").add("GO_WORLD","Завершить прогулку","Вернуться к приключению");
     }
@@ -138,6 +139,7 @@ final class SolitudeCanonical {
     }
     static int rumReward(GameEngine g){return g.level>=40?750:g.level>=30?600:g.level>=20?500:g.level>=10?400:250;}
     static void districtChoices(GameEngine g,GameEngine.Scene s,int district){
+        SolitudeCourt.districtChoices(g,s,district);
         if(district==2)SolitudeWolf.palaceChoices(g,s);
         wineChoices(g,s,district);
         if(district==0&&available(g,"Сварри",9,20)&&(graceState(g)==null||graceState(g).isEmpty()))s.add("SOLITUDE:grace:accept","Поговорить со Сварри","Каноническое поручение | Вернуть милость богов");
@@ -181,8 +183,9 @@ final class SolitudeCanonical {
         if(aldis(g)&&"ACTIVE".equals(state(g))&&!informed(g))s.add("SOLITUDE:angeline:aldis","Расспросить капитана Алдиса","Судьба Фуры");
     }
     static boolean choose(GameEngine g,String a){
-        if(!a.startsWith("SOLITUDE:angeline:")&&!a.startsWith("SOLITUDE:rum:")&&!a.startsWith("SOLITUDE:attire:")&&!a.startsWith("SOLITUDE:wine:")&&!a.startsWith("SOLITUDE:grace:")&&!a.startsWith("SOLITUDE:wolf:"))return false;
+        if(!a.startsWith("SOLITUDE:angeline:")&&!a.startsWith("SOLITUDE:rum:")&&!a.startsWith("SOLITUDE:attire:")&&!a.startsWith("SOLITUDE:wine:")&&!a.startsWith("SOLITUDE:grace:")&&!a.startsWith("SOLITUDE:wolf:")&&!a.startsWith("SOLITUDE:court:"))return false;
         if(!SolitudeCity.here(g)||g.solitude.custody()||g.road.pending()||g.hp<=0)return true;
+        if(a.startsWith("SOLITUDE:court:"))return SolitudeCourt.chooseCity(g,a);
         if(a.startsWith("SOLITUDE:wolf:"))return SolitudeWolf.choosePalace(g,a);
         if(a.startsWith("SOLITUDE:grace:"))return chooseGrace(g,a);
         if(a.startsWith("SOLITUDE:wine:"))return chooseWine(g,a);

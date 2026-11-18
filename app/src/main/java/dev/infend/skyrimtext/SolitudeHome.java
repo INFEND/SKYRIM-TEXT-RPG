@@ -45,11 +45,11 @@ final class SolitudeHome {
         String status=g.sceneState.npcStatusByName("Фолк Огнебород");
         return g.hour>=9&&g.hour<17&&!"DEAD".equals(status)&&!"MISSING".equals(status)&&!"HOSTILE".equals(status);
     }
-    static boolean eligible(GameEngine g){return g.holdReputation[3]>=10;}
+    static boolean eligible(GameEngine g){return SolitudeCourt.permission(g);}
     boolean room(int i){return (rooms&(1<<i))!=0;}
     void palace(GameEngine g,GameEngine.Scene s){
         if(!steward(g))return;
-        if(!owns(g))s.add("SOLITUDE:deed","Купить Высокий шпиль",PRICE+" септимов | "+(eligible(g)?"Разрешение получено":"Нужна репутация Хаафингара 10 (адаптация)"));
+        if(!owns(g))s.add("SOLITUDE:deed","Купить Высокий шпиль",PRICE+" септимов | "+(eligible(g)?"Разрешение получено":"Выполни «Подношение Элисиф»"));
         else for(int i=0;i<ROOMS.length;i++)if(!room(i))s.add("SOLITUDE:furnish:"+i,"Обустроить: "+ROOMS[i],COST[i]+" септимов");
     }
     boolean palaceAction(GameEngine g,String a){

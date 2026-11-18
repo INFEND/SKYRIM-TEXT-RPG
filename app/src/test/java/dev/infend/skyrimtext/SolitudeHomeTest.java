@@ -6,7 +6,8 @@ public class SolitudeHomeTest {
     @Test public void deedRequiresPermissionAndPalaceAndIsUnique(){
         GameEngine g=city();g.choose("SOLITUDE:deed");assertFalse(SolitudeHome.owns(g));
         g.choose("SOLITUDE:visit:2");g.choose("SOLITUDE:deed");assertFalse(SolitudeHome.owns(g));
-        g.holdReputation[3]=10;g.hour=20;g.choose("SOLITUDE:deed");assertFalse(SolitudeHome.owns(g));
+        g.holdReputation[3]=10;g.choose("SOLITUDE:deed");assertFalse(SolitudeHome.owns(g));
+        g.progress.setQuestOutcome(SolitudeCourt.TRIBUTE,"COMPLETED");g.hour=20;g.choose("SOLITUDE:deed");assertFalse(SolitudeHome.owns(g));
         g.hour=10;g.choose("SOLITUDE:deed");assertTrue(g.fixShop.home.owns(4));assertEquals(5000,g.gold);
         g.choose("SOLITUDE:deed");assertEquals(5000,g.gold);
     }

@@ -218,6 +218,7 @@ public final class RpgProgress {
     }
     public boolean removeItem(String id,int amount){
         if(amount<1||quantity(id)<amount||CompensationPowers.itemIndex(id)>=0)return false;
+        if(SolitudeCourt.protect(this,id))return false;
         if(SolitudeCanonical.GRACE_ITEM.equals(id)&&"ACTIVE".equals(questOutcome(SolitudeCanonical.GRACE)))return false;
         if(SolitudeCanonical.OUTFIT.equals(id)&&"ACTIVE".equals(questOutcome(SolitudeCanonical.ATTIRE))&&quantity(id)-amount<1)return false;
         quantity(id,quantity(id)-amount);
