@@ -57,6 +57,19 @@ public final class AiGameTurn {
         return m.find()?text.substring(0,m.start()).trim():text;
     }
 
+    /** Recover only a missing final root brace; all choices and effects still
+     * undergo exactly the same validation. Never fabricate missing fields. */
+    public static AiGameTurn parseLocalModel(String response,int lockedChance)throws JSONException{
+        try{return parseModel(response,lockedChance);}
+        catch(JSONException original){
+            if(response==null)throw original;
+            String tail=response.trim();
+            if(!(tail.endsWith("}")||tail.endsWith("]")))throw original;
+            try{return parseModel(tail+"}",lockedChance);}
+            catch(JSONException ignored){throw original;}
+        }
+    }
+
     public static AiGameTurn parseModel(String response,int lockedChance)throws JSONException{
         if(response==null)throw new JSONException("Пустой ответ ИИ");
         JSONObject json=extractObject(response);
