@@ -236,7 +236,7 @@ public final class AiStoryClient {
     }
     private boolean generateInternal(String token, String model, boolean chatGptPlan, String effort, GameEngine game, String history, String playerText, Listener listener, boolean aiControlled,boolean chanceOnly) {
         if (running || token == null || token.isEmpty() || model == null || !model.matches("[a-zA-Z0-9._-]{2,100}")) return false;
-        final String input = chanceOnly?localChancePrompt(game,playerText)+"\n"+FixShopAiContext.context(game,false):aiControlled?contextAi(game,history,playerText):context(game,history,playerText);
+        final String input = chanceOnly?localChancePrompt(game,playerText).replace("\n/no_think","")+"\n"+FixShopAiContext.context(game,false):aiControlled?contextAi(game,history,playerText):context(game,history,playerText);
         final String selectedEffort = AiReasoningEffort.normalize(effort);
         final int id = ++sequence;
         cancelled = false;

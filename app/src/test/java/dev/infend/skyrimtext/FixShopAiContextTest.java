@@ -27,5 +27,6 @@ public class FixShopAiContextTest {
   String prompt=AiStoryClient.localUserPrompt(g,"","Проверка действия",true);
   assertTrue(prompt.length()<=3200);for(String n:FixShopGifts.NAME)assertTrue(n,prompt.contains(n));for(String n:FixShopSeals.NAME)assertTrue(n,prompt.contains(n));
   assertTrue(prompt.contains("Проверка действия"));
+  g.fixShop.gifts.toggle(FixShopGifts.FATE);assertTrue(AiStoryClient.localUserPrompt(g,"","Проверка действия",true).contains("Благосклонность судьбы (выкл)"));
  }
 }

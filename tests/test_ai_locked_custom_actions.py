@@ -19,12 +19,15 @@ class AiLockedFreeActionContract(unittest.TestCase):
         self.assertIn("if(cancelled||sequence!=id)return;",segment)
     def test_custom_roll_survives_retry_and_process_death(self):
         view=source("MainActivity.java")
-        for fragment in ("pendingAiAction()","storeAiPending(customAction,fixedChance,die)",
+        for fragment in ("pendingAiAction()","storeAiPending(customAction,fixedChance,die,fateDay)",
                          "clearAiPending();","lockedFreeInstruction",
                          'prefs.getInt(AI_PENDING_DIE,-1)',"aiClient.generateChance(token",
                          "aiClient.generateChance(key"):
             self.assertIn(fragment,view)
         self.assertIn("int fixedChance=AiGameTurn.parseChance(answer)",view)
+        self.assertIn(".putInt(AI_PENDING_FATE,fateDay).commit()",view)
+        self.assertIn("FixShopAiContext.commitRetry(next,prefs.getInt(AI_PENDING_FATE,-1))",view)
+        self.assertIn(".remove(AI_PENDING_FATE)",view)
         self.assertIn("if(compound.equals(pendingAiAction()))",view)
         self.assertIn("if(expectedChance!=-2&&completed.customChance!=expectedChance)",view)
     def test_regular_ten_buttons_preserved(self):

@@ -2049,7 +2049,7 @@ public final class MainActivity extends Activity {
             if("WILD".equals(game.battleKind))
                 actionButton("ОТСТУПИТЬ","Шанс: "+game.progress.chance(game,"FLEE")+"%",true,()->resolveNativeAiCombat("FLEE"));
         }
-        if(!livingBusy()&&FixShopWorld.safe(game)){GameEngine.Scene giftScene=new GameEngine.Scene("","","");FixShopGifts.choices(game,giftScene);for(GameEngine.Choice c:giftScene.choices)actionButton(c.title,c.detail,true,()->resolveNativeAiGift(c.action));for(int id:new int[]{FixShopSeals.HOME,FixShopSeals.MEDITATION,FixShopSeals.ARSENAL})if(game.fixShop.seals.on(id)){final int n=id;actionButton(FixShopSeals.NAME[n],game.fixShop.seals.status(n,game),true,()->fixSealDialog(n));}}
+        if(!livingBusy()&&FixShopSeals.safe(game)){GameEngine.Scene giftScene=new GameEngine.Scene("","","");FixShopGifts.choices(game,giftScene);for(GameEngine.Choice c:giftScene.choices)actionButton(c.title,c.detail,true,()->resolveNativeAiGift(c.action));for(int id:new int[]{FixShopSeals.HOME,FixShopSeals.MEDITATION,FixShopSeals.ARSENAL})if(game.fixShop.seals.on(id)){final int n=id;actionButton(FixShopSeals.NAME[n],game.fixShop.seals.status(n,game),true,()->fixSealDialog(n));}}
         renderVisualResults();
         if(game.aiTurn==null){
             addText(content,"ИИ-Мастер создаст первую сцену из истории твоего героя. Затем появятся десять вариантов действий и поле собственного ответа.",15,TEXT,false,15);
@@ -2226,7 +2226,7 @@ public final class MainActivity extends Activity {
     }
 
     private void resolveNativeAiGift(String action){
-        if(livingBusy()||!FixShopWorld.safe(game))return;
+        if(livingBusy()||!FixShopSeals.safe(game))return;
         if(!FixShopGifts.choose(game,action)){toast("Дар сейчас недоступен");return;}
         String outcome=game.message;game.progress.sync(game);game.aiTurn=null;selectedAiChoices.clear();aiOwnDraft="";clearAiDraft();clearAiPending();save();aiMemory.add(aiSession,"event",outcome);
         requestAiTurn("Движок уже применил дар: "+outcome+"\nОпиши подтверждённый итог. Не применяй effects повторно.",false);if(!aiTurnBusy)render();

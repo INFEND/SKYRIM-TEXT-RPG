@@ -32,14 +32,14 @@ final class FixShopAiContext {
     static String context(GameEngine g,boolean compact){
         FixShopGifts f=g.fixShop.gifts;FixShopSeals s=g.fixShop.seals;
         if(f.owned==0&&s.owned==0)return "Дары/печати не куплены. Не предлагай и не применяй их.";
-        StringBuilder b=new StringBuilder(compact?"Только эти дары/печати; эффекты движка, не начисляй повторно. ":"ДАРЫ И ПЕЧАТИ (текущее сохранение). "+RULE+"\n");
+        StringBuilder b=new StringBuilder(compact?"Только перечисленные дары/печати; эффекты движка, не начисляй повторно. XP навыков без бонуса. ":"ДАРЫ И ПЕЧАТИ (текущее сохранение). "+RULE+"\n");
         int off=0;
         for(int i=0;i<FixShopGifts.NAME.length;i++)if(f.owns(i)){
-            if(compact&&!f.on(i)){off++;continue;}
+            if(compact&&!f.on(i)){b.append(FixShopGifts.NAME[i]).append(" (выкл); ");off++;continue;}
             append(b,FixShopGifts.NAME[i],giftStatus(g,i),compact?G[i]:FixShopGifts.DESC[i],compact);
         }
         for(int i=0;i<FixShopSeals.NAME.length;i++)if(s.owns(i)){
-            if(compact&&!s.on(i)){off++;continue;}
+            if(compact&&!s.on(i)){b.append(FixShopSeals.NAME[i]).append(" (выкл); ");off++;continue;}
             append(b,FixShopSeals.NAME[i],sealStatus(g,i),compact?S[i]:FixShopSeals.DESC[i],compact);
         }
         if(off>0)b.append("Выключено: ").append(off).append(". ");
