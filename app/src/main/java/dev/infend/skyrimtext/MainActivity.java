@@ -2113,7 +2113,7 @@ public final class MainActivity extends Activity {
         space(content,10);
         actionButton("ОТПРАВИТЬ","Отправить выбранные ответы и свой текст одним действием",true,()->{
             String value=own.getText().toString().trim();
-            if(value.equalsIgnoreCase("/фк")||value.equalsIgnoreCase("/фикскоин")){livingFixShop();return;}
+            if(value.equalsIgnoreCase("/фк")||value.equalsIgnoreCase("/фикскоин")||value.equalsIgnoreCase("/этернис")||value.equalsIgnoreCase("/eternis")){livingFixShop();return;}
             if(value.equalsIgnoreCase("/отношения")){journalRelations=true;tab=4;render();return;}
             if(value.equalsIgnoreCase("/статистика")||value.equalsIgnoreCase("/stats")){heroDetailed=false;tab=3;render();return;}
             if(value.length()>1500){toast("Не более 1500 символов своего текста");return;}
@@ -4849,13 +4849,13 @@ public final class MainActivity extends Activity {
         }livingDialog("Новый облик | 50 F",panel);
     }
     private void livingFixShop(){
-        if(!game.started||livingBusy()){toast("Магазин недоступен во время активного действия");return;}
+        if(!game.started||livingBusy()){toast("Этернис недоступен во время активного действия");return;}
         closeLivingDialog();ResourceStore.requestAutomaticSync(this);LinearLayout root=column();root.setBackgroundColor(Color.BLACK);root.setPadding(dp(14),dp(12),dp(14),dp(8));
-        LinearLayout head=row();head.setGravity(Gravity.CENTER_VERTICAL);head.addView(text("МАГАЗИН",23,accent(),true),new LinearLayout.LayoutParams(0,-2,1));
+        LinearLayout head=row();head.setGravity(Gravity.CENTER_VERTICAL);head.addView(text("ЭТЕРНИС",23,accent(),true),new LinearLayout.LayoutParams(0,-2,1));
         head.addView(text("∞ F",23,accent(),true),lp(-2,-2));TextView close=text(" × ",28,MUTED,true);close.setOnClickListener(v->closeLivingDialog());head.addView(close,lp(-2,-2));root.addView(head,lp(-1,-2));
         addText(root,"ФИКСКОИНЫ · ОСОБЫЕ ВОЗМОЖНОСТИ",11,MUTED,false,4);addText(root,"Потрачено в этом сохранении: "+livingNumber(game.fixSpent)+" F",12,MUTED,false,8);
         LinearLayout filters=column();root.addView(filters,lp(-1,-2));
-        if(fixShopPage<2){Switch editor=new Switch(this);editor.setText("Редактор мира");editor.setTextColor(MUTED);editor.setTextSize(sp(12));editor.setThumbTintList(ColorStateList.valueOf(accent()));editor.setChecked(game.fixShop.editorEnabled);filters.addView(editor,lp(-1,37));editor.setOnCheckedChangeListener((v,on)->{game.fixShop.editorEnabled=on;save();livingFixShop();});TextView imp=text("Импорт каталога JSON  |  Ресурсы магазина",12,accent(),true);imp.setPadding(dp(8),dp(7),dp(8),dp(7));filters.addView(imp,lp(-1,-2));imp.setOnClickListener(v->new RuneDialogBuilder(this,accent()).setTitle("Каталог магазина").setItems(new String[]{"Импорт JSON","Обновить ресурсы магазина"},(d,i)->{if(i==0)fixImport();else{closeLivingDialog();new ResourceManagerDialog(this,accent(),this::livingFixShop,"media:shop").show();}}).setNegativeButton("Отмена",null).show());}
+        if(fixShopPage<2){Switch editor=new Switch(this);editor.setText("Редактор мира");editor.setTextColor(MUTED);editor.setTextSize(sp(12));editor.setThumbTintList(ColorStateList.valueOf(accent()));editor.setChecked(game.fixShop.editorEnabled);filters.addView(editor,lp(-1,37));editor.setOnCheckedChangeListener((v,on)->{game.fixShop.editorEnabled=on;save();livingFixShop();});TextView imp=text("Импорт каталога JSON  |  Ресурсы Этерниса",12,accent(),true);imp.setPadding(dp(8),dp(7),dp(8),dp(7));filters.addView(imp,lp(-1,-2));imp.setOnClickListener(v->new RuneDialogBuilder(this,accent()).setTitle("Каталог Этерниса").setItems(new String[]{"Импорт JSON","Обновить ресурсы Этерниса"},(d,i)->{if(i==0)fixImport();else{closeLivingDialog();new ResourceManagerDialog(this,accent(),this::livingFixShop,"media:shop").show();}}).setNegativeButton("Отмена",null).show());}
         ScrollView scroll=new ScrollView(this);scroll.setFillViewport(false);LinearLayout items=column();scroll.addView(items);root.addView(scroll,new LinearLayout.LayoutParams(-1,0,1));
         LinearLayout nav=row();root.addView(nav,lp(-1,56));String[] names={"Каталог","Избранное","Покупки","История"};String[] glyphs={"inventory","heart","armor","journal"};
         for(int i=0;i<names.length;i++){final int index=i;LinearLayout cell=column();cell.setGravity(Gravity.CENTER);nav.addView(cell,new LinearLayout.LayoutParams(0,-1,1));
@@ -5029,9 +5029,9 @@ public final class MainActivity extends Activity {
         foldAddonSection("addon_alma","Альма | Алая Бессмертная",addonStart,false);
         addonStart=content.getChildCount();
         expansion=column();content.addView(expansion,lp(-1,-2));
-        if(game.started)livingLink(expansion,"Открыть магазин","∞ F","skills",this::livingFixShop);
-        else addText(expansion,"Магазин доступен после начала игры.",13,MUTED,false,0);
-        foldAddonSection("addon_fixshop","Магазин фикскоинов",addonStart,false);
+        if(game.started)livingLink(expansion,"Открыть Этернис","∞ F","skills",this::livingFixShop);
+        else addText(expansion,"Этернис доступен после начала игры.",13,MUTED,false,0);
+        foldAddonSection("addon_fixshop","Этернис",addonStart,false);
         addonStart=content.getChildCount();
         expansion=column();content.addView(expansion,lp(-1,-2));renderNeedsAddon(expansion);
         foldAddonSection("addon_needs","Потребности",addonStart,false);
