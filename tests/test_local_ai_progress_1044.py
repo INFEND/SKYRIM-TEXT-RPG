@@ -27,7 +27,7 @@ class LocalAiProgressContract(unittest.TestCase):
         self.assertIn('Последний замер: ',ui)
     def test_safe_state_still_commits_only_after_complete_json(self):
         ui=(J/"MainActivity.java").read_text(encoding="utf-8")
-        self.assertIn("AiGameTurn completed=AiGameTurn.parseModel(answer,expectedChance)",ui)
+        self.assertIn("AiGameTurn completed=local?AiGameTurn.parseLocalModel(answer,expectedChance):AiGameTurn.parseModel(answer,expectedChance)",ui)
         self.assertIn("completed.apply(next,actionResolved)",ui)
         self.assertIn("next.aiTurn=completed",ui)
         self.assertIn("requestAiTurn(lockedFreeInstruction(customAction,fixedChance,die)",ui)
