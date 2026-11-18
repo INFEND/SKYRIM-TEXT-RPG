@@ -9,6 +9,10 @@ final class AiScenePreview {
         int open=formatted.lastIndexOf("<think>");
         if(open>=0&&formatted.substring(open+7).trim().isEmpty())
             return formatted+"\n</think>\n\n";
+        // Qwen chat templates can omit the opening thinking tag, in which case
+        // the model itself emits it. Prefill an empty block before any answer.
+        if(formatted.trim().endsWith("<|im_start|>assistant"))
+            return formatted+(formatted.endsWith("\n")?"":"\n")+"<think>\n\n</think>\n\n";
         return formatted;
     }
     static String scenePrefix(String formatted,boolean scene){
