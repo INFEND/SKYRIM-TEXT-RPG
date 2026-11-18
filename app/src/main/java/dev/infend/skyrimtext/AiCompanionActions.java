@@ -24,12 +24,34 @@ final class AiCompanionActions {
     static boolean allowed(GameEngine g,String code){return available(g).containsKey(code);}
     static String context(GameEngine g,int limit){
         StringBuilder b=new StringBuilder();
+        java.util.LinkedHashMap<String,java.util.ArrayDeque<GameEngine.Choice>> groups=new java.util.LinkedHashMap<>();
         for(GameEngine.Choice c:available(g).values()){
-            String line=c.action+"="+c.title+"; ";
-            if(b.length()+line.length()>limit)break;
-            b.append(line);
+            String key=c.action.substring(0,c.action.indexOf(':'));
+            groups.computeIfAbsent(key,k->new java.util.ArrayDeque<>()).add(c);
+        }
+        boolean remaining=true;
+        while(remaining){
+            remaining=false;
+            for(java.util.ArrayDeque<GameEngine.Choice> group:groups.values()){
+                if(group.isEmpty())continue;
+                remaining=true;
+                GameEngine.Choice c=group.removeFirst();
+                String line=c.action+"="+c.title+"; ";
+                if(b.length()+line.length()<=limit)b.append(line);
+            }
         }
         return b.toString();
+    }
+    /** Critical flags for all four NPCs fit before optional history in the local prompt. */
+    static String compactProfiles(GameEngine g){
+        return compact("Кэтрин",g.katherine.enabled,g.katherine.present(g),g.katherine.stage,g.katherine.trust,g.katherine.romance)
+            +compact("Альма",g.alma.enabled,!g.alma.terminalLoss()&&g.alma.present(g),g.alma.stage,g.alma.trust,g.alma.romance)
+            +compact("Итачи",g.itachi.enabled,g.itachi.present(g),g.itachi.stage,g.itachi.trust,g.itachi.romance)
+            +compact("Ливия",g.livia.enabled,g.livia.present(g),g.livia.stage,g.livia.trust,g.livia.romance);
+    }
+    private static String compact(String name,boolean enabled,boolean present,int stage,int trust,boolean romance){
+        if(!enabled)return name+": отключена; ";
+        return name+": "+(present?"рядом":"отсутствует")+", этап="+stage+", доверие="+trust+", роман="+(romance?"да":"нет")+"; ";
     }
     static String profiles(GameEngine g){
         StringBuilder b=new StringBuilder();

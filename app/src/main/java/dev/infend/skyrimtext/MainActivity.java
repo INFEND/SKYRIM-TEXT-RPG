@@ -2057,9 +2057,9 @@ public final class MainActivity extends Activity {
         if(!livingBusy()&&FixShopSeals.safe(game)){GameEngine.Scene giftScene=new GameEngine.Scene("","","");FixShopGifts.choices(game,giftScene);for(GameEngine.Choice c:giftScene.choices)actionButton(c.title,c.detail,true,()->resolveNativeAiGift(c.action));for(int id:new int[]{FixShopSeals.HOME,FixShopSeals.MEDITATION,FixShopSeals.ARSENAL})if(game.fixShop.seals.on(id)){final int n=id;actionButton(FixShopSeals.NAME[n],game.fixShop.seals.status(n,game),true,()->fixSealDialog(n));}}
         renderVisualResults();
         if(game.aiTurn==null){
-            addText(content,"ИИ-Мастер создаст первую сцену из истории твоего героя. Затем появятся десять вариантов действий и поле собственного ответа.",15,TEXT,false,15);
-            actionButton("НАЧАТЬ ИИ-ПРИКЛЮЧЕНИЕ","Сгенерировать первую сцену и десять решений",true,()->
-                requestAiTurn("Начни историю моего героя в текущем месте. Это первый ход: не меняй параметры, предоставь ten choices.",false));
+            addText(content,"ИИ-Мастер создаст сцену по текущему состоянию героя и памяти сыгранных событий. Затем появятся десять вариантов действий и поле собственного ответа.",15,TEXT,false,15);
+            actionButton("ПРОДОЛЖИТЬ ИИ-ПРИКЛЮЧЕНИЕ","Сгенерировать актуальную сцену и десять решений",true,()->
+                requestAiTurn("Продолжи историю моего героя в текущем месте с учётом памяти и подтверждённых фактов. Не начинай заново и не повторяй уже совершённые действия. Без effects; предложи десять новых вариантов.",false));
             return;
         }
         String pending=pendingAiAction();
@@ -5376,7 +5376,18 @@ public final class MainActivity extends Activity {
         if(!game.started||tab==5){titleOpen=true;render();return;}
         if(tab==6){tab=4;render();return;}
         if(game.started&&tab!=0){tab=0;render();return;}
-        if(game.started&&!game.mode.equals("WORLD")&&!game.mode.equals("COMBAT")){recentItemGains.clear();game.choose("GO_WORLD");save();render();return;}
+        if(game.started&&!game.mode.equals("WORLD")&&!game.mode.equals("COMBAT")){
+            boolean wasNative=game.nativeSceneRequired();recentItemGains.clear();game.choose("GO_WORLD");
+            if(wasNative&&game.aiNarrativeMode&&!game.nativeSceneRequired()){
+                String outcome="Игрок вернулся из игрового меню. Место: "+game.progress.location+". "+game.message;
+                game.aiTurn=null;selectedAiChoices.clear();aiOwnDraft="";clearAiDraft();clearAiPending();
+                aiTurnStatus="";aiTurnPreview="";aiChoicePreview.clear();
+                aiMemory.add(aiSession,"event",outcome);save();tab=0;
+                requestAiTurn(outcome+"\nПродолжи текущую историю, не повторяй уже выполненные действия. Без effects.",false);
+                if(!aiTurnBusy)render();return;
+            }
+            save();render();return;
+        }
         super.onBackPressed();}
 }
 

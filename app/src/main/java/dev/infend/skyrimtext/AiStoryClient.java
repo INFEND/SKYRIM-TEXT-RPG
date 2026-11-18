@@ -159,7 +159,10 @@ public final class AiStoryClient {
             .append(" HP ").append(game.enemyHp).append('/').append(game.enemyMaxHp)
             .append("; тип боя ").append(game.battleKind).append(".\n");
         else b.append("Активного боя нет.\n");
-        if(aiControlled){localSection(b,"NPC рядом: ",AiCompanionActions.profiles(game),310,budget);localSection(b,"Коды companionAction: ",AiCompanionActions.context(game,420),420,budget);}
+        if(aiControlled){
+            localSection(b,"Статус NPC: ",AiCompanionActions.compactProfiles(game),310,budget);
+            localSection(b,"Коды companionAction: ",AiCompanionActions.context(game,420),420,budget);
+        }
         localSection(b,"ДАРЫ: ",powers,powers.length(),budget);
         // Skill levels must reach the probability model before optional companion/history text.
         StringBuilder skills=new StringBuilder();
@@ -487,6 +490,11 @@ public final class AiStoryClient {
         out.append("NPC в текущем месте: ").append(AiCompanionActions.profiles(game)).append('\n');
         out.append("Разрешённые companionAction (только варианты, не выполненные события): ").append(AiCompanionActions.context(game,6000)).append('\n');
         if(game.katherine.enabled&&game.katherine.stage>0)out.append("ПЕРСОНАЖ КЭТРИН — СОСТОЯНИЕ ДВИЖКА:\n").append(game.katherine.aiContext(game)).append('\n');
+        out.append("Статус всех NPC: ").append(AiCompanionActions.compactProfiles(game)).append('\n');
+        out.append("Состояние Альмы: ").append(game.alma.stage==0&&game.alma.enabled?"Ещё не знакома; встреча только по доступному коду.":game.alma.aiContext()).append('\n');
+        out.append("Состояние Итачи: ").append(game.itachi.aiContext(game)).append('\n');
+        out.append("Состояние Ливии: ").append(game.livia.aiContext(game)).append('\n');
+        out.append("Не переносить отсутствующих NPC в сцену. Отключённые дополнения не использовать, даже если они есть в старой памяти.\n");
         String initiative=KatherineInitiative.context(game);if(!initiative.isEmpty())out.append(initiative).append('\n');
         out.append("Герой: ").append(game.name).append("; пол ").append(game.gender).append("; ").append(game.race).append("; класс ")
                 .append(game.heroClass).append("; уровень ").append(game.level).append("; опыт ").append(game.xp).append('\n');
