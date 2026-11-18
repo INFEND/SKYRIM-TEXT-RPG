@@ -23,3 +23,5 @@ class LocalAiRecovery(unittest.TestCase):
         self.assertIn("/no_think",prompt)
         self.assertIn("Не повторяй уже исполненное действие",prompt)
         self.assertIn("effects.hourDelta",prompt)
+        self.assertIn("localChancePrompt(GameEngine game,String command)",prompt)
+        self.assertIn("if(chanceOnly) AiStoryClient.localChancePrompt", (APP/"LocalAiClient.kt").read_text())
