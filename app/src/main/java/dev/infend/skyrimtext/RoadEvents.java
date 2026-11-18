@@ -421,7 +421,7 @@ final class RoadEvents {
         String forced=unique(g,route);
         if(!forced.isEmpty()){prepare(0);id=forced;segmentFrom=g.progress.location;segmentTo="giant".equals(id)?"Ферма Пелагио":"Ферма Лорея";}
         else if(!tryFixEncounter(g,route,target)){
-            if(rng.nextInt(100)>=Math.min(60,25+route.days*8))return false;
+            if(rng.nextInt(100)>=g.fixShop.seals.encounterChance(Math.min(60,25+route.days*8)))return false;
             ArrayList<Event> pool=new ArrayList<>();int total=0;
             ArrayList<Integer> land=new ArrayList<>();for(int i=1;i<route.stops.size();i++){WorldAtlas.Place p1=WorldAtlas.find(route.stops.get(i-1)),p2=WorldAtlas.find(route.stops.get(i));if(p1!=null&&p2!=null&&((p1.region==9)!=(p2.region==9)))continue;land.add(i);}if(land.isEmpty())return false;
             int segment=land.get(rng.nextInt(land.size()));String a=route.stops.get(segment-1),next=route.stops.get(segment);segmentFrom=a;segmentTo=next;

@@ -3893,6 +3893,7 @@ public final class MainActivity extends Activity {
         if(game.needs.anyEnabled())livingLink(content,"Потребности",game.needs.penalty()==0?"В норме":"Требуют внимания","health",this::livingNeedsDialog);
         livingLink(content,"Навыки","18","skills",this::livingSkillsDialog);
         livingLink(content,"Способности","","magic",()->livingHeroDetails("Способности",game.progress.racePower(game)+"\n\nКрики: "+CanonicalCampaign.shouts(game)));
+        if(game.fixShop.seals.owned!=0)livingLink(content,"Печати мастерства","","magic",()->{fixShopCategory="Печати мастерства";fixShopPage=0;fixCatalogPage=0;fixShopQuery="";fixRarity=-1;livingFixShop();});
         if(game.fixShop.gifts.owned!=0)livingLink(content,"Дары судьбы","","magic",()->{fixShopCategory="Дары судьбы";fixShopPage=0;fixCatalogPage=0;fixShopQuery="";fixRarity=-1;livingFixShop();});
         livingLink(content,"Пассивные эффекты","","shield",()->livingHeroDetails("Пассивные эффекты",game.progress.racePassive(game)+(game.poisonTurns>0?"\nОтравление: "+game.poisonTurns+" х.":"")+(game.frostTurns>0?"\nОбморожение: "+game.frostTurns+" х.":"")));
         livingLink(content,"Экипировка","","armor",()->{tab=2;render();});
@@ -4558,7 +4559,7 @@ public final class MainActivity extends Activity {
     private int fixShopPage=0,fixShopSort=0,fixCatalogPage=0,fixRarity=-1;
     private static final int FIX_PAGE_SIZE=30;
     private String fixShopCategory="Все",fixShopQuery="";
-    private static final String[] FIX_CATEGORIES={"Все","Снаряжение","Оружие","Броня","Боеприпасы","Материалы","Ингредиенты","Зелья и яды","Провизия","Инструменты","Драгоценности","Магия","Улучшения","Навыки","Септимы","Внешность","Оформление","Редактор мира","Наборы","Недвижимость","Транспорт","Питомцы","Персонажи","Дополнения","Коллекции","Дары судьбы"};
+    private static final String[] FIX_CATEGORIES={"Все","Снаряжение","Оружие","Броня","Боеприпасы","Материалы","Ингредиенты","Зелья и яды","Провизия","Инструменты","Драгоценности","Магия","Улучшения","Навыки","Септимы","Внешность","Оформление","Редактор мира","Наборы","Недвижимость","Транспорт","Питомцы","Персонажи","Дополнения","Коллекции","Дары судьбы","Печати мастерства"};
     private static final class FixOffer {
         final String title,detail,category,glyph,rarity;final int price,color;final Runnable action;String itemId="";int tier;
         FixOffer(String t,String d,String c,String g,String rr,int col,int p,Runnable a){title=t;detail=d;category=c;glyph=g;rarity=rr;color=col;price=p;action=a;}
@@ -4566,6 +4567,7 @@ public final class MainActivity extends Activity {
     }
     private java.util.ArrayList<FixOffer> fixOffers(){
         java.util.ArrayList<FixOffer> a=new java.util.ArrayList<>();
+        for(int i=0;i<FixShopSeals.NAME.length;i++){final int n=i;String title=FixShopSeals.NAME[i];if(game.fixShop.seals.owns(i))fixOffer(a,title,game.fixShop.seals.status(i,game)+" | "+FixShopSeals.DESC[i],"Печати мастерства","magic",5,0,()->fixSealDialog(n));else fixDirect(a,title,FixShopSeals.DESC[i],"Печати мастерства","magic",5,FixShopSeals.PRICE[i],()->game.fixShop.seals.buy(n));}
         for(int i=0;i<FixShopGifts.NAME.length;i++){final int n=i;String title=FixShopGifts.NAME[i];if(game.fixShop.gifts.owns(i))fixOffer(a,title,game.fixShop.gifts.status(i,game)+" | "+FixShopGifts.DESC[i],"Дары судьбы","magic",5,0,()->fixGiftDialog(n));else fixDirect(a,title,FixShopGifts.DESC[i],"Дары судьбы","magic",5,FixShopGifts.PRICE[i],()->game.fixShop.gifts.buy(n));}
         fixOffer(a,"Уникальные предметы","Создание, привязка к душе и пассивные эффекты","Снаряжение","armor",4,50,this::livingArtifactShop);
         fixOffer(a,"Уникальные способности","Создание и улучшение собственной магии","Магия","magic",4,50,this::livingPowerShop);
@@ -4657,6 +4659,14 @@ public final class MainActivity extends Activity {
     private void fixConfirm(String title,String detail,int price,java.util.function.BooleanSupplier effect,Runnable refresh){
         new RuneDialogBuilder(this,accent()).setTitle(title).setMessage(detail+" | "+price+" F. Только для текущего сохранения.")
             .setNegativeButton("Отмена",null).setPositiveButton("Купить",(d,w)->{if(fixApply(title,detail,price,effect))refresh.run();}).show();
+    }
+    private void fixSealDialog(int n){
+        if(livingBusy())return;FixShopSeals f=game.fixShop.seals;LinearLayout panel=column();addText(panel,FixShopSeals.DESC[n],15,TEXT,false,10);addText(panel,f.status(n,game),14,accent(),true,8);
+        livingLink(panel,f.on(n)?"Выключить":"Включить","Без повторной покупки","magic",()->{if(!livingBusy()&&f.toggle(n)){save();render();fixSealDialog(n);}});
+        if(f.on(n)&&n==FixShopSeals.HOME)livingLink(panel,"Выбрать дом","","map",()->{java.util.ArrayList<String> homes=f.homes(game);if(homes.isEmpty()){toast("Нет других посещённых собственных домов");return;}new RuneDialogBuilder(this,accent()).setTitle("Зов родного очага").setItems(homes.toArray(new String[0]),(d,i)->{if(!livingBusy()&&f.returnHome(game,homes.get(i))){save();render();closeLivingDialog();}else toast("Возвращение недоступно");}).setNegativeButton("Отмена",null).show();});
+        if(f.on(n)&&n==FixShopSeals.MEDITATION)livingLink(panel,"Выбрать навык","+100 опыта навыка","skills",()->new RuneDialogBuilder(this,accent()).setTitle("Медитация мудрецов").setItems(RpgContent.SKILLS,(d,i)->{if(!livingBusy()&&f.meditate(game,i)){save();render();fixSealDialog(n);}else toast("Медитация недоступна");}).setNegativeButton("Отмена",null).show());
+        if(f.on(n)&&n==FixShopSeals.ARSENAL)for(int i=0;i<3;i++){final int index=i;LinearLayout tile=livingTile(panel);livingLine(tile,"Комплект "+(i+1),f.setLabel(i),accent());livingLink(tile,"Сохранить текущую экипировку","","armor",()->new RuneDialogBuilder(this,accent()).setTitle("Перезаписать комплект?").setNegativeButton("Отмена",null).setPositiveButton("Сохранить",(d,w)->{if(!livingBusy()&&f.saveSet(game,index)){save();fixSealDialog(n);}}).show());if(f.sets[i]!=null)livingLink(tile,"Экипировать комплект","","armor",()->{if(!livingBusy()&&f.loadSet(game,index)){save();render();fixSealDialog(n);}else toast("Не все предметы комплекта находятся в инвентаре");});}
+        livingDialog(FixShopSeals.NAME[n],panel);
     }
     private void fixGiftDialog(int n){
         if(livingBusy())return;FixShopGifts f=game.fixShop.gifts;LinearLayout panel=column();addText(panel,FixShopGifts.DESC[n],15,TEXT,false,10);addText(panel,f.status(n,game),14,accent(),true,8);

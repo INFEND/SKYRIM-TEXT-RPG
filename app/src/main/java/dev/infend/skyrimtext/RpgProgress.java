@@ -67,7 +67,7 @@ public final class RpgProgress {
     public boolean temper(ItemCatalog.Item item,GameEngine g){
         if(!temperBlock(item,g).isEmpty())return false;
         int next=temperTarget(item);
-        if(!removeItem(item.temperMaterial(),1))return false;
+        if(!g.fixShop.seals.saveMaterial(g)&&!removeItem(item.temperMaterial(),1))return false;
         tempered.put(item.id,next);
         skillExperience(g,6,Math.max(1,30+next*15));
         return true;

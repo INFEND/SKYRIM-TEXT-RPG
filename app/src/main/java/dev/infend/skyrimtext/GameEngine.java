@@ -97,7 +97,7 @@ public final class GameEngine {
         for(int i=4;i<MerchantLedger.KEYS.length;i++)if(ItemCatalog.find(MerchantLedger.KEYS[i])!=null&&MerchantLedger.capacity(region,(Math.max(1,day)-1)/MerchantLedger.RESTOCK_DAYS,i)>0)result.add(MerchantLedger.KEYS[i]);
         return result;
     }
-    public int merchantExtraPrice(String id){ItemCatalog.Item item=ItemCatalog.find(id);if(item==null||item.value<=0)return 0;return Math.max(1,(int)Math.min(Integer.MAX_VALUE,((long)item.value*(120-5*progress.branches.rank(12)-(progress.advanced.has(AdvancedPerks.HAGGLING)?5:0)-(progress.advanced.has(AdvancedPerks.MERCHANT)?5:0))+99)/100));}
+    public int merchantExtraPrice(String id){ItemCatalog.Item item=ItemCatalog.find(id);if(item==null||item.value<=0)return 0;int base=Math.max(1,(int)Math.min(Integer.MAX_VALUE,((long)item.value*(120-5*progress.branches.rank(12)-(progress.advanced.has(AdvancedPerks.HAGGLING)?5:0)-(progress.advanced.has(AdvancedPerks.MERCHANT)?5:0))+99)/100));return fixShop.seals.price(base,salePrice(item));}
     public boolean buyExtra(String id){
         if(!started||!"SHOP".equals(mode)||!merchantExtras().contains(id))return false;
         int price=merchantExtraPrice(id);ItemCatalog.Item item=ItemCatalog.find(id);
@@ -653,7 +653,7 @@ public final class GameEngine {
     void beginFixShopBattle(int i,String name,String intro){startBattle(name,65+level*6,7+level*2,"FIX_QUEST:"+i,intro);}
     void beginSolitudeWolfBattle(String stage,String name,int health,int damage,String intro){startBattle(name,health,damage,SolitudeWolf.KIND+stage,intro);}
     private void startBattle(String name,int health,int dmg,String kind,String intro) {
-        resetBattleVisuals();fixShop.gifts.beginBattle();progress.artifacts.trapTurns=0;alma.beginBattle();itachi.beginBattle();katherine.companion.beginBattle();enemyName=name;enemyHp=health;enemyMaxHp=health;enemyDamage=dmg;battleKind=kind;enemyIntro=intro;
+        resetBattleVisuals();fixShop.gifts.beginBattle();fixShop.seals.beginBattle();progress.artifacts.trapTurns=0;alma.beginBattle();itachi.beginBattle();katherine.companion.beginBattle();enemyName=name;enemyHp=health;enemyMaxHp=health;enemyDamage=dmg;battleKind=kind;enemyIntro=intro;
         battleLog="В бою важна тактика. Следи за запасом сил и магии.";mode="COMBAT";
     }
     // Retain class/quest/AI bonuses in old saves without counting the legacy
@@ -697,6 +697,9 @@ public final class GameEngine {
             case "FLEE":if(battleKind.equals("WILD")&&rollCheck(progress.chance(this,"FLEE"))){mode="RESULT";poisonTurns=frostTurns=0;message="Ты уходишь от противника. Трофеев нет.";return;}actionText="Попытка отступить не удалась.";break;
             default:return;
         }
+        if("DEFEND".equals(action))fixShop.seals.defend();
+        if("ATTACK".equals(action)||"HEAVY".equals(action)){int n=fixShop.seals.riposte(damage);if(n>0){damage=nonnegativeAdd(damage,n);actionText+="\nОгненный ответ: +"+n+" урона.";}}
+        if("MAGIC".equals(action)){int n=fixShop.seals.siphon(this,damage);if(n>0)actionText+="\nПожиратель заклинаний: +"+n+" магии.";}
         if(damage>0&&("ATTACK".equals(action)||"HEAVY".equals(action))&&progress.equippedWeaponSkill()==2&&progress.advanced.has(AdvancedPerks.POWER_SHOT)){damage=(int)Math.round(damage*1.10);actionText="Мощный выстрел: −"+damage+" здоровья врагу.";}
         if("ATTACK".equals(action)&&damage>0&&random.nextInt(100)<criticalChance()){
             lastCritical=true;damage=Math.max(1,(int)Math.round(damage*1.5));actionText="Критический удар! −"+damage+" здоровья врагу.";
@@ -733,6 +736,7 @@ public final class GameEngine {
         int almaCombo=alma.combo(Math.max(0,enemyHp-damage),"MAGIC".equals(action));if(almaCombo>0){damage+=almaCombo;actionText+="\nАльма: Кровавая связка, −"+almaCombo+" здоровья врагу.";}
         if(roadSummonTurns>0){int summon=Math.min(Math.max(0,enemyHp-damage),roadSummonKind==1?10+level/2:7+level/3);if(summon>0){damage+=summon;actionText+="\n"+(roadSummonKind==1?"Дремора":roadSummonKind==3?"Поднятый мертвец":"Двемерский автоматон")+" наносит "+summon+" урона.";}if(--roadSummonTurns==0){roadSummonKind=0;actionText+="\nПризыв рассеивается.";}}
         int roadAssist=road.allyDamage(this,damage);if(roadAssist>0){damage+=roadAssist;actionText+="\nСоратники атакуют великана: −"+roadAssist+" здоровья.";}
+        if(("ATTACK".equals(action)||"HEAVY".equals(action))&&fixShop.seals.execute(this,damage)){damage=enemyHp;actionText+="\nОко охотника: добивающий удар.";}
         if("ATTACK".equals(action)||"HEAVY".equals(action)){int heal=fixShop.gifts.drain(Math.min(enemyHp,damage),maxHp-hp);if(heal>0){hp+=heal;lastHealing+=heal;actionText+="\nПохититель жизненной силы: +"+heal+" здоровья.";}}
         lastDealt=Math.min(enemyHp,damage);lastHeavyHit="HEAVY".equals(action)&&lastDealt>0;lastMiss="HEAVY".equals(action)&&lastDealt==0;battleDealt+=lastDealt;battleTurns++;
         enemyHp=Math.max(0,enemyHp-damage);road.syncGroup(this);
@@ -763,6 +767,7 @@ public final class GameEngine {
         int almaProtection=alma.protect(incoming);incoming-=almaProtection;if(almaProtection>0){lastBlocked+=almaProtection;actionText+="\nАльма: защитная магия, −"+almaProtection+" входящего урона.";}
         if(fixShop.gifts.on(FixShopGifts.WARD)){poisonTurns=frostTurns=0;}
         int aegis=fixShop.gifts.absorb(incoming);if(aegis>0){incoming-=aegis;lastBlocked+=aegis;actionText+="\nЭгида Этериуса поглощает "+aegis+" урона.";}
+        int manaWard=fixShop.seals.ward(this,incoming);if(manaWard>0){incoming-=manaWard;lastBlocked+=manaWard;actionText+="\nЗеркало чар: −"+manaWard+" магии, поглощено "+manaWard+" урона.";}
         int poisoned=poisonTurns>0?Math.max(1,maxHp/40):0;
         if(poisonTurns>0)poisonTurns--;if(frostTurns>0){frostTurns--;stamina=Math.max(0,stamina-4);}
         String foe=enemyName.toLowerCase(java.util.Locale.ROOT);
@@ -838,6 +843,7 @@ public final class GameEngine {
         hp=(int)Math.min(maxHp,(long)hp+hours*(3L+regenBonus[0]));
         stamina=(int)Math.min(maxStamina,(long)stamina+hours*(7L+regenBonus[2]));
         magicka=(int)Math.min(maxMagicka,(long)magicka+hours*(6L+regenBonus[1]));
+        fixShop.seals.sleep(this,hours,sleep);
         message=(sleep?"Сон":"Отдых")+" длился "+hours+" ч. Наступил день "+day+", "+
             String.format(java.util.Locale.ROOT,"%02d:00",hour)+".";
         progress.recent=message;
@@ -846,9 +852,9 @@ public final class GameEngine {
     }
     public static boolean needItem(ItemCatalog.Item item,boolean water){if(item==null)return false;String cat=item.category.toLowerCase(java.util.Locale.ROOT);boolean drink=cat.contains("напит")||cat.contains("вода");return water?drink:cat.equals("еда")||cat.contains("пища");}
     public boolean consumeNeed(String id,boolean water){if(!started||"COMBAT".equals(mode)||!needItem(ItemCatalog.find(id),water))return false;syncLivingSystems();if(!needs.enabled(water?LivingNeeds.WATER:LivingNeeds.FOOD)||(water?needs.water:needs.food)>=100)return false;if(!progress.removeItem(id,1))return false;lastCheckChance=lastCheckRoll=-1;if(water)needs.drink();else needs.eat();return true;}
-    public int healingAmount(){return 45+5*progress.branches.rank(14)+(progress.advanced.has(AdvancedPerks.PHYSICIAN)?10:0)+(progress.advanced.has(AdvancedPerks.BENEFACTOR)?10:0)+(progress.advanced.has(AdvancedPerks.PURE_MIXTURE)?10:0)+(progress.advanced.has(AdvancedPerks.REGENERATION)?10:0);}
+    public int healingAmount(){return fixShop.seals.potion(45+5*progress.branches.rank(14)+(progress.advanced.has(AdvancedPerks.PHYSICIAN)?10:0)+(progress.advanced.has(AdvancedPerks.BENEFACTOR)?10:0)+(progress.advanced.has(AdvancedPerks.PURE_MIXTURE)?10:0)+(progress.advanced.has(AdvancedPerks.REGENERATION)?10:0));}
     private void restoreRespite(){if(progress.advanced.has(AdvancedPerks.RESPITE))stamina=Math.min(maxStamina,nonnegativeAdd(stamina,10));}
-    public int staminaPotionAmount(){return 50+(progress.advanced.has(AdvancedPerks.PHYSICIAN)?10:0)+(progress.advanced.has(AdvancedPerks.BENEFACTOR)?10:0)+(progress.advanced.has(AdvancedPerks.PURE_MIXTURE)?10:0);}
+    public int staminaPotionAmount(){return fixShop.seals.potion(50+(progress.advanced.has(AdvancedPerks.PHYSICIAN)?10:0)+(progress.advanced.has(AdvancedPerks.BENEFACTOR)?10:0)+(progress.advanced.has(AdvancedPerks.PURE_MIXTURE)?10:0));}
     public boolean drinkHealing() {if(!started||"COMBAT".equals(mode)||potions<=0||hp>=maxHp)return false;potions--;hp=Math.min(maxHp,nonnegativeAdd(hp,healingAmount()));restoreRespite();progress.sync(this);return true;}
     public boolean drinkStamina(){if(!started||"COMBAT".equals(mode)||stamina>=maxStamina||!progress.removeItem("Зелье запаса сил",1))return false;stamina=Math.min(maxStamina,nonnegativeAdd(stamina,staminaPotionAmount()));progress.sync(this);return true;}
     public boolean drinkMana() {if(!started||"COMBAT".equals(mode)||manaPotions<=0||magicka>=maxMagicka)return false;manaPotions--;magicka=Math.min(maxMagicka,nonnegativeAdd(magicka,35));return true;}
