@@ -261,6 +261,7 @@ public final class GameEngine {
         s.primary("CANON_OPEN","Главная история | Путь Довакина",CanonicalCampaign.objective(this));
         s.add("DRAGON_OPEN","Драконий след",DragonArc.status(this));
         s.add("EXPLORE","Исследовать окрестности","Случайные встречи, тайники и опасности");
+        SolitudeWolf.worldChoices(this,s);
         if(SolitudeCity.here(this))s.add("SOLITUDE:open","Жизнь Солитьюда","Районы столицы, местные занятия, услуги и заработок");
         s.add("QUEST","История хранителей","Пепельные печати | " + questStatus());
         s.add("TALK","Поговорить с местными","Слухи, события и полезные сведения");
@@ -388,6 +389,7 @@ public final class GameEngine {
         if(solitude.custody()){solitude.choose(this,action);return;}
         if(RoadEvents.MODE.equals(mode)){road.choose(this,action);return;}
         if(road.pending()&&!"COMBAT".equals(mode)){if("GO_WORLD".equals(action))road.resume(this);return;}
+        if(action.startsWith("WOLF:")){SolitudeWolf.chooseWorld(this,action);return;}
         if(action.startsWith("SOLITUDE:")||SolitudeCity.isMode(mode)){solitude.choose(this,action);return;}
         if(action.startsWith("FIXGIFT:")){if("FIXGIFT:escape".equals(action)){if(fixShop.gifts.escape(this))recordVisualEvent(message);}else if("FIXGIFT:blood".equals(action)||"FIXGIFT:time".equals(action)||"FIXGIFT:balance".equals(action)){if("COMBAT".equals(mode))combatTurn(action);}else FixShopGifts.choose(this,action);return;}
         if(action.startsWith("FIXRESIDENCE:")){FixShopHome.choose(this,action);return;}
@@ -647,6 +649,7 @@ public final class GameEngine {
     void beginAlmaBattle(){startBattle("Убийца Тёмного Братства",75+level*8,8+level*2,"ALMA","Преследователь преграждает дорогу. Альма предупреждает о засаде.");}
     void beginKatherineBattle(){startBattle("Агент Круга Трёх Когтей",75+level*8,8+level*2,"KATHERINE","Кэтрин поднимает барьер. Агент Круга требует, чтобы она сдалась.");}
     void beginFixShopBattle(int i,String name,String intro){startBattle(name,65+level*6,7+level*2,"FIX_QUEST:"+i,intro);}
+    void beginSolitudeWolfBattle(String stage,String name,int health,int damage,String intro){startBattle(name,health,damage,SolitudeWolf.KIND+stage,intro);}
     private void startBattle(String name,int health,int dmg,String kind,String intro) {
         resetBattleVisuals();fixShop.gifts.beginBattle();progress.artifacts.trapTurns=0;alma.beginBattle();itachi.beginBattle();katherine.companion.beginBattle();enemyName=name;enemyHp=health;enemyMaxHp=health;enemyDamage=dmg;battleKind=kind;enemyIntro=intro;
         battleLog="В бою важна тактика. Следи за запасом сил и магии.";mode="COMBAT";
@@ -789,6 +792,7 @@ public final class GameEngine {
         if(sideQuest==1)message+="\nЗаказ доски: "+sideKills+"/3.";
         if(battleKind.startsWith("FIX_QUEST:"))FixShopAdventure.victory(this,battleKind);
         if(battleKind.startsWith("ROAD_QUEST:"))RoadQuests.victory(this,battleKind);
+        if(battleKind.startsWith(SolitudeWolf.KIND))SolitudeWolf.victory(this);
         if("WILD".equals(battleKind)&&road.pending())road.applyVictory(this);
         if("FACTION".equals(battleKind)){factionStories.victory(factionBattle);factionBattle=-1;message+="\n\nОткрой сюжет фракции, чтобы завершить главу.";}
         if("CANONICAL".equals(battleKind)){
