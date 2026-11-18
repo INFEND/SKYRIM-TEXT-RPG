@@ -81,6 +81,7 @@ final class SolitudeHome {
                 if(n>1)s.add("SOLITUDE:home:withdrawAll:"+i,"Забрать всё: "+id,"До "+n+" шт. | С учётом веса");
             }
             if(room(3)&&FixShopHome.canBrew(g))s.add("SOLITUDE:home:brew","Сварить лечебное зелье","Пшеница + голубой горноцвет");
+            if(g.itachi.enabled&&g.itachi.married&&g.itachi.life.sharedHome)s.add("SOLITUDE:home:itachi","Поговорить с Итачи","Совместный дом");
             if(g.livia.enabled&&g.livia.life.married&&g.livia.life.sharedHome&&g.livia.survivor())s.add("SOLITUDE:home:livia","Поговорить с Ливией","Совместный дом");
             s.add("SOLITUDE:home:sleep","Поспать","8 часов | бесплатно");
             if(room(1)&&lastMeal!=g.day)s.add("SOLITUDE:home:meal","Поесть и выпить воды","Один раз в день");
@@ -103,6 +104,7 @@ final class SolitudeHome {
             if(room(3)&&FixShopHome.brew(g)){g.mode=MODE;report(g,"Ты приготовил лечебное зелье в Высоком шпиле.");}
             return;
         }
+        if(a.equals("SOLITUDE:home:itachi")){if(g.itachi.enabled&&g.itachi.married&&g.itachi.life.sharedHome){g.mode="WORLD";g.choose("ITACHI:open");if(ItachiStory.MODE.equals(g.mode))g.itachi.life.homeReturn=true;else g.mode=MODE;}return;}
         if(a.equals("SOLITUDE:home:livia")){if(g.livia.enabled&&g.livia.life.sharedHome&&g.livia.life.married&&g.livia.survivor()){g.mode="WORLD";g.choose("LIVIA:open");if(LiviaStory.MODE.equals(g.mode))g.livia.homeReturn=true;else g.mode=MODE;}return;}
         if(a.equals("SOLITUDE:home:sleep")){
             if(!g.restHours(8,true))return;
