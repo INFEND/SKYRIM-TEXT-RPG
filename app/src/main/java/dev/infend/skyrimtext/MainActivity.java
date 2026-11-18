@@ -1656,8 +1656,16 @@ public final class MainActivity extends Activity {
                 game.progress.sync(game);
                 captureItemGains(before,game,false);
                 recordVisual(visualBefore,game,c.title);
-                if(prefs.getBoolean("ai_enabled",false))
-                    aiMemory.add(aiSession,"event","Игровое действие: "+c.title+". Текущее сообщение движка: "+game.message);
+                if(game.aiNarrativeMode){
+                    String outcome="Игровое действие: "+c.title+". Подтверждённый итог: "+game.message;
+                    aiMemory.add(aiSession,"event",outcome);
+                    game.setAiNarrativeMode(true);
+                    if(!game.nativeSceneRequired()){
+                        game.aiTurn=null;selectedAiChoices.clear();aiOwnDraft="";clearAiDraft();clearAiPending();
+                        save();tab=0;requestAiTurn(outcome+"\nНе повторяй уже применённые эффекты. Продолжи повествование из текущего состояния.",false);
+                        if(!aiTurnBusy)render();return;
+                    }
+                }
                 save();tab=0;render();
             });
         }
@@ -1724,6 +1732,7 @@ public final class MainActivity extends Activity {
         };
     }
     private void cityPlaceDialog(String city,int category,String place){
+        if(game.aiNarrativeMode&&livingBusy()){toast("Сначала заверши или отмени текущий ход");return;}
         LinearLayout panel=column();addText(panel,city+" | "+CityArchitecture.CATEGORIES[category],14,MUTED,false,8);
         if(LocationGalleryView.hasGallery(place))panel.addView(new LocationGalleryView(this,place,accent(),false),lp(-1,-2));
         int d=-1;

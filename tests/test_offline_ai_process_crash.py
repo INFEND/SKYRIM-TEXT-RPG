@@ -16,7 +16,7 @@ class OfflineCrashGuard(unittest.TestCase):
         ui=(JAVA/"MainActivity.java").read_text(encoding="utf-8")
         self.assertIn("new LocalAiClient(this)",ui)
         self.assertIn("aiTurnStatus=\"Ошибка генерации:",ui)
-        self.assertIn("GameEngine.fromJson(saved)",ui)
+        self.assertIn("GameEngine.fromJson(saved,true)",ui)
         self.assertIn("completed.apply(next,actionResolved)",ui)
         client=(JAVA/"LocalAiClient.kt").read_text(encoding="utf-8")
         self.assertIn("onServiceDisconnected",client)

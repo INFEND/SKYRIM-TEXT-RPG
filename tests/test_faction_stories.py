@@ -29,6 +29,8 @@ class FactionStoriesTest(unittest.TestCase):
         self.assertIn('FactionStories.fromJson',g)
         self.assertIn('started(5)||g.factions.stage(5)>0',s)
         self.assertIn('factionStoryDialog(f)',m)
-        self.assertIn('"FACTION".equals(game.battleKind)',m)
+        gate=g.split("public boolean nativeSceneRequired(){",1)[1].split("public AiGameTurn aiTurn;",1)[0]
+        self.assertIn('"FACTION".equals(battleKind)',gate)
+        self.assertIn("game.nativeSceneRequired()",m)
         self.assertNotIn('{"За гранью смерти","Каирн Душ"',s)
         self.assertNotIn('{"Прикосновение к небу","Забытая долина"',s)
