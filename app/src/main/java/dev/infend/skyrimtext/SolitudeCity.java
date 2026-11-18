@@ -120,7 +120,7 @@ final class SolitudeCity {
         if(SolitudeEncounters.choose(g,d,action))return;
         if((PREFIX+"shop").equals(action)&&(d==0||d==5)){g.mode="WORLD";g.choose("SHOP");return;}
         if((PREFIX+"rest").equals(action)&&d==6){g.mode="WORLD";g.choose("REST");return;}
-        if((PREFIX+"livia").equals(action)&&d==1){g.mode="WORLD";if(g.livia.available(g))g.choose("LIVIA:open");else g.mode=PREFIX+d;return;}
+        if((PREFIX+"livia").equals(action)&&d==1){g.mode="WORLD";if(g.livia.available(g)){g.choose("LIVIA:open");g.livia.castleReturn=LiviaStory.MODE.equals(g.mode);}else g.mode=PREFIX+d;return;}
         for(int i=d*2;i<d*2+2;i++)if((PREFIX+"job:"+i).equals(action)){
             if(!blocked(g,i).isEmpty())return;
             Job j=JOBS[i];lastDay[i]=g.day;

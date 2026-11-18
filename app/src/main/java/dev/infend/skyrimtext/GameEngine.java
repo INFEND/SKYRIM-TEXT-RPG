@@ -69,7 +69,7 @@ public final class GameEngine {
     public LivingEconomy economy=new LivingEconomy();
     public final int[] regenBonus=new int[3];
     public boolean regenIgnorePenalty;
-    public void syncLivingSystems(){needs.sync(day,hour);economy.sync(day);if(started&&itachi!=null&&!"COMBAT".equals(mode))itachi.daily(this);}
+    public void syncLivingSystems(){needs.sync(day,hour);economy.sync(day);if(started&&itachi!=null&&!"COMBAT".equals(mode))itachi.daily(this);if(started&&livia!=null&&!"COMBAT".equals(mode))livia.daily(this);}
     public int regenRate(int index){return Math.max(0,1+regenBonus[index]+(index==1?compensation.passiveBonus(this,2):0)+progress.artifacts.regen(progress,index)); }
     private void regenerateCombat(){if(hp<=0||!"COMBAT".equals(mode))return;int penalty=regenIgnorePenalty?0:needs.penalty();hp=(int)Math.min(maxHp,(long)hp+(poisonTurns>0&&!regenIgnorePenalty?regenBonus[0]:Math.max(0,regenRate(0)-(penalty>0?1:0))));magicka=(int)Math.min(maxMagicka,(long)magicka+Math.max(regenBonus[1],regenRate(1)-(penalty>0?1:0)));stamina=(int)Math.min(maxStamina,(long)stamina+(frostTurns>0&&!regenIgnorePenalty?regenBonus[2]:Math.max(0,regenRate(2)-(penalty>0?1:0))));}
     public AiGameTurn aiTurn;
@@ -463,7 +463,7 @@ public final class GameEngine {
             region=target.region;
             progress.location=target.name;
             katherine.observeTravel(this);katherine.autonomous(this);alma.observeTravel(this);
-            katherine.rest(Math.min(24,route.days*3));alma.rest(Math.min(24,route.days*3));itachi.rest(Math.min(24,route.days*3));
+            katherine.rest(Math.min(24,route.days*3));alma.rest(Math.min(24,route.days*3));itachi.rest(Math.min(24,route.days*3));livia.rest(Math.min(24,route.days*3));
             // Register only locations reached through the validated atlas route.
             // A stable key keeps repeat visits idempotent across save/load.
             try {
@@ -497,7 +497,7 @@ public final class GameEngine {
             case "BOARD": board(); break;
             case "REST":
                 if(gold<20) {message="Хозяин трактира просит 20 септимов. Придётся поискать заработок.";mode="RESULT";}
-                else {gold-=20;day++;syncLivingSystems();alma.rest(8);itachi.rest(8);alma.observeTravel(this);needs.tavernRest();hp=maxHp;magicka=maxMagicka;stamina=maxStamina;message="После тёплого ужина и долгого сна силы восстановились.";mode="RESULT";} break;
+                else {gold-=20;day++;syncLivingSystems();alma.rest(8);itachi.rest(8);livia.rest(8);alma.observeTravel(this);needs.tavernRest();hp=maxHp;magicka=maxMagicka;stamina=maxStamina;message="После тёплого ужина и долгого сна силы восстановились.";mode="RESULT";} break;
             case "Q_ACCEPT": if(questStage==0) {questStage=1;gold=nonnegativeAdd(gold,40);message="Ты принимаешь 40 септимов и получаешь первую зацепку: алтарь находится в Фолкрите.";mode="RESULT";} break;
             case "Q_ALTAR": if(questStage==1 && region==5) {questStage=2;confirmSceneFact("clue", "quest_silver_plate", "Серебряная пластина под алтарём Фолкрита", "FOUND");addXp(35);message="Ты находишь под алтарём серебряную пластину. На ней указан Винтерхолд. +35 опыта.";mode="RESULT";} break;
             case "Q_BOSS": if(questStage==2 && region==6) startBattle("Пепельный страж",90+level*11,12+level*2,"QUEST","Внутри башни оживает существо из пепла и холодного камня."); break;
@@ -820,7 +820,7 @@ public final class GameEngine {
         if(day>Integer.MAX_VALUE-total/24)return false;
         day+=total/24;hour=total%24;
         syncLivingSystems();needs.recover(hours,sleep);
-        katherine.rest(hours);katherine.autonomous(this);alma.rest(hours);itachi.rest(hours);alma.observeTravel(this);
+        katherine.rest(hours);katherine.autonomous(this);alma.rest(hours);itachi.rest(hours);livia.rest(hours);alma.observeTravel(this);
         hp=(int)Math.min(maxHp,(long)hp+hours*(3L+regenBonus[0]));
         stamina=(int)Math.min(maxStamina,(long)stamina+hours*(7L+regenBonus[2]));
         magicka=(int)Math.min(maxMagicka,(long)magicka+hours*(6L+regenBonus[1]));
