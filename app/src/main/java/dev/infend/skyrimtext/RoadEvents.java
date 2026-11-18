@@ -301,6 +301,16 @@ final class RoadEvents {
     void payFine(GameEngine g,String action){if(pending()||!("WORLD".equals(g.mode)||"RESULT".equals(g.mode)))return;WorldAtlas.Place p=WorldAtlas.find(g.progress.location);if(p==null||!"Столица".equals(p.type)||!action.equals("ROADFINE:"+p.region))return;int fine=bounty(p.region);if(fine<=0)return;if(g.gold<fine){g.message="Не хватает септимов для погашения штрафа.";g.mode="RESULT";return;}g.gold-=fine;roadBounties[p.region]=0;g.progress.sync(g);g.message="Местная стража приняла "+fine+" септимов. Дорожный штраф погашен.";g.mode="RESULT";g.recordVisualEvent(g.message);}
     static int jailDays(int fine){return Math.max(1,Math.min(7,(int)(((long)fine+499)/500)));}
     void serveSentence(GameEngine g,String action){if(pending()||!("WORLD".equals(g.mode)||"RESULT".equals(g.mode)))return;WorldAtlas.Place p=WorldAtlas.find(g.progress.location);if(p==null||!"Столица".equals(p.type)||!action.equals("ROADJAIL:"+p.region)||bounty(p.region)<=0)return;int fine=bounty(p.region),days=jailDays(fine);if(g.day>Integer.MAX_VALUE-days)return;for(int i=0;i<days;i++)g.restHours(24,true);int confiscated=g.progress.quantity("Похищенное кольцо");if(confiscated>0)g.progress.removeItem("Похищенное кольцо",confiscated);int lost=0;for(int i=0;i<g.progress.skillXp.length;i++){int n=Math.min(g.progress.skillXp[i],days*10);g.progress.skillXp[i]-=n;lost+=n;}roadBounties[p.region]=0;g.progress.sync(g);g.message="Наказание отбыто: "+days+" дн. Штраф "+fine+" септимов погашен. Потеряно "+lost+" прогресса навыков."+(confiscated>0?" Украденные кольца конфискованы.":"");g.mode="RESULT";g.recordVisualEvent(g.message);}
+    void addCityBounty(int region,int amount){if(amount>0)addBounty(region,amount);}
+    /** Apply the existing confiscation and skill penalty once, after a local sentence. */
+    void finishCitySentence(GameEngine g,int region,int days){
+        if(region!=3||!SolitudeCity.here(g)||!SolitudeJustice.CELL.equals(g.mode)||days<1||days>7)return;
+        int fine=bounty(region),lost=0;
+        for(int i=0;i<g.progress.skillXp.length;i++){int n=Math.min(g.progress.skillXp[i],days*10);g.progress.skillXp[i]-=n;lost+=n;}
+        roadBounties[region]=0;g.progress.sync(g);
+        g.message="Наказание отбыто: "+days+" дн. Штраф "+fine+" септимов погашен. Потеряно "+lost+" прогресса навыков.";
+        g.recordVisualEvent(g.message);
+    }
     private void addBounty(int region,int amount){if(region>=0&&region<roadBounties.length)roadBounties[region]=GameEngine.nonnegativeAdd(roadBounties[region],amount);}
     private static boolean member(GameEngine g,int faction){return g.factions.stage(faction)>0||g.factionStories.started(faction);}
     private void remember(GameEngine g){recentDays.put(id,g.day);while(recentDays.size()>EVENTS.length)recentDays.remove(recentDays.keySet().iterator().next());}

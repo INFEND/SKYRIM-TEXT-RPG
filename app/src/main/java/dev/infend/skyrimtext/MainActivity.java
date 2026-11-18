@@ -1151,6 +1151,7 @@ public final class MainActivity extends Activity {
         closeLivingDialog();
         clearAiLiveViews();
         rememberViewport();
+        if(game.solitude.confined())tab=0;
         if(game.started&&game.visitedVisual.add(game.progress.location))save();
         String thisPage=viewportKey();
         PageScroll oldScroll=scrollCache.get(thisPage);
@@ -1184,7 +1185,7 @@ public final class MainActivity extends Activity {
         else if(tab==4)renderJournal();
         else if(tab==6)renderCodex();
         else renderSettings();
-        if(!titleOpen&&game.started)renderNav();
+        if(!titleOpen&&game.started&&!game.solitude.confined())renderNav();
         stateEffects();
         SovngardeTypeface.applyTree(root);
         SovngardeTypeface.watchTree(root);
@@ -1634,7 +1635,7 @@ public final class MainActivity extends Activity {
         if(battleSummaryPending){battleSummaryPending=false;boolean defeated="DEFEAT".equals(game.mode);if(visual(defeated?"defeat":"victory"))showBattleSummary(defeated);}
         renderItemGains();
         renderStoryJournal();
-        if(prefs.getBoolean("ai_enabled",false)&&!game.road.pending()) renderAiStoryPanel();
+        if(prefs.getBoolean("ai_enabled",false)&&!game.road.pending()&&!game.solitude.confined()) renderAiStoryPanel();
         space(content,12);
         if("WORLD".equals(game.mode)&&!game.road.pending())renderCityArchitecture();
         addText(content,"Что ты предпримешь?",22,TEXT,true,7);
@@ -3877,7 +3878,7 @@ public final class MainActivity extends Activity {
         livingLink(content,"Сопротивления","","shield",()->livingHeroDetails("Сопротивления",game.progress.racePassive(game)+"\nСнижение физического урона: "+String.format(java.util.Locale.ROOT,"%.1f%%",100*game.progress.damageReduction())));
         livingLink(content,"Подробная статистика","","hero",()->{heroDetailed=true;render();});
     }
-    private boolean livingBusy(){return aiTurnBusy||!pendingAiAction().isEmpty()||"COMBAT".equals(game.mode)||game.road.pending();}
+    private boolean livingBusy(){return game.solitude.confined()||aiTurnBusy||!pendingAiAction().isEmpty()||"COMBAT".equals(game.mode)||game.road.pending();}
     private void livingEconomyDialog(){
         if(livingBusy()){toast("Финансы недоступны во время действия");return;}
         game.syncLivingSystems();LinearLayout panel=column();livingLine(panel,"На руках",livingNumber(game.gold),ITEM_GOLD);livingLine(panel,"В обороте",livingNumber(game.economy.capital),TEXT);livingLine(panel,"Доход / день",livingNumber(game.economy.income()),ITEM_UP);livingLine(panel,"Накопленный доход",livingNumber(game.economy.accrued),ITEM_UP);

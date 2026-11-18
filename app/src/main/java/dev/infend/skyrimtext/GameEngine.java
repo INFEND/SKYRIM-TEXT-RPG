@@ -385,6 +385,7 @@ public final class GameEngine {
     public void choose(String action) {
         if (!started || action==null) return;
         lastCheckChance=lastCheckRoll=-1;
+        if(solitude.confined()){solitude.choose(this,action);return;}
         if(RoadEvents.MODE.equals(mode)){road.choose(this,action);return;}
         if(road.pending()&&!"COMBAT".equals(mode)){if("GO_WORLD".equals(action))road.resume(this);return;}
         if(action.startsWith("SOLITUDE:")||SolitudeCity.isMode(mode)){solitude.choose(this,action);return;}
@@ -401,7 +402,7 @@ public final class GameEngine {
         if(action.startsWith("ROADSTAR:")){progress.artifacts.releaseOutside(this,action);return;}
         if(action.startsWith("ROADSTONE_")||action.startsWith("ROADSTAR_")){combatTurn(action);return;}
         if(action.startsWith("ROADFINE:")){road.payFine(this,action);return;}
-        if(action.startsWith("ROADJAIL:")){road.serveSentence(this,action);return;}
+        if(action.startsWith("ROADJAIL:")){if("ROADJAIL:3".equals(action)&&SolitudeCity.here(this))solitude.beginSentence(this);else road.serveSentence(this,action);return;}
         if(action.startsWith("ROADESTATE:")){road.buyEstate(this,action);return;}
         if(action.startsWith("ROADSTART:")){RoadQuests.start(this,action.substring("ROADSTART:".length()));return;}
         if(action.startsWith("ROADDEBT:")){if("ROADDEBT:pay".equals(action)||"ROADDEBT:negotiate".equals(action))RoadQuests.payDebt(this,"ROADDEBT:negotiate".equals(action));return;}
@@ -813,7 +814,9 @@ public final class GameEngine {
         WorldAtlas.Place target=WorldAtlas.find(name);if(target==null)return false;region=target.region;progress.location=target.name;katherine.observeTravel(this);alma.observeTravel(this);mode="WORLD";message="Магический переход: "+target.name;recordVisualEvent(message);return true;
     }
     public boolean waitHours(int hours){return restHours(hours,hours>=6);}
-    public boolean restHours(int hours,boolean sleep){
+    public boolean restHours(int hours,boolean sleep){if(solitude.confined())return false;return restHoursInternal(hours,sleep);}
+    boolean restPrisonDay(){return solitude.confined()&&SolitudeJustice.CELL.equals(mode)&&restHoursInternal(24,true);}
+    private boolean restHoursInternal(int hours,boolean sleep){
         if(!started||"COMBAT".equals(mode)||road.pending()||hours<1||hours>24)return false;
         lastCheckChance=lastCheckRoll=-1;
         int total=hour+hours;
@@ -934,6 +937,7 @@ public final class GameEngine {
             }
             if(j.optJSONObject("progress")==null)g.progress.location=REGIONS[g.region];
             if(SolitudeCity.isMode(g.mode)&&(!SolitudeCity.here(g)||!SolitudeCity.validMode(g.mode)))g.mode="WORLD";
+            g.solitude.reconcilePrison(g);
             g.progress.sync(g);
             if(g.mode.equals("COMBAT")&&g.enemyHp<=0)g.mode=g.road.pending()?"RESULT":"WORLD";
         }catch(Exception ignore){return new GameEngine();}

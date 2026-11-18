@@ -46,13 +46,17 @@ final class SolitudeCity {
     private final int[] lastDay=new int[JOBS.length];
     private SolitudeShops shops=new SolitudeShops();
     private SolitudeHome home=new SolitudeHome();
+    private SolitudeJustice justice=new SolitudeJustice();
+    boolean confined(){return justice.confined();}
+    void beginSentence(GameEngine g){justice.begin(g);}
+    void reconcilePrison(GameEngine g){if(justice.confined()&&here(g))g.mode=SolitudeJustice.CELL;else if(SolitudeJustice.CELL.equals(g.mode))g.mode=SolitudeJustice.MODE;}
     static boolean here(GameEngine g){return g.started&&g.region==3&&"Солитьюд".equals(g.progress.location);}
     static boolean isMode(String m){return MODE.equals(m)||(m!=null&&m.startsWith(PREFIX));}
     private static int district(String mode){
         for(int i=0;i<PLACES.length;i++)if((PREFIX+i).equals(mode))return i;
         return -1;
     }
-    static boolean validMode(String mode){return MODE.equals(mode)||district(mode)>=0||SolitudeShops.index(mode)>=0||SolitudeHome.MODE.equals(mode)||SolitudeJustice.MODE.equals(mode);}
+    static boolean validMode(String mode){return MODE.equals(mode)||district(mode)>=0||SolitudeShops.index(mode)>=0||SolitudeHome.MODE.equals(mode)||SolitudeJustice.MODE.equals(mode)||SolitudeJustice.CELL.equals(mode);}
     private String blocked(GameEngine g,int i){
         Job j=JOBS[i];
         if(lastDay[i]>=g.day)return "Уже выполнено сегодня";
@@ -70,6 +74,7 @@ final class SolitudeCity {
             (j.skill<0?"":" | "+RpgContent.SKILLS[j.skill]);
     }
     GameEngine.Scene scene(GameEngine g){
+        if(justice.confined())return justice.cell(g);
         if(SolitudeJustice.MODE.equals(g.mode))return SolitudeJustice.scene(g);
         if(SolitudeHome.MODE.equals(g.mode))return home.scene(g);
         int store=SolitudeShops.index(g.mode);if(store>=0)return shops.scene(g,store);
@@ -101,11 +106,12 @@ final class SolitudeCity {
     }
     void choose(GameEngine g,String action){
         if(!here(g)||g.road.pending()||"COMBAT".equals(g.mode)||g.hp<=0)return;
+        if(justice.confined()){justice.cellAction(g,action);return;}
         if((PREFIX+"open").equals(action)&&"WORLD".equals(g.mode)){g.mode=MODE;g.message="";return;}
         if(!validMode(g.mode))return;
         if("GO_WORLD".equals(action)){g.mode="WORLD";return;}
         if((PREFIX+"back").equals(action)){g.mode=MODE;g.message="";return;}
-        if(SolitudeJustice.MODE.equals(g.mode)){SolitudeJustice.choose(g,action);return;}
+        if(SolitudeJustice.MODE.equals(g.mode)){justice.choose(g,action);return;}
         if(SolitudeHome.MODE.equals(g.mode)){home.choose(g,action);return;}
         int store=SolitudeShops.index(g.mode);if(store>=0){shops.choose(g,store,action);return;}
         int d=district(g.mode);
@@ -116,7 +122,7 @@ final class SolitudeCity {
         }
         for(int i=0;i<SolitudeShops.NAMES.length;i++)if(d==SolitudeShops.district(i)&&(PREFIX+"store:"+i).equals(action)){g.mode=SolitudeShops.MODE+i;g.message="";return;}
         if(d==2&&home.palaceAction(g,action))return;
-        if(d==1&&SolitudeJustice.choose(g,action))return;
+        if(d==1&&justice.choose(g,action))return;
         if(SolitudeEncounters.choose(g,d,action))return;
         if((PREFIX+"shop").equals(action)&&(d==0||d==5)){g.mode="WORLD";g.choose("SHOP");return;}
         if((PREFIX+"rest").equals(action)&&d==6){g.mode="WORLD";g.choose("REST");return;}
@@ -136,12 +142,13 @@ final class SolitudeCity {
             g.progress.sync(g);return;
         }
     }
-    JSONObject save(){JSONObject o=new JSONObject();try{o.put("lastDay",new JSONArray(lastDay)).put("shops",shops.save()).put("home",home.save());}catch(Exception ignored){}return o;}
+    JSONObject save(){JSONObject o=new JSONObject();try{o.put("lastDay",new JSONArray(lastDay)).put("shops",shops.save()).put("home",home.save()).put("justice",justice.save());}catch(Exception ignored){}return o;}
     static SolitudeCity restore(JSONObject o){
         SolitudeCity s=new SolitudeCity();JSONArray a=o==null?null:o.optJSONArray("lastDay");
         if(a!=null)for(int i=0;i<s.lastDay.length;i++)s.lastDay[i]=Math.max(0,a.optInt(i,0));
         s.shops=SolitudeShops.restore(o==null?null:o.optJSONObject("shops"));
         s.home=SolitudeHome.restore(o==null?null:o.optJSONObject("home"));
+        s.justice=SolitudeJustice.restore(o==null?null:o.optJSONObject("justice"));
         return s;
     }
 }
