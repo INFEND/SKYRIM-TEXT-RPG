@@ -3,13 +3,13 @@
   "packageName": "dev.xarkon.link",
   "apkPackageName": "dev.infend.skyrimtext",
   "legacyPackageField": true,
-  "versionCode": 219,
-  "versionName": "1.0.218",
-  "apkUrl": "https://github.com/INFEND/SKYRIM-TEXT-RPG/releases/download/v1.0.218/SKYRIM-TEXT-RPG.apk",
-  "sha256": "2d2da8087f965fabea500da9921f59e5e66aa82d61b7d0346262c76e8e7b9749",
-  "sizeBytes": 1448128,
+  "versionCode": 220,
+  "versionName": "1.0.219",
+  "apkUrl": "https://github.com/INFEND/SKYRIM-TEXT-RPG/releases/download/v1.0.219/SKYRIM-TEXT-RPG.apk",
+  "sha256": "8aa38328c73cadd41d1a91038338504079f298a19ae5f01acb141c6337c1c36f",
+  "sizeBytes": 1448428,
   "coreOnly": true,
-  "notes": "[+] Солитьюд: кража амулета на рынке, повышенный риск и общий дневной лимит краж.\n[=] Единая конфискация украденных колец и амулетов при оплате штрафа или заключении.\n",
+  "notes": "[+] Солитьюд: незаконное проникновение в закрытое служебное помещение Мрачного замка, штраф и задержание с сохранением.\n[=] Авторские городские поручения явно отмечены в меню.\n",
   "history": [
     {
       "versionCode": 2,
@@ -1100,7 +1100,12 @@
       "versionCode": 219,
       "versionName": "1.0.218",
       "notes": "[+] Солитьюд: кража амулета на рынке, повышенный риск и общий дневной лимит краж.\n[=] Единая конфискация украденных колец и амулетов при оплате штрафа или заключении.\n"
+    },
+    {
+      "versionCode": 220,
+      "versionName": "1.0.219",
+      "notes": "[+] Солитьюд: незаконное проникновение в закрытое служебное помещение Мрачного замка, штраф и задержание с сохранением.\n[=] Авторские городские поручения явно отмечены в меню.\n"
     }
   ],
-  "publishedAt": "2026-11-18T10:30:10.413729+00:00"
+  "publishedAt": "2026-11-18T11:41:18.487829+00:00"
 }
