@@ -12,7 +12,7 @@ final class LiviaStory {
     int stage=0, trust=0, respect=0, affection=0, lastTalkDay=-1, lastDateDay=-1, victories=0;
     String ending="", memory="";
     int epilogue=0,lastEpilogueDay=-1,dates=0,stance=0,companionStamina=100,lastRestDay=-1;
-    boolean castleReturn=false;
+    boolean castleReturn=false, homeReturn=false;
     JSONArray history=new JSONArray();
     LiviaLife life=new LiviaLife();
     private static final String[] REDEEM_TASKS={"Составить список семей погибших","Передать помощь пострадавшим","Засвидетельствовать выполнение обязательств"};
@@ -26,7 +26,7 @@ final class LiviaStory {
     boolean epilogueReady(GameEngine g){return stage==4&&survivor()&&epilogue<3&&lastEpilogueDay!=g.day&&castle(g)&&g.hour>=8&&g.hour<=20;}
     void rest(int hours){if(active())companionStamina=Math.min(100,companionStamina+Math.min(24,Math.max(0,hours))*12);}
     void daily(GameEngine g){if(active()&&lastRestDay!=g.day){if(lastRestDay>=0)companionStamina=Math.min(100,companionStamina+30);lastRestDay=g.day;}life.daily(g,this);}
-    void exit(GameEngine g){g.mode=castleReturn&&SolitudeCity.here(g)?SolitudeCity.PREFIX+"1":"WORLD";castleReturn=false;}
+    void exit(GameEngine g){g.mode=homeReturn&&SolitudeCity.here(g)&&SolitudeHome.owns(g)?SolitudeHome.MODE:castleReturn&&SolitudeCity.here(g)?SolitudeCity.PREFIX+"1":"WORLD";castleReturn=false;homeReturn=false;}
     static boolean matches(String name){return name!=null&&(NAME.equalsIgnoreCase(name)||"Имперский капитан".equalsIgnoreCase(name)||"Имперский капитан Хелгена".equalsIgnoreCase(name)||"Капитан Хелгена".equalsIgnoreCase(name));}
     static int clamp(int n){return Math.max(0,Math.min(100,n));}
     boolean survivor(){return !"Возмездие".equals(ending)&&!"Последний поединок".equals(ending);}
@@ -35,11 +35,11 @@ final class LiviaStory {
     boolean witnessed(GameEngine g){return "Хелген".equalsIgnoreCase(g.progress.startId);}
     boolean present(GameEngine g){return enabled&&survivor()&&(active()||castle(g));}
     boolean available(GameEngine g){return enabled&&g.started&&!g.solitude.custody()&&!g.road.pending()&&("WORLD".equals(g.mode)||"RESULT".equals(g.mode))&&present(g)&&(!witnessed(g)||g.canonicalStage>=3);}
-    boolean setEnabled(GameEngine g,boolean on){if("COMBAT".equals(g.mode))return false;enabled=on;if(!on&&MODE.equals(g.mode))g.mode="WORLD";return true;}
+    boolean setEnabled(GameEngine g,boolean on){if("COMBAT".equals(g.mode))return false;enabled=on;if(!on&&MODE.equals(g.mode))exit(g);return true;}
     String status(){return stage==0?"Мрачный замок, Солитьюд":stage==1?"Допрос капитана":stage==2?"Свидетельства Хелгена":stage==3?"Цена приговора":ending+(following?" | Спутница":"")+(romance?" | Возлюбленная":"");}
     String relation(){if(!survivor())return "Последний поединок".equals(ending)?"Погибла":"Под военным судом";return life.married?"Супруга":life.engaged?"Помолвлены":romance?"Возлюбленная":active()?"Спутница":trust>=55?"Доверяет":trust>=25?"Уважает":"Держит дистанцию";}
     String objective(){return TITLE+" | "+status()+(stage==4&&survivor()?" | "+epilogueTitle()+" ("+epilogue+"/3)":"");}
-    String aiContext(GameEngine g){if(!enabled)return "Ливия: дополнение отключено; не вводить её в сцену.";if(!survivor())return "Ливия: "+ending+". "+memory+" Не возвращать в сцену, не восстанавливать спутницу или роман.";if(witnessed(g)&&g.canonicalStage<3)return "Ливия: имперский капитан Хелгена. Ещё не наступила повторная встреча; не раскрывать её дальнейшую судьбу.";return "Ливия, имперский капитан, пережила нападение Алдуина. "+(witnessed(g)?"Приказала казнить героя в Хелгене.":"Герой не обязательно присутствовал на казни.")+" Этап "+stage+"/4, исход="+ending+", рядом="+active()+", роман="+romance+", доверие="+trust+", место="+location(g)+", эпилог="+epilogue+"/3, тактика="+stanceLabel()+", любовь="+life.love+", помолвка="+life.engaged+", свадьба="+life.married+", общий дом="+life.sharedHome+", занятие="+life.activity+". ИИ не вправе менять эти флаги.";}
+    String aiContext(GameEngine g){if(!enabled)return "Ливия: дополнение отключено; не вводить её в сцену.";if(!survivor())return "Ливия: "+ending+". "+memory+" Не возвращать в сцену, не восстанавливать спутницу или роман.";if(witnessed(g)&&g.canonicalStage<3)return "Ливия: имперский капитан Хелгена. Ещё не наступила повторная встреча; не раскрывать её дальнейшую судьбу.";return "Ливия, имперский капитан, пережила нападение Алдуина. "+(witnessed(g)?"Приказала казнить героя в Хелгене.":"Герой не обязательно присутствовал на казни.")+" Этап "+stage+"/4, исход="+ending+", рядом="+active()+", роман="+romance+", доверие="+trust+", место="+location(g)+", эпилог="+epilogue+"/3, тактика="+stanceLabel()+", любовь="+life.love+", помолвка="+life.engaged+", свадьба="+life.married+", общий дом="+life.sharedHome+", занятие="+life.activity+", снаряжение="+life.gearLabel()+", отношения с отрядом="+life.groupSummary()+". ИИ не вправе менять эти флаги.";}
     GameEngine.Scene scene(GameEngine g){
         String body; GameEngine.Scene s;
         if(stage==0){
@@ -54,7 +54,7 @@ final class LiviaStory {
         }else{
             s=new GameEngine.Scene(TITLE,"Ливия | "+relation(),"Ливия поправляет перевязь меча. "+(romance?"Она берёт тебя за руку.":"Она оставляет тебе пространство для решения.")+"\n\nЛивия:\n— "+(romance?"Я хочу быть рядом не из долга, а по собственному выбору.":"Моё прошлое не изменится. Но я могу выбирать, что делать дальше.")+"\n\n"+status()+"\nДоверие "+trust+"/100 | Уважение "+respect+"/100 | Симпатия "+affection+"/100"+(memory.isEmpty()?"":"\n\n"+memory));
             if(!following&&trust>=35)s.add("LIVIA:join","Пригласить в отряд","Меч и щит");
-            if(following)s.add("LIVIA:leave","Отпустить спутницу","Вернётся в Мрачный замок");
+            if(following)s.add("LIVIA:leave","Отпустить спутницу","Вернётся: "+(life.sharedHome&&SolitudeHome.owns(g)?"Высокий шпиль":"Мрачный замок"));
             if(epilogueReady(g))s.add("LIVIA:epilogue:"+epilogue,epilogueTitle(),"Мрачный замок | Следующий шаг выбранного пути");
             if(following){s.add("LIVIA:stance","Изменить боевую тактику",stanceLabel());s.add("LIVIA:rest","Предложить привал","Восстановление запаса сил во время отдыха");}
             if(lastTalkDay!=g.day){s.add("LIVIA:talk","Поговорить откровенно","Доверие и симпатия");if(g.gold>=25)s.add("LIVIA:aid","Помочь семьям пострадавших","25 септимов; один раз за день");}
@@ -65,7 +65,7 @@ final class LiviaStory {
         return s.add("LIVIA:exit","Продолжить путь","Вернуться к приключению");
     }
     void choose(GameEngine g,String action){
-        if("LIVIA:open".equals(action)){if(available(g)){castleReturn=false;g.mode=MODE;}return;}
+        if("LIVIA:open".equals(action)){if(available(g)){castleReturn=false;homeReturn=false;g.mode=MODE;}return;}
         if(!enabled||!MODE.equals(g.mode)||!present(g)||g.solitude.custody()||g.road.pending()||(witnessed(g)&&g.canonicalStage<3))return;
         if("LIVIA:exit".equals(action)){exit(g);return;}
         switch(stage){
@@ -84,18 +84,18 @@ final class LiviaStory {
                     case "LIVIA:stance":if(following){stance=(stance+1)%3;remember(g,"Выбрана тактика: "+stanceLabel());}return;
                     case "LIVIA:rest":if(following&&g.restHours(2,false))remember(g,"После короткого привала Ливия восстановила силы.");return;
                     case "LIVIA:join":if(!following&&trust>=35){following=true;lastRestDay=g.day;remember(g,"Ливия согласилась путешествовать с тобой.");}return;
-                    case "LIVIA:leave":if(following){following=false;exit(g);remember(g,"Ливия вернулась в Мрачный замок.");}return;
-                    case "LIVIA:talk":if(lastTalkDay!=g.day){lastTalkDay=g.day;trust=clamp(trust+6);respect=clamp(respect+4);affection=clamp(affection+7);remember(g,"Вы обсудили прошлое и планы без взаимных обвинений.");}return;
+                    case "LIVIA:leave":if(following){following=false;exit(g);remember(g,"Ливия вернулась: "+location(g)+".");}return;
+                    case "LIVIA:talk":if(lastTalkDay!=g.day){lastTalkDay=g.day;trust=clamp(trust+6);respect=clamp(respect+4);affection=clamp(affection+7);remember(g,life.talk(g,this));}return;
                     case "LIVIA:aid":if(lastTalkDay!=g.day&&g.gold>=25){g.gold-=25;lastTalkDay=g.day;trust=clamp(trust+7);respect=clamp(respect+6);affection=clamp(affection+5);remember(g,"Вы передали припасы семьям пострадавших.");}return;
                     case "LIVIA:romance":if(!romance&&trust>=65&&respect>=50&&affection>=45){romance=true;life.love=Math.max(35,affection/2);remember(g,"Ливия ответила взаимностью. Вы договорились о свободном выборе и уважении.");}return;
-                    case "LIVIA:walk":case "LIVIA:date":if(romance&&lastDateDay!=g.day&&(!"LIVIA:walk".equals(action)||castle(g))){lastDateDay=g.day;dates=GameEngine.nonnegativeAdd(dates,1);affection=clamp(affection+5);trust=clamp(trust+3);life.love=clamp(life.love+8);remember(g,"LIVIA:walk".equals(action)?"Вы гуляли по Солитьюду, остановившись у морской арки.":"Вы провели вечер вместе, обсуждая будущее.");}return;
+                    case "LIVIA:walk":case "LIVIA:date":if(romance&&lastDateDay!=g.day&&(!"LIVIA:walk".equals(action)||castle(g))){lastDateDay=g.day;dates=GameEngine.nonnegativeAdd(dates,1);affection=clamp(affection+5);trust=clamp(trust+3);life.love=clamp(life.love+8);remember(g,life.date(g,"LIVIA:walk".equals(action)));}return;
                     case "LIVIA:break":if(romance){romance=false;life.endRomance();remember(g,"Вы расстались без принуждения и сохранили уважение.");}return;
                 }
         }
     }
     void finish(GameEngine g,String result){if(stage!=3)return;stage=4;ending=result;following=false;romance=false;life.endRomance();
         if("Возмездие".equals(result)){memory="Ливия отстранена от службы и передана военному суду.";g.mode="RESULT";g.message=memory;}
-        else if("Последний поединок".equals(result)){memory="Ливия погибла в поединке.";g.mode="RESULT";}
+        else if("Последний поединок".equals(result)){memory="Ливия погибла в поединке.";g.mode="RESULT";g.message=memory;}
         else {memory="Искупление".equals(result)?"Ливия сложила полномочия и обязалась помогать семьям погибших.":"Ливия приняла прощение и обязалась отвечать за свои приказы.";g.mode=MODE;}
         remember(g,memory);g.addXp(100);
     }
@@ -105,10 +105,10 @@ final class LiviaStory {
         try{g.sceneState.setContext(g.day,g.hour,g.progress.location);org.json.JSONArray facts=g.sceneState.npcFacts();for(int i=0;i<facts.length();i++){org.json.JSONObject n=facts.optJSONObject(i);if(n!=null&&matches(n.optString("title"))&&"DEAD".equals(n.optString("status")))g.sceneState.fixNpc(n.optString("id"),50,true);}}catch(Exception ignored){}
         return true;
     }
-    void defeatedInDuel(GameEngine g){if(stage==3&&"LIVIA_DUEL".equals(g.battleKind)){memory="Ливия остановила поединок, когда ты упал. Она не нанесла последнего удара. Ты можешь вернуться и принять решение.";g.message+="\n\n"+memory;}}
+    void defeatedInDuel(GameEngine g){if(stage==3&&"LIVIA_DUEL".equals(g.battleKind)){remember(g,"Ливия остановила поединок, когда ты упал. Она не нанесла последнего удара. Ты можешь вернуться и принять решение.");g.message+="\n\n"+memory;}}
     int assist(int turn,int remaining){if(!active()||turn%2!=0||remaining<=0||companionStamina<8)return 0;companionStamina-=8;return Math.min(remaining,8+Math.min(12,victories/3)+(stance==2?4:stance==1?-2:0)+life.bonus(true)+life.training/25);}
     int protect(int incoming){if(!active()||incoming<=1||companionStamina<4)return 0;int amount=Math.min(incoming-1,3+Math.min(4,victories/5)+(stance==1?3:stance==2?-1:0)+life.bonus(false)+life.training/25);if(amount>0)companionStamina-=4;return amount;}
     void victory(GameEngine g){if("LIVIA_DUEL".equals(g.battleKind)){finish(g,"Последний поединок");return;}if(active())victories=Math.min(1000,victories+1);}
-    JSONObject save() throws JSONException{return new JSONObject().put("enabled",enabled).put("following",following).put("romance",romance).put("stage",stage).put("trust",trust).put("respect",respect).put("affection",affection).put("lastTalkDay",lastTalkDay).put("lastDateDay",lastDateDay).put("victories",victories).put("ending",ending).put("memory",memory).put("epilogue",epilogue).put("lastEpilogueDay",lastEpilogueDay).put("dates",dates).put("stance",stance).put("companionStamina",companionStamina).put("lastRestDay",lastRestDay).put("castleReturn",castleReturn).put("history",history).put("life",life.save());}
-    static LiviaStory restore(JSONObject j){LiviaStory s=new LiviaStory();if(j==null)return s;s.enabled=j.optBoolean("enabled",true);s.stage=Math.max(0,Math.min(4,j.optInt("stage")));s.trust=clamp(j.optInt("trust"));s.respect=clamp(j.optInt("respect"));s.affection=clamp(j.optInt("affection"));s.lastTalkDay=j.optInt("lastTalkDay",-1);s.lastDateDay=j.optInt("lastDateDay",-1);s.victories=Math.max(0,Math.min(1000,j.optInt("victories")));s.ending=j.optString("ending","");s.memory=j.optString("memory","");s.epilogue=Math.max(0,Math.min(3,j.optInt("epilogue")));s.lastEpilogueDay=j.optInt("lastEpilogueDay",-1);s.dates=Math.max(0,j.optInt("dates"));s.stance=Math.max(0,Math.min(2,j.optInt("stance")));s.companionStamina=clamp(j.optInt("companionStamina",100));s.lastRestDay=j.optInt("lastRestDay",-1);s.castleReturn=j.optBoolean("castleReturn");JSONArray events=j.optJSONArray("history");if(events!=null)for(int i=Math.max(0,events.length()-100);i<events.length();i++){String item=events.optString(i);if(!item.isEmpty())s.history.put(item);}s.following=s.stage==4&&s.survivor()&&j.optBoolean("following");s.romance=s.stage==4&&s.survivor()&&j.optBoolean("romance");s.life=LiviaLife.restore(j.optJSONObject("life"),s);return s;}
+    JSONObject save() throws JSONException{return new JSONObject().put("enabled",enabled).put("following",following).put("romance",romance).put("stage",stage).put("trust",trust).put("respect",respect).put("affection",affection).put("lastTalkDay",lastTalkDay).put("lastDateDay",lastDateDay).put("victories",victories).put("ending",ending).put("memory",memory).put("epilogue",epilogue).put("lastEpilogueDay",lastEpilogueDay).put("dates",dates).put("stance",stance).put("companionStamina",companionStamina).put("lastRestDay",lastRestDay).put("castleReturn",castleReturn).put("homeReturn",homeReturn).put("history",history).put("life",life.save());}
+    static LiviaStory restore(JSONObject j){LiviaStory s=new LiviaStory();if(j==null)return s;s.enabled=j.optBoolean("enabled",true);s.stage=Math.max(0,Math.min(4,j.optInt("stage")));s.trust=clamp(j.optInt("trust"));s.respect=clamp(j.optInt("respect"));s.affection=clamp(j.optInt("affection"));s.lastTalkDay=j.optInt("lastTalkDay",-1);s.lastDateDay=j.optInt("lastDateDay",-1);s.victories=Math.max(0,Math.min(1000,j.optInt("victories")));s.ending=j.optString("ending","");s.memory=j.optString("memory","");s.epilogue=Math.max(0,Math.min(3,j.optInt("epilogue")));s.lastEpilogueDay=j.optInt("lastEpilogueDay",-1);s.dates=Math.max(0,j.optInt("dates"));s.stance=Math.max(0,Math.min(2,j.optInt("stance")));s.companionStamina=clamp(j.optInt("companionStamina",100));s.lastRestDay=j.optInt("lastRestDay",-1);s.castleReturn=j.optBoolean("castleReturn");s.homeReturn=j.optBoolean("homeReturn");JSONArray events=j.optJSONArray("history");if(events!=null)for(int i=Math.max(0,events.length()-100);i<events.length();i++){String item=events.optString(i);if(!item.isEmpty())s.history.put(item);}s.following=s.stage==4&&s.survivor()&&j.optBoolean("following");s.romance=s.stage==4&&s.survivor()&&j.optBoolean("romance");s.life=LiviaLife.restore(j.optJSONObject("life"),s);return s;}
 }
