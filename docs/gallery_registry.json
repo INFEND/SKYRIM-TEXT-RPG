@@ -5998,5 +5998,175 @@
       "Винтерхолд — Лагерь Братьев Бури",
       "Winterhold Stormcloak Camp"
     ]
+  },
+  {
+    "slug": "bards_leap_summit",
+    "name": "Пик Прыжок Барда",
+    "captions": [
+      "Водопад и обрыв над ущельем"
+    ],
+    "aliases": [
+      "Bard's Leap Summit"
+    ]
+  },
+  {
+    "slug": "deep_folk_crossing",
+    "name": "Переправа Глубинного Народа",
+    "captions": [
+      "Древний мост над горной рекой"
+    ],
+    "aliases": [
+      "Deep Folk Crossing"
+    ]
+  },
+  {
+    "slug": "gjukars_monument",
+    "name": "Монумент Гьюкара",
+    "captions": [
+      "Каменная стела в открытой тундре"
+    ],
+    "aliases": [
+      "Gjukar's Monument"
+    ]
+  },
+  {
+    "slug": "orphan_rock",
+    "name": "Одинокая скала",
+    "captions": [
+      "Скальный выступ и мост из упавшей сосны"
+    ],
+    "aliases": [
+      "Orphan Rock"
+    ]
+  },
+  {
+    "slug": "reachwind_eyrie",
+    "name": "Гнездо Ветров Предела",
+    "captions": [
+      "Башня над долиной Карта"
+    ],
+    "aliases": [
+      "Reachwind Eyrie"
+    ]
+  },
+  {
+    "slug": "ruins_of_bthalft",
+    "name": "Руины Бталфта",
+    "captions": [
+      "Древний механизм среди осенних руин"
+    ],
+    "aliases": [
+      "Ruins of Bthalft"
+    ]
+  },
+  {
+    "slug": "ruins_of_rkund",
+    "name": "Руины Ркунда",
+    "captions": [
+      "Разрушенные колонны на горном гребне"
+    ],
+    "aliases": [
+      "Ruins of Rkund"
+    ]
+  },
+  {
+    "slug": "thieves_guild",
+    "name": "Гильдия воров",
+    "captions": [
+      "Подземная цистерна Гильдии воров"
+    ],
+    "aliases": [
+      "Thieves Guild"
+    ]
+  },
+  {
+    "slug": "weynon_stones",
+    "name": "Камни Вейнон",
+    "captions": [
+      "Круг мегалитов среди снегов"
+    ],
+    "aliases": [
+      "Weynon Stones"
+    ]
+  },
+  {
+    "slug": "altar_of_thrond",
+    "name": "Алтарь Тронда",
+    "captions": [
+      "Каменный алтарь у входа в пещеру"
+    ],
+    "aliases": [
+      "Altar of Thrond"
+    ]
+  },
+  {
+    "slug": "brodir_grove",
+    "name": "Роща Бродир",
+    "captions": [
+      "Каменные столбы в роще на Солстейме"
+    ],
+    "aliases": [
+      "Brodir Grove"
+    ]
+  },
+  {
+    "slug": "frykte_peak",
+    "name": "Пик Фрикте",
+    "captions": [
+      "Скалистая вершина над заснеженным ущельем"
+    ],
+    "aliases": [
+      "Frykte Peak"
+    ]
+  },
+  {
+    "slug": "horker_island",
+    "name": "Остров хоркеров",
+    "captions": [
+      "Хоркеры на берегу скалистого острова"
+    ],
+    "aliases": [
+      "Horker Island"
+    ]
+  },
+  {
+    "slug": "hvitkald_peak",
+    "name": "Пик Хвиткальд",
+    "captions": [
+      "Снежная вершина над западным побережьем"
+    ],
+    "aliases": [
+      "Hvitkald Peak"
+    ]
+  },
+  {
+    "slug": "mortrag_peak",
+    "name": "Пик Мортраг",
+    "captions": [
+      "Вершина над ледниковой долиной"
+    ],
+    "aliases": [
+      "Mortrag Peak"
+    ]
+  },
+  {
+    "slug": "mount_moesring",
+    "name": "Гора Моэсринг",
+    "captions": [
+      "Высокий гребень над хребтом Солстейма"
+    ],
+    "aliases": [
+      "Mount Moesring"
+    ]
+  },
+  {
+    "slug": "stalhrim_source",
+    "name": "Источник сталгрима",
+    "captions": [
+      "Древние саркофаги со сталгримом"
+    ],
+    "aliases": [
+      "Stalhrim Source"
+    ]
   }
 ]
