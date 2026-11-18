@@ -11,7 +11,7 @@ class AiAtomicSaveTest(unittest.TestCase):
         for key in ("AI_PENDING_ACTION","AI_PENDING_DIE","AI_PENDING_CHECKS","AI_PENDING_SESSION"):
             self.assertIn(".remove("+key+")",helper)
         self.assertIn(".commit()",helper)
-        completed=ui.split("AiGameTurn completed=AiGameTurn.parseModel",1)[1].split("catch(Exception ex)",1)[0]
+        completed=ui.split("AiGameTurn completed=local?AiGameTurn.parseLocalModel",1)[1].split("catch(Exception ex)",1)[0]
         self.assertLess(completed.index("commitAiSave(next)"),completed.index("game=next"))
         self.assertLess(completed.index("game=next"),completed.index("enqueueLivingResult"))
     def test_previous_scene_precedes_optional_companion_context(self):
