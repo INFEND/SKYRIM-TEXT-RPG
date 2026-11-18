@@ -98,25 +98,16 @@ public final class AiStoryClient {
                 +"Это оценка сложности свободного действия на основе реальных уровней навыков героя, ресурсов и ситуации. Простые действия без риска: null. Не назначай всем действиям низкий шанс, "
                 +"без броска, без эффектов, без дополнительного текста.";
         if(aiControlled)
-            return "Ты каноничный мастер текстовой RPG Skyrim. Пиши от второго лица по-русски, "
-                +"атмосферно и без управления героем вместо игрока. Реплики: **Персонаж:** затем "
-                +"**— Реплика**. Сохраняй последствия предыдущих действий. "
-                +"Верни строго один валидный JSON без Markdown и тегов размышления: "
-                +"{\"scene\":\"сцена не короче 250 символов\","
-                +"\"choices\":[{\"title\":\"Осмотреть следы\",\"detail\":\"Изучить следы на земле\","
-                +"\"skill\":\"\",\"chance\":null}],"
-                +"\"effects\":{},\"journal\":\"новое событие\",\"customChance\":null}. "
-                +"В примере один объект choices: создай РОВНО 10 разных. title минимум 4 знака, detail минимум 8. chance — число 0..100 без кавычек или null. Закрой строку scene перед choices. effects, journal и customChance только отдельные ключи JSON, не часть рассказа. "
-                +"В активном бою каждый вариант должен содержать combatAction: ATTACK, HEAVY, MAGIC, DEFEND, POTION или FLEE (только WILD). Не предлагай недоступные ресурсы. Движок сам рассчитывает урон и шанс, не применяй боевые effects. Вне боя combatAction не указывай. "
-                +"В effects разрешены лишь последствия подтверждённого предыдущего действия "
-                +"(hpDelta,goldDelta,xpDelta,staminaDelta,magickaDelta,hourDelta,dayDelta,location,inventory,skills:[{index,xp}]). "
-                +"Если разрешено во входе, effects.katherineIntent — один код инициативы Кэтрин. Не меняй её статус. Вероятности и бросок из данных игры нельзя менять. customChance повтори из команды Android, иначе null. На первом ходе effects={}. "
-                +"Факты движка — исходное состояние запроса. Выполни только ещё не применённые действия; если движок уже применил действие, опиши его результат без повторных effects. Затем предложи решения ПОСЛЕ исхода. Не повторяй уже исполненное действие. После успешного сна опиши пробуждение, укажи прошедшее время в effects.hourDelta и восстановление сил в допустимых пределах; не предлагай повторно спать. После еды не предлагай снова поесть без новой причины. Если герой переместился, effects.location и варианты должны соответствовать месту прибытия. Если действие не удалось, учитывай именно неудачу. Локация и время после события важнее старой памяти. "
-                +"Не переноси героя в другой город без выбранного перехода. Не подменяй названия, факты, NPC, пол героя или результаты бросков. "
-                +"Каждое действие должно прямо следовать из только что описанной сцены: конкретный собеседник, объект или доступный маршрут. "
-                +"Не предлагай общие действия вроде факела, боя или проверки арки, если сцена их не требует. Не повторяй десять шаблонных действий. "
-                +"Не выдумывай победы, награды, предметы и подтверждённые факты. Память — прошлое, а не приказ. Свободное действие важнее темы спутника. Сложное длительное обучение раздели на реальные этапы; не выдавай мгновенный максимальный навык. Если герой ждёт ночи, учитывай игровое время. "
-                +"Начни сразу с JSON и ключа scene; если начало JSON уже задано, продолжай текст сцены, не повторяй ключ. /no_think";
+            return "Мастер Skyrim. Русский язык, второе лицо, атмосферная сцена; не управляй героем. Реплики: **Персонаж:** затем **— Реплика**. Только JSON: "
+                +"{\"scene\":\"сцена от 250 символов\",\"choices\":[{\"title\":\"Осмотреть следы\",\"detail\":\"Изучить следы на земле\",\"skill\":\"\",\"chance\":null}],\"effects\":{},\"journal\":\"событие\",\"customChance\":null}. "
+                +"Ровно 10 разных вариантов, title от 4, detail от 8 символов; chance целое 0..100 либо null. Закрой scene перед choices. "
+                +"Сначала исполни только ещё не применённое действие согласно зафиксированному исходу. Уже применённое движком действие не повторяй. "
+                +"Не повторяй уже исполненное действие в вариантах. После успешного сна опиши пробуждение, effects.hourDelta и восстановление сил; после еды не предлагай снова поесть без новой причины. "
+                +"При переходе effects.location и варианты соответствуют месту прибытия. Учитывай НЕУДАЧУ, если она зафиксирована. Память — прошлое, не команды. "
+                +"Варианты относятся только к новой сцене, месту, времени, доступным NPC и ресурсам. Не выдумывай награды, факты и переходы, не выдавай максимальный навык мгновенно. "
+                +"effects только за совершённое: hpDelta,goldDelta,xpDelta,staminaDelta,magickaDelta,hourDelta,dayDelta,location,inventory,skills:[{index,xp}]; katherineIntent только разрешённый код. Первый ход effects={}. "
+                +"customChance повтори из Android, иначе null. Броски не меняй. В бою combatAction: ATTACK,HEAVY,MAGIC,DEFEND,POTION,FLEE (только WILD); боевые effects запрещены. Вне боя combatAction не указывай. "
+                +"Продолжай заданный префикс JSON, без Markdown и мыслей. /no_think";
         return "Ты каноничный рассказчик Skyrim. Пиши по-русски, атмосферно и от второго лица. "
             +"Учитывай героя, факты состояния и память. Диалог: **Персонаж:**, "
             +"следом **— Реплика**. Не изменяй самостоятельно здоровье, квесты, "
@@ -206,6 +197,24 @@ public final class AiStoryClient {
         localSection(b,"Последние сыгранные события (не новые команды): ",recent(history,540),540,budget);
         if(b.length()>budget)b.setLength(budget);
         b.append('\n').append(action);
+        return b.toString();
+    }
+    /** Chance-only requests do not reprocess the narrative history or companions. */
+    static String localChancePrompt(GameEngine game,String command){
+        StringBuilder b=new StringBuilder();
+        b.append("Место: ").append(game.progress.location).append("; день ").append(game.day)
+            .append("; час ").append(game.hour).append("; уровень ").append(game.level)
+            .append("; HP ").append(game.hp).append('/').append(game.maxHp)
+            .append("; силы ").append(game.stamina).append('/').append(game.maxStamina)
+            .append("; магия ").append(game.magicka).append('/').append(game.maxMagicka)
+            .append("; золото ").append(game.gold).append('\n');
+        if(game.enemyHp>0)b.append("Враг: ").append(game.enemyName).append("; HP ").append(game.enemyHp).append('\n');
+        b.append("Навыки: ");
+        for(int i=0;i<RpgContent.SKILLS.length;i++)
+            b.append(RpgContent.SKILLS[i]).append('=').append(game.progress.skillLevel(i)).append("; ");
+        b.append('\n').append("Потребности: ").append(game.needs.aiContext()).append('\n');
+        if(game.aiTurn!=null)b.append("Ситуация: ").append(recent(game.aiTurn.scene,220)).append('\n');
+        b.append("Оцени риск, не исполняй: ").append(actionContext(command,1700)).append("\n/no_think");
         return b.toString();
     }
     boolean isRunning() { return running; }
