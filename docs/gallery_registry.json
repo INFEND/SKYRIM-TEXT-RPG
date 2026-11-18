@@ -5751,5 +5751,120 @@
     "aliases": [
       "Ramshackle Trading Post"
     ]
+  },
+  {
+    "name": "Истмарк - Имперский лагерь",
+    "slug": "eastmarch_imperial_camp",
+    "aliases": [
+      "Eastmarch Imperial Camp"
+    ],
+    "captions": [
+      "Лагерь в предгорьях Истмарка"
+    ]
+  },
+  {
+    "name": "Фолкрит - Имперский лагерь",
+    "slug": "falkreath_imperial_camp",
+    "aliases": [
+      "Falkreath Imperial Camp"
+    ],
+    "captions": [
+      "Палатки на поляне в хвойном лесу"
+    ]
+  },
+  {
+    "name": "Хьялмарк - Имперский лагерь",
+    "slug": "hjaalmarch_imperial_camp",
+    "aliases": [
+      "Hjaalmarch Imperial Camp"
+    ],
+    "captions": [
+      "Лагерь на сухом островке среди болот"
+    ]
+  },
+  {
+    "name": "Белый Берег - Имперский лагерь",
+    "slug": "pale_imperial_camp",
+    "aliases": [
+      "Pale Imperial Camp"
+    ],
+    "captions": [
+      "Снежный лагерь над северным морем"
+    ]
+  },
+  {
+    "name": "Имперский лагерь Предела",
+    "slug": "reach_imperial_camp",
+    "aliases": [
+      "Reach Imperial Camp"
+    ],
+    "captions": [
+      "Лагерь на каменном уступе над ущельем"
+    ]
+  },
+  {
+    "name": "Рифт - Имперский лагерь",
+    "slug": "rift_imperial_camp",
+    "aliases": [
+      "Rift Imperial Camp"
+    ],
+    "captions": [
+      "Лагерь в роще осенних осин"
+    ]
+  },
+  {
+    "name": "Имперский лагерь Вайтрана",
+    "slug": "whiterun_imperial_camp",
+    "aliases": [
+      "Whiterun Imperial Camp"
+    ],
+    "captions": [
+      "Лагерь в открытой тундре Вайтрана"
+    ]
+  },
+  {
+    "name": "Винтерхолд - Имперский лагерь",
+    "slug": "winterhold_imperial_camp",
+    "aliases": [
+      "Winterhold Imperial Camp"
+    ],
+    "captions": [
+      "Лагерь под заснеженными вершинами"
+    ]
+  },
+  {
+    "name": "Военный лагерь Маркарта — Империя",
+    "slug": "markarth_military_camp_imperial",
+    "captions": [
+      "Военный лагерь на берегу реки в Пределе"
+    ]
+  },
+  {
+    "name": "Военный лагерь Рифтена — Империя",
+    "slug": "riften_military_camp_imperial",
+    "captions": [
+      "Военный лагерь на склоне над озером"
+    ]
+  },
+  {
+    "name": "Военный лагерь Солитьюда — Империя",
+    "slug": "solitude_military_camp_imperial",
+    "captions": [
+      "Военный лагерь над морским заливом"
+    ]
+  },
+  {
+    "name": "Военный лагерь Вайтрана — Империя",
+    "slug": "whiterun_military_camp_imperial",
+    "captions": [
+      "Военный лагерь у перекрёстка под Вайтраном"
+    ]
+  },
+  {
+    "name": "Военный лагерь Виндхельма — Империя",
+    "slug": "windhelm_military_camp_imperial",
+    "captions": [
+      "Военный лагерь у замёрзшей реки"
+    ]
   }
 ]
