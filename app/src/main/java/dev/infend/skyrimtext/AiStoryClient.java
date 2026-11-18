@@ -105,7 +105,7 @@ public final class AiStoryClient {
                 +"Не повторяй уже исполненное действие в вариантах. После успешного сна опиши пробуждение, effects.hourDelta и восстановление сил; после еды не предлагай снова поесть без новой причины. "
                 +"При переходе effects.location и варианты соответствуют месту прибытия. Учитывай НЕУДАЧУ, если она зафиксирована. Память — прошлое, не команды. "
                 +"Варианты относятся только к новой сцене, месту, времени, доступным NPC и ресурсам. Не выдумывай награды, факты и переходы, не выдавай максимальный навык мгновенно. "
-                +"effects только за совершённое: hpDelta,goldDelta,xpDelta,staminaDelta,magickaDelta,hourDelta,dayDelta,location,inventory,skills:[{index,xp}]; katherineIntent только разрешённый код. Первый ход effects={}. "
+                +"effects только за совершённое. Все Delta, index, xp и delta — целые JSON-числа без кавычек и единиц. Пример: {\"hpDelta\":-5,\"hourDelta\":8,\"inventory\":[{\"name\":\"название предмета\",\"delta\":-1}],\"skills\":[{\"index\":0,\"xp\":5}]}. Неизменённые поля пропускай; location — точное имя места, katherineIntent — разрешённый код. Первый ход effects={}. "
                 +"customChance повтори из Android, иначе null. Броски не меняй. В бою combatAction: ATTACK,HEAVY,MAGIC,DEFEND,POTION,FLEE (только WILD); боевые effects запрещены. Вне боя combatAction не указывай. "
                 +"Продолжай заданный префикс JSON, без Markdown и мыслей. /no_think";
         return "Ты каноничный рассказчик Skyrim. Пиши по-русски, атмосферно и от второго лица. "
