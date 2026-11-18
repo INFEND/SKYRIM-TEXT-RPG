@@ -96,7 +96,7 @@ public final class AiStoryClient {
         if(chanceOnly)
             return "Ты мастер Skyrim. Верни только JSON, например {\"customChance\":42} или {\"customChance\":null}. "
                 +"Это оценка сложности свободного действия на основе реальных уровней навыков героя, ресурсов и ситуации. Простые действия без риска: null. Не назначай всем действиям низкий шанс, "
-                +"без броска, без эффектов, без дополнительного текста.";
+                +"без броска, без эффектов, без дополнительного текста. /no_think";
         if(aiControlled)
             return "Мастер Skyrim. Русский язык, второе лицо, атмосферная сцена; не управляй героем. Реплики: **Персонаж:** затем **— Реплика**. Только JSON: "
                 +"{\"scene\":\"сцена от 250 символов\",\"choices\":[{\"title\":\"Осмотреть следы\",\"detail\":\"Изучить следы на земле\",\"skill\":\"\",\"chance\":null}],\"effects\":{},\"journal\":\"событие\",\"customChance\":null}. "
@@ -111,7 +111,7 @@ public final class AiStoryClient {
         return "Ты каноничный рассказчик Skyrim. Пиши по-русски, атмосферно и от второго лица. "
             +"Учитывай героя, факты состояния и память. Диалог: **Персонаж:**, "
             +"следом **— Реплика**. Не изменяй самостоятельно здоровье, квесты, "
-            +"инвентарь или локацию. Не управляй героем. Верни только сюжетный текст.";
+            +"инвентарь или локацию. Не управляй героем. Верни только сюжетный текст. /no_think";
     }
     private static String genderInstruction(GameEngine game){
         return CharacterIdentity.FEMALE.equals(game.gender)?
@@ -137,7 +137,7 @@ public final class AiStoryClient {
     }
     static String localUserPrompt(GameEngine game,String history,String command,boolean aiControlled){
         final int limit=3200;
-        String action="ТЕКУЩЕЕ ДЕЙСТВИЕ И ПОДТВЕРЖДЁННЫЙ ИСХОД (ВЫПОЛНИ ОДИН РАЗ; ВАРИАНТЫ ТОЛЬКО ПОСЛЕ НЕГО):\n"+actionContext(command,1700)+"\n/no_think";
+        String action="ТЕКУЩЕЕ ДЕЙСТВИЕ И ПОДТВЕРЖДЁННЫЙ ИСХОД (ВЫПОЛНИ ОДИН РАЗ; ВАРИАНТЫ ТОЛЬКО ПОСЛЕ НЕГО):\n"+actionContext(command,1700);
         int budget=limit-action.length()-1;
         StringBuilder b=new StringBuilder();
         b.append("ФАКТЫ ДВИЖКА НА МОМЕНТ ЗАПРОСА (ВАЖНЕЕ ПАМЯТИ):\n");
