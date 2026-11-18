@@ -121,6 +121,39 @@ public class AiModelCompatibilityTest {
             catch(JSONException expected){}
         }
     }
+    @Test public void invalidOptionalXpNeverBlocksValidSceneEffects() throws Exception {
+        for(Object invalid:new Object[]{251,10000,-1,"999999999999999999999","12.5","не знаю",true}){
+            GameEngine g=effectGame();
+            int previous=g.progress.skillXp[0], level=g.progress.skillLevel(0);
+            JSONObject e=new JSONObject().put("hourDelta",8).put("hpDelta",10)
+                .put("skills",new JSONArray().put(new JSONObject().put("index",0).put("xp",invalid)));
+            AiGameTurn turn=AiGameTurn.parseLocalModel(scene().put("effects",e).toString(),15);
+            turn.apply(g,true);
+            assertEquals(18,g.hour);assertEquals(60,g.hp);
+            assertEquals(previous,g.progress.skillXp[0]);assertEquals(level,g.progress.skillLevel(0));
+            assertEquals(15,turn.customChance);
+        }
+    }
+    @Test public void validSkillRewardSurvivesInvalidAndDuplicateRewards() throws Exception {
+        GameEngine expected=effectGame(),actual=effectGame();
+        expected.progress.skillExperience(expected,0,20);
+        JSONArray skills=new JSONArray().put(new JSONObject().put("index",0).put("xp",500))
+            .put(new JSONObject().put("index",0).put("xp","20"))
+            .put(new JSONObject().put("index",0).put("xp",250));
+        JSONObject e=new JSONObject().put("skills",skills).put("xpDelta",-100);
+        AiGameTurn.parseModel(scene().put("effects",e).toString(),15).apply(actual,true);
+        assertEquals(expected.progress.skillXp[0],actual.progress.skillXp[0]);
+        assertEquals(expected.progress.skillLevel(0),actual.progress.skillLevel(0));
+        assertEquals(expected.xp,actual.xp);
+    }
+    @Test public void invalidHeroXpDoesNotBlockOtherEffects() throws Exception {
+        for(Object invalid:new Object[]{10001,-1,"500.5",true}){
+            GameEngine g=effectGame();int xp=g.xp;
+            JSONObject e=new JSONObject().put("xpDelta",invalid).put("goldDelta",5);
+            AiGameTurn.parseModel(scene().put("effects",e).toString(),15).apply(g,true);
+            assertEquals(105,g.gold);assertEquals(xp,g.xp);
+        }
+    }
     @Test public void exactDecimalChanceIsAcceptedButNotFractionalChance() throws Exception {
         assertEquals(42,AiGameTurn.parseChance("{\"customChance\":\"+42.0%\"}"));
         try{AiGameTurn.parseChance("{\"customChance\":\"42.5%\"}");fail();}

@@ -85,11 +85,26 @@ public final class AiGameTurn {
     private static void normalizeOptionalModelField(JSONObject object,String key){
         if(object.has(key)&&absentModelValue(object.opt(key)))object.remove(key);
     }
+    // Optional XP rewards must never make a completed model scene unplayable.
+    // Drop invalid rewards instead of granting a maximum or guessing an amount.
+    private static boolean normalizeModelXp(JSONObject object,String key,int limit)throws JSONException{
+        try{
+            normalizeModelInt(object,key,true);
+            if(!object.has(key))return false;
+            int amount=change(object,key,limit);
+            if(amount>=0)return true;
+        }catch(JSONException ignored){}
+        object.remove(key);
+        return false;
+    }
     private static void normalizeModelEffects(JSONObject root)throws JSONException{
         normalizeOptionalModelField(root,"effects");
         JSONObject e=root.optJSONObject("effects");
         if(e==null)return; // parseInternal still rejects malformed non-object effects.
-        for(String field:MODEL_DELTAS)normalizeModelInt(e,field,true);
+        for(String field:MODEL_DELTAS){
+            if("xpDelta".equals(field))normalizeModelXp(e,field,10000);
+            else normalizeModelInt(e,field,true);
+        }
         for(String field:new String[]{"location","quest","questStatus","katherineIntent",
                 "inventory","skills","enemy","sceneFacts"})normalizeOptionalModelField(e,field);
         JSONArray inventory=e.optJSONArray("inventory");
@@ -98,12 +113,21 @@ public final class AiGameTurn {
             if(item!=null)normalizeModelInt(item,"delta",true);
         }
         JSONArray skills=e.optJSONArray("skills");
-        if(skills!=null)for(int i=0;i<skills.length();i++){
-            JSONObject skill=skills.optJSONObject(i);
-            if(skill!=null){
+        if(skills!=null){
+            JSONArray valid=new JSONArray();
+            HashSet<Integer> rewarded=new HashSet<>();
+            for(int i=0;i<skills.length();i++){
+                JSONObject skill=skills.optJSONObject(i);
+                if(skill==null)throw new JSONException("Неверный навык");
                 normalizeModelInt(skill,"index",false);
-                normalizeModelInt(skill,"xp",true);
+                Object rawIndex=skill.opt("index");
+                if(!(rawIndex instanceof Number))throw new JSONException("Индекс навыка должен быть целым числом");
+                int index=((Number)rawIndex).intValue();
+                if(index<0||index>=RpgContent.SKILLS.length)throw new JSONException("Неверный индекс навыка");
+                if(normalizeModelXp(skill,"xp",250)&&skill.optInt("xp")>0&&rewarded.add(index))
+                    valid.put(skill);
             }
+            e.put("skills",valid);
         }
         JSONObject enemy=e.optJSONObject("enemy");
         if(enemy!=null){
