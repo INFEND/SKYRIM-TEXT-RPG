@@ -25,7 +25,7 @@ final class LiviaStory {
     String location(GameEngine g){return active()?g.progress.location:life.sharedHome&&SolitudeHome.owns(g)?"Высокий шпиль, Солитьюд":"Мрачный замок, Солитьюд";}
     boolean epilogueReady(GameEngine g){return stage==4&&survivor()&&epilogue<3&&lastEpilogueDay!=g.day&&castle(g)&&g.hour>=8&&g.hour<=20;}
     void rest(int hours){if(active())companionStamina=Math.min(100,companionStamina+Math.min(24,Math.max(0,hours))*12);}
-    void daily(GameEngine g){if(active()&&lastRestDay!=g.day){if(lastRestDay>=0)companionStamina=Math.min(100,companionStamina+30);lastRestDay=g.day;}life.daily(g,this);}
+    void daily(GameEngine g){if(active()&&lastRestDay!=g.day){if(lastRestDay>=0)companionStamina=Math.min(100,companionStamina+30);lastRestDay=g.day;}if(!g.aiNarrativeMode)life.daily(g,this);}
     void exit(GameEngine g){g.mode=homeReturn&&SolitudeCity.here(g)&&SolitudeHome.owns(g)?SolitudeHome.MODE:castleReturn&&SolitudeCity.here(g)?SolitudeCity.PREFIX+"1":"WORLD";castleReturn=false;homeReturn=false;}
     static boolean matches(String name){return name!=null&&(NAME.equalsIgnoreCase(name)||"Имперский капитан".equalsIgnoreCase(name)||"Имперский капитан Хелгена".equalsIgnoreCase(name)||"Капитан Хелгена".equalsIgnoreCase(name));}
     static int clamp(int n){return Math.max(0,Math.min(100,n));}

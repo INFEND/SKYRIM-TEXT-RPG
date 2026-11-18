@@ -137,7 +137,7 @@ public final class MainActivity extends Activity {
         ItemCatalog.initialize(this);
         AmoledAppearance.load(this);
         SovngardeTypeface.preload(this);
-        game=GameEngine.fromJson(prefs.getString("save",null));
+        game=GameEngine.fromJson(prefs.getString("save",null),prefs.getBoolean("ai_enabled",false));
         if(bundle!=null){
             itachiReplaceTarget=bundle.getString("itachi_replace_target","");
             draftName=bundle.getString("hero_name","");
@@ -1149,6 +1149,7 @@ public final class MainActivity extends Activity {
     }
 
     private void render(){
+        game.setAiNarrativeMode(prefs.getBoolean("ai_enabled",false));
         closeLivingDialog();
         clearAiLiveViews();
         rememberViewport();
@@ -1528,7 +1529,8 @@ public final class MainActivity extends Activity {
             game.alma.enabled=prefs.getBoolean("alma_enabled",true);
             game.livia.enabled=prefs.getBoolean("livia_enabled",true);
             game.itachi.enabled=prefs.getBoolean("itachi_enabled",true);
-            if(selectedStart==0)game.choose("CANON_OPEN");
+            if(selectedStart==0&&!game.aiNarrativeMode)game.choose("CANON_OPEN");
+            game.setAiNarrativeMode(prefs.getBoolean("ai_enabled",false));
             tab=0;save();render();
         });
         addText(content,"Неофициальная самостоятельная история в знакомом северном мире.",12,MUTED,false,0);
@@ -1608,12 +1610,11 @@ public final class MainActivity extends Activity {
         }
     }
     private void renderStory(){
-        boolean canonical="CANON".equals(game.mode)||("COMBAT".equals(game.mode)&&("CANONICAL".equals(game.battleKind)||"FACTION".equals(game.battleKind)));
-        canonical=canonical||ItachiStory.MODE.equals(game.mode)||LiviaStory.MODE.equals(game.mode)||("COMBAT".equals(game.mode)&&"LIVIA_DUEL".equals(game.battleKind))||KatherineStory.MODE.equals(game.mode)||AlmaStory.MODE.equals(game.mode)||("COMBAT".equals(game.mode)&&("KATHERINE".equals(game.battleKind)||"ALMA".equals(game.battleKind)));
-        canonical=canonical||game.road.pending()||RoadEvents.MODE.equals(game.mode)||("COMBAT".equals(game.mode)&&game.battleKind.startsWith("ROAD_QUEST:"));
-        canonical=canonical||SolitudeCity.isMode(game.mode);
-        if(prefs.getBoolean("ai_enabled",false)&&!canonical&&"WORLD".equals(game.mode)&&!game.road.pending())renderCityArchitecture();
-        if(prefs.getBoolean("ai_enabled",false)&&!canonical){renderAiGame();return;}
+        boolean nativeScene=game.nativeSceneRequired();
+        if(game.aiNarrativeMode&&!nativeScene){
+            if("WORLD".equals(game.mode))renderCityArchitecture();
+            renderAiGame();return;
+        }
         GameEngine.Scene s=game.scene();section(s.kicker,s.title,"");
         if(LiviaStory.MODE.equals(game.mode)&&game.livia.stage==4&&game.livia.survivor())actionButton("Ливия | Спутница и отношения",game.livia.life.gearLabel(),false,()->npcDetails(LiviaStory.NAME));
         if(LocationGalleryView.hasGallery(game.progress.location)){
@@ -1637,7 +1638,7 @@ public final class MainActivity extends Activity {
         if(battleSummaryPending){battleSummaryPending=false;boolean defeated="DEFEAT".equals(game.mode);if(visual(defeated?"defeat":"victory"))showBattleSummary(defeated);}
         renderItemGains();
         renderStoryJournal();
-        if(prefs.getBoolean("ai_enabled",false)&&!game.road.pending()&&!game.solitude.custody()) renderAiStoryPanel();
+        // Mandatory native resolution and explicit city menus are not a second AI chat.
         space(content,12);
         if("WORLD".equals(game.mode)&&!game.road.pending())renderCityArchitecture();
         addText(content,"Что ты предпримешь?",22,TEXT,true,7);
@@ -1950,11 +1951,6 @@ public final class MainActivity extends Activity {
 
     /** AI mode replaces the entire offline story, not just its dialogue panel. */
     private void renderAiGame(){
-        if(game.itachi.available(game)&&!livingBusy())actionButton("Итачи",game.itachi.objective(game),false,()->{game.choose("ITACHI:open");save();render();});
-        if(game.livia.available(game)&&!livingBusy())actionButton("Ливия",game.livia.objective(),false,()->{game.choose("LIVIA:open");save();render();});
-        if(game.alma.available(game)&&!livingBusy())actionButton("Альма","Алая Бессмертная | "+game.alma.status(),false,()->{game.choose("ALMA:open");save();render();});
-        if(game.katherine.available(game)&&!livingBusy())actionButton("Кэтрин","Нулевой Предел | "+game.katherine.status(),false,()->{game.choose("KATH:open");save();render();});
-        if(game.katherine.active()&&!game.katherine.lastRemark.isEmpty()){LinearLayout npc=card();addText(npc,"КЭТРИН | ЛИЧНАЯ ИНИЦИАТИВА",12,accent(),true,6);addText(npc,game.katherine.lastRemark,14,TEXT,false,6);}
         String source=resolvedAiProvider();
         boolean ready="local".equals(source)?localModelReady():
             "chatgpt".equals(source)?chatGptOAuth.hasAuthorizedPlan():
@@ -2372,7 +2368,7 @@ public final class MainActivity extends Activity {
     }
     private void requestAiTurn(String instruction,boolean actionResolved,
                                boolean proposalOnly,int expectedChance,String customAction,int repairAttempt){
-        if(aiTurnBusy||aiClient.isRunning()||localAiClient.isRunning()||!game.started)return;
+        if(!game.aiNarrativeMode||aiTurnBusy||aiClient.isRunning()||localAiClient.isRunning()||!game.started||game.nativeSceneRequired())return;
         final String source=resolvedAiProvider();
         final boolean local="local".equals(source),chat="chatgpt".equals(source);
         final String model=local?"Qwen3.5-9B":prefs.getString(chat?"ai_chatgpt_model":"ai_api_model",
@@ -2451,13 +2447,13 @@ public final class MainActivity extends Activity {
                     AiGameTurn completed=local?AiGameTurn.parseLocalModel(answer,expectedChance):AiGameTurn.parseModel(answer,expectedChance);
                     if(expectedChance!=-2&&completed.customChance!=expectedChance)
                         throw new IllegalStateException("ИИ изменил шанс после броска");
-                    GameEngine next=GameEngine.fromJson(saved);
+                    GameEngine next=GameEngine.fromJson(saved,true);
                     java.util.Map<String,Integer> before=itemSnapshot(next);
                     VisualSnapshot visualBefore=new VisualSnapshot(next);
                     if(actionResolved)FixShopAiContext.commitRetry(next,prefs.getInt(AI_PENDING_FATE,-1));
                     completed.apply(next,actionResolved);
                     next.progress.sync(next);
-                    next.katherine.observeTravel(next);next.katherine.autonomous(next);next.alma.observeTravel(next);
+                    next.katherine.observeTravel(next); // Factual location only; no scripted NPC initiative.
                     if(actionResolved){if(expectedChance>=0){next.lastCheckChance=expectedChance;next.lastCheckRoll=prefs.getInt(AI_PENDING_DIE,-1);}recordVisual(visualBefore,next,completed.journal.isEmpty()?"Продолжение истории":completed.journal);LockedChecks lockedChecks=LockedChecks.restore(prefs.getString(AI_PENDING_CHECKS,""));if(lockedChecks!=null)next.lastLivingResult.put("checks",lockedChecks.snapshot());}
                     else next.recordVisualEvent(completed.journal.isEmpty()?"Продолжение истории":completed.journal);
                     next.aiTurn=completed;
@@ -3192,7 +3188,12 @@ public final class MainActivity extends Activity {
                 VisualSnapshot visualBefore=new VisualSnapshot(game,"LOC:"+place.name);
                 game.choose("LOC:"+place.name);game.progress.sync(game);
                 captureItemGains(before,game,false);recordVisual(visualBefore,game,place.name);
-                save();tab=0;render();
+                if(game.aiNarrativeMode&&!game.nativeSceneRequired()){
+                    String outcome=game.message;game.aiTurn=null;selectedAiChoices.clear();aiOwnDraft="";clearAiDraft();clearAiPending();
+                    aiMemory.add(aiSession,"event",outcome);save();tab=0;
+                    requestAiTurn("Движок уже разрешил переход: "+outcome+"\nОпиши фактическое прибытие, не повторяй перемещение и эффекты. Создай новые варианты.",false);
+                    if(!aiTurnBusy)render();
+                }else{save();tab=0;render();}
             });
             space(footer,6);
         }
@@ -4278,9 +4279,9 @@ public final class MainActivity extends Activity {
         if(!game.fixShop.world.characters.isEmpty())actionButton("Авторские персонажи","Спутники и отношения",false,this::fixCharacters);
         if(game.fixShop.world.storageAccess(game))actionButton("Хранилище поместий","Личный сундук",false,this::fixStorage);
         for(int i=0;i<FixShopAdventure.TITLES.length;i++)if(FixShopAdventure.stage(game,i)>0){final int n=i;actionButton(FixShopAdventure.TITLES[i],FixShopAdventure.objective(game,i),false,()->{if(livingBusy())return;closeLivingDialog();tab=0;render();});}
-        if(game.katherine.enabled&&game.katherine.stage>0){LinearLayout k=card();addText(k,"НУЛЕВОЙ ПРЕДЕЛ | КРУГ ТРЁХ КОГТЕЙ",13,accent(),true,8);addText(k,game.katherine.objective(),15,TEXT,false,8);if(game.katherine.available(game))actionButton("Поговорить с Кэтрин","Продолжить расследование",false,()->{if(livingBusy())return;game.choose("KATH:open");save();tab=0;render();});}
+        if(game.katherine.enabled&&game.katherine.stage>0){LinearLayout k=card();addText(k,"НУЛЕВОЙ ПРЕДЕЛ | КРУГ ТРЁХ КОГТЕЙ",13,accent(),true,8);addText(k,game.katherine.objective(),15,TEXT,false,8);if(!game.aiNarrativeMode&&game.katherine.available(game))actionButton("Поговорить с Кэтрин","Продолжить расследование",false,()->{if(livingBusy())return;game.choose("KATH:open");save();tab=0;render();});}
         if(game.itachi.enabled&&game.itachi.stage>0)actionButton("Итачи | "+game.itachi.relation(),game.itachi.objective(game),false,()->npcDetails(ItachiStory.NAME));
-        if(game.livia.enabled&&game.livia.stage>0)actionButton(LiviaStory.TITLE,game.livia.objective(),false,()->{if(!livingBusy()&&game.livia.available(game)){game.choose("LIVIA:open");save();tab=0;render();}else npcDetails(LiviaStory.NAME);});
+        if(game.livia.enabled&&game.livia.stage>0)actionButton(LiviaStory.TITLE,game.livia.objective(),false,()->{if(!game.aiNarrativeMode&&!livingBusy()&&game.livia.available(game)){game.choose("LIVIA:open");save();tab=0;render();}else npcDetails(LiviaStory.NAME);});
         if(game.alma.enabled&&game.alma.stage>0)actionButton("Алая Бессмертная",game.alma.objective()+" | "+game.alma.stage+"/12",false,()->new RuneDialogBuilder(this,accent()).setTitle("Алая Бессмертная").setMessage(game.alma.objective()+"\n\n"+(game.alma.companion?"Альма путешествует с тобой.":game.alma.terminalLoss()?"История завершена.":"Ищи Альму: "+game.alma.location(game))).setPositiveButton("Закрыть",null).show());
         String[] entries=game.aiJournal.isEmpty()?
             new String[]{"Путь Довакина","Драконий след","Пепельные печати","Опасные дороги"}:
@@ -5125,10 +5126,14 @@ public final class MainActivity extends Activity {
         aiToggle.setThumbTintList(ColorStateList.valueOf(accent()));
         aiToggle.setChecked(prefs.getBoolean("ai_enabled",false));
         aiToggle.setOnCheckedChangeListener((v,on)->{
+            if(on==prefs.getBoolean("ai_enabled",false))return;
+            if(!pendingAiAction().isEmpty()||aiTurnBusy){v.setChecked(!on);toast("Сначала заверши или отмени текущий ход");return;}
+            cancelAiForSourceChange();
             prefs.edit().putBoolean("ai_enabled",on).apply();
-            if(!on){
-                cancelAiForSourceChange();
-            }
+            game.setAiNarrativeMode(on);
+            game.aiTurn=null;selectedAiChoices.clear();aiOwnDraft="";clearAiDraft();clearAiPending();
+            aiTurnStatus="";aiMemory.add(aiSession,"event","Режим повествования изменён. Продолжай из текущего состояния мира, не повторяй старые сцены.");
+            save();
         });
         aiCard.addView(aiToggle,lp(-1,48));
         String provider=aiProviderMode();
@@ -5293,7 +5298,7 @@ public final class MainActivity extends Activity {
         new RuneDialogBuilder(this,accent()).setTitle("Восстановление").setView(e).setNegativeButton("Отмена",null)
             .setPositiveButton("Загрузить",(d,w)->{
                 try{JSONObject json=new JSONObject(e.getText().toString());if(json.optInt("schema")!=1 || !json.optBoolean("started"))throw new Exception();
-                    game=GameEngine.fromJson(json.toString());newAiSession();aiMemory.importSession(aiSession,json.optJSONArray("ai_history"));tab=0;save();render();toast("Сохранение восстановлено");
+                    game=GameEngine.fromJson(json.toString(),prefs.getBoolean("ai_enabled",false));newAiSession();aiMemory.importSession(aiSession,json.optJSONArray("ai_history"));tab=0;save();render();toast("Сохранение восстановлено");
                 }catch(Exception ex){toast("Неверный код сохранения");}
             }).show();
     }

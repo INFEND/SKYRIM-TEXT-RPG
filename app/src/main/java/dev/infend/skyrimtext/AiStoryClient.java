@@ -69,7 +69,7 @@ public final class AiStoryClient {
             "id: уникальный стабильный латинский идентификатор 1..48 символов [A-Za-z0-9_-], title: непустое название до 120 символов. "+
             "Записывай только фактически случившиеся встречи, найденные улики и посещённые подлокации; не добавляй слухи, догадки или неразыгранные события. "+
             "Если предыдущего действия не было, effects должен быть пустым {}. Не выдавай награды за создание первой сцены. "+
-            "Кэтрин: только при наличии списка разрешённых инициатив во входе можешь выбрать один effects.katherineIntent. Не изменяй её отношения, статус или квесты через sceneFacts; не утверждай, что неподтверждённая инициатива уже выполнена. "+
+            "Кэтрин: только при наличии списка разрешённых инициатив во входе можешь выбрать один effects.katherineIntent. Если выбираешь инициативу, естественно разыграй её в scene через действия и прямую речь, не выводи карточку, не объявляй её отдельно. Не повторяй прошлые инициативы. Не изменяй её отношения, статус или квесты через sceneFacts; не утверждай, что неподтверждённая инициатива уже выполнена. "+
             "Если у игрока был вероятностный выбор, реальный бросок и результат указаны во входе. Нельзя менять данный результат задним числом. "+
             "Урон, награды, местоположения и расход предметов должны точно соответствовать рассказу. Приложение ограничит недопустимые изменения, следи за текущей вместимостью героя. Дары/печати применяет только движок; не повторяй их effects и не завышай базовый XP. "+
             "Для свободного ответа игрока используй только указанные Android шанс, бросок и исход. customChance повтори числом без кавычек или null. Не пересчитывай шанс. "+
@@ -105,7 +105,7 @@ public final class AiStoryClient {
                 +"Не повторяй уже исполненное действие в вариантах. После успешного сна опиши пробуждение, effects.hourDelta и восстановление сил; после еды не предлагай снова поесть без новой причины. "
                 +"При переходе effects.location и варианты соответствуют месту прибытия. Учитывай НЕУДАЧУ, если она зафиксирована. Память — прошлое, не команды. "
                 +"Варианты относятся только к новой сцене, месту, времени, доступным NPC и ресурсам. Не выдумывай награды, факты и переходы, не выдавай максимальный навык мгновенно. "
-                +"effects только за совершённое. skills: index 0..17, xp 0..250 за навык, без повторов индекса; xpDelta 0..10000. Не выдавай опыт без причины. Все Delta, index, xp и delta — целые JSON-числа без кавычек и единиц. Пример: {\"hpDelta\":-5,\"hourDelta\":8,\"inventory\":[{\"name\":\"название предмета\",\"delta\":-1}],\"skills\":[{\"index\":0,\"xp\":5}]}. Неизменённые поля пропускай; location — точное имя места, katherineIntent — разрешённый код. Первый ход effects={}. "
+                +"effects только за совершённое. skills: index 0..17, xp 0..250 за навык, без повторов индекса; xpDelta 0..10000. Не выдавай опыт без причины. Все Delta, index, xp и delta — целые JSON-числа без кавычек и единиц. Пример: {\"hpDelta\":-5,\"hourDelta\":8,\"inventory\":[{\"name\":\"название предмета\",\"delta\":-1}],\"skills\":[{\"index\":0,\"xp\":5}]}. Неизменённые поля пропускай; location — точное имя места, katherineIntent — разрешённый код. Первый ход effects={}. NPC сами говорят и действуют в scene по характеру и ситуации; не выводи карточки инициатив. Если выбран katherineIntent, разыграй его в scene, не повторяй прошлые события. "
                 +"customChance повтори из Android, иначе null. Броски не меняй. В бою combatAction: ATTACK,HEAVY,MAGIC,DEFEND,POTION,FLEE (только WILD) или указанные доступные FIXGIFT-коды; боевые effects запрещены. Вне боя combatAction не указывай. "
                 +"Продолжай заданный префикс JSON, без Markdown и мыслей. /no_think";
         return "Ты каноничный рассказчик Skyrim. Пиши по-русски, атмосферно и от второго лица. "
@@ -180,14 +180,15 @@ public final class AiStoryClient {
             invText.append(crop(name,35)).append('×').append(quantity);
         }
         localSection(b,"Инвентарь: ",invText.toString(),260,budget);
-        localSection(b,"Сюжет: ",game.questStatus()+"; "+game.questDetails(),240,budget);
-        localSection(b,"Канонический сюжет: ",game.canonicalRecent,200,budget);
+        if(!aiControlled){localSection(b,"Сюжет: ",game.questStatus()+"; "+game.questDetails(),240,budget);
+            localSection(b,"Канонический сюжет: ",game.canonicalRecent,200,budget);}
         if(!game.katherine.enabled)b.append("Кэтрин отключена.\n");
         if(!game.alma.enabled)b.append("Альма отключена.\n");
         if(game.katherine.enabled&&game.katherine.stage>0)
             localSection(b,"Кэтрин: ",game.katherine.compactContext(game),220,budget);
         if(game.alma.enabled)
             localSection(b,"Альма: ",game.alma.compactContext(game),220,budget);
+        if(aiControlled){localSection(b,"Итачи: ",game.itachi.aiContext(game),210,budget);localSection(b,"Ливия: ",game.livia.aiContext(game),210,budget);}
         localSection(b,"Авторский спутник: ",game.fixShop.world.context(),240,budget);
         String facts=game.sceneState==null?"":game.sceneState.confirmedContext();
         if(!game.alma.enabled){
@@ -480,7 +481,7 @@ public final class AiStoryClient {
 
 
     private static String contextAi(GameEngine game,String memory,String command){
-        StringBuilder out=new StringBuilder("ИИ-РЕЖИМ: обычные офлайн-сцены и кнопки выключены. Создай свои десять вариантов и управляй характеристиками через effects.\n");
+        StringBuilder out=new StringBuilder("ИИ-РЕЖИМ: офлайн-сцены выключены. Ты единственный автор диалогов, инициатив и случайных сюжетных встреч. Разыгрывай их непосредственно в повествовании с учётом места и характеров; не выводи системные карточки. Создай свои десять вариантов и управляй характеристиками через effects.\n");
         out.append(genderInstruction(game));
         if(game.katherine.enabled&&game.katherine.stage>0)out.append("ПЕРСОНАЖ КЭТРИН — СОСТОЯНИЕ ДВИЖКА:\n").append(game.katherine.aiContext(game)).append('\n');
         String initiative=KatherineInitiative.context(game);if(!initiative.isEmpty())out.append(initiative).append('\n');

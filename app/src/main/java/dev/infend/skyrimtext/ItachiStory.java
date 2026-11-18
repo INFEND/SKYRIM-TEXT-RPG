@@ -27,7 +27,7 @@ final class ItachiStory {
     String stats(){return "Уровень "+level+" | Опыт "+xp+"/"+needXp()+" | Здоровье "+health+"/"+maxHealth()+" | Энергия "+energy+"/100 | Нагрузка на зрение "+eyeStrain+"/100";}
     String skills(){return "Клинок "+blade+"/100 | Иллюзии "+illusion+"/100 | Духовные техники "+spirit+"/100 | "+stanceLabel();}
     void remember(String text){memory=text;while(memories.length()>=40)memories.remove(0);memories.put(text);}
-    void daily(GameEngine g){if(!enabled||stage!=FINAL||lastDaily==g.day||g.road.pending()||g.solitude.custody())return;lastDaily=g.day;if(!following){recover(6);gain(10);}life.daily(g,this);}
+    void daily(GameEngine g){if(g.aiNarrativeMode||!enabled||stage!=FINAL||lastDaily==g.day||g.road.pending()||g.solitude.custody())return;lastDaily=g.day;if(!following){recover(6);gain(10);}life.daily(g,this);}
     void recover(int hours){int h=Math.max(0,Math.min(24,hours));energy=clamp(energy+h*6);eyeStrain=clamp(eyeStrain-h*5);health=Math.min(maxHealth(),health+h*7);}
     void beginBattle(){burn=stun=shield=crows=clones=reflection=0;lastPower=lastDefense="";}
     void nextTarget(){burn=stun=reflection=0;}

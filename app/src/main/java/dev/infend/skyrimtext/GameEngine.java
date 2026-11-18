@@ -72,6 +72,19 @@ public final class GameEngine {
     public void syncLivingSystems(){needs.sync(day,hour);economy.sync(day);if(started&&itachi!=null&&!"COMBAT".equals(mode))itachi.daily(this);if(started&&livia!=null&&!"COMBAT".equals(mode))livia.daily(this);}
     public int regenRate(int index){return Math.max(0,1+regenBonus[index]+(index==1?compensation.passiveBonus(this,2):0)+progress.artifacts.regen(progress,index)); }
     private void regenerateCombat(){if(hp<=0||!"COMBAT".equals(mode))return;int penalty=regenIgnorePenalty?0:needs.penalty();hp=(int)Math.min(maxHp,(long)hp+(poisonTurns>0&&!regenIgnorePenalty?regenBonus[0]:Math.max(0,regenRate(0)-(penalty>0?1:0))));magicka=(int)Math.min(maxMagicka,(long)magicka+Math.max(regenBonus[1],regenRate(1)-(penalty>0?1:0)));stamina=(int)Math.min(maxStamina,(long)stamina+(frostTurns>0&&!regenIgnorePenalty?regenBonus[2]:Math.max(0,regenRate(2)-(penalty>0?1:0))));}
+    // Runtime setting, owned by the selected game mode, not by the save schema.
+    public boolean aiNarrativeMode;
+    public void setAiNarrativeMode(boolean enabled){
+        aiNarrativeMode=enabled;
+        if(!enabled||!started||road.pending()||solitude.custody()||"COMBAT".equals(mode))return;
+        if("INTRO".equals(mode)||"CANON".equals(mode)||"EVENT".equals(mode)||"TALK".equals(mode)||"QUEST".equals(mode)||"DRAGON".equals(mode)
+            ||KatherineStory.MODE.equals(mode)||AlmaStory.MODE.equals(mode)||ItachiStory.MODE.equals(mode)||LiviaStory.MODE.equals(mode))mode="WORLD";
+    }
+    public boolean nativeSceneRequired(){
+        // Existing encounters and custody must be resolved; city menus are explicit mechanical interfaces.
+        return road.pending()||RoadEvents.MODE.equals(mode)||solitude.custody()||SolitudeCity.isMode(mode)
+            ||("COMBAT".equals(mode)&&("CANONICAL".equals(battleKind)||"FACTION".equals(battleKind)||"LIVIA_DUEL".equals(battleKind)||"KATHERINE".equals(battleKind)||"ALMA".equals(battleKind)||battleKind.startsWith("ROAD_QUEST:")));
+    }
     public AiGameTurn aiTurn;
     public SceneState sceneState = new SceneState();
     RoadEvents road = new RoadEvents();
@@ -430,6 +443,7 @@ public final class GameEngine {
         if (("Q_ACCEPT".equals(action) || "Q_ALTAR".equals(action)
                 || "Q_BOSS".equals(action) || "Q_FINISH".equals(action))
                 && !"QUEST".equals(mode)) return;
+        if(aiNarrativeMode&&(action.startsWith("ITACHI:")||action.startsWith("LIVIA:")||action.startsWith("ALMA:")||action.startsWith("KATH:")||"CANON_OPEN".equals(action)||action.startsWith("CANON:")))return;
         if(action.startsWith("ITACHI:")){itachi.choose(this,action);return;}
         if(ItachiStory.MODE.equals(mode))return;
         if(action.startsWith("LIVIA:")){livia.choose(this,action);return;}
@@ -464,7 +478,7 @@ public final class GameEngine {
             TravelPlanner.Route route=TravelPlanner.plan(this,target);
             if(!route.allowed){message=route.problem;mode="RESULT";return;}
             if(route.days==0){message="Ты уже находишься здесь.";mode="WORLD";return;}
-            if(!road.resuming&&road.begin(this,route,target))return;
+            if(!aiNarrativeMode&&!road.resuming&&road.begin(this,route,target))return;
             gold-=route.fare;
             day+=route.days;
             region=target.region;
@@ -889,8 +903,9 @@ public final class GameEngine {
          .put("holdReputation",new org.json.JSONArray(holdReputation)).put("roadSummonTurns",roadSummonTurns).put("roadSummonKind",roadSummonKind).put("poisonTurns",poisonTurns).put("frostTurns",frostTurns).put("battleTurns",battleTurns).put("battleDealt",battleDealt).put("battleTaken",battleTaken);
         return j;
     }
-    public static GameEngine fromJson(String json) {
-        GameEngine g=new GameEngine();
+    public static GameEngine fromJson(String json) {return fromJson(json,false);}
+    public static GameEngine fromJson(String json,boolean aiNarrativeMode) {
+        GameEngine g=new GameEngine();g.aiNarrativeMode=aiNarrativeMode;
         if(json==null||json.isEmpty())return g;
         try{
             JSONObject j=new JSONObject(json);
@@ -960,7 +975,8 @@ public final class GameEngine {
             g.solitude.reconcilePrison(g);
             g.progress.sync(g);
             if(g.mode.equals("COMBAT")&&g.enemyHp<=0)g.mode=g.road.pending()?"RESULT":"WORLD";
-        }catch(Exception ignore){return new GameEngine();}
+        }catch(Exception ignore){g=new GameEngine();}
+        g.setAiNarrativeMode(aiNarrativeMode);
         return g;
     }
 }
