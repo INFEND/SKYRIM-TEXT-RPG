@@ -3,7 +3,7 @@ package dev.infend.skyrimtext;
 /** Guard desk and prison use the existing regional bounty ledger and sentence rules. */
 final class SolitudeJustice {
     static final String MODE="SOLITUDE:jail", CELL="SOLITUDE:cell";
-    private int total,remaining,lastTheftDay; private boolean attempted, detained;
+    private int total,remaining,lastTheftDay; private boolean attempted, detained, exercised;
     boolean detained(){return detained;}
     void theftChoice(GameEngine g,GameEngine.Scene s){if(lastTheftDay<g.day&&g.hour>=8&&g.hour<20&&g.stamina>=5)s.add("SOLITUDE:crime:steal","Попытаться украсть кольцо","Карманные кражи | 5 запаса сил | риск задержания");}
     boolean theft(GameEngine g,String action){
@@ -20,13 +20,14 @@ final class SolitudeJustice {
         int fine=g.road.bounty(3);if(!SolitudeCity.here(g)||g.road.pending()||fine<=0||confined()||g.hp<=0)return;
         if(!MODE.equals(g.mode)&&!"WORLD".equals(g.mode)&&!"RESULT".equals(g.mode))return;
         int days=RoadEvents.jailDays(fine);if(g.day>Integer.MAX_VALUE-days)return;
-        total=remaining=days;attempted=false;detained=false;
+        total=remaining=days;attempted=false;detained=false;exercised=false;
         int stolen=g.progress.quantity("Похищенное кольцо");if(stolen>0)g.progress.removeItem("Похищенное кольцо",stolen);
         g.mode=CELL;g.message="Стража запирает камеру. Срок: "+days+" дн."+(stolen>0?" Украденные кольца конфискованы.":"");g.progress.sync(g);g.recordVisualEvent(g.message);
     }
     GameEngine.Scene cell(GameEngine g){
         GameEngine.Scene s=new GameEngine.Scene("СОЛИТЬЮД | ЗАКЛЮЧЕНИЕ","Камера Мрачного замка","Капли падают с каменного свода. За решёткой слышны шаги караула.\n\nОсталось: "+remaining+" из "+total+" дн. | Штраф: "+g.road.bounty(3)+" септимов.\n\n"+g.message);
         s.primary("SOLITUDE:cell:day","Отбыть один день","24 ч. | тюремный паёк и сон");
+        if(!exercised&&g.stamina>=5)s.add("SOLITUDE:cell:exercise","Размяться в камере","5 запаса сил | один раз за день заключения");
         if(!attempted&&g.stamina>=10&&g.progress.quantity("Отмычка")>0)s.add("SOLITUDE:cell:escape","Попытаться сбежать","Взлом | 1 отмычка | 10 запаса сил | риск дополнительного штрафа");
         return s;
     }
@@ -34,9 +35,11 @@ final class SolitudeJustice {
         if(!confined()||!CELL.equals(g.mode)||!SolitudeCity.here(g))return;
         if("SOLITUDE:cell:day".equals(action)){
             if(!g.restPrisonDay())return;
-            g.needs.eat();g.needs.drink();remaining--;attempted=false;
+            g.needs.eat();g.needs.drink();remaining--;attempted=false;exercised=false;
             if(remaining==0){g.road.finishCitySentence(g,3,total);total=0;g.mode=MODE;}
             else {g.message="Прошёл день. Стражник приносит воду и скудный паёк.";g.recordVisualEvent(g.message);}
+        }else if("SOLITUDE:cell:exercise".equals(action)&&!exercised&&g.stamina>=5){
+            exercised=true;g.stamina-=5;g.message="Ты разминаешь затёкшие мышцы в тесной камере. На сегодня достаточно.";g.recordVisualEvent(g.message);
         }else if("SOLITUDE:cell:escape".equals(action)&&!attempted&&g.stamina>=10&&g.progress.removeItem("Отмычка",1)){
             attempted=true;g.stamina-=10;boolean success=g.rollCheck(Math.min(85,20+g.progress.skillLevel(10)/2));
             g.road.addCityBounty(3,success?100:50);
@@ -46,8 +49,8 @@ final class SolitudeJustice {
         }else return;
         g.progress.recent=g.message;g.progress.sync(g);
     }
-    org.json.JSONObject save(){org.json.JSONObject o=new org.json.JSONObject();try{o.put("total",total).put("remaining",remaining).put("attempted",attempted).put("lastTheftDay",lastTheftDay).put("detained",detained);}catch(Exception ignored){}return o;}
-    static SolitudeJustice restore(org.json.JSONObject o){SolitudeJustice j=new SolitudeJustice();if(o!=null){j.total=Math.max(0,Math.min(7,o.optInt("total")));j.remaining=Math.max(0,Math.min(j.total,o.optInt("remaining")));j.attempted=j.remaining>0&&o.optBoolean("attempted");j.lastTheftDay=Math.max(0,o.optInt("lastTheftDay"));j.detained=j.remaining==0&&o.optBoolean("detained");}return j;}
+    org.json.JSONObject save(){org.json.JSONObject o=new org.json.JSONObject();try{o.put("total",total).put("remaining",remaining).put("attempted",attempted).put("lastTheftDay",lastTheftDay).put("detained",detained).put("exercised",exercised);}catch(Exception ignored){}return o;}
+    static SolitudeJustice restore(org.json.JSONObject o){SolitudeJustice j=new SolitudeJustice();if(o!=null){j.total=Math.max(0,Math.min(7,o.optInt("total")));j.remaining=Math.max(0,Math.min(j.total,o.optInt("remaining")));j.attempted=j.remaining>0&&o.optBoolean("attempted");j.lastTheftDay=Math.max(0,o.optInt("lastTheftDay"));j.detained=j.remaining==0&&o.optBoolean("detained");j.exercised=j.remaining>0&&o.optBoolean("exercised");}return j;}
     static void choices(GameEngine g,GameEngine.Scene s){
         s.add(MODE,"Подземелье Мрачного замка","Стража | Штраф Хаафингара: "+g.road.bounty(3)+" септимов");
     }
