@@ -24,6 +24,12 @@ class AccordionContract(unittest.TestCase):
         self.assertIn("onDetachedFromWindow()", motion)
         self.assertIn("ValueAnimator.areAnimatorsEnabled()", motion)
         self.assertNotIn("setAlpha(", motion)
+        self.assertIn("ValueAnimator.ofInt(start, end)", motion)
+        self.assertIn("motion.setDuration(180)", motion)
+        self.assertIn("setVisibility(open ? VISIBLE : GONE)", motion)
+        self.assertIn("finish(targetOpen)", motion)
+        self.assertIn("if (!animate || !isAttachedToWindow()", motion)
+        self.assertIn("IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS", motion)
 
     def test_gallery_respects_same_animation_preference(self):
         gallery = (JAVA / "LocationGalleryView.java").read_text(encoding="utf-8")

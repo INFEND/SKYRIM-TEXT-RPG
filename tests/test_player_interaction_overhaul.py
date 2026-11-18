@@ -42,7 +42,10 @@ class PlayerInteractionOverhaul(unittest.TestCase):
     def test_setting_sections_are_animated_and_persisted(self):
         for kind in ("appearance", "ai", "updates", "saves"):
             self.assertIn(f'foldSettingsSection("{kind}"', UI)
-        self.assertIn("android.transition.AutoTransition().setDuration(230)", UI)
+        section = UI.split("private void foldSettingsSection(", 1)[1]
+        self.assertIn("AccordionLayout body=new AccordionLayout(this)", section)
+        self.assertIn("body.setExpanded(expanded,animations)", section)
+        self.assertIn("AccordionLayout.rotateArrow(chevron,expanded,animations)", section)
         self.assertIn('prefs.edit().putBoolean("settings_group_"+key,expanded)', UI)
 
     def test_spacing_reasoning_summary_and_truthful_progress(self):

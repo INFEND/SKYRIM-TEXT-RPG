@@ -23,7 +23,7 @@ class CompactHud(unittest.TestCase):
         for token in ('setBackgroundColor(Color.BLACK)', 'header.addView(heading,headingParams)',
                       'controls.addView(page', 'page.setText(captionFor(location,index))',
                       'v->move(-1)', 'v->move(1)', 'v->show(index)',
-                      'updateIndicators();', 'galleryBody.setVisibility(collapsed?View.GONE:View.VISIBLE)',
+                      'updateIndicators();', 'galleryBody.setExpanded(!collapsed,animate)',
                       'viewport.setClipToOutline(true)'):
             self.assertIn(token,GALLERY)
         for token in ('new RuneFrameDrawable', 'header.addView(page', 'String.format("%02d / %02d"'):
