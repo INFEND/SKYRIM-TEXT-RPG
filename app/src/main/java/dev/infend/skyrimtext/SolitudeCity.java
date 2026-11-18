@@ -99,6 +99,7 @@ final class SolitudeCity {
         if(d==2)home.palace(g,s);
         if(d==1){SolitudeJustice.choices(g,s);justice.trespassChoice(g,s);SolitudeCanonical.castleChoices(g,s);}
         if(d==0)justice.theftChoice(g,s);
+        SolitudeCanonical.districtChoices(g,s,d);
         SolitudeEncounters.choices(g,s,d);
         return s.add(PREFIX+"back","На улицы Солитьюда","Вернуться к выбору районов").add("GO_WORLD","Завершить прогулку","Вернуться к приключению");
     }

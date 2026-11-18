@@ -4,6 +4,34 @@ package dev.infend.skyrimtext;
 final class SolitudeCanonical {
     static final String KEY="solitude_angeline_news", STEP=KEY+"_aldis";
     static final String TITLE="Сведения о дочери Анжелины";
+    static final String RUM="solitude_sorex_rum", RUM_TITLE="Доставка (Сорекс)";
+    static String rumState(GameEngine g){return g.progress.questOutcome(RUM);}
+    static String rumObjective(GameEngine g){return "COMPLETED".equals(rumState(g))?"Ром доставлен Фолку Огнебороду.":"Доставить ром из Строс-М’Кая Фолку Огнебороду в Синий дворец.";}
+    private static boolean available(GameEngine g,String name,int start,int end){
+        String status=g.sceneState.npcStatusByName(name);
+        return g.hour>=start&&g.hour<end&&!"DEAD".equals(status)&&!"MISSING".equals(status)&&!"HOSTILE".equals(status);
+    }
+    static int rumReward(GameEngine g){return g.level>=40?750:g.level>=30?600:g.level>=20?500:g.level>=10?400:250;}
+    static void districtChoices(GameEngine g,GameEngine.Scene s,int district){
+        String state=rumState(g);
+        if(district==6&&(state==null||state.isEmpty())&&available(g,"Сорекс Виний",6,23))
+            s.add("SOLITUDE:rum:accept","Поговорить с Сорексом Винием","Каноническое поручение | доставка рома");
+        if(district==2&&"ACTIVE".equals(state)&&available(g,"Фолк Огнебород",9,17)&&g.gold<=Integer.MAX_VALUE-rumReward(g))
+            s.add("SOLITUDE:rum:deliver","Передать ром Фолку",rumReward(g)+" септимов | +1 репутации Хаафингара");
+    }
+    private static boolean chooseRum(GameEngine g,String a){
+        String state=rumState(g);
+        if("SOLITUDE:6".equals(g.mode)&&available(g,"Сорекс Виний",6,23)&&"SOLITUDE:rum:accept".equals(a)&&(state==null||state.isEmpty())){
+            g.progress.setQuestOutcome(RUM,"ACTIVE");
+            report(g,"Сорекс Виний просит отнести Фолку Огнебороду бутылку рома из Строс-М’Кая. Посылка отмечена в журнале как квестовый груз; её нельзя выпить, продать или потерять.");
+        }else if("SOLITUDE:2".equals(g.mode)&&available(g,"Фолк Огнебород",9,17)&&"SOLITUDE:rum:deliver".equals(a)&&"ACTIVE".equals(state)){
+            int reward=rumReward(g);if(g.gold>Integer.MAX_VALUE-reward)return true;
+            g.progress.setQuestOutcome(RUM,"COMPLETED");
+            g.gold+=reward;g.holdReputation[3]=Math.min(100,g.holdReputation[3]+1);
+            report(g,"Фолк принимает бутылку рома и благодарит за доставку. Награда: "+reward+" септимов. Репутация Хаафингара +1 (адаптация).");
+        }
+        return true;
+    }
     static String state(GameEngine g){return g.progress.questOutcome(KEY);}
     static boolean informed(GameEngine g){return "COMPLETED".equals(g.progress.questOutcome(STEP));}
     static String objective(GameEngine g){
@@ -23,8 +51,9 @@ final class SolitudeCanonical {
         if(aldis(g)&&"ACTIVE".equals(state(g))&&!informed(g))s.add("SOLITUDE:angeline:aldis","Расспросить капитана Алдиса","Судьба Фуры");
     }
     static boolean choose(GameEngine g,String a){
-        if(!a.startsWith("SOLITUDE:angeline:"))return false;
+        if(!a.startsWith("SOLITUDE:angeline:")&&!a.startsWith("SOLITUDE:rum:"))return false;
         if(!SolitudeCity.here(g)||g.solitude.custody()||g.road.pending()||g.hp<=0)return true;
+        if(a.startsWith("SOLITUDE:rum:"))return chooseRum(g,a);
         String state=state(g);
         if((SolitudeShops.MODE+1).equals(g.mode)&&SolitudeShops.open(g,1)){
             if(a.equals("SOLITUDE:angeline:accept")&&(state==null||state.isEmpty())){
