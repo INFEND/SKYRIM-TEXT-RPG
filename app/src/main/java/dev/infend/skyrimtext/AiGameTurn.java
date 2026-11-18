@@ -9,9 +9,10 @@ import java.util.HashSet;
 /** AI-controlled turn; validate every patch before committing a cloned GameEngine. */
 public final class AiGameTurn {
     public static final class Option {
-        public final String title,detail,skill,combatAction;
+        public final String title,detail,skill,combatAction,companionAction;
         public final int chance;
-        Option(String t,String d,String s,int c,String a){title=t;detail=d;skill=s;chance=c;combatAction=a;}
+        Option(String t,String d,String s,int c,String a){this(t,d,s,c,a,"");}
+        Option(String t,String d,String s,int c,String a,String n){title=t;detail=d;skill=s;companionAction=AiCompanionActions.code(n);chance=companionAction.isEmpty()?c:-1;combatAction=a;}
     }
     private static final SecureRandom DICE=new SecureRandom();
     public final String scene,journal;
@@ -237,7 +238,7 @@ public final class AiGameTurn {
             if(title.length()<4||detail.length()<8||!unique.add(strictNew?title.toLowerCase(java.util.Locale.ROOT).replaceAll("[\\p{Punct}\\s]+",""):title.toLowerCase(java.util.Locale.ROOT)))
                 throw new JSONException("Действия пусты либо повторяются");
             turn.choices.add(new Option(title,detail,limited(c.optString("skill",""),65),
-                    probability(c,"chance"),combatAction(c.optString("combatAction",""))));
+                    probability(c,"chance"),combatAction(c.optString("combatAction","")),c.optString("companionAction","")));
         }
         return turn;
     }
@@ -264,6 +265,7 @@ public final class AiGameTurn {
             JSONObject c=new JSONObject().put("title",o.title).put("detail",o.detail).put("skill",o.skill);
             c.put("chance",o.chance<0?JSONObject.NULL:o.chance);
             if(!o.combatAction.isEmpty())c.put("combatAction",o.combatAction);
+            if(!o.companionAction.isEmpty())c.put("companionAction",o.companionAction);
             array.put(c);
         }
         return out.put("choices",array);
@@ -506,7 +508,7 @@ public final class AiGameTurn {
                 String id=fact.optString("id","");
                 String title=fact.optString("title","");
                 String status=fact.optString("status","");
-                if("npc".equals(kind)&&KatherineInitiative.protectedFact(id,title))continue;
+                if("npc".equals(kind)&&AiCompanionActions.protectedNpc(id,title))continue;
                 if(!("npc".equals(kind)||"clue".equals(kind)||"sublocation".equals(kind)))
                     throw new JSONException("Недопустимый тип факта");
                 if(!factIds.add(kind+":"+id))throw new JSONException("Повтор факта сцены");

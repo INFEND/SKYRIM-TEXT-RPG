@@ -1432,8 +1432,8 @@ public final class MainActivity extends Activity {
             if(!game.started){toast("Сохранённого героя пока нет");return;}
             titleOpen=false;tab=0;render();
         });
-        titleButton("Главная история",false,()->{
-            if(game.started){game.choose("CANON_OPEN");titleOpen=false;tab=0;save();render();}
+        titleButton(game.aiNarrativeMode?"ИИ-приключение":"Главная история",false,()->{
+            if(game.started){if(!game.aiNarrativeMode)game.choose("CANON_OPEN");titleOpen=false;tab=0;save();render();}
             else{selectedStart=0;titleOpen=false;tab=0;render();}
         });
         titleButton("Настройки",false,()->{titleOpen=false;tab=5;render();});
@@ -2138,6 +2138,14 @@ public final class MainActivity extends Activity {
                 resolveNativeAiCombat(action);
                 return;
             }
+            for(Integer index:indexes){
+                if(index<1||index>game.aiTurn.choices.size())continue;
+                AiGameTurn.Option option=game.aiTurn.choices.get(index-1);
+                if(!option.companionAction.isEmpty()){
+                    if(indexes.size()!=1||!value.isEmpty()){toast("Подтверди личное действие отдельно");return;}
+                    resolveNativeAiCompanion(option.companionAction);return;
+                }
+            }
             StringBuilder combined=new StringBuilder();
             if(!indexes.isEmpty()){
                 combined.append("ВЫБРАННЫЕ ВАРИАНТЫ ИГРОКА (обработай по порядку):\n");
@@ -2219,6 +2227,24 @@ public final class MainActivity extends Activity {
             case "FLEE":return "WILD".equals(game.battleKind);
             default:return false;
         }
+    }
+
+    private void resolveNativeAiCompanion(String action){
+        if(livingBusy()||!AiCompanionActions.allowed(game,action)){toast("Действие сейчас недоступно");return;}
+        try{
+            GameEngine next=GameEngine.fromJson(game.toJson().toString(),true);
+            java.util.Map<String,Integer> before=itemSnapshot(next);
+            VisualSnapshot visualBefore=new VisualSnapshot(next,action);
+            String outcome=AiCompanionActions.execute(next,action);
+            if(outcome.isEmpty()){toast("Действие сейчас недоступно");return;}
+            next.aiTurn=null;recordVisual(visualBefore,next,outcome);
+            commitAiSave(next);game=next;
+            selectedAiChoices.clear();aiOwnDraft="";captureItemGains(before,game,false);
+            aiMemory.add(aiSession,"event",outcome);
+            requestAiTurn("Игрок выбрал личное действие, движок уже применил его один раз: "+outcome+
+                "\nРазыграй естественную сцену и реакцию персонажа; не копируй системную запись, не применяй effects повторно. Дай десять новых вариантов.",false);
+            if(!aiTurnBusy)render();
+        }catch(Exception ex){toast("Не удалось сохранить действие: "+ex.getMessage());}
     }
 
     private void resolveNativeAiGift(String action){
@@ -2326,7 +2352,7 @@ public final class MainActivity extends Activity {
             livingBar(detail,displayedChance,100,SceneChoiceMeta.chanceColor(displayedChance));
             livingChanceLink(detail,option.title,combat?game.progress.chanceExplanation():"Оценка ИИ: "+option.chance+"%\nФактический бросок делает игровой движок. Состав коэффициентов модели не задан.");
         }else addText(detail,"БЕЗ ПРОВЕРКИ",12,MUTED,false,0);
-        boolean available=!combat||nativeAiCombatAvailable(option.combatAction);
+        boolean available=combat?nativeAiCombatAvailable(option.combatAction):option.companionAction.isEmpty()||AiCompanionActions.allowed(game,option.companionAction);
         if(!available){
             addText(detail,"ДЕЙСТВИЕ НЕДОСТУПНО",12,MUTED,true,0);
             row.setAlpha(0.55f);
@@ -2369,6 +2395,7 @@ public final class MainActivity extends Activity {
     private void requestAiTurn(String instruction,boolean actionResolved,
                                boolean proposalOnly,int expectedChance,String customAction,int repairAttempt){
         if(!game.aiNarrativeMode||aiTurnBusy||aiClient.isRunning()||localAiClient.isRunning()||!game.started||game.nativeSceneRequired())return;
+        game.setAiNarrativeMode(true);
         final String source=resolvedAiProvider();
         final boolean local="local".equals(source),chat="chatgpt".equals(source);
         final String model=local?"Qwen3.5-9B":prefs.getString(chat?"ai_chatgpt_model":"ai_api_model",
@@ -4325,7 +4352,8 @@ public final class MainActivity extends Activity {
         TextView target=text("ЦЕЛИ",15,accent(),true);
         target.setGravity(Gravity.CENTER);focus.addView(target,lp(-1,35));
         addText(focus,"◇  "+objective,15,TEXT,false,11);
-        if("Путь Довакина".equals(title)){
+        if(game.aiNarrativeMode){actionButton("Вернуться к ИИ-повествованию","Продолжить игру в текущей сцене",true,()->{tab=0;render();});}
+        else if("Путь Довакина".equals(title)){
             actionButton("Продолжить главную историю","Перейти к текущему заданию",true,()->{game.choose("CANON_OPEN");save();tab=0;render();});
         }else if("Драконий след".equals(title)){
             actionButton("Продолжить историю","Следующее доступное сюжетное решение",true,()->{

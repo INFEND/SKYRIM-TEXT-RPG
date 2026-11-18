@@ -77,13 +77,12 @@ public final class GameEngine {
     public void setAiNarrativeMode(boolean enabled){
         aiNarrativeMode=enabled;
         if(!enabled||!started||road.pending()||solitude.custody()||"COMBAT".equals(mode))return;
-        if("INTRO".equals(mode)||"CANON".equals(mode)||"EVENT".equals(mode)||"TALK".equals(mode)||"QUEST".equals(mode)||"DRAGON".equals(mode)
-            ||KatherineStory.MODE.equals(mode)||AlmaStory.MODE.equals(mode)||ItachiStory.MODE.equals(mode)||LiviaStory.MODE.equals(mode))mode="WORLD";
+        if(!SolitudeCity.isMode(mode)&&!RoadEvents.MODE.equals(mode))mode="WORLD";
     }
     public boolean nativeSceneRequired(){
         // Existing encounters and custody must be resolved; city menus are explicit mechanical interfaces.
         return road.pending()||RoadEvents.MODE.equals(mode)||solitude.custody()||SolitudeCity.isMode(mode)
-            ||("COMBAT".equals(mode)&&("CANONICAL".equals(battleKind)||"FACTION".equals(battleKind)||"LIVIA_DUEL".equals(battleKind)||"KATHERINE".equals(battleKind)||"ALMA".equals(battleKind)||battleKind.startsWith("ROAD_QUEST:")));
+            ||("COMBAT".equals(mode)&&("CANONICAL".equals(battleKind)||"FACTION".equals(battleKind)||battleKind.startsWith("ROAD_QUEST:")));
     }
     public AiGameTurn aiTurn;
     public SceneState sceneState = new SceneState();

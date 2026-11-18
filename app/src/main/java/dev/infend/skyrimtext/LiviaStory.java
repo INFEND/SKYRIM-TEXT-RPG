@@ -34,12 +34,12 @@ final class LiviaStory {
     boolean castle(GameEngine g){String loc=g.progress.location.toLowerCase(Locale.ROOT).replace('ё','е');return loc.equals("солитьюд")||loc.contains("мрачный замок");}
     boolean witnessed(GameEngine g){return "Хелген".equalsIgnoreCase(g.progress.startId);}
     boolean present(GameEngine g){return enabled&&survivor()&&(active()||castle(g));}
-    boolean available(GameEngine g){return enabled&&g.started&&!g.solitude.custody()&&!g.road.pending()&&("WORLD".equals(g.mode)||"RESULT".equals(g.mode))&&present(g)&&(!witnessed(g)||g.canonicalStage>=3);}
+    boolean available(GameEngine g){return enabled&&g.started&&!g.solitude.custody()&&!g.road.pending()&&("WORLD".equals(g.mode)||"RESULT".equals(g.mode))&&present(g)&&(g.aiNarrativeMode||!witnessed(g)||g.canonicalStage>=3);}
     boolean setEnabled(GameEngine g,boolean on){if("COMBAT".equals(g.mode))return false;enabled=on;if(!on&&MODE.equals(g.mode))exit(g);return true;}
     String status(){return stage==0?"Мрачный замок, Солитьюд":stage==1?"Допрос капитана":stage==2?"Свидетельства Хелгена":stage==3?"Цена приговора":ending+(following?" | Спутница":"")+(romance?" | Возлюбленная":"");}
     String relation(){if(!survivor())return "Последний поединок".equals(ending)?"Погибла":"Под военным судом";return life.married?"Супруга":life.engaged?"Помолвлены":romance?"Возлюбленная":active()?"Спутница":trust>=55?"Доверяет":trust>=25?"Уважает":"Держит дистанцию";}
     String objective(){return TITLE+" | "+status()+(stage==4&&survivor()?" | "+epilogueTitle()+" ("+epilogue+"/3)":"");}
-    String aiContext(GameEngine g){if(!enabled)return "Ливия: дополнение отключено; не вводить её в сцену.";if(!survivor())return "Ливия: "+ending+". "+memory+" Не возвращать в сцену, не восстанавливать спутницу или роман.";if(witnessed(g)&&g.canonicalStage<3)return "Ливия: имперский капитан Хелгена. Ещё не наступила повторная встреча; не раскрывать её дальнейшую судьбу.";return "Ливия, имперский капитан, пережила нападение Алдуина. "+(witnessed(g)?"Приказала казнить героя в Хелгене.":"Герой не обязательно присутствовал на казни.")+" Этап "+stage+"/4, исход="+ending+", рядом="+active()+", роман="+romance+", доверие="+trust+", место="+location(g)+", эпилог="+epilogue+"/3, тактика="+stanceLabel()+", любовь="+life.love+", помолвка="+life.engaged+", свадьба="+life.married+", общий дом="+life.sharedHome+", занятие="+life.activity+", снаряжение="+life.gearLabel()+", отношения с отрядом="+life.groupSummary()+". ИИ не вправе менять эти флаги.";}
+    String aiContext(GameEngine g){if(!enabled)return "Ливия: дополнение отключено; не вводить её в сцену.";if(!survivor())return "Ливия: "+ending+". "+memory+" Не возвращать в сцену, не восстанавливать спутницу или роман.";if(!g.aiNarrativeMode&&witnessed(g)&&g.canonicalStage<3)return "Ливия: имперский капитан Хелгена. Ещё не наступила повторная встреча; не раскрывать её дальнейшую судьбу.";return "Ливия, имперский капитан, пережила нападение Алдуина. "+(witnessed(g)?"Приказала казнить героя в Хелгене.":"Герой не обязательно присутствовал на казни.")+" Этап "+stage+"/4, исход="+ending+", рядом="+active()+", роман="+romance+", доверие="+trust+", место="+location(g)+", эпилог="+epilogue+"/3, тактика="+stanceLabel()+", любовь="+life.love+", помолвка="+life.engaged+", свадьба="+life.married+", общий дом="+life.sharedHome+", занятие="+life.activity+", снаряжение="+life.gearLabel()+", отношения с отрядом="+life.groupSummary()+". ИИ не вправе менять эти флаги.";}
     GameEngine.Scene scene(GameEngine g){
         String body; GameEngine.Scene s;
         if(stage==0){
@@ -66,7 +66,7 @@ final class LiviaStory {
     }
     void choose(GameEngine g,String action){
         if("LIVIA:open".equals(action)){if(available(g)){castleReturn=false;homeReturn=false;g.mode=MODE;}return;}
-        if(!enabled||!MODE.equals(g.mode)||!present(g)||g.solitude.custody()||g.road.pending()||(witnessed(g)&&g.canonicalStage<3))return;
+        if(!enabled||!MODE.equals(g.mode)||!present(g)||g.solitude.custody()||g.road.pending()||(!g.aiNarrativeMode&&witnessed(g)&&g.canonicalStage<3))return;
         if("LIVIA:exit".equals(action)){exit(g);return;}
         switch(stage){
             case 0: if("LIVIA:confront".equals(action)||"LIVIA:listen".equals(action)){trust="LIVIA:listen".equals(action)?12:5;respect=12;stage=1;remember(g,"Повторная встреча в Мрачном замке.");}return;

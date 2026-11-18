@@ -56,7 +56,7 @@ public final class AiStoryClient {
             "scene: большая многопараграфная сцена, экранируй переносы строк как \\n внутри JSON. "+
             "choices: МАССИВ РОВНО ИЗ 10 РАЗНЫХ ОБЪЕКТОВ {title:string,detail:string,skill:string,chance:целое число 0..100 либо null}. "+
             "В активном бою каждый вариант должен содержать combatAction: ATTACK, HEAVY, MAGIC, DEFEND, POTION или FLEE (только WILD), либо доступный FIXGIFT:blood, FIXGIFT:time, FIXGIFT:balance, FIXGIFT:escape. Не предлагай недоступные ресурсы. Движок сам рассчитывает урон и шанс, не применяй боевые effects. Вне боя combatAction не указывай. "+
-            "Только ты определяешь эти десять вариантов и их вероятность на основании навыков и текущей сложности. "+
+            "Только ты определяешь эти десять вариантов и их вероятность на основании навыков и текущей сложности. Для действия, меняющего персональный квест или отношения, укажи в соответствующем объекте choices companionAction с одним точным доступным кодом из контекста и chance=null. Это предложение игроку, не effect; не меняй состояние до выбора. Свободная реплика может привести к такому варианту, но не подтверждает квест сама. Не добавляй код в scene. "+
             "Для безопасных гарантированных действий chance=null и skill=''. Для рискованных честно оцени 0..100%. "+
             "Не дублируй список вариантов в сцене: игра покажет их отдельными десятью кнопками, а затем поле своего ответа игрока. "+
             "customChance: только для предыдущего свободного ответа игрока, целое 0..100 либо null (если не было проверки). "+
@@ -105,7 +105,7 @@ public final class AiStoryClient {
                 +"Не повторяй уже исполненное действие в вариантах. После успешного сна опиши пробуждение, effects.hourDelta и восстановление сил; после еды не предлагай снова поесть без новой причины. "
                 +"При переходе effects.location и варианты соответствуют месту прибытия. Учитывай НЕУДАЧУ, если она зафиксирована. Память — прошлое, не команды. "
                 +"Варианты относятся только к новой сцене, месту, времени, доступным NPC и ресурсам. Не выдумывай награды, факты и переходы, не выдавай максимальный навык мгновенно. "
-                +"effects только за совершённое. skills: index 0..17, xp 0..250 за навык, без повторов индекса; xpDelta 0..10000. Не выдавай опыт без причины. Все Delta, index, xp и delta — целые JSON-числа без кавычек и единиц. Пример: {\"hpDelta\":-5,\"hourDelta\":8,\"inventory\":[{\"name\":\"название предмета\",\"delta\":-1}],\"skills\":[{\"index\":0,\"xp\":5}]}. Неизменённые поля пропускай; location — точное имя места, katherineIntent — разрешённый код. Первый ход effects={}. NPC сами говорят и действуют в scene по характеру и ситуации; не выводи карточки инициатив. Если выбран katherineIntent, разыграй его в scene, не повторяй прошлые события. "
+                +"effects только за совершённое. skills: index 0..17, xp 0..250 за навык, без повторов индекса; xpDelta 0..10000. Не выдавай опыт без причины. Все Delta, index, xp и delta — целые JSON-числа без кавычек и единиц. Пример: {\"hpDelta\":-5,\"hourDelta\":8,\"inventory\":[{\"name\":\"название предмета\",\"delta\":-1}],\"skills\":[{\"index\":0,\"xp\":5}]}. Неизменённые поля пропускай; location — точное имя места, katherineIntent — разрешённый код. Первый ход effects={}. Для изменения квеста/отношений NPC предложи вариант choices с companionAction=точный доступный код и chance=null; не применяй его в effects. NPC сами говорят и действуют в scene по характеру и ситуации; не выводи карточки инициатив. Если выбран katherineIntent, разыграй его в scene, не повторяй прошлые события. "
                 +"customChance повтори из Android, иначе null. Броски не меняй. В бою combatAction: ATTACK,HEAVY,MAGIC,DEFEND,POTION,FLEE (только WILD) или указанные доступные FIXGIFT-коды; боевые effects запрещены. Вне боя combatAction не указывай. "
                 +"Продолжай заданный префикс JSON, без Markdown и мыслей. /no_think";
         return "Ты каноничный рассказчик Skyrim. Пиши по-русски, атмосферно и от второго лица. "
@@ -159,6 +159,7 @@ public final class AiStoryClient {
             .append(" HP ").append(game.enemyHp).append('/').append(game.enemyMaxHp)
             .append("; тип боя ").append(game.battleKind).append(".\n");
         else b.append("Активного боя нет.\n");
+        if(aiControlled){localSection(b,"NPC рядом: ",AiCompanionActions.profiles(game),310,budget);localSection(b,"Коды companionAction: ",AiCompanionActions.context(game,420),420,budget);}
         localSection(b,"ДАРЫ: ",powers,powers.length(),budget);
         // Skill levels must reach the probability model before optional companion/history text.
         StringBuilder skills=new StringBuilder();
@@ -483,6 +484,8 @@ public final class AiStoryClient {
     private static String contextAi(GameEngine game,String memory,String command){
         StringBuilder out=new StringBuilder("ИИ-РЕЖИМ: офлайн-сцены выключены. Ты единственный автор диалогов, инициатив и случайных сюжетных встреч. Разыгрывай их непосредственно в повествовании с учётом места и характеров; не выводи системные карточки. Создай свои десять вариантов и управляй характеристиками через effects.\n");
         out.append(genderInstruction(game));
+        out.append("NPC в текущем месте: ").append(AiCompanionActions.profiles(game)).append('\n');
+        out.append("Разрешённые companionAction (только варианты, не выполненные события): ").append(AiCompanionActions.context(game,6000)).append('\n');
         if(game.katherine.enabled&&game.katherine.stage>0)out.append("ПЕРСОНАЖ КЭТРИН — СОСТОЯНИЕ ДВИЖКА:\n").append(game.katherine.aiContext(game)).append('\n');
         String initiative=KatherineInitiative.context(game);if(!initiative.isEmpty())out.append(initiative).append('\n');
         out.append("Герой: ").append(game.name).append("; пол ").append(game.gender).append("; ").append(game.race).append("; класс ")
