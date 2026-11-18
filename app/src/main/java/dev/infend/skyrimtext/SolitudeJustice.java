@@ -4,6 +4,8 @@ package dev.infend.skyrimtext;
 final class SolitudeJustice {
     static final String MODE="SOLITUDE:jail", CELL="SOLITUDE:cell";
     private int total,remaining,lastTheftDay; private boolean attempted, detained, exercised;
+    static final String PARDON="solitude_thane_pardon";
+    static boolean canPardon(GameEngine g){return SolitudeCourt.done(g,SolitudeCourt.THANE)&&!SolitudeCourt.done(g,PARDON)&&g.road.bounty(3)>0&&g.road.bounty(3)<2000;}
     boolean detained(){return detained;}
     static int confiscate(GameEngine g){int count=0;for(String item:new String[]{"Похищенное кольцо","Похищенный амулет"}){int n=g.progress.quantity(item);if(n>0&&g.progress.removeItem(item,n))count=GameEngine.nonnegativeAdd(count,n);}return count;}
     void theftChoice(GameEngine g,GameEngine.Scene s){if(lastTheftDay<g.day&&g.hour>=8&&g.hour<20&&g.stamina>=5){s.add("SOLITUDE:crime:steal","Попытаться украсть кольцо","Карманные кражи | 5 запаса сил | риск задержания");s.add("SOLITUDE:crime:amulet","Попытаться украсть амулет","Карманные кражи | 5 запаса сил | повышенный риск");}}
@@ -63,6 +65,7 @@ final class SolitudeJustice {
         GameEngine.Scene s=new GameEngine.Scene("СОЛИТЬЮД | СТРАЖА","Подземелье Мрачного замка",
             "За решётками сыро и холодно. Дежурный стражник сверяет записи.\n\n"+(fine>0?"Твой штраф: "+fine+" септимов.":"За тобой не числится штрафов в Хаафингаре.")+"\n"+g.message);
         if(fine>0){
+            if(canPardon(g))s.add("SOLITUDE:justice:pardon","Назвать себя таном Хаафингара","Однократное освобождение от штрафа менее 2000 септимов");
             if(g.gold>=fine)s.add("SOLITUDE:justice:pay","Оплатить штраф",fine+" септимов");
             s.add("SOLITUDE:justice:serve","Сдаться страже","Наказание: "+RoadEvents.jailDays(fine)+" дн. | Потеря прогресса навыков и конфискация украденных вещей");
         }
@@ -73,6 +76,9 @@ final class SolitudeJustice {
         if(!SolitudeCity.here(g)||g.road.pending()||g.hp<=0)return false;
         if(MODE.equals(action)&&"SOLITUDE:1".equals(g.mode)){g.mode=MODE;g.message="";return true;}
         if(!MODE.equals(g.mode))return false;
+        if("SOLITUDE:justice:pardon".equals(action)){
+            if(!confined()&&canPardon(g)&&g.road.pardonHaafingar(g)){g.progress.setQuestOutcome(PARDON,"COMPLETED");detained=false;g.message="Стражник признаёт твой титул и отпускает тебя. Право на такое помилование использовано.";g.progress.recent=g.message;g.progress.sync(g);g.recordVisualEvent(g.message);}return true;
+        }
         if(!action.equals("SOLITUDE:justice:pay")&&!action.equals("SOLITUDE:justice:serve"))return false;
         if(g.road.bounty(3)<=0)return true;
         if(action.endsWith(":serve")){begin(g);return true;}
