@@ -385,7 +385,7 @@ public final class GameEngine {
     public void choose(String action) {
         if (!started || action==null) return;
         lastCheckChance=lastCheckRoll=-1;
-        if(solitude.confined()){solitude.choose(this,action);return;}
+        if(solitude.custody()){solitude.choose(this,action);return;}
         if(RoadEvents.MODE.equals(mode)){road.choose(this,action);return;}
         if(road.pending()&&!"COMBAT".equals(mode)){if("GO_WORLD".equals(action))road.resume(this);return;}
         if(action.startsWith("SOLITUDE:")||SolitudeCity.isMode(mode)){solitude.choose(this,action);return;}
@@ -814,7 +814,7 @@ public final class GameEngine {
         WorldAtlas.Place target=WorldAtlas.find(name);if(target==null)return false;region=target.region;progress.location=target.name;katherine.observeTravel(this);alma.observeTravel(this);mode="WORLD";message="Магический переход: "+target.name;recordVisualEvent(message);return true;
     }
     public boolean waitHours(int hours){return restHours(hours,hours>=6);}
-    public boolean restHours(int hours,boolean sleep){if(solitude.confined())return false;return restHoursInternal(hours,sleep);}
+    public boolean restHours(int hours,boolean sleep){if(solitude.custody())return false;return restHoursInternal(hours,sleep);}
     boolean restPrisonDay(){return solitude.confined()&&SolitudeJustice.CELL.equals(mode)&&restHoursInternal(24,true);}
     private boolean restHoursInternal(int hours,boolean sleep){
         if(!started||"COMBAT".equals(mode)||road.pending()||hours<1||hours>24)return false;

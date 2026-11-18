@@ -48,8 +48,9 @@ final class SolitudeCity {
     private SolitudeHome home=new SolitudeHome();
     private SolitudeJustice justice=new SolitudeJustice();
     boolean confined(){return justice.confined();}
+    boolean custody(){return confined()||justice.detained();}
     void beginSentence(GameEngine g){justice.begin(g);}
-    void reconcilePrison(GameEngine g){if(justice.confined()&&here(g))g.mode=SolitudeJustice.CELL;else if(SolitudeJustice.CELL.equals(g.mode))g.mode=SolitudeJustice.MODE;}
+    void reconcilePrison(GameEngine g){if(justice.confined()&&here(g))g.mode=SolitudeJustice.CELL;else if(justice.detained()&&here(g))g.mode=SolitudeJustice.MODE;else if(SolitudeJustice.CELL.equals(g.mode))g.mode=SolitudeJustice.MODE;}
     static boolean here(GameEngine g){return g.started&&g.region==3&&"Солитьюд".equals(g.progress.location);}
     static boolean isMode(String m){return MODE.equals(m)||(m!=null&&m.startsWith(PREFIX));}
     private static int district(String mode){
@@ -75,7 +76,7 @@ final class SolitudeCity {
     }
     GameEngine.Scene scene(GameEngine g){
         if(justice.confined())return justice.cell(g);
-        if(SolitudeJustice.MODE.equals(g.mode))return SolitudeJustice.scene(g);
+        if(SolitudeJustice.MODE.equals(g.mode))return justice.scene(g);
         if(SolitudeHome.MODE.equals(g.mode))return home.scene(g);
         int store=SolitudeShops.index(g.mode);if(store>=0)return shops.scene(g,store);
         int d=district(g.mode);
@@ -97,6 +98,7 @@ final class SolitudeCity {
         for(int i=0;i<SolitudeShops.NAMES.length;i++)if(SolitudeShops.district(i)==d)s.add(PREFIX+"store:"+i,SolitudeShops.NAMES[i],SolitudeShops.OWNERS[i]+" | "+(SolitudeShops.open(g,i)?"Открыто":"Закрыто (8:00–20:00)"));
         if(d==2)home.palace(g,s);
         if(d==1)SolitudeJustice.choices(g,s);
+        if(d==0)justice.theftChoice(g,s);
         SolitudeEncounters.choices(g,s,d);
         return s.add(PREFIX+"back","На улицы Солитьюда","Вернуться к выбору районов").add("GO_WORLD","Завершить прогулку","Вернуться к приключению");
     }
@@ -107,6 +109,7 @@ final class SolitudeCity {
     void choose(GameEngine g,String action){
         if(!here(g)||g.road.pending()||"COMBAT".equals(g.mode)||g.hp<=0)return;
         if(justice.confined()){justice.cellAction(g,action);return;}
+        if(justice.detained()){justice.choose(g,action);return;}
         if((PREFIX+"open").equals(action)&&"WORLD".equals(g.mode)){g.mode=MODE;g.message="";return;}
         if(!validMode(g.mode))return;
         if("GO_WORLD".equals(action)){g.mode="WORLD";return;}
@@ -123,6 +126,7 @@ final class SolitudeCity {
         for(int i=0;i<SolitudeShops.NAMES.length;i++)if(d==SolitudeShops.district(i)&&(PREFIX+"store:"+i).equals(action)){g.mode=SolitudeShops.MODE+i;g.message="";return;}
         if(d==2&&home.palaceAction(g,action))return;
         if(d==1&&justice.choose(g,action))return;
+        if(d==0&&justice.theft(g,action))return;
         if(SolitudeEncounters.choose(g,d,action))return;
         if((PREFIX+"shop").equals(action)&&(d==0||d==5)){g.mode="WORLD";g.choose("SHOP");return;}
         if((PREFIX+"rest").equals(action)&&d==6){g.mode="WORLD";g.choose("REST");return;}
