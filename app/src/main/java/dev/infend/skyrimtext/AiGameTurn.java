@@ -47,6 +47,72 @@ public final class AiGameTurn {
         }
     }
 
+    // Model-only normalization. Accept lossless integral strings, never round,
+    // clamp, guess a reward, or interpret prose as a numeric effect.
+    private static final String[] MODEL_DELTAS={
+        "hpDelta","maxHpDelta","staminaDelta","maxStaminaDelta","magickaDelta",
+        "maxMagickaDelta","goldDelta","xpDelta","hourDelta","dayDelta",
+        "reputationDelta","attackDelta","armorDelta","potionsDelta","manaPotionsDelta",
+        "questStageDelta","dragonStageDelta"
+    };
+    private static boolean absentModelValue(Object raw){
+        if(raw==null||raw==JSONObject.NULL)return true;
+        if(!(raw instanceof String))return false;
+        String v=((String)raw).trim().toLowerCase(java.util.Locale.ROOT);
+        return v.isEmpty()||v.equals("null")||v.equals("none")||v.equals("n/a")
+            ||v.equals("без изменений")||v.equals("нет изменений");
+    }
+    private static void normalizeModelInt(JSONObject object,String key,boolean optional)throws JSONException{
+        if(!object.has(key))return;
+        Object raw=object.opt(key);
+        if(optional&&absentModelValue(raw)){object.remove(key);return;}
+        if(raw instanceof String){
+            String v=((String)raw).trim().replace('\u2212','-');
+            // A decimal representation is permitted only if exactly integral.
+            if(v.length()<=32&&v.matches("[+-]?[0-9]+(?:\\.[0-9]+)?")){
+                try{object.put(key,new java.math.BigDecimal(v).intValueExact());return;}
+                catch(ArithmeticException|NumberFormatException ignored){}
+            }
+        }
+        if(raw instanceof Number){
+            double n=((Number)raw).doubleValue();
+            if(Double.isFinite(n)&&n==Math.rint(n)&&n>=Integer.MIN_VALUE&&n<=Integer.MAX_VALUE){
+                object.put(key,(int)n);return;
+            }
+        }
+        throw new JSONException("Недопустимое числовое значение: "+key);
+    }
+    private static void normalizeOptionalModelField(JSONObject object,String key){
+        if(object.has(key)&&absentModelValue(object.opt(key)))object.remove(key);
+    }
+    private static void normalizeModelEffects(JSONObject root)throws JSONException{
+        normalizeOptionalModelField(root,"effects");
+        JSONObject e=root.optJSONObject("effects");
+        if(e==null)return; // parseInternal still rejects malformed non-object effects.
+        for(String field:MODEL_DELTAS)normalizeModelInt(e,field,true);
+        for(String field:new String[]{"location","quest","questStatus","katherineIntent",
+                "inventory","skills","enemy","sceneFacts"})normalizeOptionalModelField(e,field);
+        JSONArray inventory=e.optJSONArray("inventory");
+        if(inventory!=null)for(int i=0;i<inventory.length();i++){
+            JSONObject item=inventory.optJSONObject(i);
+            if(item!=null)normalizeModelInt(item,"delta",true);
+        }
+        JSONArray skills=e.optJSONArray("skills");
+        if(skills!=null)for(int i=0;i<skills.length();i++){
+            JSONObject skill=skills.optJSONObject(i);
+            if(skill!=null){
+                normalizeModelInt(skill,"index",false);
+                normalizeModelInt(skill,"xp",true);
+            }
+        }
+        JSONObject enemy=e.optJSONObject("enemy");
+        if(enemy!=null){
+            normalizeModelInt(enemy,"hp",false);
+            normalizeModelInt(enemy,"maxHp",true);
+            normalizeModelInt(enemy,"damage",true);
+        }
+    }
+
     /** Strip model protocol accidentally emitted inside the story. Never apply
      * effects found in prose; only the validated top-level object is authoritative. */
     static String cleanScene(String text){
@@ -78,6 +144,7 @@ public final class AiGameTurn {
         JSONObject json=extractObject(response);
         json.put("scene",cleanScene(json.optString("scene","")));
         normalizeModelChance(json,"customChance");
+        normalizeModelEffects(json);
         if(lockedChance!=-2){
             // The engine owns the chance. Missing echo or known null is not a new roll.
             if(json.has("customChance")&&!json.isNull("customChance")&&
@@ -289,7 +356,7 @@ public final class AiGameTurn {
         Object raw=e.opt(name);
         if(!(raw instanceof Number))throw new JSONException("Параметр не число: "+name);
         double v=((Number)raw).doubleValue();
-        if(v!=Math.rint(v)||Math.abs(v)>limit)throw new JSONException("Недопустимое изменение "+name);
+        if(!Double.isFinite(v)||v!=Math.rint(v)||Math.abs(v)>limit)throw new JSONException("Недопустимое изменение "+name);
         return (int)v;
     }
     private static int requiredEnemyInt(JSONObject enemy,String key,int min,int max)throws JSONException{
