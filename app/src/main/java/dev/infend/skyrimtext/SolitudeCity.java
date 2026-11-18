@@ -48,7 +48,8 @@ final class SolitudeCity {
     private SolitudeHome home=new SolitudeHome();
     void companionChoices(GameEngine g,GameEngine.Scene s){home.companionChoices(g,s);}
     void companionAction(GameEngine g,String a){home.companionAction(g,a);}
-    int jordisDamage(GameEngine g,int turn,int remaining){return home.jordisActive(g)&&turn%2==0?Math.min(Math.max(0,remaining),4+Math.min(10,g.level/5)):0;}
+    int jordisDamage(GameEngine g,int turn,int remaining){return home.jordisActive(g)&&turn%2==0?Math.min(Math.max(0,remaining),4+Math.min(10,g.level/5)+home.jordisWeaponBonus()):0;}
+    int jordisProtection(GameEngine g,int incoming,boolean defending){return defending&&home.jordisActive(g)?home.jordisProtection(incoming):0;}
     private SolitudeJustice justice=new SolitudeJustice();
     boolean confined(){return justice.confined();}
     boolean custody(){return confined()||justice.detained();}

@@ -764,6 +764,7 @@ public final class GameEngine {
         int kathProtection=katherine.protect(incoming);incoming-=kathProtection;
         if(kathProtection>0){lastBlocked+=kathProtection;actionText+="\nКэтрин: защитный барьер, −"+kathProtection+" входящего урона.";}
         int itachiProtection=itachi.protect(incoming,itachiWild&&!defeatedTarget);incoming-=itachiProtection;if(itachiProtection>0){lastBlocked+=itachiProtection;actionText+="\nИтачи: "+itachi.lastDefense+", −"+itachiProtection+" входящего урона.";}
+        int jordisProtection=solitude.jordisProtection(this,incoming,defending);incoming-=jordisProtection;if(jordisProtection>0){lastBlocked+=jordisProtection;actionText+="\nЙордис: прикрывает тебя, −"+jordisProtection+" входящего урона.";}
         int liviaProtection=livia.protect(incoming);incoming-=liviaProtection;if(liviaProtection>0){lastBlocked+=liviaProtection;actionText+="\nЛивия: прикрывает щитом, −"+liviaProtection+" входящего урона.";}
         int almaWeakness=alma.weaken(incoming);incoming-=almaWeakness;if(almaWeakness>0){lastBlocked+=almaWeakness;actionText+="\nАльма: Алая тень / Метка смерти, −"+almaWeakness+" входящего урона.";}
         int almaProtection=alma.protect(incoming);incoming-=almaProtection;if(almaProtection>0){lastBlocked+=almaProtection;actionText+="\nАльма: защитная магия, −"+almaProtection+" входящего урона.";}

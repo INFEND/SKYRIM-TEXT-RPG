@@ -9,17 +9,32 @@ final class SolitudeHome {
     private static final int[] COST={2000,1500,2000,2500,2500};
     private int rooms,lastMeal=-1,lastStudy=-1;
     private boolean jordisFollowing;
+    private JordisGear jordisGear=new JordisGear();
+    int jordisWeaponBonus(){return jordisGear.damageBonus();}
+    int jordisProtection(int incoming){return jordisGear.protection(incoming);}
     boolean jordisActive(GameEngine g){return jordisFollowing&&owns(g)&&SolitudeCourt.done(g,SolitudeCourt.THANE)&&SolitudeCourt.available(g,"Йордис Дева Меча",0,24)&&!g.solitude.custody();}
     void companionChoices(GameEngine g,GameEngine.Scene s){
         if(jordisActive(g)&&SolitudeCourt.ready(g)&&"WORLD".equals(g.mode)){
             s.add("JORDIS:talk","Поговорить с Йордис","Хускарл | В пути");
             s.add("JORDIS:dismiss","Отправить Йордис домой","Высокий шпиль");
+            jordisDialogue(s,"JORDIS:");
+            jordisGear.choices(g,s,"JORDIS:");
         }
     }
     void companionAction(GameEngine g,String a){
         if(!"WORLD".equals(g.mode)||!SolitudeCourt.ready(g)||!jordisActive(g))return;
         if("JORDIS:dismiss".equals(a)){jordisFollowing=false;report(g,"Йордис возвращается в Высокий шпиль. Там она будет ждать тебя.");}
-        else if("JORDIS:talk".equals(a))report(g,"Йордис: Я рядом, мой тан. Если пожелаешь, я вернусь охранять наш дом в Солитьюде.");
+        else if("JORDIS:talk".equals(a))report(g,"Йордис: Я рядом, мой тан. "+jordisGear.summary());
+        else jordisInteraction(g,a.substring("JORDIS:".length()));
+    }
+    private void jordisDialogue(GameEngine.Scene s,String prefix){
+        s.add(prefix+"duty","Спросить Йордис о долге хускарла","Хаафингар");
+        s.add(prefix+"tactics","Обсудить тактику с Йордис","Оружие и прикрытие");
+    }
+    private void jordisInteraction(GameEngine g,String action){
+        if("duty".equals(action)){report(g,"Йордис: Я присягнула защищать тана и его дом. Высокий шпиль под моей охраной, когда мы не в пути.");return;}
+        if("tactics".equals(action)){report(g,"Йордис: Держись за моей спиной, когда нужно передохнуть. "+jordisGear.summary());return;}
+        String result=jordisGear.action(g,action);if(result!=null)report(g,result);
     }
     // Only fungible, non-quest goods; equipment and engine-backed counters are excluded.
     private final JSONObject chest=new JSONObject();
@@ -83,6 +98,8 @@ final class SolitudeHome {
             if(SolitudeCourt.done(g,SolitudeCourt.THANE)&&SolitudeCourt.available(g,"Йордис Дева Меча",0,24)){
                 s.add("SOLITUDE:home:jordis:talk","Поговорить с Йордис Девой Меча","Хускарл | "+(jordisFollowing?"Сопровождает тебя":"Охраняет поместье"));
                 s.add(jordisFollowing?"SOLITUDE:home:jordis:stay":"SOLITUDE:home:jordis:follow",jordisFollowing?"Оставить Йордис дома":"Попросить Йордис сопровождать тебя","Поддержка в бою");
+                jordisDialogue(s,"SOLITUDE:home:jordis:");
+                jordisGear.choices(g,s,"SOLITUDE:home:jordis:");
             }
             for(int i=0;i<GOODS.length;i++){
                 String id=GOODS[i];int n=stored(id);
@@ -107,7 +124,8 @@ final class SolitudeHome {
             if(!SolitudeCourt.ready(g)||!SolitudeCourt.done(g,SolitudeCourt.THANE)||!SolitudeCourt.available(g,"Йордис Дева Меча",0,24))return;
             if(a.equals("SOLITUDE:home:jordis:follow")){jordisFollowing=true;report(g,"Йордис: Я буду защищать тебя, мой тан.");}
             else if(a.equals("SOLITUDE:home:jordis:stay")){jordisFollowing=false;report(g,"Йордис остаётся охранять Высокий шпиль.");}
-            else if(a.equals("SOLITUDE:home:jordis:talk"))report(g,"Йордис: Мой долг — защищать тебя и твоё поместье. Если понадобится помощь, я готова.");
+            else if(a.equals("SOLITUDE:home:jordis:talk"))report(g,"Йордис: Мой долг — защищать тебя и твоё поместье. "+jordisGear.summary());
+            else jordisInteraction(g,a.substring("SOLITUDE:home:jordis:".length()));
             return;
         }
         if(transfer(g,a))return;
@@ -132,6 +150,6 @@ final class SolitudeHome {
         }
     }
     private static void report(GameEngine g,String m){g.message=m;g.progress.recent=m;g.recordVisualEvent(m);g.progress.sync(g);}
-    JSONObject save(){JSONObject j=new JSONObject();try{j.put("rooms",rooms).put("lastMeal",lastMeal).put("lastStudy",lastStudy).put("chest",chest).put("jordisFollowing",jordisFollowing);}catch(Exception ignored){}return j;}
-    static SolitudeHome restore(JSONObject j){SolitudeHome x=new SolitudeHome();if(j!=null){x.jordisFollowing=j.optBoolean("jordisFollowing",false);x.rooms=j.optInt("rooms")&31;x.lastMeal=j.optInt("lastMeal",-1);x.lastStudy=j.optInt("lastStudy",-1);JSONObject c=j.optJSONObject("chest");if(c!=null)for(String id:GOODS)x.setStored(id,Math.max(0,Math.min(LIMIT,c.optInt(id,0))));}return x;}
+    JSONObject save(){JSONObject j=new JSONObject();try{j.put("rooms",rooms).put("lastMeal",lastMeal).put("lastStudy",lastStudy).put("chest",chest).put("jordisFollowing",jordisFollowing).put("jordisGear",jordisGear.save());}catch(Exception ignored){}return j;}
+    static SolitudeHome restore(JSONObject j){SolitudeHome x=new SolitudeHome();if(j!=null){x.jordisFollowing=j.optBoolean("jordisFollowing",false);x.jordisGear=JordisGear.restore(j.optJSONObject("jordisGear"));x.rooms=j.optInt("rooms")&31;x.lastMeal=j.optInt("lastMeal",-1);x.lastStudy=j.optInt("lastStudy",-1);JSONObject c=j.optJSONObject("chest");if(c!=null)for(String id:GOODS)x.setStored(id,Math.max(0,Math.min(LIMIT,c.optInt(id,0))));}return x;}
 }
