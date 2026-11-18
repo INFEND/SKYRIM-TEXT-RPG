@@ -263,6 +263,7 @@ public final class GameEngine {
         s.add("EXPLORE","Исследовать окрестности","Случайные встречи, тайники и опасности");
         SolitudeWolf.worldChoices(this,s);
         SolitudeCourt.worldChoices(this,s);
+        solitude.companionChoices(this,s);
         if(SolitudeCity.here(this))s.add("SOLITUDE:open","Жизнь Солитьюда","Районы столицы, местные занятия, услуги и заработок");
         s.add("QUEST","История хранителей","Пепельные печати | " + questStatus());
         s.add("TALK","Поговорить с местными","Слухи, события и полезные сведения");
@@ -390,6 +391,7 @@ public final class GameEngine {
         if(solitude.custody()){solitude.choose(this,action);return;}
         if(RoadEvents.MODE.equals(mode)){road.choose(this,action);return;}
         if(road.pending()&&!"COMBAT".equals(mode)){if("GO_WORLD".equals(action))road.resume(this);return;}
+        if(action.startsWith("JORDIS:")){solitude.companionAction(this,action);return;}
         if(action.startsWith("COURT:")){SolitudeCourt.chooseWorld(this,action);return;}
         if(action.startsWith("WOLF:")){SolitudeWolf.chooseWorld(this,action);return;}
         if(action.startsWith("SOLITUDE:")||SolitudeCity.isMode(mode)){solitude.choose(this,action);return;}

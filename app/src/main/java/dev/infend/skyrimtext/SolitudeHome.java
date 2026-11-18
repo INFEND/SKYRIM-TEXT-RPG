@@ -10,6 +10,17 @@ final class SolitudeHome {
     private int rooms,lastMeal=-1,lastStudy=-1;
     private boolean jordisFollowing;
     boolean jordisActive(GameEngine g){return jordisFollowing&&owns(g)&&SolitudeCourt.done(g,SolitudeCourt.THANE)&&SolitudeCourt.available(g,"Йордис Дева Меча",0,24)&&!g.solitude.custody();}
+    void companionChoices(GameEngine g,GameEngine.Scene s){
+        if(jordisActive(g)&&SolitudeCourt.ready(g)&&"WORLD".equals(g.mode)){
+            s.add("JORDIS:talk","Поговорить с Йордис","Хускарл | В пути");
+            s.add("JORDIS:dismiss","Отправить Йордис домой","Высокий шпиль");
+        }
+    }
+    void companionAction(GameEngine g,String a){
+        if(!"WORLD".equals(g.mode)||!SolitudeCourt.ready(g)||!jordisActive(g))return;
+        if("JORDIS:dismiss".equals(a)){jordisFollowing=false;report(g,"Йордис возвращается в Высокий шпиль. Там она будет ждать тебя.");}
+        else if("JORDIS:talk".equals(a))report(g,"Йордис: Я рядом, мой тан. Если пожелаешь, я вернусь охранять наш дом в Солитьюде.");
+    }
     // Only fungible, non-quest goods; equipment and engine-backed counters are excluded.
     private final JSONObject chest=new JSONObject();
     private static final String[] GOODS={"Железный слиток","Стальной слиток","Кожаные полоски","Пшеница","Голубой горноцвет","Красный горноцвет","Пурпурный горноцвет","Соль","Факел","Отмычка","Железная стрела","Стальная стрела","Серебряный слиток","Золотой слиток","Эбонитовый слиток","Ртутный слиток","Двемерский металлический слиток","Орихалковый слиток","Корундовый слиток","Кожа","Лунный сахар","Стальной болт"};
