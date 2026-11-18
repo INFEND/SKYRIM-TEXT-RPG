@@ -3,14 +3,23 @@ ROOT=pathlib.Path(__file__).resolve().parents[1]
 APP=ROOT/"app/src/main/java/dev/infend/skyrimtext"
 ENGINE=ROOT/"engine/src/main/java/dev/infend/skyrimtext"
 class LocalAiRecovery(unittest.TestCase):
-    def test_one_recovery_and_fresh_request_id(self):
+    def test_worker_crash_never_replays_request(self):
         c=(APP/"LocalAiClient.kt").read_text()
-        for s in ('if(recoveryUsed||original==null', 'recoveryUsed=true', 'val retryId=synchronized(guard){++generation}', 'data.putString("resumeText",lastPartial)', 'data.putInt("resumeTokens",lastTokens)', 'Context.BIND_IMPORTANT', 'armWatchdog(retryId)', 'requestData=null'):
-            self.assertIn(s,c)
-    def test_resume_preserves_output_budget_and_save_gate(self):
-        w=(ENGINE/"LocalAiInferenceService.kt").read_text()
-        for s in ('"n_ctx" to 8192', '"n_batch" to (if (recovery) 32 else 128)', '"n_predict" to (limit - previousTokens)', 'tokenCount = previousTokens', 'if (resume.isNotEmpty()) resume', 'count > previousTokens', 'getHistoricalProcessExitReasons'):
-            self.assertIn(s,w)
+        recovery=c.split("private fun recoverProcess(",1)[1].split("private fun currentGeneration",1)[0]
+        self.assertIn("failGeneration(id",recovery)
+        self.assertNotIn("connect(",recovery)
+        self.assertNotIn("MSG_GENERATE",recovery)
+    def test_local_validation_does_not_restart_or_commit_invalid_turn(self):
         ui=(APP/"MainActivity.java").read_text()
-        self.assertIn("AiGameTurn completed=AiGameTurn.parseModel(answer,expectedChance)",ui)
+        self.assertIn("if(!local&&repairAttempt==0",ui)
+        self.assertIn("AiGameTurn.parseLocalModel(answer,expectedChance)",ui)
+        self.assertIn("НЕСОХРАНЁННЫЙ ОТВЕТ ИИ",ui)
         self.assertIn("if(!game.toJson().toString().equals(saved))",ui)
+    def test_direct_qwen_prompt_and_post_action_grounding(self):
+        preview=(ENGINE/"AiScenePreview.java").read_text()
+        self.assertIn('endsWith("<|im_start|>assistant")',preview)
+        self.assertIn(r'<think>\n\n</think>',preview)
+        prompt=(APP/"AiStoryClient.java").read_text()
+        self.assertIn("/no_think",prompt)
+        self.assertIn("Не повторяй уже исполненное действие",prompt)
+        self.assertIn("effects.hourDelta",prompt)
