@@ -6168,5 +6168,2082 @@
     "aliases": [
       "Stalhrim Source"
     ]
+  },
+  {
+    "slug": "alftand",
+    "name": "Альфтанд",
+    "captions": [
+      "Вход в руины среди ледника"
+    ],
+    "aliases": [
+      "Alftand"
+    ],
+    "artwork": {
+      "kind": "original_generated_illustration",
+      "generator": "built_in_imagegen",
+      "final_prompt": "Use case: stylized-concept. Create one original finished horizontal 16:9 environmental illustration, full bleed, for a dark Nordic fantasy location gallery. One continuous scene with a clear focal point at mobile scale. Photorealistic architectural concept art, believably weathered masonry, substantial bronze engineering with an original design, restrained natural colors, readable contrast, crisp tactile details, deep focus. Use a wholly new composition and architecture. No reference to existing screenshots or level geometry. No writing, captions, collage, UI, border, logo, watermark, or foreground figures. Scene: A stranded frontier survey camp made of two collapsed canvas shelters and a rope spans the edge of a blue glacial rift. Low, tiered megalithic ruins and a tarnished bronze grille emerge from the ice on the opposite bank. Compose from ice level through a fractured ice arch, with the offset ruined gateway as the focus. Soft overcast winter light, cold cobalt and slate, a single extinguished brazier. Distinguish the embedded ruin from the exposed machinery of a lift.",
+      "source_file": "exec-768c709b-2424-466b-80b6-37080fa0a29a.png",
+      "source_sha256": "31b95a74a2c82fc35501606f5c158e3546dca18d49515d05f2bfe50738bb7d92",
+      "source_bytes": 3475487,
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "compression": {
+        "format": "WebP",
+        "method": 6,
+        "quality": 90,
+        "dimensions": [
+          1672,
+          941
+        ],
+        "encoded_bytes": 530984,
+        "sha256": "39f834594bdaac65e3e1967db2d2aa144522bf3caa66f2d7731e9642058bab47",
+        "archive_bytes": 531096,
+        "archive_sha256": "4580cc0e049c9f8cba114c145c654329eca2bd5f1b7d4d81ae58ea6dd26e4cee",
+        "full_resolution_luma_ssim": 0.9861591,
+        "worst_128px_luma_ssim": 0.9746997,
+        "chroma_mean_absolute_error": 1.1557922,
+        "chroma_95th_percentile_error": 3.0,
+        "trials": [
+          {
+            "quality": 68,
+            "bytes": 241674,
+            "full_resolution_luma_ssim": 0.9425312,
+            "worst_128px_luma_ssim": 0.9120622,
+            "chroma_mean_absolute_error": 1.5886153,
+            "chroma_95th_percentile_error": 5.0
+          },
+          {
+            "quality": 72,
+            "bytes": 255988,
+            "full_resolution_luma_ssim": 0.9471747,
+            "worst_128px_luma_ssim": 0.9167427,
+            "chroma_mean_absolute_error": 1.5604378,
+            "chroma_95th_percentile_error": 5.0
+          },
+          {
+            "quality": 76,
+            "bytes": 278380,
+            "full_resolution_luma_ssim": 0.9531993,
+            "worst_128px_luma_ssim": 0.9277607,
+            "chroma_mean_absolute_error": 1.5142524,
+            "chroma_95th_percentile_error": 4.0
+          },
+          {
+            "quality": 80,
+            "bytes": 328004,
+            "full_resolution_luma_ssim": 0.9645755,
+            "worst_128px_luma_ssim": 0.9422749,
+            "chroma_mean_absolute_error": 1.422258,
+            "chroma_95th_percentile_error": 4.0
+          },
+          {
+            "quality": 84,
+            "bytes": 386238,
+            "full_resolution_luma_ssim": 0.9738028,
+            "worst_128px_luma_ssim": 0.9565333,
+            "chroma_mean_absolute_error": 1.3263841,
+            "chroma_95th_percentile_error": 4.0
+          },
+          {
+            "quality": 88,
+            "bytes": 472656,
+            "full_resolution_luma_ssim": 0.9823251,
+            "worst_128px_luma_ssim": 0.9687943,
+            "chroma_mean_absolute_error": 1.221181,
+            "chroma_95th_percentile_error": 3.0
+          },
+          {
+            "quality": 92,
+            "bytes": 597598,
+            "full_resolution_luma_ssim": 0.9890275,
+            "worst_128px_luma_ssim": 0.9791293,
+            "chroma_mean_absolute_error": 1.0746127,
+            "chroma_95th_percentile_error": 3.0
+          },
+          {
+            "quality": 89,
+            "bytes": 506988,
+            "full_resolution_luma_ssim": 0.9848241,
+            "worst_128px_luma_ssim": 0.9735525,
+            "chroma_mean_absolute_error": 1.1771114,
+            "chroma_95th_percentile_error": 3.0
+          },
+          {
+            "quality": 90,
+            "bytes": 530984,
+            "full_resolution_luma_ssim": 0.9861591,
+            "worst_128px_luma_ssim": 0.9746997,
+            "chroma_mean_absolute_error": 1.1557922,
+            "chroma_95th_percentile_error": 3.0
+          },
+          {
+            "quality": 91,
+            "bytes": 569254,
+            "full_resolution_luma_ssim": 0.9880848,
+            "worst_128px_luma_ssim": 0.9780136,
+            "chroma_mean_absolute_error": 1.1141436,
+            "chroma_95th_percentile_error": 3.0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "arkngthamz",
+    "name": "Аркнтамз",
+    "captions": [
+      "Обрушившийся зал резонаторов"
+    ],
+    "aliases": [
+      "Arkngthamz",
+      "Arkngthamz (DG)"
+    ],
+    "artwork": {
+      "kind": "original_generated_illustration",
+      "generator": "built_in_imagegen",
+      "final_prompt": "Use case: stylized-concept. Create one original finished horizontal 16:9 environmental illustration, full bleed, for a dark Nordic fantasy location gallery. One continuous scene with a clear focal point at mobile scale. Photorealistic architectural concept art, believably weathered masonry, substantial bronze engineering with an original design, restrained natural colors, readable contrast, crisp tactile details, deep focus. Use a wholly new composition and architecture. No reference to existing screenshots or level geometry. No writing, captions, collage, UI, border, logo, watermark, or foreground figures. Scene: Inside a slate ravine torn open by earthquakes, old stone buttresses lean across a cistern and swallow a collapsed walkway. A stream spills from a break in the rock. A newly designed bronze resonance instrument comprises three tall narrow flutes of different lengths above a shallow basin. Frame it from the side across cold wet rock, with diagonal sun from a fault above and restrained amber highlights. Architectural archaeology, fractured and visibly unstable, a memorable acoustic chamber.",
+      "source_file": "exec-cb6ad2d8-fd99-474b-a0f5-073ad564ffb7.png",
+      "source_sha256": "0683e00d17e0ead61c0f63d93eddf040ef5ffac63d12f55171c669fdae0081f9",
+      "source_bytes": 3413649,
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "compression": {
+        "format": "WebP",
+        "method": 6,
+        "quality": 90,
+        "dimensions": [
+          1672,
+          941
+        ],
+        "encoded_bytes": 550752,
+        "sha256": "6d26faa95bf42fdac431fa45406f29c932761a8b93969d3c547b9501f0b85e16",
+        "archive_bytes": 550864,
+        "archive_sha256": "1ec5f1ff36d2667cb3e3e5b1edab2c27c2503a20817ae244d1f68db1ee0b701c",
+        "full_resolution_luma_ssim": 0.985418,
+        "worst_128px_luma_ssim": 0.9786829,
+        "chroma_mean_absolute_error": 1.3765909,
+        "chroma_95th_percentile_error": 4.0,
+        "trials": [
+          {
+            "quality": 68,
+            "bytes": 248582,
+            "full_resolution_luma_ssim": 0.9386345,
+            "worst_128px_luma_ssim": 0.915468,
+            "chroma_mean_absolute_error": 1.9163128,
+            "chroma_95th_percentile_error": 6.0
+          },
+          {
+            "quality": 72,
+            "bytes": 262794,
+            "full_resolution_luma_ssim": 0.9421812,
+            "worst_128px_luma_ssim": 0.922334,
+            "chroma_mean_absolute_error": 1.8799785,
+            "chroma_95th_percentile_error": 6.0
+          },
+          {
+            "quality": 76,
+            "bytes": 285570,
+            "full_resolution_luma_ssim": 0.9490843,
+            "worst_128px_luma_ssim": 0.9318076,
+            "chroma_mean_absolute_error": 1.8204416,
+            "chroma_95th_percentile_error": 5.0
+          },
+          {
+            "quality": 80,
+            "bytes": 330400,
+            "full_resolution_luma_ssim": 0.9597813,
+            "worst_128px_luma_ssim": 0.9445698,
+            "chroma_mean_absolute_error": 1.7205584,
+            "chroma_95th_percentile_error": 5.0
+          },
+          {
+            "quality": 84,
+            "bytes": 395748,
+            "full_resolution_luma_ssim": 0.97104,
+            "worst_128px_luma_ssim": 0.9608322,
+            "chroma_mean_absolute_error": 1.588484,
+            "chroma_95th_percentile_error": 5.0
+          },
+          {
+            "quality": 88,
+            "bytes": 486078,
+            "full_resolution_luma_ssim": 0.980747,
+            "worst_128px_luma_ssim": 0.9725856,
+            "chroma_mean_absolute_error": 1.4524019,
+            "chroma_95th_percentile_error": 4.0
+          },
+          {
+            "quality": 92,
+            "bytes": 607008,
+            "full_resolution_luma_ssim": 0.9884804,
+            "worst_128px_luma_ssim": 0.9823401,
+            "chroma_mean_absolute_error": 1.3167216,
+            "chroma_95th_percentile_error": 4.0
+          },
+          {
+            "quality": 89,
+            "bytes": 509538,
+            "full_resolution_luma_ssim": 0.9829738,
+            "worst_128px_luma_ssim": 0.9748472,
+            "chroma_mean_absolute_error": 1.431127,
+            "chroma_95th_percentile_error": 4.0
+          },
+          {
+            "quality": 90,
+            "bytes": 550752,
+            "full_resolution_luma_ssim": 0.985418,
+            "worst_128px_luma_ssim": 0.9786829,
+            "chroma_mean_absolute_error": 1.3765909,
+            "chroma_95th_percentile_error": 4.0
+          },
+          {
+            "quality": 91,
+            "bytes": 580140,
+            "full_resolution_luma_ssim": 0.9871465,
+            "worst_128px_luma_ssim": 0.9805543,
+            "chroma_mean_absolute_error": 1.354257,
+            "chroma_95th_percentile_error": 4.0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "avanchnzel",
+    "name": "Аванчнзел",
+    "captions": [
+      "Каменный архив над осенней долиной"
+    ],
+    "aliases": [
+      "Avanchnzel"
+    ],
+    "artwork": {
+      "kind": "original_generated_illustration",
+      "generator": "built_in_imagegen",
+      "final_prompt": "Use case: stylized-concept. Create one original finished horizontal 16:9 environmental illustration, full bleed, for a dark Nordic fantasy location gallery. One continuous scene with a clear focal point at mobile scale. Photorealistic architectural concept art, believably weathered masonry, substantial bronze engineering with an original design, restrained natural colors, readable contrast, crisp tactile details, deep focus. Use a wholly new composition and architecture. No reference to existing screenshots or level geometry. No writing, captions, collage, UI, border, logo, watermark, or foreground figures. Scene: In an autumn valley, pale squared stone is hewn into the base of a massive brown cliff. View from within the threshold onto a long sloping archive corridor; an asymmetrical flight of broad steps leads toward stacked bronze storage shutters and sealed stone niches. Amber daylight reaches below hanging copper-colored birch leaves at the entrance, while the deep perspective recedes into cool aquamarine shadow. The nested perspective of the corridor and archive is the focus.",
+      "source_file": "exec-60109139-6200-4967-806b-7c73faaac2c5.png",
+      "source_sha256": "5d6ccb68fe5417c52a9af90c291235b7864c4c5316c6fcae7abd2d208f3e444e",
+      "source_bytes": 3415165,
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "compression": {
+        "format": "WebP",
+        "method": 6,
+        "quality": 89,
+        "dimensions": [
+          1672,
+          941
+        ],
+        "encoded_bytes": 548408,
+        "sha256": "8a159ecc8badabcf95559f0cb9e532d35998dd3ad475dbb7ce2d3c240117da27",
+        "archive_bytes": 548520,
+        "archive_sha256": "9b69ac950fcb941c6b4af84e5f28d12e73da752e55696b6a12a540d0496d71d1",
+        "full_resolution_luma_ssim": 0.985778,
+        "worst_128px_luma_ssim": 0.978319,
+        "chroma_mean_absolute_error": 1.9301018,
+        "chroma_95th_percentile_error": 6.0,
+        "trials": [
+          {
+            "quality": 68,
+            "bytes": 275796,
+            "full_resolution_luma_ssim": 0.9474691,
+            "worst_128px_luma_ssim": 0.9276061,
+            "chroma_mean_absolute_error": 2.5602974,
+            "chroma_95th_percentile_error": 8.0
+          },
+          {
+            "quality": 72,
+            "bytes": 288608,
+            "full_resolution_luma_ssim": 0.9501373,
+            "worst_128px_luma_ssim": 0.9313972,
+            "chroma_mean_absolute_error": 2.5062675,
+            "chroma_95th_percentile_error": 8.0
+          },
+          {
+            "quality": 76,
+            "bytes": 313162,
+            "full_resolution_luma_ssim": 0.9570718,
+            "worst_128px_luma_ssim": 0.9415448,
+            "chroma_mean_absolute_error": 2.4289936,
+            "chroma_95th_percentile_error": 7.0
+          },
+          {
+            "quality": 80,
+            "bytes": 361696,
+            "full_resolution_luma_ssim": 0.9662355,
+            "worst_128px_luma_ssim": 0.9526093,
+            "chroma_mean_absolute_error": 2.2989385,
+            "chroma_95th_percentile_error": 7.0
+          },
+          {
+            "quality": 84,
+            "bytes": 439168,
+            "full_resolution_luma_ssim": 0.976696,
+            "worst_128px_luma_ssim": 0.9667678,
+            "chroma_mean_absolute_error": 2.1003669,
+            "chroma_95th_percentile_error": 6.0
+          },
+          {
+            "quality": 88,
+            "bytes": 522370,
+            "full_resolution_luma_ssim": 0.9837821,
+            "worst_128px_luma_ssim": 0.9760623,
+            "chroma_mean_absolute_error": 1.9554095,
+            "chroma_95th_percentile_error": 6.0
+          },
+          {
+            "quality": 92,
+            "bytes": 645114,
+            "full_resolution_luma_ssim": 0.9904971,
+            "worst_128px_luma_ssim": 0.9846947,
+            "chroma_mean_absolute_error": 1.8035656,
+            "chroma_95th_percentile_error": 6.0
+          },
+          {
+            "quality": 89,
+            "bytes": 548408,
+            "full_resolution_luma_ssim": 0.985778,
+            "worst_128px_luma_ssim": 0.978319,
+            "chroma_mean_absolute_error": 1.9301018,
+            "chroma_95th_percentile_error": 6.0
+          },
+          {
+            "quality": 90,
+            "bytes": 585582,
+            "full_resolution_luma_ssim": 0.9877282,
+            "worst_128px_luma_ssim": 0.9817529,
+            "chroma_mean_absolute_error": 1.8659674,
+            "chroma_95th_percentile_error": 6.0
+          },
+          {
+            "quality": 91,
+            "bytes": 614572,
+            "full_resolution_luma_ssim": 0.9893898,
+            "worst_128px_luma_ssim": 0.9828049,
+            "chroma_mean_absolute_error": 1.8701139,
+            "chroma_95th_percentile_error": 6.0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "bthardamz",
+    "name": "Бтардамз",
+    "captions": [
+      "Заросшие террасы Бтардамза"
+    ],
+    "aliases": [
+      "Bthardamz"
+    ],
+    "artwork": {
+      "kind": "original_generated_illustration",
+      "generator": "built_in_imagegen",
+      "final_prompt": "Use case: stylized-concept. Create one original finished horizontal 16:9 environmental illustration, full bleed, for a dark Nordic fantasy location gallery. One continuous scene with a clear focal point at mobile scale. Photorealistic architectural concept art, believably weathered masonry, substantial bronze engineering with an original design, restrained natural colors, readable contrast, crisp tactile details, deep focus. Use a wholly new composition and architecture. No reference to existing screenshots or level geometry. No writing, captions, collage, UI, border, logo, watermark, or foreground figures. Scene: The Reach after a rainstorm: an abandoned sprawling bronze-and-stone installation rises in staggered terraces between bare limestone shoulders and tangled juniper. Overgrown channels lead downhill from dark ventilation ports. A small volume of subdued olive vapor drifts from a cracked outflow, with ochre weeds and navy clouds. View obliquely from the hillside so the rows of pale stone, tangled growth, and vapor give this ruin a sense of place.",
+      "source_file": "exec-2b79f65a-9901-4030-8251-6443f8591af3.png",
+      "source_sha256": "f38e881e5ca4c016f72fa8bb093d3fd6c1c0a956a7fe53b534bc121a43d79af6",
+      "source_bytes": 3663900,
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "compression": {
+        "format": "WebP",
+        "method": 6,
+        "quality": 85,
+        "dimensions": [
+          1672,
+          941
+        ],
+        "encoded_bytes": 491752,
+        "sha256": "c77d5e89293f7d3a3b0bf19e0c4c2fe05d4457f4c22076fa067884e53b8ddd1b",
+        "archive_bytes": 491864,
+        "archive_sha256": "5b451dd57fd1f8731c932585e6e50e43e148c9440a9659d4719b7a82892b01f6",
+        "full_resolution_luma_ssim": 0.9856753,
+        "worst_128px_luma_ssim": 0.973173,
+        "chroma_mean_absolute_error": 2.0207541,
+        "chroma_95th_percentile_error": 6.0,
+        "trials": [
+          {
+            "quality": 68,
+            "bytes": 312630,
+            "full_resolution_luma_ssim": 0.9632784,
+            "worst_128px_luma_ssim": 0.9404886,
+            "chroma_mean_absolute_error": 2.4633172,
+            "chroma_95th_percentile_error": 8.0
+          },
+          {
+            "quality": 72,
+            "bytes": 326284,
+            "full_resolution_luma_ssim": 0.9660811,
+            "worst_128px_luma_ssim": 0.9437745,
+            "chroma_mean_absolute_error": 2.4198123,
+            "chroma_95th_percentile_error": 8.0
+          },
+          {
+            "quality": 76,
+            "bytes": 353118,
+            "full_resolution_luma_ssim": 0.9708565,
+            "worst_128px_luma_ssim": 0.9506265,
+            "chroma_mean_absolute_error": 2.3548923,
+            "chroma_95th_percentile_error": 8.0
+          },
+          {
+            "quality": 80,
+            "bytes": 411156,
+            "full_resolution_luma_ssim": 0.9785063,
+            "worst_128px_luma_ssim": 0.9618921,
+            "chroma_mean_absolute_error": 2.1736452,
+            "chroma_95th_percentile_error": 7.0
+          },
+          {
+            "quality": 84,
+            "bytes": 470680,
+            "full_resolution_luma_ssim": 0.984049,
+            "worst_128px_luma_ssim": 0.9702797,
+            "chroma_mean_absolute_error": 2.0564492,
+            "chroma_95th_percentile_error": 7.0
+          },
+          {
+            "quality": 88,
+            "bytes": 564738,
+            "full_resolution_luma_ssim": 0.9897009,
+            "worst_128px_luma_ssim": 0.9817444,
+            "chroma_mean_absolute_error": 1.8851459,
+            "chroma_95th_percentile_error": 6.0
+          },
+          {
+            "quality": 85,
+            "bytes": 491752,
+            "full_resolution_luma_ssim": 0.9856753,
+            "worst_128px_luma_ssim": 0.973173,
+            "chroma_mean_absolute_error": 2.0207541,
+            "chroma_95th_percentile_error": 6.0
+          },
+          {
+            "quality": 86,
+            "bytes": 515918,
+            "full_resolution_luma_ssim": 0.9870431,
+            "worst_128px_luma_ssim": 0.9744966,
+            "chroma_mean_absolute_error": 1.9781587,
+            "chroma_95th_percentile_error": 6.0
+          },
+          {
+            "quality": 87,
+            "bytes": 537234,
+            "full_resolution_luma_ssim": 0.9885792,
+            "worst_128px_luma_ssim": 0.9805657,
+            "chroma_mean_absolute_error": 1.933491,
+            "chroma_95th_percentile_error": 6.0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "great_lift_alftand",
+    "name": "Великий подъёмник — Альфтанд",
+    "captions": [
+      "Подъёмник у края ледника"
+    ],
+    "aliases": [
+      "Great Lift at Alftand"
+    ],
+    "artwork": {
+      "kind": "original_generated_illustration",
+      "generator": "built_in_imagegen",
+      "final_prompt": "Use case: stylized-concept. Create one original finished horizontal 16:9 environmental illustration, full bleed, for a dark Nordic fantasy location gallery. One continuous scene with a clear focal point at mobile scale. Photorealistic architectural concept art, believably weathered masonry, substantial bronze engineering with an original design, restrained natural colors, readable contrast, crisp tactile details, deep focus. Use a wholly new composition and architecture. No reference to existing screenshots or level geometry. No writing, captions, collage, UI, border, logo, watermark, or foreground figures. Scene: Exterior of an isolated ancient elevator in a white glacial basin. A hefty vertical bronze bell housing with ribbed fins and a narrow iron-railed platform rises halfway out of a packed-ice shaft, clamped between two black-stone anchors. Ice crystals, frost on metal, breathlike vapor and low pale winter sun. Side view with machinery in the near midground and an unbroken white mountain face farther away. The isolated hoist is the focus.",
+      "source_file": "exec-e5d68474-79cc-4f5a-8069-7ff1ac199e66.png",
+      "source_sha256": "e8f766365781196566c2747198fee1526bb061fd7318c3a7c95a800b605405f5",
+      "source_bytes": 3287457,
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "compression": {
+        "format": "WebP",
+        "method": 6,
+        "quality": 90,
+        "dimensions": [
+          1672,
+          941
+        ],
+        "encoded_bytes": 497190,
+        "sha256": "38cd96d86a2c433cef311d4a4a9298692adbbce12cd5fd0244b5476da1590dd6",
+        "archive_bytes": 497302,
+        "archive_sha256": "1ed096b8c3a0cf833ab9826d8a136dea077107e5b96245f73ca224ae51392896",
+        "full_resolution_luma_ssim": 0.9850549,
+        "worst_128px_luma_ssim": 0.9742293,
+        "chroma_mean_absolute_error": 1.1823708,
+        "chroma_95th_percentile_error": 3.0,
+        "trials": [
+          {
+            "quality": 68,
+            "bytes": 224388,
+            "full_resolution_luma_ssim": 0.9430486,
+            "worst_128px_luma_ssim": 0.916183,
+            "chroma_mean_absolute_error": 1.6751509,
+            "chroma_95th_percentile_error": 5.0
+          },
+          {
+            "quality": 72,
+            "bytes": 234542,
+            "full_resolution_luma_ssim": 0.9460356,
+            "worst_128px_luma_ssim": 0.9202358,
+            "chroma_mean_absolute_error": 1.6460541,
+            "chroma_95th_percentile_error": 5.0
+          },
+          {
+            "quality": 76,
+            "bytes": 254992,
+            "full_resolution_luma_ssim": 0.9515828,
+            "worst_128px_luma_ssim": 0.9291122,
+            "chroma_mean_absolute_error": 1.5819041,
+            "chroma_95th_percentile_error": 5.0
+          },
+          {
+            "quality": 80,
+            "bytes": 303314,
+            "full_resolution_luma_ssim": 0.9626679,
+            "worst_128px_luma_ssim": 0.9451573,
+            "chroma_mean_absolute_error": 1.478439,
+            "chroma_95th_percentile_error": 4.0
+          },
+          {
+            "quality": 84,
+            "bytes": 357884,
+            "full_resolution_luma_ssim": 0.9728166,
+            "worst_128px_luma_ssim": 0.9609388,
+            "chroma_mean_absolute_error": 1.3793067,
+            "chroma_95th_percentile_error": 4.0
+          },
+          {
+            "quality": 88,
+            "bytes": 440786,
+            "full_resolution_luma_ssim": 0.9816213,
+            "worst_128px_luma_ssim": 0.9720739,
+            "chroma_mean_absolute_error": 1.2524931,
+            "chroma_95th_percentile_error": 4.0
+          },
+          {
+            "quality": 92,
+            "bytes": 572528,
+            "full_resolution_luma_ssim": 0.9888735,
+            "worst_128px_luma_ssim": 0.981084,
+            "chroma_mean_absolute_error": 1.102588,
+            "chroma_95th_percentile_error": 3.0
+          },
+          {
+            "quality": 89,
+            "bytes": 466286,
+            "full_resolution_luma_ssim": 0.9834048,
+            "worst_128px_luma_ssim": 0.9737458,
+            "chroma_mean_absolute_error": 1.2217625,
+            "chroma_95th_percentile_error": 4.0
+          },
+          {
+            "quality": 90,
+            "bytes": 497190,
+            "full_resolution_luma_ssim": 0.9850549,
+            "worst_128px_luma_ssim": 0.9742293,
+            "chroma_mean_absolute_error": 1.1823708,
+            "chroma_95th_percentile_error": 3.0
+          },
+          {
+            "quality": 91,
+            "bytes": 537210,
+            "full_resolution_luma_ssim": 0.9874192,
+            "worst_128px_luma_ssim": 0.9784414,
+            "chroma_mean_absolute_error": 1.151148,
+            "chroma_95th_percentile_error": 3.0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "great_lift_mzinchaleft",
+    "name": "Великий подъёмник — Мзинчалефт",
+    "captions": [
+      "Шахта подъёмника в тундре"
+    ],
+    "aliases": [
+      "Great Lift at Mzinchaleft"
+    ],
+    "artwork": {
+      "kind": "original_generated_illustration",
+      "generator": "built_in_imagegen",
+      "final_prompt": "Use case: stylized-concept. Create one original finished horizontal 16:9 environmental illustration, full bleed, for a dark Nordic fantasy location gallery. One continuous scene with a clear focal point at mobile scale. Photorealistic architectural concept art, believably weathered masonry, substantial bronze engineering with an original design, restrained natural colors, readable contrast, crisp tactile details, deep focus. Use a wholly new composition and architecture. No reference to existing screenshots or level geometry. No writing, captions, collage, UI, border, logo, watermark, or foreground figures. Scene: Open mechanical elevator in gently rolling snow-covered tundra at dusk. An ancient faceted stone ring is laid out flat in the terrain, centered on a hexagonal suspended cage. A squat bronze winch to the side catches the last pale pink sunset. See both the rim and the descending cage from an elevated three-quarter view. Sparse dead grass and distant dark spruce silhouettes, red-brown oxidation against dusty pink and lavender winter light. No large ruin facade here.",
+      "source_file": "exec-31d779b7-8d6c-4fda-952e-e53c05170ce1.png",
+      "source_sha256": "9c19e39d16454eb1f4ad4cf389b1b267aa0a5e8fc10fc8f5cec904409395aa0b",
+      "source_bytes": 2982683,
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "compression": {
+        "format": "WebP",
+        "method": 6,
+        "quality": 92,
+        "dimensions": [
+          1672,
+          941
+        ],
+        "encoded_bytes": 461238,
+        "sha256": "7efa27a856d6a112c100fd09149d8ea3315cde3710dc0e473f564a62083833b8",
+        "archive_bytes": 461350,
+        "archive_sha256": "b3d4b89f5390a5b893f0963d28dceb13f84802adaf0c94cdf9454137a1bf4616",
+        "full_resolution_luma_ssim": 0.985949,
+        "worst_128px_luma_ssim": 0.9792589,
+        "chroma_mean_absolute_error": 1.0991418,
+        "chroma_95th_percentile_error": 3.0,
+        "trials": [
+          {
+            "quality": 68,
+            "bytes": 168530,
+            "full_resolution_luma_ssim": 0.934302,
+            "worst_128px_luma_ssim": 0.9059747,
+            "chroma_mean_absolute_error": 1.6970687,
+            "chroma_95th_percentile_error": 5.0
+          },
+          {
+            "quality": 72,
+            "bytes": 181036,
+            "full_resolution_luma_ssim": 0.940599,
+            "worst_128px_luma_ssim": 0.9161265,
+            "chroma_mean_absolute_error": 1.6374997,
+            "chroma_95th_percentile_error": 5.0
+          },
+          {
+            "quality": 76,
+            "bytes": 197740,
+            "full_resolution_luma_ssim": 0.9462286,
+            "worst_128px_luma_ssim": 0.9246727,
+            "chroma_mean_absolute_error": 1.5804833,
+            "chroma_95th_percentile_error": 5.0
+          },
+          {
+            "quality": 80,
+            "bytes": 236992,
+            "full_resolution_luma_ssim": 0.9575059,
+            "worst_128px_luma_ssim": 0.9429086,
+            "chroma_mean_absolute_error": 1.4762097,
+            "chroma_95th_percentile_error": 4.0
+          },
+          {
+            "quality": 84,
+            "bytes": 283624,
+            "full_resolution_luma_ssim": 0.9677631,
+            "worst_128px_luma_ssim": 0.9561576,
+            "chroma_mean_absolute_error": 1.3600351,
+            "chroma_95th_percentile_error": 4.0
+          },
+          {
+            "quality": 88,
+            "bytes": 355818,
+            "full_resolution_luma_ssim": 0.977735,
+            "worst_128px_luma_ssim": 0.9693547,
+            "chroma_mean_absolute_error": 1.2265412,
+            "chroma_95th_percentile_error": 4.0
+          },
+          {
+            "quality": 92,
+            "bytes": 461238,
+            "full_resolution_luma_ssim": 0.985949,
+            "worst_128px_luma_ssim": 0.9792589,
+            "chroma_mean_absolute_error": 1.0991418,
+            "chroma_95th_percentile_error": 3.0
+          },
+          {
+            "quality": 89,
+            "bytes": 376514,
+            "full_resolution_luma_ssim": 0.9792647,
+            "worst_128px_luma_ssim": 0.969959,
+            "chroma_mean_absolute_error": 1.1924617,
+            "chroma_95th_percentile_error": 3.0
+          },
+          {
+            "quality": 90,
+            "bytes": 395210,
+            "full_resolution_luma_ssim": 0.9811231,
+            "worst_128px_luma_ssim": 0.97105,
+            "chroma_mean_absolute_error": 1.1819453,
+            "chroma_95th_percentile_error": 3.0
+          },
+          {
+            "quality": 91,
+            "bytes": 429072,
+            "full_resolution_luma_ssim": 0.983874,
+            "worst_128px_luma_ssim": 0.9771703,
+            "chroma_mean_absolute_error": 1.1269757,
+            "chroma_95th_percentile_error": 3.0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "great_lift_raldbthar",
+    "name": "Великий подъёмник — Ральдбтхар",
+    "captions": [
+      "Подъёмник на скальном уступе"
+    ],
+    "aliases": [
+      "Great Lift at Raldbthar"
+    ],
+    "artwork": {
+      "kind": "original_generated_illustration",
+      "generator": "built_in_imagegen",
+      "final_prompt": "Use case: stylized-concept. Create one original finished horizontal 16:9 environmental illustration, full bleed, for a dark Nordic fantasy location gallery. One continuous scene with a clear focal point at mobile scale. Photorealistic architectural concept art, believably weathered masonry, substantial bronze engineering with an original design, restrained natural colors, readable contrast, crisp tactile details, deep focus. Use a wholly new composition and architecture. No reference to existing screenshots or level geometry. No writing, captions, collage, UI, border, logo, watermark, or foreground figures. Scene: Ancient hoist on a high dry cliff buttress overlooking a sunlit pine valley and distant gray ridges. The side-on focal point is a big exposed bronze winding drum with a worn open service frame and two counterweights, built against a compact stone landing. A cage is visible partway below through a gap. Side light catches amber metal and pine resin colors. A steep layered aerial perspective makes the location distinct from tundra and glacier lifts.",
+      "source_file": "exec-8f5c2adf-72c8-43df-af69-70b0bb8e7656.png",
+      "source_sha256": "7613ce93144f1b3488061d8f766bf6190cc60ae54de15a60fe1e9a67876b01aa",
+      "source_bytes": 3455091,
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "compression": {
+        "format": "WebP",
+        "method": 6,
+        "quality": 88,
+        "dimensions": [
+          1672,
+          941
+        ],
+        "encoded_bytes": 541178,
+        "sha256": "63d5c86bf31bc54e0fa705ff3c11b2a1e14d2d001dd26e029fed07948c629a07",
+        "archive_bytes": 541290,
+        "archive_sha256": "8e1da26755f4e5bcdacb963083ea3b9a6e88466f0f7923cd6b12f17daf78cdda",
+        "full_resolution_luma_ssim": 0.9855605,
+        "worst_128px_luma_ssim": 0.9745429,
+        "chroma_mean_absolute_error": 2.0074154,
+        "chroma_95th_percentile_error": 6.0,
+        "trials": [
+          {
+            "quality": 68,
+            "bytes": 290068,
+            "full_resolution_luma_ssim": 0.9529397,
+            "worst_128px_luma_ssim": 0.932073,
+            "chroma_mean_absolute_error": 2.6750546,
+            "chroma_95th_percentile_error": 8.0
+          },
+          {
+            "quality": 72,
+            "bytes": 306424,
+            "full_resolution_luma_ssim": 0.9564046,
+            "worst_128px_luma_ssim": 0.9366984,
+            "chroma_mean_absolute_error": 2.6038461,
+            "chroma_95th_percentile_error": 8.0
+          },
+          {
+            "quality": 76,
+            "bytes": 328686,
+            "full_resolution_luma_ssim": 0.9610162,
+            "worst_128px_luma_ssim": 0.9421891,
+            "chroma_mean_absolute_error": 2.5271579,
+            "chroma_95th_percentile_error": 8.0
+          },
+          {
+            "quality": 80,
+            "bytes": 389168,
+            "full_resolution_luma_ssim": 0.9718128,
+            "worst_128px_luma_ssim": 0.9570612,
+            "chroma_mean_absolute_error": 2.3483404,
+            "chroma_95th_percentile_error": 7.0
+          },
+          {
+            "quality": 84,
+            "bytes": 451254,
+            "full_resolution_luma_ssim": 0.9786037,
+            "worst_128px_luma_ssim": 0.9647199,
+            "chroma_mean_absolute_error": 2.1844638,
+            "chroma_95th_percentile_error": 7.0
+          },
+          {
+            "quality": 88,
+            "bytes": 541178,
+            "full_resolution_luma_ssim": 0.9855605,
+            "worst_128px_luma_ssim": 0.9745429,
+            "chroma_mean_absolute_error": 2.0074154,
+            "chroma_95th_percentile_error": 6.0
+          },
+          {
+            "quality": 85,
+            "bytes": 469138,
+            "full_resolution_luma_ssim": 0.9800014,
+            "worst_128px_luma_ssim": 0.9661169,
+            "chroma_mean_absolute_error": 2.1440701,
+            "chroma_95th_percentile_error": 7.0
+          },
+          {
+            "quality": 86,
+            "bytes": 492862,
+            "full_resolution_luma_ssim": 0.9822206,
+            "worst_128px_luma_ssim": 0.9702325,
+            "chroma_mean_absolute_error": 2.096875,
+            "chroma_95th_percentile_error": 6.0
+          },
+          {
+            "quality": 87,
+            "bytes": 512744,
+            "full_resolution_luma_ssim": 0.9836785,
+            "worst_128px_luma_ssim": 0.9719373,
+            "chroma_mean_absolute_error": 2.0549982,
+            "chroma_95th_percentile_error": 6.0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "irkngthand",
+    "name": "Иркнтанд",
+    "captions": [
+      "Затопленное святилище"
+    ],
+    "aliases": [
+      "Irkngthand"
+    ],
+    "artwork": {
+      "kind": "original_generated_illustration",
+      "generator": "built_in_imagegen",
+      "final_prompt": "Use case: stylized-concept. Create one original finished horizontal 16:9 environmental illustration, full bleed, for a dark Nordic fantasy location gallery. One continuous scene with a clear focal point at mobile scale. Photorealistic architectural concept art, believably weathered masonry, substantial bronze engineering with an original design, restrained natural colors, readable contrast, crisp tactile details, deep focus. Use a wholly new composition and architecture. No reference to existing screenshots or level geometry. No writing, captions, collage, UI, border, logo, watermark, or foreground figures. Scene: Immense buried sanctuary beneath rugged mountains. An old aqueduct and footbridge of black stone end in a sunken ceremonial hall cut into dark rock. At the far end a fractured hexagonal bronze canopy hangs at an angle from an overhead support and reflects in a deep still pool. Green-blue ripples and subtle warm lamps show the scale of the silent vault. Frame diagonally from a broken side balcony, with dark foreground edges and a clearly readable center. No humanoid statues.",
+      "source_file": "exec-265da70d-e938-4856-91ed-88f7e8575260.png",
+      "source_sha256": "02cc9e560c812f92972daf8b3eaef711f9541270ebd5feb4c4f54d2ff155f5a0",
+      "source_bytes": 2858267,
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "compression": {
+        "format": "WebP",
+        "method": 6,
+        "quality": 93,
+        "dimensions": [
+          1672,
+          941
+        ],
+        "encoded_bytes": 494506,
+        "sha256": "da83547486b8c699a90e0f74a645db17dd4b5c39d4420503262671a67dfeae70",
+        "archive_bytes": 494618,
+        "archive_sha256": "d40ffc5a3e233cae4286b1ca77eccf380d742690b4c33e9652a42effb45b6bb5",
+        "full_resolution_luma_ssim": 0.9871768,
+        "worst_128px_luma_ssim": 0.9822493,
+        "chroma_mean_absolute_error": 1.2033842,
+        "chroma_95th_percentile_error": 4.0,
+        "trials": [
+          {
+            "quality": 68,
+            "bytes": 174994,
+            "full_resolution_luma_ssim": 0.9365556,
+            "worst_128px_luma_ssim": 0.8964944,
+            "chroma_mean_absolute_error": 1.778001,
+            "chroma_95th_percentile_error": 6.0
+          },
+          {
+            "quality": 72,
+            "bytes": 186356,
+            "full_resolution_luma_ssim": 0.9406261,
+            "worst_128px_luma_ssim": 0.9011406,
+            "chroma_mean_absolute_error": 1.7279302,
+            "chroma_95th_percentile_error": 6.0
+          },
+          {
+            "quality": 76,
+            "bytes": 200428,
+            "full_resolution_luma_ssim": 0.9451433,
+            "worst_128px_luma_ssim": 0.90775,
+            "chroma_mean_absolute_error": 1.687521,
+            "chroma_95th_percentile_error": 6.0
+          },
+          {
+            "quality": 80,
+            "bytes": 237466,
+            "full_resolution_luma_ssim": 0.9567512,
+            "worst_128px_luma_ssim": 0.9263309,
+            "chroma_mean_absolute_error": 1.5937486,
+            "chroma_95th_percentile_error": 5.0
+          },
+          {
+            "quality": 84,
+            "bytes": 288048,
+            "full_resolution_luma_ssim": 0.9661965,
+            "worst_128px_luma_ssim": 0.9412506,
+            "chroma_mean_absolute_error": 1.492317,
+            "chroma_95th_percentile_error": 5.0
+          },
+          {
+            "quality": 88,
+            "bytes": 353182,
+            "full_resolution_luma_ssim": 0.9770086,
+            "worst_128px_luma_ssim": 0.9638627,
+            "chroma_mean_absolute_error": 1.3556416,
+            "chroma_95th_percentile_error": 4.0
+          },
+          {
+            "quality": 92,
+            "bytes": 459298,
+            "full_resolution_luma_ssim": 0.9846767,
+            "worst_128px_luma_ssim": 0.9757401,
+            "chroma_mean_absolute_error": 1.2534353,
+            "chroma_95th_percentile_error": 4.0
+          },
+          {
+            "quality": 96,
+            "bytes": 617732,
+            "full_resolution_luma_ssim": 0.9911702,
+            "worst_128px_luma_ssim": 0.9858448,
+            "chroma_mean_absolute_error": 1.1328654,
+            "chroma_95th_percentile_error": 4.0
+          },
+          {
+            "quality": 93,
+            "bytes": 494506,
+            "full_resolution_luma_ssim": 0.9871768,
+            "worst_128px_luma_ssim": 0.9822493,
+            "chroma_mean_absolute_error": 1.2033842,
+            "chroma_95th_percentile_error": 4.0
+          },
+          {
+            "quality": 94,
+            "bytes": 545896,
+            "full_resolution_luma_ssim": 0.9891146,
+            "worst_128px_luma_ssim": 0.9844834,
+            "chroma_mean_absolute_error": 1.1699156,
+            "chroma_95th_percentile_error": 4.0
+          },
+          {
+            "quality": 95,
+            "bytes": 572398,
+            "full_resolution_luma_ssim": 0.9898811,
+            "worst_128px_luma_ssim": 0.9844726,
+            "chroma_mean_absolute_error": 1.1560646,
+            "chroma_95th_percentile_error": 4.0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "kagrenzel",
+    "name": "Кагрензел",
+    "captions": [
+      "Каменный зал над пропастью"
+    ],
+    "aliases": [
+      "Kagrenzel"
+    ],
+    "artwork": {
+      "kind": "original_generated_illustration",
+      "generator": "built_in_imagegen",
+      "final_prompt": "Use case: stylized-concept. Create one original finished horizontal 16:9 environmental illustration, full bleed, for a dark Nordic fantasy location gallery. One continuous scene with a clear focal point at mobile scale. Photorealistic architectural concept art, believably weathered masonry, substantial bronze engineering with an original design, restrained natural colors, readable contrast, crisp tactile details, deep focus. Use a wholly new composition and architecture. No reference to existing screenshots or level geometry. No writing, captions, collage, UI, border, logo, watermark, or foreground figures. Scene: An almost untouched underground observation vault under bitterly cold mountains. Downward view across a single sharply cut stone ledge toward a huge black vertical void framed by three weathered bronze crescent segments. A small pearl of ivory light floats above the shaft and softly illuminates water-polished stone. Damp cold air, charcoal and a hint of bronze. Composition creates immediate vertigo and emphasizes the empty drop. No sky or visible body.",
+      "source_file": "exec-5065364e-d0ea-4f67-8302-4e5f5268ae6e.png",
+      "source_sha256": "67afe0342717458a60a21890f0b1485160a4ad0d972f328768f67323a7030887",
+      "source_bytes": 2632075,
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "compression": {
+        "format": "WebP",
+        "method": 6,
+        "quality": 93,
+        "dimensions": [
+          1672,
+          941
+        ],
+        "encoded_bytes": 369672,
+        "sha256": "c360cc3b2ffe45aa5bd929beae2fb97dfe1ace7d8d6af23ca460b56aa98867d1",
+        "archive_bytes": 369784,
+        "archive_sha256": "dd202364c2f826ddd2e8b46ea7ebac94bf4323b3771f962686d52576f131ef06",
+        "full_resolution_luma_ssim": 0.9851283,
+        "worst_128px_luma_ssim": 0.9780591,
+        "chroma_mean_absolute_error": 0.7629815,
+        "chroma_95th_percentile_error": 2.0,
+        "trials": [
+          {
+            "quality": 68,
+            "bytes": 120412,
+            "full_resolution_luma_ssim": 0.9355522,
+            "worst_128px_luma_ssim": 0.8909911,
+            "chroma_mean_absolute_error": 0.9914495,
+            "chroma_95th_percentile_error": 3.0
+          },
+          {
+            "quality": 72,
+            "bytes": 127886,
+            "full_resolution_luma_ssim": 0.9392594,
+            "worst_128px_luma_ssim": 0.8977182,
+            "chroma_mean_absolute_error": 0.9842979,
+            "chroma_95th_percentile_error": 3.0
+          },
+          {
+            "quality": 76,
+            "bytes": 140200,
+            "full_resolution_luma_ssim": 0.9450102,
+            "worst_128px_luma_ssim": 0.9079487,
+            "chroma_mean_absolute_error": 0.9601297,
+            "chroma_95th_percentile_error": 3.0
+          },
+          {
+            "quality": 80,
+            "bytes": 167380,
+            "full_resolution_luma_ssim": 0.9550281,
+            "worst_128px_luma_ssim": 0.9278469,
+            "chroma_mean_absolute_error": 0.9173097,
+            "chroma_95th_percentile_error": 3.0
+          },
+          {
+            "quality": 84,
+            "bytes": 203852,
+            "full_resolution_luma_ssim": 0.9644454,
+            "worst_128px_luma_ssim": 0.9443917,
+            "chroma_mean_absolute_error": 0.8812799,
+            "chroma_95th_percentile_error": 3.0
+          },
+          {
+            "quality": 88,
+            "bytes": 259456,
+            "full_resolution_luma_ssim": 0.9752528,
+            "worst_128px_luma_ssim": 0.9627517,
+            "chroma_mean_absolute_error": 0.8226344,
+            "chroma_95th_percentile_error": 2.0
+          },
+          {
+            "quality": 92,
+            "bytes": 356714,
+            "full_resolution_luma_ssim": 0.984364,
+            "worst_128px_luma_ssim": 0.977527,
+            "chroma_mean_absolute_error": 0.7699409,
+            "chroma_95th_percentile_error": 2.0
+          },
+          {
+            "quality": 96,
+            "bytes": 481072,
+            "full_resolution_luma_ssim": 0.9901989,
+            "worst_128px_luma_ssim": 0.9860698,
+            "chroma_mean_absolute_error": 0.7134468,
+            "chroma_95th_percentile_error": 2.0
+          },
+          {
+            "quality": 93,
+            "bytes": 369672,
+            "full_resolution_luma_ssim": 0.9851283,
+            "worst_128px_luma_ssim": 0.9780591,
+            "chroma_mean_absolute_error": 0.7629815,
+            "chroma_95th_percentile_error": 2.0
+          },
+          {
+            "quality": 94,
+            "bytes": 415742,
+            "full_resolution_luma_ssim": 0.9874437,
+            "worst_128px_luma_ssim": 0.982177,
+            "chroma_mean_absolute_error": 0.7369629,
+            "chroma_95th_percentile_error": 2.0
+          },
+          {
+            "quality": 95,
+            "bytes": 450680,
+            "full_resolution_luma_ssim": 0.9888467,
+            "worst_128px_luma_ssim": 0.9841636,
+            "chroma_mean_absolute_error": 0.7233337,
+            "chroma_95th_percentile_error": 2.0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "mzinchaleft",
+    "name": "Руины Мзинчалефт",
+    "captions": [
+      "Ворота занесённого снегом города"
+    ],
+    "aliases": [
+      "Mzinchaleft",
+      "Мзинчалефт"
+    ],
+    "artwork": {
+      "kind": "original_generated_illustration",
+      "generator": "built_in_imagegen",
+      "final_prompt": "Use case: stylized-concept. Create one original finished horizontal 16:9 environmental illustration, full bleed, for a dark Nordic fantasy location gallery. One continuous scene with a clear focal point at mobile scale. Photorealistic architectural concept art, believably weathered masonry, substantial bronze engineering with an original design, restrained natural colors, readable contrast, crisp tactile details, deep focus. Use a wholly new composition and architecture. No reference to existing screenshots or level geometry. No writing, captions, collage, UI, border, logo, watermark, or foreground figures. Scene: Approach to a sprawling abandoned city complex on a windswept snow plain. Ground-level view along a narrow road half erased by snow, surrounded by collapsed squared limestone gatehouses and low barricadelike terraces edged with dull bronze. One taller roofless stone mass marks the lost entrance, with an offset corridor visible in shadow. Storm-blue late daylight, brown grasses and blowing fine snow. The ruined settlement spreads laterally across the frame.",
+      "source_file": "exec-549052c6-aa90-4ff1-ab60-58be6ae8c122.png",
+      "source_sha256": "238a63777204ced275019522fd5fb95e78778beb91dbe230a1728e1a45a298af",
+      "source_bytes": 3193524,
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "compression": {
+        "format": "WebP",
+        "method": 6,
+        "quality": 90,
+        "dimensions": [
+          1672,
+          941
+        ],
+        "encoded_bytes": 475054,
+        "sha256": "d20acb16529548c5c711d60857258280734f39cf6c4c1184abbbed347ef385b8",
+        "archive_bytes": 475166,
+        "archive_sha256": "9a632b8f1e69f5b9d7aab831f8df0e70d21979c9370ae2ab393c6b0d530428e9",
+        "full_resolution_luma_ssim": 0.9859779,
+        "worst_128px_luma_ssim": 0.9792878,
+        "chroma_mean_absolute_error": 1.1529264,
+        "chroma_95th_percentile_error": 4.0,
+        "trials": [
+          {
+            "quality": 68,
+            "bytes": 206222,
+            "full_resolution_luma_ssim": 0.9415152,
+            "worst_128px_luma_ssim": 0.9017048,
+            "chroma_mean_absolute_error": 1.662075,
+            "chroma_95th_percentile_error": 5.0
+          },
+          {
+            "quality": 72,
+            "bytes": 217706,
+            "full_resolution_luma_ssim": 0.945832,
+            "worst_128px_luma_ssim": 0.9105881,
+            "chroma_mean_absolute_error": 1.6370421,
+            "chroma_95th_percentile_error": 5.0
+          },
+          {
+            "quality": 76,
+            "bytes": 234256,
+            "full_resolution_luma_ssim": 0.9494372,
+            "worst_128px_luma_ssim": 0.9120819,
+            "chroma_mean_absolute_error": 1.6045751,
+            "chroma_95th_percentile_error": 5.0
+          },
+          {
+            "quality": 80,
+            "bytes": 280056,
+            "full_resolution_luma_ssim": 0.9619281,
+            "worst_128px_luma_ssim": 0.9358056,
+            "chroma_mean_absolute_error": 1.4630594,
+            "chroma_95th_percentile_error": 5.0
+          },
+          {
+            "quality": 84,
+            "bytes": 337790,
+            "full_resolution_luma_ssim": 0.9727529,
+            "worst_128px_luma_ssim": 0.9556152,
+            "chroma_mean_absolute_error": 1.3563065,
+            "chroma_95th_percentile_error": 4.0
+          },
+          {
+            "quality": 88,
+            "bytes": 412536,
+            "full_resolution_luma_ssim": 0.9813869,
+            "worst_128px_luma_ssim": 0.9716838,
+            "chroma_mean_absolute_error": 1.2318944,
+            "chroma_95th_percentile_error": 4.0
+          },
+          {
+            "quality": 92,
+            "bytes": 526954,
+            "full_resolution_luma_ssim": 0.9887811,
+            "worst_128px_luma_ssim": 0.9840246,
+            "chroma_mean_absolute_error": 1.0993363,
+            "chroma_95th_percentile_error": 3.0
+          },
+          {
+            "quality": 89,
+            "bytes": 434690,
+            "full_resolution_luma_ssim": 0.9830798,
+            "worst_128px_luma_ssim": 0.9741087,
+            "chroma_mean_absolute_error": 1.2035196,
+            "chroma_95th_percentile_error": 4.0
+          },
+          {
+            "quality": 90,
+            "bytes": 475054,
+            "full_resolution_luma_ssim": 0.9859779,
+            "worst_128px_luma_ssim": 0.9792878,
+            "chroma_mean_absolute_error": 1.1529264,
+            "chroma_95th_percentile_error": 4.0
+          },
+          {
+            "quality": 91,
+            "bytes": 503008,
+            "full_resolution_luma_ssim": 0.9876106,
+            "worst_128px_luma_ssim": 0.9824235,
+            "chroma_mean_absolute_error": 1.1369817,
+            "chroma_95th_percentile_error": 3.0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "mzulft",
+    "name": "Мзулфт",
+    "captions": [
+      "Зал древней обсерватории"
+    ],
+    "aliases": [
+      "Mzulft"
+    ],
+    "artwork": {
+      "kind": "original_generated_illustration",
+      "generator": "built_in_imagegen",
+      "final_prompt": "Use case: stylized-concept. Create one original finished horizontal 16:9 environmental illustration, full bleed, for a dark Nordic fantasy location gallery. One continuous scene with a clear focal point at mobile scale. Photorealistic architectural concept art, believably weathered masonry, substantial bronze engineering with an original design, restrained natural colors, readable contrast, crisp tactile details, deep focus. Use a wholly new composition and architecture. No reference to existing screenshots or level geometry. No writing, captions, collage, UI, border, logo, watermark, or foreground figures. Scene: Inside the forgotten observatory, a large original scientific instrument built of independent bronze arches holds one offset faceted lens. Dim indigo light from the narrow ceiling opening passes through it and lands on a weathered patterned stone surface below, with one amber maintenance alcove. Close enough to read the tarnish and hand-chiseled stone, wide enough to reveal the dome. Compose from below and to one side. Plausible large optics with restrained light and a sense of order.",
+      "source_file": "exec-0387b18d-c831-4c18-ad6e-4779e43e8e59.png",
+      "source_sha256": "428b03458589be4ab856e001a7c2e1760cf750a5136a84a4501b67686618c446",
+      "source_bytes": 2870252,
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "compression": {
+        "format": "WebP",
+        "method": 6,
+        "quality": 94,
+        "dimensions": [
+          1672,
+          941
+        ],
+        "encoded_bytes": 517184,
+        "sha256": "538452e2ddbebd557942f7b2cf7c9469b35bf9711237a05ba0d8f3e004c76d5d",
+        "archive_bytes": 517296,
+        "archive_sha256": "151e1bedcf99958ced33e1ffe7de85cb036f99c8b9fbb7bab3e906e3740dca9f",
+        "full_resolution_luma_ssim": 0.9865782,
+        "worst_128px_luma_ssim": 0.9769835,
+        "chroma_mean_absolute_error": 0.9266712,
+        "chroma_95th_percentile_error": 3.0,
+        "trials": [
+          {
+            "quality": 68,
+            "bytes": 146278,
+            "full_resolution_luma_ssim": 0.9221202,
+            "worst_128px_luma_ssim": 0.8959135,
+            "chroma_mean_absolute_error": 1.4935304,
+            "chroma_95th_percentile_error": 5.0
+          },
+          {
+            "quality": 72,
+            "bytes": 153906,
+            "full_resolution_luma_ssim": 0.9258375,
+            "worst_128px_luma_ssim": 0.9017644,
+            "chroma_mean_absolute_error": 1.4680764,
+            "chroma_95th_percentile_error": 5.0
+          },
+          {
+            "quality": 76,
+            "bytes": 171370,
+            "full_resolution_luma_ssim": 0.9355315,
+            "worst_128px_luma_ssim": 0.913055,
+            "chroma_mean_absolute_error": 1.4119272,
+            "chroma_95th_percentile_error": 4.0
+          },
+          {
+            "quality": 80,
+            "bytes": 206628,
+            "full_resolution_luma_ssim": 0.9485292,
+            "worst_128px_luma_ssim": 0.9301189,
+            "chroma_mean_absolute_error": 1.3248774,
+            "chroma_95th_percentile_error": 4.0
+          },
+          {
+            "quality": 84,
+            "bytes": 249538,
+            "full_resolution_luma_ssim": 0.9593414,
+            "worst_128px_luma_ssim": 0.9429569,
+            "chroma_mean_absolute_error": 1.2413656,
+            "chroma_95th_percentile_error": 4.0
+          },
+          {
+            "quality": 88,
+            "bytes": 325754,
+            "full_resolution_luma_ssim": 0.9721271,
+            "worst_128px_luma_ssim": 0.9610276,
+            "chroma_mean_absolute_error": 1.0974051,
+            "chroma_95th_percentile_error": 3.0
+          },
+          {
+            "quality": 92,
+            "bytes": 439460,
+            "full_resolution_luma_ssim": 0.9831637,
+            "worst_128px_luma_ssim": 0.974756,
+            "chroma_mean_absolute_error": 0.9977551,
+            "chroma_95th_percentile_error": 3.0
+          },
+          {
+            "quality": 96,
+            "bytes": 603882,
+            "full_resolution_luma_ssim": 0.9900552,
+            "worst_128px_luma_ssim": 0.9829555,
+            "chroma_mean_absolute_error": 0.8819457,
+            "chroma_95th_percentile_error": 3.0
+          },
+          {
+            "quality": 93,
+            "bytes": 479554,
+            "full_resolution_luma_ssim": 0.984826,
+            "worst_128px_luma_ssim": 0.9769416,
+            "chroma_mean_absolute_error": 0.9409697,
+            "chroma_95th_percentile_error": 3.0
+          },
+          {
+            "quality": 94,
+            "bytes": 517184,
+            "full_resolution_luma_ssim": 0.9865782,
+            "worst_128px_luma_ssim": 0.9769835,
+            "chroma_mean_absolute_error": 0.9266712,
+            "chroma_95th_percentile_error": 3.0
+          },
+          {
+            "quality": 95,
+            "bytes": 562458,
+            "full_resolution_luma_ssim": 0.988404,
+            "worst_128px_luma_ssim": 0.9798356,
+            "chroma_mean_absolute_error": 0.9016463,
+            "chroma_95th_percentile_error": 3.0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "raldbthar",
+    "name": "Ральдбтхар",
+    "captions": [
+      "Канал охлаждения старой литейной"
+    ],
+    "aliases": [
+      "Raldbthar"
+    ],
+    "artwork": {
+      "kind": "original_generated_illustration",
+      "generator": "built_in_imagegen",
+      "final_prompt": "Use case: stylized-concept. Create one original finished horizontal 16:9 environmental illustration, full bleed, for a dark Nordic fantasy location gallery. One continuous scene with a clear focal point at mobile scale. Photorealistic architectural concept art, believably weathered masonry, substantial bronze engineering with an original design, restrained natural colors, readable contrast, crisp tactile details, deep focus. Use a wholly new composition and architecture. No reference to existing screenshots or level geometry. No writing, captions, collage, UI, border, logo, watermark, or foreground figures. Scene: A heavy-work foundry ruined inside the mountain, its ash-gray nave lined with huge bronze flywheels, dark steam conduits and small weathered stone alcoves. The main subject is a broad broken wheel whose smaller splintered half has fallen into a deep cooling channel beneath a ruined kiln. View at ground level along an old service gangway overlooking the channel. Dry bronze, sooty gray and a little copper glow from deep in the complex. A low smoky ceiling, no open sky, no elevator.",
+      "source_file": "exec-831c3937-16b4-4729-bb2a-9c79850792a6.png",
+      "source_sha256": "4884d48ddc692d855e20484c0bd79749280a6960aacf0b956559fe5b837c3413",
+      "source_bytes": 3034913,
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "compression": {
+        "format": "WebP",
+        "method": 6,
+        "quality": 92,
+        "dimensions": [
+          1672,
+          941
+        ],
+        "encoded_bytes": 491996,
+        "sha256": "d114ba5869c62069a02d07d19bc319a656f257d5935f4727bda4db6097f4d00b",
+        "archive_bytes": 492108,
+        "archive_sha256": "b7f93dfcf6d70b7c835a98ad4e7c70eae61b9d8f9ba58c646b9c79ee0a260d1d",
+        "full_resolution_luma_ssim": 0.9866152,
+        "worst_128px_luma_ssim": 0.9793147,
+        "chroma_mean_absolute_error": 1.1124322,
+        "chroma_95th_percentile_error": 3.0,
+        "trials": [
+          {
+            "quality": 68,
+            "bytes": 184502,
+            "full_resolution_luma_ssim": 0.937896,
+            "worst_128px_luma_ssim": 0.9184511,
+            "chroma_mean_absolute_error": 1.5835512,
+            "chroma_95th_percentile_error": 5.0
+          },
+          {
+            "quality": 72,
+            "bytes": 196292,
+            "full_resolution_luma_ssim": 0.9419212,
+            "worst_128px_luma_ssim": 0.9252346,
+            "chroma_mean_absolute_error": 1.5434416,
+            "chroma_95th_percentile_error": 5.0
+          },
+          {
+            "quality": 76,
+            "bytes": 214066,
+            "full_resolution_luma_ssim": 0.9480678,
+            "worst_128px_luma_ssim": 0.9341532,
+            "chroma_mean_absolute_error": 1.4998811,
+            "chroma_95th_percentile_error": 5.0
+          },
+          {
+            "quality": 80,
+            "bytes": 254610,
+            "full_resolution_luma_ssim": 0.9587981,
+            "worst_128px_luma_ssim": 0.9485977,
+            "chroma_mean_absolute_error": 1.42352,
+            "chroma_95th_percentile_error": 4.0
+          },
+          {
+            "quality": 84,
+            "bytes": 308378,
+            "full_resolution_luma_ssim": 0.9701209,
+            "worst_128px_luma_ssim": 0.9619896,
+            "chroma_mean_absolute_error": 1.3182025,
+            "chroma_95th_percentile_error": 4.0
+          },
+          {
+            "quality": 88,
+            "bytes": 383412,
+            "full_resolution_luma_ssim": 0.9788831,
+            "worst_128px_luma_ssim": 0.9712958,
+            "chroma_mean_absolute_error": 1.2108304,
+            "chroma_95th_percentile_error": 4.0
+          },
+          {
+            "quality": 92,
+            "bytes": 491996,
+            "full_resolution_luma_ssim": 0.9866152,
+            "worst_128px_luma_ssim": 0.9793147,
+            "chroma_mean_absolute_error": 1.1124322,
+            "chroma_95th_percentile_error": 3.0
+          },
+          {
+            "quality": 89,
+            "bytes": 395982,
+            "full_resolution_luma_ssim": 0.9802412,
+            "worst_128px_luma_ssim": 0.9713587,
+            "chroma_mean_absolute_error": 1.2140846,
+            "chroma_95th_percentile_error": 4.0
+          },
+          {
+            "quality": 90,
+            "bytes": 426512,
+            "full_resolution_luma_ssim": 0.9824203,
+            "worst_128px_luma_ssim": 0.9743608,
+            "chroma_mean_absolute_error": 1.1585221,
+            "chroma_95th_percentile_error": 4.0
+          },
+          {
+            "quality": 91,
+            "bytes": 458248,
+            "full_resolution_luma_ssim": 0.9848554,
+            "worst_128px_luma_ssim": 0.9789101,
+            "chroma_mean_absolute_error": 1.1410768,
+            "chroma_95th_percentile_error": 3.0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "fahlbtharz",
+    "name": "Фалбтарз",
+    "captions": [
+      "Паровые механизмы в скале"
+    ],
+    "aliases": [
+      "Fahlbtharz"
+    ],
+    "artwork": {
+      "kind": "original_generated_illustration",
+      "generator": "built_in_imagegen",
+      "final_prompt": "Use case: stylized-concept. Create one original finished horizontal 16:9 environmental illustration, full bleed, for a dark Nordic fantasy location gallery. One continuous scene with a clear focal point at mobile scale. Photorealistic architectural concept art, believably weathered masonry, substantial bronze engineering with an original design, restrained natural colors, readable contrast, crisp tactile details, deep focus. Use a wholly new composition and architecture. No reference to existing screenshots or level geometry. No writing, captions, collage, UI, border, logo, watermark, or foreground figures. Scene: In an ash-covered volcanic island's underground machine hall, a deep steam chamber and stepped basalt walls surround a vertically nested array of patinated steam vessels. Narrow orange heat vents illuminate the base; vapor curls across a pipe bridge from one wall to the other. Purple-gray ash and umber bronze. Angle the camera from a mid-height ledge across the furnace space. Rich, subtle traces of recent volcanic grit in crevices and distinct readable engineering shapes.",
+      "source_file": "exec-69a69eb1-5e57-4f8f-bffb-77c0598e2364.png",
+      "source_sha256": "2e7d8b0b8f1c97ca1b32a13f4d26e21a350595ab9d85a96c5f1ffa7068f1fc62",
+      "source_bytes": 2990905,
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "compression": {
+        "format": "WebP",
+        "method": 6,
+        "quality": 92,
+        "dimensions": [
+          1672,
+          941
+        ],
+        "encoded_bytes": 490656,
+        "sha256": "7db219aa080d6a36383bc695e7f23678011f6ec4c851b99d8c968158fb9fc4d5",
+        "archive_bytes": 490768,
+        "archive_sha256": "40941b352774b41d97875ef36caa0357b59aca08845011dcb10f0e0f5ef002f8",
+        "full_resolution_luma_ssim": 0.9856879,
+        "worst_128px_luma_ssim": 0.9808965,
+        "chroma_mean_absolute_error": 1.2003503,
+        "chroma_95th_percentile_error": 4.0,
+        "trials": [
+          {
+            "quality": 68,
+            "bytes": 182500,
+            "full_resolution_luma_ssim": 0.9337386,
+            "worst_128px_luma_ssim": 0.9068182,
+            "chroma_mean_absolute_error": 1.7832697,
+            "chroma_95th_percentile_error": 5.0
+          },
+          {
+            "quality": 72,
+            "bytes": 195882,
+            "full_resolution_luma_ssim": 0.9390674,
+            "worst_128px_luma_ssim": 0.9177964,
+            "chroma_mean_absolute_error": 1.7315947,
+            "chroma_95th_percentile_error": 5.0
+          },
+          {
+            "quality": 76,
+            "bytes": 212504,
+            "full_resolution_luma_ssim": 0.944809,
+            "worst_128px_luma_ssim": 0.927862,
+            "chroma_mean_absolute_error": 1.6867567,
+            "chroma_95th_percentile_error": 5.0
+          },
+          {
+            "quality": 80,
+            "bytes": 256418,
+            "full_resolution_luma_ssim": 0.957769,
+            "worst_128px_luma_ssim": 0.946235,
+            "chroma_mean_absolute_error": 1.5628791,
+            "chroma_95th_percentile_error": 5.0
+          },
+          {
+            "quality": 84,
+            "bytes": 303444,
+            "full_resolution_luma_ssim": 0.9674736,
+            "worst_128px_luma_ssim": 0.9589624,
+            "chroma_mean_absolute_error": 1.466661,
+            "chroma_95th_percentile_error": 4.0
+          },
+          {
+            "quality": 88,
+            "bytes": 374196,
+            "full_resolution_luma_ssim": 0.9766697,
+            "worst_128px_luma_ssim": 0.9695697,
+            "chroma_mean_absolute_error": 1.3379797,
+            "chroma_95th_percentile_error": 4.0
+          },
+          {
+            "quality": 92,
+            "bytes": 490656,
+            "full_resolution_luma_ssim": 0.9856879,
+            "worst_128px_luma_ssim": 0.9808965,
+            "chroma_mean_absolute_error": 1.2003503,
+            "chroma_95th_percentile_error": 4.0
+          },
+          {
+            "quality": 89,
+            "bytes": 402442,
+            "full_resolution_luma_ssim": 0.9793365,
+            "worst_128px_luma_ssim": 0.973467,
+            "chroma_mean_absolute_error": 1.2852474,
+            "chroma_95th_percentile_error": 4.0
+          },
+          {
+            "quality": 90,
+            "bytes": 424834,
+            "full_resolution_luma_ssim": 0.9815649,
+            "worst_128px_luma_ssim": 0.9757581,
+            "chroma_mean_absolute_error": 1.2735513,
+            "chroma_95th_percentile_error": 4.0
+          },
+          {
+            "quality": 91,
+            "bytes": 443140,
+            "full_resolution_luma_ssim": 0.9826364,
+            "worst_128px_luma_ssim": 0.9759373,
+            "chroma_mean_absolute_error": 1.23912,
+            "chroma_95th_percentile_error": 4.0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "kagrumez",
+    "name": "Кагрумез",
+    "captions": [
+      "Зал испытаний"
+    ],
+    "aliases": [
+      "Kagrumez"
+    ],
+    "artwork": {
+      "kind": "original_generated_illustration",
+      "generator": "built_in_imagegen",
+      "final_prompt": "Use case: stylized-concept. Create one original finished horizontal 16:9 environmental illustration, full bleed, for a dark Nordic fantasy location gallery. One continuous scene with a clear focal point at mobile scale. Photorealistic architectural concept art, believably weathered masonry, substantial bronze engineering with an original design, restrained natural colors, readable contrast, crisp tactile details, deep focus. Use a wholly new composition and architecture. No reference to existing screenshots or level geometry. No writing, captions, collage, UI, border, logo, watermark, or foreground figures. Scene: A buried trial hall on a volcanic island, viewed from a modest entrance terrace. Geometric raised stone pads spiral across the floor toward a low original bronze dial inset with three opaque bluish cabochons. Patterned gate bars and silhouetted angular pillars along the perimeter. Candle amber touches basalt and pale dust fallen through the roof, with a small, cool off-center shaft of daylight. The challenge floor is readable at a glance. No creatures, characters or readable symbols.",
+      "source_file": "exec-19cc8831-1fa0-498e-ae87-49a0bb11cae4.png",
+      "source_sha256": "557aa4200d7bdc783ff40ebc68c82716d27c455d6c863ac7e543c5277e576699",
+      "source_bytes": 2892916,
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "compression": {
+        "format": "WebP",
+        "method": 6,
+        "quality": 93,
+        "dimensions": [
+          1672,
+          941
+        ],
+        "encoded_bytes": 496670,
+        "sha256": "0698dbbfb114197169ce434c43b2c48d7de3421291e1f8308d58e9a87c25efd1",
+        "archive_bytes": 496782,
+        "archive_sha256": "ed251af65ec2e90d293e9d7b32acc16fb272df43a5919c8ef2d4ffe21120e61d",
+        "full_resolution_luma_ssim": 0.9857289,
+        "worst_128px_luma_ssim": 0.9775491,
+        "chroma_mean_absolute_error": 1.195175,
+        "chroma_95th_percentile_error": 4.0,
+        "trials": [
+          {
+            "quality": 68,
+            "bytes": 162456,
+            "full_resolution_luma_ssim": 0.9264982,
+            "worst_128px_luma_ssim": 0.9002551,
+            "chroma_mean_absolute_error": 1.751418,
+            "chroma_95th_percentile_error": 5.0
+          },
+          {
+            "quality": 72,
+            "bytes": 169724,
+            "full_resolution_luma_ssim": 0.9299321,
+            "worst_128px_luma_ssim": 0.9054265,
+            "chroma_mean_absolute_error": 1.7217025,
+            "chroma_95th_percentile_error": 5.0
+          },
+          {
+            "quality": 76,
+            "bytes": 189548,
+            "full_resolution_luma_ssim": 0.939286,
+            "worst_128px_luma_ssim": 0.919208,
+            "chroma_mean_absolute_error": 1.6508178,
+            "chroma_95th_percentile_error": 5.0
+          },
+          {
+            "quality": 80,
+            "bytes": 226792,
+            "full_resolution_luma_ssim": 0.9522603,
+            "worst_128px_luma_ssim": 0.9333889,
+            "chroma_mean_absolute_error": 1.5627708,
+            "chroma_95th_percentile_error": 5.0
+          },
+          {
+            "quality": 84,
+            "bytes": 281230,
+            "full_resolution_luma_ssim": 0.9624323,
+            "worst_128px_luma_ssim": 0.9433433,
+            "chroma_mean_absolute_error": 1.4629415,
+            "chroma_95th_percentile_error": 4.0
+          },
+          {
+            "quality": 88,
+            "bytes": 350916,
+            "full_resolution_luma_ssim": 0.9744216,
+            "worst_128px_luma_ssim": 0.9623969,
+            "chroma_mean_absolute_error": 1.3433891,
+            "chroma_95th_percentile_error": 4.0
+          },
+          {
+            "quality": 92,
+            "bytes": 458978,
+            "full_resolution_luma_ssim": 0.9837713,
+            "worst_128px_luma_ssim": 0.9748002,
+            "chroma_mean_absolute_error": 1.2309534,
+            "chroma_95th_percentile_error": 4.0
+          },
+          {
+            "quality": 96,
+            "bytes": 629696,
+            "full_resolution_luma_ssim": 0.9907543,
+            "worst_128px_luma_ssim": 0.9849913,
+            "chroma_mean_absolute_error": 1.1008875,
+            "chroma_95th_percentile_error": 3.0
+          },
+          {
+            "quality": 93,
+            "bytes": 496670,
+            "full_resolution_luma_ssim": 0.9857289,
+            "worst_128px_luma_ssim": 0.9775491,
+            "chroma_mean_absolute_error": 1.195175,
+            "chroma_95th_percentile_error": 4.0
+          },
+          {
+            "quality": 94,
+            "bytes": 551808,
+            "full_resolution_luma_ssim": 0.9882905,
+            "worst_128px_luma_ssim": 0.9820065,
+            "chroma_mean_absolute_error": 1.1468101,
+            "chroma_95th_percentile_error": 3.0
+          },
+          {
+            "quality": 95,
+            "bytes": 582020,
+            "full_resolution_luma_ssim": 0.9892824,
+            "worst_128px_luma_ssim": 0.9826447,
+            "chroma_mean_absolute_error": 1.1305417,
+            "chroma_95th_percentile_error": 3.0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "nchardak",
+    "name": "Нчардак",
+    "captions": [
+      "Затопленные террасы у моря"
+    ],
+    "aliases": [
+      "Nchardak"
+    ],
+    "artwork": {
+      "kind": "original_generated_illustration",
+      "generator": "built_in_imagegen",
+      "final_prompt": "Use case: stylized-concept. Create one original finished horizontal 16:9 environmental illustration, full bleed, for a dark Nordic fantasy location gallery. One continuous scene with a clear focal point at mobile scale. Photorealistic architectural concept art, believably weathered masonry, substantial bronze engineering with an original design, restrained natural colors, readable contrast, crisp tactile details, deep focus. Use a wholly new composition and architecture. No reference to existing screenshots or level geometry. No writing, captions, collage, UI, border, logo, watermark, or foreground figures. Scene: Low monumental stone waterworks on a gray coastal island below distant volcanic foothills. Tidal water floods parts of the lower structure; a thin cascade flows out of an upper spillway into an almost turquoise pool. Squared basalt terraces, a few bronze sluice caps, an off-center causeway and green seaweed at the high-water mark. A three-quarter view from just above choppy sea level frames the half-drowned structures. Overcast sea light and salt crust, open water and dramatic air.",
+      "source_file": "exec-f9ed990a-394d-4963-8c28-748684bae739.png",
+      "source_sha256": "eb9ff3076c49008b98814c133b04f9ede141367adc1b9a8871432edf6035b91c",
+      "source_bytes": 3254894,
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "compression": {
+        "format": "WebP",
+        "method": 6,
+        "quality": 89,
+        "dimensions": [
+          1672,
+          941
+        ],
+        "encoded_bytes": 468786,
+        "sha256": "a7ca71f5881170518d0490848e690adc3a4423bf8e45bdf4ea1faa0c0487615e",
+        "archive_bytes": 468898,
+        "archive_sha256": "a028bb402f85d9b2337a360b1c74d3323aa06b6894a079b848fd234cc80cf1b5",
+        "full_resolution_luma_ssim": 0.9860269,
+        "worst_128px_luma_ssim": 0.978506,
+        "chroma_mean_absolute_error": 1.2210526,
+        "chroma_95th_percentile_error": 4.0,
+        "trials": [
+          {
+            "quality": 68,
+            "bytes": 238066,
+            "full_resolution_luma_ssim": 0.9502107,
+            "worst_128px_luma_ssim": 0.9279928,
+            "chroma_mean_absolute_error": 1.5905093,
+            "chroma_95th_percentile_error": 5.0
+          },
+          {
+            "quality": 72,
+            "bytes": 249606,
+            "full_resolution_luma_ssim": 0.9535124,
+            "worst_128px_luma_ssim": 0.9327672,
+            "chroma_mean_absolute_error": 1.5685158,
+            "chroma_95th_percentile_error": 5.0
+          },
+          {
+            "quality": 76,
+            "bytes": 270694,
+            "full_resolution_luma_ssim": 0.9590563,
+            "worst_128px_luma_ssim": 0.9400318,
+            "chroma_mean_absolute_error": 1.5128436,
+            "chroma_95th_percentile_error": 5.0
+          },
+          {
+            "quality": 80,
+            "bytes": 312880,
+            "full_resolution_luma_ssim": 0.9676793,
+            "worst_128px_luma_ssim": 0.9500818,
+            "chroma_mean_absolute_error": 1.4364557,
+            "chroma_95th_percentile_error": 4.0
+          },
+          {
+            "quality": 84,
+            "bytes": 373156,
+            "full_resolution_luma_ssim": 0.9764647,
+            "worst_128px_luma_ssim": 0.9644014,
+            "chroma_mean_absolute_error": 1.3385819,
+            "chroma_95th_percentile_error": 4.0
+          },
+          {
+            "quality": 88,
+            "bytes": 441268,
+            "full_resolution_luma_ssim": 0.9834899,
+            "worst_128px_luma_ssim": 0.9740588,
+            "chroma_mean_absolute_error": 1.2476626,
+            "chroma_95th_percentile_error": 4.0
+          },
+          {
+            "quality": 92,
+            "bytes": 552726,
+            "full_resolution_luma_ssim": 0.9897835,
+            "worst_128px_luma_ssim": 0.9832147,
+            "chroma_mean_absolute_error": 1.1361409,
+            "chroma_95th_percentile_error": 3.0
+          },
+          {
+            "quality": 89,
+            "bytes": 468786,
+            "full_resolution_luma_ssim": 0.9860269,
+            "worst_128px_luma_ssim": 0.978506,
+            "chroma_mean_absolute_error": 1.2210526,
+            "chroma_95th_percentile_error": 4.0
+          },
+          {
+            "quality": 90,
+            "bytes": 502058,
+            "full_resolution_luma_ssim": 0.9875091,
+            "worst_128px_luma_ssim": 0.9808941,
+            "chroma_mean_absolute_error": 1.1824293,
+            "chroma_95th_percentile_error": 4.0
+          },
+          {
+            "quality": 91,
+            "bytes": 529794,
+            "full_resolution_luma_ssim": 0.9888742,
+            "worst_128px_luma_ssim": 0.9824231,
+            "chroma_mean_absolute_error": 1.1651144,
+            "chroma_95th_percentile_error": 3.0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "nchuand_zel",
+    "name": "Нчуанд-Зел",
+    "captions": [
+      "Подземные шлюзы Нчуанд-Зела"
+    ],
+    "aliases": [
+      "Nchuand-Zel"
+    ],
+    "parent": "Маркарт",
+    "artwork": {
+      "kind": "original_generated_illustration",
+      "generator": "built_in_imagegen",
+      "final_prompt": "Use case: stylized-concept. Create one original finished horizontal 16:9 environmental illustration, full bleed, for a dark Nordic fantasy location gallery. One continuous scene with a clear focal point at mobile scale. Photorealistic architectural concept art, believably weathered masonry, substantial bronze engineering with an original design, restrained natural colors, readable contrast, crisp tactile details, deep focus. Use a wholly new composition and architecture. No reference to existing screenshots or level geometry. No writing, captions, collage, UI, border, logo, watermark, or foreground figures. Scene: Beneath a city built into limestone, a monumental buried river terrace appears in a partly flooded natural cavern. Angular masonry supports a row of ancient bronze sluices at staggered heights, with a narrow stone footpath and fallen cantilevered portions over milky dark water. Side view from the footpath into the long cavern, one diagonal band of warm light from an old oil lantern and a dim green reflection off mineral stone. City-scale submerged engineering is the subject.",
+      "source_file": "exec-8be22534-c528-4234-b395-b2bf77b0d688.png",
+      "source_sha256": "66cd878cc3a7b3dd58037f53cd9b0ec8c9f7332be0449b7a39090281b000abba",
+      "source_bytes": 3255545,
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "compression": {
+        "format": "WebP",
+        "method": 6,
+        "quality": 90,
+        "dimensions": [
+          1672,
+          941
+        ],
+        "encoded_bytes": 512174,
+        "sha256": "d95bd9b0ee5beda28a484e03f0f8fdf165318f3312614e9af92d969bde245d48",
+        "archive_bytes": 512286,
+        "archive_sha256": "d9edfc3c9e93b2f84d5064db1353eaf7a6d23e3a49c636ad5c6c8640638c3ff5",
+        "full_resolution_luma_ssim": 0.9854516,
+        "worst_128px_luma_ssim": 0.9754297,
+        "chroma_mean_absolute_error": 1.3894634,
+        "chroma_95th_percentile_error": 4.0,
+        "trials": [
+          {
+            "quality": 68,
+            "bytes": 231744,
+            "full_resolution_luma_ssim": 0.942563,
+            "worst_128px_luma_ssim": 0.9191546,
+            "chroma_mean_absolute_error": 1.883473,
+            "chroma_95th_percentile_error": 6.0
+          },
+          {
+            "quality": 72,
+            "bytes": 244280,
+            "full_resolution_luma_ssim": 0.9464718,
+            "worst_128px_luma_ssim": 0.9255519,
+            "chroma_mean_absolute_error": 1.8503504,
+            "chroma_95th_percentile_error": 6.0
+          },
+          {
+            "quality": 76,
+            "bytes": 265918,
+            "full_resolution_luma_ssim": 0.9514824,
+            "worst_128px_luma_ssim": 0.9333035,
+            "chroma_mean_absolute_error": 1.7962099,
+            "chroma_95th_percentile_error": 6.0
+          },
+          {
+            "quality": 80,
+            "bytes": 314514,
+            "full_resolution_luma_ssim": 0.9638413,
+            "worst_128px_luma_ssim": 0.9506921,
+            "chroma_mean_absolute_error": 1.6875308,
+            "chroma_95th_percentile_error": 5.0
+          },
+          {
+            "quality": 84,
+            "bytes": 373666,
+            "full_resolution_luma_ssim": 0.9732105,
+            "worst_128px_luma_ssim": 0.9612246,
+            "chroma_mean_absolute_error": 1.5795715,
+            "chroma_95th_percentile_error": 5.0
+          },
+          {
+            "quality": 88,
+            "bytes": 459224,
+            "full_resolution_luma_ssim": 0.9820901,
+            "worst_128px_luma_ssim": 0.9731967,
+            "chroma_mean_absolute_error": 1.4607262,
+            "chroma_95th_percentile_error": 5.0
+          },
+          {
+            "quality": 92,
+            "bytes": 581780,
+            "full_resolution_luma_ssim": 0.9892685,
+            "worst_128px_luma_ssim": 0.982199,
+            "chroma_mean_absolute_error": 1.3331886,
+            "chroma_95th_percentile_error": 4.0
+          },
+          {
+            "quality": 89,
+            "bytes": 482368,
+            "full_resolution_luma_ssim": 0.9839537,
+            "worst_128px_luma_ssim": 0.9752173,
+            "chroma_mean_absolute_error": 1.4302229,
+            "chroma_95th_percentile_error": 4.0
+          },
+          {
+            "quality": 90,
+            "bytes": 512174,
+            "full_resolution_luma_ssim": 0.9854516,
+            "worst_128px_luma_ssim": 0.9754297,
+            "chroma_mean_absolute_error": 1.3894634,
+            "chroma_95th_percentile_error": 4.0
+          },
+          {
+            "quality": 91,
+            "bytes": 556708,
+            "full_resolution_luma_ssim": 0.9880564,
+            "worst_128px_luma_ssim": 0.9802438,
+            "chroma_mean_absolute_error": 1.3658758,
+            "chroma_95th_percentile_error": 4.0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "nchuand_zel_excavation_site",
+    "name": "Раскопки Нчуанд-Зела",
+    "captions": [
+      "Каменная кладка в шахте раскопа"
+    ],
+    "aliases": [
+      "Nchuand-Zel Excavation Site"
+    ],
+    "parent": "Маркарт",
+    "artwork": {
+      "kind": "original_generated_illustration",
+      "generator": "built_in_imagegen",
+      "final_prompt": "Use case: stylized-concept. Create one original finished horizontal 16:9 environmental illustration, full bleed, for a dark Nordic fantasy location gallery. One continuous scene with a clear focal point at mobile scale. Photorealistic architectural concept art, believably weathered masonry, substantial bronze engineering with an original design, restrained natural colors, readable contrast, crisp tactile details, deep focus. Use a wholly new composition and architecture. No reference to existing screenshots or level geometry. No writing, captions, collage, UI, border, logo, watermark, or foreground figures. Scene: View just inside a modest archaeological excavation after the diggers have left for the night. One row of simple rough timber shoring and a rope ladder leads toward a partly exposed carved limestone wall, with bronze pipe joints protruding from the sediment at ground level. Crouching-height side view reveals stratified dirt and irregular excavation steps, a canvas-covered sifting tray near the foreground, faint golden lamplight with dark cool rock overhead. Intimate archaeological dig, no museum or monumental open hall.",
+      "source_file": "exec-ac0fab47-18fc-4d7c-9c91-3a9271471d5a.png",
+      "source_sha256": "7cc450abf9486afe7857c69fccd2ec6476e9b7effc9ebf6df7a14cf028e39709",
+      "source_bytes": 3235284,
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "compression": {
+        "format": "WebP",
+        "method": 6,
+        "quality": 91,
+        "dimensions": [
+          1672,
+          941
+        ],
+        "encoded_bytes": 530020,
+        "sha256": "06e105b360aeb210a22d7a483edd6b6b1a138821f40808d9b955f5d2b7634f17",
+        "archive_bytes": 530132,
+        "archive_sha256": "c0d436e3d0b14fb452d9da8667f860d80e744feafa717a5923f42b45e3e25573",
+        "full_resolution_luma_ssim": 0.9863772,
+        "worst_128px_luma_ssim": 0.9797116,
+        "chroma_mean_absolute_error": 1.2909244,
+        "chroma_95th_percentile_error": 4.0,
+        "trials": [
+          {
+            "quality": 68,
+            "bytes": 205640,
+            "full_resolution_luma_ssim": 0.9305084,
+            "worst_128px_luma_ssim": 0.9015146,
+            "chroma_mean_absolute_error": 1.8328378,
+            "chroma_95th_percentile_error": 5.0
+          },
+          {
+            "quality": 72,
+            "bytes": 217174,
+            "full_resolution_luma_ssim": 0.9353351,
+            "worst_128px_luma_ssim": 0.9087379,
+            "chroma_mean_absolute_error": 1.8126217,
+            "chroma_95th_percentile_error": 5.0
+          },
+          {
+            "quality": 76,
+            "bytes": 237980,
+            "full_resolution_luma_ssim": 0.943319,
+            "worst_128px_luma_ssim": 0.9217011,
+            "chroma_mean_absolute_error": 1.75092,
+            "chroma_95th_percentile_error": 5.0
+          },
+          {
+            "quality": 80,
+            "bytes": 287060,
+            "full_resolution_luma_ssim": 0.9567147,
+            "worst_128px_luma_ssim": 0.9408192,
+            "chroma_mean_absolute_error": 1.6443021,
+            "chroma_95th_percentile_error": 5.0
+          },
+          {
+            "quality": 84,
+            "bytes": 347992,
+            "full_resolution_luma_ssim": 0.9683505,
+            "worst_128px_luma_ssim": 0.9577483,
+            "chroma_mean_absolute_error": 1.5490898,
+            "chroma_95th_percentile_error": 4.0
+          },
+          {
+            "quality": 88,
+            "bytes": 430762,
+            "full_resolution_luma_ssim": 0.9788409,
+            "worst_128px_luma_ssim": 0.9699606,
+            "chroma_mean_absolute_error": 1.4128758,
+            "chroma_95th_percentile_error": 4.0
+          },
+          {
+            "quality": 92,
+            "bytes": 556552,
+            "full_resolution_luma_ssim": 0.9877843,
+            "worst_128px_luma_ssim": 0.9817648,
+            "chroma_mean_absolute_error": 1.2539174,
+            "chroma_95th_percentile_error": 4.0
+          },
+          {
+            "quality": 89,
+            "bytes": 453878,
+            "full_resolution_luma_ssim": 0.981256,
+            "worst_128px_luma_ssim": 0.9740068,
+            "chroma_mean_absolute_error": 1.3742138,
+            "chroma_95th_percentile_error": 4.0
+          },
+          {
+            "quality": 90,
+            "bytes": 491754,
+            "full_resolution_luma_ssim": 0.9839736,
+            "worst_128px_luma_ssim": 0.9786071,
+            "chroma_mean_absolute_error": 1.3335636,
+            "chroma_95th_percentile_error": 4.0
+          },
+          {
+            "quality": 91,
+            "bytes": 530020,
+            "full_resolution_luma_ssim": 0.9863772,
+            "worst_128px_luma_ssim": 0.9797116,
+            "chroma_mean_absolute_error": 1.2909244,
+            "chroma_95th_percentile_error": 4.0
+          }
+        ]
+      }
+    }
   }
 ]
