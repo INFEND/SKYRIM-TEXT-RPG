@@ -2016,7 +2016,16 @@ public final class MainActivity extends Activity {
             });
             return;
         }
-        if(!aiTurnStatus.isEmpty())addText(content,aiTurnStatus,12,MUTED,false,11);
+        if(!aiTurnStatus.isEmpty()){
+            addText(content,aiTurnStatus,12,MUTED,false,11);
+            if("local".equals(source)&&!aiTurnPreview.isEmpty()){
+                LinearLayout draft=card();
+                addText(draft,"НЕСОХРАНЁННЫЙ ОТВЕТ ИИ",12,accent(),true,8);
+                addText(draft,aiTurnPreview,15,TEXT,false,8);
+                for(AiGameTurn.Option option:aiChoicePreview)
+                    addText(draft,option.title+" | "+option.detail,13,MUTED,false,4);
+            }
+        }
         if("COMBAT".equals(game.mode)&&game.enemyHp>0){
             addText(content,"БОЙ | "+game.enemyName+" | "+game.enemyHp+"/"+game.enemyMaxHp,14,accent(),true,8);
             if(game.road.groupActive(game))addText(content,game.road.groupStatus(game),13,TEXT,false,8);
@@ -2044,7 +2053,7 @@ public final class MainActivity extends Activity {
                     .setMessage("Незавершённая ИИ-сцена и её бросок будут отброшены. Состояние героя не изменится.")
                     .setNegativeButton("Назад",null).setPositiveButton("Отменить",(d,w)->{
                         clearAiPending();selectedAiChoices.clear();aiOwnDraft="";clearAiDraft();
-                        aiTurnStatus="";render();
+                        aiTurnStatus="";aiTurnPreview="";aiChoicePreview.clear();render();
                     }).show();
             });
         }
@@ -2417,7 +2426,7 @@ public final class MainActivity extends Activity {
                             true,false,fixedChance,null);
                         return;
                     }
-                    AiGameTurn completed=AiGameTurn.parseModel(answer,expectedChance);
+                    AiGameTurn completed=local?AiGameTurn.parseLocalModel(answer,expectedChance):AiGameTurn.parseModel(answer,expectedChance);
                     if(expectedChance!=-2&&completed.customChance!=expectedChance)
                         throw new IllegalStateException("ИИ изменил шанс после броска");
                     GameEngine next=GameEngine.fromJson(saved);
@@ -2440,7 +2449,7 @@ public final class MainActivity extends Activity {
                     if(!completed.journal.isEmpty())aiMemory.add(aiSession,"event",completed.journal);
                     aiTurnStatus="";
                  }catch(Exception ex){
-                    if(repairAttempt==0&&game==originalGame&&ex instanceof org.json.JSONException){
+                    if(!local&&repairAttempt==0&&game==originalGame&&ex instanceof org.json.JSONException){
                         aiTurnBusy=false;aiTurnPreview="";
                         String fix=proposalOnly?
                             "\nИсправление: верни только JSON {\"customChance\":42} либо {\"customChance\":null}; число без кавычек.":
@@ -2450,12 +2459,14 @@ public final class MainActivity extends Activity {
                     }
                     aiTurnStatus=game==originalGame?"Не удалось завершить ИИ-сцену: "+ex.getMessage()+". Повтори или отмени действие; сохранение не изменилось.":"Сцена сохранена, но не удалось обновить её отображение.";
                 }
-                aiTurnBusy=false;aiTurnPreview="";
+                aiTurnBusy=false;
+                if(!local||aiTurnStatus.isEmpty()){aiTurnPreview="";aiChoicePreview.clear();}
                 if(tab==0)render();
             }
             @Override public void onError(String error){
                 if(!active())return;
-                aiTurnBusy=false;aiTurnPreview="";
+                aiTurnBusy=false;
+                if(!local){aiTurnPreview="";aiChoicePreview.clear();}
                 aiTurnStatus="Ошибка генерации: "+error+". Сохранение не изменено.";
                 if(tab==0)render();
             }
