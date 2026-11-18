@@ -18,8 +18,19 @@ public class SolitudeCourtTest {
         g.region=3;g.progress.location="Солитьюд";palace(g);g.choose("SOLITUDE:court:tribute_finish");assertTrue(SolitudeHome.eligible(g));
         g.choose("SOLITUDE:deed");assertTrue(SolitudeHome.owns(g));assertEquals(5000,g.gold);g.choose("SOLITUDE:deed");assertEquals(5000,g.gold);
     }
+    @Test public void thaneRequiresFiveDistinctFavorsAndHouse() throws Exception {
+        GameEngine g=city();palace(g);
+        g.progress.setQuestOutcome(SolitudeCourt.TRIBUTE,"COMPLETED");
+        for(String id:new String[]{SolitudeCanonical.KEY,SolitudeCanonical.RUM,SolitudeCanonical.WINE,SolitudeCanonical.ATTIRE})g.progress.setQuestOutcome(id,"COMPLETED");
+        g.choose("SOLITUDE:court:thane");assertFalse(SolitudeCourt.done(g,SolitudeCourt.THANE));
+        g.progress.setQuestOutcome(SolitudeCanonical.GRACE,"COMPLETED");
+        g.choose("SOLITUDE:court:thane");assertFalse(SolitudeCourt.done(g,SolitudeCourt.THANE));
+        g.fixShop.home.buy(4);g.choose("SOLITUDE:court:thane");assertTrue(SolitudeCourt.done(g,SolitudeCourt.THANE));
+        g=GameEngine.fromJson(g.toJson().toString());assertTrue(SolitudeCourt.done(g,SolitudeCourt.THANE));
+        assertEquals(5,SolitudeCourt.favors(g));
+    }
     @Test public void queenRequiresLetterPriestBattlesAndBlessing() throws Exception {
-        GameEngine g=city();g.choose("COURT:letter");assertFalse(SolitudeCourt.done(g,SolitudeCourt.LETTER));
+        GameEngine g=city();g.level=1;g.choose("COURT:letter");assertFalse(SolitudeCourt.done(g,SolitudeCourt.LETTER));
         g.level=10;g.choose("COURT:letter");assertTrue(SolitudeCourt.done(g,SolitudeCourt.LETTER));palace(g);
         g.choose("SOLITUDE:court:queen");assertTrue(SolitudeCourt.active(g,SolitudeCourt.QUEEN));g.choose("SOLITUDE:court:queen_finish");assertFalse(SolitudeCourt.done(g,SolitudeCourt.QUEEN));
         g.choose("SOLITUDE:back");g.choose("SOLITUDE:visit:4");g.choose("SOLITUDE:court:guard");assertEquals("SOLITUDE:4",g.mode);
