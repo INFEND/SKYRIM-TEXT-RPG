@@ -5751,5 +5751,137 @@
     "aliases": [
       "Ramshackle Trading Post"
     ]
+  },
+  {
+    "slug": "falkreath_stormcloak_camp",
+    "name": "Фолкрит - Лагерь Братьев Бури",
+    "captions": [
+      "Лагерь среди хвойных склонов Фолкрита"
+    ],
+    "aliases": [
+      "Фолкрит — Лагерь Братьев Бури",
+      "Falkreath Stormcloak Camp"
+    ]
+  },
+  {
+    "slug": "haafingar_stormcloak_camp",
+    "name": "Хаафингар - Лагерь Братьев Бури",
+    "captions": [
+      "Лагерь над долиной реки Карт"
+    ],
+    "aliases": [
+      "Хаафингар — Лагерь Братьев Бури",
+      "Haafingar Stormcloak Camp"
+    ]
+  },
+  {
+    "slug": "hjaalmarch_stormcloak_camp",
+    "name": "Хьялмарк - Лагерь Братьев Бури",
+    "captions": [
+      "Лагерь у туманной низины Хьялмарка"
+    ],
+    "aliases": [
+      "Хьялмарк — Лагерь Братьев Бури",
+      "Hjaalmarch Stormcloak Camp"
+    ]
+  },
+  {
+    "slug": "markarth_stormcloak_military_camp",
+    "name": "Военный лагерь Маркарта — Братья Бури",
+    "captions": [
+      "Временный лагерь среди скал у Маркарта"
+    ],
+    "aliases": [
+      "Военный лагерь Маркарта - Братья Бури",
+      "Markarth Military Camp — Stormcloaks"
+    ]
+  },
+  {
+    "slug": "pale_stormcloak_camp",
+    "name": "Белый Берег - Лагерь Братьев Бури",
+    "captions": [
+      "Лагерь на холодном склоне над озером Йоргрим"
+    ],
+    "aliases": [
+      "Белый Берег — Лагерь Братьев Бури",
+      "Pale Stormcloak Camp"
+    ]
+  },
+  {
+    "slug": "reach_stormcloak_camp",
+    "name": "Предел - Лагерь Братьев Бури",
+    "captions": [
+      "Лагерь в каменистом ущелье Предела"
+    ],
+    "aliases": [
+      "Предел — Лагерь Братьев Бури",
+      "Reach Stormcloak Camp"
+    ]
+  },
+  {
+    "slug": "rift_stormcloak_camp",
+    "name": "Рифт - Лагерь Братьев Бури",
+    "captions": [
+      "Лагерь среди осенних берёз Рифта"
+    ],
+    "aliases": [
+      "Рифт — Лагерь Братьев Бури",
+      "Rift Stormcloak Camp"
+    ]
+  },
+  {
+    "slug": "riften_stormcloak_military_camp",
+    "name": "Военный лагерь Рифтена — Братья Бури",
+    "captions": [
+      "Временный лагерь на осенней дороге у Рифтена"
+    ],
+    "aliases": [
+      "Военный лагерь Рифтена - Братья Бури",
+      "Riften Military Camp — Stormcloaks"
+    ]
+  },
+  {
+    "slug": "solitude_stormcloak_military_camp",
+    "name": "Военный лагерь Солитьюда — Братья Бури",
+    "captions": [
+      "Временный лагерь над холодным заливом у Солитьюда"
+    ],
+    "aliases": [
+      "Военный лагерь Солитьюда - Братья Бури",
+      "Solitude Military Camp — Stormcloaks"
+    ]
+  },
+  {
+    "slug": "whiterun_stormcloak_military_camp",
+    "name": "Военный лагерь Вайтрана — Братья Бури",
+    "captions": [
+      "Временный лагерь на равнине у Вайтрана"
+    ],
+    "aliases": [
+      "Военный лагерь Вайтрана - Братья Бури",
+      "Whiterun Military Camp — Stormcloaks"
+    ]
+  },
+  {
+    "slug": "whiterun_stormcloak_camp",
+    "name": "Вайтран - Лагерь Братьев Бури",
+    "captions": [
+      "Лагерь у каменистых предгорий Вайтрана"
+    ],
+    "aliases": [
+      "Вайтран — Лагерь Братьев Бури",
+      "Whiterun Stormcloak Camp"
+    ]
+  },
+  {
+    "slug": "winterhold_stormcloak_camp",
+    "name": "Винтерхолд - Лагерь Братьев Бури",
+    "captions": [
+      "Лагерь среди заснеженных скал Винтерхолда"
+    ],
+    "aliases": [
+      "Винтерхолд — Лагерь Братьев Бури",
+      "Winterhold Stormcloak Camp"
+    ]
   }
 ]
