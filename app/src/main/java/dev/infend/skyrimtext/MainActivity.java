@@ -101,7 +101,7 @@ public final class MainActivity extends Activity {
     private static final String AI_PENDING_DIE="ai_pending_die";
     private static final String AI_PENDING_SCENE="ai_pending_scene_hash";
     private static final String AI_PENDING_SESSION="ai_pending_session";
-    private static final String AI_PENDING_INSTRUCTION="ai_pending_instruction",AI_PENDING_CHECKS="ai_pending_checks";
+    private static final String AI_PENDING_INSTRUCTION="ai_pending_instruction",AI_PENDING_CHECKS="ai_pending_checks",AI_PENDING_FATE="ai_pending_fate_day";
     private boolean aiTurnBusy;
     private String aiTurnPreview="",aiTurnStatus="";
     private String aiLocalPhase="Локальная генерация…";
@@ -1894,7 +1894,7 @@ public final class MainActivity extends Activity {
     private void clearAiPending(){
         prefs.edit().remove(AI_PENDING_ACTION).remove(AI_PENDING_CHANCE)
             .remove(AI_PENDING_DIE).remove(AI_PENDING_SCENE)
-            .remove(AI_PENDING_SESSION).remove(AI_PENDING_INSTRUCTION).remove(AI_PENDING_CHECKS).apply();
+            .remove(AI_PENDING_SESSION).remove(AI_PENDING_INSTRUCTION).remove(AI_PENDING_CHECKS).remove(AI_PENDING_FATE).apply();
     }
     /** Commit the next scene and remove its pending roll in one preferences transaction. */
     private void commitAiSave(GameEngine next)throws org.json.JSONException{
@@ -1902,20 +1902,20 @@ public final class MainActivity extends Activity {
         if(!prefs.edit().putString("save",serialized)
             .remove(AI_PENDING_ACTION).remove(AI_PENDING_CHANCE).remove(AI_PENDING_DIE)
             .remove(AI_PENDING_SCENE).remove(AI_PENDING_SESSION)
-            .remove(AI_PENDING_INSTRUCTION).remove(AI_PENDING_CHECKS)
+            .remove(AI_PENDING_INSTRUCTION).remove(AI_PENDING_CHECKS).remove(AI_PENDING_FATE)
             .remove("ai_draft_scene").remove("ai_draft_selected").remove("ai_draft_text").commit())
             throw new IllegalStateException("Не удалось записать сохранение на устройство");
     }
-    private boolean storeAiPending(String action,int chance,int die){
+    private boolean storeAiPending(String action,int chance,int die,int fateDay){
         return prefs.edit().putString(AI_PENDING_ACTION,action)
             .putInt(AI_PENDING_CHANCE,chance).putInt(AI_PENDING_DIE,die)
             .putInt(AI_PENDING_SCENE,game.aiTurn==null?0:game.aiTurn.scene.hashCode())
-            .putString(AI_PENDING_SESSION,aiSession).remove(AI_PENDING_INSTRUCTION).remove(AI_PENDING_CHECKS).commit();
+            .putString(AI_PENDING_SESSION,aiSession).remove(AI_PENDING_INSTRUCTION).remove(AI_PENDING_CHECKS).putInt(AI_PENDING_FATE,fateDay).commit();
     }
-    private boolean storeSelectedChecks(String compound,String instruction,LockedChecks checks){
+    private boolean storeSelectedChecks(String compound,String instruction,LockedChecks checks,int fateDay){
         return prefs.edit().putString(AI_PENDING_ACTION,compound).putInt(AI_PENDING_CHANCE,-2).putInt(AI_PENDING_DIE,-1)
             .putInt(AI_PENDING_SCENE,game.aiTurn.scene.hashCode()).putString(AI_PENDING_SESSION,aiSession)
-            .putString(AI_PENDING_INSTRUCTION,instruction).putString(AI_PENDING_CHECKS,checks.toString()).commit();
+            .putString(AI_PENDING_INSTRUCTION,instruction).putString(AI_PENDING_CHECKS,checks.toString()).putInt(AI_PENDING_FATE,fateDay).commit();
     }
     private void retryLockedAction(){
         String action=pendingAiAction();if(action.isEmpty()||aiTurnBusy)return;
@@ -1929,7 +1929,7 @@ public final class MainActivity extends Activity {
         String verdict=chance<0?"Проверка не требуется, действие гарантировано.":
             "ИИ ранее зафиксировал шанс "+chance+"%, Android уже бросил "+die+
             " из 100. Результат "+(AiGameTurn.success(chance,die)?"УСПЕХ":"НЕУДАЧА")+".";
-        return "СВОБОДНОЕ ДЕЙСТВИЕ ИГРОКА: "+action+"\n"+verdict+
+        return "СВОБОДНОЕ ДЕЙСТВИЕ ИГРОКА: "+action+"\n"+(prefs.getInt(AI_PENDING_FATE,-1)==game.day?"Благосклонность судьбы уже дала повтор; итог окончательный.\n":"")+verdict+
             " НЕ пересчитывай вероятность и НЕ меняй исход. Верни customChance ровно "+
             (chance<0?"null":String.valueOf(chance))+
             ", опиши только этот установленный результат, effects и 10 новых вариантов.";
@@ -2044,10 +2044,12 @@ public final class MainActivity extends Activity {
             actionButton("МАГИЯ",game.magicCost()+" единиц магии",game.magicka>=game.magicCost(),()->resolveNativeAiCombat("MAGIC"));
             actionButton("ЗАЩИТА","Восстановить силы и уменьшить входящий урон",true,()->resolveNativeAiCombat("DEFEND"));
             for(int i=0;i<CompensationPowers.SLOTS;i++){final int index=i;if(game.compensation.available(game,i))actionButton(game.compensation.powerName(i),game.compensation.detail(i),true,()->resolveNativeAiCombat("FIX_POWER:"+index));}
+            for(String code:new String[]{"FIXGIFT:blood","FIXGIFT:time","FIXGIFT:balance","FIXGIFT:escape"})if(FixShopAiContext.combatAvailable(game,code)){int i=code.endsWith("blood")?FixShopGifts.BLOOD:code.endsWith("time")?FixShopGifts.TIME:code.endsWith("balance")?FixShopGifts.BALANCE:FixShopGifts.ESCAPE;actionButton(FixShopGifts.NAME[i],FixShopGifts.DESC[i],true,()->resolveNativeAiCombat(code));}
             actionButton("ЛЕЧЕБНОЕ ЗЕЛЬЕ","В наличии: "+game.potions,game.potions>0,()->resolveNativeAiCombat("POTION"));
             if("WILD".equals(game.battleKind))
                 actionButton("ОТСТУПИТЬ","Шанс: "+game.progress.chance(game,"FLEE")+"%",true,()->resolveNativeAiCombat("FLEE"));
         }
+        if(!livingBusy()&&FixShopWorld.safe(game)){GameEngine.Scene giftScene=new GameEngine.Scene("","","");FixShopGifts.choices(game,giftScene);for(GameEngine.Choice c:giftScene.choices)actionButton(c.title,c.detail,true,()->resolveNativeAiGift(c.action));for(int id:new int[]{FixShopSeals.HOME,FixShopSeals.MEDITATION,FixShopSeals.ARSENAL})if(game.fixShop.seals.on(id)){final int n=id;actionButton(FixShopSeals.NAME[n],game.fixShop.seals.status(n,game),true,()->fixSealDialog(n));}}
         renderVisualResults();
         if(game.aiTurn==null){
             addText(content,"ИИ-Мастер создаст первую сцену из истории твоего героя. Затем появятся десять вариантов действий и поле собственного ответа.",15,TEXT,false,15);
@@ -2172,10 +2174,11 @@ public final class MainActivity extends Activity {
             StringBuilder instruction=new StringBuilder(compound);
             instruction.append("\nУчитывай конфликты действий: невозможное не исполняй. ");
             instruction.append("Исходы выполнимых действий уже установлены Android:\n");
+            int fateDay=-1;
             for(Integer index:indexes){
                 if(index<1||index>game.aiTurn.choices.size())continue;
                 AiGameTurn.Option option=game.aiTurn.choices.get(index-1);
-                int die=option.chance<0?-1:AiGameTurn.roll();checks.add(index,option.title,option.chance,die);
+                int die=option.chance<0?-1:AiGameTurn.roll();if(FixShopAiContext.mayRetry(game,option.chance,die,fateDay==game.day)){die=AiGameTurn.roll();fateDay=game.day;instruction.append("Благосклонность судьбы использована; повторный бросок окончательный.\n");}checks.add(index,option.title,option.chance,die);
                 instruction.append("Вариант ").append(index).append(": ");
                 if(option.chance<0)instruction.append("без проверки.");
                 else instruction.append("шанс ").append(option.chance).append("%, бросок ")
@@ -2184,7 +2187,7 @@ public final class MainActivity extends Activity {
                 instruction.append("\n");
             }
             instruction.append("Продолжи историю, применив effects только за совершённые действия.");
-            if(!storeSelectedChecks(compound,instruction.toString(),checks)){toast("Не удалось сохранить броски");return;}
+            if(!storeSelectedChecks(compound,instruction.toString(),checks,fateDay)){toast("Не удалось сохранить броски");return;}
             requestAiTurn(instruction.toString(),true);
         });
     }
@@ -2203,12 +2206,14 @@ public final class MainActivity extends Activity {
             case "защита":case "защищаюсь":case "блок":case "блокировать":return "DEFEND";
             case "зелье":case "лечебное зелье":case "выпить лечебное зелье":return "POTION";
             case "отступление":case "отступить":case "отступаю":case "бежать":return "FLEE";
+            case "кровавый обмен":return "FIXGIFT:blood";case "пески времени":return "FIXGIFT:time";case "равновесие стихий":return "FIXGIFT:balance";case "тропа призрака":return "FIXGIFT:escape";
             default:return "";
         }
     }
 
     private boolean nativeAiCombatAvailable(String action){
         if(!"COMBAT".equals(game.mode)||game.enemyHp<=0)return false;
+        if(action!=null&&action.startsWith("FIXGIFT:"))return FixShopAiContext.combatAvailable(game,action);
         int custom=CompensationPowers.actionIndex(action);if(custom>=0)return game.compensation.available(game,custom);
         switch(action){
             case "ATTACK":case "DEFEND":return true;
@@ -2220,6 +2225,12 @@ public final class MainActivity extends Activity {
         }
     }
 
+    private void resolveNativeAiGift(String action){
+        if(livingBusy()||!FixShopWorld.safe(game))return;
+        if(!FixShopGifts.choose(game,action)){toast("Дар сейчас недоступен");return;}
+        String outcome=game.message;game.progress.sync(game);game.aiTurn=null;selectedAiChoices.clear();aiOwnDraft="";clearAiDraft();clearAiPending();save();aiMemory.add(aiSession,"event",outcome);
+        requestAiTurn("Движок уже применил дар: "+outcome+"\nОпиши подтверждённый итог. Не применяй effects повторно.",false);if(!aiTurnBusy)render();
+    }
     private void resolveNativeAiCombat(String action){
         if(aiTurnBusy||!"COMBAT".equals(game.mode)||game.enemyHp<=0)return;
         if("HEAVY".equals(action)&&game.stamina<game.heavyCost())return;
@@ -2429,8 +2440,9 @@ public final class MainActivity extends Activity {
                     if(proposalOnly){
                         // The short chance-only response is never written to RPG memory.
                         int fixedChance=AiGameTurn.parseChance(answer);
-                        int die=fixedChance<0?-1:AiGameTurn.roll();
-                        if(!storeAiPending(customAction,fixedChance,die))throw new IllegalStateException("Не удалось сохранить бросок");
+                        int die=fixedChance<0?-1:AiGameTurn.roll();int fateDay=-1;
+                        if(FixShopAiContext.mayRetry(game,fixedChance,die,false)){die=AiGameTurn.roll();fateDay=game.day;}
+                        if(!storeAiPending(customAction,fixedChance,die,fateDay))throw new IllegalStateException("Не удалось сохранить бросок");
                         aiTurnBusy=false;aiTurnPreview="";
                         requestAiTurn(lockedFreeInstruction(customAction,fixedChance,die),
                             true,false,fixedChance,null);
@@ -2442,6 +2454,7 @@ public final class MainActivity extends Activity {
                     GameEngine next=GameEngine.fromJson(saved);
                     java.util.Map<String,Integer> before=itemSnapshot(next);
                     VisualSnapshot visualBefore=new VisualSnapshot(next);
+                    if(actionResolved)FixShopAiContext.commitRetry(next,prefs.getInt(AI_PENDING_FATE,-1));
                     completed.apply(next,actionResolved);
                     next.progress.sync(next);
                     next.katherine.observeTravel(next);next.katherine.autonomous(next);next.alma.observeTravel(next);

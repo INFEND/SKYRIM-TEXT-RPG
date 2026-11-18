@@ -218,7 +218,7 @@ public final class AiGameTurn {
         return turn;
     }
     private static String combatAction(String action){
-        switch(action){case "ATTACK":case "HEAVY":case "MAGIC":case "DEFEND":case "POTION":case "FLEE":return action;default:return "";}
+        switch(action){case "ATTACK":case "HEAVY":case "MAGIC":case "DEFEND":case "POTION":case "FLEE":case "FIXGIFT:blood":case "FIXGIFT:time":case "FIXGIFT:balance":case "FIXGIFT:escape":return action;default:return "";}
     }
     /** Short, isolated AI request. The returned chance is locked before a roll. */
     public static int parseChance(String response)throws JSONException{
@@ -426,7 +426,7 @@ public final class AiGameTurn {
                 if(amount<0||amount>9999)throw new JSONException("Неверное количество "+name);
                 weight+=changes.get(name)*ItemCatalog.find(name).weight;
             }
-            if(weight>50.0001 || weight < -0.0001)throw new JSONException("Недопустимый вес рюкзака");
+            if(weight>Math.max(g.progress.carryLimit(),g.progress.carryWeight())+0.0001 || weight < -0.0001)throw new JSONException("Недопустимый вес рюкзака");
             inventoryChanges.putAll(changes);
         }
         int q=change(e,"questStageDelta",1),d=change(e,"dragonStageDelta",1);
@@ -504,7 +504,7 @@ public final class AiGameTurn {
             g.progress.quantity(name,g.progress.quantity(name)+inventoryChanges.get(name));
         if(enemy!=null){
             int health=cap(enemy.optInt("hp",0),0,50000);
-            if(health>0&&(!"COMBAT".equals(g.mode)||g.enemyHp<=0)){g.resetBattleVisuals();g.katherine.companion.beginBattle();g.alma.beginBattle();}
+            if(health>0&&(!"COMBAT".equals(g.mode)||g.enemyHp<=0)){g.resetBattleVisuals();g.fixShop.gifts.beginBattle();g.fixShop.seals.beginBattle();g.katherine.companion.beginBattle();g.alma.beginBattle();}
             if(health<=0){g.poisonTurns=g.frostTurns=0;}
             g.enemyName=health>0?limited(enemy.optString("name",""),70):"";g.enemyHp=health;
             g.enemyMaxHp=health>0?requiredEnemyInt(enemy,"maxHp",health,50000):0;
