@@ -64,4 +64,66 @@ public class AiModelCompatibilityTest {
         assertEquals(original,AiGameTurn.parseModel(json.toString(),15).scene);
         assertEquals("Текст.",AiGameTurn.previewScene("{\"scene\":\"Текст. effects={"));
     }
+
+    private GameEngine effectGame(){
+        GameEngine g=new GameEngine();
+        g.start("Герой","Норд","Маг");
+        g.enemyHp=0;g.mode="WORLD";g.progress.location="Ривервуд";
+        g.hp=50;g.maxHp=100;g.gold=100;g.hour=10;
+        return g;
+    }
+    @Test public void quotedEffectsAreAppliedExactlyOnce() throws Exception {
+        GameEngine g=effectGame();
+        JSONObject effects=new JSONObject().put("hpDelta","+10").put("goldDelta","-5")
+            .put("hourDelta","8.0").put("staminaDelta",JSONObject.NULL)
+            .put("magickaDelta","без изменений").put("location","null")
+            .put("inventory",JSONObject.NULL).put("sceneFacts","none")
+            .put("skills",new JSONArray().put(new JSONObject().put("index","0").put("xp","0")));
+        AiGameTurn.parseLocalModel(scene().put("effects",effects).toString(),15).apply(g,true);
+        assertEquals(60,g.hp);assertEquals(95,g.gold);assertEquals(18,g.hour);
+        assertEquals("Ривервуд",g.progress.location);
+    }
+    @Test public void allScalarDeltaFieldsAcceptExactZeroAndNull() throws Exception {
+        String[] fields={"hpDelta","maxHpDelta","staminaDelta","maxStaminaDelta",
+            "magickaDelta","maxMagickaDelta","goldDelta","xpDelta","hourDelta","dayDelta",
+            "reputationDelta","attackDelta","armorDelta","potionsDelta","manaPotionsDelta",
+            "questStageDelta","dragonStageDelta"};
+        JSONObject e=new JSONObject();
+        for(int i=0;i<fields.length;i++)e.put(fields[i],i%2==0?"0.0":JSONObject.NULL);
+        GameEngine g=effectGame();
+        AiGameTurn.parseModel(scene().put("effects",e).toString(),15).apply(g,true);
+        assertEquals(50,g.hp);assertEquals(100,g.gold);assertEquals(10,g.hour);
+    }
+    @Test public void quotedEnemyStatsAreNotRoundedOrLost() throws Exception {
+        JSONObject e=new JSONObject().put("enemy",new JSONObject().put("name","Волк")
+            .put("hp","15").put("maxHp","20.0").put("damage","+3"));
+        GameEngine g=effectGame();
+        AiGameTurn.parseLocalModel(scene().put("effects",e).toString(),15).apply(g,true);
+        assertEquals(15,g.enemyHp);assertEquals(20,g.enemyMaxHp);assertEquals(3,g.enemyDamage);
+    }
+    @Test public void invalidEffectsRemainRejectedWithoutMutation() throws Exception {
+        for(Object value:new Object[]{"5 HP","5.5","99999999999999999999999999",true,"не знаю","501"}){
+            GameEngine g=effectGame();
+            JSONObject e=new JSONObject().put("hpDelta",value).put("goldDelta","10");
+            try{
+                AiGameTurn.parseLocalModel(scene().put("effects",e).toString(),15).apply(g,true);
+                fail("Accepted invalid effect: "+value);
+            }catch(JSONException expected){}
+            assertEquals(50,g.hp);assertEquals(100,g.gold);
+        }
+    }
+    @Test public void invalidRequiredNestedNumbersAreNotDefaulted() throws Exception {
+        JSONObject enemy=new JSONObject().put("name","Волк").put("hp",JSONObject.NULL);
+        JSONObject skill=new JSONObject().put("index","0.5").put("xp","10");
+        for(JSONObject e:new JSONObject[]{new JSONObject().put("enemy",enemy),
+                new JSONObject().put("skills",new JSONArray().put(skill))}){
+            try{AiGameTurn.parseLocalModel(scene().put("effects",e).toString(),15);fail();}
+            catch(JSONException expected){}
+        }
+    }
+    @Test public void exactDecimalChanceIsAcceptedButNotFractionalChance() throws Exception {
+        assertEquals(42,AiGameTurn.parseChance("{\"customChance\":\"+42.0%\"}"));
+        try{AiGameTurn.parseChance("{\"customChance\":\"42.5%\"}");fail();}
+        catch(JSONException expected){}
+    }
 }
