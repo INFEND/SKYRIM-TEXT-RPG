@@ -53,12 +53,14 @@ final class SolitudeEncounters {
         if("ACTIVE".equals(state))return worked(g,q)?"Вернуться к "+NAMES[q.giver]:q.task;
         return q.offer;
     }
+    static boolean availableForWork(GameEngine g,int d,int hours){return present(g,d)&&g.hour+hours<=CLOSE[d];}
+    static String workHours(int d){return OPEN[d]+":00–"+CLOSE[d]+":00";}
     private static String npcKey(GameEngine g,int d){
         JSONArray a=g.sceneState.npcFacts();
         for(int i=0;i<a.length();i++){JSONObject o=a.optJSONObject(i);if(o!=null&&NAMES[d].equalsIgnoreCase(o.optString("title")))return o.optString("id");}
         return "solitude_"+IDS[d];
     }
-    private static boolean present(GameEngine g,int d){
+    static boolean present(GameEngine g,int d){
         String status=g.sceneState.npcStatusByName(NAMES[d]);
         return g.hour>=OPEN[d]&&g.hour<CLOSE[d]&&!"DEAD".equals(status)&&!"MISSING".equals(status)&&!"HOSTILE".equals(status);
     }

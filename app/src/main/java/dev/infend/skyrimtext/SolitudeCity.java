@@ -67,6 +67,7 @@ final class SolitudeCity {
         if(lastDay[i]>=g.day)return "Уже выполнено сегодня";
         int start=i/2==6?6:8, end=i/2==6?23:20;
         if(g.hour<start||g.hour+j.hours>end)return "Доступно "+start+":00–"+end+":00";
+        if(!SolitudeEncounters.availableForWork(g,i/2,j.hours))return "Ответственный житель недоступен | "+SolitudeEncounters.workHours(i/2);
         if(g.stamina<j.stamina)return "Не хватает запаса сил";
         if(j.gold<0&&g.gold< -j.gold)return "Не хватает септимов";
         if(j.gold>0&&g.gold>Integer.MAX_VALUE-j.gold)return "Кошелёк переполнен";
