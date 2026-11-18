@@ -2,6 +2,20 @@ package dev.infend.skyrimtext;
 import org.junit.Test;
 import static org.junit.Assert.*;
 public class SolitudeCanonicalTest {
+    @Test public void taarieRequiresRealEquippedOutfitAndPaysOnce() throws Exception {
+        GameEngine g=new GameEngine();g.start("Тест","Норд","Воин");g.region=3;g.progress.location="Солитьюд";g.mode="WORLD";g.hour=10;
+        g.choose("SOLITUDE:open");g.choose("SOLITUDE:visit:0");g.choose("SOLITUDE:store:0");
+        g.choose("SOLITUDE:attire:accept");assertEquals("ACTIVE",SolitudeCanonical.attireState(g));
+        String outfit=SolitudeCanonical.OUTFIT;assertEquals(1,g.progress.quantity(outfit));assertFalse(g.progress.removeItem(outfit,1));
+        g.choose("SOLITUDE:attire:accept");assertEquals(1,g.progress.quantity(outfit));g.choose("SOLITUDE:attire:finish");assertEquals("ACTIVE",SolitudeCanonical.attireState(g));
+        g.choose("SOLITUDE:back");g.choose("SOLITUDE:visit:2");g.choose("SOLITUDE:attire:show");assertFalse(SolitudeCanonical.shown(g));
+        assertTrue(g.progress.equip(outfit));g.hour=20;g.choose("SOLITUDE:attire:show");assertFalse(SolitudeCanonical.shown(g));
+        g.hour=10;g.choose("SOLITUDE:attire:show");assertTrue(SolitudeCanonical.shown(g));
+        g=GameEngine.fromJson(g.toJson().toString());assertTrue(SolitudeCanonical.shown(g));assertTrue(g.progress.equipped(outfit));assertFalse(g.progress.removeItem(outfit,1));
+        g.choose("SOLITUDE:back");g.choose("SOLITUDE:visit:0");g.choose("SOLITUDE:store:0");int gold=g.gold,reward=SolitudeCanonical.rumReward(g);
+        g.choose("SOLITUDE:attire:finish");assertEquals("COMPLETED",SolitudeCanonical.attireState(g));assertEquals(gold+reward,g.gold);
+        g.choose("SOLITUDE:attire:finish");assertEquals(gold+reward,g.gold);assertEquals(1,g.progress.quantity(outfit));assertTrue(g.progress.removeItem(outfit,1));
+    }
     @Test public void sorexDeliveryPersistsAndPaysOnlyOnce() throws Exception {
         GameEngine g=new GameEngine();g.start("Тест","Норд","Воин");g.region=3;g.progress.location="Солитьюд";g.mode="WORLD";g.hour=10;
         g.choose("SOLITUDE:open");g.choose("SOLITUDE:visit:2");g.choose("SOLITUDE:rum:deliver");assertNull(SolitudeCanonical.rumState(g));

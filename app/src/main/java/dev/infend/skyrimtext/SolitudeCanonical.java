@@ -5,6 +5,39 @@ final class SolitudeCanonical {
     static final String KEY="solitude_angeline_news", STEP=KEY+"_aldis";
     static final String TITLE="Сведения о дочери Анжелины";
     static final String RUM="solitude_sorex_rum", RUM_TITLE="Доставка (Сорекс)";
+    static final String ATTIRE="solitude_taarie_attire", ATTIRE_STEP=ATTIRE+"_elisif";
+    static final String ATTIRE_TITLE="Одежда, достойная ярла", OUTFIT="Наряд из «Сияющих одежд»";
+    static String attireState(GameEngine g){return g.progress.questOutcome(ATTIRE);}
+    static boolean shown(GameEngine g){return "COMPLETED".equals(g.progress.questOutcome(ATTIRE_STEP));}
+    static String attireObjective(GameEngine g){
+        if("COMPLETED".equals(attireState(g)))return "Таари получила известие о заказе из дворца.";
+        return shown(g)?"Вернуться к Таари в «Сияющие одежды».":"Надеть наряд из «Сияющих одежд» и показать его Элисиф в Синем дворце.";
+    }
+    static void attireChoices(GameEngine g,GameEngine.Scene s){
+        if(!SolitudeShops.open(g,0))return;
+        String state=attireState(g);
+        if(state==null||state.isEmpty())s.add("SOLITUDE:attire:accept","Обсудить одежду для двора","Каноническое поручение | наряд Таари");
+        else if("ACTIVE".equals(state)&&shown(g)&&g.gold<=Integer.MAX_VALUE-rumReward(g))s.add("SOLITUDE:attire:finish","Передать отзыв Элисиф",rumReward(g)+" септимов | наряд остаётся у тебя");
+    }
+    private static boolean chooseAttire(GameEngine g,String a){
+        String state=attireState(g);
+        if((SolitudeShops.MODE+0).equals(g.mode)&&SolitudeShops.open(g,0)){
+            if("SOLITUDE:attire:accept".equals(a)&&(state==null||state.isEmpty())){
+                if(g.progress.quantity(OUTFIT)==0&&!g.progress.addItem(OUTFIT,1)){report(g,"Освободи место для наряда Таари.");return true;}
+                g.progress.setQuestOutcome(ATTIRE,"ACTIVE");
+                report(g,"Таари просит показать её наряд ярлу Элисиф Прекрасной и рассказать о лавке. Надень полученную одежду перед визитом в Синий дворец.");
+            }else if("SOLITUDE:attire:finish".equals(a)&&"ACTIVE".equals(state)&&shown(g)){
+                int reward=rumReward(g);if(g.gold>Integer.MAX_VALUE-reward)return true;
+                g.progress.setQuestOutcome(ATTIRE,"COMPLETED");g.gold+=reward;g.holdReputation[3]=Math.min(100,g.holdReputation[3]+1);
+                report(g,"Таари рада известию о заказе из дворца. Наряд остаётся у тебя. Награда: "+reward+" септимов. Репутация Хаафингара +1 (адаптация).");
+            }
+        }else if("SOLITUDE:2".equals(g.mode)&&available(g,"Элисиф Прекрасная",9,17)&&"SOLITUDE:attire:show".equals(a)&&"ACTIVE".equals(state)&&!shown(g)){
+            if(!g.progress.equipped(OUTFIT)){report(g,"Сначала надень наряд Таари.");return true;}
+            g.progress.setQuestOutcome(ATTIRE_STEP,"COMPLETED");
+            report(g,"Элисиф одобряет наряд и обещает заказать новые платья в «Сияющих одеждах». Вернись к Таари с её отзывом.");
+        }
+        return true;
+    }
     static String rumState(GameEngine g){return g.progress.questOutcome(RUM);}
     static String rumObjective(GameEngine g){return "COMPLETED".equals(rumState(g))?"Ром доставлен Фолку Огнебороду.":"Доставить ром из Строс-М’Кая Фолку Огнебороду в Синий дворец.";}
     private static boolean available(GameEngine g,String name,int start,int end){
@@ -13,6 +46,8 @@ final class SolitudeCanonical {
     }
     static int rumReward(GameEngine g){return g.level>=40?750:g.level>=30?600:g.level>=20?500:g.level>=10?400:250;}
     static void districtChoices(GameEngine g,GameEngine.Scene s,int district){
+        if(district==2&&"ACTIVE".equals(attireState(g))&&!shown(g)&&available(g,"Элисиф Прекрасная",9,17))
+            s.add("SOLITUDE:attire:show","Показать наряд Элисиф",g.progress.equipped(OUTFIT)?"Рассказать о лавке":"Сначала надень наряд в инвентаре");
         String state=rumState(g);
         if(district==6&&(state==null||state.isEmpty())&&available(g,"Сорекс Виний",6,23))
             s.add("SOLITUDE:rum:accept","Поговорить с Сорексом Винием","Каноническое поручение | доставка рома");
@@ -51,8 +86,9 @@ final class SolitudeCanonical {
         if(aldis(g)&&"ACTIVE".equals(state(g))&&!informed(g))s.add("SOLITUDE:angeline:aldis","Расспросить капитана Алдиса","Судьба Фуры");
     }
     static boolean choose(GameEngine g,String a){
-        if(!a.startsWith("SOLITUDE:angeline:")&&!a.startsWith("SOLITUDE:rum:"))return false;
+        if(!a.startsWith("SOLITUDE:angeline:")&&!a.startsWith("SOLITUDE:rum:")&&!a.startsWith("SOLITUDE:attire:"))return false;
         if(!SolitudeCity.here(g)||g.solitude.custody()||g.road.pending()||g.hp<=0)return true;
+        if(a.startsWith("SOLITUDE:attire:"))return chooseAttire(g,a);
         if(a.startsWith("SOLITUDE:rum:"))return chooseRum(g,a);
         String state=state(g);
         if((SolitudeShops.MODE+1).equals(g.mode)&&SolitudeShops.open(g,1)){

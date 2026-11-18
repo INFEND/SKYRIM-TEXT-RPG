@@ -50,6 +50,7 @@ final class SolitudeShops {
             if(canSell(g,item,s))scene.add("SOLITUDE:sell:"+s+":"+i,"Продать: "+item.name,g.salePrice(item)+" септимов | У тебя: "+g.progress.quantity(id));
         }
         else scene=new GameEngine.Scene(scene.kicker,scene.title,scene.body+"\n\nЛавка закрыта или торговец недоступен.");
+        if(s==0)SolitudeCanonical.attireChoices(g,scene);
         if(s==1)SolitudeCanonical.shopChoices(g,scene);
         return scene.add("SOLITUDE:back","Вернуться на улицу","Покинуть лавку").add("GO_WORLD","Завершить прогулку","Вернуться к приключению");
     }
