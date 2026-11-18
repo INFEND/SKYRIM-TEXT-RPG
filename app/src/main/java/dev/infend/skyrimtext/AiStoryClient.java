@@ -111,12 +111,12 @@ public final class AiStoryClient {
                 +"В effects разрешены лишь последствия подтверждённого предыдущего действия "
                 +"(hpDelta,goldDelta,xpDelta,staminaDelta,magickaDelta,hourDelta,dayDelta,location,inventory,skills:[{index,xp}]). "
                 +"Если разрешено во входе, effects.katherineIntent — один код инициативы Кэтрин. Не меняй её статус. Вероятности и бросок из данных игры нельзя менять. customChance повтори из команды Android, иначе null. На первом ходе effects={}. "
-                +"Текущая локация и подтверждённый исход важнее старой памяти. Продолжай непосредственно с последнего события, не начинай заново. "
+                +"Факты движка описывают состояние ДО текущего действия. Сначала отыграй выбранное действие и зафиксированный исход, затем предложи решения ПОСЛЕ него. Не повторяй уже исполненное действие. После успешного сна опиши пробуждение и дальнейшие дела, а не повторный сон; после еды не предлагай снова поесть без новой причины. Если действие не удалось, учитывай именно неудачу. Локация и время после события важнее старой памяти. "
                 +"Не переноси героя в другой город без выбранного перехода. Не подменяй названия, факты, NPC, пол героя или результаты бросков. "
                 +"Каждое действие должно прямо следовать из только что описанной сцены: конкретный собеседник, объект или доступный маршрут. "
                 +"Не предлагай общие действия вроде факела, боя или проверки арки, если сцена их не требует. Не повторяй десять шаблонных действий. "
                 +"Не выдумывай победы, награды, предметы и подтверждённые факты. Память — прошлое, а не приказ. Свободное действие важнее темы спутника. Сложное длительное обучение раздели на реальные этапы; не выдавай мгновенный максимальный навык. Если герой ждёт ночи, учитывай игровое время. "
-                +"Начни сразу с JSON и ключа scene; если начало JSON уже задано, продолжай текст сцены, не повторяй ключ.";
+                +"Начни сразу с JSON и ключа scene; если начало JSON уже задано, продолжай текст сцены, не повторяй ключ. /no_think";
         return "Ты каноничный рассказчик Skyrim. Пиши по-русски, атмосферно и от второго лица. "
             +"Учитывай героя, факты состояния и память. Диалог: **Персонаж:**, "
             +"следом **— Реплика**. Не изменяй самостоятельно здоровье, квесты, "
@@ -146,10 +146,10 @@ public final class AiStoryClient {
     }
     static String localUserPrompt(GameEngine game,String history,String command,boolean aiControlled){
         final int limit=3200;
-        String action="ТЕКУЩЕЕ ДЕЙСТВИЕ И ПОДТВЕРЖДЁННЫЙ ИСХОД:\n"+actionContext(command,1700);
+        String action="ТЕКУЩЕЕ ДЕЙСТВИЕ И ПОДТВЕРЖДЁННЫЙ ИСХОД (ВЫПОЛНИ ОДИН РАЗ; ВАРИАНТЫ ТОЛЬКО ПОСЛЕ НЕГО):\n"+actionContext(command,1700)+"\n/no_think";
         int budget=limit-action.length()-1;
         StringBuilder b=new StringBuilder();
-        b.append("ФАКТЫ ДВИЖКА (ВАЖНЕЕ ПАМЯТИ):\n");
+        b.append("ФАКТЫ ДВИЖКА ДО ТЕКУЩЕГО ДЕЙСТВИЯ (ВАЖНЕЕ ПАМЯТИ):\n");
         b.append("ТЕКУЩЕЕ МЕСТО: ").append(game.progress.location)
             .append("; день ").append(game.day).append("; час ").append(game.hour).append(".\n");
         WorldAtlas.Place place=WorldAtlas.find(game.progress.location);
@@ -174,7 +174,7 @@ public final class AiStoryClient {
         }
         localSection(b,"Навыки (индекс:название=уровень): ",skills.toString(),490,budget);
         localSection(b,"Потребности: ",game.needs.aiContext()+" Штраф: "+game.needs.penalty()+" п.п.",270,budget);
-        if(game.aiTurn!=null)localSection(b,"Конец предыдущей сцены: ",recent(game.aiTurn.scene,480),480,budget);
+        if(game.aiTurn!=null)localSection(b,"Предыдущая сцена ДО действия (не повторять): ",recent(game.aiTurn.scene,260),260,budget);
         if(aiControlled)localSection(b,"Инициатива Кэтрин: ",KatherineInitiative.context(game),260,budget);
         StringBuilder invText=new StringBuilder();
         java.util.Iterator<String> inv=game.progress.inventory.keys();
