@@ -181,8 +181,8 @@ class LocalAiClient(private val context: Context) {
         if(!currentGeneration(id)) {releaseBinding();return}
         releaseBinding()
         val original=requestData
-        if(recoveryUsed||original==null||(lastTokens>0&&lastTokens>=original.getInt("maxTokens")-24)) {
-            failGeneration(id,reason.trimEnd('.')+" (получено $lastTokens токенов). Повтори действие")
+        if(recoveryUsed||original==null||lastTokens>0) {
+            failGeneration(id,reason.trimEnd('.')+" (получено $lastTokens токенов). Автоматического перезапуска после начала ответа нет; можно повторить действие вручную")
             return
         }
         recoveryUsed=true
