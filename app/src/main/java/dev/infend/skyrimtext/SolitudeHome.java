@@ -8,6 +8,8 @@ final class SolitudeHome {
     private static final String[] ROOMS={"Спальня","Кухня","Гостиная","Алхимическая лаборатория","Лаборатория зачарования"};
     private static final int[] COST={2000,1500,2000,2500,2500};
     private int rooms,lastMeal=-1,lastStudy=-1;
+    private boolean jordisFollowing;
+    boolean jordisActive(GameEngine g){return jordisFollowing&&owns(g)&&SolitudeCourt.done(g,SolitudeCourt.THANE)&&SolitudeCourt.available(g,"Йордис Дева Меча",0,24)&&!g.solitude.custody();}
     // Only fungible, non-quest goods; equipment and engine-backed counters are excluded.
     private final JSONObject chest=new JSONObject();
     private static final String[] GOODS={"Железный слиток","Стальной слиток","Кожаные полоски","Пшеница","Голубой горноцвет","Красный горноцвет","Пурпурный горноцвет","Соль","Факел","Отмычка","Железная стрела","Стальная стрела","Серебряный слиток","Золотой слиток","Эбонитовый слиток","Ртутный слиток","Двемерский металлический слиток","Орихалковый слиток","Корундовый слиток","Кожа","Лунный сахар","Стальной болт"};
@@ -67,6 +69,10 @@ final class SolitudeHome {
     GameEngine.Scene scene(GameEngine g){
         GameEngine.Scene s=new GameEngine.Scene("СОЛИТЬЮД | ДОМ","Высокий шпиль",owns(g)?"За дверью твоего дома стихает шум столицы.\n\n"+g.message:"Поместье закрыто. О покупке можно договориться с Фолком Огнебородом в Синем дворце.");
         if(owns(g)){
+            if(SolitudeCourt.done(g,SolitudeCourt.THANE)&&SolitudeCourt.available(g,"Йордис Дева Меча",0,24)){
+                s.add("SOLITUDE:home:jordis:talk","Поговорить с Йордис Девой Меча","Хускарл | "+(jordisFollowing?"Сопровождает тебя":"Охраняет поместье"));
+                s.add(jordisFollowing?"SOLITUDE:home:jordis:stay":"SOLITUDE:home:jordis:follow",jordisFollowing?"Оставить Йордис дома":"Попросить Йордис сопровождать тебя","Поддержка в бою");
+            }
             for(int i=0;i<GOODS.length;i++){
                 String id=GOODS[i];int n=stored(id);
                 if(g.progress.quantity(id)>0&&n<LIMIT)s.add("SOLITUDE:home:deposit:"+i,"Положить: "+id,"В сумке: "+g.progress.quantity(id)+" | В сундуке: "+n);
@@ -84,6 +90,13 @@ final class SolitudeHome {
     }
     void choose(GameEngine g,String a){
         if(!owns(g))return;
+        if(a.startsWith("SOLITUDE:home:jordis:")){
+            if(!SolitudeCourt.ready(g)||!SolitudeCourt.done(g,SolitudeCourt.THANE)||!SolitudeCourt.available(g,"Йордис Дева Меча",0,24))return;
+            if(a.equals("SOLITUDE:home:jordis:follow")){jordisFollowing=true;report(g,"Йордис: Я буду защищать тебя, мой тан.");}
+            else if(a.equals("SOLITUDE:home:jordis:stay")){jordisFollowing=false;report(g,"Йордис остаётся охранять Высокий шпиль.");}
+            else if(a.equals("SOLITUDE:home:jordis:talk"))report(g,"Йордис: Мой долг — защищать тебя и твоё поместье. Если понадобится помощь, я готова.");
+            return;
+        }
         if(transfer(g,a))return;
         if(a.equals("SOLITUDE:home:brew")){
             if(room(3)&&FixShopHome.brew(g)){g.mode=MODE;report(g,"Ты приготовил лечебное зелье в Высоком шпиле.");}
@@ -104,6 +117,6 @@ final class SolitudeHome {
         }
     }
     private static void report(GameEngine g,String m){g.message=m;g.progress.recent=m;g.recordVisualEvent(m);g.progress.sync(g);}
-    JSONObject save(){JSONObject j=new JSONObject();try{j.put("rooms",rooms).put("lastMeal",lastMeal).put("lastStudy",lastStudy).put("chest",chest);}catch(Exception ignored){}return j;}
-    static SolitudeHome restore(JSONObject j){SolitudeHome x=new SolitudeHome();if(j!=null){x.rooms=j.optInt("rooms")&31;x.lastMeal=j.optInt("lastMeal",-1);x.lastStudy=j.optInt("lastStudy",-1);JSONObject c=j.optJSONObject("chest");if(c!=null)for(String id:GOODS)x.setStored(id,Math.max(0,Math.min(LIMIT,c.optInt(id,0))));}return x;}
+    JSONObject save(){JSONObject j=new JSONObject();try{j.put("rooms",rooms).put("lastMeal",lastMeal).put("lastStudy",lastStudy).put("chest",chest).put("jordisFollowing",jordisFollowing);}catch(Exception ignored){}return j;}
+    static SolitudeHome restore(JSONObject j){SolitudeHome x=new SolitudeHome();if(j!=null){x.jordisFollowing=j.optBoolean("jordisFollowing",false);x.rooms=j.optInt("rooms")&31;x.lastMeal=j.optInt("lastMeal",-1);x.lastStudy=j.optInt("lastStudy",-1);JSONObject c=j.optJSONObject("chest");if(c!=null)for(String id:GOODS)x.setStored(id,Math.max(0,Math.min(LIMIT,c.optInt(id,0))));}return x;}
 }

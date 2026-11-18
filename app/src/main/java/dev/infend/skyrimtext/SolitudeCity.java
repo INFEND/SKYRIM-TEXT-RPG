@@ -46,6 +46,7 @@ final class SolitudeCity {
     private final int[] lastDay=new int[JOBS.length];
     private SolitudeShops shops=new SolitudeShops();
     private SolitudeHome home=new SolitudeHome();
+    int jordisDamage(GameEngine g,int turn,int remaining){return home.jordisActive(g)&&turn%2==0?Math.min(Math.max(0,remaining),4+Math.min(10,g.level/5)):0;}
     private SolitudeJustice justice=new SolitudeJustice();
     boolean confined(){return justice.confined();}
     boolean custody(){return confined()||justice.detained();}

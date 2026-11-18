@@ -723,6 +723,7 @@ public final class GameEngine {
         if("ACTIVE".equals(progress.questOutcome("road_boethiah_hireling"))&&enemyHp>damage){int assist=Math.min(3,enemyHp-damage);damage+=assist;actionText+="\nНаёмник из Виндхельма помогает в бою: −"+assist+" здоровья врагу.";}
         if(road.hasDog(this)&&enemyHp>damage&&(battleTurns+1)%3==0){damage+=3;actionText+="\nБродячий пёс помогает в бою: −3 здоровья врагу.";}
         int petDamage=fixShop.world.petDamage(battleTurns+1,Math.max(0,enemyHp-damage));if(petDamage>0){damage+=petDamage;actionText+="\n"+fixShop.world.petName()+": −"+petDamage+" здоровья врагу.";}
+        int jordisDamage=solitude.jordisDamage(this,battleTurns+1,enemyHp-damage);if(jordisDamage>0){damage+=jordisDamage;actionText+="\nЙордис Дева Меча: удар мечом, −"+jordisDamage+" здоровья врагу.";}
         int customDamage=fixShop.world.companionDamage(battleTurns+1,Math.max(0,enemyHp-damage));if(customDamage>0){damage+=customDamage;actionText+="\n"+fixShop.world.companionName()+": −"+customDamage+" здоровья врагу.";}
         int itachiOngoing=itachi.ongoingDamage(Math.max(0,enemyHp-damage));if(itachiOngoing>0){damage+=itachiOngoing;actionText+="\nИтачи: остаточное пламя, клоны или отражение, −"+itachiOngoing+" здоровья врагу.";}
         boolean itachiWild="WILD".equals(battleKind)&&!road.groupActive(this)&&!enemyName.toLowerCase(java.util.Locale.ROOT).contains("карстааг")&&!enemyName.toLowerCase(java.util.Locale.ROOT).contains("дракон");

@@ -267,6 +267,7 @@ public final class ItemCatalog {
     static { ApparelAndPotionCatalog.register(); WorldItemCatalog.register(); LibraryItemCatalog.register(); CommonItemCatalog.register();
         registerMissing(SolitudeCourt.HORN,"Квестовые предметы","",0,0,"Боевой рог покойного верховного короля Торуга.","",-1,-1);
         registerMissing(SolitudeCourt.SKULL,"Квестовые предметы","",0,0,"Останки Королевы-Волчицы для освящения Стирром.","",-1,-1);
+        registerMissing(SolitudeCourt.BLADE,"Оружие","",10,300,"Наградное оружие тана Хаафингара. Фиксированный вариант для текстовой адаптации.","",13,0);
         registerMissing(SolitudeCourt.SHIELD,"Броня","",12,1540,"Награда защитнику Солитьюда.","Сопротивление магии 20%; при блокировании входящий урон уменьшается ещё на 25%.",27,4);
         registerMissing("Амулет Талоса Роггвира","Квестовые предметы","",0,0,"Личный амулет Роггвира, предназначенный для возвращения Грете.","",-1,-1);
         registerMissing("Пряное вино","Напитки","",0.5,7,"Пряное вино Иветты Сан из Солитьюда.","",-1,-1);

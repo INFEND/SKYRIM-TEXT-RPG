@@ -15,7 +15,7 @@ final class SolitudeCourt {
         return g.hour>=start&&g.hour<end&&!"DEAD".equals(status)&&!"MISSING".equals(status)&&!"HOSTILE".equals(status);
     }
     static boolean ready(GameEngine g){return g.started&&g.hp>0&&!g.road.pending()&&!g.solitude.custody();}
-    static final String THANE="solitude_thane";
+    static final String THANE="solitude_thane", BLADE_REWARD=THANE+"_blade", BLADE="Клинок Хаафингара";
     static int favors(GameEngine g){
         int count=0;
         for(String id:new String[]{SolitudeCanonical.KEY,SolitudeCanonical.RUM,SolitudeCanonical.WINE,SolitudeCanonical.ATTIRE,SolitudeCanonical.GRACE})if(done(g,id))count++;
@@ -55,6 +55,7 @@ final class SolitudeCourt {
     static void districtChoices(GameEngine g,GameEngine.Scene s,int d){
         if(!ready(g))return;
         if(d==2&&available(g,"Элисиф Прекрасная",9,17)&&SolitudeWolf.done(g,SolitudeWolf.KEY)){
+            if(done(g,THANE)&&!done(g,BLADE_REWARD))s.add("SOLITUDE:court:blade","Получить клинок Хаафингара","Награда тана");
             if(!done(g,THANE)&&thaneEligible(g))s.add("SOLITUDE:court:thane","Просить титул тана Хаафингара","Поместье и помощь пяти жителям");
             if(absent(g,TRIBUTE))s.add("SOLITUDE:court:tribute","Выслушать личную просьбу Элисиф","Каноническое поручение");
             if(active(g,TRIBUTE)&&done(g,OFFER))s.add("SOLITUDE:court:tribute_finish","Сообщить о подношении","Право купить Высокий шпиль");
@@ -77,6 +78,10 @@ final class SolitudeCourt {
     static boolean chooseCity(GameEngine g,String a){
         if(!ready(g)||!SolitudeCity.here(g))return true;
         if("SOLITUDE:2".equals(g.mode)&&available(g,"Элисиф Прекрасная",9,17)&&SolitudeWolf.done(g,SolitudeWolf.KEY)){
+            if("SOLITUDE:court:blade".equals(a)&&done(g,THANE)&&!done(g,BLADE_REWARD)){
+                if(!g.progress.addItem(BLADE,1)){report(g,"Освободи место для наградного оружия.");return true;}
+                g.progress.setQuestOutcome(BLADE_REWARD,"COMPLETED");report(g,"Элисиф вручает тебе клинок Хаафингара.");return true;
+            }
             if("SOLITUDE:court:thane".equals(a)&&!done(g,THANE)&&thaneEligible(g)){
                 g.progress.setQuestOutcome(THANE,"COMPLETED");report(g,"Элисиф признаёт твою помощь Хаафингару и дарует титул тана. Ты заслужил уважение жителей.");return true;
             }
