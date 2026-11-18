@@ -2,6 +2,51 @@ package dev.infend.skyrimtext;
 
 /** Offline adaptation of Angeline's original quest, using the shared quest ledger. */
 final class SolitudeCanonical {
+    static final String GRACE="solitude_greta_grace", GRACE_TALK=GRACE+"_greta", GRACE_LOOT=GRACE+"_amulet";
+    static final String GRACE_TITLE="Вернуть милость богов", GRACE_ITEM="Амулет Талоса Роггвира";
+    static final String ADDVAR="SOLITUDE:addvar", CATACOMBS="SOLITUDE:catacombs";
+    static String graceState(GameEngine g){return g.progress.questOutcome(GRACE);}
+    static boolean graceTalked(GameEngine g){return "COMPLETED".equals(g.progress.questOutcome(GRACE_TALK));}
+    static boolean graceLooted(GameEngine g){return "COMPLETED".equals(g.progress.questOutcome(GRACE_LOOT));}
+    static boolean graceMode(String mode){return ADDVAR.equals(mode)||CATACOMBS.equals(mode);}
+    static String graceObjective(GameEngine g){
+        if("COMPLETED".equals(graceState(g)))return "Амулет возвращён Грете; она готова снова посещать храм.";
+        if(!graceTalked(g))return "Поговорить с Гретой в доме Аддвара.";
+        return graceLooted(g)?"Вернуть амулет Роггвира Грете.":"Найти амулет Роггвира в катакомбах Солитьюда.";
+    }
+    static GameEngine.Scene graceScene(GameEngine g){
+        boolean home=ADDVAR.equals(g.mode),active="ACTIVE".equals(graceState(g));
+        GameEngine.Scene s=new GameEngine.Scene("СОЛИТЬЮД | "+g.hour+":00",home?"Дом Аддвара":"Катакомбы Солитьюда",
+            (home?"В доме торговца рыбой тихо. Семья ещё скорбит о Роггвире.":"В холодных нишах покоятся умершие жители столицы. Среди каменных гробов находится могила Роггвира.")+"\n\n"+g.message);
+        if(home&&active&&available(g,"Грета",8,20)){
+            if(!graceTalked(g))s.add("SOLITUDE:grace:talk","Поговорить с Гретой","Почему она оставила храм?");
+            else if(graceLooted(g)&&g.progress.quantity(GRACE_ITEM)>0&&g.gold<=Integer.MAX_VALUE-rumReward(g))
+                s.add("SOLITUDE:grace:finish","Вернуть амулет Роггвира",rumReward(g)+" септимов");
+        }
+        if(!home&&active&&graceTalked(g)&&!graceLooted(g))s.add("SOLITUDE:grace:loot","Найти амулет в гробу Роггвира","Квестовый предмет");
+        return s.add("SOLITUDE:back","На улицы Солитьюда","Вернуться к выбору районов").add("GO_WORLD","Завершить прогулку","Вернуться к приключению");
+    }
+    private static boolean chooseGrace(GameEngine g,String a){
+        String state=graceState(g);
+        if("SOLITUDE:0".equals(g.mode)&&available(g,"Сварри",9,20)&&"SOLITUDE:grace:accept".equals(a)&&(state==null||state.isEmpty())){
+            g.progress.setQuestOutcome(GRACE,"ACTIVE");
+            report(g,"Сварри рассказывает, что после казни дяди Роггвира её мать Грета перестала ходить в Храм Богов. Девочка просит поговорить с матерью в доме Аддвара.");
+        }else if(ADDVAR.equals(g.mode)&&available(g,"Грета",8,20)&&"ACTIVE".equals(state)){
+            if("SOLITUDE:grace:talk".equals(a)&&!graceTalked(g)){
+                g.progress.setQuestOutcome(GRACE_TALK,"COMPLETED");
+                report(g,"Грета хочет вернуться в храм, но ей не хватает связи с Талосом. Она просит найти амулет брата в катакомбах Солитьюда.");
+            }else if("SOLITUDE:grace:finish".equals(a)&&graceTalked(g)&&graceLooted(g)&&g.progress.quantity(GRACE_ITEM)>0){
+                int reward=rumReward(g);if(g.gold>Integer.MAX_VALUE-reward)return true;
+                g.progress.setQuestOutcome(GRACE,"COMPLETED");g.progress.quantity(GRACE_ITEM,0);
+                g.gold+=reward;g.holdReputation[3]=Math.min(100,g.holdReputation[3]+1);
+                report(g,"Грета бережно принимает амулет брата и обещает вновь посещать храм. Награда: "+reward+" септимов.");
+            }
+        }else if(CATACOMBS.equals(g.mode)&&"ACTIVE".equals(state)&&graceTalked(g)&&!graceLooted(g)&&"SOLITUDE:grace:loot".equals(a)){
+            if(g.progress.quantity(GRACE_ITEM)==0&&!g.progress.addItem(GRACE_ITEM,1))return true;
+            g.progress.setQuestOutcome(GRACE_LOOT,"COMPLETED");report(g,"В гробу Роггвира ты находишь его амулет Талоса. Верни его Грете.");
+        }
+        return true;
+    }
     static final String KEY="solitude_angeline_news", STEP=KEY+"_aldis";
     static final String TITLE="Сведения о дочери Анжелины";
     static final String RUM="solitude_sorex_rum", RUM_TITLE="Доставка (Сорекс)";
@@ -94,6 +139,7 @@ final class SolitudeCanonical {
     static int rumReward(GameEngine g){return g.level>=40?750:g.level>=30?600:g.level>=20?500:g.level>=10?400:250;}
     static void districtChoices(GameEngine g,GameEngine.Scene s,int district){
         wineChoices(g,s,district);
+        if(district==0&&available(g,"Сварри",9,20)&&(graceState(g)==null||graceState(g).isEmpty()))s.add("SOLITUDE:grace:accept","Поговорить со Сварри","Каноническое поручение | Вернуть милость богов");
         if(district==2&&"ACTIVE".equals(attireState(g))&&!shown(g)&&available(g,"Элисиф Прекрасная",9,17))
             s.add("SOLITUDE:attire:show","Показать наряд Элисиф",g.progress.equipped(OUTFIT)?"Рассказать о лавке":"Сначала надень наряд в инвентаре");
         String state=rumState(g);
@@ -134,8 +180,9 @@ final class SolitudeCanonical {
         if(aldis(g)&&"ACTIVE".equals(state(g))&&!informed(g))s.add("SOLITUDE:angeline:aldis","Расспросить капитана Алдиса","Судьба Фуры");
     }
     static boolean choose(GameEngine g,String a){
-        if(!a.startsWith("SOLITUDE:angeline:")&&!a.startsWith("SOLITUDE:rum:")&&!a.startsWith("SOLITUDE:attire:")&&!a.startsWith("SOLITUDE:wine:"))return false;
+        if(!a.startsWith("SOLITUDE:angeline:")&&!a.startsWith("SOLITUDE:rum:")&&!a.startsWith("SOLITUDE:attire:")&&!a.startsWith("SOLITUDE:wine:")&&!a.startsWith("SOLITUDE:grace:"))return false;
         if(!SolitudeCity.here(g)||g.solitude.custody()||g.road.pending()||g.hp<=0)return true;
+        if(a.startsWith("SOLITUDE:grace:"))return chooseGrace(g,a);
         if(a.startsWith("SOLITUDE:wine:"))return chooseWine(g,a);
         if(a.startsWith("SOLITUDE:attire:"))return chooseAttire(g,a);
         if(a.startsWith("SOLITUDE:rum:"))return chooseRum(g,a);

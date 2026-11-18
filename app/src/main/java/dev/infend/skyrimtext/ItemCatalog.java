@@ -265,6 +265,7 @@ public final class ItemCatalog {
         if(!items.containsKey(name))put(name,category,icon,weight,cost,desc,effect,stat,skill);
     }
     static { ApparelAndPotionCatalog.register(); WorldItemCatalog.register(); LibraryItemCatalog.register(); CommonItemCatalog.register();
+        registerMissing("Амулет Талоса Роггвира","Квестовые предметы","",0,0,"Личный амулет Роггвира, предназначенный для возвращения Грете.","",-1,-1);
         registerMissing("Пряное вино","Напитки","",0.5,7,"Пряное вино Иветты Сан из Солитьюда.","",-1,-1);
         registerMissing("Медовуха Хоннинга","Напитки","",0.5,20,"Медовуха из варницы Хоннинга.","",-1,-1);
         registerMissing("Зачарованное ожерелье","Украшения","",0.5,100,"Подарок весельчаков. При ношении увеличивает переносимый вес на 25 кг.","Грузоподъёмность +25 кг",0,-1);

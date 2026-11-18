@@ -1730,6 +1730,14 @@ public final class MainActivity extends Activity {
             if("Рыночная площадь".equals(place))d=0;
             if("Подземелье Мрачного замка".equals(place))d=1;
         }
+        if("Солитьюд".equals(city)&&("Дом Аддвара".equals(place)||"Катакомбы Солитьюда".equals(place)||"Зал мёртвых".equals(place))){
+            final String destination="Дом Аддвара".equals(place)?SolitudeCanonical.ADDVAR:SolitudeCanonical.CATACOMBS;
+            new RuneDialogBuilder(this,accent()).setTitle(place).setView(panel).setPositiveButton("Посетить",(dialog,w)->{
+                if(!city.equals(game.progress.location)||!"WORLD".equals(game.mode)||game.road.pending())return;
+                if(aiClient!=null)aiClient.cancel();if(localAiClient!=null)localAiClient.cancel();
+                game.choose("SOLITUDE:open");game.choose(destination);save();tab=0;render();
+            }).setNegativeButton("Закрыть",null).show();return;
+        }
         if("Солитьюд".equals(city)&&"Высокий шпиль".equals(place)){
             new RuneDialogBuilder(this,accent()).setTitle(place).setView(panel).setPositiveButton("Посетить",(dialog,w)->{
                 if(!city.equals(game.progress.location)||!"WORLD".equals(game.mode)||game.road.pending())return;
@@ -4216,6 +4224,7 @@ public final class MainActivity extends Activity {
         section("ЛЕТОПИСЬ СЕВЕРА","Журнал","Выбирай задание, чтобы увидеть описание и текущую цель.");
         renderFactionJournal();
         renderRoadQuestJournal();
+        if("ACTIVE".equals(SolitudeCanonical.graceState(game))){LinearLayout local=card();addText(local,SolitudeCanonical.GRACE_TITLE,15,TEXT,true,6);addText(local,"Солитьюд | Каноническое поручение (адаптация) | "+SolitudeCanonical.graceObjective(game),13,MUTED,false,6);}
         if("ACTIVE".equals(SolitudeCanonical.wineState(game))){LinearLayout local=card();addText(local,SolitudeCanonical.WINE_TITLE,15,TEXT,true,6);addText(local,"Солитьюд | Каноническое поручение (адаптация) | "+SolitudeCanonical.wineObjective(game),13,MUTED,false,6);}
         if("ACTIVE".equals(SolitudeCanonical.attireState(game))){LinearLayout local=card();addText(local,SolitudeCanonical.ATTIRE_TITLE,15,TEXT,true,6);addText(local,"Солитьюд | Каноническое поручение (адаптация) | "+SolitudeCanonical.attireObjective(game),13,MUTED,false,6);}
         if("ACTIVE".equals(SolitudeCanonical.rumState(game))){LinearLayout local=card();addText(local,SolitudeCanonical.RUM_TITLE,15,TEXT,true,6);addText(local,"Солитьюд | Каноническое поручение (адаптация) | "+SolitudeCanonical.rumObjective(game),13,MUTED,false,6);}
@@ -4306,7 +4315,8 @@ public final class MainActivity extends Activity {
         if("COMPLETED".equals(SolitudeCanonical.rumState(game)))addText(completed,"◇ "+SolitudeCanonical.RUM_TITLE+" | "+SolitudeCanonical.rumObjective(game),14,TEXT,false,6);
         if("COMPLETED".equals(SolitudeCanonical.attireState(game)))addText(completed,"◇ "+SolitudeCanonical.ATTIRE_TITLE+" | "+SolitudeCanonical.attireObjective(game),14,TEXT,false,6);
         if("COMPLETED".equals(SolitudeCanonical.wineState(game)))addText(completed,"◇ "+SolitudeCanonical.WINE_TITLE+" | "+SolitudeCanonical.wineObjective(game),14,TEXT,false,6);
-        boolean cityCompleted="COMPLETED".equals(SolitudeCanonical.wineState(game))||"COMPLETED".equals(SolitudeCanonical.attireState(game))||"COMPLETED".equals(SolitudeCanonical.state(game))||"COMPLETED".equals(SolitudeCanonical.rumState(game));for(SolitudeEncounters.Quest q:SolitudeEncounters.QUESTS)if("COMPLETED".equals(SolitudeEncounters.state(game,q))){cityCompleted=true;addText(completed,"◇ "+q.title+" | "+SolitudeEncounters.objective(game,q),14,TEXT,false,6);}
+        if("COMPLETED".equals(SolitudeCanonical.graceState(game)))addText(completed,"◇ "+SolitudeCanonical.GRACE_TITLE+" | "+SolitudeCanonical.graceObjective(game),14,TEXT,false,6);
+        boolean cityCompleted="COMPLETED".equals(SolitudeCanonical.graceState(game))||"COMPLETED".equals(SolitudeCanonical.wineState(game))||"COMPLETED".equals(SolitudeCanonical.attireState(game))||"COMPLETED".equals(SolitudeCanonical.state(game))||"COMPLETED".equals(SolitudeCanonical.rumState(game));for(SolitudeEncounters.Quest q:SolitudeEncounters.QUESTS)if("COMPLETED".equals(SolitudeEncounters.state(game,q))){cityCompleted=true;addText(completed,"◇ "+q.title+" | "+SolitudeEncounters.objective(game,q),14,TEXT,false,6);}
         if(!cityCompleted&&game.progress.completed.isEmpty()&&game.questStage!=4
                 &&game.progress.dragonStage<DragonArc.FINAL_STAGE&&game.boardCompleted==0)
             addText(completed,"Завершённых поручений пока нет.",14,MUTED,false,0);

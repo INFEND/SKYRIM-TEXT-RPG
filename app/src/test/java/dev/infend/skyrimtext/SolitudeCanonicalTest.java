@@ -2,6 +2,23 @@ package dev.infend.skyrimtext;
 import org.junit.Test;
 import static org.junit.Assert.*;
 public class SolitudeCanonicalTest {
+    @Test public void graceUniqueAmuletAndLocationsPersist() throws Exception {
+        GameEngine g=new GameEngine();g.start("Тест","Норд","Воин");g.region=3;g.progress.location="Солитьюд";g.mode="WORLD";g.hour=10;
+        String id=SolitudeCanonical.GRACE_ITEM;
+        g.choose("SOLITUDE:open");g.choose(SolitudeCanonical.CATACOMBS);assertEquals(SolitudeCanonical.CATACOMBS,g.mode);
+        g.choose("SOLITUDE:grace:loot");assertEquals(0,g.progress.quantity(id));
+        g.choose("SOLITUDE:back");g.choose("SOLITUDE:visit:0");g.choose("SOLITUDE:grace:accept");assertEquals("ACTIVE",SolitudeCanonical.graceState(g));
+        g.choose("SOLITUDE:grace:talk");assertFalse(SolitudeCanonical.graceTalked(g));
+        g.choose("SOLITUDE:back");g.choose(SolitudeCanonical.ADDVAR);g.choose("SOLITUDE:grace:talk");assertTrue(SolitudeCanonical.graceTalked(g));
+        g.choose("SOLITUDE:grace:finish");assertEquals("ACTIVE",SolitudeCanonical.graceState(g));
+        g.choose("SOLITUDE:back");g.choose(SolitudeCanonical.CATACOMBS);g.choose("SOLITUDE:grace:loot");g.choose("SOLITUDE:grace:loot");
+        assertEquals(1,g.progress.quantity(id));assertFalse(g.progress.removeItem(id,1));
+        g=GameEngine.fromJson(g.toJson().toString());assertEquals(SolitudeCanonical.CATACOMBS,g.mode);assertTrue(SolitudeCanonical.graceLooted(g));assertEquals(1,g.progress.quantity(id));
+        g.choose("SOLITUDE:back");g.choose(SolitudeCanonical.ADDVAR);g.hour=23;g.choose("SOLITUDE:grace:finish");assertEquals("ACTIVE",SolitudeCanonical.graceState(g));
+        g.hour=10;int gold=g.gold,reward=SolitudeCanonical.rumReward(g);
+        g.choose("SOLITUDE:grace:finish");assertEquals("COMPLETED",SolitudeCanonical.graceState(g));assertEquals(0,g.progress.quantity(id));assertEquals(gold+reward,g.gold);
+        g.choose("SOLITUDE:grace:finish");assertEquals(gold+reward,g.gold);
+    }
     @Test public void wineTariffPersistsAndRewardIsUnique() throws Exception {
         GameEngine g=new GameEngine();g.start("Тест","Норд","Воин");g.region=3;g.progress.location="Солитьюд";g.mode="WORLD";g.hour=10;g.gold=3000;
         g.choose("SOLITUDE:open");g.choose("SOLITUDE:visit:0");g.choose("SOLITUDE:wine:finish");assertNull(SolitudeCanonical.wineState(g));

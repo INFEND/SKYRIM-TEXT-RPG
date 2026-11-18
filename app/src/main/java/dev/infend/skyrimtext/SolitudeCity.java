@@ -57,7 +57,7 @@ final class SolitudeCity {
         for(int i=0;i<PLACES.length;i++)if((PREFIX+i).equals(mode))return i;
         return -1;
     }
-    static boolean validMode(String mode){return MODE.equals(mode)||district(mode)>=0||SolitudeShops.index(mode)>=0||SolitudeHome.MODE.equals(mode)||SolitudeJustice.MODE.equals(mode)||SolitudeJustice.CELL.equals(mode);}
+    static boolean validMode(String mode){return MODE.equals(mode)||district(mode)>=0||SolitudeShops.index(mode)>=0||SolitudeHome.MODE.equals(mode)||SolitudeJustice.MODE.equals(mode)||SolitudeJustice.CELL.equals(mode)||SolitudeCanonical.graceMode(mode);}
     private String blocked(GameEngine g,int i){
         Job j=JOBS[i];
         if(lastDay[i]>=g.day)return "Уже выполнено сегодня";
@@ -78,12 +78,15 @@ final class SolitudeCity {
         if(justice.confined())return justice.cell(g);
         if(SolitudeJustice.MODE.equals(g.mode))return justice.scene(g);
         if(SolitudeHome.MODE.equals(g.mode))return home.scene(g);
+        if(SolitudeCanonical.graceMode(g.mode))return SolitudeCanonical.graceScene(g);
         int store=SolitudeShops.index(g.mode);if(store>=0)return shops.scene(g,store);
         int d=district(g.mode);
         if(d<0){
             GameEngine.Scene s=new GameEngine.Scene("СОЛИТЬЮД | ДЕНЬ "+g.day,"Жизнь столицы",
                 "Над городом возвышается Синий дворец, под аркой шумит море. Выбери, куда отправиться. Местные поручения и уроки имеют свои часы работы и не требуют перехода на глобальной карте.");
             for(int i=0;i<PLACES.length;i++)s.add(PREFIX+"visit:"+i,PLACES[i],PROSE[i]);
+            s.add(SolitudeCanonical.ADDVAR,"Дом Аддвара","Жилой дом торговца рыбой");
+            s.add(SolitudeCanonical.CATACOMBS,"Катакомбы Солитьюда","Место погребения жителей");
             s.add("SOLITUDE:home","Высокий шпиль",SolitudeHome.owns(g)?"Собственный дом":"Поместье | покупка в Синем дворце");
             return s.add("GO_WORLD","Вернуться к приключению","Открыть обычные действия города");
         }
@@ -117,10 +120,12 @@ final class SolitudeCity {
         if((PREFIX+"back").equals(action)){g.mode=MODE;g.message="";return;}
         if(SolitudeJustice.MODE.equals(g.mode)){justice.choose(g,action);return;}
         if(SolitudeCanonical.choose(g,action))return;
+        if(SolitudeCanonical.graceMode(g.mode))return;
         if(SolitudeHome.MODE.equals(g.mode)){home.choose(g,action);return;}
         int store=SolitudeShops.index(g.mode);if(store>=0){shops.choose(g,store,action);return;}
         int d=district(g.mode);
         if(MODE.equals(g.mode)){
+            if(SolitudeCanonical.graceMode(action)){g.mode=action;g.message="";return;}
             if(SolitudeHome.MODE.equals(action)){g.mode=SolitudeHome.MODE;g.message="";return;}
             for(int i=0;i<PLACES.length;i++)if((PREFIX+"visit:"+i).equals(action)){g.mode=PREFIX+i;g.message="";return;}
             return;
