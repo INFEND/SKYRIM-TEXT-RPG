@@ -18,6 +18,17 @@ final class SolitudeEncounters {
         "В моей таверне знают много историй, но я не отвечаю за правдивость каждой из них.",
         "В порту нет мелочей. Один неверный знак в ведомости способен задержать целый груз."
     };
+    // Authored lines about established places and occupations; not original game quotes.
+    private static final String[] LOCAL={
+        "На рынке у ворот удобно купить свежие припасы. В гавани свои торговые дела, там спроси у грузчиков.",
+        "Мрачный замок — оплот Легиона. Держись подальше от закрытых помещений и уважай караул.",
+        "В Синем дворце принимают просителей. За имуществом и делами двора обращаются ко мне.",
+        "В Коллегии бардов хранят старые песни. Внимание к словам здесь ценят не меньше хорошего голоса.",
+        "В Храме Богов можно найти утешение. Не путай храм с катакомбами, где покоятся умершие.",
+        "У кузницы можно освоить ремесло и приобрести снаряжение. За горном нужен внимательный присмотр.",
+        "Смеющаяся крыса принимает путешественников. За едой, постелью и слухами лучше обращаться до закрытия.",
+        "Гавань связывает столицу с торговыми путями. На причалах у каждого груза есть своя ведомость."
+    };
     private static final int[] OPEN={8,8,9,9,7,8,6,8}, CLOSE={18,18,17,19,19,18,23,18};
     static final class Quest {
         final String id,title,offer,task,work,finish,alternative;
@@ -51,6 +62,21 @@ final class SolitudeEncounters {
         String status=g.sceneState.npcStatusByName(NAMES[d]);
         return g.hour>=OPEN[d]&&g.hour<CLOSE[d]&&!"DEAD".equals(status)&&!"MISSING".equals(status)&&!"HOSTILE".equals(status);
     }
+    private static JSONObject fact(GameEngine g,int d){
+        String key=npcKey(g,d);JSONArray facts=g.sceneState.npcFacts();
+        for(int i=0;i<facts.length();i++){JSONObject f=facts.optJSONObject(i);if(f!=null&&key.equals(f.optString("id")))return f;}
+        return null;
+    }
+    private static String memory(GameEngine g,int d){
+        JSONObject f=fact(g,d);if(f==null)return "";
+        StringBuilder b=new StringBuilder("Отношение: ").append(f.optInt("relation",50)).append("/100");
+        if(f.optInt("lastDay")>0)b.append(" | Последняя встреча: день ").append(f.optInt("lastDay"));
+        for(Quest q:QUESTS)if(q.giver==d||q.target==d){
+            if("COMPLETED".equals(state(g,q)))b.append("\nПомнит: ").append(q.title).append(" — завершено.").append("COMPLETED".equals(g.progress.questOutcome(q.key()+"_gift"))?" Ты отказался от платы.":"");
+            else if("ACTIVE".equals(state(g,q)))b.append("\nПомнит поручение: ").append(q.title).append(". ").append(objective(g,q));
+        }
+        return b.toString();
+    }
     private static void remember(GameEngine g,int d,String status){
         try{
             String key=npcKey(g,d);g.sceneState.setContext(g.day,g.hour,"Солитьюд");
@@ -64,7 +90,10 @@ final class SolitudeEncounters {
     }
     static void choices(GameEngine g,GameEngine.Scene s,int d){
         if(!present(g,d))return;
-        s.add("SOLITUDE:talk:"+d,"Поговорить: "+NAMES[d],"Разговор и знакомство");
+        JSONObject f=fact(g,d);
+        s.add("SOLITUDE:talk:"+d,"Поговорить: "+NAMES[d],f==null?"Разговор и знакомство":"Отношение: "+f.optInt("relation",50)+"/100");
+        s.add("SOLITUDE:local:"+d,"Расспросить "+NAMES[d]+" о городе","Местные сведения | авторский диалог");
+        if(f!=null)s.add("SOLITUDE:memory:"+d,"Вспомнить прошлые встречи: "+NAMES[d],"Общие воспоминания и поручения");
         for(int i=0;i<QUESTS.length;i++){
             Quest q=QUESTS[i];String state=state(g,q);
             if(d==q.giver&&state.isEmpty())s.add("SOLITUDE:quest:"+i+":accept",q.title,"Авторское поручение | "+q.offer);
@@ -78,10 +107,18 @@ final class SolitudeEncounters {
     }
     private static boolean canWork(GameEngine g,int d,Quest q){return present(g,d)&&g.hour+q.hours<=CLOSE[d]&&g.stamina>=q.stamina;}
     static boolean choose(GameEngine g,int d,String action){
-        if(!action.startsWith("SOLITUDE:talk:")&&!action.startsWith("SOLITUDE:quest:"))return false;
+        if(!action.startsWith("SOLITUDE:talk:")&&!action.startsWith("SOLITUDE:quest:")&&!action.startsWith("SOLITUDE:local:")&&!action.startsWith("SOLITUDE:memory:"))return false;
         if(!present(g,d))return true;
         if(action.equals("SOLITUDE:talk:"+d)){
-            remember(g,d,"MET");report(g,NAMES[d]+": «"+TOPICS[d]+"»");return true;
+            JSONObject f=fact(g,d);String greeting=f==null?"":"HELPED".equals(f.optString("status"))?"Спасибо за прежнюю помощь. ":"Снова встретились. ";
+            remember(g,d,"MET");report(g,NAMES[d]+": «"+greeting+TOPICS[d]+"»");return true;
+        }
+        if(action.equals("SOLITUDE:local:"+d)){
+            remember(g,d,"MET");report(g,NAMES[d]+": «"+LOCAL[d]+"»");return true;
+        }
+        if(action.equals("SOLITUDE:memory:"+d)){
+            if(fact(g,d)==null)return true;
+            String remembered=memory(g,d);remember(g,d,"MET");report(g,NAMES[d]+"\n"+remembered);return true;
         }
         for(int i=0;i<QUESTS.length;i++){
             Quest q=QUESTS[i];String prefix="SOLITUDE:quest:"+i+":",state=state(g,q);

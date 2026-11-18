@@ -4,13 +4,19 @@ import org.json.JSONObject;
 
 /** One real inventory item per slot. Default housecarl gear is not lootable. */
 final class JordisGear {
-    private static final String[] SLOTS={"weapon","shield","body"};
+    private static final String[] SLOTS={"weapon","shield","body","head","hands","feet"};
     private static final String[] ALLOWED={
         "Железный меч","Стальной меч","Орочий меч","Двемерский меч","Эльфийский меч","Стеклянный меч","Эбонитовый меч","Даэдрический меч",
         "Железный щит","Стальной щит","Орочий щит","Двемерский щит","Эльфийский щит","Стеклянный щит","Эбонитовый щит","Даэдрический щит",
-        "Железная кираса","Стальная кираса","Орочья кираса","Двемерская кираса","Стальная пластинчатая кираса","Эбонитовая кираса","Даэдрическая кираса","Кожаная кираса"
+        "Железная кираса","Стальная кираса","Орочья кираса","Двемерская кираса","Стальная пластинчатая кираса","Эбонитовая кираса","Даэдрическая кираса","Кожаная кираса",
+        "Железный шлем","Стальной шлем","Орочий шлем","Двемерский шлем","Эльфийский шлем","Стеклянный шлем","Эбонитовый шлем","Даэдрический шлем","Кожаный шлем",
+        "Железные перчатки","Стальные перчатки","Орочьи перчатки","Двемерские перчатки","Эльфийские перчатки","Стеклянные перчатки","Эбонитовые перчатки","Даэдрические перчатки","Кожаные наручи",
+        "Железные сапоги","Стальные сапоги","Орочьи сапоги","Двемерские сапоги","Эльфийские сапоги","Стеклянные сапоги","Эбонитовые сапоги","Даэдрические сапоги","Кожаные сапоги",
+        "Железный боевой топор","Стальной боевой топор","Орочий боевой топор","Двемерский боевой топор","Эльфийский боевой топор","Стеклянный боевой топор","Эбонитовый боевой топор","Даэдрический боевой топор",
+        "Железная булава","Стальная булава","Орочья булава","Двемерская булава","Эльфийская булава","Стеклянная булава","Эбонитовая булава","Даэдрическая булава",
+        "Эльфийская кираса","Стеклянная кираса","Нордская резная кираса","Сталгримовая кираса","Драконья чешуйчатая кираса"
     };
-    private final String[] items={"","",""};
+    private final String[] items={"","","","","",""};
     private static int slot(String id){
         boolean allowed=false;for(String a:ALLOWED)if(a.equals(id)){allowed=true;break;}
         if(!allowed)return -1;
@@ -44,8 +50,8 @@ final class JordisGear {
     }
     private double stat(int i){ItemCatalog.Item item=ItemCatalog.find(items[i]);return item==null?0:item.baseStat;}
     int damageBonus(){return Math.min(8,(int)Math.ceil(stat(0)/2));}
-    int protection(int incoming){return Math.min(Math.max(0,incoming),Math.min(8,(int)((stat(1)+stat(2))/8)));}
-    String summary(){return "Оружие: "+name(0)+" | Щит: "+name(1)+" | Броня: "+name(2);}
+    int protection(int incoming){return Math.min(Math.max(0,incoming),Math.min(12,(int)((stat(1)+stat(2)+stat(3)+stat(4)+stat(5))/8)));}
+    String summary(){return "Оружие: "+name(0)+" | Щит: "+name(1)+" | Броня: "+name(2)+" | Шлем: "+name(3)+" | Руки: "+name(4)+" | Ноги: "+name(5);}
     private String name(int i){return items[i].isEmpty()?"Личное снаряжение":items[i];}
     JSONObject save(){JSONObject j=new JSONObject();try{for(int i=0;i<SLOTS.length;i++)j.put(SLOTS[i],items[i]);}catch(Exception e){throw new IllegalStateException(e);}return j;}
     static JordisGear restore(JSONObject j){JordisGear x=new JordisGear();if(j!=null)for(int i=0;i<SLOTS.length;i++){String id=j.optString(SLOTS[i],"");if(slot(id)==i)x.items[i]=id;}return x;}
