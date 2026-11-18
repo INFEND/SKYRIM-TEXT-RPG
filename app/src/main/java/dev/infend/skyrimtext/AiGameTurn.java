@@ -28,7 +28,7 @@ public final class AiGameTurn {
         Object raw=o.opt(field);
         if(!(raw instanceof Number))throw new JSONException("Шанс должен быть числом либо null");
         double n=((Number)raw).doubleValue();
-        if(n<0||n>100||n!=Math.rint(n))throw new JSONException("Неверный шанс действия");
+        if(!Double.isFinite(n)||n<0||n>100||n!=Math.rint(n))throw new JSONException("Неверный шанс действия");
         return (int)n;
     }
     /** Model-only compatibility: accept explicit numeric strings/percentages and
@@ -41,9 +41,11 @@ public final class AiGameTurn {
                 value.equals("без броска")||value.equals("n/a")){
             o.put(key,JSONObject.NULL);return;
         }
-        if(value.matches("[0-9]{1,3}\\s*%?")){
-            int n=Integer.parseInt(value.replace("%","").trim());
-            if(n<=100)o.put(key,n);
+        if(value.length()<=32&&value.matches("[+]?[0-9]{1,3}(?:\\.0+)?\\s*%?")){
+            try{
+                int n=new java.math.BigDecimal(value.replace("%","").trim()).intValueExact();
+                if(n>=0&&n<=100)o.put(key,n);
+            }catch(ArithmeticException|NumberFormatException ignored){}
         }
     }
 
@@ -75,10 +77,8 @@ public final class AiGameTurn {
             }
         }
         if(raw instanceof Number){
-            double n=((Number)raw).doubleValue();
-            if(Double.isFinite(n)&&n==Math.rint(n)&&n>=Integer.MIN_VALUE&&n<=Integer.MAX_VALUE){
-                object.put(key,(int)n);return;
-            }
+            try{object.put(key,new java.math.BigDecimal(raw.toString()).intValueExact());return;}
+            catch(ArithmeticException|NumberFormatException ignored){}
         }
         throw new JSONException("Недопустимое числовое значение: "+key);
     }
@@ -438,8 +438,11 @@ public final class AiGameTurn {
             if(skills.length()>18)throw new JSONException("Слишком много изменений навыков");
             for(int i=0;i<skills.length();i++){
                 JSONObject sk=skills.optJSONObject(i);if(sk==null)throw new JSONException("Неверный навык");
+                Object index=sk.opt("index");
+                if(!(index instanceof Number))throw new JSONException("Индекс навыка должен быть целым числом");
+                double numericIndex=((Number)index).doubleValue();
                 int ix=sk.optInt("index",-1);
-                if(ix<0||ix>=RpgContent.SKILLS.length||change(sk,"xp",250)<0)
+                if(!Double.isFinite(numericIndex)||numericIndex!=ix||ix<0||ix>=RpgContent.SKILLS.length||change(sk,"xp",250)<0)
                     throw new JSONException("Неверный навык или опыт");
             }
         }
