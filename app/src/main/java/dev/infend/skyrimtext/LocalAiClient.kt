@@ -180,30 +180,9 @@ class LocalAiClient(private val context: Context) {
     private fun recoverProcess(id:Long,reason:String) {
         if(!currentGeneration(id)) {releaseBinding();return}
         releaseBinding()
-        val original=requestData
-        if(recoveryUsed||original==null||lastTokens>0) {
-            failGeneration(id,reason.trimEnd('.')+" (получено $lastTokens токенов). Автоматического перезапуска после начала ответа нет; можно повторить действие вручную")
-            return
-        }
-        recoveryUsed=true
-        // A new ID rejects queued callbacks from the dead process.
-        val retryId=synchronized(guard){++generation}
-        val data=Bundle(original)
-        data.putLong("id",retryId)
-        data.putBoolean("recovery",true)
-        if(lastPartial.length in 1..30000 && lastTokens>0) {
-            data.putString("resumeText",lastPartial)
-            data.putInt("resumeTokens",lastTokens)
-        }
-        val msg=Message.obtain(null,LocalAiProtocol.MSG_GENERATE)
-        msg.data=data
-        msg.replyTo=incoming
-        pending=msg
-        activationAttempted=false
-        awaitingActivation=false
-        activeListener?.onLocalStatus("Восстановление локального ИИ: $lastTokens токенов…")
-        armWatchdog(retryId)
-        ui.postDelayed({if(currentGeneration(retryId))connect(retryId)},500L)
+        // Never silently replay a request after a native worker crash, even
+        // before the first token. The player can explicitly retry the locked action.
+        failGeneration(id,reason.trimEnd('.')+" (получено $lastTokens токенов). Повтори действие вручную")
     }
 
     private fun currentGeneration(id:Long):Boolean=synchronized(guard){!closed&&busy&&id==generation}
