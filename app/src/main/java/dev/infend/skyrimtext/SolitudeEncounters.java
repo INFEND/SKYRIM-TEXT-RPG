@@ -67,7 +67,7 @@ final class SolitudeEncounters {
         s.add("SOLITUDE:talk:"+d,"Поговорить: "+NAMES[d],"Разговор и знакомство");
         for(int i=0;i<QUESTS.length;i++){
             Quest q=QUESTS[i];String state=state(g,q);
-            if(d==q.giver&&state.isEmpty())s.add("SOLITUDE:quest:"+i+":accept",q.title,q.offer);
+            if(d==q.giver&&state.isEmpty())s.add("SOLITUDE:quest:"+i+":accept",q.title,"Авторское поручение | "+q.offer);
             if(d==q.target&&"ACTIVE".equals(state)&&!worked(g,q)&&canWork(g,d,q))
                 s.add("SOLITUDE:quest:"+i+":work",q.task,q.hours+" ч. | −"+q.stamina+" запаса сил");
             if(d==q.giver&&"ACTIVE".equals(state)&&worked(g,q)){

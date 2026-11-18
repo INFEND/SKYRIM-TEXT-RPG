@@ -7,8 +7,10 @@ final class SolitudeJustice {
     boolean detained(){return detained;}
     static int confiscate(GameEngine g){int count=0;for(String item:new String[]{"Похищенное кольцо","Похищенный амулет"}){int n=g.progress.quantity(item);if(n>0&&g.progress.removeItem(item,n))count=GameEngine.nonnegativeAdd(count,n);}return count;}
     void theftChoice(GameEngine g,GameEngine.Scene s){if(lastTheftDay<g.day&&g.hour>=8&&g.hour<20&&g.stamina>=5){s.add("SOLITUDE:crime:steal","Попытаться украсть кольцо","Карманные кражи | 5 запаса сил | риск задержания");s.add("SOLITUDE:crime:amulet","Попытаться украсть амулет","Карманные кражи | 5 запаса сил | повышенный риск");}}
+    void trespassChoice(GameEngine g,GameEngine.Scene s){if(g.hour>=20&&lastTheftDay<g.day&&g.stamina>=5)s.add("SOLITUDE:crime:trespass","Проникнуть в закрытое служебное помещение","Авторское действие | нарушение границ владения | риск задержания");}
     boolean theft(GameEngine g,String action){
-        boolean amulet="SOLITUDE:crime:amulet".equals(action);if(!amulet&&!"SOLITUDE:crime:steal".equals(action))return false;
+        boolean amulet="SOLITUDE:crime:amulet".equals(action);boolean trespass="SOLITUDE:crime:trespass".equals(action);if(!amulet&&!trespass&&!"SOLITUDE:crime:steal".equals(action))return false;
+        if(trespass){if(!"SOLITUDE:1".equals(g.mode)||g.hour<20||lastTheftDay>=g.day||g.stamina<5)return true;lastTheftDay=g.day;g.stamina-=5;g.road.addCityBounty(3,5);detained=true;g.mode=MODE;g.message="Караульный останавливает тебя у закрытого служебного помещения. Штраф за незаконное проникновение: 5 септимов.";g.progress.recent=g.message;g.progress.sync(g);g.recordVisualEvent(g.message);return true;}
         String item=amulet?"Похищенный амулет":"Похищенное кольцо";int fine=amulet?50:25;
         if(!"SOLITUDE:0".equals(g.mode)||lastTheftDay>=g.day||g.hour<8||g.hour>=20||g.stamina<5)return true;
         lastTheftDay=g.day;g.stamina-=5;

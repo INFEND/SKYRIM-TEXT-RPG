@@ -97,7 +97,7 @@ final class SolitudeCity {
             if(available)s.add(PREFIX+"livia","Поговорить с Ливией",g.livia.objective());}
         for(int i=0;i<SolitudeShops.NAMES.length;i++)if(SolitudeShops.district(i)==d)s.add(PREFIX+"store:"+i,SolitudeShops.NAMES[i],SolitudeShops.OWNERS[i]+" | "+(SolitudeShops.open(g,i)?"Открыто":"Закрыто (8:00–20:00)"));
         if(d==2)home.palace(g,s);
-        if(d==1)SolitudeJustice.choices(g,s);
+        if(d==1){SolitudeJustice.choices(g,s);justice.trespassChoice(g,s);}
         if(d==0)justice.theftChoice(g,s);
         SolitudeEncounters.choices(g,s,d);
         return s.add(PREFIX+"back","На улицы Солитьюда","Вернуться к выбору районов").add("GO_WORLD","Завершить прогулку","Вернуться к приключению");
@@ -126,7 +126,7 @@ final class SolitudeCity {
         for(int i=0;i<SolitudeShops.NAMES.length;i++)if(d==SolitudeShops.district(i)&&(PREFIX+"store:"+i).equals(action)){g.mode=SolitudeShops.MODE+i;g.message="";return;}
         if(d==2&&home.palaceAction(g,action))return;
         if(d==1&&justice.choose(g,action))return;
-        if(d==0&&justice.theft(g,action))return;
+        if((d==0||d==1)&&justice.theft(g,action))return;
         if(SolitudeEncounters.choose(g,d,action))return;
         if((PREFIX+"shop").equals(action)&&(d==0||d==5)){g.mode="WORLD";g.choose("SHOP");return;}
         if((PREFIX+"rest").equals(action)&&d==6){g.mode="WORLD";g.choose("REST");return;}
