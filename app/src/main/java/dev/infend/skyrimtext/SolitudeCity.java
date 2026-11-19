@@ -122,6 +122,7 @@ final class SolitudeCity {
         SolitudeCanonical.districtChoices(g,s,d);
         SolitudeEncounters.choices(g,s,d);
         SolitudeResidents.choices(g,s,d);
+        if(d==5)SolitudeCraft.choices(g,s);
         return s.add(PREFIX+"back","На улицы Солитьюда","Вернуться к выбору районов").add("GO_WORLD","Завершить прогулку","Вернуться к приключению");
     }
     private GameEngine.Scene newBlocked(GameEngine.Scene s,GameEngine g,int i){
@@ -137,6 +138,7 @@ final class SolitudeCity {
         if("GO_WORLD".equals(action)){g.mode="WORLD";return;}
         if((PREFIX+"back").equals(action)){g.mode=MODE;g.message="";return;}
         if(SolitudeJustice.MODE.equals(g.mode)){justice.choose(g,action);return;}
+        if(SolitudeCraft.choose(g,action))return;
         if(SolitudeCanonical.choose(g,action))return;
         if(SolitudeCanonical.graceMode(g.mode))return;
         if(SolitudeHome.MODE.equals(g.mode)){home.choose(g,action);return;}

@@ -105,6 +105,7 @@ final class SolitudeShops {
             tradeChoices(scene,"SOLITUDE:sell:"+s+":"+i,"Продать: "+item.name,g.salePrice(item),maxSell(g,s,item),"У тебя: "+g.progress.quantity(id));
         }
         else scene=new GameEngine.Scene(scene.kicker,scene.title,scene.body+"\n\nЛавка закрыта или торговец недоступен.");
+        if(s==1||s==4)SolitudeCraft.choices(g,scene);
         if(s==0)SolitudeCanonical.attireChoices(g,scene);
         if(s==1)SolitudeCanonical.shopChoices(g,scene);
         return scene.add("SOLITUDE:back","Вернуться на улицу","Покинуть лавку").add("GO_WORLD","Завершить прогулку","Вернуться к приключению");
