@@ -98,8 +98,10 @@ def build(commit, thin=False):
                 raise ValueError("Serana gallery differs from the supplied archive")
             add(path,"media:serana","Серана")
         elif group=="elisif":
-            if path!="media/elisif/gallery.zip" or hashlib.sha256(f.read_bytes()).hexdigest()!="8e6c4f75b0cd8f93b650a4b62908851e0ca1c4ae254fd12d0b6d00b47a790e1a":
-                raise ValueError("Elisif gallery differs from the supplied archive")
+            expected={"media/elisif/gallery.zip":"8e6c4f75b0cd8f93b650a4b62908851e0ca1c4ae254fd12d0b6d00b47a790e1a",
+                      "media/elisif/portrait.png":"ebccdfe23435e7412d343ad885a4ab089f0250c20f6bdee08546221ef3b2b2aa"}
+            if path not in expected or hashlib.sha256(f.read_bytes()).hexdigest()!=expected[path]:
+                raise ValueError("Elisif artwork differs from the supplied originals")
             add(path,"media:elisif","Элисиф Прекрасная")
         else:add(path,"media:"+group,"Дополнительные ресурсы: "+group)
     listed={e["path"] for e in records}
