@@ -3,13 +3,13 @@
   "packageName": "dev.xarkon.link",
   "apkPackageName": "dev.infend.skyrimtext",
   "legacyPackageField": true,
-  "versionCode": 274,
-  "versionName": "1.0.273",
-  "apkUrl": "https://github.com/INFEND/SKYRIM-TEXT-RPG/releases/download/v1.0.273/SKYRIM-TEXT-RPG.apk",
-  "sha256": "50316edeccae9bc84355487775773fbde015aeae189c0775bffac1a907eb54cb",
-  "sizeBytes": 1526140,
+  "versionCode": 275,
+  "versionName": "1.0.274",
+  "apkUrl": "https://github.com/INFEND/SKYRIM-TEXT-RPG/releases/download/v1.0.274/SKYRIM-TEXT-RPG.apk",
+  "sha256": "c4a26c96412b67d3653dbf08cc718d6639b026751489da7bc7cefc89bb3ffc7d",
+  "sizeBytes": 1526244,
   "coreOnly": true,
-  "notes": "[+] Солитьюд: авторское зачарование серебряного ожерелья защиты (+15 брони при ношении), общий расход материалов и проверка экипировки.\n",
+  "notes": "[+] Элисиф Прекрасная: галерея из 10 оригинальных JPG доступна в управлении ресурсами; кнопки скачивания и восстановления в карточке галереи.\n[=] Архив проверяется по SHA-256, ручной импорт сохранён; APK остаётся облегчённым.\n",
   "history": [
     {
       "versionCode": 2,
@@ -1375,7 +1375,12 @@
       "versionCode": 274,
       "versionName": "1.0.273",
       "notes": "[+] Солитьюд: авторское зачарование серебряного ожерелья защиты (+15 брони при ношении), общий расход материалов и проверка экипировки.\n"
+    },
+    {
+      "versionCode": 275,
+      "versionName": "1.0.274",
+      "notes": "[+] Элисиф Прекрасная: галерея из 10 оригинальных JPG доступна в управлении ресурсами; кнопки скачивания и восстановления в карточке галереи.\n[=] Архив проверяется по SHA-256, ручной импорт сохранён; APK остаётся облегчённым.\n"
     }
   ],
-  "publishedAt": "2026-11-19T17:41:47.751551+00:00"
+  "publishedAt": "2026-11-19T18:15:12.731404+00:00"
 }
