@@ -108,7 +108,7 @@ final class SolitudeHome {
                 if(n>0)s.add("SOLITUDE:home:withdraw:"+i,"Забрать: "+id,"В сундуке: "+n);
                 if(n>1)s.add("SOLITUDE:home:withdrawAll:"+i,"Забрать всё: "+id,"До "+n+" шт. | С учётом веса");
             }
-            if(room(3)&&FixShopHome.canBrew(g))s.add("SOLITUDE:home:brew","Сварить лечебное зелье","Пшеница + голубой горноцвет");
+            if(room(3))SolitudeCraft.choices(g,s);
             if(g.itachi.enabled&&g.itachi.married&&g.itachi.life.sharedHome)s.add("SOLITUDE:home:itachi","Поговорить с Итачи","Совместный дом");
             if(g.livia.enabled&&g.livia.life.married&&g.livia.life.sharedHome&&g.livia.survivor())s.add("SOLITUDE:home:livia","Поговорить с Ливией","Совместный дом");
             s.add("SOLITUDE:home:sleep","Поспать","8 часов | бесплатно");
@@ -130,7 +130,8 @@ final class SolitudeHome {
         }
         if(transfer(g,a))return;
         if(a.equals("SOLITUDE:home:brew")){
-            if(room(3)&&FixShopHome.brew(g)){g.mode=MODE;report(g,"Ты приготовил лечебное зелье в Высоком шпиле.");}
+            // Legacy action uses the same validated recipe as the current UI.
+            SolitudeCraft.choose(g,"SOLITUDE:craft:brew");
             return;
         }
         if(a.equals("SOLITUDE:home:itachi")){if(g.itachi.enabled&&g.itachi.married&&g.itachi.life.sharedHome){g.mode="WORLD";g.choose("ITACHI:open");if(ItachiStory.MODE.equals(g.mode))g.itachi.life.homeReturn=true;else g.mode=MODE;}return;}

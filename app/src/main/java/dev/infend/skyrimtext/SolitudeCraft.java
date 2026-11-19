@@ -11,7 +11,7 @@ final class SolitudeCraft {
             &&SolitudeShops.open(g,4)&&SolitudeEncounters.availableForWork(g,5,1)&&g.stamina>=5;
     }
     private static boolean lab(GameEngine g){
-        return SolitudeCity.here(g)&&SolitudeCourt.ready(g)&&"SOLITUDE:store:1".equals(g.mode)&&SolitudeShops.open(g,1)&&g.hour+1<=20&&g.stamina>=3;
+        return SolitudeCity.here(g)&&SolitudeCourt.ready(g)&&g.stamina>=3&&g.hour<23&&(g.solitude.homeLaboratory(g)||("SOLITUDE:store:1".equals(g.mode)&&SolitudeShops.open(g,1)&&g.hour+1<=20));
     }
     private static boolean canMake(GameEngine g,int i){
         if(!forge(g)||g.progress.quantity(MATERIAL[i])<METAL[i]||g.progress.quantity("Кожаные полоски")<STRIPS[i])return false;
@@ -37,7 +37,7 @@ final class SolitudeCraft {
         else if(!g.progress.addItem(ALCHEMY_OUT[i],1)){
             g.progress.addItem(ALCHEMY_A[i],1);g.progress.addItem(ALCHEMY_B[i],1);return;
         }
-        g.progress.skillExperience(g,7,25);finish(g,"В лаборатории Анжелины приготовлено: "+ALCHEMY_OUT[i],3);
+        g.progress.skillExperience(g,7,25);finish(g,(g.solitude.homeLaboratory(g)?"В Высоком шпиле приготовлено: ":"В лаборатории Анжелины приготовлено: ")+ALCHEMY_OUT[i],3);
     }
     private static void finish(GameEngine g,String text,int stamina){
         g.stamina-=stamina;g.hour++;g.syncLivingSystems();g.message=text;g.progress.recent=text;g.recordVisualEvent(text);g.progress.sync(g);
@@ -56,7 +56,7 @@ final class SolitudeCraft {
         for(int i=0;i<ALCHEMY_OUT.length;i++)if(a.equals(PREFIX+"mix:"+i)){mix(g,i);return true;}
         if(a.equals(PREFIX+"brew")){
             if(!lab(g)||!FixShopHome.canBrew(g))return true;
-            String mode=g.mode;if(FixShopHome.brew(g)){g.mode=mode;finish(g,"В лаборатории Анжелины приготовлено лечебное зелье.",3);}return true;
+            String mode=g.mode;if(FixShopHome.brew(g)){g.mode=mode;finish(g,g.solitude.homeLaboratory(g)?"В Высоком шпиле приготовлено лечебное зелье.":"В лаборатории Анжелины приготовлено лечебное зелье.",3);}return true;
         }
         if(!forge(g))return true;
         if(a.startsWith(PREFIX+"temper:")){

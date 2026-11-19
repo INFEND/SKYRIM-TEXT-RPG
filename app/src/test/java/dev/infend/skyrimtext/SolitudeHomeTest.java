@@ -39,6 +39,19 @@ public class SolitudeHomeTest {
         assertEquals(potions+1,g.potions);assertEquals(0,g.progress.quantity("Пшеница"));assertEquals(SolitudeHome.MODE,g.mode);
         g.choose("SOLITUDE:home:brew");assertEquals(potions+1,g.potions);
     }
+    @Test public void homeAlchemySharesRecipesAndConsumesTime() throws Exception {
+        GameEngine g=city();g.fixShop.home.buy(4);g.choose("SOLITUDE:home");
+        g.progress.quantity("Красный горноцвет",1);g.progress.quantity("Снежные ягоды",1);
+        int before=g.manaPotions;
+        g.choose("SOLITUDE:craft:mix:0");assertEquals(before,g.manaPotions);
+        g.choose("SOLITUDE:back");g.choose("SOLITUDE:visit:2");g.choose("SOLITUDE:furnish:3");
+        g.choose("SOLITUDE:back");g.choose("SOLITUDE:home");g.stamina=0;
+        g.choose("SOLITUDE:craft:mix:0");assertEquals(before,g.manaPotions);
+        g.stamina=50;g.choose("SOLITUDE:craft:mix:0");
+        assertEquals(before+1,g.manaPotions);assertEquals(11,g.hour);assertEquals(0,g.progress.quantity("Красный горноцвет"));
+        assertEquals(0,g.progress.quantity("Снежные ягоды"));assertEquals(SolitudeHome.MODE,g.mode);
+        g=GameEngine.fromJson(g.toJson().toString());g.choose("SOLITUDE:craft:mix:0");assertEquals(before+1,g.manaPotions);
+    }
     @Test public void bulkChestPreservesGoodsAndRespectsWeight() throws Exception {
         GameEngine g=city();g.fixShop.home.buy(4);g.choose("SOLITUDE:home");
         assertTrue(g.progress.addItem("Золотой слиток",5));
