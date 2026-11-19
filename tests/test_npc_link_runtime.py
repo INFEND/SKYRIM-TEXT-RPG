@@ -24,6 +24,13 @@ public class NpcLinkProbe {
     Map<String,String> names=NpcProfiles.linkNames();
     check(new HashSet<>(names.values()).size()>=390,"NPC registry lost entries");
     check(NpcProfiles.authorProfiles().size()==4,"author count");
+    check(NpcProfiles.templateCount()==206,"template count");
+    check(NpcProfiles.originalProfiles().size()==NpcProfiles.namedOriginalCount()+NpcProfiles.templateCount(),"combined originals");
+    check(NpcProfiles.findOriginal("Стражник Вайтрана").template,"guard");
+    check(NpcProfiles.findOriginal("Bandit Chief").template,"bandit alias");
+    check(NpcProfiles.findOriginal("Культист Мирака").template,"DLC");
+    check(!NpcProfiles.findOriginal("Серана").template,"named profile");
+    check(!names.containsKey("бандит"),"generic noun not global link");
     check(NpcProfiles.findOriginal("Итачи")==null,"author excluded");
     check(NpcProfiles.findAuthor("Итачи Учиха")==NpcProfiles.find("Итачи"),"author alias");
     check(NpcProfiles.findOriginal("Сонд (паломник)")!=NpcProfiles.findOriginal("Сонд"),"two Sond identities");

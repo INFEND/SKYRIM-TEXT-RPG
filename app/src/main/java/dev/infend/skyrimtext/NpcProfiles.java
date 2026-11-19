@@ -5,10 +5,11 @@ import java.util.LinkedHashMap;
 /** Named characters use curated identities rather than guesses based on their name. */
 final class NpcProfiles {
     static final class Profile {
-        final String name,race,gender,role;final int variant;final boolean dragon,child,author,mentioned;
-        Profile(String n,String r,String g,String role,int v,boolean d,boolean a,boolean m){name=n;race=r;gender=g;this.role=role;variant=v;dragon=d;author=a;mentioned=m;child=role.startsWith("Ребёнок |")||n.equals("Бабетта");}
+        final String name,race,gender,role;final int variant;final boolean dragon,child,author,mentioned,template;
+        Profile(String n,String r,String g,String role,int v,boolean d,boolean a,boolean m,boolean t){name=n;race=r;gender=g;this.role=role;variant=v;dragon=d;author=a;mentioned=m;template=t;child=role.startsWith("Ребёнок |")||n.equals("Бабетта");}
     }
     private static final LinkedHashMap<String,Profile> INDEX=new LinkedHashMap<>();
+    private static final LinkedHashMap<String,Profile> TEMPLATES=new LinkedHashMap<>();
     private static final LinkedHashMap<String,Profile> AUTHORS=new LinkedHashMap<>();
     private static final LinkedHashMap<String,Profile> MENTIONS=new LinkedHashMap<>();
     private static String key(String s){return s==null?"":s.toLowerCase(Locale.ROOT).replace('ё','е').replace('’','\'').replace("\u0301","").trim();}
@@ -18,8 +19,217 @@ final class NpcProfiles {
     private static void addAuthor(String n,String r,String g,String role,int v,String... aliases){register(AUTHORS,n,r,g,role,v,true,false,aliases);}
     private static void addMention(String n,String r,String g,String role,int v,String... aliases){register(MENTIONS,n,r,g,role,v,false,true,aliases);}
     private static void register(LinkedHashMap<String,Profile> target,String n,String r,String g,String role,int v,boolean author,boolean mentioned,String... aliases){
-        Profile p=new Profile(n,r,g,role,v,"Дракон".equals(r),author,mentioned);
+        Profile p=new Profile(n,r,g,role,v,"Дракон".equals(r),author,mentioned,target==TEMPLATES);
         target.put(key(n),p);for(String alias:aliases)target.put(key(alias),p);
+    }
+    private static void addTemplate(String n,String r,String g,String role,int v,String... aliases){register(TEMPLATES,n,r,g,role,v,false,false,aliases);}
+    private static void registerTemplates(){
+        addTemplate("Стражник","Разная","Не указан","Стража | Skyrim",1,"Guard","Стражница");
+        addTemplate("Стражник Вайтрана","Разная","Не указан","Стража | Skyrim",1,"Whiterun Guard","Стражница Вайтрана");
+        addTemplate("Стражник Солитьюда","Разная","Не указан","Стража | Skyrim",1,"Solitude Guard","Стражница Солитьюда");
+        addTemplate("Стражник Виндхельма","Разная","Не указан","Стража | Skyrim",1,"Windhelm Guard","Стражница Виндхельма");
+        addTemplate("Стражник Рифтена","Разная","Не указан","Стража | Skyrim",1,"Riften Guard","Стражница Рифтена");
+        addTemplate("Стражник Маркарта","Разная","Не указан","Стража | Skyrim",1,"Markarth Guard","Стражница Маркарта");
+        addTemplate("Стражник Фолкрита","Разная","Не указан","Стража | Skyrim",1,"Falkreath Guard","Стражница Фолкрита");
+        addTemplate("Стражник Морфала","Разная","Не указан","Стража | Skyrim",1,"Morthal Guard","Стражница Морфала");
+        addTemplate("Стражник Данстара","Разная","Не указан","Стража | Skyrim",1,"Dawnstar Guard","Стражница Данстара");
+        addTemplate("Стражник Винтерхолда","Разная","Не указан","Стража | Skyrim",1,"Winterhold Guard","Стражница Винтерхолда");
+        addTemplate("Имперский солдат","Разная","Не указан","Имперский легион | Skyrim",1,"Imperial Soldier","Легионер");
+        addTemplate("Имперский офицер","Разная","Не указан","Имперский легион | Skyrim",1,"Imperial Officer");
+        addTemplate("Имперский легат","Разная","Не указан","Имперский легион | Skyrim",1,"Imperial Legate");
+        addTemplate("Имперский квартирмейстер","Разная","Не указан","Имперский легион | Skyrim",1,"Imperial Quartermaster");
+        addTemplate("Имперский палач","Разная","Не указан","Имперский легион | Skyrim",1,"Imperial Headsman");
+        addTemplate("Солдат Братьев Бури","Разная","Не указан","Братья Бури | Skyrim",1,"Stormcloak Soldier","Брат Бури","Сестра Бури");
+        addTemplate("Офицер Братьев Бури","Разная","Не указан","Братья Бури | Skyrim",1,"Stormcloak Officer");
+        addTemplate("Квартирмейстер Братьев Бури","Разная","Не указан","Братья Бури | Skyrim",1,"Stormcloak Quartermaster");
+        addTemplate("Командир Братьев Бури","Разная","Не указан","Братья Бури | Skyrim",1,"Stormcloak Commander");
+        addTemplate("Бандит","Разная","Не указан","Бандиты | Skyrim",1,"Bandit","Бандитка");
+        addTemplate("Бандит-изгой","Разная","Не указан","Бандиты | Skyrim",1,"Bandit Outlaw");
+        addTemplate("Бандит-головорез","Разная","Не указан","Бандиты | Skyrim",1,"Bandit Thug");
+        addTemplate("Бандит-разбойник","Разная","Не указан","Бандиты | Skyrim",1,"Bandit Highwayman","Разбойник");
+        addTemplate("Бандит-грабитель","Разная","Не указан","Бандиты | Skyrim",1,"Bandit Plunderer");
+        addTemplate("Бандит-мародёр","Разная","Не указан","Бандиты | Skyrim",1,"Bandit Marauder");
+        addTemplate("Главарь бандитов","Разная","Не указан","Бандиты | Skyrim",1,"Bandit Chief","Предводитель бандитов");
+        addTemplate("Бандит-лучник","Разная","Не указан","Бандиты | Skyrim",1,"Bandit Archer");
+        addTemplate("Бандит-маг","Разная","Не указан","Бандиты | Skyrim",1,"Bandit Wizard");
+        addTemplate("Вор","Разная","Не указан","Бандиты | Skyrim",1,"Thief","Воровка");
+        addTemplate("Наёмник","Разная","Не указан","Бандиты | Skyrim",1,"Mercenary","Наёмница");
+        addTemplate("Беглец","Разная","Не указан","Бандиты | Skyrim",1,"Fugitive");
+        addTemplate("Наёмный головорез","Разная","Не указан","Бандиты | Skyrim",1,"Hired Thug");
+        addTemplate("Пират","Разная","Не указан","Бандиты | Skyrim",1,"Pirate");
+        addTemplate("Некромант","Разная","Не указан","Враждебные маги | Skyrim",1,"Necromancer","Некромантка");
+        addTemplate("Ученик некроманта","Разная","Не указан","Враждебные маги | Skyrim",1,"Apprentice Necromancer");
+        addTemplate("Адепт некромантии","Разная","Не указан","Враждебные маги | Skyrim",1,"Adept Necromancer");
+        addTemplate("Некромант-мастер","Разная","Не указан","Враждебные маги | Skyrim",1,"Master Necromancer");
+        addTemplate("Архинекромант","Разная","Не указан","Враждебные маги | Skyrim",1,"Arch Necromancer");
+        addTemplate("Колдун","Разная","Не указан","Враждебные маги | Skyrim",1,"Conjurer","Колдунья");
+        addTemplate("Ученик колдуна","Разная","Не указан","Враждебные маги | Skyrim",1,"Apprentice Conjurer");
+        addTemplate("Адепт колдовства","Разная","Не указан","Враждебные маги | Skyrim",1,"Adept Conjurer");
+        addTemplate("Колдун-мастер","Разная","Не указан","Враждебные маги | Skyrim",1,"Master Conjurer");
+        addTemplate("Архиколдун","Разная","Не указан","Враждебные маги | Skyrim",1,"Arch Conjurer");
+        addTemplate("Огненный маг","Разная","Не указан","Враждебные маги | Skyrim",1,"Fire Mage","Маг огня");
+        addTemplate("Ледяной маг","Разная","Не указан","Враждебные маги | Skyrim",1,"Ice Mage","Маг льда");
+        addTemplate("Маг молний","Разная","Не указан","Враждебные маги | Skyrim",1,"Storm Mage");
+        addTemplate("Пиромант","Разная","Не указан","Враждебные маги | Skyrim",1,"Pyromancer");
+        addTemplate("Криомант","Разная","Не указан","Враждебные маги | Skyrim",1,"Cryomancer");
+        addTemplate("Электромант","Разная","Не указан","Враждебные маги | Skyrim",1,"Electromancer");
+        addTemplate("Архипиромант","Разная","Не указан","Враждебные маги | Skyrim",1,"Arch Pyromancer");
+        addTemplate("Архикриомант","Разная","Не указан","Враждебные маги | Skyrim",1,"Arch Cryomancer");
+        addTemplate("Архиэлектромант","Разная","Не указан","Враждебные маги | Skyrim",1,"Arch Electromancer");
+        addTemplate("Ведьма","Разная","Не указан","Враждебные маги | Skyrim",1,"Witch");
+        addTemplate("Изгой","Разная","Не указан","Изгои | Skyrim",1,"Forsworn");
+        addTemplate("Изгой-разведчик","Разная","Не указан","Изгои | Skyrim",1,"Forsworn Scout");
+        addTemplate("Изгой-грабитель","Разная","Не указан","Изгои | Skyrim",1,"Forsworn Pillager");
+        addTemplate("Изгой-мародёр","Разная","Не указан","Изгои | Skyrim",1,"Forsworn Ravager");
+        addTemplate("Изгой-разрушитель","Разная","Не указан","Изгои | Skyrim",1,"Forsworn Devastator");
+        addTemplate("Изгой-вересковое сердце","Разная","Не указан","Изгои | Skyrim",1,"Forsworn Briarheart","Вересковое сердце");
+        addTemplate("Шаман изгоев","Разная","Не указан","Изгои | Skyrim",1,"Forsworn Shaman");
+        addTemplate("Солдат Талмора","Альтмер","Не указан","Талмор | Skyrim",1,"Thalmor Soldier","Талморский солдат");
+        addTemplate("Талморский юстициар","Альтмер","Не указан","Талмор | Skyrim",1,"Thalmor Justiciar","Юстициар Талмора");
+        addTemplate("Талморский маг","Альтмер","Не указан","Талмор | Skyrim",1,"Thalmor Wizard");
+        addTemplate("Талморский стражник","Альтмер","Не указан","Талмор | Skyrim",1,"Thalmor Guard");
+        addTemplate("Вампир","Разная","Не указан","Вампиры | Skyrim",1,"Vampire","Вампирша");
+        addTemplate("Вампир-новобранец","Разная","Не указан","Вампиры | Skyrim",1,"Vampire Fledgling");
+        addTemplate("Вампир-кровопийца","Разная","Не указан","Вампиры | Skyrim",1,"Blooded Vampire");
+        addTemplate("Вампир-туманный","Разная","Не указан","Вампиры | Skyrim",1,"Mistwalker");
+        addTemplate("Древний вампир","Разная","Не указан","Вампиры | Skyrim",1,"Ancient Vampire");
+        addTemplate("Вампир-мастер","Разная","Не указан","Вампиры | Skyrim",1,"Master Vampire");
+        addTemplate("Вампир Волкихара","Разная","Не указан","Вампиры | Skyrim",1,"Volkihar Vampire");
+        addTemplate("Трэлл вампира","Разная","Не указан","Вампиры | Skyrim",1,"Vampire Thrall","Раб вампира");
+        addTemplate("Охотник Стражи Рассвета","Разная","Не указан","Стража Рассвета | Dawnguard",1,"Dawnguard");
+        addTemplate("Гончая смерти","Разная","Не указан","Стража Рассвета | Dawnguard",1,"Death Hound");
+        addTemplate("Трэлл Волкихара","Разная","Не указан","Стража Рассвета | Dawnguard",1,"Volkihar Thrall");
+        addTemplate("Гаргулья","Разная","Не указан","Стража Рассвета | Dawnguard",1,"Gargoyle");
+        addTemplate("Гаргулья-страж","Разная","Не указан","Стража Рассвета | Dawnguard",1,"Gargoyle Sentinel");
+        addTemplate("Гаргулья-громила","Разная","Не указан","Стража Рассвета | Dawnguard",1,"Gargoyle Brute");
+        addTemplate("Бронированный тролль","Разная","Не указан","Стража Рассвета | Dawnguard",1,"Armored Troll");
+        addTemplate("Бронированный морозный тролль","Разная","Не указан","Стража Рассвета | Dawnguard",1,"Armored Frost Troll");
+        addTemplate("Дозорный Стендарра","Разная","Не указан","Фракции | Skyrim",1,"Vigilant of Stendarr","Дозорная Стендарра");
+        addTemplate("Охотник Серебряной Руки","Разная","Не указан","Фракции | Skyrim",1,"Silver Hand");
+        addTemplate("Наёмник Восточной имперской компании","Разная","Не указан","Фракции | Skyrim",1,"East Empire Company Mercenary");
+        addTemplate("Стражник Восточной имперской компании","Разная","Не указан","Фракции | Skyrim",1,"East Empire Company Guard");
+        addTemplate("Воин Алик'ра","Разная","Не указан","Фракции | Skyrim",1,"Alik'r Warrior");
+        addTemplate("Убийца Тёмного Братства","Разная","Не указан","Фракции | Skyrim",1,"Dark Brotherhood Assassin");
+        addTemplate("Стражник Соловьёв","Разная","Не указан","Фракции | Skyrim",1,"Nightingale Sentinel");
+        addTemplate("Охотник","Разная","Не указан","Мирные NPC | Skyrim",1,"Hunter","Охотница");
+        addTemplate("Рыбак","Разная","Не указан","Мирные NPC | Skyrim",1,"Fisherman");
+        addTemplate("Фермер","Разная","Не указан","Мирные NPC | Skyrim",1,"Farmer","Фермерша");
+        addTemplate("Шахтёр","Разная","Не указан","Мирные NPC | Skyrim",1,"Miner","Шахтёрка");
+        addTemplate("Лесоруб","Разная","Не указан","Мирные NPC | Skyrim",1,"Woodcutter");
+        addTemplate("Извозчик","Разная","Не указан","Мирные NPC | Skyrim",1,"Carriage Driver");
+        addTemplate("Торговец","Разная","Не указан","Мирные NPC | Skyrim",1,"Merchant","Торговка");
+        addTemplate("Паломник","Разная","Не указан","Мирные NPC | Skyrim",1,"Pilgrim","Паломница");
+        addTemplate("Путешественник","Разная","Не указан","Мирные NPC | Skyrim",1,"Traveler");
+        addTemplate("Беженец","Разная","Не указан","Мирные NPC | Skyrim",1,"Refugee");
+        addTemplate("Нищий","Разная","Не указан","Мирные NPC | Skyrim",1,"Beggar","Нищенка");
+        addTemplate("Курьер","Разная","Не указан","Мирные NPC | Skyrim",1,"Courier");
+        addTemplate("Гонец","Разная","Не указан","Мирные NPC | Skyrim",1,"Messenger");
+        addTemplate("Моряк","Разная","Не указан","Мирные NPC | Skyrim",1,"Sailor");
+        addTemplate("Рабочий","Разная","Не указан","Мирные NPC | Skyrim",1,"Worker");
+        addTemplate("Заключённый","Разная","Не указан","Мирные NPC | Skyrim",1,"Prisoner","Узник");
+        addTemplate("Дворянин","Разная","Не указан","Мирные NPC | Skyrim",1,"Noble","Дворянка");
+        addTemplate("Телохранитель","Разная","Не указан","Мирные NPC | Skyrim",1,"Bodyguard");
+        addTemplate("Бард","Разная","Не указан","Мирные NPC | Skyrim",1,"Bard");
+        addTemplate("Слуга","Разная","Не указан","Мирные NPC | Skyrim",1,"Servant","Служанка");
+        addTemplate("Браконьер","Разная","Не указан","Мирные NPC | Skyrim",1,"Poacher");
+        addTemplate("Странствующий торговец","Разная","Не указан","Мирные NPC | Skyrim",1,"Peddler");
+        addTemplate("Алхимик","Разная","Не указан","Мирные NPC | Skyrim",1,"Alchemist");
+        addTemplate("Кузнец","Разная","Не указан","Мирные NPC | Skyrim",1,"Blacksmith");
+        addTemplate("Трактирщик","Разная","Не указан","Мирные NPC | Skyrim",1,"Innkeeper");
+        addTemplate("Повар","Разная","Не указан","Мирные NPC | Skyrim",1,"Cook");
+        addTemplate("Жрец","Разная","Не указан","Мирные NPC | Skyrim",1,"Priest","Жрица");
+        addTemplate("Драугр","Нежить","Не указан","Нежить | Skyrim",1,"Draugr");
+        addTemplate("Беспокойный драугр","Нежить","Не указан","Нежить | Skyrim",1,"Restless Draugr");
+        addTemplate("Драугр-воин","Нежить","Не указан","Нежить | Skyrim",1,"Draugr Wight");
+        addTemplate("Драугр-палач","Нежить","Не указан","Нежить | Skyrim",1,"Draugr Scourge");
+        addTemplate("Драугр-военачальник","Нежить","Не указан","Нежить | Skyrim",1,"Draugr Deathlord");
+        addTemplate("Драугр-главнокомандующий","Нежить","Не указан","Нежить | Skyrim",1,"Draugr Death Overlord");
+        addTemplate("Скелет","Нежить","Не указан","Нежить | Skyrim",1,"Skeleton");
+        addTemplate("Скелет-лучник","Нежить","Не указан","Нежить | Skyrim",1,"Skeleton Archer");
+        addTemplate("Скелет-маг","Нежить","Не указан","Нежить | Skyrim",1,"Skeleton Mage");
+        addTemplate("Призрак","Нежить","Не указан","Нежить | Skyrim",1,"Ghost");
+        addTemplate("Драконий жрец","Нежить","Не указан","Нежить | Skyrim",1,"Dragon Priest");
+        addTemplate("Дремора","Даэдра","Не указан","Даэдра | Skyrim",1,"Dremora");
+        addTemplate("Дремора-кинвал","Даэдра","Не указан","Даэдра | Skyrim",1,"Dremora Kynval");
+        addTemplate("Дремора-кинрив","Даэдра","Не указан","Даэдра | Skyrim",1,"Dremora Kynreeve");
+        addTemplate("Дремора-кинмаршер","Даэдра","Не указан","Даэдра | Skyrim",1,"Dremora Kynmarcher");
+        addTemplate("Дремора-маркиназ","Даэдра","Не указан","Даэдра | Skyrim",1,"Dremora Markynaz");
+        addTemplate("Дремора-валкиназ","Даэдра","Не указан","Даэдра | Skyrim",1,"Dremora Valkynaz");
+        addTemplate("Дремора-лорд","Даэдра","Не указан","Даэдра | Skyrim",1,"Dremora Lord");
+        addTemplate("Дремора-колдун","Даэдра","Не указан","Даэдра | Skyrim",1,"Dremora Warlock");
+        addTemplate("Огненный атронах","Даэдра","Не указан","Даэдра | Skyrim",1,"Flame Atronach");
+        addTemplate("Ледяной атронах","Даэдра","Не указан","Даэдра | Skyrim",1,"Frost Atronach");
+        addTemplate("Грозовой атронах","Даэдра","Не указан","Даэдра | Skyrim",1,"Storm Atronach");
+        addTemplate("Фалмер","Фалмер","Не указан","Фалмеры | Skyrim",1,"Falmer");
+        addTemplate("Фалмер-скрытень","Фалмер","Не указан","Фалмеры | Skyrim",1,"Falmer Skulker");
+        addTemplate("Фалмер-мракобес","Фалмер","Не указан","Фалмеры | Skyrim",1,"Falmer Gloomlurker");
+        addTemplate("Фалмер-сумеречный","Фалмер","Не указан","Фалмеры | Skyrim",1,"Falmer Nightprowler");
+        addTemplate("Фалмер-воитель","Фалмер","Не указан","Фалмеры | Skyrim",1,"Falmer Shadowmaster");
+        addTemplate("Фалмер-лучник","Фалмер","Не указан","Фалмеры | Skyrim",1,"Falmer Archer");
+        addTemplate("Фалмер-шаман","Фалмер","Не указан","Фалмеры | Skyrim",1,"Falmer Shaman");
+        addTemplate("Фалмер-военачальник","Фалмер","Не указан","Фалмеры | Dawnguard",1,"Falmer Warmonger");
+        addTemplate("Закалённый фалмер","Фалмер","Не указан","Фалмеры | Dawnguard",1,"Hardened Falmer");
+        addTemplate("Хранитель Каирна Душ","Нежить","Не указан","Каирн Душ | Dawnguard",1,"Keeper");
+        addTemplate("Костяной человек","Нежить","Не указан","Каирн Душ | Dawnguard",1,"Boneman");
+        addTemplate("Туманный человек","Нежить","Не указан","Каирн Душ | Dawnguard",1,"Mistman");
+        addTemplate("Гневный человек","Нежить","Не указан","Каирн Душ | Dawnguard",1,"Wrathman");
+        addTemplate("Жнец","Нежить","Не указан","Каирн Душ | Dawnguard",1,"Reaper");
+        addTemplate("Стражник Вороньей Скалы","Разная","Не указан","Солстейм | Dragonborn",1,"Raven Rock Guard","Стражник Редоран","Redoran Guard");
+        addTemplate("Убийца Мораг Тонг","Разная","Не указан","Солстейм | Dragonborn",1,"Morag Tong Assassin");
+        addTemplate("Культист Мирака","Разная","Не указан","Солстейм | Dragonborn",1,"Cultist","Культист");
+        addTemplate("Пират Солстейма","Разная","Не указан","Солстейм | Dragonborn",1,"Reaver");
+        addTemplate("Главарь пиратов Солстейма","Разная","Не указан","Солстейм | Dragonborn",1,"Reaver Lord");
+        addTemplate("Риклинг","Разная","Не указан","Солстейм | Dragonborn",1,"Riekling");
+        addTemplate("Риклинг-воин","Разная","Не указан","Солстейм | Dragonborn",1,"Riekling Warrior");
+        addTemplate("Риклинг-всадник","Разная","Не указан","Солстейм | Dragonborn",1,"Riekling Rider");
+        addTemplate("Пепельное порождение","Разная","Не указан","Солстейм | Dragonborn",1,"Ash Spawn");
+        addTemplate("Пепельный страж","Разная","Не указан","Солстейм | Dragonborn",1,"Ash Guardian");
+        addTemplate("Искатель","Разная","Не указан","Солстейм | Dragonborn",1,"Seeker");
+        addTemplate("Скрытень","Разная","Не указан","Солстейм | Dragonborn",1,"Lurker");
+        addTemplate("Медведь-оборотень","Разная","Не указан","Солстейм | Dragonborn",1,"Werebear");
+        addTemplate("Дракон","Дракон","Не указан","Драконы | Skyrim",1,"Dragon");
+        addTemplate("Кровавый дракон","Дракон","Не указан","Драконы | Skyrim",1,"Blood Dragon");
+        addTemplate("Морозный дракон","Дракон","Не указан","Драконы | Skyrim",1,"Frost Dragon");
+        addTemplate("Старейший дракон","Дракон","Не указан","Драконы | Skyrim",1,"Elder Dragon");
+        addTemplate("Древний дракон","Дракон","Не указан","Драконы | Skyrim",1,"Ancient Dragon");
+        addTemplate("Благородный дракон","Дракон","Не указан","Драконы | Dawnguard",1,"Revered Dragon");
+        addTemplate("Легендарный дракон","Дракон","Не указан","Драконы | Dawnguard",1,"Legendary Dragon");
+        addTemplate("Великан","Разная","Не указан","Существа | Skyrim",1,"Giant");
+        addTemplate("Тролль","Разная","Не указан","Существа | Skyrim",1,"Troll");
+        addTemplate("Морозный тролль","Разная","Не указан","Существа | Skyrim",1,"Frost Troll");
+        addTemplate("Спригган","Разная","Не указан","Существа | Skyrim",1,"Spriggan");
+        addTemplate("Спригган-матрона","Разная","Не указан","Существа | Skyrim",1,"Spriggan Matron");
+        addTemplate("Оборотень","Разная","Не указан","Существа | Skyrim",1,"Werewolf");
+        addTemplate("Хоркер","Разная","Не указан","Существа | Skyrim",1,"Horker");
+        addTemplate("Злокрыс","Разная","Не указан","Существа | Skyrim",1,"Skeever");
+        addTemplate("Волк (существо)","Разная","Не указан","Существа | Skyrim",1,"Wolf");
+        addTemplate("Ледяной волк","Разная","Не указан","Существа | Skyrim",1,"Ice Wolf");
+        addTemplate("Медведь","Разная","Не указан","Существа | Skyrim",1,"Bear");
+        addTemplate("Пещерный медведь","Разная","Не указан","Существа | Skyrim",1,"Cave Bear");
+        addTemplate("Белый медведь","Разная","Не указан","Существа | Skyrim",1,"Snow Bear");
+        addTemplate("Саблезуб","Разная","Не указан","Существа | Skyrim",1,"Sabre Cat");
+        addTemplate("Снежный саблезуб","Разная","Не указан","Существа | Skyrim",1,"Snowy Sabre Cat");
+        addTemplate("Грязевой краб","Разная","Не указан","Существа | Skyrim",1,"Mudcrab");
+        addTemplate("Морозный паук","Разная","Не указан","Существа | Skyrim",1,"Frostbite Spider");
+        addTemplate("Гигантский морозный паук","Разная","Не указан","Существа | Skyrim",1,"Giant Frostbite Spider");
+        addTemplate("Мать дымков","Разная","Не указан","Существа | Skyrim",1,"Wispmother");
+        addTemplate("Огонёк","Разная","Не указан","Существа | Skyrim",1,"Wisp");
+        addTemplate("Кор","Разная","Не указан","Существа | Skyrim",1,"Chaurus");
+        addTemplate("Кор-жнец","Разная","Не указан","Существа | Skyrim",1,"Chaurus Reaper");
+        addTemplate("Двемерский паук","Разная","Не указан","Существа | Skyrim",1,"Dwarven Spider");
+        addTemplate("Двемерская сфера","Разная","Не указан","Существа | Skyrim",1,"Dwarven Sphere");
+        addTemplate("Двемерский центурион","Разная","Не указан","Существа | Skyrim",1,"Dwarven Centurion");
+        addTemplate("Кор-охотник","Разная","Не указан","Существа | Dawnguard",1,"Chaurus Hunter");
+        addTemplate("Спригган-земная мать","Разная","Не указан","Существа | Dawnguard",1,"Spriggan Earth Mother");
+        addTemplate("Морозный великан","Разная","Не указан","Существа | Dawnguard",1,"Frost Giant");
+        addTemplate("Долинный саблезуб","Разная","Не указан","Существа | Dawnguard",1,"Vale Sabre Cat");
+        addTemplate("Долинный олень","Разная","Не указан","Существа | Dawnguard",1,"Vale Deer");
+        addTemplate("Горящий спригган","Разная","Не указан","Существа | Dragonborn",1,"Burnt Spriggan");
+        addTemplate("Нетч","Разная","Не указан","Существа | Dragonborn",1,"Netch");
+        addTemplate("Нетч-самец","Разная","Не указан","Существа | Dragonborn",1,"Bull Netch");
+        addTemplate("Нетч-самка","Разная","Не указан","Существа | Dragonborn",1,"Betty Netch");
+        addTemplate("Пепельный прыгун","Разная","Не указан","Существа | Dragonborn",1,"Ash Hopper");
+        addTemplate("Щетиноспин","Разная","Не указан","Существа | Dragonborn",1,"Bristleback");
     }
     static {
         add("Серана","Норд","Женский","Вампир | дочь Харкона",1,"Serana");
@@ -1083,16 +1293,20 @@ final class NpcProfiles {
         add("Ульфр Слепой","Норд","Мужской","Слепой обитатель Белой реки",1,"Ulfr the Blind","Ульфр");
         add("Адвард","Скелет","Мужской","Именной скелет у места гибели рыбаков",1,"Advard");
         add("Гьюк","Норд","Мужской","Наёмник в задании Восточной имперской компании",1,"Gjuk");
+        registerTemplates();
         AuthorNpcProfiles.register(NpcProfiles::addAuthor);
         LoreNpcProfiles.register(NpcProfiles::addMention);
     }
     private static Profile exact(String name){
-        String k=key(name);Profile p=INDEX.get(k);if(p==null)p=AUTHORS.get(k);if(p==null)p=MENTIONS.get(k);return p;
+        String k=key(name);Profile p=INDEX.get(k);if(p==null)p=AUTHORS.get(k);if(p==null)p=MENTIONS.get(k);if(p==null)p=TEMPLATES.get(k);return p;
     }
     static Profile find(String name){Profile p=exact(name);return p!=null?p:exact(canonicalName(name));}
     static Profile findOriginal(String name){Profile p=find(name);return p!=null&&!p.author&&!p.mentioned?p:null;}
     static Profile findAuthor(String name){Profile p=find(name);return p!=null&&p.author?p:null;}
-    static java.util.List<Profile> originalProfiles(){return profiles(INDEX);}
+    static java.util.List<Profile> originalProfiles(){java.util.ArrayList<Profile> all=new java.util.ArrayList<>(profiles(INDEX));all.addAll(profiles(TEMPLATES));all.sort((a,b)->a.name.compareToIgnoreCase(b.name));return java.util.Collections.unmodifiableList(all);}
+    static int namedOriginalCount(){return profiles(INDEX).size();}
+    static int templateCount(){return profiles(TEMPLATES).size();}
+    static boolean isTemplate(String name){Profile p=find(name);return p!=null&&p.template;}
     static java.util.List<Profile> authorProfiles(){return profiles(AUTHORS);}
     static java.util.List<Profile> mentionedProfiles(){return profiles(MENTIONS);}
     private static java.util.List<Profile> profiles(LinkedHashMap<String,Profile> map){
@@ -1177,6 +1391,7 @@ final class NpcProfiles {
     static String canonicalName(String name){
         if(name==null)return "";
         String canonical=LINK_NAMES.get(NpcNameMatcher.key(name));
+        if(canonical==null){Profile t=TEMPLATES.get(key(name));if(t!=null)canonical=t.name;}
         return canonical==null?name.trim():canonical;
     }
 }

@@ -491,6 +491,7 @@ public final class MainActivity extends Activity {
         NpcProfiles.Profile profile=NpcProfiles.find(name);
         if(profile!=null){
             if(profile.child)return npcEmblem(profile.name,"hero");
+            if(profile.template)return npcEmblem(profile.name,profile.dragon?"dragon":"hero");
             if(profile.dragon)return npcEmblem(profile.name,"dragon");
             if(!java.util.Arrays.asList(RpgContent.RACES).contains(profile.race))return npcEmblem(profile.name,"hero");
             String path=CharacterIdentity.portraitPath(profile.race,profile.gender,profile.variant);
@@ -518,6 +519,7 @@ public final class MainActivity extends Activity {
     private static String npcKey(String value){return value==null?"":value.toLowerCase(java.util.Locale.ROOT).replace('ё','е').trim();}
     private static boolean sameNpc(String first,String second){
         NpcProfiles.Profile a=NpcProfiles.find(first),b=NpcProfiles.find(second);
+        if((a!=null&&a.template)||(b!=null&&b.template))return false; // a template is not a person
         return npcKey(NpcProfiles.canonicalName(first)).equals(npcKey(NpcProfiles.canonicalName(second)))||(a!=null&&a==b);
     }
     private JSONObject npcFact(String name){
@@ -601,7 +603,7 @@ public final class MainActivity extends Activity {
         dialog.requestWindowFeature(android.view.Window.FEATURE_NO_TITLE);
         LinearLayout panel=column();panel.setPadding(dp(14),dp(10),dp(14),dp(14));panel.setBackgroundColor(Color.BLACK);
         LinearLayout header=row();TextView back=npcCentered("‹",30,TEXT,true);header.addView(back,lp(42,42));back.setContentDescription("Назад");back.setOnClickListener(v->dialog.dismiss());
-        header.addView(npcCentered(profile!=null&&profile.author?"АВТОРСКИЙ NPC":profile!=null&&profile.mentioned?"УПОМИНАНИЕ":"ПЕРСОНАЖ",18,TEXT,true),new LinearLayout.LayoutParams(0,dp(42),1));
+        header.addView(npcCentered(profile!=null&&profile.author?"АВТОРСКИЙ NPC":profile!=null&&profile.mentioned?"УПОМИНАНИЕ":profile!=null&&profile.template?"ТИПОВОЙ NPC":"ПЕРСОНАЖ",18,TEXT,true),new LinearLayout.LayoutParams(0,dp(42),1));
         TextView more=npcCentered("⋮",25,TEXT,true);header.addView(more,lp(42,42));more.setContentDescription("Дополнительно");
         more.setOnClickListener(v->{android.widget.PopupMenu menu=new android.widget.PopupMenu(this,more);menu.getMenu().add("Открыть подробное досье");menu.getMenu().add("Открыть галерею");menu.setOnMenuItemClickListener(item->{if(item.getTitle().toString().contains("галерею"))npcGallerySection(display);else npcLegacyDetails(display);return true;});menu.show();});
         panel.addView(header,lp(-1,-2));space(panel,8);
@@ -611,21 +613,21 @@ public final class MainActivity extends Activity {
         TextView npcNameTitle=npcCentered(display,23,accent(),true);npcNameTitle.setTag("npc_no_self_link");panel.addView(npcNameTitle,lp(-1,-2));space(panel,7);
         if(profile!=null&&!profile.role.isEmpty())panel.addView(npcCentered(profile.role,14,MUTED,false),lp(-1,-2));
         space(panel,16);
-        String status=npcKnownStatus(display);boolean female=profile!=null&&"Женский".equals(profile.gender);
+        String status=profile!=null&&profile.template?"":npcKnownStatus(display);boolean female=profile!=null&&"Женский".equals(profile.gender);
         boolean alive=npcInCurrentScene(display)||"MET".equals(status)||"INFORMED".equals(status)||"HELPED".equals(status)||"HOSTILE".equals(status);
         String life="DEAD".equals(status)?(profile==null?"Смерть":female?"Погибла":"Погиб"):"MISSING".equals(status)?(profile==null?"Исчезновение":female?"Пропала":"Пропал"):alive?(profile==null?"В живых":female?"Жива":"Жив"):"Неизвестно";
         int lifeColor="DEAD".equals(status)?ITEM_DOWN:"MISSING".equals(status)?MUTED:alive?ITEM_UP:MUTED;
         LinearLayout statuses=row();statuses.setGravity(Gravity.CENTER);
         statuses.addView(npcStatusCell("pulse",life,lifeColor),new LinearLayout.LayoutParams(0,-2,1));
         statuses.addView(npcStatusCell("race",profile==null?"Раса неизвестна":profile.race,TEXT),new LinearLayout.LayoutParams(0,-2,1));
-        statuses.addView(npcStatusCell("heart",npcRelation(display),TEXT),new LinearLayout.LayoutParams(0,-2,1));
+        statuses.addView(npcStatusCell("heart",profile!=null&&profile.template?"Не применяется":npcRelation(display),TEXT),new LinearLayout.LayoutParams(0,-2,1));
         panel.addView(statuses,lp(-1,-2));space(panel,16);
         View rule=new View(this);rule.setBackgroundColor(0xff292929);panel.addView(rule,lp(-1,1));space(panel,12);
-        npcGrid(panel,NPC_SECTIONS,NPC_SECTION_ICONS,accent(),index->npcSection(display,index));
+        if(profile!=null&&profile.template){addText(panel,"Типовая запись. Внешность, пол, отношения и состояние зависят от конкретного экземпляра.",14,MUTED,false,10);}else npcGrid(panel,NPC_SECTIONS,NPC_SECTION_ICONS,accent(),index->npcSection(display,index));
         space(panel,9);
         LinearLayout interact=row();interact.setGravity(Gravity.CENTER);interact.setBackground(npcShape(0xff201c14,0,14));
         interact.addView(new NpcLineIcon(this,"talk",accent()),lp(23,23));TextView action=npcCentered("Взаимодействовать",16,accent(),true);action.setPadding(dp(8),0,0,0);interact.addView(action,lp(-2,-2));
-        if(profile==null||!profile.mentioned){panel.addView(interact,lp(-1,56));interact.setOnClickListener(v->npcActions(display,dialog));}
+        if(profile==null||(!profile.mentioned&&!profile.template)){panel.addView(interact,lp(-1,56));interact.setOnClickListener(v->npcActions(display,dialog));}
         ScrollView scroll=new ScrollView(this);scroll.setFillViewport(true);scroll.setBackgroundColor(Color.BLACK);scroll.addView(panel);
         dialog.setContentView(scroll);dialog.show();android.view.Window window=dialog.getWindow();if(window!=null){window.setBackgroundDrawable(new android.graphics.drawable.ColorDrawable(Color.BLACK));window.setLayout(-1,-1);window.setStatusBarColor(Color.BLACK);window.setNavigationBarColor(Color.BLACK);window.getDecorView().setSystemUiVisibility(0);}
         AmoledAppearance.applyTree(panel);
@@ -694,6 +696,7 @@ public final class MainActivity extends Activity {
         ScrollView sc=new ScrollView(this);sc.addView(panel);
         final AlertDialog menu=new RuneDialogBuilder(this,accent()).setTitle("Взаимодействовать").setView(sc).setNegativeButton("Закрыть",null).create();
         NpcProfiles.Profile targetProfile=NpcProfiles.find(name);
+        if(targetProfile!=null&&targetProfile.template){toast("Это общая карточка типа NPC");return;}
         final boolean child=targetProfile!=null&&targetProfile.child;
         final int[] allowed=child?new int[]{0,2,6,11}:new int[]{0,1,2,3,4,5,6,7,8,9,10,11};
         String[] labelsForMenu=new String[allowed.length],iconsForMenu=new String[allowed.length];
@@ -4908,7 +4911,7 @@ public final class MainActivity extends Activity {
         };
         list.setAdapter(adapter);
         Runnable refresh=()->{String q=NpcNameMatcher.key(search.getText().toString());filtered.clear();labels.clear();NpcProfiles.Profile exact=NpcProfiles.find(q);
-            for(NpcProfiles.Profile p:profiles)if(q.isEmpty()||p==exact||NpcNameMatcher.key(p.name+" "+p.race+" "+p.role).contains(q)){filtered.add(p);labels.add(p.name+"  |  "+p.race);}
+            for(NpcProfiles.Profile p:profiles)if(q.isEmpty()||p==exact||NpcNameMatcher.key(p.name+" "+p.race+" "+p.role).contains(q)){filtered.add(p);labels.add(p.name+"  |  "+(p.template?"Типовой NPC":p.race));}
             adapter.notifyDataSetChanged();
         };
         search.addTextChangedListener(new android.text.TextWatcher(){public void beforeTextChanged(CharSequence x,int st,int c,int a){}public void onTextChanged(CharSequence x,int st,int before,int c){refresh.run();}public void afterTextChanged(android.text.Editable e){}});
