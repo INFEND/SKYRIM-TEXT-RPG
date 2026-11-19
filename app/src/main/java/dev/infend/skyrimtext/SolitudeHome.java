@@ -7,7 +7,7 @@ final class SolitudeHome {
     static final int PRICE=25000, HOUSE=4;
     private static final String[] ROOMS={"Спальня","Кухня","Гостиная","Алхимическая лаборатория","Лаборатория зачарования"};
     private static final int[] COST={2000,1500,2000,2500,2500};
-    private int rooms,lastMeal=-1,lastStudy=-1;
+    private int rooms,lastMeal=-1,lastAlchemy=-1,lastEnchant=-1;
     private boolean jordisFollowing;
     private JordisGear jordisGear=new JordisGear();
     int jordisWeaponBonus(){return jordisGear.damageBonus();}
@@ -113,8 +113,8 @@ final class SolitudeHome {
             if(g.livia.enabled&&g.livia.life.married&&g.livia.life.sharedHome&&g.livia.survivor())s.add("SOLITUDE:home:livia","Поговорить с Ливией","Совместный дом");
             s.add("SOLITUDE:home:sleep","Поспать","8 часов | бесплатно");
             if(room(1)&&lastMeal!=g.day)s.add("SOLITUDE:home:meal","Поесть и выпить воды","Один раз в день");
-            if(room(3)&&lastStudy!=g.day)s.add("SOLITUDE:home:study:7","Практиковать алхимию","1 час | один урок в день");
-            if(room(4)&&lastStudy!=g.day)s.add("SOLITUDE:home:study:17","Изучить зачарование","1 час | один урок в день");
+            if(room(3)&&lastAlchemy!=g.day&&g.hour<23)s.add("SOLITUDE:home:study:7","Практиковать алхимию","1 час | один урок в день");
+            if(room(4)&&lastEnchant!=g.day&&g.hour<23)s.add("SOLITUDE:home:study:8","Изучить зачарование","1 час | один урок в день");
         }
         return s.add("SOLITUDE:back","На улицы Солитьюда","Покинуть поместье").add("GO_WORLD","Завершить прогулку","Вернуться к приключению");
     }
@@ -142,15 +142,17 @@ final class SolitudeHome {
             report(g,"Ты отдохнул в собственном доме.");return;
         }
         if(a.equals("SOLITUDE:home:meal")&&room(1)&&lastMeal!=g.day){g.syncLivingSystems();lastMeal=g.day;g.needs.eat();g.needs.drink();report(g,"Ты поел и выпил воды дома.");return;}
-        boolean alchemy=a.equals("SOLITUDE:home:study:7"),enchant=a.equals("SOLITUDE:home:study:17");
-        if((alchemy&&room(3)||enchant&&room(4))&&lastStudy!=g.day){
-            if(!g.restHours(1,false))return;lastStudy=g.day;
+        boolean alchemy=a.equals("SOLITUDE:home:study:7"),enchant=a.equals("SOLITUDE:home:study:8")||a.equals("SOLITUDE:home:study:17");
+        if(g.hour<23&&SolitudeCourt.ready(g)&&(alchemy&&room(3)&&lastAlchemy!=g.day||enchant&&room(4)&&lastEnchant!=g.day)){
+            int studyDay=g.day;
+            if(!g.restHours(1,false))return;
+            if(alchemy)lastAlchemy=studyDay;else lastEnchant=studyDay;
             String name=alchemy?"Алхимия":"Зачарование";
             for(int i=0;i<RpgContent.SKILLS.length;i++)if(name.equalsIgnoreCase(RpgContent.SKILLS[i])){g.progress.skillExperience(g,i,25);break;}
             report(g,"Домашняя практика: "+name);
         }
     }
     private static void report(GameEngine g,String m){g.message=m;g.progress.recent=m;g.recordVisualEvent(m);g.progress.sync(g);}
-    JSONObject save(){JSONObject j=new JSONObject();try{j.put("rooms",rooms).put("lastMeal",lastMeal).put("lastStudy",lastStudy).put("chest",chest).put("jordisFollowing",jordisFollowing).put("jordisGear",jordisGear.save());}catch(Exception ignored){}return j;}
-    static SolitudeHome restore(JSONObject j){SolitudeHome x=new SolitudeHome();if(j!=null){x.jordisFollowing=j.optBoolean("jordisFollowing",false);x.jordisGear=JordisGear.restore(j.optJSONObject("jordisGear"));x.rooms=j.optInt("rooms")&31;x.lastMeal=j.optInt("lastMeal",-1);x.lastStudy=j.optInt("lastStudy",-1);JSONObject c=j.optJSONObject("chest");if(c!=null)for(String id:GOODS)x.setStored(id,Math.max(0,Math.min(LIMIT,c.optInt(id,0))));}return x;}
+    JSONObject save(){JSONObject j=new JSONObject();try{j.put("rooms",rooms).put("lastMeal",lastMeal).put("lastStudy",Math.max(lastAlchemy,lastEnchant)).put("lastAlchemy",lastAlchemy).put("lastEnchant",lastEnchant).put("chest",chest).put("jordisFollowing",jordisFollowing).put("jordisGear",jordisGear.save());}catch(Exception ignored){}return j;}
+    static SolitudeHome restore(JSONObject j){SolitudeHome x=new SolitudeHome();if(j!=null){x.jordisFollowing=j.optBoolean("jordisFollowing",false);x.jordisGear=JordisGear.restore(j.optJSONObject("jordisGear"));x.rooms=j.optInt("rooms")&31;x.lastMeal=j.optInt("lastMeal",-1);int legacy=j.optInt("lastStudy",-1);x.lastAlchemy=j.optInt("lastAlchemy",legacy);x.lastEnchant=j.optInt("lastEnchant",legacy);JSONObject c=j.optJSONObject("chest");if(c!=null)for(String id:GOODS)x.setStored(id,Math.max(0,Math.min(LIMIT,c.optInt(id,0))));}return x;}
 }

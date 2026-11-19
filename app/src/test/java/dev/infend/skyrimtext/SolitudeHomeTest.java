@@ -52,6 +52,19 @@ public class SolitudeHomeTest {
         assertEquals(0,g.progress.quantity("Снежные ягоды"));assertEquals(SolitudeHome.MODE,g.mode);
         g=GameEngine.fromJson(g.toJson().toString());g.choose("SOLITUDE:craft:mix:0");assertEquals(before+1,g.manaPotions);
     }
+    @Test public void separateHomeStudiesPersistAndRejectLateHours() throws Exception {
+        GameEngine g=city();g.fixShop.home.buy(4);g.choose("SOLITUDE:visit:2");
+        g.choose("SOLITUDE:furnish:3");g.choose("SOLITUDE:furnish:4");
+        g.choose("SOLITUDE:back");g.choose("SOLITUDE:home");
+        int a=g.progress.skillXp[7],e=g.progress.skillXp[8];
+        g.choose("SOLITUDE:home:study:7");g.choose("SOLITUDE:home:study:8");
+        assertTrue(g.progress.skillXp[7]>a);assertTrue(g.progress.skillXp[8]>e);
+        assertEquals(12,g.hour);
+        g=GameEngine.fromJson(g.toJson().toString());
+        g.choose("SOLITUDE:home:study:7");g.choose("SOLITUDE:home:study:17");assertEquals(12,g.hour);
+        g.day++;g.hour=23;g.choose("SOLITUDE:home:study:8");assertEquals(23,g.hour);
+        g.hour=10;g.choose("SOLITUDE:home:study:17");assertEquals(11,g.hour);
+    }
     @Test public void bulkChestPreservesGoodsAndRespectsWeight() throws Exception {
         GameEngine g=city();g.fixShop.home.buy(4);g.choose("SOLITUDE:home");
         assertTrue(g.progress.addItem("Золотой слиток",5));
