@@ -127,6 +127,12 @@ public final class SceneState {
             e.put("status",status).put("relation",relation).put("delta",relation-old).put("history",next);return true;
         }catch(JSONException ex){return false;}
     }
+    /** Names only for UI linking; never clone the entire relationship history on layout. */
+    public java.util.List<String> npcNames(){
+        java.util.ArrayList<String> names=new java.util.ArrayList<>(npcs.size());
+        for(JSONObject npc:npcs.values())names.add(npc.optString("title"));
+        return names;
+    }
     public JSONArray npcFacts(){JSONArray result=new JSONArray();for(JSONObject npc:orderedNpcs())try{result.put(new JSONObject(npc.toString()));}catch(JSONException ignored){}return result;}
     /** Bounded, read-only context of facts confirmed by the engine. */
     public String confirmedContext() {

@@ -188,6 +188,7 @@ public final class MainActivity extends Activity {
     @Override protected void onNewIntent(Intent intent){super.onNewIntent(intent);setIntent(intent);if(updater!=null&&intent.getBooleanExtra("ota_open_from_notification",false))updater.onNotificationIntent();}
     @Override protected void onDestroy(){
         ResourceStore.UI.removeCallbacks(resourceRefreshTick);
+        closeNpcDialog();
         clearNotices();
         clearAiLiveViews();
         aiRequestSerial++;
@@ -512,11 +513,11 @@ public final class MainActivity extends Activity {
     private static final String[] NPC_ACTIONS={"Поговорить","Торговля","Подарить","Флиртовать","Пригласить","Обучение","Задания","Вызвать на бой","Стать спутником","Подкупить","Обокрасть","Попрощаться"};
     private static final String[] NPC_ACTION_ICONS={"talk","trade","gift","heart","people","learn","scroll","swords","shield","coins","steal","door"};
     private static final String[] NPC_ACTION_TEXT={"Заговариваю с персонажем","Предлагаю торговлю персонажу","Предлагаю выбрать подарок для персонажа","Пробую пофлиртовать с персонажем","Приглашаю персонажа провести время вместе","Спрашиваю персонажа об обучении","Спрашиваю персонажа о доступных заданиях","Вызываю персонажа на поединок","Предлагаю персонажу стать моим спутником","Пробую договориться о подкупе персонажа","Пробую незаметно обокрасть персонажа","Прощаюсь с персонажем"};
-    private static final String[] NPC_NATIVE_WORDS={"поговор|разговор|спрос|бесед","торгов|купить|продать|товар","подар|дарить","флирт|романт|ухажив","приглас|свидан","обуч|науч|урок","задан|поручен|квест","поедин|дуэл|вызвать на бой","спутник|сопровожд|вместе в путь","подкуп|взятк","обокра|карман|украсть","прощ|покинуть беседу|закончить разговор"};
+    private static final String[] NPC_NATIVE_WORDS={"поговор|разговор|спрос|бесед|попрос","торгов|купить|продать|товар","подар|дарить","флирт|романт|ухажив","приглас|свидан","обуч|науч|урок","задан|поручен|квест","поедин|дуэл|вызвать на бой","спутник|сопровожд|вместе в путь","подкуп|взятк","обокра|карман|украсть","прощ|покинуть беседу|закончить разговор"};
     private static String npcKey(String value){return value==null?"":value.toLowerCase(java.util.Locale.ROOT).replace('ё','е').trim();}
     private static boolean sameNpc(String first,String second){
         NpcProfiles.Profile a=NpcProfiles.find(first),b=NpcProfiles.find(second);
-        return npcKey(first).equals(npcKey(second))||(a!=null&&a==b);
+        return npcKey(NpcProfiles.canonicalName(first)).equals(npcKey(NpcProfiles.canonicalName(second)))||(a!=null&&a==b);
     }
     private JSONObject npcFact(String name){
         org.json.JSONArray facts=game.sceneState.npcFacts();
@@ -526,9 +527,22 @@ public final class MainActivity extends Activity {
     private String npcKnownStatus(String name){JSONObject n=npcFact(name);return n==null?"":n.optString("status");}
     private boolean npcInCurrentScene(String name){
         if(!game.started)return false;
-        String scene=game.aiNarrativeMode&&!game.nativeSceneRequired()?(game.aiTurn==null?"":game.aiTurn.scene):game.scene().body;
-        for(String speaker:NpcProfiles.speakers(scene,game.name))if(sameNpc(name,speaker))return true;
+        if(!npcAddonEnabled(name))return false;
+        if(ItachiProfile.matches(name)&&game.itachi.present(game))return true;
+        if(LiviaStory.matches(name)&&game.livia.present(game))return true;
+        if(KatherineStory.NAME.equals(name)&&game.katherine.present(game))return true;
+        if(AlmaStory.NAME.equals(name)&&!game.alma.terminalLoss()&&game.alma.present(game))return true;
+        java.util.Set<String> speakers=game.aiNarrativeMode&&!game.nativeSceneRequired()
+            ?NpcProfiles.speakers(game.aiTurn==null?"":game.aiTurn.scene,game.name):npcSceneNames;
+        for(String speaker:speakers)if(sameNpc(name,speaker))return true;
         return false;
+    }
+    private boolean npcAddonEnabled(String name){
+        if(ItachiProfile.matches(name))return game.itachi.enabled;
+        if(LiviaStory.matches(name))return game.livia.enabled;
+        if(KatherineStory.NAME.equals(name))return game.katherine.enabled;
+        if(AlmaStory.NAME.equals(name))return game.alma.enabled;
+        return true;
     }
     private String npcRelation(String name){
         if(ItachiProfile.matches(name)&&game.itachi.enabled&&game.itachi.stage>0)return game.itachi.relation();
@@ -550,7 +564,7 @@ public final class MainActivity extends Activity {
     }
     private LinearLayout npcStatusCell(String icon,String label,int color){
         LinearLayout cell=row();cell.setGravity(Gravity.CENTER);cell.addView(new NpcLineIcon(this,icon,color),lp(15,15));
-        TextView t=npcCentered(label,11,color,false);t.setPadding(dp(3),0,0,0);t.setMaxLines(2);cell.addView(t,new LinearLayout.LayoutParams(-2,-2));return cell;
+        TextView t=npcCentered(label,11,color,false);t.setPadding(dp(3),0,0,0);t.setMaxLines(2);cell.addView(t,new LinearLayout.LayoutParams(0,-2,1));return cell;
     }
     private void npcGrid(LinearLayout panel,String[] labels,String[] icons,int tint,java.util.function.IntConsumer action){
         for(int i=0;i<labels.length;i+=3){
@@ -566,10 +580,23 @@ public final class MainActivity extends Activity {
             panel.addView(line,lp(-1,-2));
         }
     }
+    private android.app.Dialog activeNpcDialog;
+    private String activeNpcName="";
+    private void closeNpcDialog(){
+        android.app.Dialog old=activeNpcDialog;activeNpcDialog=null;activeNpcName="";
+        if(old!=null&&old.isShowing())old.dismiss();
+    }
     private void npcDetails(String name){
-        NpcProfiles.Profile profile=NpcProfiles.find(name);
-        final String display=profile==null?name:profile.name;
+        if(game==null||isFinishing()||isDestroyed())return;
+        String canonical=NpcProfiles.canonicalName(name);
+        if(canonical.isEmpty())return;
+        NpcProfiles.Profile profile=NpcProfiles.find(canonical);
+        final String display=profile==null?canonical:profile.name;
+        if(activeNpcDialog!=null&&activeNpcDialog.isShowing()&&sameNpc(display,activeNpcName))return;
+        closeNpcDialog();
         final android.app.Dialog dialog=new android.app.Dialog(this);
+        activeNpcDialog=dialog;activeNpcName=display;
+        dialog.setOnDismissListener(d->{if(activeNpcDialog==dialog){activeNpcDialog=null;activeNpcName="";}});
         dialog.requestWindowFeature(android.view.Window.FEATURE_NO_TITLE);
         LinearLayout panel=column();panel.setPadding(dp(14),dp(10),dp(14),dp(14));panel.setBackgroundColor(Color.BLACK);
         LinearLayout header=row();TextView back=npcCentered("‹",30,TEXT,true);header.addView(back,lp(42,42));back.setContentDescription("Назад");back.setOnClickListener(v->dialog.dismiss());
@@ -580,13 +607,13 @@ public final class MainActivity extends Activity {
         View portrait=npcPortrait(display);portrait.setBackground(npcShape(0xff111111,0,16));portrait.setClipToOutline(true);
         if(portrait instanceof android.widget.ImageView){((android.widget.ImageView)portrait).setScaleType(android.widget.ImageView.ScaleType.CENTER_CROP);((android.widget.ImageView)portrait).setAdjustViewBounds(false);}
         panel.addView(portrait,lp(-1,190));portrait.setOnClickListener(v->npcGallerySection(display));space(panel,14);
-        panel.addView(npcCentered(display,23,accent(),true),lp(-1,-2));space(panel,7);
+        TextView npcNameTitle=npcCentered(display,23,accent(),true);npcNameTitle.setTag("npc_no_self_link");panel.addView(npcNameTitle,lp(-1,-2));space(panel,7);
         if(profile!=null&&!profile.role.isEmpty())panel.addView(npcCentered(profile.role,14,MUTED,false),lp(-1,-2));
         space(panel,16);
         String status=npcKnownStatus(display);boolean female=profile!=null&&"Женский".equals(profile.gender);
         boolean alive=npcInCurrentScene(display)||"MET".equals(status)||"INFORMED".equals(status)||"HELPED".equals(status)||"HOSTILE".equals(status);
         String life="DEAD".equals(status)?(profile==null?"Смерть":female?"Погибла":"Погиб"):"MISSING".equals(status)?(profile==null?"Исчезновение":female?"Пропала":"Пропал"):alive?(profile==null?"В живых":female?"Жива":"Жив"):"Неизвестно";
-        int lifeColor="DEAD".equals(status)?ITEM_DOWN:alive?ITEM_UP:MUTED;
+        int lifeColor="DEAD".equals(status)?ITEM_DOWN:"MISSING".equals(status)?MUTED:alive?ITEM_UP:MUTED;
         LinearLayout statuses=row();statuses.setGravity(Gravity.CENTER);
         statuses.addView(npcStatusCell("pulse",life,lifeColor),new LinearLayout.LayoutParams(0,-2,1));
         statuses.addView(npcStatusCell("race",profile==null?"Раса неизвестна":profile.race,TEXT),new LinearLayout.LayoutParams(0,-2,1));
@@ -666,19 +693,24 @@ public final class MainActivity extends Activity {
         ScrollView sc=new ScrollView(this);sc.addView(panel);
         final AlertDialog menu=new RuneDialogBuilder(this,accent()).setTitle("Взаимодействовать").setView(sc).setNegativeButton("Закрыть",null).create();
         npcGrid(panel,NPC_ACTIONS,NPC_ACTION_ICONS,TEXT,index->{
-            if("DEAD".equals(npcKnownStatus(name))||"MISSING".equals(npcKnownStatus(name))||livingBusy()){toast("Персонаж или действие сейчас недоступны");return;}
+            if(!game.started||!npcAddonEnabled(name)||"DEAD".equals(npcKnownStatus(name))||"MISSING".equals(npcKnownStatus(name))||livingBusy()){toast("Персонаж или действие сейчас недоступны");return;}
             if(game.aiNarrativeMode&&!game.nativeSceneRequired()){
                 if(!npcInCurrentScene(name)){toast("Персонаж не участвует в текущей сцене");return;}
                 String draft=NPC_ACTION_TEXT[index]+": "+name+".";
                 if(!aiOwnDraft.trim().isEmpty())draft=aiOwnDraft.trim()+"\n"+draft;
+                if(draft.length()>1500){toast("Слишком длинный собственный ответ");return;}
                 aiOwnDraft=draft;persistAiDraft();menu.dismiss();parent.dismiss();tab=0;render();toast("Действие добавлено в свой ответ. Подтверди отправку.");return;
             }
             java.util.ArrayList<GameEngine.Choice> matches=new java.util.ArrayList<>();
             java.util.ArrayList<String> labels=new java.util.ArrayList<>();
-            NpcProfiles.Profile profile=NpcProfiles.find(name);String key=npcKey(name);
+            NpcNameMatcher matcher=npcNameMatcher();
             for(GameEngine.Choice choice:game.scene().choices){
-                String title=npcKey(choice.title),both=title+" "+npcKey(choice.detail);
-                boolean named=both.contains(key)||(profile!=null&&both.contains(npcKey(profile.name)));
+                String title=npcKey(choice.title);
+                java.util.List<NpcNameMatcher.Match> targets=matcher.find(choice.title);
+                // Only a named action title can establish its target; incidental names in details cannot.
+                if(targets.isEmpty())continue;
+                boolean named=true;
+                for(NpcNameMatcher.Match target:targets)if(!sameNpc(name,target.name)){named=false;break;}
                 if(!named)continue;
                 boolean match=false;for(String word:NPC_NATIVE_WORDS[index].split("\\|"))if(title.contains(word)){match=true;break;}
                 if(match){matches.add(choice);labels.add(choice.title);}
@@ -847,7 +879,8 @@ public final class MainActivity extends Activity {
             if(!speakers.isEmpty()){
                 HorizontalScrollView strip=new HorizontalScrollView(this);strip.setHorizontalScrollBarEnabled(false);
                 LinearLayout avatars=row();strip.addView(avatars);
-                for(String name:speakers){
+                int avatarCount=0;
+                for(String name:speakers){if(avatarCount++>=8)break;
                     LinearLayout person=column();person.setGravity(Gravity.CENTER);
                     person.setPadding(dp(5),dp(4),dp(5),dp(8));person.addView(npcPortrait(name),lp(68,-2));
                     NpcProfiles.Profile profile=NpcProfiles.find(name);
@@ -3141,18 +3174,14 @@ public final class MainActivity extends Activity {
     private NpcNameMatcher npcNameMatcher(){
         java.util.LinkedHashMap<String,String> names=new java.util.LinkedHashMap<>(npcStaticNames);
         if(game!=null&&game.started){
-            org.json.JSONArray facts=game.sceneState.npcFacts();
-            for(int i=0;i<facts.length();i++){
-                JSONObject fact=facts.optJSONObject(i);if(fact==null)continue;
-                String name=fact.optString("title");if(npcSpeakerName(name))NpcNameMatcher.add(names,name);
-            }
+            for(String name:game.sceneState.npcNames())if(npcSpeakerName(name))NpcNameMatcher.add(names,NpcProfiles.canonicalName(name),name);
             if(game.aiTurn!=null)for(String speaker:NpcProfiles.speakers(game.aiTurn.scene,game.name))
-                if(npcSpeakerName(speaker))NpcNameMatcher.add(names,speaker);
-            if(npcSceneNames!=null)for(String speaker:npcSceneNames)if(npcSpeakerName(speaker))NpcNameMatcher.add(names,speaker);
-            if(aiTurnBusy&&aiTurnPreview!=null&&!aiTurnPreview.isEmpty())for(String speaker:NpcProfiles.speakers(aiTurnPreview,game.name))if(npcSpeakerName(speaker))NpcNameMatcher.add(names,speaker);
+                if(npcSpeakerName(speaker))NpcNameMatcher.add(names,NpcProfiles.canonicalName(speaker),speaker);
+            if(npcSceneNames!=null)for(String speaker:npcSceneNames)if(npcSpeakerName(speaker))NpcNameMatcher.add(names,NpcProfiles.canonicalName(speaker),speaker);
+            if(aiTurnBusy&&aiTurnPreview!=null&&!aiTurnPreview.isEmpty())for(String speaker:NpcProfiles.speakers(aiTurnPreview,game.name))if(npcSpeakerName(speaker))NpcNameMatcher.add(names,NpcProfiles.canonicalName(speaker),speaker);
             // A custom player name is not a link to an unrelated NPC with the same spelling.
             String hero=NpcNameMatcher.key(game.name);
-            if(!hero.isEmpty())names.remove(hero);
+            if(!hero.isEmpty()){names.remove(hero);names.remove(NpcNameMatcher.key(NpcProfiles.canonicalName(game.name)));}
         }
         if(npcMatcher==null||!names.equals(npcMatcherNames)){npcMatcherNames=names;npcMatcher=new NpcNameMatcher(names);}
         return npcMatcher;
@@ -3162,7 +3191,7 @@ public final class MainActivity extends Activity {
         CharSequence lastText; NpcNameMatcher matcher; int style;
         boolean touched; float downX,downY;
         android.text.style.ClickableSpan downSpan;
-        boolean watching,installedTouch;
+        boolean watching,installedTouch,updating; android.text.method.MovementMethod originalMovement;
     }
     private final class NpcLinkSpan extends android.text.style.ClickableSpan {
         final String name;NpcLinkSpan(String name){this.name=name;}
@@ -3219,7 +3248,7 @@ public final class MainActivity extends Activity {
     }
     private void decorateNpcNameView(TextView view,NpcNameMatcher matcher){
         // Do not change editable text, switches or platform button semantics.
-        if(view instanceof EditText||view instanceof android.widget.CompoundButton||view instanceof android.widget.Button)return;
+        if(view instanceof EditText||view instanceof android.widget.CompoundButton||view instanceof android.widget.Button||"npc_no_self_link".equals(view.getTag()))return;
         NpcLinkState state=npcLinkViews.get(view);
         if(state==null){state=new NpcLinkState();npcLinkViews.put(view,state);}
         final NpcLinkState current=state;
@@ -3230,7 +3259,7 @@ public final class MainActivity extends Activity {
                 public void onTextChanged(CharSequence s,int start,int before,int count){}
                 public void afterTextChanged(android.text.Editable value){
                     // A later stream chunk may replace all spans; reapply only after the edit.
-                    if(view.isAttachedToWindow())view.post(()->decorateNpcNameView(view,npcNameMatcher()));
+                    if(!current.updating&&view.isAttachedToWindow())view.post(()->{if(view.isAttachedToWindow())decorateNpcNameView(view,npcNameMatcher());});
                 }
             });
         }
@@ -3252,13 +3281,18 @@ public final class MainActivity extends Activity {
         }
         if(prior.length==0&&count==0)return;
         boolean clickable=view.isClickable(),longClickable=view.isLongClickable(),focusable=view.isFocusable();
-        view.setText(span,TextView.BufferType.SPANNABLE);
+        current.updating=true;
+        try{view.setText(span,TextView.BufferType.SPANNABLE);}finally{current.updating=false;}
         if(count>0){
-            if(view.getMovementMethod()!=NpcLinkMovement.INSTANCE)view.setMovementMethod(NpcLinkMovement.INSTANCE);
+            if(view.getMovementMethod()!=NpcLinkMovement.INSTANCE){current.originalMovement=view.getMovementMethod();view.setMovementMethod(NpcLinkMovement.INSTANCE);}
             // Let clicks outside the link continue to reach existing choice/card callbacks.
             view.setClickable(clickable);view.setLongClickable(longClickable);view.setFocusable(focusable);
             view.setHighlightColor(0x2255dfcb);
             installNpcTouch(view,current);
+        }else if(current.installedTouch){
+            view.setOnTouchListener(null);current.installedTouch=false;
+            if(view.getMovementMethod()==NpcLinkMovement.INSTANCE)view.setMovementMethod(current.originalMovement);
+            view.setClickable(clickable);view.setLongClickable(longClickable);view.setFocusable(focusable);
         }
         current.lastText=view.getText();current.matcher=matcher;current.style=style;
     }
@@ -3271,7 +3305,16 @@ public final class MainActivity extends Activity {
         if(root==null||prefs==null||npcLinkRoots.containsKey(root))return;
         npcLinkRoots.put(root,Boolean.TRUE);
         npcNameTree(root,npcNameMatcher());
-        root.getViewTreeObserver().addOnGlobalLayoutListener(()->npcNameTree(root,npcNameMatcher()));
+        final android.view.ViewTreeObserver.OnGlobalLayoutListener listener=()->npcNameTree(root,npcNameMatcher());
+        root.getViewTreeObserver().addOnGlobalLayoutListener(listener);
+        root.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener(){
+            public void onViewAttachedToWindow(View v){}
+            public void onViewDetachedFromWindow(View v){
+                android.view.ViewTreeObserver observer=root.getViewTreeObserver();
+                if(observer.isAlive())observer.removeOnGlobalLayoutListener(listener);
+                npcLinkRoots.remove(root);root.removeOnAttachStateChangeListener(this);
+            }
+        });
     }
     private void npcNameSettings(){
         int start=content.getChildCount();LinearLayout panel=card();
