@@ -214,9 +214,14 @@ class LocalAiClient(private val context: Context) {
             val lowMemory=report?.getBoolean("lowMemory")==true
             ui.post {
                 if(currentGeneration(id)) {
-                    if(tokens==0&&path.isNotEmpty())
-                        crashProfiles.edit().putInt(profileKey(path),if(lowMemory)2 else 1).apply()
-                    val hint=if(tokens==0) ". При следующем ручном запуске включится совместимый режим" else ""
+                    // A worker can die during prefill OR decoding. Escalate
+                    // compatibility after either, without rerolling/replaying the scene.
+                    val previous=if(path.isNotEmpty()) crashProfiles.getInt(profileKey(path),0) else 0
+                    val next=if(lowMemory||previous>=1) 2 else 1
+                    if(path.isNotEmpty())
+                        crashProfiles.edit().putInt(profileKey(path),next).apply()
+                    val hint=if(path.isNotEmpty()&&previous!=next)
+                        ". Следующий ручной запуск: "+(if(next==2) "режим сниженной нагрузки на память" else "совместимый режим") else ""
                     failGeneration(id,reason.trimEnd('.')+". "+detail+
                         ". Этап: "+phase+" (получено $tokens токенов)"+hint+". Повтори действие вручную")
                 }
