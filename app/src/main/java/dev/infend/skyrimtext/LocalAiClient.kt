@@ -1,7 +1,6 @@
 package dev.infend.skyrimtext
 
 import android.app.Activity
-import android.app.ActivityManager
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
@@ -13,6 +12,7 @@ import android.os.Looper
 import android.os.Message
 import android.os.Messenger
 import android.os.RemoteException
+import android.net.Uri
 import java.io.File
 
 /**
@@ -27,7 +27,12 @@ class LocalAiClient(private val context: Context) {
     private var generation=0L
     private var pending: Message?=null
     private var requestData: Bundle?=null
-    private var recoveryUsed=false
+    private var workerPid=0
+    private var requestStarted=0L
+    private var lastPhase=""
+    private var diagnosing=false
+    private val crashProfiles=context.getSharedPreferences("skyrim_local_crash_profiles",Context.MODE_PRIVATE)
+    private fun profileKey(path:String)="engine_"+LocalAiEngineModule.VERSION+"_"+path
     private var lastPartial=""
     private var lastTokens=0
     private var activeListener: AiStoryClient.Listener?=null
@@ -43,7 +48,11 @@ class LocalAiClient(private val context: Context) {
             val listener=synchronized(guard) {
                 if(!closed&&busy&&id==generation)activeListener else null
             }
-            listener?.onLocalStatus(reply.data.getString("status").orEmpty())
+            if(listener!=null) {
+                workerPid=reply.data.getInt("pid",workerPid)
+                lastPhase=reply.data.getString("status").orEmpty()
+                listener.onLocalStatus(lastPhase)
+            }
         }else if(reply.what==LocalAiProtocol.MSG_TEXT) {
             val id=reply.data.getLong("id",-1L)
             val listener=synchronized(guard) {
@@ -115,26 +124,13 @@ class LocalAiClient(private val context: Context) {
             return true
         }
         val modelUri=LocalAiModelProvider.uri(context,modelPath) ?: return false
-        var fail:String?=null
-        try {
-            val manager=context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
-            val info=ActivityManager.MemoryInfo()
-            manager.getMemoryInfo(info)
-            // A 9B model needs substantial resident RAM even with mmap; do not start
-            // a high-risk native load when the OS reports severe memory pressure.
-            if(info.lowMemory || info.availMem<3L*1024*1024*1024)
-                fail="Недостаточно свободной оперативной памяти. Закрой другие приложения и попробуй снова."
-        } catch(_:Exception) { /* Some devices restrict memory inspection. */ }
+        // RAM availability alone cannot establish native loading failure.
         val id:Long
         synchronized(guard) {
             if(busy||closed)return false
             busy=true
             id=++generation
             activeListener=listener
-        }
-        if(fail!=null) {
-            failGeneration(id,fail)
-            return true
         }
         val request=Message.obtain(null,LocalAiProtocol.MSG_GENERATE)
         val data=Bundle()
@@ -144,16 +140,23 @@ class LocalAiClient(private val context: Context) {
         data.putString("prompt",prompt)
         data.putInt("maxTokens",maxTokens)
         data.putBoolean("scene",scene)
+        data.putLong("modelBytes",model.length())
+        val profile=crashProfiles.getInt(profileKey(modelUri.toString()),0)
+        data.putBoolean("recovery",profile!=0)
+        data.putBoolean("memoryProfile",profile==2)
         request.data=data
         request.replyTo=incoming
         pending=request
         requestData=Bundle(data)
-        recoveryUsed=false
+        workerPid=0
+        requestStarted=System.currentTimeMillis()
+        lastPhase="Подключение к движку"
+        diagnosing=false
         lastPartial=""
         lastTokens=0
         activationAttempted=false
         awaitingActivation=false
-        listener.onLocalStatus("Подключение к отдельному процессу модели…")
+        listener.onLocalStatus(if(profile!=0) "Подключение: совместимый режим после сбоя…" else "Подключение к отдельному процессу модели…")
         armWatchdog(id)
         val current=messenger
         if(current!=null) {
@@ -179,10 +182,46 @@ class LocalAiClient(private val context: Context) {
 
     private fun recoverProcess(id:Long,reason:String) {
         if(!currentGeneration(id)) {releaseBinding();return}
+        if(diagnosing)return
+        diagnosing=true
         releaseBinding()
-        // Never silently replay a request after a native worker crash, even
-        // before the first token. The player can explicitly retry the locked action.
-        failGeneration(id,reason.trimEnd('.')+" (получено $lastTokens токенов). Повтори действие вручную")
+        val pid=workerPid
+        val phase=lastPhase
+        val tokens=lastTokens
+        val started=requestStarted
+        val path=requestData?.getString("path").orEmpty()
+        activeListener?.onLocalStatus("Определение причины завершения движка…")
+        // Engine UID owns the exit records. Never automatically replay a scene.
+        Thread({
+            var report:Bundle?=null
+            if(pid>0&&android.os.Build.VERSION.SDK_INT>=30) {
+                repeat(4) {
+                    if(report==null) {
+                        try {
+                            val candidate=context.contentResolver.call(
+                                Uri.parse("content://"+LocalAiEngineModule.PACKAGE+".diagnostics"),
+                                "exit",null,Bundle().apply {
+                                    putInt("pid",pid)
+                                    putLong("since",started)
+                                })
+                            if(candidate?.getBoolean("found")==true)report=candidate
+                        }catch(_:Exception){}
+                        if(report==null)try{Thread.sleep(350L)}catch(_:InterruptedException){}
+                    }
+                }
+            }
+            val detail=report?.getString("detail") ?: "Android не предоставил подтверждённую причину завершения"
+            val lowMemory=report?.getBoolean("lowMemory")==true
+            ui.post {
+                if(currentGeneration(id)) {
+                    if(tokens==0&&path.isNotEmpty())
+                        crashProfiles.edit().putInt(profileKey(path),if(lowMemory)2 else 1).apply()
+                    val hint=if(tokens==0) ". При следующем ручном запуске включится совместимый режим" else ""
+                    failGeneration(id,reason.trimEnd('.')+". "+detail+
+                        ". Этап: "+phase+" (получено $tokens токенов)"+hint+". Повтори действие вручную")
+                }
+            }
+        },"local-ai-exit-diagnostics").start()
     }
 
     private fun currentGeneration(id:Long):Boolean=synchronized(guard){!closed&&busy&&id==generation}
@@ -205,7 +244,7 @@ class LocalAiClient(private val context: Context) {
             override fun onServiceDisconnected(name:ComponentName?) {
                 if(binding!==this)return
                 val active=synchronized(guard){generation}
-                recoverProcess(active,"Процесс локального ИИ завершился. Возможны нехватка памяти или сбой нативного движка")
+                recoverProcess(active,"Процесс локального ИИ завершился")
             }
             override fun onBindingDied(name:ComponentName?) {
                 if(binding!==this)return
@@ -282,6 +321,7 @@ class LocalAiClient(private val context: Context) {
         lastPartial=""
         lastTokens=0
         awaitingActivation=false
+        diagnosing=false
         ui.post { listener?.onError(error) }
     }
 
@@ -297,6 +337,7 @@ class LocalAiClient(private val context: Context) {
             lastPartial=""
             lastTokens=0
             awaitingActivation=false
+            diagnosing=false
         }
         // The native completion is not cooperatively cancellable. Its own process
         // can be terminated without crashing the foreground game.

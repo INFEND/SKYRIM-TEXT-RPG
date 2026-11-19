@@ -19,7 +19,7 @@ import org.json.JSONObject;
 /** Separately installed, signature-checked APK; no downloaded executable is loaded in-process. */
 final class LocalAiEngineModule {
     static final String PACKAGE="dev.infend.skyrimtext.engine";
-    static final int VERSION=4;
+    static final int VERSION=5;
     static final int REQUEST_ACTIVATE=7108;
     static Intent activationIntent(boolean returnToGame){return new Intent().setComponent(new ComponentName(PACKAGE,"dev.infend.skyrimtext.EngineActivationActivity")).putExtra("returnToGame",returnToGame);}
     static String diagnostic(Context c){try{PackageManager pm=c.getPackageManager();PackageInfo info=pm.getPackageInfo(PACKAGE,0);ApplicationInfo app=info.applicationInfo;ServiceInfo svc=pm.getServiceInfo(new ComponentName(PACKAGE,"dev.infend.skyrimtext.LocalAiInferenceService"),0);return "v"+info.versionCode+", приложение "+(app.enabled?"включено":"выключено")+", служба "+(svc.enabled?"включена":"выключена")+", разрешение "+(c.checkSelfPermission("dev.infend.skyrimtext.permission.LOCAL_ENGINE")==PackageManager.PERMISSION_GRANTED?"есть":"нет");}catch(Exception e){return e.getClass().getSimpleName();}}

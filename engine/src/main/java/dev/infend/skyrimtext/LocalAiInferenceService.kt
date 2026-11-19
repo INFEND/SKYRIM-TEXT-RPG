@@ -53,6 +53,8 @@ class LocalAiInferenceService : Service() {
     private var loadedPath = ""
     private var loadedContext: Int? = null
     private var loadedRecovery = false
+    private var loadedMemoryProfile = false
+    private var contextCapacity = 8192
     private var activeReply: Messenger? = null
     private var activeId: Long = -1L
     private var textBuffer = StringBuilder()
@@ -71,6 +73,8 @@ class LocalAiInferenceService : Service() {
         val limit = data.getInt("maxTokens", 1024).coerceIn(24, 3072)
         val scene = data.getBoolean("scene", false)
         val recovery = data.getBoolean("recovery", false)
+        val memoryProfile = data.getBoolean("memoryProfile", false)
+        val modelBytes = data.getLong("modelBytes",0L)
         val resume = if (recovery) data.getString("resumeText").orEmpty().takeIf { it.length <= 30000 }.orEmpty() else ""
         val previousTokens = if (resume.isNotEmpty()) data.getInt("resumeTokens", 0).coerceIn(0, limit - 24) else 0
 
@@ -111,7 +115,7 @@ class LocalAiInferenceService : Service() {
             var speed = 0f
             var elapsed = 0L
             try {
-                val context = ensureLoaded(path, receiver, id, recovery)
+                val context = ensureLoaded(path, receiver, id, recovery, memoryProfile, modelBytes)
                 status(receiver, id, "Подготовка игрового контекста…")
                 val messages = listOf<Map<String, Any>>(
                     mapOf("role" to "system", "content" to system),
@@ -123,7 +127,6 @@ class LocalAiInferenceService : Service() {
                     ?.takeIf { it.isNotBlank() }
                     ?: ("<|im_start|>system\n" + system + "<|im_end|>\n" +
                         "<|im_start|>user\n" + prompt + "<|im_end|>\n<|im_start|>assistant\n")
-                status(receiver, id, "Генерация ответа, токены появятся по мере готовности…")
                 val direct = AiScenePreview.directPrompt(formatted)
                 val prefix = if (resume.isNotEmpty()) resume else AiScenePreview.scenePrefix(direct, scene)
                 // Prefill is part of the response, not a generated token.
@@ -131,11 +134,20 @@ class LocalAiInferenceService : Service() {
                     textBuffer.append(prefix)
                     generatedAt = SystemClock.elapsedRealtime()
                 }
+                status(receiver, id, "Проверка размера контекста…")
+                val inputTokens = (engine.tokenize(context,direct + prefix).firstOrNull()?.get("tokens") as? List<*>)?.size
+                if(inputTokens!=null && inputTokens + 16 >= contextCapacity)
+                    error("Запрос не помещается в контекст модели: $inputTokens / $contextCapacity токенов.")
+                val outputBudget=if(inputTokens==null) limit-previousTokens else
+                    minOf(limit-previousTokens,contextCapacity-inputTokens-16)
+                if(outputBudget<24)error("Недостаточно места для ответа в контексте модели.")
+                status(receiver, id, "Генерация ответа, токены появятся по мере готовности…")
                 val started = SystemClock.elapsedRealtime()
                 val result = engine.launchCompletion(context, mapOf(
                     "prompt" to (direct + prefix),
                     "emit_partial_completion" to true,
-                    "n_predict" to (limit - previousTokens),
+                    "n_predict" to outputBudget,
+                    "n_threads" to (if(recovery) 2 else 4),
                     "temperature" to 0.7,
                     "top_p" to 0.9,
                     "top_k" to 40,
@@ -168,8 +180,10 @@ class LocalAiInferenceService : Service() {
         }
     }
 
-    private fun ensureLoaded(path: String, receiver: Messenger, id: Long, recovery: Boolean): Int {
-        if (loadedPath == path && loadedContext != null && loadedRecovery == recovery) return loadedContext!!
+    private fun ensureLoaded(path: String, receiver: Messenger, id: Long, recovery: Boolean,
+                             memoryProfile:Boolean, modelBytes:Long): Int {
+        if (loadedPath == path && loadedContext != null && loadedRecovery == recovery &&
+            loadedMemoryProfile == memoryProfile) return loadedContext!!
         loadedContext?.let {
             try { engine.releaseContext(it) } catch (_: Throwable) {}
         }
@@ -177,23 +191,30 @@ class LocalAiInferenceService : Service() {
         loadedContext = null
         status(receiver, id, "Загрузка модели Qwen из памяти телефона…")
         val uri = Uri.parse(path)
+        status(receiver,id,"Проверка GGUF и нативной библиотеки…")
+        val nativeEngine=engine
+        if(!nativeEngine.isGGUF(uri))error("Файл не содержит корректный заголовок GGUF.")
         val descriptor = contentResolver.openFileDescriptor(uri, "r")
             ?: error("Не удалось открыть GGUF для нативного движка.")
+        val size=descriptor.statSize.takeIf{it>0} ?: modelBytes
+        // Upstream FD loader uses non-mmap. Larger files and confirmed LMK use mmap.
+        val mmap=memoryProfile || size<=0 || size>8L*1024*1024*1024
+        contextCapacity=if(recovery)6144 else 8192
         val fd = descriptor.detachFd()
         val config = mapOf<String, Any>(
             "model" to uri.toString(),
             "model_fd" to fd,
             "embedding" to false,
             // Reserve room for prompt, ten choices and resumed output.
-            "n_ctx" to 8192,
-            // Reduce transient native scratch allocations.
-            "n_batch" to (if (recovery) 32 else 128),
-            "n_threads" to (if (recovery) 3 else 4),
+            "n_ctx" to contextCapacity,
+            "n_batch" to (if (recovery) 32 else 64),
+            "n_threads" to (if (recovery) 2 else 4),
             "n_gpu_layers" to 0,
-            "use_mmap" to true,
+            "use_mmap" to mmap,
             "use_mlock" to false,
             "vocab_only" to false
         )
+        status(receiver,id,"Инициализация llama.cpp: контекст $contextCapacity, mmap "+(if(mmap)"вкл" else "выкл")+"…")
         val result = engine.startEngine(config) { token -> onNativeToken(token) }
             ?: error("Не удалось загрузить GGUF. Возможно, библиотека не поддерживает архитектуру модели.")
         val context = (result["contextId"] as? Number)?.toInt()
@@ -201,6 +222,7 @@ class LocalAiInferenceService : Service() {
         loadedPath = path
         loadedContext = context
         loadedRecovery = recovery
+        loadedMemoryProfile = memoryProfile
         status(receiver, id, "Модель загружена, контекст готов.")
         return context
     }
@@ -238,6 +260,7 @@ class LocalAiInferenceService : Service() {
         msg.data = Bundle().apply {
             putLong("id", id)
             putString("status", value)
+            putInt("pid", Process.myPid())
         }
         try { receiver.send(msg) } catch (_: Exception) {}
     }
