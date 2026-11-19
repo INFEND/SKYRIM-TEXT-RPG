@@ -123,7 +123,7 @@ public final class RpgProgress {
         return item!=null&&quantity(item.id)>0&&item.statSkill>=0&&item.statSkill<=2?item.statSkill:0;
     }
     public double equippedArmor(){
-        double total=0;
+        double total=equipped("Серебряное ожерелье защиты")?15:0;
         for(String slot:SLOTS){
             ItemCatalog.Item item=ItemCatalog.find(equipped.get(slot));
             if(item!=null&&quantity(item.id)>0&&item.wearable()&&item.baseStat>0)total+=item.currentStat(this);

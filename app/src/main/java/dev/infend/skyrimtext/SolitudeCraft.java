@@ -43,23 +43,25 @@ final class SolitudeCraft {
         g.stamina-=stamina;g.hour++;g.syncLivingSystems();g.message=text;g.progress.recent=text;g.recordVisualEvent(text);g.progress.sync(g);
     }
     static final String ENCHANT_RING="Серебряное кольцо грузоподъёмности", SOUL_GEM="Малый камень душ (заполненный)", BASE_RING="Кольцо серебряное";
-    private static boolean canEnchant(GameEngine g){
+    static final String BASE_NECK="Серебряное ожерелье", ENCHANT_NECK="Серебряное ожерелье защиты";
+    private static boolean canEnchant(GameEngine g,String base,String out){
         return SolitudeCity.here(g)&&SolitudeCourt.ready(g)&&g.solitude.homeEnchanting(g)&&g.hour<23&&g.stamina>=3
-            &&g.progress.quantity(BASE_RING)>0&&!g.progress.equipped(BASE_RING)&&g.progress.quantity(SOUL_GEM)>0
-            &&g.progress.quantity(ENCHANT_RING)<Integer.MAX_VALUE
+            &&g.progress.quantity(base)>0&&!g.progress.equipped(base)&&g.progress.quantity(SOUL_GEM)>0
+            &&g.progress.quantity(out)<Integer.MAX_VALUE
             &&g.progress.carryWeight()-0.2<=g.progress.carryLimit()+0.00001;
     }
-    private static void enchant(GameEngine g){
-        if(!canEnchant(g))return;
-        int rings=g.progress.quantity(BASE_RING),gems=g.progress.quantity(SOUL_GEM);
-        if(!g.progress.removeItem(BASE_RING,1))return;
-        if(!g.progress.removeItem(SOUL_GEM,1)||!g.progress.addItem(ENCHANT_RING,1)){
-            g.progress.quantity(BASE_RING,rings);g.progress.quantity(SOUL_GEM,gems);return;
+    private static void enchant(GameEngine g,String base,String out){
+        if(!canEnchant(g,base,out))return;
+        int rings=g.progress.quantity(base),gems=g.progress.quantity(SOUL_GEM);
+        if(!g.progress.removeItem(base,1))return;
+        if(!g.progress.removeItem(SOUL_GEM,1)||!g.progress.addItem(out,1)){
+            g.progress.quantity(base,rings);g.progress.quantity(SOUL_GEM,gems);return;
         }
-        g.progress.skillExperience(g,8,25);finish(g,"В Высоком шпиле зачаровано: "+ENCHANT_RING,3);
+        g.progress.skillExperience(g,8,25);finish(g,"В Высоком шпиле зачаровано: "+out,3);
     }
     static void choices(GameEngine g,GameEngine.Scene s){
-        if(canEnchant(g))s.add(PREFIX+"enchant:ring","Зачаровать серебряное кольцо","Авторский рецепт | +10 кг при ношении | заполненный малый камень душ | 1 ч.");
+        if(canEnchant(g,BASE_NECK,ENCHANT_NECK))s.add(PREFIX+"enchant:neck","Зачаровать серебряное ожерелье","Авторский рецепт | +15 брони при ношении | заполненный малый камень душ | 1 ч.");
+        if(canEnchant(g,BASE_RING,ENCHANT_RING))s.add(PREFIX+"enchant:ring","Зачаровать серебряное кольцо","Авторский рецепт | +10 кг при ношении | заполненный малый камень душ | 1 ч.");
         if(forge(g)){
             for(int i=0;i<OUTPUT.length;i++)if(canMake(g,i))s.add(PREFIX+"make:"+i,"Изготовить: "+OUTPUT[i]+" ×"+COUNT[i],METAL[i]+" × "+MATERIAL[i]+(STRIPS[i]>0?" + "+STRIPS[i]+" × Кожаные полоски":"")+" | 1 ч. | 5 запаса сил");
             for(ItemCatalog.Item item:g.progress.owned("Все","Название"))if(!item.temperMaterial().isEmpty()&&g.progress.temperBlock(item,g).isEmpty())
@@ -70,7 +72,8 @@ final class SolitudeCraft {
     }
     static boolean choose(GameEngine g,String a){
         if(!a.startsWith(PREFIX))return false;
-        if(a.equals(PREFIX+"enchant:ring")){enchant(g);return true;}
+        if(a.equals(PREFIX+"enchant:ring")){enchant(g,BASE_RING,ENCHANT_RING);return true;}
+        if(a.equals(PREFIX+"enchant:neck")){enchant(g,BASE_NECK,ENCHANT_NECK);return true;}
         for(int i=0;i<ALCHEMY_OUT.length;i++)if(a.equals(PREFIX+"mix:"+i)){mix(g,i);return true;}
         if(a.equals(PREFIX+"brew")){
             if(!lab(g)||!FixShopHome.canBrew(g))return true;

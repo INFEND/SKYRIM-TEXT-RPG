@@ -83,6 +83,22 @@ public class SolitudeHomeTest {
         g.choose("SOLITUDE:craft:enchant:ring");assertEquals(1,g.progress.quantity(SolitudeCraft.ENCHANT_RING));
         g.progress.unequip(SolitudeCraft.ENCHANT_RING);assertEquals(limit,g.progress.carryLimit(),0.001);
     }
+    @Test public void protectionNecklaceUsesGemAndAppliesArmorOnlyWhenEquipped() throws Exception {
+        GameEngine g=city();g.fixShop.home.buy(4);g.choose("SOLITUDE:home");
+        g.progress.quantity(SolitudeCraft.BASE_NECK,1);g.progress.quantity(SolitudeCraft.SOUL_GEM,1);
+        g.choose("SOLITUDE:craft:enchant:neck");assertEquals(0,g.progress.quantity(SolitudeCraft.ENCHANT_NECK));
+        g.choose("SOLITUDE:back");g.choose("SOLITUDE:visit:2");g.choose("SOLITUDE:furnish:4");
+        g.choose("SOLITUDE:back");g.choose("SOLITUDE:home");g.stamina=50;
+        double armor=g.progress.equippedArmor();
+        g.choose("SOLITUDE:craft:enchant:neck");
+        assertEquals(1,g.progress.quantity(SolitudeCraft.ENCHANT_NECK));
+        assertEquals(0,g.progress.quantity(SolitudeCraft.BASE_NECK));assertEquals(0,g.progress.quantity(SolitudeCraft.SOUL_GEM));
+        assertEquals(armor,g.progress.equippedArmor(),0.001);
+        assertTrue(g.progress.equip(SolitudeCraft.ENCHANT_NECK));assertEquals(armor+15,g.progress.equippedArmor(),0.001);
+        g=GameEngine.fromJson(g.toJson().toString());assertEquals(armor+15,g.progress.equippedArmor(),0.001);
+        g.choose("SOLITUDE:craft:enchant:neck");assertEquals(1,g.progress.quantity(SolitudeCraft.ENCHANT_NECK));
+        g.progress.unequip(SolitudeCraft.ENCHANT_NECK);assertEquals(armor,g.progress.equippedArmor(),0.001);
+    }
     @Test public void bulkChestPreservesGoodsAndRespectsWeight() throws Exception {
         GameEngine g=city();g.fixShop.home.buy(4);g.choose("SOLITUDE:home");
         assertTrue(g.progress.addItem("Золотой слиток",5));
