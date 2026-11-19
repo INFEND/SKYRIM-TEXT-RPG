@@ -3659,7 +3659,7 @@ public final class MainActivity extends Activity {
         android.app.Dialog dialog=new android.app.Dialog(this,R.style.RunicDialogTheme);
         dialog.requestWindowFeature(android.view.Window.FEATURE_NO_TITLE);
         LinearLayout panel=column();
-        panel.setBackground(AmoledAppearance.window(0xff090909,accent()));
+        panel.setBackground(AmoledAppearance.window(0xff080808,accent()));
         panel.setPadding(dp(14),dp(13),dp(14),dp(14));
         addText(panel,place.name,22,TEXT,true,9);
 
@@ -4240,7 +4240,7 @@ public final class MainActivity extends Activity {
         LinearLayout.LayoutParams wordsParams=new LinearLayout.LayoutParams(0,-2,1);
         wordsParams.leftMargin=dp(10);heading.addView(words,wordsParams);
         String subtype=itemSubtype(item);
-        words.addView(itemText((itemType(item)+(subtype.isEmpty()?"":" • "+subtype)).toUpperCase(java.util.Locale.ROOT),11,0xffa3a3a3,false),lp(-1,-2));space(words,5);
+        words.addView(itemText((itemType(item)+(subtype.isEmpty()?"":" | "+subtype)).toUpperCase(java.util.Locale.ROOT),11,0xffa3a3a3,false),lp(-1,-2));space(words,5);
         words.addView(itemText(item.name,22,TEXT,true),lp(-1,-2));
         String material=itemMaterialLabel(item);
         if(!material.isEmpty()){space(words,4);

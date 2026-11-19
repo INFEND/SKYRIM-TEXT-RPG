@@ -22,6 +22,6 @@ class EquipmentCatalog(unittest.TestCase):
         self.assertIn('itemSummary(item,game.progress.quantity(item.id),active,true,item.value)',UI)
         self.assertIn('item.currentStat(game.progress)',UI)
         self.assertIn('itemDetailMetrics(view,item)',UI)
-        self.assertIn('itemMetric("ВЕС","bag",itemNumber(item.weight)',UI)
-        self.assertIn('itemMetric("ЦЕНА","septims",String.valueOf(item.value)',UI)
+        self.assertIn('itemMetric("Вес","bag",itemNumber(item.weight)',UI)
+        self.assertIn('itemMetric("Стоимость","septims",String.valueOf(item.value)',UI)
 if __name__=="__main__":unittest.main()
