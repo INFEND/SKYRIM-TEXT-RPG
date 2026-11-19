@@ -13,6 +13,22 @@ public class SolitudeCraftTest {
         assertEquals(before+1,g.progress.quantity("Железный меч"));assertEquals(0,g.progress.quantity("Железный слиток"));assertEquals(0,g.progress.quantity("Кожаные полоски"));assertEquals(10,g.hour);
         g=GameEngine.fromJson(g.toJson().toString());g.choose("SOLITUDE:craft:make:0");assertEquals(before+1,g.progress.quantity("Железный меч"));
     }
+    @Test public void newIronRecipesDoNotRequireSteelSkill() throws Exception {
+        GameEngine g=city(5);
+        g.progress.quantity("Железный слиток",3);g.progress.quantity("Кожаные полоски",1);
+        int before=g.progress.quantity("Железная булава");
+        g.choose("SOLITUDE:craft:make:13");
+        assertEquals(before+1,g.progress.quantity("Железная булава"));
+        assertEquals(0,g.progress.quantity("Железный слиток"));
+        assertEquals(0,g.progress.quantity("Кожаные полоски"));
+        g=GameEngine.fromJson(g.toJson().toString());
+        g.choose("SOLITUDE:craft:make:13");
+        assertEquals(before+1,g.progress.quantity("Железная булава"));
+    }
+    @Test public void expandedRecipeOutputsExistInCatalog() {
+        for(String name:new String[]{"Железная булава","Железный двуручный меч","Железная секира","Железный боевой молот","Железные перчатки","Железные сапоги","Стальная булава","Стальной двуручный меч","Стальная секира","Стальной боевой молот","Стальные перчатки","Стальные сапоги"})
+            assertNotNull(name,ItemCatalog.find(name));
+    }
     @Test public void wrongDistrictClosedAndOverweightCannotCraft() {
         GameEngine g=city(0);g.progress.quantity("Железный слиток",2);g.progress.quantity("Кожаные полоски",1);
         g.choose("SOLITUDE:craft:make:0");assertEquals(2,g.progress.quantity("Железный слиток"));
