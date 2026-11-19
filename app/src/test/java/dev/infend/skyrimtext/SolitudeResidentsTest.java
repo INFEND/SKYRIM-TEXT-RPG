@@ -44,4 +44,20 @@ public class SolitudeResidentsTest {
         assertEquals(7,SolitudeResidents.district(6,15));
         assertEquals(-1,SolitudeResidents.district(6,18));
     }
+    @Test public void trustAndAdviceAreGatedAndPersistWithoutRepeatRewards() throws Exception {
+        GameEngine g=new GameEngine();g.start("Тест","Норд","Воин");
+        g.region=3;g.progress.location="Солитьюд";g.mode="WORLD";g.hour=9;
+        g.choose("SOLITUDE:open");g.choose("SOLITUDE:visit:0");
+        int gold=g.gold,rep=g.holdReputation[3];
+        String before=g.message;g.choose("SOLITUDE:resident:advice:1");assertEquals(before,g.message);
+        g.choose("SOLITUDE:resident:talk:1");
+        g.choose("SOLITUDE:resident:trust:1");
+        assertEquals("INFORMED",g.sceneState.npcStatusByName("Сорекс Виний"));
+        before=g.message;g.choose("SOLITUDE:resident:trust:1");assertEquals(before,g.message);
+        g.hour=11;g.choose("SOLITUDE:back");g.choose("SOLITUDE:visit:6");
+        g=GameEngine.fromJson(g.toJson().toString());
+        g.choose("SOLITUDE:resident:advice:1");assertTrue(g.message.contains("часы смены"));
+        g.choose("SOLITUDE:resident:memory:1");assertTrue(g.message.contains("60/100"));
+        assertEquals(gold,g.gold);assertEquals(rep,g.holdReputation[3]);
+    }
 }

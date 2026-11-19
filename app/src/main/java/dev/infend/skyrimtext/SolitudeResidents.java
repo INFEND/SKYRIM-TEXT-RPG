@@ -26,6 +26,15 @@ final class SolitudeResidents {
         "На рынке можно услышать больше городских новостей, чем за закрытыми дверями.",
         "В Синем дворце обсуждают дела владения, а в гавани — дела купцов."
     };
+    private static final String[] ADVICE={
+        "Если ищешь разрешение на дом, обратись к Фолку Огнебороду в Синем дворце.",
+        "В трактире можно найти работу; сначала проверь часы смены.",
+        "В гавани работа начинается раньше, чем на рынке.",
+        "В Коллегии бардов можно практиковаться в музыке.",
+        "За алхимическими припасами загляни в Ароматы Анжелины.",
+        "На рынке стоит поговорить с торговцами до закрытия лавок.",
+        "За торговыми припасами отправляйся в гавань или на рынок."
+    };
     // Half-open time windows; -1 means off duty and unavailable for public dialogue.
     static int district(int i,int hour){
         if(hour<0||hour>=24)return -1;
@@ -55,6 +64,8 @@ final class SolitudeResidents {
             JSONObject f=fact(g,i);
             s.add("SOLITUDE:resident:talk:"+i,"Поговорить: "+NAMES[i],f==null?"Авторский диалог | Знакомство":"Отношение: "+f.optInt("relation",50)+"/100");
             s.add("SOLITUDE:resident:topic:"+i,"Расспросить: "+NAMES[i],"Городская жизнь | авторский диалог");
+            if(f!=null&&"MET".equals(f.optString("status")))s.add("SOLITUDE:resident:trust:"+i,"Поделиться впечатлениями: "+NAMES[i],"Авторский диалог | Однократное знакомство ближе");
+            if(f!=null&&f.optInt("relation",50)>=60)s.add("SOLITUDE:resident:advice:"+i,"Попросить совета: "+NAMES[i],"Авторский совет | Отношение от 60");
             if(f!=null)s.add("SOLITUDE:resident:memory:"+i,"Вспомнить встречу: "+NAMES[i],"Общая память NPC");
         }
     }
@@ -63,14 +74,19 @@ final class SolitudeResidents {
         for(int i=0;i<NAMES.length;i++)if(present(g,i,d)){
             boolean memory=a.equals("SOLITUDE:resident:memory:"+i);
             boolean topic=a.equals("SOLITUDE:resident:topic:"+i);
-            if(!memory&&!topic&&!a.equals("SOLITUDE:resident:talk:"+i))continue;
+            boolean trust=a.equals("SOLITUDE:resident:trust:"+i);
+            boolean advice=a.equals("SOLITUDE:resident:advice:"+i);
+            if(!memory&&!topic&&!trust&&!advice&&!a.equals("SOLITUDE:resident:talk:"+i))continue;
             JSONObject f=fact(g,i);if(memory&&f==null)return true;
+            if(trust&&(f==null||!"MET".equals(f.optString("status"))))return true;
+            if(advice&&(f==null||f.optInt("relation",50)<60))return true;
             try{
                 g.sceneState.setContext(g.day,g.hour,"Солитьюд");
                 if(f==null)g.sceneState.confirm("npc","solitude_"+IDS[i],NAMES[i],"MET");
-                else g.sceneState.revisitNpc(f.optString("id"));
-            }catch(org.json.JSONException ignored){}
-            g.message=NAMES[i]+": "+(memory?"Отношение: "+f.optInt("relation",50)+"/100 | Последняя встреча: день "+f.optInt("lastDay"):(f==null?"":"Снова встретились. ")+(topic?TOPICS[i]:LINES[i]));
+                else if(trust)g.sceneState.confirm("npc",f.optString("id"),NAMES[i],"INFORMED");
+                else if(!memory)g.sceneState.revisitNpc(f.optString("id"));
+            }catch(org.json.JSONException ignored){return true;}
+            g.message=NAMES[i]+": "+(memory?"Отношение: "+f.optInt("relation",50)+"/100 | Последняя встреча: день "+f.optInt("lastDay"):(f==null?"":"Снова встретились. ")+(trust?"Спасибо за рассказ. Теперь мы немного лучше знакомы.":advice?ADVICE[i]:topic?TOPICS[i]:LINES[i]));
             g.progress.recent=g.message;g.recordVisualEvent(g.message);g.progress.sync(g);return true;
         }
         return true;
