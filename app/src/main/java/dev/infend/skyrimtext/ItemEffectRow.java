@@ -20,7 +20,7 @@ final class ItemEffectRow {
         if(raw==null)return rows;
         for(String part:raw.split("\\s*\\|\\s*")){
             String label=part.trim(),value="",duration="";
-            if(label.isEmpty()||label.toLowerCase(Locale.ROOT).replace('ё','е').contains("заряд зачар"))continue;
+            if(label.isEmpty()||label.toLowerCase(Locale.ROOT).replace('ё','е').contains("заряд зачар")||label.toLowerCase(Locale.ROOT).startsWith("прочность"))continue;
             Matcher time=DURATION.matcher(label);
             if(time.find()){duration=time.group(1);label=label.substring(0,time.start()).trim();}
             if(duration.isEmpty()){

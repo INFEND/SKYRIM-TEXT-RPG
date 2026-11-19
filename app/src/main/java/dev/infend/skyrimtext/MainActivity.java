@@ -4088,38 +4088,17 @@ public final class MainActivity extends Activity {
     }
     private void itemCondition(LinearLayout host,ItemCatalog.Item item,AlertDialog[] owner){
         if(!item.weapon()&&!item.wearable())return;
-        boolean track=game.progress.tracksCondition(item)&&game.progress.quantity(item.id)>0;
         boolean worn=game.progress.equipped(item.id);
         boolean unique="Артефакты".equals(item.category)||CompensationPowers.itemIndex(item.id)>=0;
-        if(!track&&!worn&&!unique)return;
-        if(!track){
-            space(host,5);host.addView(itemText("Состояние предмета",14,TEXT,true),lp(-1,-2));space(host,8);
-            if(unique)itemProperty(host,"soul","Редкость","Уникальный",0xffc7a46b);
-            if(worn)itemProperty(host,"shield","Экипировано","Да",0xff66bb6a);
-            return;
-        }
-        int percent=game.progress.conditionPercent(item);
-        int color=percent>=65?0xff66bb6a:percent>=30?0xffffb74d:0xffef5350;
+        String poison=game.progress.appliedPoison(item.id);
+        if(!worn&&!unique&&poison.isEmpty())return;
         space(host,5);host.addView(itemText("Состояние предмета",14,TEXT,true),lp(-1,-2));space(host,8);
-        LinearLayout line=row();line.setGravity(Gravity.CENTER_VERTICAL);
-        line.addView(new ItemStatGlyph(this,"shield",color),lp(20,20));
-        TextView label=itemText("Прочность",14,TEXT,true);
-        LinearLayout.LayoutParams lpLabel=new LinearLayout.LayoutParams(0,-2,1);lpLabel.leftMargin=dp(8);line.addView(label,lpLabel);
-        line.addView(itemText(percent+"%",14,color,false),lp(-2,-2));host.addView(line,lp(-1,-2));space(host,7);
-        ProgressBar bar=new ProgressBar(this,null,android.R.attr.progressBarStyleHorizontal);
-        bar.setMax(100);bar.setProgress(percent);bar.setProgressTintList(ColorStateList.valueOf(color));
-        bar.setProgressBackgroundTintList(ColorStateList.valueOf((color&0x00ffffff)|0x33000000));host.addView(bar,lp(-1,5));space(host,8);
+        if(unique)itemProperty(host,"soul","Редкость","Уникальный",0xffc7a46b);
         if(worn)itemProperty(host,"shield","Экипировано","Да",0xff66bb6a);
-        if(percent<100){
-            String blocked=game.progress.repairBlock(item,game);
-            if(blocked.isEmpty()){
-                TextView repair=itemAction("Ремонт | "+item.temperMaterial());host.addView(repair,lp(-1,42));
-                repair.setOnClickListener(v->new RuneDialogBuilder(this,accent()).setTitle("Восстановить прочность?")
-                    .setMessage("Расход: 1 × "+item.temperMaterial()).setNegativeButton("Отмена",null)
-                    .setPositiveButton("Ремонт",(d,w)->{if(game.progress.repair(item,game)){
-                        save();if(owner[0]!=null)owner[0].dismiss();render();itemDialog(item);
-                    }else toast(game.progress.repairBlock(item,game));}).show());
-            }else host.addView(itemText(blocked,11,MUTED,false),lp(-1,-2));
+        if(!poison.isEmpty()){
+            host.addView(itemText("Яды и ослабления",14,TEXT,true),lp(-1,-2));space(host,8);
+            itemEffectLine(host,new ItemEffectRow("Нанесённый яд",poison,"",0),ItemEffectStyle.POISON);
+            itemEffectLine(host,new ItemEffectRow("Осталось применений","1","",0),ItemEffectStyle.POISON);
         }
     }
     private void itemEffectPreview(LinearLayout host,ItemCatalog.Item item){
@@ -4372,13 +4351,18 @@ public final class MainActivity extends Activity {
         LinearLayout actions=row();space(view,9);view.addView(actions,lp(-1,-2));
         boolean owned=game.progress.quantity(item.id)>0;
         boolean worn=game.progress.equipped(item.id);
-        String primary=owned&&!"COMBAT".equals(game.mode)&&!item.slot().isEmpty()?(worn?"СНЯТЬ":"ЭКИПИРОВАТЬ"):
+        String primary=owned&&!"COMBAT".equals(game.mode)&&GearEffects.supportedPoison(item.id)?"НАНЕСТИ ЯД":owned&&!"COMBAT".equals(game.mode)&&!item.slot().isEmpty()?(worn?"СНЯТЬ":"ЭКИПИРОВАТЬ"):
             owned&&!"COMBAT".equals(game.mode)&&("Лечебное зелье".equals(item.id)||"Зелье магии".equals(item.id)||"Зелье запаса сил".equals(item.id))?"ИСПОЛЬЗОВАТЬ":"ЗАКРЫТЬ";
         TextView equip=itemAction(primary.substring(0,1)+primary.substring(1).toLowerCase(java.util.Locale.ROOT));
         equip.setBackground(itemBackground(accent(),0,12));equip.setTextColor(android.graphics.Color.luminance(accent())>.45?0xff000000:0xffffffff);equip.setTextSize(15);
         actions.addView(equip,new LinearLayout.LayoutParams(0,dp(48),1));
         equip.setOnClickListener(v->{
             if("ЗАКРЫТЬ".equals(primary)){dialog.dismiss();return;}
+            if("НАНЕСТИ ЯД".equals(primary)){
+                if(game.progress.applyPoison(item.id,game)){save();dialog.dismiss();render();ItemCatalog.Item weapon=ItemCatalog.find(game.progress.equippedName("weapon"));if(weapon!=null)itemDialog(weapon);toast("Яд нанесён");}
+                else toast("Нужно экипированное оружие без нанесённого яда");
+                return;
+            }
             if("ИСПОЛЬЗОВАТЬ".equals(primary)){
                 boolean result="Лечебное зелье".equals(item.id)?game.drinkHealing():"Зелье магии".equals(item.id)?game.drinkMana():game.drinkStamina();
                 game.progress.sync(game);save();dialog.dismiss();render();
@@ -4387,7 +4371,7 @@ public final class MainActivity extends Activity {
             if("COMBAT".equals(game.mode))return;
             if(worn)game.progress.unequip(item.id);
             else if(!game.progress.equip(item.id)){toast("Сначала сними двуручное оружие");return;}
-            save();dialog.dismiss();render();
+            game.syncGearAttributes();save();dialog.dismiss();render();
         });
         if(item.weapon()||item.wearable()){
             View compare=itemIconAction("compare",TEXT,"Сравнить с экипированным");

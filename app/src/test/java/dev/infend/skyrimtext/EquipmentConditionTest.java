@@ -1,23 +1,30 @@
 package dev.infend.skyrimtext;
+import org.json.JSONObject;
 import org.junit.Test;
 import static org.junit.Assert.*;
 public class EquipmentConditionTest {
-    @Test public void conditionPersistsAndAffectsStat(){
+    @Test public void legacyWearIgnored() throws Exception {
         RpgProgress p=new RpgProgress();ItemCatalog.Item item=ItemCatalog.find("Железный меч");
-        p.quantity(item.id,1);
-        double full=item.currentStat(p);
-        p.wearItem(item,40);
-        assertEquals(60,p.conditionPercent(item));
-        assertEquals(full*.8,item.currentStat(p),.0001);
-        RpgProgress restored=RpgProgress.fromJson(p.toJson());
-        assertEquals(60,restored.conditionPercent(item));
-        restored.wearItem(item,1000);
-        assertEquals(0,restored.conditionPercent(item));
-        assertEquals(.5,restored.conditionMultiplier(item),.0001);
-        restored.quantity(item.id,0);restored.quantity(item.id,1);
-        assertEquals(100,restored.conditionPercent(item));
+        p.quantity(item.id,1);double full=item.currentStat(p);
+        JSONObject old=p.toJson().put("equipmentCondition",new JSONObject().put(item.id,0));
+        RpgProgress restored=RpgProgress.fromJson(old);
+        assertEquals(full,item.currentStat(restored),.0001);
+        assertFalse(restored.toJson().has("equipmentCondition"));
     }
-    @Test public void noChargeRows(){
-        assertEquals(1,ItemEffectRow.parse("Заряд зачарования: 75% | Урон огнём: 10 ед.").size());
+    @Test public void noChargeOrWearRows(){
+        assertEquals(1,ItemEffectRow.parse("Заряд зачарования: 75% | Прочность: 60% | Урон огнём: 10 ед.").size());
+    }
+    @Test public void poisonApplicationAndSave() {
+        GameEngine g=new GameEngine();g.started=true;g.mode="WORLD";
+        g.progress.quantity("Железный меч",1);assertTrue(g.progress.equip("Железный меч"));
+        g.progress.quantity("Яд паралича",2);assertTrue(g.progress.applyPoison("Яд паралича",g));
+        assertFalse(g.progress.applyPoison("Яд паралича",g));assertEquals(1,g.progress.quantity("Яд паралича"));
+        RpgProgress p=RpgProgress.fromJson(g.progress.toJson());assertEquals("Яд паралича",p.consumePoison("Железный меч"));assertEquals("",p.consumePoison("Железный меч"));
+    }
+    @Test public void gearDoesNotStackOnSync(){
+        GameEngine g=new GameEngine();int base=g.maxHp;
+        g.progress.quantity("Амулет Аркея",1);assertTrue(g.progress.equip("Амулет Аркея"));
+        g.syncGearAttributes();g.syncGearAttributes();assertEquals(base+10,g.maxHp);
+        g.progress.unequip("Амулет Аркея");g.syncGearAttributes();assertEquals(base,g.maxHp);
     }
 }

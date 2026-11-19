@@ -70,7 +70,18 @@ public final class GameEngine {
     public final int[] regenBonus=new int[3];
     public boolean regenIgnorePenalty;
     public void syncLivingSystems(){needs.sync(day,hour);economy.sync(day);if(started&&itachi!=null&&!"COMBAT".equals(mode))itachi.daily(this);if(started&&livia!=null&&!"COMBAT".equals(mode))livia.daily(this);}
-    public int regenRate(int index){return Math.max(0,1+regenBonus[index]+(index==1?compensation.passiveBonus(this,2):0)+progress.artifacts.regen(progress,index)); }
+    private int gearHpApplied,gearMpApplied,gearSpApplied;
+    public void syncGearAttributes(){
+        int health=progress.gearHealth(),mana=progress.gearMagicka(),stam=progress.gearStamina();
+        maxHp=Math.max(1,maxHp-gearHpApplied+health);maxMagicka=Math.max(1,maxMagicka-gearMpApplied+mana);maxStamina=Math.max(1,maxStamina-gearSpApplied+stam);
+        gearHpApplied=health;gearMpApplied=mana;gearSpApplied=stam;
+        hp=Math.min(hp,maxHp);magicka=Math.min(magicka,maxMagicka);stamina=Math.min(stamina,maxStamina);
+    }
+    public int regenRate(int index){
+        int base=Math.max(0,1+regenBonus[index]+(index==1?compensation.passiveBonus(this,2):0)+progress.artifacts.regen(progress,index));
+        if(index==1){long percent=(long)base*progress.gearManaRegen();return base+(int)(((battleTurns+1L)*percent/100)-(battleTurns*percent/100));}
+        return base;
+    }
     private void regenerateCombat(){if(hp<=0||!"COMBAT".equals(mode))return;int penalty=regenIgnorePenalty?0:needs.penalty();hp=(int)Math.min(maxHp,(long)hp+(poisonTurns>0&&!regenIgnorePenalty?regenBonus[0]:Math.max(0,regenRate(0)-(penalty>0?1:0))));magicka=(int)Math.min(maxMagicka,(long)magicka+Math.max(regenBonus[1],regenRate(1)-(penalty>0?1:0)));stamina=(int)Math.min(maxStamina,(long)stamina+(frostTurns>0&&!regenIgnorePenalty?regenBonus[2]:Math.max(0,regenRate(2)-(penalty>0?1:0))));}
     // Runtime setting, owned by the selected game mode, not by the save schema.
     public boolean aiNarrativeMode;
@@ -93,10 +104,11 @@ public final class GameEngine {
     public ItachiStory itachi = new ItachiStory();
     public String aiJournal = "";
     public int roadSummonTurns,roadSummonKind;
+    public int enemyParalysisTurns;
     public int poisonTurns,frostTurns,battleTurns,battleDealt,battleTaken,lastDealt,lastTaken,lastHealing,lastBlocked;
     public boolean lastHeavyHit,lastMiss,lastCritical;
     public final int[] holdReputation=new int[10];
-    public void resetBattleVisuals(){roadSummonTurns=roadSummonKind=0;java.util.Arrays.fill(compensation.cooldown,0);poisonTurns=frostTurns=battleTurns=battleDealt=battleTaken=lastDealt=lastTaken=lastHealing=lastBlocked=0;lastHeavyHit=lastMiss=lastCritical=false;}
+    public void resetBattleVisuals(){enemyParalysisTurns=0;roadSummonTurns=roadSummonKind=0;java.util.Arrays.fill(compensation.cooldown,0);poisonTurns=frostTurns=battleTurns=battleDealt=battleTaken=lastDealt=lastTaken=lastHealing=lastBlocked=0;lastHeavyHit=lastMiss=lastCritical=false;}
     private MerchantLedger merchants=new MerchantLedger();
     FactionCampaign factions=new FactionCampaign();
     FactionStories factionStories=new FactionStories();
@@ -109,7 +121,7 @@ public final class GameEngine {
         for(int i=4;i<MerchantLedger.KEYS.length;i++)if(ItemCatalog.find(MerchantLedger.KEYS[i])!=null&&MerchantLedger.capacity(region,(Math.max(1,day)-1)/MerchantLedger.RESTOCK_DAYS,i)>0)result.add(MerchantLedger.KEYS[i]);
         return result;
     }
-    public int merchantExtraPrice(String id){ItemCatalog.Item item=ItemCatalog.find(id);if(item==null||item.value<=0)return 0;int base=Math.max(1,(int)Math.min(Integer.MAX_VALUE,((long)item.value*(120-5*progress.branches.rank(12)-(progress.advanced.has(AdvancedPerks.HAGGLING)?5:0)-(progress.advanced.has(AdvancedPerks.MERCHANT)?5:0))+99)/100));return fixShop.seals.price(base,salePrice(item));}
+    public int merchantExtraPrice(String id){ItemCatalog.Item item=ItemCatalog.find(id);if(item==null||item.value<=0)return 0;int base=Math.max(1,(int)Math.min(Integer.MAX_VALUE,((long)item.value*(120-5*progress.branches.rank(12)-(progress.advanced.has(AdvancedPerks.HAGGLING)?5:0)-(progress.advanced.has(AdvancedPerks.MERCHANT)?5:0))+99)/100));return fixShop.seals.price(Math.max(1,(int)Math.round(base*(100-progress.gearTrade())/100.0)),salePrice(item));}
     public boolean buyExtra(String id){
         if(!started||!"SHOP".equals(mode)||!merchantExtras().contains(id))return false;
         int price=merchantExtraPrice(id);ItemCatalog.Item item=ItemCatalog.find(id);
@@ -152,7 +164,7 @@ public final class GameEngine {
             &&!"Походный клинок".equals(item.id)&&!"Дорожная одежда".equals(item.id)
             &&!(swordUpgraded&&"Стальной меч".equals(item.id))&&!(armorUpgraded&&"Стальная кираса".equals(item.id));
     }
-    public int salePrice(ItemCatalog.Item item){return item==null||item.value<=0?0:Math.max(1,(int)((long)item.value*(30+progress.skillLevel(12)/5+5*progress.branches.rank(12)+(progress.advanced.has(AdvancedPerks.MASTER_TRADER)?8:0))/100));}
+    public int salePrice(ItemCatalog.Item item){return item==null||item.value<=0?0:Math.max(1,(int)((long)item.value*(30+(progress.skillLevel(12)+progress.gearSpeech())/5+5*progress.branches.rank(12)+progress.gearTrade()/2+(progress.advanced.has(AdvancedPerks.MASTER_TRADER)?8:0))/100));}
     public boolean sellOne(String id){
         ItemCatalog.Item item=ItemCatalog.find(id);if(!canSell(item))return false;
         int price=salePrice(item);if((long)gold+price>Integer.MAX_VALUE||merchantGold()<price||!progress.removeItem(id,1))return false;
@@ -208,7 +220,7 @@ public final class GameEngine {
         started=true;solitude=new SolitudeCity();compensation=new CompensationPowers();compensation.installCatalog();lastLivingResult=new JSONObject();lastCheckChance=lastCheckRoll=-1;needs=new LivingNeeds();economy=new LivingEconomy();java.util.Arrays.fill(regenBonus,0);regenIgnorePenalty=false;fixSpent=0;fixShop=new FixShopState();aiTurn=null;sceneState=new SceneState();road=new RoadEvents();katherine=new KatherineStory();alma=new AlmaStory();livia=new LiviaStory();itachi=new ItachiStory();aiJournal="";day=1;hour=8;level=1;xp=0;gold=85;potions=3;manaPotions=1;
         questStage=0;sideQuest=0;sideKills=0;boardCompleted=0;explored=0;victories=0;reputation=0;
         swordUpgraded=false;armorUpgraded=false;
-        maxHp=100;maxStamina=100;maxMagicka=100;attack=12;armor=2;
+        gearHpApplied=gearMpApplied=gearSpApplied=0;maxHp=100;maxStamina=100;maxMagicka=100;attack=12;armor=2;
         switch(heroClass){
             case "Воин":maxHp+=15;maxStamina+=10;attack+=4;break;
             case "Маг":maxMagicka+=25;attack+=1;break;
@@ -692,7 +704,7 @@ public final class GameEngine {
         return Math.max(0,armor-(armorUpgraded?4:0))+(int)Math.round(progress.equippedArmor());
     }
     public int heavyCost(){int skill=progress.equippedWeaponSkill();return fixShop.gifts.cost((skill==0&&progress.advanced.has(AdvancedPerks.FIGHTING)||skill==1&&progress.advanced.has(AdvancedPerks.CHAMPION)?7:10)-(factionStories.beast()==1?1:0),FixShopGifts.ENDURANCE);}
-    public int magicCost(){return fixShop.gifts.cost((progress.advanced.has(AdvancedPerks.NOVICE_DESTRUCTION)?9:12)-(progress.advanced.has(AdvancedPerks.MASTER_DESTRUCTION)?3:0),FixShopGifts.ARCHMAGE);}
+    public int magicCost(){int base=fixShop.gifts.cost((progress.advanced.has(AdvancedPerks.NOVICE_DESTRUCTION)?9:12)-(progress.advanced.has(AdvancedPerks.MASTER_DESTRUCTION)?3:0),FixShopGifts.ARCHMAGE);return base<=0?0:Math.max(1,(int)Math.floor(base*(100-progress.gearSpellDiscount())/100.0));}
     public int criticalChance(){int skill=progress.equippedWeaponSkill();return 8+(skill==2&&progress.advanced.has(AdvancedPerks.CRITICAL_SHOT)?10:0)+(skill==0&&progress.advanced.has(AdvancedPerks.BLADESMAN)||skill==1&&progress.advanced.has(AdvancedPerks.GREAT_CRITICAL)?8:0)+(skill==2&&progress.advanced.has(AdvancedPerks.BULLSEYE)?12:0);}
     private void combatTurn(String action) {
         if(!mode.equals("COMBAT"))return;
@@ -738,7 +750,17 @@ public final class GameEngine {
         boolean weaponHit=damage>0&&("ATTACK".equals(action)||"HEAVY".equals(action));
         boolean chillParalyzed=false;
         if(weaponHit){
-            progress.wearWeapon("HEAVY".equals(action));
+            String applied=progress.consumePoison(progress.equippedName("weapon"));
+            if(!applied.isEmpty()){
+                int poisonDamage=GearEffects.poisonDamage(applied);
+                if(!RoadArtifacts.undead(enemyName)){
+                    if(poisonDamage>0){damage=nonnegativeAdd(damage,poisonDamage);actionText+="\n"+applied+": +"+poisonDamage+" урона ядом.";}
+                    if(GearEffects.paralysis(applied)>0&&"WILD".equals(battleKind)&&!road.groupActive(this)&&!enemyName.toLowerCase(java.util.Locale.ROOT).contains("карстааг")){
+                        enemyParalysisTurns=Math.max(enemyParalysisTurns,GearEffects.paralysis(applied));
+                        actionText+="\nПаралич: "+enemyParalysisTurns+" ход.";
+                    }
+                }else actionText+="\nНежить невосприимчива к яду.";
+            }
             if(progress.equipped("Охладитель")){
                 damage=nonnegativeAdd(damage,30);actionText+="\nОхладитель: урон морозом +30.";
                 if(!road.groupActive(this)&&"WILD".equals(battleKind)&&!enemyName.toLowerCase(java.util.Locale.ROOT).contains("карстааг")&&random.nextInt(100)<25){
@@ -783,8 +805,9 @@ public final class GameEngine {
         baseIncoming=Math.max(1,baseIncoming-compensation.passiveBonus(this,1));
         int rawIncoming=Math.max(1,baseIncoming-(defending?enemyDamage/2+3+2*progress.branches.rank(3)+(progress.advanced.has(AdvancedPerks.QUICK_REFLEXES)?2:0)+(progress.advanced.has(AdvancedPerks.SHIELD_WALL)&&!"Не надето".equals(progress.equippedName("shield"))?3:0)+(progress.advanced.has(AdvancedPerks.SHIELD_CHARGE)&&!"Не надето".equals(progress.equippedName("shield"))?4:0):0));
         int incoming=Math.max(1,(int)Math.round(rawIncoming*(1-progress.damageReduction())));
+        if(defending&&progress.gearBlock()>0)incoming=Math.max(1,(int)Math.round(incoming*(100-progress.gearBlock())/100.0));
         if(road.magicalEnemy(enemyName)){incoming=progress.artifacts.magicAdjust(progress,incoming);if(progress.equipped("Шкура Спасителя"))incoming=(int)Math.round(incoming*.85);}
-        if(chillParalyzed&&!defeatedTarget){lastBlocked+=incoming;incoming=0;}
+
         if(progress.equipped(SolitudeCourt.SHIELD)){
             if(road.magicalEnemy(enemyName)||(SolitudeWolf.KIND+"potema_boss").equals(battleKind))incoming=Math.max(1,(int)Math.round(incoming*.80));
             if(defending)incoming=Math.max(1,(int)Math.round(incoming*.75));
@@ -793,6 +816,8 @@ public final class GameEngine {
         if(defending)lastBlocked=Math.max(0,Math.max(1,(int)Math.round(Math.max(1,baseIncoming)*(1-progress.damageReduction())))-(incoming-flank));
         if(defending&&progress.equipped("Разрушитель Заклинаний")&&road.magicalEnemy(enemyName)){int ward=Math.min(10,incoming);incoming-=ward;lastBlocked+=ward;actionText+="\nРазрушитель Заклинаний: оберег поглощает "+ward+" магического урона.";}
         if(defending&&progress.equipped("Этериевый щит")&&battleTurns%3==0){int phase=Math.max(0,incoming-flank);incoming-=phase;lastBlocked+=phase;actionText+="\nЭтериевый щит: текущий враг становится бесплотным и пропускает ответную атаку.";}
+        if(defeatedTarget)enemyParalysisTurns=0;
+        if(!defeatedTarget&&(chillParalyzed||enemyParalysisTurns>0)){lastBlocked+=incoming;incoming=0;if(enemyParalysisTurns>0)enemyParalysisTurns--;}
         if(shadow){lastBlocked+=incoming;incoming=0;actionText+="\nОтветная атака не достигает скрытого героя.";}
         if(progress.artifacts.trapTurns>0)progress.artifacts.trapTurns--;
         int kathWeakness=katherine.active()?katherine.companion.weaken(incoming):0;incoming-=kathWeakness;
@@ -809,7 +834,7 @@ public final class GameEngine {
         int manaWard=fixShop.seals.ward(this,incoming);if(manaWard>0){incoming-=manaWard;lastBlocked+=manaWard;actionText+="\nЗеркало чар: −"+manaWard+" магии, поглощено "+manaWard+" урона.";}
         int poisoned=poisonTurns>0?Math.max(1,maxHp/40):0;
         if(progress.equipped("Шкура Спасителя"))poisoned=(int)Math.ceil(poisoned*.5);
-        if(incoming>0)progress.wearArmor(defending);
+
         if(poisonTurns>0)poisonTurns--;if(frostTurns>0){frostTurns--;stamina=Math.max(0,stamina-4);}
         String foe=enemyName.toLowerCase(java.util.Locale.ROOT);
         if(!fixShop.gifts.on(FixShopGifts.WARD)&&!defending&&foe.contains("морозный паук"))poisonTurns=2;
@@ -903,7 +928,7 @@ public final class GameEngine {
     public String questDetails() {switch(questStage){case 0:return "Поговори с хранителем в разделе «Главная история».";case 1:return "Доберись до Фолкрита и осмотри алтарь.";case 2:return "Найди башню в Винтерхолде и победи пепельного стража.";case 3:return "Передай журнал хранителям Солитьюда.";default:return "Сюжетная линия завершена. Ты можешь продолжать приключения.";}}
     private static boolean contains(String[] arr,String v){for(String s:arr)if(s.equals(v))return true;return false;}
     public JSONObject toJson() throws JSONException {
-        syncLivingSystems();
+        syncLivingSystems();syncGearAttributes();
         JSONObject j=new JSONObject();
         j.put("needs",needs.toJson()).put("fixSpent",fixSpent).put("fixShop",fixShop.toJson()).put("economy",economy.toJson()).put("regenBonus",new org.json.JSONArray(regenBonus)).put("regenIgnorePenalty",regenIgnorePenalty).put("compensation",compensation.toJson()).put("lastLivingResult",lastLivingResult);
         j.put("katherine",katherine.save()).put("solitudeCity",solitude.save());
@@ -911,7 +936,7 @@ public final class GameEngine {
         j.put("schema",1).put("started",started).put("name",name).put("race",race).put("heroClass",heroClass)
          .put("gender",gender).put("portrait",portrait)
          .put("region",region).put("day",day).put("hour",hour).put("level",level).put("xp",xp).put("maxHp",maxHp).put("hp",hp)
-         .put("maxStamina",maxStamina).put("stamina",stamina).put("maxMagicka",maxMagicka).put("magicka",magicka)
+         .put("maxStamina",maxStamina).put("stamina",stamina).put("maxMagicka",maxMagicka).put("magicka",magicka).put("gearHpApplied",gearHpApplied).put("gearMpApplied",gearMpApplied).put("gearSpApplied",gearSpApplied)
          .put("gold",gold).put("potions",potions).put("manaPotions",manaPotions).put("attack",attack).put("armor",armor)
          .put("canonicalStage",canonicalStage).put("canonicalPhase",canonicalPhase).put("canonicalPage",canonicalPage)
          .put("canonicalShoutCooldown",canonicalShoutCooldown).put("canonicalShouts",canonicalShouts).put("canonicalTreaty",canonicalTreaty).put("canonicalPaarthurnax",canonicalPaarthurnax)
@@ -924,7 +949,7 @@ public final class GameEngine {
          .put("aiJournal",aiJournal).put("aiTurn",aiTurn==null?JSONObject.NULL:aiTurn.save())
          .put("road",road.save()).put("sceneState",sceneState.toJson()).put("merchants",merchants.toJson()).put("factions",factions.toJson()).put("factionStories",factionStories.toJson()).put("factionBattle",factionBattle)
          .put("visitedVisual",new org.json.JSONArray(visitedVisual)).put("visualChronicle",visualChronicle)
-         .put("holdReputation",new org.json.JSONArray(holdReputation)).put("roadSummonTurns",roadSummonTurns).put("roadSummonKind",roadSummonKind).put("poisonTurns",poisonTurns).put("frostTurns",frostTurns).put("battleTurns",battleTurns).put("battleDealt",battleDealt).put("battleTaken",battleTaken);
+         .put("holdReputation",new org.json.JSONArray(holdReputation)).put("roadSummonTurns",roadSummonTurns).put("roadSummonKind",roadSummonKind).put("enemyParalysisTurns",enemyParalysisTurns).put("poisonTurns",poisonTurns).put("frostTurns",frostTurns).put("battleTurns",battleTurns).put("battleDealt",battleDealt).put("battleTaken",battleTaken);
         return j;
     }
     public static GameEngine fromJson(String json) {return fromJson(json,false);}
@@ -961,11 +986,12 @@ public final class GameEngine {
             g.enemyHp=Math.max(0,j.optInt("enemyHp",0));g.enemyMaxHp=Math.max(0,j.optInt("enemyMaxHp",0));g.enemyDamage=Math.max(0,j.optInt("enemyDamage",0));
             g.compensation=CompensationPowers.fromJson(j.optJSONObject("compensation"));g.compensation.installCatalog();
             g.progress=RpgProgress.fromJson(j.optJSONObject("progress"));
+            g.gearHpApplied=Math.max(0,Math.min(30,j.optInt("gearHpApplied")));g.gearMpApplied=Math.max(0,Math.min(10,j.optInt("gearMpApplied")));g.gearSpApplied=Math.max(0,Math.min(10,j.optInt("gearSpApplied")));
             g.solitude=SolitudeCity.restore(j.optJSONObject("solitudeCity"));
              g.needs=LivingNeeds.fromJson(j.optJSONObject("needs"));g.economy=LivingEconomy.fromJson(j.optJSONObject("economy"));g.syncLivingSystems();g.fixSpent=Math.max(0,j.optLong("fixSpent",0));g.fixShop=FixShopState.fromJson(j.optJSONObject("fixShop"));g.fixShop.migrateRemoved(g);org.json.JSONArray rates=j.optJSONArray("regenBonus");if(rates!=null)for(int i=0;i<3;i++)g.regenBonus[i]=Math.max(0,Math.min(1000000,rates.optInt(i)));g.regenIgnorePenalty=j.optBoolean("regenIgnorePenalty");g.compensation.reconcile(g);JSONObject result=j.optJSONObject("lastLivingResult");if(result!=null)g.lastLivingResult=result;
             g.merchants=MerchantLedger.fromJson(j.optJSONObject("merchants"));g.factions=FactionCampaign.fromJson(j.optJSONObject("factions"));g.factionStories=FactionStories.fromJson(j.optJSONObject("factionStories"));g.factionBattle=Math.max(-1,Math.min(6,j.optInt("factionBattle",-1)));
             org.json.JSONArray holds=j.optJSONArray("holdReputation");if(holds!=null)for(int i=0;i<g.holdReputation.length;i++)g.holdReputation[i]=Math.max(-100,Math.min(100,holds.optInt(i,0)));
-            if("COMBAT".equals(g.mode)){g.poisonTurns=Math.max(0,Math.min(2,j.optInt("poisonTurns")));g.frostTurns=Math.max(0,Math.min(2,j.optInt("frostTurns")));}
+            if("COMBAT".equals(g.mode)){g.enemyParalysisTurns=Math.max(0,Math.min(3,j.optInt("enemyParalysisTurns")));g.poisonTurns=Math.max(0,Math.min(2,j.optInt("poisonTurns")));g.frostTurns=Math.max(0,Math.min(2,j.optInt("frostTurns")));}
             g.roadSummonTurns=Math.max(0,Math.min(3,j.optInt("roadSummonTurns")));g.roadSummonKind=g.roadSummonTurns>0?Math.max(1,Math.min(3,j.optInt("roadSummonKind"))):0;g.battleTurns=Math.max(0,j.optInt("battleTurns"));g.battleDealt=Math.max(0,j.optInt("battleDealt"));g.battleTaken=Math.max(0,j.optInt("battleTaken"));
             org.json.JSONArray visited=j.optJSONArray("visitedVisual");
             if(visited!=null)for(int i=0;i<Math.min(visited.length(),2000);i++){String v=visited.optString(i);if(!v.isEmpty())g.visitedVisual.add(v);}

@@ -33,38 +33,22 @@ public final class RpgProgress {
     private boolean equipmentInitialized;
     // One improved exemplar per item ID until the inventory supports individual instances.
     private final LinkedHashMap<String,Integer> tempered=new LinkedHashMap<>();
-    // Like tempering, condition is tracked per catalog ID until individual instances exist.
-    private final LinkedHashMap<String,Integer> condition=new LinkedHashMap<>();
-    public boolean tracksCondition(ItemCatalog.Item item){
-        return item!=null&&item.baseStat>0&&!item.temperMaterial().isEmpty()
-            &&(item.weapon()||item.wearable())&&!"Боеприпасы".equals(item.category);
+    private final LinkedHashMap<String,String> weaponPoisons=new LinkedHashMap<>();
+    public String appliedPoison(String id){return weaponPoisons.getOrDefault(id,"");}
+    public String consumePoison(String id){String value=weaponPoisons.remove(id);return value==null?"":value;}
+    public boolean applyPoison(String id,GameEngine g){
+        String weapon=equippedName("weapon");ItemCatalog.Item item=ItemCatalog.find(weapon);
+        if(!g.started||"COMBAT".equals(g.mode)||item==null||!item.weapon()||item.baseStat<=0||!GearEffects.supportedPoison(id)||!appliedPoison(weapon).isEmpty()||!removeItem(id,1))return false;
+        weaponPoisons.put(weapon,id);return true;
     }
-    public int conditionPercent(ItemCatalog.Item item){
-        return tracksCondition(item)&&quantity(item.id)>0?condition.getOrDefault(item.id,100):100;
-    }
-    public double conditionMultiplier(ItemCatalog.Item item){return 0.5+conditionPercent(item)/200.0;}
-    public void wearItem(ItemCatalog.Item item,int amount){
-        if(!tracksCondition(item)||quantity(item.id)<1||amount<=0)return;
-        condition.put(item.id,Math.max(0,conditionPercent(item)-Math.min(100,amount)));
-    }
-    public void wearWeapon(boolean heavy){wearItem(ItemCatalog.find(equippedName("weapon")),heavy?2:1);}
-    public void wearArmor(boolean defending){
-        for(String slot:new String[]{"head","body","hands","feet","shield"}){
-            if("shield".equals(slot)&&!defending)continue;
-            wearItem(ItemCatalog.find(equippedName(slot)),1);
-        }
-    }
-    public String repairBlock(ItemCatalog.Item item,GameEngine g){
-        if(!tracksCondition(item)||quantity(item.id)!=1)return "Для ремонта нужен одиночный экземпляр";
-        if(conditionPercent(item)>=100)return "Ремонт не требуется";
-        if(g.solitude.custody()||g.road.pending()||"COMBAT".equals(g.mode)||(!atForge()&&!(g.fixShop.home.room(3)&&!g.fixShop.home.here(g).isEmpty())&&!(g.fixShop.gifts.on(FixShopGifts.FORGE)&&FixShopWorld.safe(g))))return "Нужна кузница вне боя";
-        if(quantity(item.temperMaterial())<1)return "Не хватает материала: "+item.temperMaterial();
-        return "";
-    }
-    public boolean repair(ItemCatalog.Item item,GameEngine g){
-        if(!repairBlock(item,g).isEmpty()||!removeItem(item.temperMaterial(),1))return false;
-        condition.remove(item.id);return true;
-    }
+    public int gearHealth(){return (equipped("Амулет Аркея")||equipped("Амулет Андурса")?10:0)+(equipped("Зачарованное кольцо")?20:0);}
+    public int gearMagicka(){return equipped("Амулет Джулианоса")?10:0;}
+    public int gearStamina(){return equipped("Амулет Кинарет")?10:0;}
+    public int gearManaRegen(){return (equipped("Амулет Акатоша")?25:0)+(equipped("Одеяние культиста")?75:0);}
+    public int gearSpeech(){return equipped("Амулет Дибеллы")?15:0;}
+    public int gearTrade(){return equipped("Амулет Зенитара")||equipped("Амулет Зенитара Шави")?10:0;}
+    public int gearSpellDiscount(){return equipped("Амулет Саартала")?3:0;}
+    public int gearBlock(){return equipped("Амулет Стендарра")?10:0;}
     private static final String[] QUALITY={"Обычное","Хорошее","Отличное","Превосходное","Безупречное","Эпическое","Легендарное"};
     private static final int[] TEMPER_LEVELS={0,14,31,65,100,134,168};
     public int temperQuality(String id){return quantity(id)>0?tempered.getOrDefault(id,0):0;}
@@ -234,14 +218,14 @@ public final class RpgProgress {
             equip(g.swordUpgraded?"Стальной меч":"Походный клинок");
             equip(g.armorUpgraded?"Стальная кираса":"Дорожная одежда");
         }
-        cleanEquipment();
+        cleanEquipment();g.syncGearAttributes();
     }
     public void quantity(String id,int n){
-        try{inventory.put(id,Math.max(0,n));if(n<=0)tempered.remove(id);if(n<=0)condition.remove(id);}catch(Exception ignored){}
+        try{inventory.put(id,Math.max(0,n));if(n<=0)tempered.remove(id);if(n<=0)weaponPoisons.remove(id);}catch(Exception ignored){}
     }
     public int quantity(String id){return inventory.optInt(id,0);}
     public int fixCarryBonus=0;
-    public double carryLimit(){return 50+(equipped("Зачарованное ожерелье")?25:0)+(equipped("Серебряное кольцо грузоподъёмности")?10:0)+artifacts.carryBonus(this)+fixCarryBonus;}
+    public double carryLimit(){return 50+((equipped("Зачарованное ожерелье")||equipped("Очарованное ожерелье"))?25:0)+(equipped("Серебряное кольцо грузоподъёмности")?10:0)+artifacts.carryBonus(this)+fixCarryBonus;}
     public boolean addItem(String id,int quantity){
         if(quantity<=0||ItemCatalog.find(id)==null||CompensationPowers.itemIndex(id)>=0||quantity(id)>Integer.MAX_VALUE-quantity)return false;
         ItemCatalog.Item item=ItemCatalog.find(id);
@@ -298,7 +282,7 @@ public final class RpgProgress {
         int exhaustion=stat==1?(g.maxMagicka-g.magicka):stat==2?(g.maxStamina-g.stamina):Math.max(0,g.maxHp-g.hp);
         int difficulty=baseDifficulty+Math.max(0,15-g.level)*2;
         int danger=Math.max(0,g.region/2)+difficulty/10;
-        int skill=skillIndex<0?0:(skillLevel(skillIndex)-15)/2;
+        int skill=skillIndex<0?0:(skillLevel(skillIndex)+(skillIndex==12?gearSpeech():0)-15)/2;
         int context=Math.min(18,g.reputation/3)+skill+(skillIndex==9&&equipped("Эбонитовая кольчуга")?15:0)+artifacts.towerBonus(g,skillIndex)+branches.chanceBonus(skillIndex)+advanced.checkBonus(skillIndex)+(skillIndex==12&&advanced.has(AdvancedPerks.PERSUASION)?5:0)-(carryWeight()>carryLimit()*0.9?8:0);
         g.needs.sync(g.day,g.hour);
         int base=RpgContent.successChance(g,stat,difficulty,danger,exhaustion,context);
@@ -436,7 +420,7 @@ public final class RpgProgress {
              .put("questOutcomes",new JSONObject(questOutcomes)).put("roadArtifacts",artifacts.save())
              .put("fixCarryBonus",fixCarryBonus).put("perks",perkPoints).put("combatPerks",new JSONArray(combatPerks)).put("studyPerks",new JSONArray(studyPerks)).put("talentBranches",branches.toJson()).put("advancedPerks",advanced.toJson())
              .put("equipmentInitialized",equipmentInitialized).put("equipped",new JSONObject(equipped))
-             .put("tempered",new JSONObject(tempered)).put("equipmentCondition",new JSONObject(condition))
+             .put("tempered",new JSONObject(tempered)).put("weaponPoisons",new JSONObject(weaponPoisons))
              .put("activePowerDay",activePowerDay).put("difficulty",difficulty)
              .put("actionDay",actionDay).put("attemptedToday",new JSONArray(attemptedToday))
              .put("dragonStage",dragonStage).put("dragonInsight",dragonInsight)
@@ -508,11 +492,11 @@ public final class RpgProgress {
             if(item!=null&&p.quantity(id)>0&&!item.temperMaterial().isEmpty()&&quality>0&&quality<=6)
                 p.tempered.put(id,quality);
         }}
-        JSONObject wear=obj.optJSONObject("equipmentCondition");
-        if(wear!=null){Iterator<String> keys=wear.keys();while(keys.hasNext()){
-            String id=keys.next();ItemCatalog.Item item=ItemCatalog.find(id);
-            int value=wear.optInt(id,100);
-            if(p.tracksCondition(item)&&p.quantity(id)>0&&value>=0&&value<100)p.condition.put(id,value);
+        // Legacy wear data is intentionally ignored; old equipment regains its full stats.
+        JSONObject poisons=obj.optJSONObject("weaponPoisons");
+        if(poisons!=null){Iterator<String> keys=poisons.keys();while(keys.hasNext()){
+            String id=keys.next(),value=poisons.optString(id,"");ItemCatalog.Item item=ItemCatalog.find(id);
+            if(item!=null&&item.weapon()&&p.quantity(id)>0&&GearEffects.supportedPoison(value))p.weaponPoisons.put(id,value);
         }}
         p.cleanEquipment();
         JSONArray done=obj.optJSONArray("completed"),bad=obj.optJSONArray("failed");

@@ -31,7 +31,7 @@ public final class ItemCatalog {
         public double currentStat(RpgProgress progress){
             if(baseStat<0||statSkill<0||progress==null)return baseStat;
             double rank=(slot().equals("shield")?0:progress.combatPerkRank(statSkill))*0.2;
-            return (baseStat+progress.temperBonus(this))*(1+progress.skillLevel(statSkill)*(weapon()?0.005:0.004))*(1+rank)*progress.conditionMultiplier(this);
+            return (baseStat+progress.temperBonus(this))*(1+progress.skillLevel(statSkill)*(weapon()?0.005:0.004))*(1+rank);
         }
         // Only known, non-enchanted standard equipment can be tempered.
         public String temperMaterial(){
