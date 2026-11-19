@@ -23,6 +23,12 @@ public class NpcLinkProbe {
   public static void main(String[] args) {
     Map<String,String> names=NpcProfiles.linkNames();
     check(new HashSet<>(names.values()).size()>=390,"NPC registry lost entries");
+    check(NpcProfiles.authorProfiles().size()==4,"author count");
+    check(NpcProfiles.findOriginal("Итачи")==null,"author excluded");
+    check(NpcProfiles.findAuthor("Итачи Учиха")==NpcProfiles.find("Итачи"),"author alias");
+    check(NpcProfiles.findOriginal("Сонд (паломник)")!=NpcProfiles.findOriginal("Сонд"),"two Sond identities");
+    check(NpcProfiles.find("Фура Моррар").mentioned,"lore only");
+    check(NpcProfiles.find("Фура")==null,"ambiguous Fura");
     NpcNameMatcher matcher=new NpcNameMatcher(names);
     String source="Эллисиф Прекрасная встретила Ульфрика Буревестника и Серану.";
     List<NpcNameMatcher.Match> hits=matcher.find(source);
@@ -48,7 +54,7 @@ public class NpcLinkProbe {
             folder = pathlib.Path(folder)
             src = folder / "NpcLinkProbe.java"
             src.write_text(probe, encoding="utf-8")
-            subprocess.run([javac, "-encoding", "UTF-8", "-d", str(folder), str(JAVA/"NpcProfiles.java"), str(JAVA/"NpcNameMatcher.java"), str(src)], check=True, capture_output=True, text=True, timeout=45)
+            subprocess.run([javac, "-encoding", "UTF-8", "-d", str(folder), str(JAVA/"NpcProfiles.java"), str(JAVA/"NpcNameMatcher.java"), str(JAVA/"AuthorNpcProfiles.java"), str(JAVA/"LoreNpcProfiles.java"), str(src)], check=True, capture_output=True, text=True, timeout=45)
             subprocess.run([java, "-cp", str(folder), "dev.infend.skyrimtext.NpcLinkProbe"], check=True, capture_output=True, text=True, timeout=20)
 
     def test_card_and_link_guards(self):

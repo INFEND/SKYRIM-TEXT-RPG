@@ -1,13 +1,7 @@
 # NPC catalog audit
 
-Scope: Skyrim.esm, Dawnguard.esm, HearthFires.esm, Dragonborn.esm; no Creation Club. Custom story characters remain available and are not evidence of vanilla coverage.
+Original catalog: 1031 curated profiles, not a verified exhaustive export. Authors: 4, in AuthorNpcProfiles.java. Canonical mention-only: 2, in LoreNpcProfiles.java. Unique direct normalized keys: 1829. Creation Club excluded. Global lookup remains compatible, original/author lookups are separate.
 
-Reference lists consulted (not an exhaustive game-record export):
-- https://skyriminformationonline.weebly.com/people.html
-- https://elderscrolls.fandom.com/wiki/Characters_(Dragonborn)
-- https://elderscrolls.fandom.com/wiki/Knud
-- https://skyrim.fandom.com/wiki/Michel_Lylvieve
-- https://www.gamerguides.com/the-elder-scrolls-v-skyrim-anniversary-edition/guide/hearthfire-dlc/adoption/adoptable-children
-- https://skyrim.fandom.com/wiki/Category:Bosses
+Verified distinctions: Sond child (000B94A3) and pilgrim (00015CC4); Karita pilgrim (000BC07C) and bard; Gunjar Hearthfire (local 0032B0) and Helgen; Fura Morrard (mentioned only) vs Fura Bloodmouth. Corrected Addvild's farm, Thaer's occupation, Ra'zhinda's gender.
 
-Audit result: 1026 catalog rows; 1785 unique normalized direct lookup keys; 33 additions; 2 merged duplicate profiles. Unknown race is deliberately represented as unknown where a definitive source was unavailable. No claim of complete original game coverage: final verification requires a localized NPC_ export with FormIDs and origin plugins. Different individuals with the same name must retain distinct contextual names (e.g. Gunjar in Helgen and Gunjar in Lakeview Manor).
+Sources: https://skyrimcommands.com/npcs ; https://skyriminformationonline.weebly.com/people.html ; https://elderscrolls.fandom.com/wiki/Sond_(Child) ; https://elderscrolls.fandom.com/wiki/Sond_(Adult) ; https://skyrim.fandom.com/wiki/Thaer ; https://skyrim.fandom.com/wiki/Addvild ; https://skyrim.fandom.com/wiki/Ra%27zhinda ; https://skyrim.fandom.com/wiki/No_News_is_Good_News ; https://elderscrolls.fandom.com/wiki/Lilija_Snow-Shod . Full FormID reconciliation remains pending.

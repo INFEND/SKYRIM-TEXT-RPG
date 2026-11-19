@@ -601,7 +601,7 @@ public final class MainActivity extends Activity {
         dialog.requestWindowFeature(android.view.Window.FEATURE_NO_TITLE);
         LinearLayout panel=column();panel.setPadding(dp(14),dp(10),dp(14),dp(14));panel.setBackgroundColor(Color.BLACK);
         LinearLayout header=row();TextView back=npcCentered("‹",30,TEXT,true);header.addView(back,lp(42,42));back.setContentDescription("Назад");back.setOnClickListener(v->dialog.dismiss());
-        header.addView(npcCentered("ПЕРСОНАЖ",18,TEXT,true),new LinearLayout.LayoutParams(0,dp(42),1));
+        header.addView(npcCentered(profile!=null&&profile.author?"АВТОРСКИЙ NPC":profile!=null&&profile.mentioned?"УПОМИНАНИЕ":"ПЕРСОНАЖ",18,TEXT,true),new LinearLayout.LayoutParams(0,dp(42),1));
         TextView more=npcCentered("⋮",25,TEXT,true);header.addView(more,lp(42,42));more.setContentDescription("Дополнительно");
         more.setOnClickListener(v->{android.widget.PopupMenu menu=new android.widget.PopupMenu(this,more);menu.getMenu().add("Открыть подробное досье");menu.getMenu().add("Открыть галерею");menu.setOnMenuItemClickListener(item->{if(item.getTitle().toString().contains("галерею"))npcGallerySection(display);else npcLegacyDetails(display);return true;});menu.show();});
         panel.addView(header,lp(-1,-2));space(panel,8);
@@ -625,7 +625,7 @@ public final class MainActivity extends Activity {
         space(panel,9);
         LinearLayout interact=row();interact.setGravity(Gravity.CENTER);interact.setBackground(npcShape(0xff201c14,0,14));
         interact.addView(new NpcLineIcon(this,"talk",accent()),lp(23,23));TextView action=npcCentered("Взаимодействовать",16,accent(),true);action.setPadding(dp(8),0,0,0);interact.addView(action,lp(-2,-2));
-        panel.addView(interact,lp(-1,56));interact.setOnClickListener(v->npcActions(display,dialog));
+        if(profile==null||!profile.mentioned){panel.addView(interact,lp(-1,56));interact.setOnClickListener(v->npcActions(display,dialog));}
         ScrollView scroll=new ScrollView(this);scroll.setFillViewport(true);scroll.setBackgroundColor(Color.BLACK);scroll.addView(panel);
         dialog.setContentView(scroll);dialog.show();android.view.Window window=dialog.getWindow();if(window!=null){window.setBackgroundDrawable(new android.graphics.drawable.ColorDrawable(Color.BLACK));window.setLayout(-1,-1);window.setStatusBarColor(Color.BLACK);window.setNavigationBarColor(Color.BLACK);window.getDecorView().setSystemUiVisibility(0);}
         AmoledAppearance.applyTree(panel);
@@ -4857,7 +4857,7 @@ public final class MainActivity extends Activity {
         section("ДРЕВНИЕ ЛЕТОПИСИ","Кодекс","Бестиарий, народы, места и истории, которые открывают мир северных земель.");
         content.addView(new NordicArtView(this,NordicArtView.CODEX),lp(-1,190));
         space(content,15);
-        String[] groups={"Бестиарий","Народы","История","Места"};
+        String[] groups={"Бестиарий","Народы","История","Места","Персонажи"};
         String selected=groups[Math.max(0,Math.min(groups.length-1,codexCategory))];
         chips(groups,selected,category->{
             for(int i=0;i<groups.length;i++)if(groups[i].equals(category)){codexCategory=i;break;}
@@ -4889,6 +4889,12 @@ public final class MainActivity extends Activity {
             if(game.alma.enabled&&game.alma.stage>0)actionButton("Альма | Алая Бессмертная","Авторская история · "+game.alma.status(),false,()->npcDetails(AlmaStory.NAME));
             if(docs.isEmpty())addText(content,"Справочные рукописи пока не загружены.",14,MUTED,false,8);
             for(String file:docs)actionButton("◇  "+file.replace(".txt",""),"Читать рукопись",false,()->showDocument(file));
+        }else if(codexCategory==4){
+            addText(content,"ᛟ  СПРАВОЧНИК ПЕРСОНАЖЕЙ",11,accent(),false,10);
+            actionButton("Оригинальные NPC","Skyrim + три DLC | "+NpcProfiles.originalProfiles().size(),false,()->npcCatalogDialog("Оригинальные NPC",NpcProfiles.originalProfiles()));
+            actionButton("Авторские NPC","Сюжетные дополнения | "+NpcProfiles.authorProfiles().size(),false,()->npcCatalogDialog("Авторские NPC",NpcProfiles.authorProfiles()));
+            actionButton("Мои персонажи","Созданные игроком | "+game.fixShop.world.characters.size(),false,this::fixCharacters);
+            actionButton("Упоминаемые персонажи","Канонические упоминания | "+NpcProfiles.mentionedProfiles().size(),false,()->npcCatalogDialog("Упоминаемые персонажи",NpcProfiles.mentionedProfiles()));
         }else{
             addText(content,"ᛟ  МЕСТА И ДОРОГИ",11,accent(),false,10);
             java.util.ArrayList<WorldAtlas.Place> places=WorldAtlas.all();
@@ -4899,6 +4905,24 @@ public final class MainActivity extends Activity {
             }
             actionButton("Открыть полную карту","Отметки, маршруты и расположение героя",true,()->{tab=1;render();});
         }
+    }
+    private void npcCatalogDialog(String title,java.util.List<NpcProfiles.Profile> profiles){
+        LinearLayout panel=column();panel.setPadding(dp(12),dp(6),dp(12),dp(8));
+        android.widget.EditText search=new android.widget.EditText(this);search.setSingleLine(true);search.setHint("Имя, раса или роль");search.setTextColor(TEXT);search.setHintTextColor(MUTED);panel.addView(search,lp(-1,-2));
+        android.widget.ListView list=new android.widget.ListView(this);panel.addView(list,new LinearLayout.LayoutParams(-1,dp(420)));
+        java.util.ArrayList<NpcProfiles.Profile> filtered=new java.util.ArrayList<>();
+        java.util.ArrayList<String> labels=new java.util.ArrayList<>();
+        android.widget.ArrayAdapter<String> adapter=new android.widget.ArrayAdapter<String>(this,android.R.layout.simple_list_item_1,labels){
+            @Override public View getView(int pos,View convert,android.view.ViewGroup parent){View v=super.getView(pos,convert,parent);if(v instanceof TextView)((TextView)v).setTextColor(TEXT);return v;}
+        };
+        list.setAdapter(adapter);
+        Runnable refresh=()->{String q=NpcNameMatcher.key(search.getText().toString());filtered.clear();labels.clear();NpcProfiles.Profile exact=NpcProfiles.find(q);
+            for(NpcProfiles.Profile p:profiles)if(q.isEmpty()||p==exact||NpcNameMatcher.key(p.name+" "+p.race+" "+p.role).contains(q)){filtered.add(p);labels.add(p.name+"  |  "+p.race);}
+            adapter.notifyDataSetChanged();
+        };
+        search.addTextChangedListener(new android.text.TextWatcher(){public void beforeTextChanged(CharSequence x,int st,int c,int a){}public void onTextChanged(CharSequence x,int st,int before,int c){refresh.run();}public void afterTextChanged(android.text.Editable e){}});
+        refresh.run();AlertDialog dialog=new RuneDialogBuilder(this,accent()).setTitle(title).setView(panel).setNegativeButton("Закрыть",null).create();
+        list.setOnItemClickListener((parent,v,pos,id)->{if(pos>=0&&pos<filtered.size()){String name=filtered.get(pos).name;dialog.dismiss();npcDetails(name);}});dialog.show();
     }
     private String selectedJournalEntry="Путь Довакина";
     private void liviaEquipment(){

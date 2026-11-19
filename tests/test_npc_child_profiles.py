@@ -8,4 +8,4 @@ class NpcChildProfiles(unittest.TestCase):
         self.assertIn('child=role.startsWith("Ребёнок |")',s)
         self.assertIn('if(profile.child)return npcEmblem',ui)
         self.assertIn('child?new int[]{0,2,6,11}',ui)
-        self.assertIn('add("Фура Моррар"',s)
+        self.assertIn('add.add("Фура Моррар"',(ROOT/"app/src/main/java/dev/infend/skyrimtext/LoreNpcProfiles.java").read_text(encoding="utf-8"))
