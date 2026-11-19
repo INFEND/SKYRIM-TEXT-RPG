@@ -8,11 +8,11 @@ final class SolitudeShops {
     static final String[] NAMES={"Сияющие одежды","Ароматы Анжелины","Всякая всячина","Лучник","Кузница Солитьюда"};
     static final String[] OWNERS={"Таари","Анжелина Моррар","Сайма","Фихада","Бейранд"};
     private static final String[][] ITEMS={
-        {"Шляпа путника","Сапоги странника","Кожаные перчатки","Кольцо серебряное","Кольцо золотое"},
-        {"Зелье запаса сил","Голубой горноцвет","Красный горноцвет","Пурпурный горноцвет","Соль"},
-        {"Отмычка","Факел","Пшеница","Соль","Кожаные полоски"},
-        {"Железный лук","Стальной лук","Железная стрела","Стальная стрела"},
-        {"Железный слиток","Стальной слиток","Кожаные полоски","Железный меч","Стальной меч"}
+        {"Шляпа путника","Сапоги странника","Кожаные перчатки","Кольцо серебряное","Кольцо золотое","Золотое ожерелье","Серебряное ожерелье","Диадема из камня","Плащ паломника"},
+        {"Зелье запаса сил","Голубой горноцвет","Красный горноцвет","Пурпурный горноцвет","Соль","Лаванда","Чеснок","Снежные ягоды","Крыло голубой бабочки","Грибы имп","Корень Нирна","Жир тролля"},
+        {"Отмычка","Факел","Пшеница","Соль","Кожаные полоски","Кожа","Гранат","Аметист","Рубин","Сапфир"},
+        {"Железный лук","Стальной лук","Железная стрела","Стальная стрела","Длинный лук","Охотничий лук","Орочий лук","Двемерский лук","Эльфийский лук"},
+        {"Железный слиток","Стальной слиток","Кожаные полоски","Железный меч","Стальной меч","Кожа","Корундовый слиток","Железный щит","Стальной щит","Железный шлем","Стальной шлем","Железная кираса","Стальная кираса","Железный боевой топор","Стальной боевой топор"}
     };
     private static final String[] TOPICS={
         "Для двора важны и ткань, и покрой. Но даже дорожная одежда должна хорошо сидеть.",
@@ -68,6 +68,28 @@ final class SolitudeShops {
             &&!item.id.equals("Дорожная одежда")&&!item.id.equals("Походный клинок")&&!(g.swordUpgraded&&item.id.equals("Стальной меч"))&&!(g.armorUpgraded&&item.id.equals("Стальная кираса"))
             &&budget[s]>=g.salePrice(item)&&g.gold<=Integer.MAX_VALUE-g.salePrice(item);
     }
+    private int maxBuy(GameEngine g,int s,int i,ItemCatalog.Item item){
+        int p=price(g,item);
+        int weight=item.weight<=0?99:(int)Math.max(0,Math.floor((g.progress.carryLimit()-g.progress.carryWeight()+0.00001)/item.weight));
+        return Math.max(0,Math.min(99,Math.min(stock(g,s,i),Math.min(weight,Math.min(g.gold/p,Math.min((Integer.MAX_VALUE-budget[s])/p,Integer.MAX_VALUE-g.progress.quantity(item.id)))))));
+    }
+    private int maxSell(GameEngine g,int s,ItemCatalog.Item item){
+        if(!canSell(g,item,s))return 0;
+        int p=g.salePrice(item);if(p<=0)return 0;
+        return Math.max(0,Math.min(99,Math.min(g.progress.quantity(item.id),Math.min(budget[s]/p,(Integer.MAX_VALUE-g.gold)/p))));
+    }
+    private static void tradeChoices(GameEngine.Scene scene,String action,String title,int price,int max,String detail){
+        if(max<1)return;
+        scene.add(action,title,price+" септимов | "+detail);
+        if(max>5)scene.add(action+":5",title+" ×5",(5L*price)+" септимов");
+        if(max>1)scene.add(action+":max",title+" ×"+max,(long)max*price+" септимов | Максимум сейчас");
+    }
+    private static int amount(String action,String base,int max){
+        if(action.equals(base))return max>=1?1:0;
+        if(action.equals(base+":5"))return max>=5?5:0;
+        if(action.equals(base+":max"))return max;
+        return 0;
+    }
     GameEngine.Scene scene(GameEngine g,int s){
         refresh(g,s);
         GameEngine.Scene scene=new GameEngine.Scene("СОЛИТЬЮД | ТОРГОВЛЯ",NAMES[s],OWNERS[s]+" | Кошелёк: "+budget[s]+" септимов.\nПополнение через каждые два игровых дня.\n\n"+g.message);
@@ -79,9 +101,8 @@ final class SolitudeShops {
         if(open(g,s))for(int i=0;i<ITEMS[s].length;i++){
             String id=ITEMS[s][i];ItemCatalog.Item item=ItemCatalog.find(id);if(item==null)continue;
             int n=stock(g,s,i),p=price(g,item);
-            if(n>0&&g.gold>=p&&g.progress.carryWeight()+item.weight<=g.progress.carryLimit()+0.00001)
-                scene.add("SOLITUDE:buy:"+s+":"+i,"Купить: "+item.name,p+" септимов | В наличии: "+n);
-            if(canSell(g,item,s))scene.add("SOLITUDE:sell:"+s+":"+i,"Продать: "+item.name,g.salePrice(item)+" септимов | У тебя: "+g.progress.quantity(id));
+            tradeChoices(scene,"SOLITUDE:buy:"+s+":"+i,"Купить: "+item.name,p,maxBuy(g,s,i,item),"В наличии: "+n);
+            tradeChoices(scene,"SOLITUDE:sell:"+s+":"+i,"Продать: "+item.name,g.salePrice(item),maxSell(g,s,item),"У тебя: "+g.progress.quantity(id));
         }
         else scene=new GameEngine.Scene(scene.kicker,scene.title,scene.body+"\n\nЛавка закрыта или торговец недоступен.");
         if(s==0)SolitudeCanonical.attireChoices(g,scene);
@@ -94,13 +115,16 @@ final class SolitudeShops {
         if(action.equals("SOLITUDE:merchant:memory:"+s)){conversation(g,s,true);return;}
         for(int i=0;i<ITEMS[s].length;i++){
             String id=ITEMS[s][i];ItemCatalog.Item item=ItemCatalog.find(id);if(item==null)continue;
-            if(action.equals("SOLITUDE:buy:"+s+":"+i)){
-                int p=price(g,item);
-                if(stock(g,s,i)<=0||g.gold<p||budget[s]>Integer.MAX_VALUE-p||!g.progress.addItem(id,1))return;
-                sold[s][i]++;g.gold-=p;budget[s]+=p;g.message="Куплено: "+item.name+" | −"+p+" септимов.";
-            }else if(action.equals("SOLITUDE:sell:"+s+":"+i)){
-                if(!canSell(g,item,s)||!g.progress.removeItem(id,1))return;
-                int p=g.salePrice(item);budget[s]-=p;g.gold+=p;sold[s][i]=Math.max(0,sold[s][i]-1);g.message="Продано: "+item.name+" | +"+p+" септимов.";
+            int buy=amount(action,"SOLITUDE:buy:"+s+":"+i,maxBuy(g,s,i,item));
+            int sell=amount(action,"SOLITUDE:sell:"+s+":"+i,maxSell(g,s,item));
+            if(buy>0){
+                int total=price(g,item)*buy;
+                if(!g.progress.addItem(id,buy))return;
+                sold[s][i]+=buy;g.gold-=total;budget[s]+=total;g.message="Куплено: "+item.name+" ×"+buy+" | −"+total+" септимов.";
+            }else if(sell>0){
+                int total=g.salePrice(item)*sell;
+                if(!g.progress.removeItem(id,sell))return;
+                budget[s]-=total;g.gold+=total;sold[s][i]=Math.max(0,sold[s][i]-sell);g.message="Продано: "+item.name+" ×"+sell+" | +"+total+" септимов.";
             }else continue;
             g.progress.recent=g.message;g.recordVisualEvent(NAMES[s]+": "+g.message);g.progress.sync(g);return;
         }
