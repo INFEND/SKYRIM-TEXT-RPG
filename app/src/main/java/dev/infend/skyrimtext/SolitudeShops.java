@@ -23,10 +23,11 @@ final class SolitudeShops {
     };
     private static final String[] IDS={"taarie","angeline","sayma","fihada","beirand"};
     private static final int[] FUNDS={500,500,700,600,800};
+    private final java.util.List<java.util.LinkedHashMap<String,Integer>> resale=new java.util.ArrayList<>();
     private final int[][] sold=new int[NAMES.length][];
     private final int[] budget=FUNDS.clone();
     private final int[] cycle=new int[NAMES.length];
-    SolitudeShops(){for(int i=0;i<sold.length;i++){sold[i]=new int[ITEMS[i].length];cycle[i]=-1;}}
+    SolitudeShops(){for(int i=0;i<sold.length;i++){sold[i]=new int[ITEMS[i].length];cycle[i]=-1;resale.add(new java.util.LinkedHashMap<>());}}
     static int index(String mode){for(int i=0;i<NAMES.length;i++)if((MODE+i).equals(mode))return i;return -1;}
     static int district(int s){return s==4?5:0;}
     static boolean open(GameEngine g,int s){
@@ -56,7 +57,7 @@ final class SolitudeShops {
     }
     private void refresh(GameEngine g,int s){
         int now=(Math.max(1,g.day)-1)/2;
-        if(cycle[s]!=now){cycle[s]=now;java.util.Arrays.fill(sold[s],0);budget[s]=FUNDS[s];}
+        if(cycle[s]!=now){cycle[s]=now;java.util.Arrays.fill(sold[s],0);budget[s]=FUNDS[s];resale.get(s).clear();}
     }
     static int price(GameEngine g,ItemCatalog.Item item){
         return (int)Math.max(1,Math.min(Integer.MAX_VALUE,((long)item.value*Math.max(100,130-g.progress.skillLevel(12)/5)+99)/100));
@@ -67,11 +68,12 @@ final class SolitudeShops {
         return g.canTradeItem(item)
             &&budget[s]>=g.salePrice(item)&&g.gold<=Integer.MAX_VALUE-g.salePrice(item);
     }
-    private int maxBuy(GameEngine g,int s,int i,ItemCatalog.Item item){
+    private int maxBuy(GameEngine g,int s,int i,ItemCatalog.Item item){return maxPurchase(g,s,item,stock(g,s,i));}
+    private int maxPurchase(GameEngine g,int s,ItemCatalog.Item item,int available){
         if(g.progress.temperQuality(item.id)>0||g.progress.artifacts.filled(item.id)||(g.swordUpgraded&&"Стальной меч".equals(item.id))||(g.armorUpgraded&&"Стальная кираса".equals(item.id)))return 0;
         int p=price(g,item);
         int weight=item.weight<=0?99:(int)Math.max(0,Math.floor((g.progress.carryLimit()-g.progress.carryWeight()+0.00001)/item.weight));
-        return Math.max(0,Math.min(99,Math.min(stock(g,s,i),Math.min(weight,Math.min(g.gold/p,Math.min((Integer.MAX_VALUE-budget[s])/p,Integer.MAX_VALUE-g.progress.quantity(item.id)))))));
+        return Math.max(0,Math.min(99,Math.min(available,Math.min(weight,Math.min(g.gold/p,Math.min((Integer.MAX_VALUE-budget[s])/p,Integer.MAX_VALUE-g.progress.quantity(item.id)))))));
     }
     private int maxSell(GameEngine g,int s,ItemCatalog.Item item){
         if(!canSell(g,item,s))return 0;
@@ -120,6 +122,10 @@ final class SolitudeShops {
         else scene=new GameEngine.Scene(scene.kicker,scene.title,scene.body+"\n\nЛавка закрыта или торговец недоступен.");
         if(open(g,s))for(ItemCatalog.Item item:g.progress.owned("Все","Название"))
             if(extraAccepted(s,item))tradeChoices(scene,"SOLITUDE:extraSell:"+s+":"+item.id,"Продать: "+item.name,g.salePrice(item),maxSell(g,s,item),"У тебя: "+g.progress.quantity(item.id)+" | Скупка по специализации");
+        if(open(g,s))for(java.util.Map.Entry<String,Integer> e:resale.get(s).entrySet()){
+            ItemCatalog.Item item=ItemCatalog.find(e.getKey());if(item==null)continue;
+            tradeChoices(scene,"SOLITUDE:rebuy:"+s+":"+item.id,"Выкупить: "+item.name,price(g,item),maxPurchase(g,s,item,e.getValue()),"В наличии: "+e.getValue());
+        }
         if(s==1||s==4)SolitudeCraft.choices(g,scene);
         if(s==0)SolitudeCanonical.attireChoices(g,scene);
         if(s==1)SolitudeCanonical.shopChoices(g,scene);
@@ -129,12 +135,21 @@ final class SolitudeShops {
         refresh(g,s);if(!open(g,s))return;
         if(action.equals("SOLITUDE:merchant:talk:"+s)){conversation(g,s,false);return;}
         if(action.equals("SOLITUDE:merchant:memory:"+s)){conversation(g,s,true);return;}
+        for(java.util.Map.Entry<String,Integer> e:resale.get(s).entrySet()){
+            ItemCatalog.Item item=ItemCatalog.find(e.getKey());if(item==null)continue;
+            int n=amount(action,"SOLITUDE:rebuy:"+s+":"+item.id,maxPurchase(g,s,item,e.getValue()));if(n<=0)continue;
+            int total=price(g,item)*n;if(!g.progress.addItem(item.id,n))return;
+            if(n==e.getValue())resale.get(s).remove(item.id);else e.setValue(e.getValue()-n);
+            g.gold-=total;budget[s]+=total;g.message="Выкуплено: "+item.name+" ×"+n+" | −"+total+" септимов.";
+            g.progress.recent=g.message;g.recordVisualEvent(NAMES[s]+": "+g.message);g.progress.sync(g);return;
+        }
         for(ItemCatalog.Item item:g.progress.owned("Все","Название")){
             if(!extraAccepted(s,item))continue;
             int n=amount(action,"SOLITUDE:extraSell:"+s+":"+item.id,maxSell(g,s,item));
             if(n<=0)continue;
             int total=g.salePrice(item)*n;
             if(!g.progress.removeItem(item.id,n))return;
+            resale.get(s).merge(item.id,n,(a,b)->GameEngine.nonnegativeAdd(a,b));
             budget[s]-=total;g.gold+=total;g.message="Продано: "+item.name+" ×"+n+" | +"+total+" септимов.";
             g.progress.recent=g.message;g.recordVisualEvent(NAMES[s]+": "+g.message);g.progress.sync(g);return;
         }
@@ -154,6 +169,6 @@ final class SolitudeShops {
             g.progress.recent=g.message;g.recordVisualEvent(NAMES[s]+": "+g.message);g.progress.sync(g);return;
         }
     }
-    JSONObject save(){JSONObject o=new JSONObject();try{JSONArray rows=new JSONArray();for(int[] a:sold)rows.put(new JSONArray(a));o.put("sold",rows).put("budget",new JSONArray(budget)).put("cycle",new JSONArray(cycle));}catch(Exception ignored){}return o;}
-    static SolitudeShops restore(JSONObject o){SolitudeShops s=new SolitudeShops();if(o==null)return s;JSONArray rows=o.optJSONArray("sold"),b=o.optJSONArray("budget"),c=o.optJSONArray("cycle");for(int i=0;i<NAMES.length;i++){if(b!=null)s.budget[i]=Math.max(0,b.optInt(i,FUNDS[i]));if(c!=null)s.cycle[i]=Math.max(-1,c.optInt(i,-1));JSONArray row=rows==null?null:rows.optJSONArray(i);if(row!=null)for(int k=0;k<s.sold[i].length;k++)s.sold[i][k]=Math.max(0,Math.min(capacity(ITEMS[i][k]),row.optInt(k,0)));}return s;}
+    JSONObject save(){JSONObject o=new JSONObject();try{JSONArray rows=new JSONArray();for(int[] a:sold)rows.put(new JSONArray(a));JSONArray extra=new JSONArray();for(java.util.Map<String,Integer> m:resale)extra.put(new JSONObject(m));o.put("resale",extra);o.put("sold",rows).put("budget",new JSONArray(budget)).put("cycle",new JSONArray(cycle));}catch(Exception ignored){}return o;}
+    static SolitudeShops restore(JSONObject o){SolitudeShops s=new SolitudeShops();if(o==null)return s;JSONArray extra=o.optJSONArray("resale");JSONArray rows=o.optJSONArray("sold"),b=o.optJSONArray("budget"),c=o.optJSONArray("cycle");for(int i=0;i<NAMES.length;i++){JSONObject m=extra==null?null:extra.optJSONObject(i);if(m!=null){java.util.Iterator<String> keys=m.keys();while(keys.hasNext()){String id=keys.next();int n=m.optInt(id,0);if(n>0&&extraAccepted(i,ItemCatalog.find(id)))s.resale.get(i).put(id,n);}}if(b!=null)s.budget[i]=Math.max(0,b.optInt(i,FUNDS[i]));if(c!=null)s.cycle[i]=Math.max(-1,c.optInt(i,-1));JSONArray row=rows==null?null:rows.optJSONArray(i);if(row!=null)for(int k=0;k<s.sold[i].length;k++)s.sold[i][k]=Math.max(0,Math.min(capacity(ITEMS[i][k]),row.optInt(k,0)));}return s;}
 }
