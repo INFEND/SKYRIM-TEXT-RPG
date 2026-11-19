@@ -40,6 +40,12 @@ public class NpcLinkProbe {
     check(NpcProfiles.canonicalName("Йордис").equals("Йордис Дева Меча"),"canonical surname");
     check(matcher.find("Ароматы Анжелины").get(0).name.equals("Анжелина Моррар"),"canonical inflection");
     check(matcher.find("Серанажды Альманах").isEmpty(),"not substrings");
+    String full="Элисиф Прекрасную и Фолком Огнебородом";
+    List<NpcNameMatcher.Match> declined=matcher.find(full);
+    check(declined.size()==2,"full declined names");
+    check(full.substring(declined.get(0).start,declined.get(0).end).equals("Элисиф Прекрасную"),"complete Elisif link");
+    check(full.substring(declined.get(1).start,declined.get(1).end).equals("Фолком Огнебородом"),"complete Falk link");
+    check(declined.get(1).name.equals("Фолк Огнебород"),"Falk identity");
     String accented="Сера\u0301на встретила М’Айка.";
     List<NpcNameMatcher.Match> accentedHits=matcher.find(accented);
     check(accentedHits.size()==2,"stress and apostrophe");

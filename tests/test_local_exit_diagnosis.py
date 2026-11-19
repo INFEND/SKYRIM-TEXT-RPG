@@ -9,8 +9,13 @@ class LocalExitDiagnosis(unittest.TestCase):
         self.assertNotIn("Возможны нехватка памяти",c)
         self.assertNotIn("info.availMem<",c)
         self.assertIn('candidate?.getBoolean("found")==true',c)
-        self.assertIn("if(tokens==0&&path.isNotEmpty())",c)
-        self.assertIn("if(lowMemory)2 else 1",c)
+        self.assertIn("val previous=if(path.isNotEmpty())",c)
+        self.assertIn("val next=if(lowMemory||previous>=1) 2 else 1",c)
+        self.assertIn("crashProfiles.edit().putInt(profileKey(path),next).apply()",c)
+        recovery=c.split("private fun recoverProcess(",1)[1].split("private fun currentGeneration(",1)[0]
+        self.assertIn("failGeneration(id,",recovery)
+        self.assertNotIn("send(",recovery)
+        self.assertNotIn("connect(",recovery)
     def test_diagnosis_matches_current_pid_and_request(self):
         p=(ENGINE/"EngineDiagnosticsProvider.java").read_text()
         self.assertIn("e.getPid()!=pid||e.getTimestamp()<since",p)

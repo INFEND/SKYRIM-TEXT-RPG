@@ -724,7 +724,7 @@ public final class MainActivity extends Activity {
             }
             if(matches.isEmpty()){toast("Нет такого действия в текущей сюжетной сцене");return;}
             new RuneDialogBuilder(this,accent()).setTitle(NPC_ACTIONS[index]).setItems(labels.toArray(new String[0]),(d,i)->{
-                if(livingBusy())return;
+                if(livingBusy()||!npcAddonEnabled(name)||"DEAD".equals(npcKnownStatus(name))||"MISSING".equals(npcKnownStatus(name)))return;
                 GameEngine.Choice chosen=matches.get(i);boolean valid=false;
                 for(GameEngine.Choice current:game.scene().choices)if(current.action.equals(chosen.action)){valid=true;break;}
                 if(!valid){toast("Действие больше недоступно");return;}
@@ -3191,7 +3191,7 @@ public final class MainActivity extends Activity {
             if(aiTurnBusy&&aiTurnPreview!=null&&!aiTurnPreview.isEmpty())for(String speaker:NpcProfiles.speakers(aiTurnPreview,game.name))if(npcSpeakerName(speaker))NpcNameMatcher.add(names,NpcProfiles.canonicalName(speaker),speaker);
             // A custom player name is not a link to an unrelated NPC with the same spelling.
             String hero=NpcNameMatcher.key(game.name);
-            if(!hero.isEmpty()){names.remove(hero);names.remove(NpcNameMatcher.key(NpcProfiles.canonicalName(game.name)));}
+            if(!hero.isEmpty()){String canonical=NpcNameMatcher.key(NpcProfiles.canonicalName(game.name));names.entrySet().removeIf(entry->entry.getKey().equals(hero)||NpcNameMatcher.key(entry.getValue()).equals(canonical));}
         }
         if(npcMatcher==null||!names.equals(npcMatcherNames)){npcMatcherNames=names;npcMatcher=new NpcNameMatcher(names);}
         return npcMatcher;
@@ -3227,8 +3227,15 @@ public final class MainActivity extends Activity {
         if(x<layout.getLineLeft(line)||x>layout.getLineRight(line))return null;
         int offset=layout.getOffsetForHorizontal(line,x);
         android.text.Spanned sp=(android.text.Spanned)text;
-        android.text.style.ClickableSpan[] links=sp.getSpans(offset,offset,android.text.style.ClickableSpan.class);
-        for(android.text.style.ClickableSpan link:links)if(offset>=sp.getSpanStart(link)&&offset<sp.getSpanEnd(link))return link;
+        int start=Math.max(layout.getLineStart(line),offset-1),end=Math.min(layout.getLineEnd(line),offset+1);
+        android.text.style.ClickableSpan[] links=sp.getSpans(start,end,android.text.style.ClickableSpan.class);
+        for(android.text.style.ClickableSpan link:links){
+            int left=Math.max(layout.getLineStart(line),sp.getSpanStart(link)),right=Math.min(layout.getLineEnd(line),sp.getSpanEnd(link));
+            if(left>=right)continue;
+            // At a wrapped line's end Android's cursor may already be on the next line.
+            float a=layout.getPrimaryHorizontal(left),b=right==layout.getLineEnd(line)?layout.getLineRight(line):layout.getPrimaryHorizontal(right);
+            if(x>=Math.min(a,b)&&x<Math.max(a,b))return link;
+        }
         return null;
     }
     private void installNpcTouch(TextView view,NpcLinkState state){
@@ -3252,7 +3259,7 @@ public final class MainActivity extends Activity {
                 if(link!=null&&link==npcSpanAt(view,event))link.onClick(view);
                 return true;
             }
-            if(action==android.view.MotionEvent.ACTION_CANCEL){state.touched=false;state.downSpan=null;return true;}
+            if(action==android.view.MotionEvent.ACTION_CANCEL||action==android.view.MotionEvent.ACTION_POINTER_DOWN){state.touched=false;state.downSpan=null;return true;}
             return true;
         });
     }
