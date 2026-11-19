@@ -601,6 +601,7 @@ public final class MainActivity extends Activity {
         ScrollView scroll=new ScrollView(this);scroll.setFillViewport(true);scroll.setBackgroundColor(Color.BLACK);scroll.addView(panel);
         dialog.setContentView(scroll);dialog.show();android.view.Window window=dialog.getWindow();if(window!=null){window.setBackgroundDrawable(new android.graphics.drawable.ColorDrawable(Color.BLACK));window.setLayout(-1,-1);window.setStatusBarColor(Color.BLACK);window.setNavigationBarColor(Color.BLACK);window.getDecorView().setSystemUiVisibility(0);}
         AmoledAppearance.applyTree(panel);
+        watchNpcNames(panel);
     }
     private void npcGallerySection(String name){
         if(ItachiProfile.matches(name)){itachiLocalGallery(0);return;}
@@ -839,6 +840,7 @@ public final class MainActivity extends Activity {
     }
     private String lastNarrative="";
     private void decorateNarrative(LinearLayout host,TextView body,String raw){
+        npcSceneNames=NpcProfiles.speakers(raw,game.name);
         if(!visual("narrative"))body.setText(body.getText().toString());
         if(visual("portraits")){
             java.util.LinkedHashSet<String> speakers=NpcProfiles.speakers(raw,game.name);
@@ -1391,6 +1393,7 @@ public final class MainActivity extends Activity {
         if(game.started&&game.visitedVisual.add(game.progress.location))save();
         String thisPage=viewportKey();
         PageScroll oldScroll=scrollCache.get(thisPage);
+        npcSceneNames=java.util.Collections.emptySet();
         root=column();root.setBackgroundColor(BG);root.setFitsSystemWindows(true);
         setContentView(root);
         activeTerrainMap=null;
@@ -1425,6 +1428,7 @@ public final class MainActivity extends Activity {
         stateEffects();
         SovngardeTypeface.applyTree(root);
         SovngardeTypeface.watchTree(root);
+        watchNpcNames(root);
         renderedPage=thisPage;
         resumeViewport(oldScroll,scroll,thisPage);
         attachActiveNotice();scheduleNotice();
@@ -3114,6 +3118,169 @@ public final class MainActivity extends Activity {
                     render();
                 }catch(Exception e){toast("Не удалось сохранить ключ");}
             }).show();
+    }
+
+
+    private static final String NPC_LINKS="npc_name_links",NPC_LINK_COLOR="npc_name_color",NPC_LINK_BOLD="npc_name_bold",NPC_LINK_UNDERLINE="npc_name_underline";
+    private static final String NPC_LINK_COLORED="npc_name_colored";
+    private final java.util.WeakHashMap<TextView,NpcLinkState> npcLinkViews=new java.util.WeakHashMap<>();
+    private final java.util.WeakHashMap<View,Boolean> npcLinkRoots=new java.util.WeakHashMap<>();
+    private final java.util.LinkedHashMap<String,String> npcStaticNames=NpcProfiles.linkNames();
+    private NpcNameMatcher npcMatcher;
+    private java.util.Map<String,String> npcMatcherNames;
+    private int npcLinkColor(){
+        int selected=prefs.getInt(NPC_LINK_COLOR,-1);
+        return selected>=0&&selected<ACCENTS.length?ACCENTS[selected]:accent();
+    }
+    private boolean npcLinkSetting(String key){return prefs.getBoolean(key,true);}
+    private static boolean npcSpeakerName(String name){
+        if(name==null||name.trim().length()<2||name.length()>80)return false;
+        String key=NpcNameMatcher.key(name);
+        return !key.matches("ты|герой|игрок|рассказчик|повествование|наблюдение|событие|действие|мысли|ответ|система|неизвестно|неизвестный");
+    }
+    private NpcNameMatcher npcNameMatcher(){
+        java.util.LinkedHashMap<String,String> names=new java.util.LinkedHashMap<>(npcStaticNames);
+        if(game!=null&&game.started){
+            org.json.JSONArray facts=game.sceneState.npcFacts();
+            for(int i=0;i<facts.length();i++){
+                JSONObject fact=facts.optJSONObject(i);if(fact==null)continue;
+                String name=fact.optString("title");if(npcSpeakerName(name))NpcNameMatcher.add(names,name);
+            }
+            if(game.aiTurn!=null)for(String speaker:NpcProfiles.speakers(game.aiTurn.scene,game.name))
+                if(npcSpeakerName(speaker))NpcNameMatcher.add(names,speaker);
+            if(npcSceneNames!=null)for(String speaker:npcSceneNames)if(npcSpeakerName(speaker))NpcNameMatcher.add(names,speaker);
+            // A custom player name is not a link to an unrelated NPC with the same spelling.
+            String hero=NpcNameMatcher.key(game.name);
+            if(!hero.isEmpty())names.remove(hero);
+        }
+        if(npcMatcher==null||!names.equals(npcMatcherNames)){npcMatcherNames=names;npcMatcher=new NpcNameMatcher(names);}
+        return npcMatcher;
+    }
+    private java.util.Set<String> npcSceneNames=java.util.Collections.emptySet();
+    private static final class NpcLinkState {
+        CharSequence lastText; NpcNameMatcher matcher; int style;
+        boolean touched; float downX,downY;
+        android.text.style.ClickableSpan downSpan;
+        boolean watching,installedTouch;
+    }
+    private final class NpcLinkSpan extends android.text.style.ClickableSpan {
+        final String name;NpcLinkSpan(String name){this.name=name;}
+        @Override public void onClick(View widget){npcDetails(name);}
+        @Override public void updateDrawState(android.text.TextPaint paint){
+            if(npcLinkSetting(NPC_LINK_COLORED))paint.setColor(npcLinkColor());
+            if(npcLinkSetting(NPC_LINK_BOLD))paint.setFakeBoldText(true);
+            if(npcLinkSetting(NPC_LINK_UNDERLINE))paint.setUnderlineText(true);
+        }
+    }
+    private static android.text.style.ClickableSpan npcSpanAt(TextView view,android.view.MotionEvent event){
+        CharSequence text=view.getText();android.text.Layout layout=view.getLayout();
+        if(!(text instanceof android.text.Spanned)||layout==null)return null;
+        float x=event.getX()-view.getTotalPaddingLeft()+view.getScrollX();
+        float y=event.getY()-view.getTotalPaddingTop()+view.getScrollY();
+        if(y<0||y>=layout.getHeight())return null;
+        int line=layout.getLineForVertical((int)y);
+        if(x<layout.getLineLeft(line)||x>layout.getLineRight(line))return null;
+        int offset=layout.getOffsetForHorizontal(line,x);
+        android.text.Spanned sp=(android.text.Spanned)text;
+        android.text.style.ClickableSpan[] links=sp.getSpans(offset,offset,android.text.style.ClickableSpan.class);
+        for(android.text.style.ClickableSpan link:links)if(offset>=sp.getSpanStart(link)&&offset<sp.getSpanEnd(link))return link;
+        return null;
+    }
+    private void installNpcTouch(TextView view,NpcLinkState state){
+        if(state.installedTouch)return;
+        state.installedTouch=true;
+        view.setOnTouchListener((v,event)->{
+            int action=event.getActionMasked();
+            if(action==android.view.MotionEvent.ACTION_DOWN){
+                state.downSpan=npcSpanAt(view,event);state.touched=state.downSpan!=null;
+                state.downX=event.getX();state.downY=event.getY();
+                return state.touched;
+            }
+            if(!state.touched)return false;
+            if(action==android.view.MotionEvent.ACTION_MOVE){
+                int slop=android.view.ViewConfiguration.get(this).getScaledTouchSlop();
+                if(Math.abs(event.getX()-state.downX)>slop||Math.abs(event.getY()-state.downY)>slop)state.downSpan=null;
+                return true;
+            }
+            if(action==android.view.MotionEvent.ACTION_UP){
+                android.text.style.ClickableSpan link=state.downSpan;state.touched=false;state.downSpan=null;
+                if(link!=null&&link==npcSpanAt(view,event))link.onClick(view);
+                return true;
+            }
+            if(action==android.view.MotionEvent.ACTION_CANCEL){state.touched=false;state.downSpan=null;return true;}
+            return true;
+        });
+    }
+    private void decorateNpcNameView(TextView view,NpcNameMatcher matcher){
+        // Do not change editable text, switches or platform button semantics.
+        if(view instanceof EditText||view instanceof android.widget.CompoundButton||view instanceof android.widget.Button)return;
+        NpcLinkState state=npcLinkViews.get(view);
+        if(state==null){state=new NpcLinkState();npcLinkViews.put(view,state);}
+        final NpcLinkState current=state;
+        if(!state.watching){
+            state.watching=true;
+            view.addTextChangedListener(new android.text.TextWatcher(){
+                public void beforeTextChanged(CharSequence s,int start,int count,int after){}
+                public void onTextChanged(CharSequence s,int start,int before,int count){}
+                public void afterTextChanged(android.text.Editable value){
+                    // A later stream chunk may replace all spans; reapply only after the edit.
+                    if(view.isAttachedToWindow())view.post(()->decorateNpcNameView(view,npcNameMatcher()));
+                }
+            });
+        }
+        CharSequence source=view.getText();if(source==null)return;
+        int style=(npcLinkSetting(NPC_LINKS)?1:0)|(npcLinkSetting(NPC_LINK_COLORED)?2:0)|(npcLinkSetting(NPC_LINK_BOLD)?4:0)|(npcLinkSetting(NPC_LINK_UNDERLINE)?8:0);
+        if(state.lastText==source&&state.matcher==matcher&&state.style==style)return;
+        state.lastText=source;state.matcher=matcher;state.style=style;
+        android.text.SpannableStringBuilder span=new android.text.SpannableStringBuilder(source);
+        NpcLinkSpan[] prior=span.getSpans(0,span.length(),NpcLinkSpan.class);
+        for(NpcLinkSpan old:prior)span.removeSpan(old);
+        int count=0;
+        if(npcLinkSetting(NPC_LINKS)){
+            for(NpcNameMatcher.Match match:matcher.find(span)){
+                // Existing item links and other explicit links take precedence.
+                if(span.getSpans(match.start,match.end,android.text.style.ClickableSpan.class).length>0)continue;
+                span.setSpan(new NpcLinkSpan(match.name),match.start,match.end,android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE|android.text.Spanned.SPAN_PRIORITY);
+                count++;
+            }
+        }
+        if(prior.length==0&&count==0)return;
+        boolean clickable=view.isClickable(),longClickable=view.isLongClickable(),focusable=view.isFocusable();
+        view.setText(span,TextView.BufferType.SPANNABLE);
+        if(count>0){
+            if(view.getMovementMethod()==null)view.setMovementMethod(android.text.method.LinkMovementMethod.getInstance());
+            // Let clicks outside the link continue to reach existing choice/card callbacks.
+            view.setClickable(clickable);view.setLongClickable(longClickable);view.setFocusable(focusable);
+            view.setHighlightColor(0x2255dfcb);
+            installNpcTouch(view,current);
+        }
+        current.lastText=view.getText();current.matcher=matcher;current.style=style;
+    }
+    private void npcNameTree(View view,NpcNameMatcher matcher){
+        if(view instanceof TextView)decorateNpcNameView((TextView)view,matcher);
+        if(view instanceof ViewGroup){ViewGroup group=(ViewGroup)view;for(int i=0;i<group.getChildCount();i++)npcNameTree(group.getChildAt(i),matcher);}
+    }
+    /** Shared root hook: every normal game screen and Rune dialog, including dynamic content. */
+    void watchNpcNames(View root){
+        if(root==null||prefs==null||npcLinkRoots.containsKey(root))return;
+        npcLinkRoots.put(root,Boolean.TRUE);
+        npcNameTree(root,npcNameMatcher());
+        root.getViewTreeObserver().addOnGlobalLayoutListener(()->npcNameTree(root,npcNameMatcher()));
+    }
+    private void npcNameSettings(){
+        int start=content.getChildCount();LinearLayout panel=card();
+        addText(panel,"Нажатие на имя открывает карточку этого персонажа. Оформление можно менять отдельно.",13,MUTED,false,8);
+        TextView example=text("Серана",18,TEXT,false);example.setGravity(Gravity.CENTER);panel.addView(example,lp(-1,44));
+        String[][] options={{NPC_LINKS,"Кликабельные имена NPC"},{NPC_LINK_COLORED,"Выделять имена цветом"},{NPC_LINK_BOLD,"Жирный текст"},{NPC_LINK_UNDERLINE,"Подчёркивание"}};
+        for(String[] option:options){
+            Switch toggle=new Switch(this);toggle.setText(option[1]);toggle.setTextColor(TEXT);toggle.setTextSize(sp(14));toggle.setThumbTintList(ColorStateList.valueOf(accent()));toggle.setChecked(npcLinkSetting(option[0]));toggle.setMinHeight(dp(46));panel.addView(toggle,lp(-1,-2));
+            toggle.setOnCheckedChangeListener((v,on)->{prefs.edit().putBoolean(option[0],on).apply();render();});
+        }
+        int chosen=prefs.getInt(NPC_LINK_COLOR,-1);
+        TextView color=text("Цвет имён NPC | "+(chosen>=0&&chosen<ACCENT_NAMES.length?ACCENT_NAMES[chosen]:"Цвет акцента"),14,npcLinkColor(),true);color.setGravity(Gravity.CENTER);color.setMinHeight(dp(48));color.setBackground(bg(PANEL_2,BORDER,10));panel.addView(color,lp(-1,-2));
+        color.setOnClickListener(v->{String[] colors=new String[ACCENT_NAMES.length+1];colors[0]="Цвет акцента";System.arraycopy(ACCENT_NAMES,0,colors,1,ACCENT_NAMES.length);
+            new RuneDialogBuilder(this,accent()).setTitle("Цвет имён NPC").setSingleChoiceItems(colors,chosen>=0&&chosen<ACCENT_NAMES.length?chosen+1:0,(dialog,index)->{prefs.edit().putInt(NPC_LINK_COLOR,index-1).apply();dialog.dismiss();render();}).setNegativeButton("Отмена",null).show();});
+        foldSettingsSection("npc_names","ИМЕНА ПЕРСОНАЖЕЙ",start);
     }
 
     private void makeItemsClickable(TextView view,String source){
@@ -5456,6 +5623,7 @@ public final class MainActivity extends Activity {
         }
         foldSettingsSection("appearance","ОФОРМЛЕНИЕ И ЧИТАЕМОСТЬ",appearanceStart);
         amoledSettings();
+        npcNameSettings();
         visualSettings();
         int aiStart=content.getChildCount();
         space(content,6);addText(content,"ИИ-ПРИКЛЮЧЕНИЕ",11,accent(),true,11);

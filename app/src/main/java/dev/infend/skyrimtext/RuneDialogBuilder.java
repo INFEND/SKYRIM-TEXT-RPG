@@ -64,7 +64,7 @@ public final class RuneDialogBuilder extends AlertDialog.Builder {
             styleButton(dialog.getButton(DialogInterface.BUTTON_POSITIVE),true);
             styleButton(dialog.getButton(DialogInterface.BUTTON_NEGATIVE),false);
             styleButton(dialog.getButton(DialogInterface.BUTTON_NEUTRAL),false);
-            if(window!=null){SovngardeTypeface.applyTree(window.getDecorView());SovngardeTypeface.watchTree(window.getDecorView());}
+            if(window!=null){SovngardeTypeface.applyTree(window.getDecorView());SovngardeTypeface.watchTree(window.getDecorView());if(context instanceof MainActivity)((MainActivity)context).watchNpcNames(window.getDecorView());}
         });
         return dialog;
     }
