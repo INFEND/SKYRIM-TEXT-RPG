@@ -3149,6 +3149,7 @@ public final class MainActivity extends Activity {
             if(game.aiTurn!=null)for(String speaker:NpcProfiles.speakers(game.aiTurn.scene,game.name))
                 if(npcSpeakerName(speaker))NpcNameMatcher.add(names,speaker);
             if(npcSceneNames!=null)for(String speaker:npcSceneNames)if(npcSpeakerName(speaker))NpcNameMatcher.add(names,speaker);
+            if(aiTurnBusy&&aiTurnPreview!=null&&!aiTurnPreview.isEmpty())for(String speaker:NpcProfiles.speakers(aiTurnPreview,game.name))if(npcSpeakerName(speaker))NpcNameMatcher.add(names,speaker);
             // A custom player name is not a link to an unrelated NPC with the same spelling.
             String hero=NpcNameMatcher.key(game.name);
             if(!hero.isEmpty())names.remove(hero);
@@ -3171,6 +3172,11 @@ public final class MainActivity extends Activity {
             if(npcLinkSetting(NPC_LINK_BOLD))paint.setFakeBoldText(true);
             if(npcLinkSetting(NPC_LINK_UNDERLINE))paint.setUnderlineText(true);
         }
+    }
+    /** Touch dispatch is handled by the span listener; no-link touches must bubble to the original card. */
+    private static final class NpcLinkMovement extends android.text.method.LinkMovementMethod {
+        static final NpcLinkMovement INSTANCE=new NpcLinkMovement();
+        @Override public boolean onTouchEvent(TextView widget,android.text.Spannable buffer,android.view.MotionEvent event){return false;}
     }
     private static android.text.style.ClickableSpan npcSpanAt(TextView view,android.view.MotionEvent event){
         CharSequence text=view.getText();android.text.Layout layout=view.getLayout();
@@ -3240,7 +3246,7 @@ public final class MainActivity extends Activity {
             for(NpcNameMatcher.Match match:matcher.find(span)){
                 // Existing item links and other explicit links take precedence.
                 if(span.getSpans(match.start,match.end,android.text.style.ClickableSpan.class).length>0)continue;
-                span.setSpan(new NpcLinkSpan(match.name),match.start,match.end,android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE|android.text.Spanned.SPAN_PRIORITY);
+                span.setSpan(new NpcLinkSpan(match.name),match.start,match.end,android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
                 count++;
             }
         }
@@ -3248,7 +3254,7 @@ public final class MainActivity extends Activity {
         boolean clickable=view.isClickable(),longClickable=view.isLongClickable(),focusable=view.isFocusable();
         view.setText(span,TextView.BufferType.SPANNABLE);
         if(count>0){
-            if(view.getMovementMethod()==null)view.setMovementMethod(android.text.method.LinkMovementMethod.getInstance());
+            if(view.getMovementMethod()!=NpcLinkMovement.INSTANCE)view.setMovementMethod(NpcLinkMovement.INSTANCE);
             // Let clicks outside the link continue to reach existing choice/card callbacks.
             view.setClickable(clickable);view.setLongClickable(longClickable);view.setFocusable(focusable);
             view.setHighlightColor(0x2255dfcb);
