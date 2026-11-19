@@ -178,7 +178,15 @@ public final class GameEngine {
             org.json.JSONArray a=d==null?null:d.optJSONArray("route");if(a==null||a.length()<2)continue;
             java.util.ArrayList<String> out=new java.util.ArrayList<>();
             for(int j=0;j<Math.min(32,a.length());j++){String name=a.optString(j);if(!name.isEmpty())out.add(name);}
-            if(out.size()>=2)return out;
+            // A previous journey is not the active route after the hero moves
+            // elsewhere (including AI-driven travel).
+            if(out.size()>=2){
+                SkyrimMapCatalog.Site end=SkyrimMapCatalog.find(out.get(out.size()-1));
+                SkyrimMapCatalog.Site current=SkyrimMapCatalog.find(progress.location);
+                return progress.location.equals(out.get(out.size()-1))||
+                    (end!=null&&current!=null&&end.id.equals(current.id))?
+                    out:java.util.Collections.emptyList();
+            }
         }return java.util.Collections.emptyList();
     }
     private final Random random = new Random();
