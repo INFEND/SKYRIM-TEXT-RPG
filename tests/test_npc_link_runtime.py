@@ -31,6 +31,18 @@ public class NpcLinkProbe {
     check(NpcProfiles.findOriginal("Культист Мирака").template,"DLC");
     check(!NpcProfiles.findOriginal("Серана").template,"named profile");
     check(!names.containsKey("бандит"),"generic noun not global link");
+    Map<String,String> types=NpcProfiles.templateLinkNames();
+    NpcNameMatcher all=new NpcNameMatcher(names);
+    NpcNameMatcher typeMatcher=new NpcNameMatcher(types);
+    for(NpcProfiles.Profile profile:NpcProfiles.originalProfiles()){
+        check(NpcProfiles.find(profile.name)==profile,"exact profile: "+profile.name);
+        List<NpcNameMatcher.Match> hits=(profile.template?typeMatcher:all).find(profile.name);
+        check(hits.size()==1&&hits.get(0).name.equals(profile.name),"whole name resolves: "+profile.name);
+    }
+    for(NpcProfiles.Profile profile:NpcProfiles.authorProfiles())check(NpcProfiles.find(profile.name)==profile,"author identity");
+    for(NpcProfiles.Profile profile:NpcProfiles.mentionedProfiles())check(NpcProfiles.find(profile.name)==profile,"lore identity");
+    check(all.find("Стражник Вайтрана").get(0).name.equals("Стражник Вайтрана"),"qualified template link");
+    check(all.find("Мерсера Фрея").get(0).name.equals("Мерсер Фрей"),"generated full name");
     check(NpcProfiles.findOriginal("Итачи")==null,"author excluded");
     check(NpcProfiles.findAuthor("Итачи Учиха")==NpcProfiles.find("Итачи"),"author alias");
     check(NpcProfiles.findOriginal("Сонд (паломник)")!=NpcProfiles.findOriginal("Сонд"),"two Sond identities");

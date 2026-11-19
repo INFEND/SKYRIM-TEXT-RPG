@@ -498,11 +498,6 @@ public final class MainActivity extends Activity {
             if(ResourceStore.has(this,path))return new CharacterPortraitView(this,profile.race,profile.gender,profile.variant);
             return npcEmblem(profile.name,"hero");
         }
-        String lower=name.toLowerCase(java.util.Locale.ROOT);
-        String race=lower.contains("ирилет")||lower.contains("данмер")?"Данмер":lower.contains("каджит")?"Каджит":lower.contains("аргониан")?"Аргонианин":lower.contains("альтмер")?"Альтмер":lower.contains("орк")?"Орк":lower.contains("импер")||lower.contains("хадвар")?"Имперец":"Норд";
-        boolean female=lower.contains("ирилет")||lower.contains("дельфин")||lower.contains("гердур")||lower.contains("торговка")||lower.contains("женщина")||lower.contains("жрица")||lower.contains("хозяйка")||lower.contains("девушка");
-        String gender=female?CharacterIdentity.FEMALE:CharacterIdentity.MALE;int variant=1+Math.floorMod(name.hashCode(),3);
-        if(ResourceStore.has(this,CharacterIdentity.portraitPath(race,gender,variant)))return new CharacterPortraitView(this,race,gender,variant);
         return npcEmblem(name,"hero");
     }
     private View npcEmblem(String name,String glyph){
@@ -523,6 +518,7 @@ public final class MainActivity extends Activity {
         return npcKey(NpcProfiles.canonicalName(first)).equals(npcKey(NpcProfiles.canonicalName(second)))||(a!=null&&a==b);
     }
     private JSONObject npcFact(String name){
+        if(NpcProfiles.isTemplate(name))return null; // Never merge personal histories of repeatable actors.
         org.json.JSONArray facts=game.sceneState.npcFacts();
         for(int i=0;i<facts.length();i++){JSONObject n=facts.optJSONObject(i);if(n!=null&&sameNpc(name,n.optString("title")))return n;}
         return null;
@@ -553,8 +549,8 @@ public final class MainActivity extends Activity {
         if(KatherineStory.NAME.equals(name)&&game.katherine.enabled&&game.katherine.stage>0)return game.katherine.companion.relation(game.katherine);
         if(AlmaStory.NAME.equals(name)&&game.alma.enabled&&game.alma.stage>0)return game.alma.relationship();
         String status=npcKnownStatus(name);
-        if(status.isEmpty()){NpcProfiles.Profile p=NpcProfiles.find(name);return p==null?"Не знакомы":"Женский".equals(p.gender)?"Незнакомка":"Незнакомец";}
-        if("MET".equals(status)){NpcProfiles.Profile p=NpcProfiles.find(name);return p==null?"Знакомство":"Женский".equals(p.gender)?"Знакомая":"Знакомый";}
+        if(status.isEmpty()){NpcProfiles.Profile p=NpcProfiles.find(name);return p==null||"Не указан".equals(p.gender)?"Не знакомы":"Женский".equals(p.gender)?"Незнакомка":"Незнакомец";}
+        if("MET".equals(status)){NpcProfiles.Profile p=NpcProfiles.find(name);return p==null||"Не указан".equals(p.gender)?"Знакомство":"Женский".equals(p.gender)?"Знакомая":"Знакомый";}
         if("DEAD".equals(status)||"MISSING".equals(status))return "Неизвестно";
         return npcStatusLabel(status);
     }
@@ -616,14 +612,17 @@ public final class MainActivity extends Activity {
         String status=profile!=null&&profile.template?"":npcKnownStatus(display);boolean female=profile!=null&&"Женский".equals(profile.gender);
         boolean alive=npcInCurrentScene(display)||"MET".equals(status)||"INFORMED".equals(status)||"HELPED".equals(status)||"HOSTILE".equals(status);
         String life="DEAD".equals(status)?(profile==null?"Смерть":female?"Погибла":"Погиб"):"MISSING".equals(status)?(profile==null?"Исчезновение":female?"Пропала":"Пропал"):alive?(profile==null?"В живых":female?"Жива":"Жив"):"Неизвестно";
-        int lifeColor="DEAD".equals(status)?ITEM_DOWN:"MISSING".equals(status)?MUTED:alive?ITEM_UP:MUTED;
+        if(profile!=null&&profile.template)life="Зависит от NPC";
+        else if(profile!=null&&profile.mentioned)life="Упоминание";
+        int lifeColor=profile!=null&&(profile.template||profile.mentioned)?MUTED:"DEAD".equals(status)?ITEM_DOWN:"MISSING".equals(status)?MUTED:alive?ITEM_UP:MUTED;
         LinearLayout statuses=row();statuses.setGravity(Gravity.CENTER);
         statuses.addView(npcStatusCell("pulse",life,lifeColor),new LinearLayout.LayoutParams(0,-2,1));
         statuses.addView(npcStatusCell("race",profile==null?"Раса неизвестна":profile.race,TEXT),new LinearLayout.LayoutParams(0,-2,1));
-        statuses.addView(npcStatusCell("heart",profile!=null&&profile.template?"Не применяется":npcRelation(display),TEXT),new LinearLayout.LayoutParams(0,-2,1));
+        statuses.addView(npcStatusCell("heart",profile!=null&&(profile.template||profile.mentioned)?"Не применяется":npcRelation(display),TEXT),new LinearLayout.LayoutParams(0,-2,1));
         panel.addView(statuses,lp(-1,-2));space(panel,16);
         View rule=new View(this);rule.setBackgroundColor(0xff292929);panel.addView(rule,lp(-1,1));space(panel,12);
-        if(profile!=null&&profile.template){addText(panel,"Типовая запись. Внешность, пол, отношения и состояние зависят от конкретного экземпляра.",14,MUTED,false,10);}else npcGrid(panel,NPC_SECTIONS,NPC_SECTION_ICONS,accent(),index->npcSection(display,index));
+        if(profile!=null&&profile.template)addText(panel,"Типовая запись. Внешность, пол, отношения и состояние зависят от конкретного экземпляра.",13,MUTED,false,8);
+        npcGrid(panel,NPC_SECTIONS,NPC_SECTION_ICONS,accent(),index->npcSection(display,index));
         space(panel,9);
         LinearLayout interact=row();interact.setGravity(Gravity.CENTER);interact.setBackground(npcShape(0xff201c14,0,14));
         interact.addView(new NpcLineIcon(this,"talk",accent()),lp(23,23));TextView action=npcCentered("Взаимодействовать",16,accent(),true);action.setPadding(dp(8),0,0,0);interact.addView(action,lp(-2,-2));
@@ -649,6 +648,15 @@ public final class MainActivity extends Activity {
         livingDialog(name+" | Галерея",p);
     }
     private void npcSection(String name,int index){
+        NpcProfiles.Profile record=NpcProfiles.find(name);
+        if(record!=null&&(record.template||record.mentioned)){
+            LinearLayout info=column();
+            if(index==0){livingLine(info,"Имя",record.name,accent());livingLine(info,"Раса",record.race,TEXT);livingLine(info,"Пол",record.gender,TEXT);livingLine(info,"Роль",record.role,TEXT);}
+            else if(index==1){info.addView(npcEmblem(record.name,record.dragon?"dragon":"hero"),lp(-1,160));addText(info,"Индивидуальная галерея отсутствует.",13,MUTED,false,6);}
+            else if(index==3)addText(info,"Роль: "+record.role,14,TEXT,false,8);
+            addText(info,record.template?"Это справочная карточка типа. Индивидуальные сведения и история конкретного экземпляра не объединяются.":"Этот персонаж известен по упоминаниям. Подтверждённых индивидуальных данных прохождения нет.",14,MUTED,false,8);
+            livingDialog(record.name+" | "+NPC_SECTIONS[index],info);return;
+        }
         if(index==0){npcLegacyDetails(name);return;}
         if(index==1){npcGallerySection(name);return;}
         if(index==2&&AlmaStory.NAME.equals(name)&&game.alma.stage>0){almaRelationshipDetails();return;}
@@ -696,7 +704,7 @@ public final class MainActivity extends Activity {
         ScrollView sc=new ScrollView(this);sc.addView(panel);
         final AlertDialog menu=new RuneDialogBuilder(this,accent()).setTitle("Взаимодействовать").setView(sc).setNegativeButton("Закрыть",null).create();
         NpcProfiles.Profile targetProfile=NpcProfiles.find(name);
-        if(targetProfile!=null&&targetProfile.template){toast("Это общая карточка типа NPC");return;}
+        if(targetProfile!=null&&(targetProfile.template||targetProfile.mentioned)){toast("Это справочная карточка NPC");return;}
         final boolean child=targetProfile!=null&&targetProfile.child;
         final int[] allowed=child?new int[]{0,2,6,11}:new int[]{0,1,2,3,4,5,6,7,8,9,10,11};
         String[] labelsForMenu=new String[allowed.length],iconsForMenu=new String[allowed.length];
@@ -738,7 +746,7 @@ public final class MainActivity extends Activity {
     private void npcLegacyDetails(String name){
         LinearLayout panel=column();panel.setGravity(Gravity.CENTER);panel.setPadding(dp(12),dp(12),dp(12),dp(12));
         NpcProfiles.Profile profile=NpcProfiles.find(name);
-        if(profile!=null){addText(panel,profile.race+" | "+profile.role,14,TEXT,true,8);}
+        if(profile!=null){livingLine(panel,"Имя",profile.name,accent());livingLine(panel,"Раса",profile.race,TEXT);livingLine(panel,"Пол",profile.gender,TEXT);livingLine(panel,"Роль",profile.role,TEXT);if(profile.child)addText(panel,"Ребёнок",13,MUTED,false,8);}
         if(ItachiProfile.matches(name)){
             if(!ResourceStore.has(this,"media/itachi/portrait.webp")){TextView load=text("Загрузить портрет Итачи",14,accent(),true);load.setPadding(dp(12),dp(12),dp(12),dp(12));load.setOnClickListener(v->new ResourceManagerDialog(this,accent(),this::render,"media:itachi").show());panel.addView(load,lp(-1,-2));}
             if(game.itachi.enabled&&game.itachi.stage>0){addText(panel,game.itachi.relation()+" | "+game.itachi.objective(game),14,TEXT,true,8);addText(panel,"Доверие "+game.itachi.trust+"/100 | Уважение "+game.itachi.respect+"/100 | Симпатия "+game.itachi.affection+"/100 | Энергия "+game.itachi.energy+"/100",13,TEXT,false,8);}
@@ -3187,7 +3195,7 @@ public final class MainActivity extends Activity {
     private NpcNameMatcher npcNameMatcher(){
         java.util.LinkedHashMap<String,String> names=new java.util.LinkedHashMap<>(npcStaticNames);
         if(game!=null&&game.started){
-            for(String name:game.sceneState.npcNames())if(npcSpeakerName(name))NpcNameMatcher.add(names,NpcProfiles.canonicalName(name),name);
+            for(String name:game.sceneState.npcNames())if(npcSpeakerName(name)&&!NpcProfiles.isTemplate(name))NpcNameMatcher.add(names,NpcProfiles.canonicalName(name),name);
             if(game.aiTurn!=null)for(String speaker:NpcProfiles.speakers(game.aiTurn.scene,game.name))
                 if(npcSpeakerName(speaker))NpcNameMatcher.add(names,NpcProfiles.canonicalName(speaker),speaker);
             if(npcSceneNames!=null)for(String speaker:npcSceneNames)if(npcSpeakerName(speaker))NpcNameMatcher.add(names,NpcProfiles.canonicalName(speaker),speaker);
@@ -4907,7 +4915,19 @@ public final class MainActivity extends Activity {
         java.util.ArrayList<NpcProfiles.Profile> filtered=new java.util.ArrayList<>();
         java.util.ArrayList<String> labels=new java.util.ArrayList<>();
         android.widget.ArrayAdapter<String> adapter=new android.widget.ArrayAdapter<String>(this,android.R.layout.simple_list_item_1,labels){
-            @Override public View getView(int pos,View convert,android.view.ViewGroup parent){View v=super.getView(pos,convert,parent);if(v instanceof TextView)((TextView)v).setTextColor(TEXT);return v;}
+            @Override public View getView(int pos,View convert,android.view.ViewGroup parent){
+                View v=super.getView(pos,convert,parent);
+                if(v instanceof TextView){TextView row=(TextView)v;row.setTextColor(TEXT);row.setTag("npc_no_self_link");
+                    if(pos>=0&&pos<filtered.size()&&npcLinkSetting(NPC_LINKS)){
+                        String label=labels.get(pos);int end=filtered.get(pos).name.length();
+                        android.text.SpannableString styled=new android.text.SpannableString(label);
+                        if(npcLinkSetting(NPC_LINK_COLORED))styled.setSpan(new android.text.style.ForegroundColorSpan(npcLinkColor()),0,end,33);
+                        if(npcLinkSetting(NPC_LINK_BOLD))styled.setSpan(new android.text.style.StyleSpan(android.graphics.Typeface.BOLD),0,end,33);
+                        if(npcLinkSetting(NPC_LINK_UNDERLINE))styled.setSpan(new android.text.style.UnderlineSpan(),0,end,33);
+                        row.setText(styled);
+                    }
+                }return v;
+            }
         };
         list.setAdapter(adapter);
         Runnable refresh=()->{String q=NpcNameMatcher.key(search.getText().toString());filtered.clear();labels.clear();NpcProfiles.Profile exact=NpcProfiles.find(q);

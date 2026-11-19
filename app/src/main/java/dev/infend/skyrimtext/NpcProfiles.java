@@ -1328,6 +1328,46 @@ final class NpcProfiles {
             if(reply.startsWith("— ")||reply.startsWith("- "))result.add(name);
         }return result;
     }
+    /** Conservative declensions of registered names; ambiguous generated forms are discarded. */
+    private static String[] nounCases(String word,boolean female){
+        if(!word.matches("[а-яё]+")||word.length()<3)return new String[]{word,word,word,word,word};
+        int n=word.length();char end=word.charAt(n-1);String stem=word.substring(0,n-1);
+        if(word.endsWith("ая")){String r=word.substring(0,n-2);return new String[]{r+"ой",r+"ой",r+"ую",r+"ой",r+"ой"};}
+        if(word.endsWith("яя")){String r=word.substring(0,n-2);return new String[]{r+"ей",r+"ей",r+"юю",r+"ей",r+"ей"};}
+        if(end=='а'){char prev=word.charAt(n-2);return new String[]{stem+("гкхжчшщ".indexOf(prev)>=0?"и":"ы"),stem+"е",stem+"у",stem+("жчшщ".indexOf(prev)>=0?"ей":"ой"),stem+"е"};}
+        if(end=='я')return new String[]{stem+"и",stem+"е",stem+"ю",stem+"ей",stem+"е"};
+        if(female||word.endsWith("ый")||word.endsWith("ой"))return new String[]{word,word,word,word,word};
+        if(end=='й'||end=='ь')return new String[]{stem+"я",stem+"ю",stem+"я",stem+"ем",stem+"е"};
+        if("бвгджзклмнпрстфхцчшщ".indexOf(end)>=0)return new String[]{word+"а",word+"у",word+"а",word+"ом",word+"е"};
+        return new String[]{word,word,word,word,word};
+    }
+    private static void addGeneratedForms(LinkedHashMap<String,String> out){
+        LinkedHashMap<String,String> generated=new LinkedHashMap<>();
+        java.util.HashSet<String> ambiguous=new java.util.HashSet<>();
+        // Only exact registered names and aliases are inputs, not previously declined forms.
+        for(java.util.Map.Entry<String,String> e:new java.util.ArrayList<>(out.entrySet())){
+            Profile profile=exact(e.getValue());
+            String alias=e.getKey();
+            if(profile==null||profile.template||profile.mentioned||exact(alias)!=profile||!alias.matches("[а-яё]+(?: [а-яё]+)?"))continue;
+            String[] parts=alias.split(" ");
+            boolean female="Женский".equals(profile.gender);
+            String[][] cases=new String[parts.length][];
+            for(int i=0;i<parts.length;i++)cases[i]=nounCases(parts[i],female);
+            for(int k=0;k<5;k++){
+                String form=parts.length==1?cases[0][k]:cases[0][k]+" "+cases[1][k];
+                if(form.equals(alias)||form.length()<4||out.containsKey(form)||ambiguous.contains(form))continue;
+                String prior=generated.putIfAbsent(form,profile.name);
+                if(prior!=null&&!prior.equals(profile.name)){generated.remove(form);ambiguous.add(form);}
+            }
+        }
+        generated.forEach(out::putIfAbsent);
+    }
+    static LinkedHashMap<String,String> templateLinkNames(){
+        LinkedHashMap<String,String> out=new LinkedHashMap<>();
+        TEMPLATES.forEach((alias,profile)->{if(exact(alias)==profile)out.put(alias,profile.name);});
+        return out;
+    }
+
     /** Includes grammatical aliases without changing the canonical NPC identity. */
     private static java.util.LinkedHashMap<String,String> buildLinkNames(){
         java.util.LinkedHashMap<String,String> out=new java.util.LinkedHashMap<>();
@@ -1384,6 +1424,9 @@ final class NpcProfiles {
             String canonical=profile==null?row[0]:profile.name;
             NpcNameMatcher.add(out,canonical,java.util.Arrays.copyOfRange(row,1,row.length));
         }
+        addGeneratedForms(out);
+        // Fully qualified type names are safe reference links. Bare types are context-only.
+        templateLinkNames().forEach((alias,canonical)->{if(alias.contains(" "))out.putIfAbsent(alias,canonical);});
         return out;
     }
     private static final java.util.Map<String,String> LINK_NAMES=java.util.Collections.unmodifiableMap(buildLinkNames());
