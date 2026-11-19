@@ -27,7 +27,9 @@ final class SolitudeCraft {
         if(!lab(g)||g.progress.quantity(ALCHEMY_A[i])<1||g.progress.quantity(ALCHEMY_B[i])<1)return false;
         if(i==0&&g.manaPotions==Integer.MAX_VALUE)return false;
         if(g.progress.quantity(ALCHEMY_OUT[i])==Integer.MAX_VALUE)return false;
-        return g.progress.carryWeight()+0.3<=g.progress.carryLimit()+0.00001;
+        ItemCatalog.Item first=ItemCatalog.find(ALCHEMY_A[i]),second=ItemCatalog.find(ALCHEMY_B[i]),potion=ItemCatalog.find(ALCHEMY_OUT[i]);
+        if(first==null||second==null||potion==null)return false;
+        return g.progress.carryWeight()-first.weight-second.weight+potion.weight<=g.progress.carryLimit()+0.00001;
     }
     private static void mix(GameEngine g,int i){
         if(!canMix(g,i))return;

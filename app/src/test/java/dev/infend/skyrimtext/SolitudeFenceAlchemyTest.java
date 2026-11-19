@@ -24,4 +24,19 @@ public class SolitudeFenceAlchemyTest {
         g.progress.quantity("Пурпурный горноцвет",1);g.progress.quantity("Лаванда",1);int n=g.progress.quantity("Зелье запаса сил");
         g.choose("SOLITUDE:craft:mix:1");assertEquals(n+1,g.progress.quantity("Зелье запаса сил"));assertEquals(11,g.hour);
     }
+    @Test public void alchemyUsesNetWeightAndSurvivesReload() throws Exception {
+        GameEngine g=city(0,9);g.choose("SOLITUDE:store:1");
+        g.progress.quantity("Красный горноцвет",1);g.progress.quantity("Снежные ягоды",1);
+        // Ingredients weigh 0.2 kg, the resulting potion weighs 0.5 kg.
+        // A 0.3 kg free allowance must be enough even at the carry limit.
+        double free=g.progress.carryLimit()-g.progress.carryWeight();
+        assertTrue("test needs 0.3 kg free",free>=0.3);
+        int before=g.manaPotions;
+        g.choose("SOLITUDE:craft:mix:0");
+        assertEquals(before+1,g.manaPotions);
+        assertEquals(0,g.progress.quantity("Красный горноцвет"));
+        g=GameEngine.fromJson(g.toJson().toString());
+        g.choose("SOLITUDE:craft:mix:0");assertEquals(before+1,g.manaPotions);
+    }
 }
+

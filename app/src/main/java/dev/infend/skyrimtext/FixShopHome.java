@@ -18,7 +18,11 @@ final class FixShopHome {
     String here(GameEngine g){for(int i=0;i<CITY.length;i++)if(owns(i)&&CITY[i].equals(g.progress.location))return NAME[i];for(int r:new int[]{5,7,8})if(RoadEvents.ownsEstate(g,r)&&RoadEvents.estate(r).equals(g.progress.location))return RoadEvents.estate(r);return "";}
     static void choices(GameEngine g,GameEngine.Scene s){if(!FixShopWorld.safe(g))return;FixShopHome h=g.fixShop.home;if(h.here(g).isEmpty())return;s.add("FIXRESIDENCE:rest","Отдохнуть: "+h.here(g),h.room(0)?"8 часов | улучшенный отдых":"8 часов | бесплатно");if(h.room(1)&&h.lastMeal!=g.day)s.add("FIXRESIDENCE:meal","Поесть дома","Бесплатно | один раз в день");if(h.room(2)&&h.lastAlchemy!=g.day)s.add("FIXRESIDENCE:alchemy","Алхимическая лаборатория","Практика алхимии | 1 час");if(h.room(2)&&canBrew(g))s.add("FIXRESIDENCE:brew","Сварить лечебное зелье","Пшеница + голубой горноцвет");if(h.room(3)&&h.lastForge!=g.day)s.add("FIXRESIDENCE:forge","Личная кузница","Практика кузнечного дела | 1 час");}
     int lastAlchemy=-1,lastForge=-1;
-    static boolean canBrew(GameEngine g){return g.potions<Integer.MAX_VALUE&&g.progress.quantity("Пшеница")>0&&g.progress.quantity("Голубой горноцвет")>0&&g.progress.carryWeight()+0.3<=g.progress.carryLimit()+0.00001;}
+    static boolean canBrew(GameEngine g){return g.potions<Integer.MAX_VALUE&&g.progress.quantity("Пшеница")>0&&g.progress.quantity("Голубой горноцвет")>0&&alchemyFits(g);}
+    private static boolean alchemyFits(GameEngine g){
+        ItemCatalog.Item wheat=ItemCatalog.find("Пшеница"),flower=ItemCatalog.find("Голубой горноцвет"),potion=ItemCatalog.find("Лечебное зелье");
+        return wheat!=null&&flower!=null&&potion!=null&&g.progress.carryWeight()-wheat.weight-flower.weight+potion.weight<=g.progress.carryLimit()+0.00001;
+    }
     static boolean brew(GameEngine g){if(!canBrew(g))return false;if(!g.progress.removeItem("Пшеница",1))return false;if(!g.progress.removeItem("Голубой горноцвет",1)){g.progress.addItem("Пшеница",1);return false;}g.potions++;g.progress.skillExperience(g,7,25);g.progress.sync(g);g.message="Ты приготовил лечебное зелье.";g.mode="RESULT";return true;}
     static boolean choose(GameEngine g,String a){if(!FixShopWorld.safe(g))return false;FixShopHome h=g.fixShop.home;if(h.here(g).isEmpty())return false;
         if("FIXRESIDENCE:rest".equals(a)){if(!g.restHours(8,true))return false;if(h.room(0)){g.hp=g.maxHp;g.magicka=g.maxMagicka;g.stamina=g.maxStamina;}g.mode="RESULT";return true;}

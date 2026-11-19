@@ -43,4 +43,16 @@ public class SolitudeCraftTest {
         assertEquals(0,g.progress.quantity("Пшеница"));assertEquals(0,g.progress.quantity("Голубой горноцвет"));
         g=GameEngine.fromJson(g.toJson().toString());g.choose("SOLITUDE:craft:brew");assertEquals(before+1,g.potions);
     }
+    @Test public void homeAlchemyUsesConsumedIngredientWeight() throws Exception {
+        GameEngine g=city(0);
+        g.progress.quantity("Пшеница",1);g.progress.quantity("Голубой горноцвет",1);
+        assertTrue(FixShopHome.canBrew(g));
+        int before=g.potions;
+        assertTrue(FixShopHome.brew(g));
+        assertEquals(before+1,g.potions);
+        assertEquals(0,g.progress.quantity("Пшеница"));
+        g=GameEngine.fromJson(g.toJson().toString());
+        assertFalse(FixShopHome.canBrew(g));
+    }
 }
+
