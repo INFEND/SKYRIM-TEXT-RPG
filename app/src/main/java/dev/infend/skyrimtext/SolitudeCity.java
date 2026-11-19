@@ -50,7 +50,7 @@ final class SolitudeCity {
         new Job("Подготовить кузнечные инструменты","Ты очищаешь клещи и сортируешь заготовки для Бейранда.",6,1,6,10,10,0),
         new Job("Подготовить зал трактира","Ты расставляешь кружки и готовишь столы к приёму гостей.",12,1,4,8,8,0),
         new Job("Проверить причальные канаты","Ты осматриваешь крепления и заменяешь изношенные верёвки из запасов порта.",-1,2,10,17,0,1),
-new Job("Упаковать товары","Ты оборачиваешь хрупкие товары тканью и подписываешь ящики.",12,1,4,10,8,0),
+        new Job("Упаковать товары","Ты оборачиваешь хрупкие товары тканью и подписываешь ящики.",12,1,4,10,8,0),
         new Job("Осмотреть учебные щиты","Ты проверяешь ремни и крепления учебного снаряжения.",3,1,5,10,8,0),
         new Job("Переписать опись дворца","Ты сверяешь перечень имущества с архивной копией.",12,2,3,14,10,1),
         new Job("Настроить инструменты","Ты помогаешь ученикам подготовить инструменты к занятию.",12,1,2,8,8,0),
@@ -188,7 +188,7 @@ new Job("Упаковать товары","Ты оборачиваешь хру�
     JSONObject save(){JSONObject o=new JSONObject();try{o.put("lastDay",new JSONArray(lastDay)).put("shops",shops.save()).put("home",home.save()).put("justice",justice.save()).put("fenceDay",fence.save());}catch(Exception ignored){}return o;}
     static SolitudeCity restore(JSONObject o){
         SolitudeCity s=new SolitudeCity();JSONArray a=o==null?null:o.optJSONArray("lastDay");
-        if(a!=null)for(int i=0;i<s.lastDay.length;i++)s.lastDay[i]=Math.max(0,a.optInt(i,0));
+        if(a!=null)for(int i=0;i<Math.min(a.length(),s.lastDay.length);i++)s.lastDay[i]=Math.max(0,a.optInt(i,0));
         s.shops=SolitudeShops.restore(o==null?null:o.optJSONObject("shops"));
         s.home=SolitudeHome.restore(o==null?null:o.optJSONObject("home"));
         s.justice=SolitudeJustice.restore(o==null?null:o.optJSONObject("justice"));
