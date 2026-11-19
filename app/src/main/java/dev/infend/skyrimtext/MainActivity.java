@@ -535,7 +535,8 @@ public final class MainActivity extends Activity {
         if(KatherineStory.NAME.equals(name)&&game.katherine.enabled&&game.katherine.stage>0)return game.katherine.companion.relation(game.katherine);
         if(AlmaStory.NAME.equals(name)&&game.alma.enabled&&game.alma.stage>0)return game.alma.relationship();
         String status=npcKnownStatus(name);
-        if(status.isEmpty()){NpcProfiles.Profile p=NpcProfiles.find(name);return p!=null&&"Женский".equals(p.gender)?"Незнакомка":"Незнакомый";}
+        if(status.isEmpty()){NpcProfiles.Profile p=NpcProfiles.find(name);return p==null?"Не знакомы":"Женский".equals(p.gender)?"Незнакомка":"Незнакомец";}
+        if("MET".equals(status)){NpcProfiles.Profile p=NpcProfiles.find(name);return p==null?"Знакомство":"Женский".equals(p.gender)?"Знакомая":"Знакомый";}
         if("DEAD".equals(status)||"MISSING".equals(status))return "Неизвестно";
         return npcStatusLabel(status);
     }
@@ -583,7 +584,7 @@ public final class MainActivity extends Activity {
         space(panel,16);
         String status=npcKnownStatus(display);boolean female=profile!=null&&"Женский".equals(profile.gender);
         boolean alive=npcInCurrentScene(display)||"MET".equals(status)||"INFORMED".equals(status)||"HELPED".equals(status)||"HOSTILE".equals(status);
-        String life="DEAD".equals(status)?(female?"Погибла":"Погиб"):"MISSING".equals(status)?(female?"Пропала":"Пропал"):alive?(female?"Жива":"Жив"):"Неизвестно";
+        String life="DEAD".equals(status)?(profile==null?"Смерть":female?"Погибла":"Погиб"):"MISSING".equals(status)?(profile==null?"Исчезновение":female?"Пропала":"Пропал"):alive?(profile==null?"В живых":female?"Жива":"Жив"):"Неизвестно";
         int lifeColor="DEAD".equals(status)?ITEM_DOWN:alive?ITEM_UP:MUTED;
         LinearLayout statuses=row();statuses.setGravity(Gravity.CENTER);
         statuses.addView(npcStatusCell("pulse",life,lifeColor),new LinearLayout.LayoutParams(0,-2,1));
