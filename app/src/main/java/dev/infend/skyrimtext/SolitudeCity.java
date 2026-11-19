@@ -61,6 +61,7 @@ final class SolitudeCity {
     int jordisDamage(GameEngine g,int turn,int remaining){return home.jordisActive(g)&&turn%2==0?Math.min(Math.max(0,remaining),4+Math.min(10,g.level/5)+home.jordisWeaponBonus()):0;}
     int jordisProtection(GameEngine g,int incoming,boolean defending){return defending&&home.jordisActive(g)?home.jordisProtection(incoming):0;}
     private SolitudeJustice justice=new SolitudeJustice();
+    private final SolitudeFence fence=new SolitudeFence();
     boolean confined(){return justice.confined();}
     boolean custody(){return confined()||justice.detained();}
     void beginSentence(GameEngine g){justice.begin(g);}
@@ -119,6 +120,7 @@ final class SolitudeCity {
         if(d==2)home.palace(g,s);
         if(d==1){SolitudeJustice.choices(g,s);justice.trespassChoice(g,s);SolitudeCanonical.castleChoices(g,s);}
         if(d==0)justice.theftChoice(g,s);
+        if(d==7)fence.choices(g,s);
         SolitudeCanonical.districtChoices(g,s,d);
         SolitudeEncounters.choices(g,s,d);
         SolitudeResidents.choices(g,s,d);
@@ -139,6 +141,7 @@ final class SolitudeCity {
         if((PREFIX+"back").equals(action)){g.mode=MODE;g.message="";return;}
         if(SolitudeJustice.MODE.equals(g.mode)){justice.choose(g,action);return;}
         if(SolitudeCraft.choose(g,action))return;
+        if(fence.choose(g,action))return;
         if(SolitudeCanonical.choose(g,action))return;
         if(SolitudeCanonical.graceMode(g.mode))return;
         if(SolitudeHome.MODE.equals(g.mode)){home.choose(g,action);return;}
@@ -174,13 +177,14 @@ final class SolitudeCity {
             g.progress.sync(g);return;
         }
     }
-    JSONObject save(){JSONObject o=new JSONObject();try{o.put("lastDay",new JSONArray(lastDay)).put("shops",shops.save()).put("home",home.save()).put("justice",justice.save());}catch(Exception ignored){}return o;}
+    JSONObject save(){JSONObject o=new JSONObject();try{o.put("lastDay",new JSONArray(lastDay)).put("shops",shops.save()).put("home",home.save()).put("justice",justice.save()).put("fenceDay",fence.save());}catch(Exception ignored){}return o;}
     static SolitudeCity restore(JSONObject o){
         SolitudeCity s=new SolitudeCity();JSONArray a=o==null?null:o.optJSONArray("lastDay");
         if(a!=null)for(int i=0;i<s.lastDay.length;i++)s.lastDay[i]=Math.max(0,a.optInt(i,0));
         s.shops=SolitudeShops.restore(o==null?null:o.optJSONObject("shops"));
         s.home=SolitudeHome.restore(o==null?null:o.optJSONObject("home"));
         s.justice=SolitudeJustice.restore(o==null?null:o.optJSONObject("justice"));
+        s.fence.restore(o==null?0:o.optInt("fenceDay"));
         return s;
     }
 }

@@ -21,6 +21,24 @@ final class SolitudeCraft {
         if(out==null||mat==null||strip==null||g.progress.temperQuality(out.id)>0||g.progress.quantity(out.id)>Integer.MAX_VALUE-COUNT[i])return false;
         return g.progress.carryWeight()-METAL[i]*mat.weight-STRIPS[i]*strip.weight+COUNT[i]*out.weight<=g.progress.carryLimit()+0.00001;
     }
+    private static final String[] ALCHEMY_A={"Красный горноцвет","Пурпурный горноцвет"}, ALCHEMY_B={"Снежные ягоды","Лаванда"};
+    private static final String[] ALCHEMY_OUT={"Зелье магии","Зелье запаса сил"};
+    private static boolean canMix(GameEngine g,int i){
+        if(!lab(g)||g.progress.quantity(ALCHEMY_A[i])<1||g.progress.quantity(ALCHEMY_B[i])<1)return false;
+        if(i==0&&g.manaPotions==Integer.MAX_VALUE)return false;
+        if(g.progress.quantity(ALCHEMY_OUT[i])==Integer.MAX_VALUE)return false;
+        return g.progress.carryWeight()+0.3<=g.progress.carryLimit()+0.00001;
+    }
+    private static void mix(GameEngine g,int i){
+        if(!canMix(g,i))return;
+        if(!g.progress.removeItem(ALCHEMY_A[i],1))return;
+        if(!g.progress.removeItem(ALCHEMY_B[i],1)){g.progress.addItem(ALCHEMY_A[i],1);return;}
+        if(i==0)g.manaPotions++;
+        else if(!g.progress.addItem(ALCHEMY_OUT[i],1)){
+            g.progress.addItem(ALCHEMY_A[i],1);g.progress.addItem(ALCHEMY_B[i],1);return;
+        }
+        g.progress.skillExperience(g,7,25);finish(g,"В лаборатории Анжелины приготовлено: "+ALCHEMY_OUT[i],3);
+    }
     private static void finish(GameEngine g,String text,int stamina){
         g.stamina-=stamina;g.hour++;g.syncLivingSystems();g.message=text;g.progress.recent=text;g.recordVisualEvent(text);g.progress.sync(g);
     }
@@ -30,10 +48,12 @@ final class SolitudeCraft {
             for(ItemCatalog.Item item:g.progress.owned("Все","Название"))if(!item.temperMaterial().isEmpty()&&g.progress.temperBlock(item,g).isEmpty())
                 s.add(PREFIX+"temper:"+item.id,"Улучшить: "+item.name,"1 × "+item.temperMaterial()+" | "+g.progress.temperTargetName(item)+" | 1 ч.");
         }
+        for(int i=0;i<ALCHEMY_OUT.length;i++)if(canMix(g,i))s.add(PREFIX+"mix:"+i,"Сварить: "+ALCHEMY_OUT[i],ALCHEMY_A[i]+" + "+ALCHEMY_B[i]+" | Адаптированный рецепт | 1 ч. | 3 запаса сил");
         if(lab(g)&&FixShopHome.canBrew(g))s.add(PREFIX+"brew","Сварить лечебное зелье","Пшеница + голубой горноцвет | 1 ч. | 3 запаса сил");
     }
     static boolean choose(GameEngine g,String a){
         if(!a.startsWith(PREFIX))return false;
+        for(int i=0;i<ALCHEMY_OUT.length;i++)if(a.equals(PREFIX+"mix:"+i)){mix(g,i);return true;}
         if(a.equals(PREFIX+"brew")){
             if(!lab(g)||!FixShopHome.canBrew(g))return true;
             String mode=g.mode;if(FixShopHome.brew(g)){g.mode=mode;finish(g,"В лаборатории Анжелины приготовлено лечебное зелье.",3);}return true;
