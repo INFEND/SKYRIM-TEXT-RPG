@@ -27,4 +27,21 @@ public class SolitudeResidentsTest {
         assertEquals(3,SolitudeResidents.district(3,16));
         assertEquals(6,SolitudeResidents.district(3,17));
     }
+    @Test public void newResidentsAndTopicsShareMemoryAcrossDistricts() throws Exception {
+        GameEngine g=new GameEngine();g.start("Тест","Норд","Воин");
+        g.region=3;g.progress.location="Солитьюд";g.mode="WORLD";g.hour=12;
+        g.choose("SOLITUDE:open");g.choose("SOLITUDE:visit:0");
+        int gold=g.gold,rep=g.holdReputation[3];
+        g.choose("SOLITUDE:resident:topic:5");
+        assertEquals("MET",g.sceneState.npcStatusByName("Гисли"));
+        assertTrue(g.message.contains("городских новостей"));
+        g.hour=15;String before=g.message;g.choose("SOLITUDE:resident:topic:5");assertEquals(before,g.message);
+        g.choose("SOLITUDE:back");g.choose("SOLITUDE:visit:6");
+        g=GameEngine.fromJson(g.toJson().toString());
+        g.choose("SOLITUDE:resident:talk:5");assertTrue(g.message.contains("Снова встретились"));
+        assertEquals(gold,g.gold);assertEquals(rep,g.holdReputation[3]);
+        assertEquals(2,SolitudeResidents.district(6,14));
+        assertEquals(7,SolitudeResidents.district(6,15));
+        assertEquals(-1,SolitudeResidents.district(6,18));
+    }
 }
