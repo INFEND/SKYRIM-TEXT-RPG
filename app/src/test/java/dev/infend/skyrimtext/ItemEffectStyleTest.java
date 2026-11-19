@@ -2,6 +2,14 @@ package dev.infend.skyrimtext;
 import org.junit.Test;
 import static org.junit.Assert.*;
 public class ItemEffectStyleTest {
+    @Test public void groupedByMeaningNotColor(){
+        assertEquals(0,ItemEffectStyle.group("Урон огнём"));
+        assertEquals(3,ItemEffectStyle.group("Сопротивление огню"));
+        assertEquals(9,ItemEffectStyle.group("Уязвимость к огню"));
+        assertEquals(1,ItemEffectStyle.group("Поглощение здоровья"));
+        assertEquals(2,ItemEffectStyle.group("Паралич"));
+        assertEquals(7,ItemEffectStyle.group("Кузнечное дело"));
+    }
     @Test public void expandedReferencePalette(){
         assertSame(ItemEffectStyle.CHAOS,ItemEffectStyle.classify("Урон хаосом",""));
         assertSame(ItemEffectStyle.PARALYSIS,ItemEffectStyle.classify("Паралич",""));

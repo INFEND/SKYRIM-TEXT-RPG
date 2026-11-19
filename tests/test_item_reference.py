@@ -5,7 +5,7 @@ ROOT=Path(__file__).resolve().parents[1]
 UI=(ROOT/"app/src/main/java/dev/infend/skyrimtext/MainActivity.java").read_text()
 class ItemReference(unittest.TestCase):
     def test_reference_layout(self):
-        for token in ('itemPicture(item,54)','itemPicture(item,94)','new ItemStatGlyph','SovngardeTypeface.styled(this,Typeface.ITALIC)','Typeface.ITALIC','item.weight-worn.weight','item.value-worn.value','actions.addView(equip','actions.addView(discard','itemDialog(item);'):
+        for token in ('itemPicture(item,54)','itemPicture(item,94)','new ItemStatGlyph','SovngardeTypeface.styled(this,Typeface.ITALIC)','Typeface.ITALIC','item.weight-worn.weight','item.value-worn.value','actions.addView(equip','actions.addView(more','itemDialog(item);'):
             self.assertIn(token,UI)
         self.assertNotIn('NATIVE_ITEM_FONT',UI)
         item_text=UI.split('private TextView itemText(',1)[1].split('private android.graphics.drawable.GradientDrawable',1)[0]

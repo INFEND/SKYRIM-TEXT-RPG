@@ -3787,7 +3787,8 @@ public final class MainActivity extends Activity {
         String e=item.effect==null?"":item.effect.toLowerCase(java.util.Locale.ROOT);
         if(!item.weapon()&&!item.wearable())return false;
         return e.contains("зачар")||e.contains("поглощ")||e.contains("захват душ")||
-            ItemEffectStyle.damageEnchantment(e);
+            e.contains("сопротивлен")||e.contains("паралич")||e.contains("при ношении")||
+            e.contains("регенерац")||ItemEffectStyle.damageEnchantment(e);
     }
     private View itemPicture(ItemCatalog.Item item,int size){
         android.widget.FrameLayout tile=new android.widget.FrameLayout(this);
@@ -3996,7 +3997,17 @@ public final class MainActivity extends Activity {
         if(restoration<=0&&("Зелья".equals(item.category)||"Яды".equals(item.category)||"Ингредиенты".equals(item.category))){
             host.addView(itemText("Справочный эффект:",11,MUTED,false),lp(-1,-2));space(host,4);
         }
-        for(ItemEffectRow entry:effects){
+        if(item.weapon()||item.wearable()){
+            for(int group=0;group<ItemEffectStyle.GROUPS.length;group++){
+                boolean heading=false;
+                for(ItemEffectRow entry:effects){
+                    String effect=entry.label;
+                    if(ItemEffectStyle.group(effect)!=group)continue;
+                    if(!heading){space(host,4);host.addView(itemText(ItemEffectStyle.GROUPS[group],14,TEXT,true),lp(-1,-2));space(host,8);heading=true;}
+                    itemEffectLine(host,entry,ItemEffectStyle.classify(effect,item.name));
+                }
+            }
+        }else for(ItemEffectRow entry:effects){
             String effect=entry.label;
             itemEffectLine(host,entry,ItemEffectStyle.classify(effect,item.name));
         }
@@ -4189,7 +4200,13 @@ public final class MainActivity extends Activity {
         words.addView(itemText((itemType(item)+(subtype.isEmpty()?"":" • "+subtype)).toUpperCase(java.util.Locale.ROOT),11,0xffa3a3a3,false),lp(-1,-2));space(words,5);
         words.addView(itemText(item.name,22,TEXT,true),lp(-1,-2));
         String material=itemMaterialLabel(item);
-        if(!material.isEmpty()){space(words,4);words.addView(itemText("◇ "+material,12,accent(),false),lp(-1,-2));}
+        if(!material.isEmpty()){space(words,4);
+            String family=item.name.toLowerCase(java.util.Locale.ROOT).startsWith("даэдр")?(item.weapon()?"Даэдрическое оружие":"Даэдрический доспех"):material;
+            LinearLayout familyLine=row();familyLine.setGravity(Gravity.CENTER_VERTICAL);
+            familyLine.addView(new ItemStatGlyph(this,"soul",accent()),lp(15,15));
+            TextView familyName=itemText(family,12,accent(),false);
+            LinearLayout.LayoutParams fp=lp(-2,-2);fp.leftMargin=dp(4);familyLine.addView(familyName,fp);words.addView(familyLine,lp(-1,-2));
+        }
         if(game.progress.equipped(item.id)){space(words,4);words.addView(itemText("◆ Экипировано",12,ITEM_UP,false),lp(-1,-2));}
         int quantity=game.progress.quantity(item.id);
         if(quantity>0){space(words,3);words.addView(itemText("В наличии: "+quantity,12,MUTED,false),lp(-1,-2));}
@@ -4217,7 +4234,7 @@ public final class MainActivity extends Activity {
             if(!item.temperMaterial().isEmpty())itemProperty(view,"hammer","Улучшение",game.progress.quantity(item.id)>0?game.progress.temperQualityName(item.id):"Нет",0xffa3a3a3);
             itemProperty(view,"magic","Зачарование",itemEnchanted(item)?"Есть":"Нет",0xffa3a3a3);
         }
-        itemDivider(view,7);itemEffect(view,item);
+        itemEffect(view,item);
         int artifact=CompensationPowers.itemIndex(item.id);if(artifact>=0){addText(view,game.compensation.bound[artifact]?"Привязка к душе":"Системное снаряжение | нельзя потерять",12,ITEM_MAGIC,true,5);if(game.compensation.passive[artifact])addText(view,game.compensation.passiveLabel(artifact)+" при экипировке",13,ITEM_UP,false,6);}
         itemEffectPreview(view,item);
         itemDivider(view,7);
