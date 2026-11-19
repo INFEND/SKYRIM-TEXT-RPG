@@ -506,9 +506,192 @@ public final class MainActivity extends Activity {
         tile.setBackground(new RuneFrameDrawable(PANEL,accent(),false));tile.addView(new SkyrimIconView(this,glyph,accent()),lp(40,48));
         TextView letter=text(name.isEmpty()?"?":name.substring(0,1),15,accent(),true);letter.setGravity(Gravity.CENTER);tile.addView(letter,lp(-1,-2));return tile;
     }
+    private static final String[] NPC_SECTIONS={"Досье","Галерея","Отношения","Способности","Имущество","Хроника"};
+    private static final String[] NPC_SECTION_ICONS={"id","gallery","heart","swords","bag","book"};
+    private static final String[] NPC_ACTIONS={"Поговорить","Торговля","Подарить","Флиртовать","Пригласить","Обучение","Задания","Вызвать на бой","Стать спутником","Подкупить","Обокрасть","Попрощаться"};
+    private static final String[] NPC_ACTION_ICONS={"talk","trade","gift","heart","people","learn","scroll","swords","shield","coins","steal","door"};
+    private static final String[] NPC_ACTION_TEXT={"Заговариваю с персонажем","Предлагаю торговлю персонажу","Предлагаю выбрать подарок для персонажа","Пробую пофлиртовать с персонажем","Приглашаю персонажа провести время вместе","Спрашиваю персонажа об обучении","Спрашиваю персонажа о доступных заданиях","Вызываю персонажа на поединок","Предлагаю персонажу стать моим спутником","Пробую договориться о подкупе персонажа","Пробую незаметно обокрасть персонажа","Прощаюсь с персонажем"};
+    private static final String[] NPC_NATIVE_WORDS={"поговор|разговор|спрос|бесед","торгов|купить|продать|товар","подар|дарить","флирт|романт|ухажив","приглас|свидан","обуч|науч|урок","задан|поручен|квест","поедин|дуэл|вызвать на бой","спутник|сопровожд|вместе в путь","подкуп|взятк","обокра|карман|украсть","прощ|покинуть беседу|закончить разговор"};
+    private static String npcKey(String value){return value==null?"":value.toLowerCase(java.util.Locale.ROOT).replace('ё','е').trim();}
+    private static boolean sameNpc(String first,String second){
+        NpcProfiles.Profile a=NpcProfiles.find(first),b=NpcProfiles.find(second);
+        return npcKey(first).equals(npcKey(second))||(a!=null&&a==b);
+    }
+    private JSONObject npcFact(String name){
+        org.json.JSONArray facts=game.sceneState.npcFacts();
+        for(int i=0;i<facts.length();i++){JSONObject n=facts.optJSONObject(i);if(n!=null&&sameNpc(name,n.optString("title")))return n;}
+        return null;
+    }
+    private String npcKnownStatus(String name){JSONObject n=npcFact(name);return n==null?"":n.optString("status");}
+    private boolean npcInCurrentScene(String name){
+        if(!game.started)return false;
+        String scene=game.aiNarrativeMode&&!game.nativeSceneRequired()?(game.aiTurn==null?"":game.aiTurn.scene):game.scene().body;
+        for(String speaker:NpcProfiles.speakers(scene,game.name))if(sameNpc(name,speaker))return true;
+        return false;
+    }
+    private String npcRelation(String name){
+        if(ItachiProfile.matches(name)&&game.itachi.enabled&&game.itachi.stage>0)return game.itachi.relation();
+        if(LiviaStory.matches(name)&&game.livia.enabled&&game.livia.stage>0)return game.livia.relation();
+        if(KatherineStory.NAME.equals(name)&&game.katherine.enabled&&game.katherine.stage>0)return game.katherine.companion.relation(game.katherine);
+        if(AlmaStory.NAME.equals(name)&&game.alma.enabled&&game.alma.stage>0)return game.alma.relationship();
+        String status=npcKnownStatus(name);
+        if(status.isEmpty()){NpcProfiles.Profile p=NpcProfiles.find(name);return p!=null&&"Женский".equals(p.gender)?"Незнакомка":"Незнакомый";}
+        if("DEAD".equals(status)||"MISSING".equals(status))return "Неизвестно";
+        return npcStatusLabel(status);
+    }
+    private android.graphics.drawable.GradientDrawable npcShape(int color,int border,int radius){
+        android.graphics.drawable.GradientDrawable shape=new android.graphics.drawable.GradientDrawable();
+        shape.setColor(color);shape.setCornerRadius(dp(radius));if(border!=0)shape.setStroke(dp(1),border);return shape;
+    }
+    private TextView npcCentered(String value,int size,int color,boolean bold){
+        TextView t=text(value,size,color,bold);t.setGravity(Gravity.CENTER);t.setIncludeFontPadding(false);return t;
+    }
+    private LinearLayout npcStatusCell(String icon,String label,int color){
+        LinearLayout cell=row();cell.setGravity(Gravity.CENTER);cell.addView(new NpcLineIcon(this,icon,color),lp(15,15));
+        TextView t=npcCentered(label,11,color,false);t.setPadding(dp(3),0,0,0);t.setMaxLines(2);cell.addView(t,new LinearLayout.LayoutParams(-2,-2));return cell;
+    }
+    private void npcGrid(LinearLayout panel,String[] labels,String[] icons,int tint,java.util.function.IntConsumer action){
+        for(int i=0;i<labels.length;i+=3){
+            LinearLayout line=row();line.setGravity(Gravity.TOP);
+            for(int j=i;j<Math.min(i+3,labels.length);j++){
+                final int index=j;LinearLayout tile=column();tile.setGravity(Gravity.CENTER);tile.setPadding(dp(3),dp(6),dp(3),dp(6));
+                tile.setBackground(npcShape(0xff141414,0xff303030,14));
+                tile.addView(new NpcLineIcon(this,icons[j],tint),lp(26,26));space(tile,5);
+                TextView label=npcCentered(labels[j],12,TEXT,false);label.setMaxLines(2);tile.addView(label,lp(-1,-2));
+                LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(0,dp(84),1);p.setMargins(dp(3),dp(3),dp(3),dp(3));line.addView(tile,p);
+                tile.setContentDescription(labels[j]);tile.setOnClickListener(v->action.accept(index));
+            }
+            panel.addView(line,lp(-1,-2));
+        }
+    }
     private void npcDetails(String name){
+        NpcProfiles.Profile profile=NpcProfiles.find(name);
+        final String display=profile==null?name:profile.name;
+        final android.app.Dialog dialog=new android.app.Dialog(this);
+        dialog.requestWindowFeature(android.view.Window.FEATURE_NO_TITLE);
+        LinearLayout panel=column();panel.setPadding(dp(14),dp(10),dp(14),dp(14));panel.setBackgroundColor(Color.BLACK);
+        LinearLayout header=row();TextView back=npcCentered("‹",30,TEXT,true);header.addView(back,lp(42,42));back.setContentDescription("Назад");back.setOnClickListener(v->dialog.dismiss());
+        header.addView(npcCentered("ПЕРСОНАЖ",18,TEXT,true),new LinearLayout.LayoutParams(0,dp(42),1));
+        TextView more=npcCentered("⋮",25,TEXT,true);header.addView(more,lp(42,42));more.setContentDescription("Дополнительно");
+        more.setOnClickListener(v->{android.widget.PopupMenu menu=new android.widget.PopupMenu(this,more);menu.getMenu().add("Открыть подробное досье");menu.getMenu().add("Открыть галерею");menu.setOnMenuItemClickListener(item->{if(item.getTitle().toString().contains("галерею"))npcGallerySection(display);else npcLegacyDetails(display);return true;});menu.show();});
+        panel.addView(header,lp(-1,-2));space(panel,8);
+        View portrait=npcPortrait(display);portrait.setBackground(npcShape(0xff111111,0,16));portrait.setClipToOutline(true);
+        if(portrait instanceof android.widget.ImageView){((android.widget.ImageView)portrait).setScaleType(android.widget.ImageView.ScaleType.CENTER_CROP);((android.widget.ImageView)portrait).setAdjustViewBounds(false);}
+        panel.addView(portrait,lp(-1,190));portrait.setOnClickListener(v->npcGallerySection(display));space(panel,14);
+        panel.addView(npcCentered(display,23,accent(),true),lp(-1,-2));space(panel,7);
+        if(profile!=null&&!profile.role.isEmpty())panel.addView(npcCentered(profile.role,14,MUTED,false),lp(-1,-2));
+        space(panel,16);
+        String status=npcKnownStatus(display);boolean female=profile!=null&&"Женский".equals(profile.gender);
+        boolean alive=npcInCurrentScene(display)||"MET".equals(status)||"INFORMED".equals(status)||"HELPED".equals(status)||"HOSTILE".equals(status);
+        String life="DEAD".equals(status)?(female?"Погибла":"Погиб"):"MISSING".equals(status)?(female?"Пропала":"Пропал"):alive?(female?"Жива":"Жив"):"Неизвестно";
+        int lifeColor="DEAD".equals(status)?ITEM_DOWN:alive?ITEM_UP:MUTED;
+        LinearLayout statuses=row();statuses.setGravity(Gravity.CENTER);
+        statuses.addView(npcStatusCell("pulse",life,lifeColor),new LinearLayout.LayoutParams(0,-2,1));
+        statuses.addView(npcStatusCell("race",profile==null?"Раса неизвестна":profile.race,TEXT),new LinearLayout.LayoutParams(0,-2,1));
+        statuses.addView(npcStatusCell("heart",npcRelation(display),TEXT),new LinearLayout.LayoutParams(0,-2,1));
+        panel.addView(statuses,lp(-1,-2));space(panel,16);
+        View rule=new View(this);rule.setBackgroundColor(0xff292929);panel.addView(rule,lp(-1,1));space(panel,12);
+        npcGrid(panel,NPC_SECTIONS,NPC_SECTION_ICONS,accent(),index->npcSection(display,index));
+        space(panel,9);
+        LinearLayout interact=row();interact.setGravity(Gravity.CENTER);interact.setBackground(npcShape(0xff201c14,0,14));
+        interact.addView(new NpcLineIcon(this,"talk",accent()),lp(23,23));TextView action=npcCentered("Взаимодействовать",16,accent(),true);action.setPadding(dp(8),0,0,0);interact.addView(action,lp(-2,-2));
+        panel.addView(interact,lp(-1,56));interact.setOnClickListener(v->npcActions(display,dialog));
+        ScrollView scroll=new ScrollView(this);scroll.setFillViewport(true);scroll.setBackgroundColor(Color.BLACK);scroll.addView(panel);
+        dialog.setContentView(scroll);dialog.show();android.view.Window window=dialog.getWindow();if(window!=null){window.setBackgroundDrawable(new android.graphics.drawable.ColorDrawable(Color.BLACK));window.setLayout(-1,-1);window.setStatusBarColor(Color.BLACK);window.setNavigationBarColor(Color.BLACK);window.getDecorView().setSystemUiVisibility(0);}
+        AmoledAppearance.applyTree(panel);
+    }
+    private void npcGallerySection(String name){
+        if(ItachiProfile.matches(name)){itachiLocalGallery(0);return;}
+        if(ElisifGallery.matches(name)){elisifGallery(1);return;}
+        if(LiviaStory.matches(name)){liviaPortrait();return;}
+        if("Серана".equalsIgnoreCase(name)){seranaGallery(1);return;}
+        if(KatherineStory.NAME.equals(name)){katherineGallery(1);return;}
+        if(AlmaStory.NAME.equals(name)){almaGallery(1);return;}
+        LinearLayout p=column();View portrait=npcPortrait(name);p.addView(portrait,lp(-1,300));
+        if(!NpcAppearance.has(this,name))addText(p,"Иллюстративный образ или эмблема, не индивидуальный портрет.",12,MUTED,false,8);
+        if(!NpcAppearance.id(name).isEmpty()){
+            livingLink(p,"Индивидуальные портреты","","hero",()->new ResourceManagerDialog(this,accent(),this::render,NpcAppearance.GROUP).show());
+            livingLink(p,"Импорт оригинальных WebP","","hero",this::chooseNpcAppearances);
+        }
+        livingDialog(name+" | Галерея",p);
+    }
+    private void npcSection(String name,int index){
+        if(index==0){npcLegacyDetails(name);return;}
+        if(index==1){npcGallerySection(name);return;}
+        if(index==2&&AlmaStory.NAME.equals(name)&&game.alma.stage>0){almaRelationshipDetails();return;}
+        LinearLayout p=column();JSONObject fact=npcFact(name);
+        boolean it=ItachiProfile.matches(name)&&game.itachi.enabled&&game.itachi.stage>0;
+        boolean li=LiviaStory.matches(name)&&game.livia.enabled&&game.livia.stage>0;
+        boolean ka=KatherineStory.NAME.equals(name)&&game.katherine.enabled&&game.katherine.stage>0;
+        boolean al=AlmaStory.NAME.equals(name)&&game.alma.enabled&&game.alma.stage>0;
+        switch(index){
+            case 2:
+                addText(p,npcRelation(name),17,accent(),true,10);
+                if(it){npcScore(p,"Доверие",game.itachi.trust);npcScore(p,"Уважение",game.itachi.respect);npcScore(p,"Симпатия",game.itachi.affection);npcScore(p,"Любовь",game.itachi.love);npcScore(p,"Привязанность",game.itachi.attachment);}
+                else if(li){npcScore(p,"Доверие",game.livia.trust);npcScore(p,"Уважение",game.livia.respect);npcScore(p,"Симпатия",game.livia.affection);npcScore(p,"Любовь",game.livia.life.love);}
+                else if(ka){npcScore(p,"Доверие",game.katherine.trust);npcScore(p,"Уважение",game.katherine.respect);npcScore(p,"Симпатия",game.katherine.affection);npcScore(p,"Любовь",game.katherine.companion.love);npcScore(p,"Привязанность",game.katherine.companion.attachment);}
+                else if(fact!=null&&!"DEAD".equals(fact.optString("status"))&&!"MISSING".equals(fact.optString("status")))npcScore(p,"Отношение",fact.optInt("relation",50));
+                break;
+            case 3:
+                if(ItachiProfile.matches(name)){addText(p,ItachiProfile.STYLE,14,TEXT,false,8);for(String power:ItachiProfile.POWERS)addText(p,power,14,TEXT,false,7);if(it){addText(p,game.itachi.stats(),14,TEXT,false,8);addText(p,game.itachi.skills(),14,TEXT,false,8);}}
+                else if(ka){addText(p,"Уровень "+game.katherine.companion.level+" | Магия "+game.katherine.mana+"/"+game.katherine.maxMana(),14,TEXT,true,8);addText(p,game.katherine.companion.spellName(),14,TEXT,false,8);}
+                else if(li)addText(p,"Тактика: "+game.livia.stanceLabel()+" | Запас сил: "+game.livia.companionStamina+"/100",14,TEXT,false,8);
+                else if(al){addText(p,"Уровень "+game.alma.level+" | Магия "+game.alma.mana+"/"+game.alma.maxMana(),14,TEXT,true,8);addText(p,game.alma.skillsLabel(),14,TEXT,false,8);}
+                break;
+            case 4:
+                if(ItachiProfile.matches(name)){addText(p,ItachiProfile.EQUIPMENT,14,TEXT,false,8);if(it)itachiLifeDetails(p);}
+                else if(li)liviaLifeDetails(p);
+                else if(ka)addText(p,game.katherine.companion.inventoryLabel(),14,TEXT,false,8);
+                else if(al){addText(p,game.alma.inventoryLabel(),14,TEXT,false,8);livingLink(p,"Передать предмет","","bag",()->almaInventory(true));livingLink(p,"Забрать предмет","","bag",()->almaInventory(false));livingLink(p,"Экипировка","","bag",this::almaEquipment);}
+                break;
+            case 5:
+                if(fact!=null){if(fact.optInt("lastDay")>0)addText(p,"Последняя встреча: день "+fact.optInt("lastDay")+" | "+fact.optString("lastLocation"),13,MUTED,false,8);org.json.JSONArray history=fact.optJSONArray("history");if(history!=null)for(int i=history.length()-1;i>=0;i--){JSONObject event=history.optJSONObject(i);if(event!=null)addText(p,"День "+event.optInt("day")+" | "+npcStatusLabel(event.optString("status")),14,TEXT,false,6);}}
+                if(it)addText(p,game.itachi.memory,14,TEXT,false,8);
+                if(li)npcMemoryRows(p,game.livia.history);
+                if(ka)npcMemoryRows(p,game.katherine.memory);
+                if(al)npcMemoryRows(p,game.alma.memory);
+                break;
+            default:break;
+        }
+        if(p.getChildCount()==0)addText(p,"Нет подтверждённых сведений. Информация откроется по мере знакомства.",14,MUTED,false,8);
+        livingDialog(name+" | "+NPC_SECTIONS[index],p);
+    }
+    private void npcScore(LinearLayout panel,String name,int score){livingLine(panel,name,score+" / 100",accent());livingBar(panel,score,100,accent());space(panel,6);}
+    private void npcMemoryRows(LinearLayout panel,org.json.JSONArray events){for(int i=events.length()-1;i>=Math.max(0,events.length()-100);i--)addText(panel,events.optString(i),14,TEXT,false,6);}
+    private void npcActions(String name,android.app.Dialog parent){
+        LinearLayout panel=column();panel.setPadding(dp(8),dp(8),dp(8),dp(8));
+        ScrollView sc=new ScrollView(this);sc.addView(panel);
+        final AlertDialog menu=new RuneDialogBuilder(this,accent()).setTitle("Взаимодействовать").setView(sc).setNegativeButton("Закрыть",null).create();
+        npcGrid(panel,NPC_ACTIONS,NPC_ACTION_ICONS,TEXT,index->{
+            if("DEAD".equals(npcKnownStatus(name))||"MISSING".equals(npcKnownStatus(name))||livingBusy()){toast("Персонаж или действие сейчас недоступны");return;}
+            if(game.aiNarrativeMode&&!game.nativeSceneRequired()){
+                if(!npcInCurrentScene(name)){toast("Персонаж не участвует в текущей сцене");return;}
+                String draft=NPC_ACTION_TEXT[index]+": "+name+".";
+                if(!aiOwnDraft.trim().isEmpty())draft=aiOwnDraft.trim()+"\n"+draft;
+                aiOwnDraft=draft;persistAiDraft();menu.dismiss();parent.dismiss();tab=0;render();toast("Действие добавлено в свой ответ. Подтверди отправку.");return;
+            }
+            java.util.ArrayList<GameEngine.Choice> matches=new java.util.ArrayList<>();
+            java.util.ArrayList<String> labels=new java.util.ArrayList<>();
+            NpcProfiles.Profile profile=NpcProfiles.find(name);String key=npcKey(name);
+            for(GameEngine.Choice choice:game.scene().choices){
+                String title=npcKey(choice.title),both=title+" "+npcKey(choice.detail);
+                boolean named=both.contains(key)||(profile!=null&&both.contains(npcKey(profile.name)));
+                if(!named)continue;
+                boolean match=false;for(String word:NPC_NATIVE_WORDS[index].split("\\|"))if(title.contains(word)){match=true;break;}
+                if(match){matches.add(choice);labels.add(choice.title);}
+            }
+            if(matches.isEmpty()){toast("Нет такого действия в текущей сюжетной сцене");return;}
+            new RuneDialogBuilder(this,accent()).setTitle(NPC_ACTIONS[index]).setItems(labels.toArray(new String[0]),(d,i)->{
+                if(livingBusy())return;
+                GameEngine.Choice chosen=matches.get(i);boolean valid=false;
+                for(GameEngine.Choice current:game.scene().choices)if(current.action.equals(chosen.action)){valid=true;break;}
+                if(!valid){toast("Действие больше недоступно");return;}
+                menu.dismiss();parent.dismiss();executeStoryChoice(chosen);
+            }).setNegativeButton("Отмена",null).show();
+        });menu.show();
+    }
+    private void npcLegacyDetails(String name){
         LinearLayout panel=column();panel.setGravity(Gravity.CENTER);panel.setPadding(dp(12),dp(12),dp(12),dp(12));
-        panel.addView(npcPortrait(name),lp(112,-2));
         NpcProfiles.Profile profile=NpcProfiles.find(name);
         if(profile!=null){addText(panel,profile.race+" | "+profile.role,14,TEXT,true,8);}
         if(ItachiProfile.matches(name)){
@@ -537,8 +720,42 @@ public final class MainActivity extends Activity {
         }
         if(!ItachiProfile.matches(name)&&!NpcAppearance.has(this,name)&&!(ElisifGallery.matches(name)&&ElisifGallery.available(this))&&!("Серана".equalsIgnoreCase(name)&&SeranaGallery.available(this))&&!KatherineStory.NAME.equals(name)&&!AlmaStory.NAME.equals(name)&&!LiviaStory.matches(name))addText(panel,"Иллюстративный образ или эмблема, не индивидуальный портрет",11,MUTED,false,10);
         addText(panel,npcStatusLabel(game.sceneState.npcStatusByName(name)),15,TEXT,true,8);
-        new RuneDialogBuilder(this,accent()).setTitle(name).setView(panel).setNegativeButton("Закрыть",null).show();
+        livingDialog(name+" | Досье",panel);
     }
+
+    /** Small outline icons for the shared NPC screen; independent of optional art packs. */
+    private static final class NpcLineIcon extends View {
+        private final String key;private final android.graphics.Paint paint=new android.graphics.Paint(3);
+        NpcLineIcon(android.content.Context context,String key,int color){super(context);this.key=key;paint.setColor(color);paint.setStyle(android.graphics.Paint.Style.STROKE);paint.setStrokeWidth(1.8f);paint.setStrokeCap(android.graphics.Paint.Cap.ROUND);paint.setStrokeJoin(android.graphics.Paint.Join.ROUND);setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO);}
+        private void line(android.graphics.Canvas c,float... p){android.graphics.Path path=new android.graphics.Path();path.moveTo(p[0],p[1]);for(int i=2;i<p.length;i+=2)path.lineTo(p[i],p[i+1]);c.drawPath(path,paint);}
+        private void box(android.graphics.Canvas c,float l,float t,float r,float b,float radius){c.drawRoundRect(l,t,r,b,radius,radius,paint);}
+        private void circle(android.graphics.Canvas c,float x,float y,float r){c.drawCircle(x,y,r,paint);}
+        private void heart(android.graphics.Canvas c){android.graphics.Path p=new android.graphics.Path();p.moveTo(12,21);p.cubicTo(8,17,2,13,2,8);p.cubicTo(2,2,9,1,12,6);p.cubicTo(15,1,22,2,22,8);p.cubicTo(22,13,16,17,12,21);c.drawPath(p,paint);}
+        @Override protected void onDraw(android.graphics.Canvas c){super.onDraw(c);float size=Math.min(getWidth(),getHeight());c.save();c.translate((getWidth()-size)/2,(getHeight()-size)/2);c.scale(size/24,size/24);
+            switch(key){
+                case "id":box(c,3,3,21,22,3);line(c,8,1,8,5);line(c,16,1,16,5);circle(c,12,10,3);c.drawArc(6,14,18,25,190,160,false,paint);break;
+                case "gallery":box(c,2,6,17,22,3);line(c,7,3,19,3,22,6,22,16);circle(c,7,11,1.5f);line(c,3,19,8,15,12,18,16,13);break;
+                case "pulse":heart(c);line(c,3,11,8,11,10,7,13,15,15,11,21,11);break;
+                case "heart":heart(c);break;
+                case "race":circle(c,12,7,4);c.drawArc(3,12,21,27,190,160,false,paint);line(c,3,22,21,22);break;
+                case "swords":line(c,3,3,8,4,20,16,16,20,4,8,3,3);line(c,14,18,21,11);line(c,18,21,21,18);line(c,14,8,20,3,21,8,17,12);line(c,8,14,3,19,5,21,10,16);break;
+                case "bag":box(c,5,6,19,22,3);box(c,9,2,15,6,2);box(c,8,12,16,18,1);line(c,8,15,16,15);break;
+                case "book":line(c,12,5,7,2,2,3,2,19,7,18,12,21,17,18,22,19,22,3,17,2,12,5,12,21);break;
+                case "talk":box(c,2,3,22,18,7);line(c,5,17,4,22,10,18);break;
+                case "trade":line(c,2,6,6,3,10,7,13,5,18,3,22,7,18,16,15,19,12,17,9,19,3,13,2,6);line(c,6,8,10,12,14,9,19,14);break;
+                case "gift":box(c,3,8,21,12,1);box(c,5,12,19,22,1);line(c,12,8,12,22);c.drawOval(5,2,12,8,paint);c.drawOval(12,2,19,8,paint);break;
+                case "people":circle(c,9,7,3);circle(c,17,8,2.5f);c.drawArc(2,12,16,25,190,160,false,paint);c.drawArc(12,13,23,24,270,100,false,paint);break;
+                case "learn":line(c,1,8,12,3,23,8,12,13,1,8);line(c,5,10,5,16,12,20,19,16,19,10);line(c,23,8,23,16);break;
+                case "scroll":box(c,5,3,19,21,2);line(c,5,3,2,3,2,8,5,8);line(c,8,7,16,7);line(c,8,11,16,11);line(c,8,15,13,15);break;
+                case "shield":line(c,12,2,21,6,20,14,17,19,12,22,7,19,4,14,3,6,12,2);break;
+                case "coins":circle(c,12,7,4);line(c,2,17,6,13,12,13,14,16,10,17,15,17,20,13,22,15,16,21,8,21,5,23,2,17);break;
+                case "steal":c.drawOval(2,6,22,18,paint);circle(c,12,12,3);line(c,3,3,21,21);break;
+                case "door":line(c,4,22,4,3,18,3,18,22);line(c,7,4,14,2,14,22,7,20,7,4);circle(c,11,13,.7f);line(c,2,22,22,22);break;
+                default:circle(c,12,12,8);
+            }c.restore();
+        }
+    }
+
     private static final int REQUEST_ITACHI_LOCAL_ART=7431, REQUEST_ITACHI_REPLACE_ART=7432;
     private String itachiReplaceTarget="";
     private int itachiArtIndex(java.io.File file){java.io.File[] all=LocalCharacterGallery.files(this);for(int i=0;i<all.length;i++)if(all[i].equals(file))return i;return 0;}
@@ -1661,7 +1878,13 @@ public final class MainActivity extends Activity {
         int number=0;
         for(GameEngine.Choice c:s.choices){
             if("SHOP".equals(game.mode))renderShopItem(c.action);
-            storyChoice(++number,c,()->{
+            storyChoice(++number,c,()->executeStoryChoice(c));
+        }
+        space(content,5);
+        addText(content,"Каждое действие сохраняется автоматически",11,MUTED,false,0);
+    }
+
+    private void executeStoryChoice(GameEngine.Choice c){
                 if(aiClient!=null)aiClient.cancel();if(localAiClient!=null)localAiClient.cancel();
                 int old=game.questStage;
                 java.util.Map<String,Integer> before=itemSnapshot(game);
@@ -1682,10 +1905,6 @@ public final class MainActivity extends Activity {
                     }
                 }
                 save();tab=0;render();
-            });
-        }
-        space(content,5);
-        addText(content,"Каждое действие сохраняется автоматически",11,MUTED,false,0);
     }
 
     private static final String CITY_ICONS_ONLY_PREF="city_architecture_icons_only";
@@ -4329,7 +4548,7 @@ public final class MainActivity extends Activity {
         if(game.katherine.enabled&&game.katherine.stage>0)renderKatherineRelations();
         if(game.itachi.enabled&&game.itachi.stage>0)actionButton("Итачи | "+game.itachi.relation(),game.itachi.objective(game),false,()->npcDetails(ItachiStory.NAME));
         if(game.livia.enabled&&game.livia.stage>0)actionButton("Ливия | "+game.livia.relation(),"Доверие "+game.livia.trust+"/100",false,()->npcDetails(LiviaStory.NAME));
-        if(game.alma.enabled&&game.alma.stage>0)actionButton("Альма | "+game.alma.relationship(),"Доверие "+game.alma.trust+"/100 · Любовь "+game.alma.love+"/100",false,this::almaRelationshipDetails);
+        if(game.alma.enabled&&game.alma.stage>0)actionButton("Альма | "+game.alma.relationship(),"Доверие "+game.alma.trust+"/100 · Любовь "+game.alma.love+"/100",false,()->npcDetails(AlmaStory.NAME));
         org.json.JSONArray npcs=game.sceneState.npcFacts();
         if(npcs.length()==0){if((!game.alma.enabled||game.alma.stage==0)&&(!game.katherine.enabled||game.katherine.stage==0)&&(!game.livia.enabled||game.livia.stage==0)&&(!game.itachi.enabled||game.itachi.stage==0))addText(content,"Пока нет подтверждённых знакомств.",15,MUTED,false,8);return;}
         for(int i=0;i<npcs.length();i++){JSONObject n=npcs.optJSONObject(i);if(n==null)continue;String name=n.optString("title"),status=n.optString("status");if(AlmaStory.NAME.equals(name)||KatherineStory.NAME.equals(name)||LiviaStory.matches(name)||(!game.alma.enabled&&"alma_serana".equals(n.optString("id"))))continue;int score;String relation;
@@ -4337,7 +4556,7 @@ public final class MainActivity extends Activity {
             if(score>=0)score=n.optInt("relation",score);int color=score<0?MUTED:score>=65?ITEM_UP:score>=40?ITEM_GOLD:ITEM_DOWN;LinearLayout tile=livingTile(content);LinearLayout line=row();line.setGravity(Gravity.CENTER_VERTICAL);
             line.addView(new SkyrimIconView(this,"hero",color),lp(38,42));LinearLayout words=column();words.setPadding(dp(10),0,0,0);line.addView(words,new LinearLayout.LayoutParams(0,-2,1));addText(words,name,18,TEXT,true,3);addText(words,relation,13,color,false,0);
             if(score>=0)line.addView(text(score+" / 100",16,color,true));tile.addView(line);space(tile,10);if(score>=0)livingBar(tile,score,100,color);
-            int change=n.optInt("delta",0);addText(tile,"Последнее событие: "+npcStatusLabel(status)+(change==0?"":change>0?" | +"+change:" | "+change),12,MUTED,false,0);if(n.optInt("lastDay")>0)addText(tile,"День "+n.optInt("lastDay")+" · "+n.optString("lastLocation"),11,MUTED,false,0);tile.setOnClickListener(v->livingRelationDetails(n));}
+            int change=n.optInt("delta",0);addText(tile,"Последнее событие: "+npcStatusLabel(status)+(change==0?"":change>0?" | +"+change:" | "+change),12,MUTED,false,0);if(n.optInt("lastDay")>0)addText(tile,"День "+n.optInt("lastDay")+" · "+n.optString("lastLocation"),11,MUTED,false,0);tile.setOnClickListener(v->npcDetails(name));}
         addText(content,"Отношения меняются после подтверждённых событий. Скрытые намерения не раскрываются.",11,MUTED,false,4);
     }
     private void renderKatherineRelations(){
