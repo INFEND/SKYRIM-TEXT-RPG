@@ -41,8 +41,18 @@ final class SolitudeCity {
         new Job("Помочь хозяину трактира","Ты убираешь столы и приносишь припасы из кладовой.",12,2,8,15,12,1),
         new Job("Поесть и выпить воды","Горячая похлёбка и вода возвращают силы после долгой дороги.",-1,1,0,-8,0,0),
         new Job("Разгрузить торговое судно","Ты переносишь груз с причала и помогаешь закрепить пустые бочки.",-1,3,18,30,0,1),
-        new Job("Проверить грузовую ведомость","Ты сверяешь метки на ящиках с записями и находишь ошибку в счёте.",12,2,4,19,16,1)
+        new Job("Проверить грузовую ведомость","Ты сверяешь метки на ящиках с записями и находишь ошибку в счёте.",12,2,4,19,16,1),
+        new Job("Разобрать рыночные весы","Ты проверяешь гири и очищаешь чаши весов.",12,1,3,9,8,0),
+        new Job("Упражнение с мечом","Под присмотром гарнизона ты отрабатываешь безопасные выпады.",0,2,12,-14,22,0),
+        new Job("Разобрать архив прошений","Ты раскладываешь бумаги по датам и передаёшь их управителю.",12,2,3,12,10,1),
+        new Job("Репетиция баллады","Ты разучиваешь строфы и упражняешься в выразительном чтении.",12,1,2,-8,14,0),
+        new Job("Уход за храмом","Ты очищаешь подсвечники и подметаешь пол у алтарей.",14,1,4,0,8,1),
+        new Job("Подготовить кузнечные инструменты","Ты очищаешь клещи и сортируешь заготовки для Бейранда.",6,1,6,10,10,0),
+        new Job("Подготовить зал трактира","Ты расставляешь кружки и готовишь столы к приёму гостей.",12,1,4,8,8,0),
+        new Job("Проверить причальные канаты","Ты осматриваешь крепления и заменяешь изношенные верёвки из запасов порта.",-1,2,10,17,0,1)
     };
+    // Preserve the original 0–15 save/action IDs; new jobs are appended.
+    private static int jobDistrict(int i){return i<16?i/2:i-16;}
     private final int[] lastDay=new int[JOBS.length];
     private SolitudeShops shops=new SolitudeShops();
     private SolitudeHome home=new SolitudeHome();
@@ -65,9 +75,9 @@ final class SolitudeCity {
     private String blocked(GameEngine g,int i){
         Job j=JOBS[i];
         if(lastDay[i]>=g.day)return "Уже выполнено сегодня";
-        int start=i/2==6?6:8, end=i/2==6?23:20;
+        int d=jobDistrict(i);int start=d==6?6:8, end=d==6?23:20;
         if(g.hour<start||g.hour+j.hours>end)return "Доступно "+start+":00–"+end+":00";
-        if(!SolitudeEncounters.availableForWork(g,i/2,j.hours))return "Ответственный житель недоступен | "+SolitudeEncounters.workHours(i/2);
+        if(!SolitudeEncounters.availableForWork(g,d,j.hours))return "Ответственный житель недоступен | "+SolitudeEncounters.workHours(d);
         if(g.stamina<j.stamina)return "Не хватает запаса сил";
         if(j.gold<0&&g.gold< -j.gold)return "Не хватает септимов";
         if(j.gold>0&&g.gold>Integer.MAX_VALUE-j.gold)return "Кошелёк переполнен";
@@ -97,8 +107,10 @@ final class SolitudeCity {
         }
         GameEngine.Scene s=new GameEngine.Scene("СОЛИТЬЮД | "+g.hour+":00",PLACES[d],PROSE[d]+
             "\n\n"+(g.message.isEmpty()?"Выбери занятие или вернись на улицу.":g.message));
-        for(int i=d*2;i<d*2+2;i++)if(blocked(g,i).isEmpty())s.add(PREFIX+"job:"+i,JOBS[i].title,detail(g,i));
-        else s=newBlocked(s,g,i);
+        for(int i=0;i<JOBS.length;i++)if(jobDistrict(i)==d){
+            if(blocked(g,i).isEmpty())s.add(PREFIX+"job:"+i,JOBS[i].title,detail(g,i));
+            else s=newBlocked(s,g,i);
+        }
         if(d==0||d==5)s.add(PREFIX+"shop","Открыть торговлю","Существующий торговый инвентарь города");
         if(d==6)s.add(PREFIX+"rest","Снять комнату","20 септимов | существующий отдых в трактире");
         if(d==1){String old=g.mode;g.mode="WORLD";boolean available=g.livia.available(g);g.mode=old;
@@ -143,7 +155,7 @@ final class SolitudeCity {
         if((PREFIX+"shop").equals(action)&&(d==0||d==5)){g.mode="WORLD";g.choose("SHOP");return;}
         if((PREFIX+"rest").equals(action)&&d==6){g.mode="WORLD";g.choose("REST");return;}
         if((PREFIX+"livia").equals(action)&&d==1){g.mode="WORLD";if(g.livia.available(g)){g.choose("LIVIA:open");g.livia.castleReturn=LiviaStory.MODE.equals(g.mode);}else g.mode=PREFIX+d;return;}
-        for(int i=d*2;i<d*2+2;i++)if((PREFIX+"job:"+i).equals(action)){
+        for(int i=0;i<JOBS.length;i++)if(jobDistrict(i)==d&&(PREFIX+"job:"+i).equals(action)){
             if(!blocked(g,i).isEmpty())return;
             Job j=JOBS[i];lastDay[i]=g.day;
             g.stamina-=j.stamina;g.gold=GameEngine.nonnegativeAdd(g.gold,j.gold);
