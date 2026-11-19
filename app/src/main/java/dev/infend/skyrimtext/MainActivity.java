@@ -615,7 +615,7 @@ public final class MainActivity extends Activity {
         LinearLayout header=row();TextView back=npcCentered("‹",30,TEXT,true);header.addView(back,lp(42,42));back.setContentDescription("Назад");back.setOnClickListener(v->dialog.dismiss());
         header.addView(npcCentered(profile!=null&&profile.author?"АВТОРСКИЙ NPC":profile!=null&&profile.mentioned?"УПОМИНАНИЕ":profile!=null&&profile.template?"ТИПОВОЙ NPC":"ПЕРСОНАЖ",18,TEXT,true),new LinearLayout.LayoutParams(0,dp(42),1));
         TextView more=npcCentered("⋮",25,TEXT,true);header.addView(more,lp(42,42));more.setContentDescription("Дополнительно");
-        more.setOnClickListener(v->{android.widget.PopupMenu menu=new android.widget.PopupMenu(this,more);menu.getMenu().add("Открыть подробное досье");menu.getMenu().add("Открыть галерею");menu.setOnMenuItemClickListener(item->{if(item.getTitle().toString().contains("галерею"))npcGallerySection(display);else npcLegacyDetails(display);return true;});menu.show();});
+        more.setOnClickListener(v->{android.widget.PopupMenu menu=new android.widget.PopupMenu(this,more);menu.getMenu().add("Открыть подробное досье");menu.getMenu().add("Открыть галерею");menu.setOnMenuItemClickListener(item->{if(item.getTitle().toString().contains("галерею"))npcGallerySection(display);else npcSection(display,0);return true;});menu.show();});
         panel.addView(header,lp(-1,-2));space(panel,8);
         activeNpcPortrait=new android.widget.FrameLayout(this);panel.addView(activeNpcPortrait,lp(-1,280));space(panel,14);
         TextView npcNameTitle=npcCentered(display,23,accent(),true);npcNameTitle.setTag("npc_no_self_link");panel.addView(npcNameTitle,lp(-1,-2));space(panel,7);
@@ -635,6 +635,19 @@ public final class MainActivity extends Activity {
         View rule=new View(this);rule.setBackgroundColor(0xff292929);panel.addView(rule,lp(-1,1));space(panel,12);
         if(profile!=null&&profile.template)addText(panel,"Типовая запись. Внешность, пол, отношения и состояние зависят от конкретного экземпляра.",13,MUTED,false,8);
         npcGrid(panel,NPC_SECTIONS,NPC_SECTION_ICONS,accent(),index->npcSection(display,index));
+        if(profile!=null&&!profile.template&&!profile.mentioned&&!profile.author&&game.started&&!livingBusy()&&(!game.aiNarrativeMode||game.nativeSceneRequired())){
+            java.util.ArrayList<GameEngine.Choice> available=npcNativeChoices(display);
+            if(!available.isEmpty()){
+                space(panel,6);addText(panel,"ДОСТУПНЫЕ ДЕЙСТВИЯ В СЦЕНЕ",11,accent(),true,6);
+                for(GameEngine.Choice choice:available){
+                    livingLink(panel,choice.title,choice.detail,"talk",()->{
+                        if(livingBusy()||!npcAddonEnabled(display)||"DEAD".equals(npcKnownStatus(display))||"MISSING".equals(npcKnownStatus(display)))return;
+                        for(GameEngine.Choice current:npcNativeChoices(display))if(current.action.equals(choice.action)){dialog.dismiss();executeStoryChoice(current);return;}
+                        toast("Действие больше недоступно");
+                    });
+                }
+            }
+        }
         space(panel,9);
         LinearLayout interact=row();interact.setGravity(Gravity.CENTER);interact.setBackground(npcShape(0xff201c14,0,14));
         interact.addView(new NpcLineIcon(this,"talk",accent()),lp(23,23));TextView action=npcCentered("Взаимодействовать",16,accent(),true);action.setPadding(dp(8),0,0,0);interact.addView(action,lp(-2,-2));
@@ -661,57 +674,72 @@ public final class MainActivity extends Activity {
     }
     private void npcSection(String name,int index){
         NpcProfiles.Profile record=NpcProfiles.find(name);
-        if(record!=null&&(record.template||record.mentioned)){
-            LinearLayout info=column();
-            if(index==0){livingLine(info,"Имя",record.name,accent());livingLine(info,"Раса",record.race,TEXT);livingLine(info,"Пол",record.gender,TEXT);livingLine(info,"Роль",record.role,TEXT);}
-            else if(index==1){info.addView(npcEmblem(record.name,record.dragon?"dragon":"hero"),lp(-1,160));addText(info,"Индивидуальная галерея отсутствует.",13,MUTED,false,6);}
-            else if(index==3)addText(info,"Роль: "+record.role,14,TEXT,false,8);
-            addText(info,record.template?"Это справочная карточка типа. Индивидуальные сведения и история конкретного экземпляра не объединяются.":"Этот персонаж известен по упоминаниям. Подтверждённых индивидуальных данных прохождения нет.",14,MUTED,false,8);
-            livingDialog(record.name+" | "+NPC_SECTIONS[index],info);return;
-        }
         if(index==1){npcGallerySection(name);return;}
         if(record!=null&&record.author){npcAuthorSection(name,index);return;}
-        if(index==0){npcLegacyDetails(name);return;}
-        if(index==2&&AlmaStory.NAME.equals(name)&&game.alma.stage>0){almaRelationshipDetails();return;}
-        LinearLayout p=column();JSONObject fact=npcFact(name);
-        boolean it=ItachiProfile.matches(name)&&game.itachi.enabled&&game.itachi.stage>0;
-        boolean li=LiviaStory.matches(name)&&game.livia.enabled&&game.livia.stage>0;
-        boolean ka=KatherineStory.NAME.equals(name)&&game.katherine.enabled&&game.katherine.stage>0;
-        boolean al=AlmaStory.NAME.equals(name)&&game.alma.enabled&&game.alma.stage>0;
-        switch(index){
-            case 2:
-                addText(p,npcRelation(name),17,accent(),true,10);
-                if(it){npcScore(p,"Доверие",game.itachi.trust);npcScore(p,"Уважение",game.itachi.respect);npcScore(p,"Симпатия",game.itachi.affection);npcScore(p,"Любовь",game.itachi.love);npcScore(p,"Привязанность",game.itachi.attachment);}
-                else if(li){npcScore(p,"Доверие",game.livia.trust);npcScore(p,"Уважение",game.livia.respect);npcScore(p,"Симпатия",game.livia.affection);npcScore(p,"Любовь",game.livia.life.love);}
-                else if(ka){npcScore(p,"Доверие",game.katherine.trust);npcScore(p,"Уважение",game.katherine.respect);npcScore(p,"Симпатия",game.katherine.affection);npcScore(p,"Любовь",game.katherine.companion.love);npcScore(p,"Привязанность",game.katherine.companion.attachment);}
-                else if(fact!=null&&!"DEAD".equals(fact.optString("status"))&&!"MISSING".equals(fact.optString("status")))npcScore(p,"Отношение",fact.optInt("relation",50));
-                break;
-            case 3:
-                if(ItachiProfile.matches(name)){addText(p,ItachiProfile.STYLE,14,TEXT,false,8);for(String power:ItachiProfile.POWERS)addText(p,power,14,TEXT,false,7);if(it){addText(p,game.itachi.stats(),14,TEXT,false,8);addText(p,game.itachi.skills(),14,TEXT,false,8);}}
-                else if(ka){addText(p,"Уровень "+game.katherine.companion.level+" | Магия "+game.katherine.mana+"/"+game.katherine.maxMana(),14,TEXT,true,8);addText(p,game.katherine.companion.spellName(),14,TEXT,false,8);}
-                else if(li)addText(p,"Тактика: "+game.livia.stanceLabel()+" | Запас сил: "+game.livia.companionStamina+"/100",14,TEXT,false,8);
-                else if(al){addText(p,"Уровень "+game.alma.level+" | Магия "+game.alma.mana+"/"+game.alma.maxMana(),14,TEXT,true,8);addText(p,game.alma.skillsLabel(),14,TEXT,false,8);}
-                break;
-            case 4:
-                if(ItachiProfile.matches(name)){addText(p,ItachiProfile.EQUIPMENT,14,TEXT,false,8);if(it)itachiLifeDetails(p);}
-                else if(li)liviaLifeDetails(p);
-                else if(ka)addText(p,game.katherine.companion.inventoryLabel(),14,TEXT,false,8);
-                else if(al){addText(p,game.alma.inventoryLabel(),14,TEXT,false,8);livingLink(p,"Передать предмет","","bag",()->almaInventory(true));livingLink(p,"Забрать предмет","","bag",()->almaInventory(false));livingLink(p,"Экипировка","","bag",this::almaEquipment);}
-                break;
-            case 5:
-                if(fact!=null){if(fact.optInt("lastDay")>0)addText(p,"Последняя встреча: день "+fact.optInt("lastDay")+" | "+fact.optString("lastLocation"),13,MUTED,false,8);org.json.JSONArray history=fact.optJSONArray("history");if(history!=null)for(int i=history.length()-1;i>=0;i--){JSONObject event=history.optJSONObject(i);if(event!=null)addText(p,"День "+event.optInt("day")+" | "+npcStatusLabel(event.optString("status")),14,TEXT,false,6);}}
-                if(it)addText(p,game.itachi.memory,14,TEXT,false,8);
-                if(li)npcMemoryRows(p,game.livia.history);
-                if(ka)npcMemoryRows(p,game.katherine.memory);
-                if(al)npcMemoryRows(p,game.alma.memory);
-                break;
-            default:break;
+        LinearLayout panel=column();
+        boolean reference=record!=null&&(record.template||record.mentioned);
+        NpcDossier.Entry dossier=NpcDossier.find(name);
+        JSONObject fact=reference?null:npcFact(name);
+        if(index==0){
+            npcField(panel,"id","Имя",name);
+            if(record!=null){
+                npcField(panel,"race","Раса",npcRaceLabel(record));
+                npcField(panel,"id","Пол",record.gender);
+                npcField(panel,"id","Роль",record.role);
+                if(record.child)npcField(panel,"id","Возрастная группа","Ребёнок или персонаж с обликом ребёнка");
+                npcField(panel,"book","Источник",record.template?"Типовая запись оригинального Skyrim":record.mentioned?"Каноническое упоминание":"Справочник оригинального Skyrim и DLC");
+            }
+            if(dossier!=null){npcField(panel,"book","Биография",dossier.biography);npcField(panel,"door","Место в оригинальной игре",dossier.location);}
+            else if(record!=null)npcField(panel,"book","Справка о персонаже",record.role);
+            if(fact!=null&&fact.optInt("lastDay")>0)npcField(panel,"door","Последнее известное место",fact.optString("lastLocation"));
+            npcField(panel,"pulse","Состояние в прохождении",reference?"Не применяется":npcKnownStatus(name).isEmpty()?"Не подтверждено":npcStatusLabel(npcKnownStatus(name)));
+        }else if(index==2){
+            if(!reference){
+                npcField(panel,"heart","Отношение к герою",npcRelation(name));
+                if(fact!=null&&!"DEAD".equals(fact.optString("status"))&&!"MISSING".equals(fact.optString("status")))npcScore(panel,"Отношение",fact.optInt("relation",50));
+            }
+            if(dossier!=null)npcField(panel,"people","Связи в оригинальной игре",dossier.connections);
+            if(fact==null&&!reference)npcField(panel,"heart","История знакомства","В этом сохранении подтверждённой встречи пока нет.");
+        }else if(index==3){
+            if(dossier!=null)npcField(panel,"swords","Известные навыки и способности",dossier.skills);
+            if(record!=null)npcField(panel,"id","Роль / специализация",record.role);
+            npcField(panel,"pulse","Уровень и параметры","Индивидуальные числовые характеристики этого NPC пока не подтверждены.");
+        }else if(index==4){
+            if(dossier!=null)npcField(panel,"bag","Известное имущество в оригинале",dossier.possessions);
+            npcField(panel,"bag","Инвентарь в прохождении","Нет подтверждённого индивидуального списка предметов.");
+        }else if(index==5){
+            if(dossier!=null)npcField(panel,"scroll","Связь с оригинальным сюжетом",dossier.story);
+            if(!reference){
+                addText(panel,"СОБЫТИЯ ЭТОГО СОХРАНЕНИЯ",12,accent(),true,8);
+                if(fact!=null){
+                    if(fact.optInt("lastDay")>0)npcField(panel,"door","Последняя встреча","День "+fact.optInt("lastDay")+" | "+String.format(java.util.Locale.ROOT,"%02d:00",fact.optInt("lastHour"))+" | "+fact.optString("lastLocation"));
+                    org.json.JSONArray history=fact.optJSONArray("history");
+                    if(history!=null)for(int i=history.length()-1;i>=0;i--){
+                        JSONObject event=history.optJSONObject(i);if(event==null)continue;
+                        String delta=event.optInt("delta")==0?"":" | Отношение "+(event.optInt("delta")>0?"+":"")+event.optInt("delta");
+                        npcField(panel,"book","День "+event.optInt("day")+" | "+String.format(java.util.Locale.ROOT,"%02d:00",event.optInt("hour")),npcStatusLabel(event.optString("status"))+delta+" | "+event.optString("location"));
+                    }
+                }else npcField(panel,"book","Хроника","Подтверждённых событий пока нет.");
+            }
         }
-        if(p.getChildCount()==0)addText(p,"Нет подтверждённых сведений. Информация откроется по мере знакомства.",14,MUTED,false,8);
-        livingDialog(name+" | "+NPC_SECTIONS[index],p);
+        if(reference)npcField(panel,"id","Ограничение",record.template?"Это общая справка о типе NPC. Состояние, пол и личные события зависят от конкретного экземпляра.":"Персонаж известен по упоминаниям; индивидуальной игровой истории нет.");
+        if(dossier==null&&index!=0)npcField(panel,"id","Справочные сведения","Дополнительные индивидуальные сведения ещё не заполнены.");
+        npcSectionDialog(name,index,panel);
     }
     private void npcScore(LinearLayout panel,String name,int score){livingLine(panel,name,score+" / 100",accent());livingBar(panel,score,100,accent());space(panel,6);}
     private void npcMemoryRows(LinearLayout panel,org.json.JSONArray events){for(int i=events.length()-1;i>=Math.max(0,events.length()-100);i--)addText(panel,events.optString(i),14,TEXT,false,6);}
+    private java.util.ArrayList<GameEngine.Choice> npcNativeChoices(String name){
+        java.util.ArrayList<GameEngine.Choice> out=new java.util.ArrayList<>();
+        if(!game.started||NpcProfiles.isTemplate(name)||"DEAD".equals(npcKnownStatus(name))||"MISSING".equals(npcKnownStatus(name)))return out;
+        NpcNameMatcher matcher=npcNameMatcher();
+        for(GameEngine.Choice choice:game.scene().choices){
+            java.util.List<NpcNameMatcher.Match> targets=matcher.find(choice.title);
+            if(targets.isEmpty())continue;
+            boolean same=true;for(NpcNameMatcher.Match target:targets)if(!sameNpc(name,target.name)){same=false;break;}
+            if(same)out.add(choice);
+        }
+        return out;
+    }
     private void npcActions(String name,android.app.Dialog parent){
         LinearLayout panel=column();panel.setPadding(dp(8),dp(8),dp(8),dp(8));
         ScrollView sc=new ScrollView(this);sc.addView(panel);
