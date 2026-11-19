@@ -3848,7 +3848,7 @@ public final class MainActivity extends Activity {
         if(!item.weapon()&&!item.wearable())return false;
         return e.contains("зачар")||e.contains("поглощ")||e.contains("захват душ")||
             e.contains("сопротивлен")||e.contains("паралич")||e.contains("при ношении")||
-            e.contains("регенерац")||item.name.toLowerCase(java.util.Locale.ROOT).contains("зачарован")||ItemEffectStyle.damageEnchantment(e);
+            e.contains("регенерац")||GearEffects.knownEnchantment(item.id)||item.name.toLowerCase(java.util.Locale.ROOT).contains("зачарован")||ItemEffectStyle.damageEnchantment(e);
     }
     private View itemPicture(ItemCatalog.Item item,int size){
         android.widget.FrameLayout tile=new android.widget.FrameLayout(this);

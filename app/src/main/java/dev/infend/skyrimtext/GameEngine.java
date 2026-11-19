@@ -244,7 +244,7 @@ public final class GameEngine {
             }
         }
         hp=maxHp;magicka=maxMagicka;stamina=maxStamina;
-        progress=RpgProgress.newHero(this,origin,points);
+        progress=RpgProgress.newHero(this,origin,points);syncGearAttributes();
         String[] back=RpgContent.startParts(origin);
         region=Integer.parseInt(back[2]);
         canonicalStage=canonicalPhase=canonicalPage=canonicalShouts=canonicalTreaty=canonicalPaarthurnax=canonicalShoutCooldown=0;canonicalPrepared=false;canonicalRecent="";
@@ -379,7 +379,7 @@ public final class GameEngine {
         if(roadSummonTurns==0&&progress.equipped("Роза Сангвина"))s.add("ROAD_SUMMON_ROSE","Призвать дремора","20 магии | три хода помощи");
         if(roadSummonTurns==0&&progress.equipped("Этериевый посох"))s.add("ROAD_SUMMON_AETHER","Призвать автоматон","20 магии | три хода помощи");
         if("WILD".equals(battleKind))s.add("FLEE","Отступить","Шанс выйти из боя без награды");
-        if("CANONICAL".equals(battleKind)&&canonicalShouts!=0&&canonicalShoutCooldown==0)s.add("CANON_SHOUT",CanonicalCampaign.combatShout(this),"Урон и ослабление врага | Восстановление 3 хода");
+        if("CANONICAL".equals(battleKind)&&canonicalShouts!=0&&canonicalShoutCooldown==0)s.add("CANON_SHOUT",CanonicalCampaign.combatShout(this),"Урон и ослабление врага | Восстановление "+shoutRecovery()+" хода");
         if(fixShop.gifts.availableBattle(FixShopGifts.TIME))s.add("FIXGIFT:time","Пески времени","Пропуск ответного удара | раз за бой");
         if(fixShop.gifts.canBalance(this))s.add("FIXGIFT:balance","Равновесие стихий","Магия → выносливость | раз за бой");
         if(fixShop.gifts.canEscape(this))s.add("FIXGIFT:escape","Тропа призрака","Гарантированное отступление без трофеев");
@@ -704,7 +704,8 @@ public final class GameEngine {
         return Math.max(0,armor-(armorUpgraded?4:0))+(int)Math.round(progress.equippedArmor());
     }
     public int heavyCost(){int skill=progress.equippedWeaponSkill();return fixShop.gifts.cost((skill==0&&progress.advanced.has(AdvancedPerks.FIGHTING)||skill==1&&progress.advanced.has(AdvancedPerks.CHAMPION)?7:10)-(factionStories.beast()==1?1:0),FixShopGifts.ENDURANCE);}
-    public int magicCost(){int base=fixShop.gifts.cost((progress.advanced.has(AdvancedPerks.NOVICE_DESTRUCTION)?9:12)-(progress.advanced.has(AdvancedPerks.MASTER_DESTRUCTION)?3:0),FixShopGifts.ARCHMAGE);return base<=0?0:Math.max(1,(int)Math.floor(base*(100-progress.gearSpellDiscount())/100.0));}
+    public int shoutRecovery(){return progress.gearTalos()?2:3;}
+    public int magicCost(){int base=fixShop.gifts.cost((progress.advanced.has(AdvancedPerks.NOVICE_DESTRUCTION)?9:12)-(progress.advanced.has(AdvancedPerks.MASTER_DESTRUCTION)?3:0),FixShopGifts.ARCHMAGE);return base<=0?0:Math.max(1,base-(progress.gearSpellDiscount()>0?Math.max(1,(int)Math.round(base*progress.gearSpellDiscount()/100.0)):0));}
     public int criticalChance(){int skill=progress.equippedWeaponSkill();return 8+(skill==2&&progress.advanced.has(AdvancedPerks.CRITICAL_SHOT)?10:0)+(skill==0&&progress.advanced.has(AdvancedPerks.BLADESMAN)||skill==1&&progress.advanced.has(AdvancedPerks.GREAT_CRITICAL)?8:0)+(skill==2&&progress.advanced.has(AdvancedPerks.BULLSEYE)?12:0);}
     private void combatTurn(String action) {
         if(!mode.equals("COMBAT"))return;
@@ -729,7 +730,7 @@ public final class GameEngine {
                 if(rollCheck(hitChance)){damage=Math.max(1,(int)Math.round((effectiveAttack()*2+random.nextInt(9))*(1+(progress.equippedWeaponSkill()==0&&progress.advanced.has(AdvancedPerks.PARALYZING)||progress.equippedWeaponSkill()==1&&progress.advanced.has(AdvancedPerks.SWEEP)?.15:0))));actionText="Сильный удар! −"+damage+" здоровья врагу.";}else actionText="Сильный удар проходит мимо.";break;
             case "MAGIC":if(magicka<magicCost()){battleLog="Недостаточно магии. Нужны "+magicCost()+" единиц.";return;}magicka-=magicCost();damage=(int)Math.round((18+level*4+random.nextInt(8))*(1+.05*progress.branches.rank(13)+(progress.advanced.has(AdvancedPerks.DUAL_CAST)?.10:0)));actionText="Магическая вспышка обжигает врага: −"+damage+".";break;
             case "CANON_SHOUT":if(!"CANONICAL".equals(battleKind)||canonicalShouts==0||canonicalShoutCooldown>0)return;
-                damage=24+level*3+((canonicalShouts&4)!=0?12:0);defending=true;canonicalShoutCooldown=3;actionText=CanonicalCampaign.combatShout(this)+": −"+damage+" здоровья врагу.";break;
+                damage=24+level*3+((canonicalShouts&4)!=0?12:0);defending=true;canonicalShoutCooldown=shoutRecovery();actionText=CanonicalCampaign.combatShout(this)+": −"+damage+" здоровья врагу.";break;
             case "DEFEND": defending=true;stamina=Math.min(maxStamina,nonnegativeAdd(stamina,12));magicka=Math.min(maxMagicka,nonnegativeAdd(magicka,5+(progress.advanced.has(AdvancedPerks.RECOVERY)?3:0)+(progress.advanced.has(AdvancedPerks.REGENERATION)?5:0)));actionText="Ты встаёшь в оборону, восстанавливая силы.";break;
             case "POTION":if(potions==0){battleLog="Лечебных зелий больше нет.";return;}potions--;int restored=Math.min(healingAmount(),maxHp-hp);hp+=restored;restoreRespite();lastHealing=restored;actionText="Ты восстанавливаешь "+restored+" здоровья.";break;
             case "FLEE":if(battleKind.equals("WILD")&&rollCheck(progress.chance(this,"FLEE"))){mode="RESULT";poisonTurns=frostTurns=0;message="Ты уходишь от противника. Трофеев нет.";return;}actionText="Попытка отступить не удалась.";break;
@@ -817,7 +818,8 @@ public final class GameEngine {
         if(defending&&progress.equipped("Разрушитель Заклинаний")&&road.magicalEnemy(enemyName)){int ward=Math.min(10,incoming);incoming-=ward;lastBlocked+=ward;actionText+="\nРазрушитель Заклинаний: оберег поглощает "+ward+" магического урона.";}
         if(defending&&progress.equipped("Этериевый щит")&&battleTurns%3==0){int phase=Math.max(0,incoming-flank);incoming-=phase;lastBlocked+=phase;actionText+="\nЭтериевый щит: текущий враг становится бесплотным и пропускает ответную атаку.";}
         if(defeatedTarget)enemyParalysisTurns=0;
-        if(!defeatedTarget&&(chillParalyzed||enemyParalysisTurns>0)){lastBlocked+=incoming;incoming=0;if(enemyParalysisTurns>0)enemyParalysisTurns--;}
+        boolean enemyDisabled=!defeatedTarget&&(chillParalyzed||enemyParalysisTurns>0);
+        if(enemyDisabled){lastBlocked+=incoming;incoming=0;if(enemyParalysisTurns>0)enemyParalysisTurns--;}
         if(shadow){lastBlocked+=incoming;incoming=0;actionText+="\nОтветная атака не достигает скрытого героя.";}
         if(progress.artifacts.trapTurns>0)progress.artifacts.trapTurns--;
         int kathWeakness=katherine.active()?katherine.companion.weaken(incoming):0;incoming-=kathWeakness;
@@ -837,11 +839,11 @@ public final class GameEngine {
 
         if(poisonTurns>0)poisonTurns--;if(frostTurns>0){frostTurns--;stamina=Math.max(0,stamina-4);}
         String foe=enemyName.toLowerCase(java.util.Locale.ROOT);
-        if(!fixShop.gifts.on(FixShopGifts.WARD)&&!defending&&foe.contains("морозный паук"))poisonTurns=2;
-        if(!fixShop.gifts.on(FixShopGifts.WARD)&&!defending&&foe.contains("ледяной призрак"))frostTurns=2;
+        if(!fixShop.gifts.on(FixShopGifts.WARD)&&!defending&&!enemyDisabled&&foe.contains("морозный паук"))poisonTurns=2;
+        if(!fixShop.gifts.on(FixShopGifts.WARD)&&!defending&&!enemyDisabled&&foe.contains("ледяной призрак"))frostTurns=2;
         lastTaken=Math.min(hp,incoming+poisoned);battleTaken+=lastTaken;
         hp=Math.max(0,hp-incoming-poisoned);stamina=Math.min(maxStamina,nonnegativeAdd(stamina,3+(progress.hasArmorType(5)&&progress.advanced.has(AdvancedPerks.WIND_WALKER)?2:0)));
-        battleLog=actionText+"\n"+(road.groupActive(this)?"Отряд противников":enemyName)+" отвечает: −"+incoming+" здоровья."+(poisoned>0?"\nЯд: −"+poisoned+" здоровья.":"")+(poisonTurns>0?"\nОтравление: "+poisonTurns+" хода.":"")+(frostTurns>0?"\nОбморожение: "+frostTurns+" хода.":"");
+        battleLog=actionText+"\n"+(enemyDisabled?enemyName+" пропускает ответную атаку.":(road.groupActive(this)?"Отряд противников":enemyName)+" отвечает: −"+incoming+" здоровья.")+(poisoned>0?"\nЯд: −"+poisoned+" здоровья.":"")+(poisonTurns>0?"\nОтравление: "+poisonTurns+" хода.":"")+(frostTurns>0?"\nОбморожение: "+frostTurns+" хода.":"");
         if(hp>0){int link=alma.bloodLink(this);if(link>0){lastHealing+=link;battleLog+="\nАльма: Связь душ, +"+link+" здоровья." ;}}
         if(hp==0&&alma.rescue(this))battleLog+="\nАльма: Алая клятва спасла героя.";
         if(hp==0&&fixShop.gifts.rescue(this)){lastHealing+=hp;battleLog+="\nКлятва Феникса возвращает героя к жизни.";}

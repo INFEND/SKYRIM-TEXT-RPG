@@ -16,5 +16,6 @@ final class GearEffects {
             default:return 0;
         }
     }
+    static boolean knownEnchantment(String id){return id!=null&&(id.startsWith("Амулет Талоса")||id.startsWith("Амулет Зенитара")||java.util.Arrays.asList("Амулет Аркея","Амулет Андурса","Амулет Джулианоса","Амулет Кинарет","Амулет Акатоша","Амулет Дибеллы","Амулет Стендарра","Амулет Саартала","Одеяние культиста","Кольцо чистейших смесей","Очарованное ожерелье","Зачарованное кольцо").contains(id));}
     static boolean supportedPoison(String id){return poisonDamage(id)>0||paralysis(id)>0;}
 }

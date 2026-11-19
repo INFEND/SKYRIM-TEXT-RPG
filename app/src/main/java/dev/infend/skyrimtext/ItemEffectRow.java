@@ -8,8 +8,9 @@ import java.util.regex.Pattern;
 /** Read-only catalog presentation; no invented magnitudes, timers or mechanics. */
 final class ItemEffectRow {
     private static final Pattern DURATION=Pattern.compile("(?:,\\s*|:\\s*)(\\d+\\s*(?:сек\\.?|мин\\.?|ч\\.?))\\.?$");
-    private static final Pattern VALUE=Pattern.compile("^(.*?)(?::\\s*|\\s+)([+−-]?\\d+(?:[.,]\\d+)?\\s*(?:%|ед\\.?|/сек\\.?)?)\\.?$");
+    private static final Pattern VALUE=Pattern.compile("^(.*?)(?::\\s*|\\s+)([+−-]?\\d+(?:[.,]\\d+)?\\s*(?:%|ед\\.?|/сек\\.?|кг|ход(?:а|ов)?\\.?)?)\\.?$");
     private static final Pattern ONLY_TIME=Pattern.compile("^(.*?)(?:[: ]+)("+ "\\d+\\s*(?:сек\\.?|мин\\.?|ч\\.?))\\.?$");
+    private static final Pattern QUALIFIER=Pattern.compile("\\s*\\(([^()]*)\\)\\.?$");
     final String label,value,duration;
     final int direction;
     ItemEffectRow(String label,String value,String duration,int direction){
@@ -21,6 +22,7 @@ final class ItemEffectRow {
         for(String part:raw.split("\\s*\\|\\s*")){
             String label=part.trim(),value="",duration="";
             if(label.isEmpty()||label.toLowerCase(Locale.ROOT).replace('ё','е').contains("заряд зачар")||label.toLowerCase(Locale.ROOT).startsWith("прочность"))continue;
+            String qualifier="";Matcher q=QUALIFIER.matcher(label);if(q.find()){qualifier=q.group(1);label=label.substring(0,q.start()).trim();}
             Matcher time=DURATION.matcher(label);
             if(time.find()){duration=time.group(1);label=label.substring(0,time.start()).trim();}
             if(duration.isEmpty()){
@@ -41,6 +43,7 @@ final class ItemEffectRow {
                 if(e.startsWith("восстановление"))value="+"+value;
                 else if(e.startsWith("урон здоров")||e.startsWith("урон магии")||e.startsWith("урон запас")||e.startsWith("урон вынослив"))value="−"+value;
             }
+            if(!qualifier.isEmpty())duration=duration.isEmpty()?qualifier:duration+" | "+qualifier;
             rows.add(new ItemEffectRow(label,value,duration,direction));
         }
         return rows;

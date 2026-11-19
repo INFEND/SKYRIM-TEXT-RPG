@@ -21,6 +21,9 @@ public class EquipmentConditionTest {
         assertFalse(g.progress.applyPoison("Яд паралича",g));assertEquals(1,g.progress.quantity("Яд паралича"));
         RpgProgress p=RpgProgress.fromJson(g.progress.toJson());assertEquals("Яд паралича",p.consumePoison("Железный меч"));assertEquals("",p.consumePoison("Железный меч"));
     }
+    @Test public void talosOnlyWhenEquipped(){
+        GameEngine g=new GameEngine();g.progress.quantity("Амулет Талоса",1);assertEquals(3,g.shoutRecovery());assertTrue(g.progress.equip("Амулет Талоса"));assertEquals(2,g.shoutRecovery());g.progress.unequip("Амулет Талоса");assertEquals(3,g.shoutRecovery());
+    }
     @Test public void gearDoesNotStackOnSync(){
         GameEngine g=new GameEngine();int base=g.maxHp;
         g.progress.quantity("Амулет Аркея",1);assertTrue(g.progress.equip("Амулет Аркея"));

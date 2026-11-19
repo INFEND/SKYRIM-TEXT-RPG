@@ -48,6 +48,8 @@ public final class RpgProgress {
     public int gearSpeech(){return equipped("Амулет Дибеллы")?15:0;}
     public int gearTrade(){return equipped("Амулет Зенитара")||equipped("Амулет Зенитара Шави")?10:0;}
     public int gearSpellDiscount(){return equipped("Амулет Саартала")?3:0;}
+    public int gearAlchemy(){return equipped("Кольцо чистейших смесей")?12:0;}
+    public boolean gearTalos(){return equipped("Амулет Талоса")||equipped("Амулет Талоса Огмунда")||equipped("Амулет Талоса Раэрека");}
     public int gearBlock(){return equipped("Амулет Стендарра")?10:0;}
     private static final String[] QUALITY={"Обычное","Хорошее","Отличное","Превосходное","Безупречное","Эпическое","Легендарное"};
     private static final int[] TEMPER_LEVELS={0,14,31,65,100,134,168};
@@ -218,14 +220,14 @@ public final class RpgProgress {
             equip(g.swordUpgraded?"Стальной меч":"Походный клинок");
             equip(g.armorUpgraded?"Стальная кираса":"Дорожная одежда");
         }
-        cleanEquipment();g.syncGearAttributes();
+        cleanEquipment();if(g.progress==this)g.syncGearAttributes();
     }
     public void quantity(String id,int n){
         try{inventory.put(id,Math.max(0,n));if(n<=0)tempered.remove(id);if(n<=0)weaponPoisons.remove(id);}catch(Exception ignored){}
     }
     public int quantity(String id){return inventory.optInt(id,0);}
     public int fixCarryBonus=0;
-    public double carryLimit(){return 50+((equipped("Зачарованное ожерелье")||equipped("Очарованное ожерелье"))?25:0)+(equipped("Серебряное кольцо грузоподъёмности")?10:0)+artifacts.carryBonus(this)+fixCarryBonus;}
+    public double carryLimit(){return 50+(equipped("Зачарованное ожерелье")?25:0)+(equipped("Очарованное ожерелье")?25:0)+(equipped("Серебряное кольцо грузоподъёмности")?10:0)+artifacts.carryBonus(this)+fixCarryBonus;}
     public boolean addItem(String id,int quantity){
         if(quantity<=0||ItemCatalog.find(id)==null||CompensationPowers.itemIndex(id)>=0||quantity(id)>Integer.MAX_VALUE-quantity)return false;
         ItemCatalog.Item item=ItemCatalog.find(id);
@@ -282,7 +284,7 @@ public final class RpgProgress {
         int exhaustion=stat==1?(g.maxMagicka-g.magicka):stat==2?(g.maxStamina-g.stamina):Math.max(0,g.maxHp-g.hp);
         int difficulty=baseDifficulty+Math.max(0,15-g.level)*2;
         int danger=Math.max(0,g.region/2)+difficulty/10;
-        int skill=skillIndex<0?0:(skillLevel(skillIndex)+(skillIndex==12?gearSpeech():0)-15)/2;
+        int skill=skillIndex<0?0:(skillLevel(skillIndex)+(skillIndex==12?gearSpeech():skillIndex==14?gearAlchemy():0)-15)/2;
         int context=Math.min(18,g.reputation/3)+skill+(skillIndex==9&&equipped("Эбонитовая кольчуга")?15:0)+artifacts.towerBonus(g,skillIndex)+branches.chanceBonus(skillIndex)+advanced.checkBonus(skillIndex)+(skillIndex==12&&advanced.has(AdvancedPerks.PERSUASION)?5:0)-(carryWeight()>carryLimit()*0.9?8:0);
         g.needs.sync(g.day,g.hour);
         int base=RpgContent.successChance(g,stat,difficulty,danger,exhaustion,context);
