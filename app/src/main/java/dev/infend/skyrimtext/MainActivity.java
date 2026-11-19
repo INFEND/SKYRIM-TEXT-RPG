@@ -490,6 +490,7 @@ public final class MainActivity extends Activity {
         }
         NpcProfiles.Profile profile=NpcProfiles.find(name);
         if(profile!=null){
+            if(profile.child)return npcEmblem(profile.name,"hero");
             if(profile.dragon)return npcEmblem(profile.name,"dragon");
             if(!java.util.Arrays.asList(RpgContent.RACES).contains(profile.race))return npcEmblem(profile.name,"hero");
             String path=CharacterIdentity.portraitPath(profile.race,profile.gender,profile.variant);
@@ -692,7 +693,13 @@ public final class MainActivity extends Activity {
         LinearLayout panel=column();panel.setPadding(dp(8),dp(8),dp(8),dp(8));
         ScrollView sc=new ScrollView(this);sc.addView(panel);
         final AlertDialog menu=new RuneDialogBuilder(this,accent()).setTitle("Взаимодействовать").setView(sc).setNegativeButton("Закрыть",null).create();
-        npcGrid(panel,NPC_ACTIONS,NPC_ACTION_ICONS,TEXT,index->{
+        NpcProfiles.Profile targetProfile=NpcProfiles.find(name);
+        final boolean child=targetProfile!=null&&targetProfile.child;
+        final int[] allowed=child?new int[]{0,2,6,11}:new int[]{0,1,2,3,4,5,6,7,8,9,10,11};
+        String[] labelsForMenu=new String[allowed.length],iconsForMenu=new String[allowed.length];
+        for(int k=0;k<allowed.length;k++){labelsForMenu[k]=NPC_ACTIONS[allowed[k]];iconsForMenu[k]=NPC_ACTION_ICONS[allowed[k]];}
+        npcGrid(panel,labelsForMenu,iconsForMenu,TEXT,slot->{
+            int index=allowed[slot];
             if(!game.started||!npcAddonEnabled(name)||"DEAD".equals(npcKnownStatus(name))||"MISSING".equals(npcKnownStatus(name))||livingBusy()){toast("Персонаж или действие сейчас недоступны");return;}
             if(game.aiNarrativeMode&&!game.nativeSceneRequired()){
                 if(!npcInCurrentScene(name)){toast("Персонаж не участвует в текущей сцене");return;}
