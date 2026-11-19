@@ -121,6 +121,7 @@ final class SolitudeCity {
         if(d==0)justice.theftChoice(g,s);
         SolitudeCanonical.districtChoices(g,s,d);
         SolitudeEncounters.choices(g,s,d);
+        SolitudeResidents.choices(g,s,d);
         return s.add(PREFIX+"back","На улицы Солитьюда","Вернуться к выбору районов").add("GO_WORLD","Завершить прогулку","Вернуться к приключению");
     }
     private GameEngine.Scene newBlocked(GameEngine.Scene s,GameEngine g,int i){
@@ -152,6 +153,7 @@ final class SolitudeCity {
         if(d==1&&justice.choose(g,action))return;
         if((d==0||d==1)&&justice.theft(g,action))return;
         if(SolitudeEncounters.choose(g,d,action))return;
+        if(SolitudeResidents.choose(g,d,action))return;
         if((PREFIX+"shop").equals(action)&&(d==0||d==5)){g.mode="WORLD";g.choose("SHOP");return;}
         if((PREFIX+"rest").equals(action)&&d==6){g.mode="WORLD";g.choose("REST");return;}
         if((PREFIX+"livia").equals(action)&&d==1){g.mode="WORLD";if(g.livia.available(g)){g.choose("LIVIA:open");g.livia.castleReturn=LiviaStory.MODE.equals(g.mode);}else g.mode=PREFIX+d;return;}
