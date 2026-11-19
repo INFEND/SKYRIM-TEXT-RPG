@@ -1022,11 +1022,11 @@ public final class MainActivity extends Activity {
                 int probability=check.optInt("chance",-1),die=check.optInt("roll",-1);
                 if(probability<0||die<1)continue;
                 boolean success=AiGameTurn.success(probability,die);
-                rewardNotice((success?"Успех":"Неудача")+" · "+die+" / 100 · "+probability+"%",success?ITEM_UP:ITEM_DOWN);
+                rewardNotice((success?"Успех":"Неудача")+" | Бросок: "+die+"/100 | Шанс: "+probability+"%",success?ITEM_UP:ITEM_DOWN);
             }
         }else if(roll>=1&&chance>=0){
             boolean success=roll<=chance;
-            rewardNotice((success?"Успех":"Неудача")+" · "+roll+" / 100 · "+chance+"%",success?ITEM_UP:ITEM_DOWN);
+            rewardNotice((success?"Успех":"Неудача")+" | Бросок: "+roll+"/100 | Шанс: "+chance+"%",success?ITEM_UP:ITEM_DOWN);
         }
         if(deltas!=null){java.util.Iterator<String> keys=deltas.keys();while(keys.hasNext()){
             String key=keys.next();long n=deltas.optLong(key);if(n==0)continue;
@@ -3385,7 +3385,7 @@ public final class MainActivity extends Activity {
         LinearLayout sheets=row();overview.addView(sheets,lp(-1,47));
         mapControl(sheets,"Скайрим",()->{terrainMap.setMapRegion(-1);terrainMap.setSheet(0);});
         mapControl(sheets,"Солстейм",()->{terrainMap.setMapRegion(-1);terrainMap.setSheet(1);});
-        overview.addView(terrainMap,lp(-1,410));
+        overview.addView(terrainMap,lp(-1,Math.min(410,Math.max(220,Math.round(getResources().getDisplayMetrics().widthPixels / getResources().getDisplayMetrics().density)-64))));
         LinearLayout mapActions=row();mapActions.setGravity(Gravity.CENTER);
         mapActions.setPadding(0,dp(10),0,dp(8));overview.addView(mapActions,lp(-1,-2));
         mapControl(mapActions,"−",()->terrainMap.zoomBy(1f/1.45f));
