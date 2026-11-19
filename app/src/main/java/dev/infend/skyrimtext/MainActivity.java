@@ -4077,7 +4077,17 @@ public final class MainActivity extends Activity {
         host.addView(line,lp(-1,-2));space(host,9);
     }
     private void itemCondition(LinearLayout host,ItemCatalog.Item item,AlertDialog[] owner){
-        if(!game.progress.tracksCondition(item)||game.progress.quantity(item.id)<1)return;
+        if(!item.weapon()&&!item.wearable())return;
+        boolean track=game.progress.tracksCondition(item)&&game.progress.quantity(item.id)>0;
+        boolean worn=game.progress.equipped(item.id);
+        boolean unique="Артефакты".equals(item.category)||CompensationPowers.itemIndex(item.id)>=0;
+        if(!track&&!worn&&!unique)return;
+        if(!track){
+            space(host,5);host.addView(itemText("Состояние предмета",14,TEXT,true),lp(-1,-2));space(host,8);
+            if(unique)itemProperty(host,"soul","Редкость","Уникальный",0xffc7a46b);
+            if(worn)itemProperty(host,"shield","Экипировано","Да",0xff66bb6a);
+            return;
+        }
         int percent=game.progress.conditionPercent(item);
         int color=percent>=65?0xff66bb6a:percent>=30?0xffffb74d:0xffef5350;
         space(host,5);host.addView(itemText("Состояние предмета",14,TEXT,true),lp(-1,-2));space(host,8);
@@ -4089,10 +4099,11 @@ public final class MainActivity extends Activity {
         ProgressBar bar=new ProgressBar(this,null,android.R.attr.progressBarStyleHorizontal);
         bar.setMax(100);bar.setProgress(percent);bar.setProgressTintList(ColorStateList.valueOf(color));
         bar.setProgressBackgroundTintList(ColorStateList.valueOf((color&0x00ffffff)|0x33000000));host.addView(bar,lp(-1,5));space(host,8);
+        if(worn)itemProperty(host,"shield","Экипировано","Да",0xff66bb6a);
         if(percent<100){
             String blocked=game.progress.repairBlock(item,game);
             if(blocked.isEmpty()){
-                TextView repair=itemAction("Ремонт • "+item.temperMaterial());host.addView(repair,lp(-1,42));
+                TextView repair=itemAction("Ремонт | "+item.temperMaterial());host.addView(repair,lp(-1,42));
                 repair.setOnClickListener(v->new RuneDialogBuilder(this,accent()).setTitle("Восстановить прочность?")
                     .setMessage("Расход: 1 × "+item.temperMaterial()).setNegativeButton("Отмена",null)
                     .setPositiveButton("Ремонт",(d,w)->{if(game.progress.repair(item,game)){
@@ -4179,7 +4190,8 @@ public final class MainActivity extends Activity {
     private void renderInventory(){
         game.progress.sync(game);
         section("СУМКА ПУТНИКА","Инвентарь","Предметы и снаряжение");
-        java.util.ArrayList<String> groups=ItemCatalog.groups();
+        java.util.ArrayList<String> groups=new java.util.ArrayList<>(ItemCatalog.groups());
+        groups.add(1,"Избранное");
         if(!groups.contains(selectedCategory))selectedCategory="Все";
         // Category icon ribbon, horizontally scrollable and fully transparent.
         HorizontalScrollView categoryScroll=new HorizontalScrollView(this);
@@ -4196,7 +4208,8 @@ public final class MainActivity extends Activity {
             LinearLayout tile=column();tile.setGravity(Gravity.CENTER);
             tile.setPadding(dp(7),dp(3),dp(7),dp(3));
             categoryStrip.addView(tile,lp(65,67));
-            tile.addView(new SkyrimIconView(this,image,active?accent():MUTED),lp(28,30));
+            if("Избранное".equals(group))tile.addView(new ItemStatGlyph(this,"star",active?accent():MUTED),lp(28,30));
+            else tile.addView(new SkyrimIconView(this,image,active?accent():MUTED),lp(28,30));
             TextView caption=text(group.toUpperCase(java.util.Locale.ROOT),9,active?TEXT:MUTED,active);
             caption.setGravity(Gravity.CENTER);caption.setMaxLines(2);
             tile.addView(caption,lp(-1,-2));
@@ -4207,15 +4220,16 @@ public final class MainActivity extends Activity {
         LinearLayout summary=card();
         TextView weight=text(String.format(java.util.Locale.forLanguageTag("ru"),
                 "ВЕС  %.2f / %.0f кг     ◈  СЕПТИМЫ  %d",carried,game.progress.carryLimit(),game.gold),
-                15,carried>50?0xffd9a5a5:TEXT,true);
+                15,carried>game.progress.carryLimit()?0xffd9a5a5:TEXT,true);
         weight.setGravity(Gravity.CENTER);summary.addView(weight);
         space(summary,6);
         ProgressBar load=new ProgressBar(this,null,android.R.attr.progressBarStyleHorizontal);
-        load.setMax(5000);load.setProgress((int)Math.min(5000,Math.round(carried*100)));
+        int capacity=(int)Math.max(1,Math.min(Integer.MAX_VALUE,Math.round(game.progress.carryLimit()*100)));load.setMax(capacity);load.setProgress((int)Math.min(capacity,Math.round(carried*100)));
         load.setProgressTintList(ColorStateList.valueOf(0xffc4c9c9));
         load.setProgressBackgroundTintList(ColorStateList.valueOf(0xff303839));
         summary.addView(load,lp(-1,3));
-        java.util.ArrayList<ItemCatalog.Item> owned=game.progress.owned(selectedCategory,selectedSort);
+        java.util.ArrayList<ItemCatalog.Item> owned=game.progress.owned("Избранное".equals(selectedCategory)?"Все":selectedCategory,selectedSort);
+        if("Избранное".equals(selectedCategory))owned.removeIf(item->!prefs.getBoolean(itemFavoriteKey(item),false));
         if(owned.isEmpty())focusedInventoryId="";
         else if(focusedInventoryId.isEmpty()||game.progress.quantity(focusedInventoryId)==0
                 ||owned.stream().noneMatch(item->item.id.equals(focusedInventoryId)))
@@ -4269,6 +4283,13 @@ public final class MainActivity extends Activity {
         view.addView(heading,lp(-1,-2));
         if(hasItemStat(item))heading.addView(itemPicture(item,94),lp(94,94));
         else heading.addView(itemPicture(item,64),lp(64,64));
+        View preview=heading.getChildAt(0);preview.setContentDescription("Увеличить изображение: "+item.name);
+        preview.setOnClickListener(v->{
+            int size=Math.max(120,Math.min(360,(int)(getResources().getDisplayMetrics().widthPixels/getResources().getDisplayMetrics().density)-36));
+            LinearLayout panel=column();panel.setGravity(Gravity.CENTER);panel.setPadding(dp(8),dp(8),dp(8),dp(8));
+            panel.addView(itemPicture(item,size),lp(size,size));
+            new RuneDialogBuilder(this,accent()).setTitle(item.name).setView(panel).setPositiveButton("Закрыть",null).show();
+        });
         LinearLayout words=column();
         LinearLayout.LayoutParams wordsParams=new LinearLayout.LayoutParams(0,-2,1);
         wordsParams.leftMargin=dp(10);heading.addView(words,wordsParams);
@@ -4300,6 +4321,7 @@ public final class MainActivity extends Activity {
                 android.widget.FrameLayout frame=(android.widget.FrameLayout)star;frame.removeAllViews();
                 frame.addView(new ItemStatGlyph(this,"star",next?accent():0xffa3a3a3),new android.widget.FrameLayout.LayoutParams(dp(22),dp(22),Gravity.CENTER));
                 toast(next?"Добавлено в избранное":"Удалено из избранного");
+                if("Избранное".equals(selectedCategory))render();
             });
         }
         itemDivider(view,12);
@@ -4330,7 +4352,7 @@ public final class MainActivity extends Activity {
                 improve.setOnClickListener(v->new RuneDialogBuilder(this,accent()).setTitle("Улучшить "+item.name+"?")
                     .setMessage("Расход: 1 × "+item.temperMaterial()+"\nКачество: "+game.progress.temperTargetName(item))
                     .setNegativeButton("Отмена",null).setPositiveButton("Улучшить",(a,b)->{
-                        if(game.progress.temper(item,game)){save();render();toast("Предмет улучшен");}
+                        if(game.progress.temper(item,game)){save();if(owner[0]!=null)owner[0].dismiss();render();itemDialog(item);toast("Предмет улучшен");}
                         else toast(game.progress.temperBlock(item,game));
                     }).show());
             }

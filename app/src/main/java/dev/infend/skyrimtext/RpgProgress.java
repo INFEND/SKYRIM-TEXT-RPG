@@ -237,7 +237,7 @@ public final class RpgProgress {
         cleanEquipment();
     }
     public void quantity(String id,int n){
-        try{inventory.put(id,Math.max(0,n));if(n<=0){tempered.remove(id);condition.remove(id);}}catch(Exception ignored){}
+        try{inventory.put(id,Math.max(0,n));if(n<=0)tempered.remove(id);if(n<=0)condition.remove(id);}catch(Exception ignored){}
     }
     public int quantity(String id){return inventory.optInt(id,0);}
     public int fixCarryBonus=0;
