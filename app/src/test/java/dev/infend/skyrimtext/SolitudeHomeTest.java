@@ -99,6 +99,19 @@ public class SolitudeHomeTest {
         g.choose("SOLITUDE:craft:enchant:neck");assertEquals(1,g.progress.quantity(SolitudeCraft.ENCHANT_NECK));
         g.progress.unequip(SolitudeCraft.ENCHANT_NECK);assertEquals(armor,g.progress.equippedArmor(),0.001);
     }
+    @Test public void enchantedSwordConsumesResourcesAndUsesWeaponDamage() throws Exception {
+        GameEngine g=city();g.fixShop.home.buy(4);g.choose("SOLITUDE:visit:2");g.choose("SOLITUDE:furnish:4");
+        g.choose("SOLITUDE:back");g.choose("SOLITUDE:home");g.stamina=50;
+        g.progress.quantity(SolitudeCraft.BASE_SWORD,1);g.progress.quantity(SolitudeCraft.SOUL_GEM,1);
+        assertTrue(g.progress.equip(SolitudeCraft.BASE_SWORD));double base=g.progress.equippedDamage();
+        g.choose("SOLITUDE:craft:enchant:sword");assertEquals(0,g.progress.quantity(SolitudeCraft.ENCHANT_SWORD));
+        g.progress.unequip(SolitudeCraft.BASE_SWORD);g.choose("SOLITUDE:craft:enchant:sword");
+        assertEquals(0,g.progress.quantity(SolitudeCraft.BASE_SWORD));assertEquals(0,g.progress.quantity(SolitudeCraft.SOUL_GEM));
+        assertEquals(1,g.progress.quantity(SolitudeCraft.ENCHANT_SWORD));assertTrue(g.progress.equip(SolitudeCraft.ENCHANT_SWORD));
+        assertTrue(g.progress.equippedDamage()>base);double damage=g.progress.equippedDamage();
+        g=GameEngine.fromJson(g.toJson().toString());assertEquals(damage,g.progress.equippedDamage(),0.001);
+        g.choose("SOLITUDE:craft:enchant:sword");assertEquals(1,g.progress.quantity(SolitudeCraft.ENCHANT_SWORD));
+    }
     @Test public void bulkChestPreservesGoodsAndRespectsWeight() throws Exception {
         GameEngine g=city();g.fixShop.home.buy(4);g.choose("SOLITUDE:home");
         assertTrue(g.progress.addItem("Золотой слиток",5));

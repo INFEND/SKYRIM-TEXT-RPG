@@ -44,11 +44,14 @@ final class SolitudeCraft {
     }
     static final String ENCHANT_RING="Серебряное кольцо грузоподъёмности", SOUL_GEM="Малый камень душ (заполненный)", BASE_RING="Кольцо серебряное";
     static final String BASE_NECK="Серебряное ожерелье", ENCHANT_NECK="Серебряное ожерелье защиты";
+    static final String BASE_SWORD="Железный меч", ENCHANT_SWORD="Зачарованный железный меч силы";
     private static boolean canEnchant(GameEngine g,String base,String out){
+        ItemCatalog.Item source=ItemCatalog.find(base),result=ItemCatalog.find(out),gem=ItemCatalog.find(SOUL_GEM);
+        if(source==null||result==null||gem==null||g.progress.temperQuality(base)>0)return false;
         return SolitudeCity.here(g)&&SolitudeCourt.ready(g)&&g.solitude.homeEnchanting(g)&&g.hour<23&&g.stamina>=3
             &&g.progress.quantity(base)>0&&!g.progress.equipped(base)&&g.progress.quantity(SOUL_GEM)>0
             &&g.progress.quantity(out)<Integer.MAX_VALUE
-            &&g.progress.carryWeight()-0.2<=g.progress.carryLimit()+0.00001;
+            &&g.progress.carryWeight()-source.weight-gem.weight+result.weight<=g.progress.carryLimit()+0.00001;
     }
     private static void enchant(GameEngine g,String base,String out){
         if(!canEnchant(g,base,out))return;
@@ -60,6 +63,7 @@ final class SolitudeCraft {
         g.progress.skillExperience(g,8,25);finish(g,"В Высоком шпиле зачаровано: "+out,3);
     }
     static void choices(GameEngine g,GameEngine.Scene s){
+        if(canEnchant(g,BASE_SWORD,ENCHANT_SWORD))s.add(PREFIX+"enchant:sword","Зачаровать железный меч","Авторский рецепт | +3 базового урона | заполненный малый камень душ | 1 ч.");
         if(canEnchant(g,BASE_NECK,ENCHANT_NECK))s.add(PREFIX+"enchant:neck","Зачаровать серебряное ожерелье","Авторский рецепт | +15 брони при ношении | заполненный малый камень душ | 1 ч.");
         if(canEnchant(g,BASE_RING,ENCHANT_RING))s.add(PREFIX+"enchant:ring","Зачаровать серебряное кольцо","Авторский рецепт | +10 кг при ношении | заполненный малый камень душ | 1 ч.");
         if(forge(g)){
@@ -72,6 +76,7 @@ final class SolitudeCraft {
     }
     static boolean choose(GameEngine g,String a){
         if(!a.startsWith(PREFIX))return false;
+        if(a.equals(PREFIX+"enchant:sword")){enchant(g,BASE_SWORD,ENCHANT_SWORD);return true;}
         if(a.equals(PREFIX+"enchant:ring")){enchant(g,BASE_RING,ENCHANT_RING);return true;}
         if(a.equals(PREFIX+"enchant:neck")){enchant(g,BASE_NECK,ENCHANT_NECK);return true;}
         for(int i=0;i<ALCHEMY_OUT.length;i++)if(a.equals(PREFIX+"mix:"+i)){mix(g,i);return true;}
