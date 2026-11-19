@@ -2,6 +2,24 @@ package dev.infend.skyrimtext;
 import org.junit.Test;
 import static org.junit.Assert.*;
 public class SolitudeResidentsTest {
+    @Test public void additionalResidentsRespectScheduleAndPersist() throws Exception {
+        GameEngine g=new GameEngine();g.start("Тест","Норд","Воин");
+        g.region=3;g.progress.location="Солитьюд";g.mode="WORLD";g.hour=12;
+        g.choose("SOLITUDE:open");g.choose("SOLITUDE:visit:3");
+        g.choose("SOLITUDE:resident:talk:11");
+        assertEquals("MET",g.sceneState.npcStatusByName("Гирауд Жиман"));
+        g.choose("SOLITUDE:resident:talk:12");
+        assertEquals("MET",g.sceneState.npcStatusByName("Инге Шесть Пальцев"));
+        g.hour=18;String before=g.message;g.choose("SOLITUDE:resident:talk:12");assertEquals(before,g.message);
+        g.choose("SOLITUDE:back");g.choose("SOLITUDE:visit:6");
+        g=GameEngine.fromJson(g.toJson().toString());
+        g.choose("SOLITUDE:resident:talk:12");assertTrue(g.message.contains("Снова встретились"));
+        g.choose("SOLITUDE:resident:talk:13");assertEquals("MET",g.sceneState.npcStatusByName("Лисетта"));
+        g.choose("SOLITUDE:back");g.choose("SOLITUDE:visit:0");g.hour=10;
+        g.choose("SOLITUDE:resident:talk:14");assertEquals("MET",g.sceneState.npcStatusByName("Джала"));
+        assertEquals(-1,SolitudeResidents.district(14,18));
+    }
+
     @Test public void itinerariesAreExclusiveAndMemorySurvivesTravel() throws Exception {
         GameEngine g=new GameEngine();g.start("Тест","Норд","Воин");
         g.region=3;g.progress.location="Солитьюд";g.mode="WORLD";g.hour=9;
