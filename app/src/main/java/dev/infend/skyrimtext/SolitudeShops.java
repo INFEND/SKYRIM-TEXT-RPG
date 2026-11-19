@@ -78,6 +78,19 @@ final class SolitudeShops {
         int p=g.salePrice(item);if(p<=0)return 0;
         return Math.max(0,Math.min(99,Math.min(g.progress.quantity(item.id),Math.min(budget[s]/p,(Integer.MAX_VALUE-g.gold)/p))));
     }
+    private static boolean extraAccepted(int s,ItemCatalog.Item item){
+        if(item==null)return false;
+        for(String id:ITEMS[s])if(id.equals(item.id))return false;
+        String c=item.category;
+        switch(s){
+            case 0:return "Одежда".equals(c)||"Украшения".equals(c);
+            case 1:return "Ингредиенты".equals(c);
+            case 2:return "Материалы".equals(c)||"Драгоценности".equals(c)||"Инструменты".equals(c);
+            case 3:return "Оружие".equals(c)&&(item.id.toLowerCase(java.util.Locale.ROOT).contains("лук")||item.id.toLowerCase(java.util.Locale.ROOT).contains("арбалет"));
+            case 4:return "Броня".equals(c)||"Материалы".equals(c)||("Оружие".equals(c)&&!item.id.toLowerCase(java.util.Locale.ROOT).contains("лук")&&!item.id.toLowerCase(java.util.Locale.ROOT).contains("арбалет"));
+            default:return false;
+        }
+    }
     private static void tradeChoices(GameEngine.Scene scene,String action,String title,int price,int max,String detail){
         if(max<1)return;
         scene.add(action,title,price+" септимов | "+detail);
@@ -105,6 +118,8 @@ final class SolitudeShops {
             tradeChoices(scene,"SOLITUDE:sell:"+s+":"+i,"Продать: "+item.name,g.salePrice(item),maxSell(g,s,item),"У тебя: "+g.progress.quantity(id));
         }
         else scene=new GameEngine.Scene(scene.kicker,scene.title,scene.body+"\n\nЛавка закрыта или торговец недоступен.");
+        if(open(g,s))for(ItemCatalog.Item item:g.progress.owned("Все","Название"))
+            if(extraAccepted(s,item))tradeChoices(scene,"SOLITUDE:extraSell:"+s+":"+item.id,"Продать: "+item.name,g.salePrice(item),maxSell(g,s,item),"У тебя: "+g.progress.quantity(item.id)+" | Скупка по специализации");
         if(s==1||s==4)SolitudeCraft.choices(g,scene);
         if(s==0)SolitudeCanonical.attireChoices(g,scene);
         if(s==1)SolitudeCanonical.shopChoices(g,scene);
@@ -114,6 +129,15 @@ final class SolitudeShops {
         refresh(g,s);if(!open(g,s))return;
         if(action.equals("SOLITUDE:merchant:talk:"+s)){conversation(g,s,false);return;}
         if(action.equals("SOLITUDE:merchant:memory:"+s)){conversation(g,s,true);return;}
+        for(ItemCatalog.Item item:g.progress.owned("Все","Название")){
+            if(!extraAccepted(s,item))continue;
+            int n=amount(action,"SOLITUDE:extraSell:"+s+":"+item.id,maxSell(g,s,item));
+            if(n<=0)continue;
+            int total=g.salePrice(item)*n;
+            if(!g.progress.removeItem(item.id,n))return;
+            budget[s]-=total;g.gold+=total;g.message="Продано: "+item.name+" ×"+n+" | +"+total+" септимов.";
+            g.progress.recent=g.message;g.recordVisualEvent(NAMES[s]+": "+g.message);g.progress.sync(g);return;
+        }
         for(int i=0;i<ITEMS[s].length;i++){
             String id=ITEMS[s][i];ItemCatalog.Item item=ItemCatalog.find(id);if(item==null)continue;
             int buy=amount(action,"SOLITUDE:buy:"+s+":"+i,maxBuy(g,s,i,item));
