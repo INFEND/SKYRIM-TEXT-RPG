@@ -237,11 +237,11 @@ public final class MainActivity extends Activity {
                 toast("Портреты: "+installed.size()+" из 5"+(rejected>0?" | Не распознано: "+rejected:""));render();
             }return;
         }
-        if(requestCode==REQUEST_LIVIA_PORTRAIT){if(resultCode==RESULT_OK&&data!=null&&data.getData()!=null){try{LiviaPortrait.install(this,data.getData());liviaPortrait();}catch(Exception e){toast("Не удалось импортировать портрет: "+e.getMessage());}}return;}
-        if(requestCode==REQUEST_ALMA_GALLERY){if(resultCode==RESULT_OK&&data!=null&&data.getData()!=null){try{AlmaGallery.install(this,data.getData());almaGallery(1);}catch(Exception e){toast("Не удалось импортировать галерею: "+e.getMessage());}}return;}
+        if(requestCode==REQUEST_LIVIA_PORTRAIT){if(resultCode==RESULT_OK&&data!=null&&data.getData()!=null){try{LiviaPortrait.install(this,data.getData());refreshNpcPortrait();liviaPortrait();}catch(Exception e){toast("Не удалось импортировать портрет: "+e.getMessage());}}return;}
+        if(requestCode==REQUEST_ALMA_GALLERY){if(resultCode==RESULT_OK&&data!=null&&data.getData()!=null){try{AlmaGallery.install(this,data.getData());refreshNpcPortrait();almaGallery(npcGalleryPrimary("alma",7,AlmaGallery.COUNT));}catch(Exception e){toast("Не удалось импортировать галерею: "+e.getMessage());}}return;}
         if(requestCode==REQUEST_ELISIF_GALLERY){if(resultCode==RESULT_OK&&data!=null&&data.getData()!=null){final android.net.Uri uri=data.getData();new Thread(()->{try{ElisifGallery.install(this,uri);runOnUiThread(()->{if(!isFinishing()&&!isDestroyed()){toast("Галерея Элисиф обновлена");render();elisifGallery(0);}});}catch(Exception e){runOnUiThread(()->{if(!isFinishing()&&!isDestroyed())toast("Не удалось импортировать галерею: "+e.getMessage());});}},"elisif-import").start();}return;}
         if(requestCode==REQUEST_SERANA_GALLERY){if(resultCode==RESULT_OK&&data!=null&&data.getData()!=null){try{SeranaGallery.install(this,data.getData());seranaGallery(1);}catch(Exception e){toast("Не удалось импортировать галерею: "+e.getMessage());}}return;}
-        if(requestCode==REQUEST_KATHERINE_GALLERY){if(resultCode==RESULT_OK&&data!=null&&data.getData()!=null){try{KatherineGallery.install(this,data.getData());katherineGallery(1);}catch(Exception e){toast("Не удалось импортировать галерею: "+e.getMessage());}}return;}
+        if(requestCode==REQUEST_KATHERINE_GALLERY){if(resultCode==RESULT_OK&&data!=null&&data.getData()!=null){try{KatherineGallery.install(this,data.getData());refreshNpcPortrait();katherineGallery(npcGalleryPrimary("katherine",1,KatherineGallery.COUNT));}catch(Exception e){toast("Не удалось импортировать галерею: "+e.getMessage());}}return;}
         if(requestCode==LocalAiEngineModule.REQUEST_ACTIVATE){if(localAiClient!=null)localAiClient.onEngineActivationResult(resultCode==RESULT_OK);return;}
         if(requestCode==REQUEST_LOCAL_GGUF&&resultCode==RESULT_OK&&data!=null&&data.getData()!=null)
             importLocalModel(data.getData());
@@ -474,12 +474,12 @@ public final class MainActivity extends Activity {
         if(LiviaStory.matches(name)){try{android.widget.ImageView portrait=new android.widget.ImageView(this);portrait.setImageBitmap(LiviaPortrait.photo(this));portrait.setAdjustViewBounds(true);portrait.setScaleType(android.widget.ImageView.ScaleType.FIT_CENTER);portrait.setContentDescription("Ливия");portrait.setOnClickListener(v->liviaPortrait());return portrait;}catch(java.io.IOException ignored){return npcEmblem(name,"hero");}}
         if("Серана".equalsIgnoreCase(name)){try{if(SeranaGallery.available(this)){android.widget.ImageView portrait=new android.widget.ImageView(this);portrait.setImageBitmap(SeranaGallery.photo(this,1));portrait.setAdjustViewBounds(true);portrait.setScaleType(android.widget.ImageView.ScaleType.FIT_CENTER);portrait.setContentDescription("Серана");portrait.setOnClickListener(v->seranaGallery(1));return portrait;}}catch(java.io.IOException ignored){}}
 
-        if(AlmaStory.NAME.equalsIgnoreCase(name)){try{if(AlmaGallery.available(this)){android.widget.ImageView portrait=new android.widget.ImageView(this);portrait.setImageBitmap(AlmaGallery.photo(this,7));portrait.setAdjustViewBounds(true);portrait.setScaleType(android.widget.ImageView.ScaleType.FIT_CENTER);portrait.setContentDescription("Альма");return portrait;}}catch(java.io.IOException ignored){}return npcEmblem(name,"hero");}
+        if(AlmaStory.NAME.equalsIgnoreCase(name)){try{if(AlmaGallery.available(this)){android.widget.ImageView portrait=new android.widget.ImageView(this);portrait.setImageBitmap(AlmaGallery.photo(this,npcGalleryPrimary("alma",7,AlmaGallery.COUNT)));portrait.setAdjustViewBounds(true);portrait.setScaleType(android.widget.ImageView.ScaleType.FIT_CENTER);portrait.setContentDescription("Альма");return portrait;}}catch(java.io.IOException ignored){}return npcEmblem(name,"hero");}
         if(KatherineStory.NAME.equalsIgnoreCase(name)){
             String path="media/katherine/portrait.webp";
             try{
                 android.graphics.Bitmap bitmap;
-                if(KatherineGallery.available(this))bitmap=KatherineGallery.photo(this,1);
+                if(KatherineGallery.available(this))bitmap=KatherineGallery.photo(this,npcGalleryPrimary("katherine",1,KatherineGallery.COUNT));
                 else try(java.io.InputStream in=ResourceStore.open(this,path)){bitmap=android.graphics.BitmapFactory.decodeStream(in);}
                 if(bitmap!=null){android.widget.ImageView portrait=new android.widget.ImageView(this);
                     portrait.setImageBitmap(bitmap);portrait.setAdjustViewBounds(true);
@@ -523,7 +523,10 @@ public final class MainActivity extends Activity {
         for(int i=0;i<facts.length();i++){JSONObject n=facts.optJSONObject(i);if(n!=null&&sameNpc(name,n.optString("title")))return n;}
         return null;
     }
-    private String npcKnownStatus(String name){JSONObject n=npcFact(name);return n==null?"":n.optString("status");}
+    private String npcKnownStatus(String name){
+        if(npcAddonEnabled(name)){if(LiviaStory.matches(name)&&"Последний поединок".equals(game.livia.ending))return "DEAD";if(AlmaStory.NAME.equals(name)&&"Последняя жертва".equals(game.alma.ending))return "DEAD";}
+        JSONObject n=npcFact(name);return n==null?"":n.optString("status");
+    }
     private boolean npcInCurrentScene(String name){
         if(!game.started)return false;
         if(!npcAddonEnabled(name))return false;
@@ -544,6 +547,7 @@ public final class MainActivity extends Activity {
         return true;
     }
     private String npcRelation(String name){
+        String knownStatus=npcKnownStatus(name);if("DEAD".equals(knownStatus)||"MISSING".equals(knownStatus))return "Не применяется";
         if(ItachiProfile.matches(name)&&game.itachi.enabled&&game.itachi.stage>0)return game.itachi.relation();
         if(LiviaStory.matches(name)&&game.livia.enabled&&game.livia.stage>0)return game.livia.relation();
         if(KatherineStory.NAME.equals(name)&&game.katherine.enabled&&game.katherine.stage>0)return game.katherine.companion.relation(game.katherine);
@@ -581,8 +585,18 @@ public final class MainActivity extends Activity {
     }
     private android.app.Dialog activeNpcDialog;
     private String activeNpcName="";
+    private android.widget.FrameLayout activeNpcPortrait;
+    private int npcGalleryPrimary(String key,int fallback,int count){int value=prefs.getInt("npc_primary_"+key,fallback);return value>=1&&value<=count?value:fallback;}
+    private void setNpcGalleryPrimary(String key,int value){prefs.edit().putInt("npc_primary_"+key,value).apply();refreshNpcPortrait();}
+    private void refreshNpcPortrait(){
+        if(activeNpcDialog==null||!activeNpcDialog.isShowing()||activeNpcPortrait==null||activeNpcName.isEmpty())return;
+        String name=activeNpcName;View portrait=npcPortrait(name);portrait.setBackground(npcShape(0xff111111,0,16));portrait.setClipToOutline(true);
+        if(portrait instanceof android.widget.ImageView){android.widget.ImageView image=(android.widget.ImageView)portrait;image.setScaleType(android.widget.ImageView.ScaleType.FIT_CENTER);image.setAdjustViewBounds(true);}
+        activeNpcPortrait.removeAllViews();activeNpcPortrait.addView(portrait,new android.widget.FrameLayout.LayoutParams(-1,-1));
+        activeNpcPortrait.getLayoutParams().height=dp(portrait instanceof android.widget.ImageView?280:150);activeNpcPortrait.requestLayout();portrait.setOnClickListener(v->npcGallerySection(name));
+    }
     private void closeNpcDialog(){
-        android.app.Dialog old=activeNpcDialog;activeNpcDialog=null;activeNpcName="";
+        android.app.Dialog old=activeNpcDialog;activeNpcDialog=null;activeNpcName="";activeNpcPortrait=null;
         if(old!=null&&old.isShowing())old.dismiss();
     }
     private void npcDetails(String name){
@@ -595,7 +609,7 @@ public final class MainActivity extends Activity {
         closeNpcDialog();
         final android.app.Dialog dialog=new android.app.Dialog(this);
         activeNpcDialog=dialog;activeNpcName=display;
-        dialog.setOnDismissListener(d->{if(activeNpcDialog==dialog){activeNpcDialog=null;activeNpcName="";}});
+        dialog.setOnDismissListener(d->{if(activeNpcDialog==dialog){activeNpcDialog=null;activeNpcName="";activeNpcPortrait=null;}});
         dialog.requestWindowFeature(android.view.Window.FEATURE_NO_TITLE);
         LinearLayout panel=column();panel.setPadding(dp(14),dp(10),dp(14),dp(14));panel.setBackgroundColor(Color.BLACK);
         LinearLayout header=row();TextView back=npcCentered("‹",30,TEXT,true);header.addView(back,lp(42,42));back.setContentDescription("Назад");back.setOnClickListener(v->dialog.dismiss());
@@ -603,14 +617,11 @@ public final class MainActivity extends Activity {
         TextView more=npcCentered("⋮",25,TEXT,true);header.addView(more,lp(42,42));more.setContentDescription("Дополнительно");
         more.setOnClickListener(v->{android.widget.PopupMenu menu=new android.widget.PopupMenu(this,more);menu.getMenu().add("Открыть подробное досье");menu.getMenu().add("Открыть галерею");menu.setOnMenuItemClickListener(item->{if(item.getTitle().toString().contains("галерею"))npcGallerySection(display);else npcLegacyDetails(display);return true;});menu.show();});
         panel.addView(header,lp(-1,-2));space(panel,8);
-        View portrait=npcPortrait(display);portrait.setBackground(npcShape(0xff111111,0,16));portrait.setClipToOutline(true);
-        if(portrait instanceof android.widget.ImageView){((android.widget.ImageView)portrait).setScaleType(android.widget.ImageView.ScaleType.FIT_CENTER);((android.widget.ImageView)portrait).setAdjustViewBounds(true);}
-        panel.addView(portrait,lp(-1,portrait instanceof android.widget.ImageView?280:150));portrait.setOnClickListener(v->npcGallerySection(display));space(panel,14);
+        activeNpcPortrait=new android.widget.FrameLayout(this);panel.addView(activeNpcPortrait,lp(-1,280));space(panel,14);
         TextView npcNameTitle=npcCentered(display,23,accent(),true);npcNameTitle.setTag("npc_no_self_link");panel.addView(npcNameTitle,lp(-1,-2));space(panel,7);
         if(profile!=null&&!profile.role.isEmpty()){TextView role=npcCentered(profile.role,14,MUTED,false);role.setTag("npc_no_self_link");panel.addView(role,lp(-1,-2));}
         space(panel,16);
         String status=profile!=null&&profile.template?"":npcKnownStatus(display);boolean female=profile!=null&&"Женский".equals(profile.gender);
-        if(profile!=null&&profile.author&&npcAddonEnabled(display)){if(LiviaStory.matches(display)&&"Последний поединок".equals(game.livia.ending))status="DEAD";if(AlmaStory.NAME.equals(display)&&"Последняя жертва".equals(game.alma.ending))status="DEAD";}
         boolean alive=npcInCurrentScene(display)||"MET".equals(status)||"INFORMED".equals(status)||"HELPED".equals(status)||"HOSTILE".equals(status)||npcAuthorKnown(display);
         String life="DEAD".equals(status)?(profile==null?"Смерть":female?"Погибла":"Погиб"):"MISSING".equals(status)?(profile==null?"Исчезновение":female?"Пропала":"Пропал"):alive?(profile==null?"В живых":female?"Жива":"Жив"):"Неизвестно";
         if(profile!=null&&profile.template)life="Зависит от NPC";
@@ -627,19 +638,19 @@ public final class MainActivity extends Activity {
         space(panel,9);
         LinearLayout interact=row();interact.setGravity(Gravity.CENTER);interact.setBackground(npcShape(0xff201c14,0,14));
         interact.addView(new NpcLineIcon(this,"talk",accent()),lp(23,23));TextView action=npcCentered("Взаимодействовать",16,accent(),true);action.setPadding(dp(8),0,0,0);interact.addView(action,lp(-2,-2));
-        if(profile==null||(!profile.mentioned&&!profile.template)){panel.addView(interact,lp(-1,56));interact.setOnClickListener(v->npcActions(display,dialog));}
+        if(profile==null||(!profile.mentioned&&!profile.template)){boolean blocked=!npcAddonEnabled(display)||"DEAD".equals(status)||"MISSING".equals(status);panel.addView(interact,lp(-1,56));interact.setEnabled(!blocked);interact.setAlpha(blocked?.45f:1f);if(blocked)action.setText("Недоступно");else interact.setOnClickListener(v->npcActions(display,dialog));}
         ScrollView scroll=new ScrollView(this);scroll.setFillViewport(true);scroll.setBackgroundColor(Color.BLACK);scroll.addView(panel);
         dialog.setContentView(scroll);dialog.show();android.view.Window window=dialog.getWindow();if(window!=null){window.setBackgroundDrawable(new android.graphics.drawable.ColorDrawable(Color.BLACK));window.setLayout(-1,-1);window.setStatusBarColor(Color.BLACK);window.setNavigationBarColor(Color.BLACK);window.getDecorView().setSystemUiVisibility(0);}
-        AmoledAppearance.applyTree(panel);
+        refreshNpcPortrait();AmoledAppearance.applyTree(panel);
         watchNpcNames(panel);
     }
     private void npcGallerySection(String name){
-        if(ItachiProfile.matches(name)){itachiLocalGallery(0);return;}
-        if(ElisifGallery.matches(name)){elisifGallery(0);return;}
+        if(ItachiProfile.matches(name)){java.io.File selected=LocalCharacterGallery.selected(this);itachiLocalGallery(selected==null?0:itachiArtIndex(selected));return;}
+        if(ElisifGallery.matches(name)){elisifGallery(ElisifGallery.primary(this));return;}
         if(LiviaStory.matches(name)){liviaPortrait();return;}
         if("Серана".equalsIgnoreCase(name)){seranaGallery(1);return;}
-        if(KatherineStory.NAME.equals(name)){katherineGallery(1);return;}
-        if(AlmaStory.NAME.equals(name)){almaGallery(1);return;}
+        if(KatherineStory.NAME.equals(name)){katherineGallery(npcGalleryPrimary("katherine",1,KatherineGallery.COUNT));return;}
+        if(AlmaStory.NAME.equals(name)){almaGallery(npcGalleryPrimary("alma",7,AlmaGallery.COUNT));return;}
         LinearLayout p=column();View portrait=npcPortrait(name);p.addView(portrait,lp(-1,300));
         if(!NpcAppearance.has(this,name))addText(p,"Иллюстративный образ или эмблема, не индивидуальный портрет.",12,MUTED,false,8);
         if(!NpcAppearance.id(name).isEmpty()){
@@ -904,7 +915,7 @@ public final class MainActivity extends Activity {
         TextView primary=text(isPrimary?"Вернуть стандартный портрет":"Сделать основным портретом",14,accent(),true);primary.setPadding(dp(12),dp(12),dp(12),dp(12));panel.addView(primary,lp(-1,-2));
         TextView remove=text("Удалить из личной галереи",14,MUTED,false);remove.setPadding(dp(12),dp(12),dp(12),dp(12));panel.addView(remove,lp(-1,-2));
         AlertDialog dialog=new RuneDialogBuilder(this,accent()).setTitle("Итачи | Личная галерея").setView(panel).setNegativeButton("Закрыть",null).setNeutralButton("Назад",(d,w)->itachiLocalGallery(index-1)).setPositiveButton("Вперёд",(d,w)->itachiLocalGallery(index+1)).create();
-        add.setOnClickListener(v->{dialog.dismiss();chooseItachiLocalArt();});replace.setOnClickListener(v->{dialog.dismiss();chooseItachiReplacement(files[index]);});primary.setOnClickListener(v->{if(LocalCharacterGallery.select(this,isPrimary?null:files[index])){dialog.dismiss();render();itachiLocalGallery(index);}else toast("Не удалось изменить портрет");});remove.setOnClickListener(v->new RuneDialogBuilder(this,accent()).setTitle("Удалить изображение?").setMessage("Исходный файл на телефоне останется без изменений.").setPositiveButton("Удалить",(d,w)->{if(LocalCharacterGallery.remove(this,files[index])){dialog.dismiss();itachiLocalGallery(index);}else toast("Не удалось удалить");}).setNegativeButton("Отмена",null).show());dialog.show();
+        add.setOnClickListener(v->{dialog.dismiss();chooseItachiLocalArt();});replace.setOnClickListener(v->{dialog.dismiss();chooseItachiReplacement(files[index]);});primary.setOnClickListener(v->{if(LocalCharacterGallery.select(this,isPrimary?null:files[index])){dialog.dismiss();render();itachiLocalGallery(index);}else toast("Не удалось изменить портрет");});remove.setOnClickListener(v->new RuneDialogBuilder(this,accent()).setTitle("Удалить изображение?").setMessage("Исходный файл на телефоне останется без изменений.").setPositiveButton("Удалить",(d,w)->{if(LocalCharacterGallery.remove(this,files[index])){dialog.dismiss();refreshNpcPortrait();itachiLocalGallery(index);}else toast("Не удалось удалить");}).setNegativeButton("Отмена",null).show());dialog.show();
     }
     private static final int REQUEST_NPC_APPEARANCES=7228;
     private void chooseNpcAppearances(){Intent picker=new Intent(Intent.ACTION_OPEN_DOCUMENT);picker.addCategory(Intent.CATEGORY_OPENABLE);picker.setType("image/webp");picker.putExtra(Intent.EXTRA_ALLOW_MULTIPLE,true);try{startActivityForResult(picker,REQUEST_NPC_APPEARANCES);}catch(Exception e){toast("Не удалось открыть выбор портретов");}}
@@ -918,13 +929,19 @@ public final class MainActivity extends Activity {
         if(LiviaPortrait.overridden(this)){TextView reset=text("Вернуть серверный портрет",14,accent(),true);reset.setPadding(dp(12),dp(12),dp(12),dp(12));panel.addView(reset,lp(-1,-2));reset.setOnClickListener(v->new RuneDialogBuilder(this,accent()).setTitle("Удалить личную замену?").setMessage("Исходный файл в памяти телефона не будет удалён.").setPositiveButton("Вернуть",(d,w)->{if(LiviaPortrait.reset(this)){toast("Серверный портрет восстановлен");render();}else toast("Не удалось удалить замену");}).setNegativeButton("Отмена",null).show());}
         new RuneDialogBuilder(this,accent()).setTitle("Ливия | Портрет").setView(panel).setPositiveButton("Импорт фото",(d,w)->chooseLiviaPortrait()).setNeutralButton("Ресурсы",(d,w)->new ResourceManagerDialog(this,accent(),this::render,"media:livia").show()).setNegativeButton("Закрыть",null).show();
     }
+    private void npcGalleryChoice(LinearLayout panel,AlertDialog dialog,String key,int index,int fallback,int count,Runnable reopen){
+        int selected=npcGalleryPrimary(key,fallback,count);
+        TextView primary=text(index==selected?"Основной портрет":"Сделать основным портретом",14,accent(),true);primary.setPadding(dp(12),dp(12),dp(12),dp(12));panel.addView(primary,lp(-1,-2));
+        if(index!=selected)primary.setOnClickListener(v->{setNpcGalleryPrimary(key,index);dialog.dismiss();reopen.run();});
+        if(selected!=fallback){TextView reset=text("Вернуть портрет по умолчанию",14,MUTED,false);reset.setPadding(dp(12),dp(12),dp(12),dp(12));panel.addView(reset,lp(-1,-2));reset.setOnClickListener(v->{setNpcGalleryPrimary(key,fallback);dialog.dismiss();reopen.run();});}
+    }
     private static final int REQUEST_ALMA_GALLERY=7219;
     private void chooseAlmaGallery(){Intent picker=new Intent(Intent.ACTION_OPEN_DOCUMENT);picker.addCategory(Intent.CATEGORY_OPENABLE);picker.setType("application/zip");try{startActivityForResult(picker,REQUEST_ALMA_GALLERY);}catch(Exception e){toast("Не удалось открыть выбор файла");}}
     private void almaGallery(int index){
         LinearLayout panel=column();panel.setPadding(dp(12),dp(8),dp(12),dp(8));
         if(!AlmaGallery.available(this)){addText(panel,"Оригинальная галерея: 7 фотографий. Скачай подписанный пакет Альмы из управления ресурсами. Ручной импорт также доступен.",14,TEXT,false,8);new RuneDialogBuilder(this,accent()).setTitle("Альма | Галерея").setView(panel).setPositiveButton("Скачать",(d,w)->new ResourceManagerDialog(this,accent(),this::render,"media:alma").show()).setNeutralButton("Импорт ZIP",(d,w)->chooseAlmaGallery()).setNegativeButton("Закрыть",null).show();return;}
         try{android.widget.ImageView image=new android.widget.ImageView(this);image.setImageBitmap(AlmaGallery.photo(this,index));image.setAdjustViewBounds(true);image.setScaleType(android.widget.ImageView.ScaleType.FIT_CENTER);panel.addView(image,lp(-1,400));TextView count=text(index+" / "+AlmaGallery.COUNT,14,accent(),true);count.setGravity(Gravity.CENTER);panel.addView(count,lp(-1,34));
-            new RuneDialogBuilder(this,accent()).setTitle("Альма | Галерея").setView(panel).setNegativeButton("Закрыть",null).setNeutralButton("Назад",(d,w)->almaGallery(index==1?AlmaGallery.COUNT:index-1)).setPositiveButton("Вперёд",(d,w)->almaGallery(index==AlmaGallery.COUNT?1:index+1)).show();}catch(Exception e){new RuneDialogBuilder(this,accent()).setTitle("Альма | Галерея").setMessage("Не удалось прочитать фото. Восстанови пакет в управлении ресурсами или повтори импорт оригинального архива.").setPositiveButton("Восстановить",(d,w)->new ResourceManagerDialog(this,accent(),this::render,"media:alma").show()).setNeutralButton("Импорт ZIP",(d,w)->chooseAlmaGallery()).setNegativeButton("Закрыть",null).show();}
+            AlertDialog dialog=new RuneDialogBuilder(this,accent()).setTitle("Альма | Галерея").setView(panel).setNegativeButton("Закрыть",null).setNeutralButton("Назад",(d,w)->almaGallery(index==1?AlmaGallery.COUNT:index-1)).setPositiveButton("Вперёд",(d,w)->almaGallery(index==AlmaGallery.COUNT?1:index+1)).create();npcGalleryChoice(panel,dialog,"alma",index,7,AlmaGallery.COUNT,()->almaGallery(index));dialog.show();}catch(Exception e){new RuneDialogBuilder(this,accent()).setTitle("Альма | Галерея").setMessage("Не удалось прочитать фото. Восстанови пакет в управлении ресурсами или повтори импорт оригинального архива.").setPositiveButton("Восстановить",(d,w)->new ResourceManagerDialog(this,accent(),this::render,"media:alma").show()).setNeutralButton("Импорт ZIP",(d,w)->chooseAlmaGallery()).setNegativeButton("Закрыть",null).show();}
     }
     private static final int REQUEST_KATHERINE_GALLERY=7218;
     private void chooseKatherineGallery(){Intent picker=new Intent(Intent.ACTION_OPEN_DOCUMENT);picker.addCategory(Intent.CATEGORY_OPENABLE);picker.setType("application/zip");try{startActivityForResult(picker,REQUEST_KATHERINE_GALLERY);}catch(Exception e){toast("Не удалось открыть выбор файла");}}
@@ -937,7 +954,7 @@ public final class MainActivity extends Activity {
         try{
             android.widget.ImageView image=new android.widget.ImageView(this);image.setImageBitmap(KatherineGallery.photo(this,index));image.setAdjustViewBounds(true);image.setScaleType(android.widget.ImageView.ScaleType.FIT_CENTER);panel.addView(image,lp(-1,440));
             TextView count=text(index+" / "+KatherineGallery.COUNT,14,accent(),true);count.setGravity(Gravity.CENTER);panel.addView(count,lp(-1,34));
-            AlertDialog dialog=new RuneDialogBuilder(this,accent()).setTitle("Кэтрин | Галерея").setView(panel).setNegativeButton("Закрыть",null).setNeutralButton("Назад",(d,w)->katherineGallery(index==1?KatherineGallery.COUNT:index-1)).setPositiveButton("Вперёд",(d,w)->katherineGallery(index==KatherineGallery.COUNT?1:index+1)).create();dialog.show();
+            AlertDialog dialog=new RuneDialogBuilder(this,accent()).setTitle("Кэтрин | Галерея").setView(panel).setNegativeButton("Закрыть",null).setNeutralButton("Назад",(d,w)->katherineGallery(index==1?KatherineGallery.COUNT:index-1)).setPositiveButton("Вперёд",(d,w)->katherineGallery(index==KatherineGallery.COUNT?1:index+1)).create();npcGalleryChoice(panel,dialog,"katherine",index,1,KatherineGallery.COUNT,()->katherineGallery(index));dialog.show();
         }catch(Exception e){new RuneDialogBuilder(this,accent()).setTitle("Кэтрин | Галерея").setMessage("Не удалось прочитать фото. Восстанови пакет в управлении ресурсами или повтори импорт оригинального архива.").setPositiveButton("Восстановить",(d,w)->new ResourceManagerDialog(this,accent(),this::render,"media:katherine").show()).setNeutralButton("Импорт ZIP",(d,w)->chooseKatherineGallery()).setNegativeButton("Закрыть",null).show();}
     }
     private static final int REQUEST_ELISIF_GALLERY=7440;
@@ -1517,6 +1534,7 @@ public final class MainActivity extends Activity {
     }
 
     private void render(){
+        refreshNpcPortrait();
         game.setAiNarrativeMode(prefs.getBoolean("ai_enabled",false));
         closeLivingDialog();
         clearAiLiveViews();

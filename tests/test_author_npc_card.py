@@ -7,8 +7,10 @@ UI = (ROOT / "app/src/main/java/dev/infend/skyrimtext/MainActivity.java").read_t
 class AuthorNpcCardTests(unittest.TestCase):
     def test_portrait_not_center_cropped(self):
         card = UI.split("private void npcDetails(String name)", 1)[1].split("private void npcGallerySection", 1)[0]
-        self.assertIn("ScaleType.FIT_CENTER", card)
-        self.assertNotIn("ScaleType.CENTER_CROP", card)
+        self.assertIn("refreshNpcPortrait()", card)
+        frame = UI.split("private void refreshNpcPortrait()", 1)[1].split("private void closeNpcDialog()", 1)[0]
+        self.assertIn("ScaleType.FIT_CENTER", frame)
+        self.assertNotIn("ScaleType.CENTER_CROP", frame)
         self.assertIn('role.setTag("npc_no_self_link")', card)
 
     def test_author_sections_and_progress(self):
@@ -18,6 +20,10 @@ class AuthorNpcCardTests(unittest.TestCase):
             self.assertIn(token, section)
         self.assertIn('title.setTag("npc_no_self_link")', UI)
         self.assertIn("setCustomTitle(title)", UI)
+
+    def test_primary_gallery_and_terminal_state(self):
+        for token in ('npcGalleryPrimary("alma",7,AlmaGallery.COUNT)', 'npcGalleryPrimary("katherine",1,KatherineGallery.COUNT)', 'npcGalleryChoice(panel,dialog,"alma"', 'npcGalleryChoice(panel,dialog,"katherine"', 'activeNpcPortrait.removeAllViews()', 'interact.setEnabled(!blocked)'):
+            self.assertIn(token, UI)
 
 if __name__ == "__main__":
     unittest.main()
