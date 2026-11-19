@@ -64,6 +64,7 @@ final class SolitudeCity {
     private final int[] lastDay=new int[JOBS.length];
     private SolitudeShops shops=new SolitudeShops();
     private SolitudeHome home=new SolitudeHome();
+    boolean homeEnchanting(GameEngine g){return SolitudeHome.MODE.equals(g.mode)&&SolitudeHome.owns(g)&&home.room(4);}
     boolean homeLaboratory(GameEngine g){return SolitudeHome.MODE.equals(g.mode)&&SolitudeHome.owns(g)&&home.room(3);}
     void companionChoices(GameEngine g,GameEngine.Scene s){home.companionChoices(g,s);}
     void companionAction(GameEngine g,String a){home.companionAction(g,a);}

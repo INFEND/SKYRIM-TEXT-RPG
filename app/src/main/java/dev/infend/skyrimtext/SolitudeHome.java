@@ -108,7 +108,7 @@ final class SolitudeHome {
                 if(n>0)s.add("SOLITUDE:home:withdraw:"+i,"Забрать: "+id,"В сундуке: "+n);
                 if(n>1)s.add("SOLITUDE:home:withdrawAll:"+i,"Забрать всё: "+id,"До "+n+" шт. | С учётом веса");
             }
-            if(room(3))SolitudeCraft.choices(g,s);
+            if(room(3)||room(4))SolitudeCraft.choices(g,s);
             if(g.itachi.enabled&&g.itachi.married&&g.itachi.life.sharedHome)s.add("SOLITUDE:home:itachi","Поговорить с Итачи","Совместный дом");
             if(g.livia.enabled&&g.livia.life.married&&g.livia.life.sharedHome&&g.livia.survivor())s.add("SOLITUDE:home:livia","Поговорить с Ливией","Совместный дом");
             s.add("SOLITUDE:home:sleep","Поспать","8 часов | бесплатно");

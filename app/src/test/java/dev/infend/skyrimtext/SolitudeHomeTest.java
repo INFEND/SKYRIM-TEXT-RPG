@@ -65,6 +65,24 @@ public class SolitudeHomeTest {
         g.day++;g.hour=23;g.choose("SOLITUDE:home:study:8");assertEquals(23,g.hour);
         g.hour=10;g.choose("SOLITUDE:home:study:17");assertEquals(11,g.hour);
     }
+    @Test public void enchantingConsumesGemAndRingAndPersistsEffect() throws Exception {
+        GameEngine g=city();g.fixShop.home.buy(4);g.choose("SOLITUDE:home");
+        g.progress.quantity(SolitudeCraft.BASE_RING,1);g.progress.quantity(SolitudeCraft.SOUL_GEM,1);
+        g.choose("SOLITUDE:craft:enchant:ring");assertEquals(0,g.progress.quantity(SolitudeCraft.ENCHANT_RING));
+        g.choose("SOLITUDE:back");g.choose("SOLITUDE:visit:2");g.choose("SOLITUDE:furnish:4");
+        g.choose("SOLITUDE:back");g.choose("SOLITUDE:home");g.stamina=50;
+        assertTrue(g.progress.equip(SolitudeCraft.BASE_RING));
+        g.choose("SOLITUDE:craft:enchant:ring");assertEquals(0,g.progress.quantity(SolitudeCraft.ENCHANT_RING));
+        g.progress.unequip(SolitudeCraft.BASE_RING);
+        g.choose("SOLITUDE:craft:enchant:ring");
+        assertEquals(1,g.progress.quantity(SolitudeCraft.ENCHANT_RING));assertEquals(0,g.progress.quantity(SolitudeCraft.SOUL_GEM));
+        assertEquals(0,g.progress.quantity(SolitudeCraft.BASE_RING));assertEquals(11,g.hour);
+        double limit=g.progress.carryLimit();assertTrue(g.progress.equip(SolitudeCraft.ENCHANT_RING));
+        assertEquals(limit+10,g.progress.carryLimit(),0.001);
+        g=GameEngine.fromJson(g.toJson().toString());assertEquals(limit+10,g.progress.carryLimit(),0.001);
+        g.choose("SOLITUDE:craft:enchant:ring");assertEquals(1,g.progress.quantity(SolitudeCraft.ENCHANT_RING));
+        g.progress.unequip(SolitudeCraft.ENCHANT_RING);assertEquals(limit,g.progress.carryLimit(),0.001);
+    }
     @Test public void bulkChestPreservesGoodsAndRespectsWeight() throws Exception {
         GameEngine g=city();g.fixShop.home.buy(4);g.choose("SOLITUDE:home");
         assertTrue(g.progress.addItem("Золотой слиток",5));

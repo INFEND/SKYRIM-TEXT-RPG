@@ -209,7 +209,7 @@ public final class RpgProgress {
     }
     public int quantity(String id){return inventory.optInt(id,0);}
     public int fixCarryBonus=0;
-    public double carryLimit(){return 50+(equipped("Зачарованное ожерелье")?25:0)+artifacts.carryBonus(this)+fixCarryBonus;}
+    public double carryLimit(){return 50+(equipped("Зачарованное ожерелье")?25:0)+(equipped("Серебряное кольцо грузоподъёмности")?10:0)+artifacts.carryBonus(this)+fixCarryBonus;}
     public boolean addItem(String id,int quantity){
         if(quantity<=0||ItemCatalog.find(id)==null||CompensationPowers.itemIndex(id)>=0||quantity(id)>Integer.MAX_VALUE-quantity)return false;
         ItemCatalog.Item item=ItemCatalog.find(id);
