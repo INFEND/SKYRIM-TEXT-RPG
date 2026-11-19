@@ -61,6 +61,7 @@ final class SolitudeEncounters {
         return "solitude_"+IDS[d];
     }
     static boolean present(GameEngine g,int d){
+        if(d<0||d>=NAMES.length)return false;
         String status=g.sceneState.npcStatusByName(NAMES[d]);
         return g.hour>=OPEN[d]&&g.hour<CLOSE[d]&&!"DEAD".equals(status)&&!"MISSING".equals(status)&&!"HOSTILE".equals(status);
     }

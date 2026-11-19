@@ -14,6 +14,14 @@ final class SolitudeShops {
         {"Железный лук","Стальной лук","Железная стрела","Стальная стрела"},
         {"Железный слиток","Стальной слиток","Кожаные полоски","Железный меч","Стальной меч"}
     };
+    private static final String[] TOPICS={
+        "Для двора важны и ткань, и покрой. Но даже дорожная одежда должна хорошо сидеть.",
+        "В моей лавке есть травы и зелья. Не всякий красивый цветок безопасен для алхимика.",
+        "Путешественники часто забывают факелы и отмычки. Лучше проверить сумку до выхода из города.",
+        "Лук выбирают по руке, а стрелы — по задаче. Следи за тетивой в сырую погоду.",
+        "Прежде чем покупать клинок, проверь его баланс. Хорошая сталь не заменяет умения."
+    };
+    private static final String[] IDS={"taarie","angeline","sayma","fihada","beirand"};
     private static final int[] FUNDS={500,500,700,600,800};
     private final int[][] sold=new int[NAMES.length][];
     private final int[] budget=FUNDS.clone();
@@ -24,6 +32,27 @@ final class SolitudeShops {
     static boolean open(GameEngine g,int s){
         String status=g.sceneState.npcStatusByName(OWNERS[s]);
         return g.hour>=8&&g.hour<20&&!"DEAD".equals(status)&&!"MISSING".equals(status)&&!"HOSTILE".equals(status);
+    }
+    private static String npcKey(GameEngine g,int s){
+        JSONArray facts=g.sceneState.npcFacts();
+        for(int i=0;i<facts.length();i++){JSONObject f=facts.optJSONObject(i);if(f!=null&&OWNERS[s].equalsIgnoreCase(f.optString("title")))return f.optString("id");}
+        return "solitude_"+IDS[s];
+    }
+    private static JSONObject fact(GameEngine g,int s){
+        String key=npcKey(g,s);JSONArray facts=g.sceneState.npcFacts();
+        for(int i=0;i<facts.length();i++){JSONObject f=facts.optJSONObject(i);if(f!=null&&key.equals(f.optString("id")))return f;}
+        return null;
+    }
+    private static void conversation(GameEngine g,int s,boolean memory){
+        JSONObject f=fact(g,s);
+        if(memory&&f==null)return;
+        try{
+            String key=npcKey(g,s);g.sceneState.setContext(g.day,g.hour,"Солитьюд");
+            if(f==null)g.sceneState.confirm("npc",key,OWNERS[s],"MET");else g.sceneState.revisitNpc(key);
+        }catch(org.json.JSONException ignored){}
+        String line=memory?"Отношение: "+f.optInt("relation",50)+"/100 | Последняя встреча: день "+f.optInt("lastDay"):
+            (f==null?"":"Снова встретились. ")+TOPICS[s];
+        g.message=OWNERS[s]+": "+line;g.progress.recent=g.message;g.recordVisualEvent(g.message);g.progress.sync(g);
     }
     private void refresh(GameEngine g,int s){
         int now=(Math.max(1,g.day)-1)/2;
@@ -42,6 +71,11 @@ final class SolitudeShops {
     GameEngine.Scene scene(GameEngine g,int s){
         refresh(g,s);
         GameEngine.Scene scene=new GameEngine.Scene("СОЛИТЬЮД | ТОРГОВЛЯ",NAMES[s],OWNERS[s]+" | Кошелёк: "+budget[s]+" септимов.\nПополнение через каждые два игровых дня.\n\n"+g.message);
+        if(open(g,s)){
+            JSONObject f=fact(g,s);
+            scene.add("SOLITUDE:merchant:talk:"+s,"Поговорить: "+OWNERS[s],f==null?"Знакомство | авторский диалог":"Отношение: "+f.optInt("relation",50)+"/100");
+            if(f!=null)scene.add("SOLITUDE:merchant:memory:"+s,"Вспомнить прошлую встречу","Общая память NPC");
+        }
         if(open(g,s))for(int i=0;i<ITEMS[s].length;i++){
             String id=ITEMS[s][i];ItemCatalog.Item item=ItemCatalog.find(id);if(item==null)continue;
             int n=stock(g,s,i),p=price(g,item);
@@ -56,6 +90,8 @@ final class SolitudeShops {
     }
     void choose(GameEngine g,int s,String action){
         refresh(g,s);if(!open(g,s))return;
+        if(action.equals("SOLITUDE:merchant:talk:"+s)){conversation(g,s,false);return;}
+        if(action.equals("SOLITUDE:merchant:memory:"+s)){conversation(g,s,true);return;}
         for(int i=0;i<ITEMS[s].length;i++){
             String id=ITEMS[s][i];ItemCatalog.Item item=ItemCatalog.find(id);if(item==null)continue;
             if(action.equals("SOLITUDE:buy:"+s+":"+i)){
