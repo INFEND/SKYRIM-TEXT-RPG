@@ -143,7 +143,10 @@ public final class GameEngine {
         gold+=total;progress.sync(this);message="Продано: "+id+" ×"+amount+" | +"+total+" септимов.";recordVisualEvent(message);return true;
     }
     public boolean canSell(ItemCatalog.Item item){
-        return started&&"SHOP".equals(mode)&&item!=null&&item.value>0&&progress.quantity(item.id)>0
+        return started&&"SHOP".equals(mode)&&canTradeItem(item);
+    }
+    boolean canTradeItem(ItemCatalog.Item item){
+        return item!=null&&item.value>0&&progress.quantity(item.id)>0
             &&!progress.equipped(item.id)&&!progress.artifacts.filled(item.id)&&progress.temperQuality(item.id)==0&&!"Квестовые предметы".equals(item.category)&&!"Ключи".equals(item.category)
             &&!"Септимы".equals(item.id)&&!"Лечебное зелье".equals(item.id)&&!"Зелье магии".equals(item.id)
             &&!"Походный клинок".equals(item.id)&&!"Дорожная одежда".equals(item.id)

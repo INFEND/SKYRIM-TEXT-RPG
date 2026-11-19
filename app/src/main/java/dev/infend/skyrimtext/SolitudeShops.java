@@ -48,7 +48,7 @@ final class SolitudeShops {
         if(memory&&f==null)return;
         try{
             String key=npcKey(g,s);g.sceneState.setContext(g.day,g.hour,"Солитьюд");
-            if(f==null)g.sceneState.confirm("npc",key,OWNERS[s],"MET");else g.sceneState.revisitNpc(key);
+            if(f==null)g.sceneState.confirm("npc",key,OWNERS[s],"MET");else if(!memory)g.sceneState.revisitNpc(key);
         }catch(org.json.JSONException ignored){}
         String line=memory?"Отношение: "+f.optInt("relation",50)+"/100 | Последняя встреча: день "+f.optInt("lastDay"):
             (f==null?"":"Снова встретились. ")+TOPICS[s];
@@ -64,11 +64,11 @@ final class SolitudeShops {
     static int capacity(String id){return id.endsWith("стрела")?20:id.endsWith("слиток")||id.equals("Отмычка")?8:3;}
     int stock(GameEngine g,int s,int i){refresh(g,s);return Math.max(0,capacity(ITEMS[s][i])-sold[s][i]);}
     private boolean canSell(GameEngine g,ItemCatalog.Item item,int s){
-        return item!=null&&item.value>0&&g.progress.quantity(item.id)>0&&!g.progress.equipped(item.id)&&g.progress.temperQuality(item.id)==0&&!g.progress.artifacts.filled(item.id)
-            &&!item.id.equals("Дорожная одежда")&&!item.id.equals("Походный клинок")&&!(g.swordUpgraded&&item.id.equals("Стальной меч"))&&!(g.armorUpgraded&&item.id.equals("Стальная кираса"))
+        return g.canTradeItem(item)
             &&budget[s]>=g.salePrice(item)&&g.gold<=Integer.MAX_VALUE-g.salePrice(item);
     }
     private int maxBuy(GameEngine g,int s,int i,ItemCatalog.Item item){
+        if(g.progress.temperQuality(item.id)>0||g.progress.artifacts.filled(item.id)||(g.swordUpgraded&&"Стальной меч".equals(item.id))||(g.armorUpgraded&&"Стальная кираса".equals(item.id)))return 0;
         int p=price(g,item);
         int weight=item.weight<=0?99:(int)Math.max(0,Math.floor((g.progress.carryLimit()-g.progress.carryWeight()+0.00001)/item.weight));
         return Math.max(0,Math.min(99,Math.min(stock(g,s,i),Math.min(weight,Math.min(g.gold/p,Math.min((Integer.MAX_VALUE-budget[s])/p,Integer.MAX_VALUE-g.progress.quantity(item.id)))))));

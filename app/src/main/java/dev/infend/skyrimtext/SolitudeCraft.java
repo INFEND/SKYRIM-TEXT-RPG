@@ -3,9 +3,9 @@ package dev.infend.skyrimtext;
 /** City workshop adapter: existing inventory, skill, temper and potion systems. */
 final class SolitudeCraft {
     private static final String PREFIX="SOLITUDE:craft:";
-    private static final String[] OUTPUT={"Железный меч","Железный кинжал","Стальной меч","Кожаные полоски"};
-    private static final String[] MATERIAL={"Железный слиток","Железный слиток","Стальной слиток","Кожа"};
-    private static final int[] METAL={2,1,2,1}, STRIPS={1,1,1,0}, COUNT={1,1,1,4};
+    private static final String[] OUTPUT={"Железный меч","Железный кинжал","Стальной меч","Кожаные полоски","Железный боевой топор","Железный щит","Железный шлем","Железная кираса","Стальной кинжал","Стальной боевой топор","Стальной щит","Стальной шлем","Стальная кираса"};
+    private static final String[] MATERIAL={"Железный слиток","Железный слиток","Стальной слиток","Кожа","Железный слиток","Железный слиток","Железный слиток","Железный слиток","Стальной слиток","Стальной слиток","Стальной слиток","Стальной слиток","Стальной слиток"};
+    private static final int[] METAL={2,1,2,1,2,4,3,5,1,2,4,3,5}, STRIPS={1,1,1,0,2,1,2,3,1,2,1,2,3}, COUNT={1,1,1,4,1,1,1,1,1,1,1,1,1};
     private static boolean forge(GameEngine g){
         return SolitudeCity.here(g)&&SolitudeCourt.ready(g)&&("SOLITUDE:5".equals(g.mode)||"SOLITUDE:store:4".equals(g.mode))
             &&SolitudeShops.open(g,4)&&SolitudeEncounters.availableForWork(g,5,1)&&g.stamina>=5;
@@ -15,7 +15,8 @@ final class SolitudeCraft {
     }
     private static boolean canMake(GameEngine g,int i){
         if(!forge(g)||g.progress.quantity(MATERIAL[i])<METAL[i]||g.progress.quantity("Кожаные полоски")<STRIPS[i])return false;
-        if(i==2&&(g.swordUpgraded||g.progress.skillLevel(6)<20))return false;
+        if((i==2||i>=8)&&g.progress.skillLevel(6)<20)return false;
+        if((i==2&&g.swordUpgraded)||(i==12&&g.armorUpgraded))return false;
         ItemCatalog.Item out=ItemCatalog.find(OUTPUT[i]),mat=ItemCatalog.find(MATERIAL[i]),strip=ItemCatalog.find("Кожаные полоски");
         if(out==null||mat==null||strip==null||g.progress.temperQuality(out.id)>0||g.progress.quantity(out.id)>Integer.MAX_VALUE-COUNT[i])return false;
         return g.progress.carryWeight()-METAL[i]*mat.weight-STRIPS[i]*strip.weight+COUNT[i]*out.weight<=g.progress.carryLimit()+0.00001;
