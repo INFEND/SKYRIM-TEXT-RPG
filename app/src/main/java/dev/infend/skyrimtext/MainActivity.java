@@ -490,6 +490,7 @@ public final class MainActivity extends Activity {
         NpcProfiles.Profile profile=NpcProfiles.find(name);
         if(profile!=null){
             if(profile.dragon)return npcEmblem(profile.name,"dragon");
+            if(!java.util.Arrays.asList(RpgContent.RACES).contains(profile.race))return npcEmblem(profile.name,"hero");
             String path=CharacterIdentity.portraitPath(profile.race,profile.gender,profile.variant);
             if(ResourceStore.has(this,path))return new CharacterPortraitView(this,profile.race,profile.gender,profile.variant);
             return npcEmblem(profile.name,"hero");
