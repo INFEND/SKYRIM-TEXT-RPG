@@ -9,6 +9,7 @@ import java.util.regex.Pattern;
 final class ItemEffectRow {
     private static final Pattern DURATION=Pattern.compile("(?:,\\s*|:\\s*)(\\d+\\s*(?:сек\\.?|мин\\.?|ч\\.?))\\.?$");
     private static final Pattern VALUE=Pattern.compile("^(.*?)(?::\\s*|\\s+)([+−-]?\\d+(?:[.,]\\d+)?\\s*(?:%|ед\\.?|/сек\\.?)?)\\.?$");
+    private static final Pattern ONLY_TIME=Pattern.compile("^(.*?)(?:[: ]+)("+ "\\d+\\s*(?:сек\\.?|мин\\.?|ч\\.?))\\.?$");
     final String label,value,duration;
     final int direction;
     ItemEffectRow(String label,String value,String duration,int direction){
@@ -22,6 +23,10 @@ final class ItemEffectRow {
             if(label.isEmpty())continue;
             Matcher time=DURATION.matcher(label);
             if(time.find()){duration=time.group(1);label=label.substring(0,time.start()).trim();}
+            if(duration.isEmpty()){
+                Matcher only=ONLY_TIME.matcher(label);
+                if(only.matches()){label=only.group(1).trim();duration=only.group(2).trim();}
+            }
             Matcher magnitude=VALUE.matcher(label);
             if(magnitude.matches()){
                 label=magnitude.group(1).trim();value=magnitude.group(2).trim().replace('-', '−');

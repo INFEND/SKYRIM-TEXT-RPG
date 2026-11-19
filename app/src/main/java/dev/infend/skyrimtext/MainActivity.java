@@ -3805,7 +3805,7 @@ public final class MainActivity extends Activity {
                 if(bitmap!=null){
                     android.widget.ImageView image=new android.widget.ImageView(this);
                     image.setImageBitmap(bitmap);image.setScaleType(android.widget.ImageView.ScaleType.FIT_CENTER);
-                    image.setBackground(itemBackground(0xffffffff,0,13));image.setClipToOutline(true);
+                    image.setBackground(itemBackground(0xff101010,0,13));image.setClipToOutline(true);
                     tile.addView(image,new android.widget.FrameLayout.LayoutParams(-1,-1));
                     return tile;
                 }
@@ -3817,7 +3817,7 @@ public final class MainActivity extends Activity {
                         if(bitmap!=null){
                             android.widget.ImageView image=new android.widget.ImageView(this);
                             image.setImageBitmap(bitmap);image.setScaleType(android.widget.ImageView.ScaleType.FIT_CENTER);
-                            image.setBackground(itemBackground(0xffffffff,0,13));image.setClipToOutline(true);
+                            image.setBackground(itemBackground(0xff101010,0,13));image.setClipToOutline(true);
                             tile.removeAllViews();tile.addView(image,new android.widget.FrameLayout.LayoutParams(-1,-1));
                         }
                     }catch(Exception ignored){}
@@ -3830,11 +3830,12 @@ public final class MainActivity extends Activity {
     }
     private LinearLayout itemMetric(String label,String glyph,String value,int color,double delta,boolean large){
         LinearLayout metric=column();metric.setGravity(Gravity.CENTER);
-        TextView caption=itemText(label,large?11:10,0xffa3a3a3,false);caption.setGravity(Gravity.CENTER);
+        TextView caption=itemText(label,large?12:10,0xffa3a3a3,false);caption.setGravity(Gravity.CENTER);
         TextView number=itemText(value,large?23:19,("bag".equals(glyph)||"septims".equals(glyph))?TEXT:color,true);
         number.setGravity(Gravity.CENTER);number.setSingleLine(true);
         number.setAutoSizeTextTypeUniformWithConfiguration(13,large?23:19,1,android.util.TypedValue.COMPLEX_UNIT_SP);
         if(large){
+            metric.setBackground(itemBackground(0xff111111,0,14));metric.setPadding(dp(4),dp(12),dp(4),dp(12));
             metric.addView(new ItemStatGlyph(this,glyph,color),lp(21,21));space(metric,3);
             metric.addView(number,lp(-1,29));space(metric,3);metric.addView(caption,lp(-1,-2));
         }else{
@@ -3900,12 +3901,84 @@ public final class MainActivity extends Activity {
         ItemCatalog.Item worn=comparedItem(item);
         if(hasItemStat(item)){
             boolean weapon=item.weapon();
-            metrics.addView(itemMetric(weapon?"УРОН":"БРОНЯ",weapon?"weapon":"shield",
-                itemNumber(item.currentStat(game.progress)),weapon?ITEM_DAMAGE:ITEM_ARMOR,itemDelta(item),true),new LinearLayout.LayoutParams(0,-2,1));
+            itemMetricTile(metrics,itemMetric(weapon?"Урон":"Защита",weapon?"weapon":"shield",
+                itemNumber(item.currentStat(game.progress)),accent(),itemDelta(item),true));
         }
-        metrics.addView(itemMetric("ВЕС","bag",itemNumber(item.weight),0xffb5b5b5,worn==null?Double.NaN:item.weight-worn.weight,true),new LinearLayout.LayoutParams(0,-2,1));
-        metrics.addView(itemMetric("ЦЕНА","septims",String.valueOf(item.value),ITEM_GOLD,worn==null?Double.NaN:item.value-worn.value,true),new LinearLayout.LayoutParams(0,-2,1));
+        itemMetricTile(metrics,itemMetric("Вес","bag",itemNumber(item.weight),0xffb5b5b5,worn==null?Double.NaN:item.weight-worn.weight,true));
+        itemMetricTile(metrics,itemMetric("Стоимость","septims",String.valueOf(item.value),accent(),worn==null?Double.NaN:item.value-worn.value,true));
         host.addView(metrics,lp(-1,-2));
+    }
+    private void itemMetricTile(LinearLayout metrics,View tile){
+        LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(0,-2,1);
+        if(metrics.getChildCount()>0)p.leftMargin=dp(7);
+        metrics.addView(tile,p);
+    }
+    private void itemProperty(LinearLayout host,String glyph,String label,String value,int color){
+        LinearLayout line=row();line.setGravity(Gravity.CENTER_VERTICAL);
+        line.addView(new ItemStatGlyph(this,glyph,color),lp(18,18));
+        TextView key=itemText(label,14,0xffa3a3a3,false);
+        LinearLayout.LayoutParams kp=new LinearLayout.LayoutParams(0,-2,1);kp.leftMargin=dp(8);kp.rightMargin=dp(8);
+        line.addView(key,kp);
+        TextView val=itemText(value,14,TEXT,false);val.setGravity(Gravity.END);
+        val.setMaxWidth(dp(165));line.addView(val,lp(-2,-2));
+        host.addView(line,lp(-1,-2));space(host,10);
+    }
+    private String itemSlotLabel(ItemCatalog.Item item){
+        switch(item.slot()){
+            case "weapon":return item.twoHanded()?"Две руки":"Одна рука";
+            case "shield":return "Левая рука";
+            case "body":return "Туловище";
+            case "head":return "Голова";
+            case "hands":return "Руки";
+            case "feet":return "Ноги";
+            case "ring":return "Палец";
+            case "neck":return "Шея";
+            case "ammo":return "Боеприпасы";
+            default:return "";
+        }
+    }
+    private String itemMaterialLabel(ItemCatalog.Item item){
+        String n=item.name.toLowerCase(java.util.Locale.ROOT);
+        if(n.startsWith("даэдр")||n.startsWith("эбонит"))return "Эбонит";
+        if(n.startsWith("стальн"))return "Сталь";
+        if(n.startsWith("железн"))return "Железо";
+        if(n.startsWith("стеклян"))return "Малахит";
+        if(n.startsWith("эльфий"))return "Лунный камень";
+        if(n.startsWith("двемер"))return "Двемерский металл";
+        if(n.startsWith("ороч"))return "Орихалк";
+        if(n.startsWith("сталгрим"))return "Сталгрим";
+        if(n.startsWith("кожан"))return "Кожа";
+        return "";
+    }
+    private String itemSubtype(ItemCatalog.Item item){
+        String n=item.name.toLowerCase(java.util.Locale.ROOT);
+        if(n.contains("двуручный меч"))return "Меч";
+        if(n.contains("меч")||n.contains("клинок"))return "Меч";
+        if(n.contains("кинжал"))return "Кинжал";
+        if(n.contains("топор")||n.contains("секира"))return "Топор";
+        if(n.contains("булав"))return "Булава";
+        if(n.contains("молот"))return "Молот";
+        if(n.contains("арбалет"))return "Арбалет";
+        if(n.contains("лук"))return "Лук";
+        if(n.contains("посох"))return "Посох";
+        if(item.wearable())switch(item.slot()){
+            case "body":return "Броня".equals(item.category)?"Кираса":"Одежда";
+            case "head":return "Шлем";
+            case "hands":return "Перчатки";
+            case "feet":return "Сапоги";
+            case "shield":return "Щит";
+            case "ring":return "Кольцо";
+            case "neck":return "Амулет";
+        }
+        return "";
+    }
+    private String itemFavoriteKey(ItemCatalog.Item item){return "item_favorite:"+item.id;}
+    private View itemIconAction(String glyph,int color,String description){
+        android.widget.FrameLayout tile=new android.widget.FrameLayout(this);
+        tile.setBackground(itemBackground(0xff141414,0,12));tile.setContentDescription(description);
+        tile.setFocusable(true);
+        android.widget.FrameLayout.LayoutParams p=new android.widget.FrameLayout.LayoutParams(dp(22),dp(22),Gravity.CENTER);
+        tile.addView(new ItemStatGlyph(this,glyph,color),p);return tile;
     }
     private void itemEffect(LinearLayout host,ItemCatalog.Item item){
         int restoration=potionRestore(item);
@@ -3915,11 +3988,11 @@ public final class MainActivity extends Activity {
         if(restoration>0){
             effects.add(new ItemEffectRow("Восстановление "+(healing?"здоровья":staminaPotion?"выносливости":"магии"),"+"+restoration,"Мгновенно",1));
         }else{
-            if(item.effect==null||item.effect.trim().isEmpty()||item.effect.equals(itemType(item)+".")||"Без дополнительных чар.".equals(item.effect))return;
+            if(item.effect==null||item.effect.trim().isEmpty()||item.effect.equals(itemType(item)+".")||"Без дополнительных чар.".equals(item.effect)||"Стрельба.".equals(item.effect)||"Ближний бой.".equals(item.effect))return;
             effects=ItemEffectRow.parse(item.effect);
         }
         if(effects.isEmpty())return;
-        host.addView(itemText("ЭФФЕКТЫ · "+effects.size(),11,MUTED,true),lp(-1,-2));space(host,7);
+        host.addView(itemText("ЭФФЕКТЫ И СВОЙСТВА",12,0xffa3a3a3,true),lp(-1,-2));space(host,10);
         if(restoration<=0&&("Зелья".equals(item.category)||"Яды".equals(item.category)||"Ингредиенты".equals(item.category))){
             host.addView(itemText("Справочный эффект:",11,MUTED,false),lp(-1,-2));space(host,4);
         }
@@ -3934,15 +4007,11 @@ public final class MainActivity extends Activity {
         LinearLayout words=column();
         LinearLayout.LayoutParams vp=new LinearLayout.LayoutParams(0,-2,1);vp.leftMargin=dp(8);vp.rightMargin=dp(6);
         line.addView(words,vp);
-        words.addView(itemText(effect.label,14,TEXT,false),lp(-1,-2));
-        if(!effect.duration.isEmpty()){space(words,2);words.addView(itemText(effect.duration,11,MUTED,false),lp(-1,-2));}
-        if(!effect.value.isEmpty()){
-            TextView value=itemText(effect.value,17,style.color,true);value.setGravity(Gravity.END);
-            line.addView(value,lp(-2,-2));
-        }
-        if(effect.direction!=0){
-            TextView direction=itemText(effect.direction>0?"▲":"▼",11,effect.direction>0?ITEM_UP:ITEM_DOWN,true);
-            LinearLayout.LayoutParams p=lp(-2,-2);p.leftMargin=dp(5);line.addView(direction,p);
+        words.addView(itemText(effect.label,14,TEXT,true),lp(-1,-2));
+        String display=effect.value.isEmpty()?effect.duration:effect.duration.isEmpty()?effect.value:effect.value+" · "+effect.duration;
+        if(!display.isEmpty()){
+            TextView value=itemText(display,14,style.color,false);value.setGravity(Gravity.END);
+            value.setMaxWidth(dp(136));line.addView(value,lp(-2,-2));
         }
         host.addView(line,lp(-1,-2));space(host,9);
     }
@@ -4108,7 +4177,7 @@ public final class MainActivity extends Activity {
     private void itemDialog(ItemCatalog.Item item){
         LinearLayout view=column();
         view.setPadding(dp(12),dp(12),dp(12),dp(12));
-        view.setBackground(AmoledAppearance.window(0xff080808,accent()));
+        view.setBackground(itemBackground(0xff000000,0,16));
         LinearLayout heading=row();heading.setGravity(Gravity.CENTER_VERTICAL);
         view.addView(heading,lp(-1,-2));
         if(hasItemStat(item))heading.addView(itemPicture(item,94),lp(94,94));
@@ -4116,7 +4185,11 @@ public final class MainActivity extends Activity {
         LinearLayout words=column();
         LinearLayout.LayoutParams wordsParams=new LinearLayout.LayoutParams(0,-2,1);
         wordsParams.leftMargin=dp(10);heading.addView(words,wordsParams);
-        words.addView(itemText(item.name,18,TEXT,true),lp(-1,-2));
+        String subtype=itemSubtype(item);
+        words.addView(itemText((itemType(item)+(subtype.isEmpty()?"":" • "+subtype)).toUpperCase(java.util.Locale.ROOT),11,0xffa3a3a3,false),lp(-1,-2));space(words,5);
+        words.addView(itemText(item.name,22,TEXT,true),lp(-1,-2));
+        String material=itemMaterialLabel(item);
+        if(!material.isEmpty()){space(words,4);words.addView(itemText("◇ "+material,12,accent(),false),lp(-1,-2));}
         if(game.progress.equipped(item.id)){space(words,4);words.addView(itemText("◆ Экипировано",12,ITEM_UP,false),lp(-1,-2));}
         int quantity=game.progress.quantity(item.id);
         if(quantity>0){space(words,3);words.addView(itemText("В наличии: "+quantity,12,MUTED,false),lp(-1,-2));}
@@ -4126,11 +4199,28 @@ public final class MainActivity extends Activity {
             TextView label=itemText("Зачарованный",13,ITEM_GOLD,false);
             LinearLayout.LayoutParams tag=lp(-2,-2);tag.leftMargin=dp(4);enchanted.addView(label,tag);words.addView(enchanted,lp(-1,-2));
         }
-        space(view,6);view.addView(new SkyrimRuleView(this,0xff888888),lp(-1,12));space(view,6);
-        itemDetailMetrics(view,item);itemDivider(view,9);
-        itemEffect(view,item);
+        if(item.weapon()||item.wearable()){
+            View star=itemIconAction("star",prefs.getBoolean(itemFavoriteKey(item),false)?accent():0xffa3a3a3,"Избранное");
+            heading.addView(star,lp(40,40));star.setOnClickListener(v->{
+                boolean next=!prefs.getBoolean(itemFavoriteKey(item),false);
+                prefs.edit().putBoolean(itemFavoriteKey(item),next).apply();
+                android.widget.FrameLayout frame=(android.widget.FrameLayout)star;frame.removeAllViews();
+                frame.addView(new ItemStatGlyph(this,"star",next?accent():0xffa3a3a3),new android.widget.FrameLayout.LayoutParams(dp(22),dp(22),Gravity.CENTER));
+                toast(next?"Добавлено в избранное":"Удалено из избранного");
+            });
+        }
+        itemDivider(view,12);
+        itemDetailMetrics(view,item);space(view,14);
+        if(item.weapon()||item.wearable()){
+            if(!material.isEmpty())itemProperty(view,"layers","Материал",material,0xffa3a3a3);
+            if(!itemSlotLabel(item).isEmpty())itemProperty(view,item.weapon()?"hand":"shirt","Слот",itemSlotLabel(item),0xffa3a3a3);
+            if(!item.temperMaterial().isEmpty())itemProperty(view,"hammer","Улучшение",game.progress.quantity(item.id)>0?game.progress.temperQualityName(item.id):"Нет",0xffa3a3a3);
+            itemProperty(view,"magic","Зачарование",itemEnchanted(item)?"Есть":"Нет",0xffa3a3a3);
+        }
+        itemDivider(view,7);itemEffect(view,item);
         int artifact=CompensationPowers.itemIndex(item.id);if(artifact>=0){addText(view,game.compensation.bound[artifact]?"Привязка к душе":"Системное снаряжение | нельзя потерять",12,ITEM_MAGIC,true,5);if(game.compensation.passive[artifact])addText(view,game.compensation.passiveLabel(artifact)+" при экипировке",13,ITEM_UP,false,6);}
         itemEffectPreview(view,item);
+        itemDivider(view,7);
         TextView description=itemText(item.description,14,0xffa3a3a3,false);
         description.setTypeface(SovngardeTypeface.styled(this,Typeface.ITALIC));
         description.setLineSpacing(dp(2),1.05f);space(view,4);view.addView(description,lp(-1,-2));
@@ -4139,7 +4229,7 @@ public final class MainActivity extends Activity {
         }
         if(game.progress.quantity(item.id)>0&&!item.temperMaterial().isEmpty()){
             itemDivider(view,10);
-            view.addView(itemText("Качество: "+game.progress.temperQualityName(item.id),13,MUTED,false));
+            // Quality is already displayed in the equipment property block.
             String blocked=game.progress.temperBlock(item,game);
             if(blocked.isEmpty()){
                 TextView improve=itemAction("УЛУЧШИТЬ");space(view,8);view.addView(improve,lp(-1,43));
@@ -4158,8 +4248,9 @@ public final class MainActivity extends Activity {
         boolean worn=game.progress.equipped(item.id);
         String primary=owned&&!"COMBAT".equals(game.mode)&&!item.slot().isEmpty()?(worn?"СНЯТЬ":"ЭКИПИРОВАТЬ"):
             owned&&!"COMBAT".equals(game.mode)&&("Лечебное зелье".equals(item.id)||"Зелье магии".equals(item.id)||"Зелье запаса сил".equals(item.id))?"ИСПОЛЬЗОВАТЬ":"ЗАКРЫТЬ";
-        TextView equip=itemAction(primary);
-        actions.addView(equip,new LinearLayout.LayoutParams(0,dp(44),1));
+        TextView equip=itemAction(primary.substring(0,1)+primary.substring(1).toLowerCase(java.util.Locale.ROOT));
+        equip.setBackground(itemBackground(accent(),0,12));equip.setTextColor(android.graphics.Color.luminance(accent())>.45?0xff000000:0xffffffff);equip.setTextSize(15);
+        actions.addView(equip,new LinearLayout.LayoutParams(0,dp(48),1));
         equip.setOnClickListener(v->{
             if("ЗАКРЫТЬ".equals(primary)){dialog.dismiss();return;}
             if("ИСПОЛЬЗОВАТЬ".equals(primary)){
@@ -4172,18 +4263,35 @@ public final class MainActivity extends Activity {
             else if(!game.progress.equip(item.id)){toast("Сначала сними двуручное оружие");return;}
             save();dialog.dismiss();render();
         });
-        TextView discard=itemAction(canDiscardItem(item)?"ВЫБРОСИТЬ":"ЗАКРЫТЬ");
-        LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(0,dp(44),1);p.leftMargin=dp(8);
-        if(!"ЗАКРЫТЬ".equals(primary)||canDiscardItem(item))actions.addView(discard,p);
-        discard.setOnClickListener(v->{
-            if(!canDiscardItem(item)){dialog.dismiss();return;}
-            new RuneDialogBuilder(this,accent()).setTitle("Выбросить предмет?")
-                .setMessage(item.name+" ×1").setNegativeButton("Отмена",null)
-                .setPositiveButton("Выбросить",(d,w)->{
-                    if(canDiscardItem(item)&&game.progress.removeItem(item.id,1)){
-                        save();dialog.dismiss();render();toast("Предмет выброшен");
-                    }
-                }).show();
+        if(item.weapon()||item.wearable()){
+            View compare=itemIconAction("compare",TEXT,"Сравнить с экипированным");
+            LinearLayout.LayoutParams cp=lp(48,48);cp.leftMargin=dp(7);actions.addView(compare,cp);
+            compare.setOnClickListener(v->{
+                ItemCatalog.Item other=comparedItem(item);
+                if(other==null){toast("Нет другого экипированного предмета в этом слоте");return;}
+                LinearLayout panel=column();panel.setPadding(dp(12),dp(8),dp(12),dp(8));
+                panel.addView(itemText(other.name,16,TEXT,true));itemDetailMetrics(panel,other);
+                itemDivider(panel,8);panel.addView(itemText(item.name,16,TEXT,true));itemDetailMetrics(panel,item);
+                new RuneDialogBuilder(this,accent()).setTitle("Сравнение").setView(panel).setPositiveButton("Закрыть",null).show();
+            });
+        }
+        View more=itemIconAction("more",TEXT,"Действия");
+        LinearLayout.LayoutParams p=lp(48,48);p.leftMargin=dp(7);actions.addView(more,p);
+        more.setOnClickListener(v->{
+            android.widget.PopupMenu menu=new android.widget.PopupMenu(this,more);
+            if(canDiscardItem(item))menu.getMenu().add("Выбросить");
+            menu.getMenu().add("Закрыть");
+            menu.setOnMenuItemClickListener(choice->{
+                if(!"Выбросить".contentEquals(choice.getTitle())){dialog.dismiss();return true;}
+                new RuneDialogBuilder(this,accent()).setTitle("Выбросить предмет?")
+                    .setMessage(item.name+" ×1").setNegativeButton("Отмена",null)
+                    .setPositiveButton("Выбросить",(d,w)->{
+                        if(canDiscardItem(item)&&game.progress.removeItem(item.id,1)){
+                            save();dialog.dismiss();render();toast("Предмет выброшен");
+                        }
+                    }).show();
+                return true;
+            });menu.show();
         });
         dialog.show();
         if(dialog.getWindow()!=null){

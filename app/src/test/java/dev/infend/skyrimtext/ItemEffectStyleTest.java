@@ -2,6 +2,16 @@ package dev.infend.skyrimtext;
 import org.junit.Test;
 import static org.junit.Assert.*;
 public class ItemEffectStyleTest {
+    @Test public void expandedReferencePalette(){
+        assertSame(ItemEffectStyle.CHAOS,ItemEffectStyle.classify("Урон хаосом",""));
+        assertSame(ItemEffectStyle.PARALYSIS,ItemEffectStyle.classify("Паралич",""));
+        assertSame(ItemEffectStyle.WEIGHT,ItemEffectStyle.classify("Переносимый вес",""));
+        assertSame(ItemEffectStyle.CRAFT,ItemEffectStyle.classify("Кузнечное дело",""));
+        assertSame(ItemEffectStyle.WATER,ItemEffectStyle.classify("Подводное дыхание",""));
+        assertSame(ItemEffectStyle.SPELL_ABSORB,ItemEffectStyle.classify("Поглощение заклинаний",""));
+        assertSame(ItemEffectStyle.MANA,ItemEffectStyle.classify("Урон магии",""));
+        assertFalse(ItemEffectStyle.damageEnchantment("Сопротивление огню"));
+    }
     @Test public void elementalAndResourceColors(){
         assertSame(ItemEffectStyle.FIRE,ItemEffectStyle.classify("Урон огнём: 15",""));
         assertSame(ItemEffectStyle.FROST,ItemEffectStyle.classify("Урон морозом",""));
