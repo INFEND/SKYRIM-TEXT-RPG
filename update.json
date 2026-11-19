@@ -3,13 +3,13 @@
   "packageName": "dev.xarkon.link",
   "apkPackageName": "dev.infend.skyrimtext",
   "legacyPackageField": true,
-  "versionCode": 269,
-  "versionName": "1.0.268",
-  "apkUrl": "https://github.com/INFEND/SKYRIM-TEXT-RPG/releases/download/v1.0.268/SKYRIM-TEXT-RPG.apk",
-  "sha256": "d8844b6d98d97676c0f1609bf68439ca5ecceb0b2d8fc8d4600affc2508dc2b8",
-  "sizeBytes": 1524780,
+  "versionCode": 270,
+  "versionName": "1.0.269",
+  "apkUrl": "https://github.com/INFEND/SKYRIM-TEXT-RPG/releases/download/v1.0.269/SKYRIM-TEXT-RPG.apk",
+  "sha256": "bad4ef310bc799f20a31984c450ed046d5080b5fa9ecfcee8685e09fea4a4c79",
+  "sizeBytes": 1525280,
   "coreOnly": true,
-  "notes": "[+] Солитьюд: обратный выкуп товаров, проданных вне основного ассортимента. Отдельные остатки лавок сохраняются до очередного пополнения; действуют ограничения веса, денег и защищённых предметов.\n",
+  "notes": "[+] Солитьюд: четыре дополнительных жителя с авторскими диалогами, расписанием и общей памятью отношений: Гирауд Жиман, Инге Шесть Пальцев, Лисетта и Джала.\n",
   "history": [
     {
       "versionCode": 2,
@@ -1350,7 +1350,12 @@
       "versionCode": 269,
       "versionName": "1.0.268",
       "notes": "[+] Солитьюд: обратный выкуп товаров, проданных вне основного ассортимента. Отдельные остатки лавок сохраняются до очередного пополнения; действуют ограничения веса, денег и защищённых предметов.\n"
+    },
+    {
+      "versionCode": 270,
+      "versionName": "1.0.269",
+      "notes": "[+] Солитьюд: четыре дополнительных жителя с авторскими диалогами, расписанием и общей памятью отношений: Гирауд Жиман, Инге Шесть Пальцев, Лисетта и Джала.\n"
     }
   ],
-  "publishedAt": "2026-11-19T13:03:11.947864+00:00"
+  "publishedAt": "2026-11-19T13:53:52.263740+00:00"
 }
