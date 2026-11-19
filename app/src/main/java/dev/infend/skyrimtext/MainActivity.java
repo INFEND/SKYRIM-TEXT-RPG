@@ -604,20 +604,21 @@ public final class MainActivity extends Activity {
         more.setOnClickListener(v->{android.widget.PopupMenu menu=new android.widget.PopupMenu(this,more);menu.getMenu().add("Открыть подробное досье");menu.getMenu().add("Открыть галерею");menu.setOnMenuItemClickListener(item->{if(item.getTitle().toString().contains("галерею"))npcGallerySection(display);else npcLegacyDetails(display);return true;});menu.show();});
         panel.addView(header,lp(-1,-2));space(panel,8);
         View portrait=npcPortrait(display);portrait.setBackground(npcShape(0xff111111,0,16));portrait.setClipToOutline(true);
-        if(portrait instanceof android.widget.ImageView){((android.widget.ImageView)portrait).setScaleType(android.widget.ImageView.ScaleType.CENTER_CROP);((android.widget.ImageView)portrait).setAdjustViewBounds(false);}
-        panel.addView(portrait,lp(-1,190));portrait.setOnClickListener(v->npcGallerySection(display));space(panel,14);
+        if(portrait instanceof android.widget.ImageView){((android.widget.ImageView)portrait).setScaleType(android.widget.ImageView.ScaleType.FIT_CENTER);((android.widget.ImageView)portrait).setAdjustViewBounds(true);}
+        panel.addView(portrait,lp(-1,portrait instanceof android.widget.ImageView?280:150));portrait.setOnClickListener(v->npcGallerySection(display));space(panel,14);
         TextView npcNameTitle=npcCentered(display,23,accent(),true);npcNameTitle.setTag("npc_no_self_link");panel.addView(npcNameTitle,lp(-1,-2));space(panel,7);
-        if(profile!=null&&!profile.role.isEmpty())panel.addView(npcCentered(profile.role,14,MUTED,false),lp(-1,-2));
+        if(profile!=null&&!profile.role.isEmpty()){TextView role=npcCentered(profile.role,14,MUTED,false);role.setTag("npc_no_self_link");panel.addView(role,lp(-1,-2));}
         space(panel,16);
         String status=profile!=null&&profile.template?"":npcKnownStatus(display);boolean female=profile!=null&&"Женский".equals(profile.gender);
-        boolean alive=npcInCurrentScene(display)||"MET".equals(status)||"INFORMED".equals(status)||"HELPED".equals(status)||"HOSTILE".equals(status);
+        if(profile!=null&&profile.author&&npcAddonEnabled(display)){if(LiviaStory.matches(display)&&"Последний поединок".equals(game.livia.ending))status="DEAD";if(AlmaStory.NAME.equals(display)&&"Последняя жертва".equals(game.alma.ending))status="DEAD";}
+        boolean alive=npcInCurrentScene(display)||"MET".equals(status)||"INFORMED".equals(status)||"HELPED".equals(status)||"HOSTILE".equals(status)||npcAuthorKnown(display);
         String life="DEAD".equals(status)?(profile==null?"Смерть":female?"Погибла":"Погиб"):"MISSING".equals(status)?(profile==null?"Исчезновение":female?"Пропала":"Пропал"):alive?(profile==null?"В живых":female?"Жива":"Жив"):"Неизвестно";
         if(profile!=null&&profile.template)life="Зависит от NPC";
         else if(profile!=null&&profile.mentioned)life="Упоминание";
         int lifeColor=profile!=null&&(profile.template||profile.mentioned)?MUTED:"DEAD".equals(status)?ITEM_DOWN:"MISSING".equals(status)?MUTED:alive?ITEM_UP:MUTED;
         LinearLayout statuses=row();statuses.setGravity(Gravity.CENTER);
         statuses.addView(npcStatusCell("pulse",life,lifeColor),new LinearLayout.LayoutParams(0,-2,1));
-        statuses.addView(npcStatusCell("race",profile==null?"Раса неизвестна":profile.race,TEXT),new LinearLayout.LayoutParams(0,-2,1));
+        statuses.addView(npcStatusCell("race",profile==null?"Раса неизвестна":npcRaceLabel(profile),TEXT),new LinearLayout.LayoutParams(0,-2,1));
         statuses.addView(npcStatusCell("heart",profile!=null&&(profile.template||profile.mentioned)?"Не применяется":npcRelation(display),TEXT),new LinearLayout.LayoutParams(0,-2,1));
         panel.addView(statuses,lp(-1,-2));space(panel,16);
         View rule=new View(this);rule.setBackgroundColor(0xff292929);panel.addView(rule,lp(-1,1));space(panel,12);
@@ -657,8 +658,9 @@ public final class MainActivity extends Activity {
             addText(info,record.template?"Это справочная карточка типа. Индивидуальные сведения и история конкретного экземпляра не объединяются.":"Этот персонаж известен по упоминаниям. Подтверждённых индивидуальных данных прохождения нет.",14,MUTED,false,8);
             livingDialog(record.name+" | "+NPC_SECTIONS[index],info);return;
         }
-        if(index==0){npcLegacyDetails(name);return;}
         if(index==1){npcGallerySection(name);return;}
+        if(record!=null&&record.author){npcAuthorSection(name,index);return;}
+        if(index==0){npcLegacyDetails(name);return;}
         if(index==2&&AlmaStory.NAME.equals(name)&&game.alma.stage>0){almaRelationshipDetails();return;}
         LinearLayout p=column();JSONObject fact=npcFact(name);
         boolean it=ItachiProfile.matches(name)&&game.itachi.enabled&&game.itachi.stage>0;
@@ -743,7 +745,83 @@ public final class MainActivity extends Activity {
             }).setNegativeButton("Отмена",null).show();
         });menu.show();
     }
+    private String npcRaceLabel(NpcProfiles.Profile p){
+        if("Женский".equals(p.gender)){if("Имперец".equals(p.race))return "Имперка";if("Бретон".equals(p.race))return "Бретонка";}return p.race;
+    }
+    private boolean npcAuthorKnown(String name){
+        if(!game.started||!npcAddonEnabled(name))return false;
+        if(ItachiProfile.matches(name))return game.itachi.stage>0;
+        if(LiviaStory.matches(name))return game.livia.stage>0;
+        if(KatherineStory.NAME.equals(name))return game.katherine.stage>0;
+        if(AlmaStory.NAME.equals(name))return game.alma.stage>0;
+        return false;
+    }
+    private void npcField(LinearLayout host,String icon,String label,String value){
+        if(value==null||value.trim().isEmpty())return;
+        LinearLayout tile=column();tile.setPadding(dp(11),dp(9),dp(11),dp(9));tile.setBackground(npcShape(0xff141414,0xff303030,12));
+        LinearLayout line=row();line.setGravity(Gravity.CENTER_VERTICAL);line.addView(new NpcLineIcon(this,icon,accent()),lp(19,19));
+        TextView heading=text(label,12,MUTED,true);heading.setPadding(dp(8),0,0,0);line.addView(heading,new LinearLayout.LayoutParams(0,-2,1));tile.addView(line,lp(-1,-2));
+        TextView detail=text(value,15,TEXT,false);detail.setPadding(0,dp(5),0,0);tile.addView(detail,lp(-1,-2));host.addView(tile,lp(-1,-2));space(host,7);
+    }
+    private void npcFields(LinearLayout host,String icon,String label,String values){
+        for(String value:values.split("\\|"))if(!value.trim().isEmpty())npcField(host,icon,label,value.trim());
+    }
+    private void npcMeter(LinearLayout p,String label,int value,int max,int color){
+        livingLine(p,label,value+" / "+max,color);livingBar(p,value,max,color);
+    }
+    private void npcSectionDialog(String name,int index,LinearLayout panel){
+        closeLivingDialog();panel.setPadding(dp(12),dp(6),dp(12),dp(10));
+        ScrollView scroll=new ScrollView(this);scroll.setFillViewport(false);scroll.addView(panel);
+        TextView title=text(name+" | "+NPC_SECTIONS[index],19,accent(),true);title.setTag("npc_no_self_link");title.setPadding(dp(16),dp(15),dp(16),dp(9));
+        activeLivingDialog=new RuneDialogBuilder(this,accent()).setCustomTitle(title).setView(scroll).setNegativeButton("Закрыть",null).show();
+    }
+    private void npcAuthorSection(String name,int index){
+        LinearLayout p=column();NpcProfiles.Profile profile=NpcProfiles.find(name);
+        boolean it=ItachiProfile.matches(name),li=LiviaStory.matches(name),ka=KatherineStory.NAME.equals(name),al=AlmaStory.NAME.equals(name);
+        boolean known=npcAuthorKnown(name);
+        ItachiStory i=game.itachi;LiviaStory l=game.livia;KatherineStory k=game.katherine;KatherineCompanion c=k.companion;AlmaStory a=game.alma;
+        if(index==0){
+            if(profile!=null){npcField(p,"race","Раса / пол",npcRaceLabel(profile)+" | "+profile.gender);npcField(p,"id","Роль",profile.role);}
+            if(it){npcField(p,"id","Внешность",ItachiProfile.APPEARANCE);npcField(p,"heart","Характер",ItachiProfile.CHARACTER);npcField(p,"book","Происхождение",ItachiProfile.BACKGROUND);}
+            if(ka){npcField(p,"id","Возраст","18 лет");npcField(p,"heart","Характер","Самостоятельная, гордая; ценит честность и свободу выбора.");}
+            if(al&&known){npcField(p,"id","Возраст","437 лет");npcField(p,"book","Происхождение","Маг крови, бывшая убийца.");}
+            if(known){
+                if(it){npcField(p,"pulse","Настроение",i.mood());npcField(p,"scroll","Личная цель",i.life.goal);npcField(p,"door","Местонахождение",i.location(game));npcField(p,"talk","Занятие",i.life.activity);}
+                if(li){npcField(p,"scroll","Состояние сюжета",l.status());if(l.survivor()){npcField(p,"door","Местонахождение",l.location(game));npcField(p,"talk","Занятие",l.life.activity);}}
+                if(ka){npcField(p,"pulse","Настроение",c.mood);npcField(p,"scroll","Личная цель",c.currentGoal);npcField(p,"door","Местонахождение",k.location(game));npcField(p,"book","Итог",c.ending);}
+                if(al){npcField(p,"pulse","Настроение",a.mood());npcField(p,"scroll","Личная цель",a.goal);npcField(p,"door","Местонахождение",a.location(game));npcField(p,"talk","Занятие",a.activity(game));}
+            }
+        }else if(index==2&&known){
+            npcField(p,"heart","Отношения",npcRelation(name));
+            if(it){npcScore(p,"Доверие",i.trust);npcScore(p,"Уважение",i.respect);npcScore(p,"Симпатия",i.affection);npcScore(p,"Любовь",i.love);npcScore(p,"Привязанность",i.attachment);npcScore(p,"Обида",i.hurt);}
+            if(li){npcScore(p,"Доверие",l.trust);npcScore(p,"Уважение",l.respect);npcScore(p,"Симпатия",l.affection);npcScore(p,"Любовь",l.life.love);}
+            if(ka){npcScore(p,"Доверие",k.trust);npcScore(p,"Уважение",k.respect);npcScore(p,"Симпатия",k.affection);npcScore(p,"Любовь",c.love);npcScore(p,"Привязанность",c.attachment);npcScore(p,"Ревность",k.jealousy);npcScore(p,"Обида",c.hurt);}
+            if(al){npcScore(p,"Доверие",a.trust);npcScore(p,"Уважение",a.respect);npcScore(p,"Симпатия",a.affection);npcScore(p,"Любовь",a.love);npcScore(p,"Ревность",a.jealousy);npcScore(p,"Обида",a.hurt);npcScore(p,"Преданность",a.loyalty);}
+        }else if(index==3){
+            if(it){if(known){npcField(p,"swords","Уровень",String.valueOf(i.level));npcMeter(p,"Опыт",i.xp,i.needXp(),accent());npcMeter(p,"Здоровье",i.health,i.maxHealth(),ITEM_UP);npcMeter(p,"Энергия",i.energy,100,accent());npcMeter(p,"Нагрузка на зрение",i.eyeStrain,100,ITEM_DOWN);npcScore(p,"Клинок",i.blade);npcScore(p,"Иллюзии",i.illusion);npcScore(p,"Духовные техники",i.spirit);npcField(p,"shield","Тактика",i.stanceLabel());}
+                npcField(p,"swords","Боевой стиль",ItachiProfile.STYLE);for(String power:ItachiProfile.POWERS){int split=power.indexOf(':');npcField(p,"swords",split<0?"Способность":power.substring(0,split),split<0?power:power.substring(split+1).trim());}npcField(p,"shield","Ограничения",ItachiProfile.LIMITS);}
+            if(ka&&known){npcField(p,"swords","Уровень",String.valueOf(c.level));npcMeter(p,"Опыт",c.xp,c.needXp(),accent());npcMeter(p,"Здоровье",c.hp,c.maxHp(),ITEM_UP);npcMeter(p,"Магия",k.mana,k.maxMana(),accent());npcField(p,"shield","Тактика",k.stanceLabel());npcField(p,"learn","Магический ранг",k.magicRank+" / 3");npcField(p,"swords","Победы",String.valueOf(k.victories));
+                String[] descriptions={"Базовый магический удар.","Поджигает цель.","Замедляет и ослабляет противника.","Ослабляет противника электрическим разрядом.","Сочетает горение и электрическое ослабление.","Ослабляет противника пространственным воздействием."};
+                for(int n=0;n<KatherineCompanion.SPELLS.length;n++){boolean unlocked=n<=c.limitSpell(k.magicRank);npcField(p,"swords",KatherineCompanion.SPELLS[n],(n==c.spell?"Выбрано • ":unlocked?"Доступно • ":"Закрыто • ")+descriptions[n]+" Расход магии: "+(n==4?16:n==5?18:8));}}
+            if(li){npcField(p,"swords","Боевой стиль","Военная подготовка имперского капитана.");if(known){npcMeter(p,"Запас сил",l.companionStamina,100,accent());npcField(p,"shield","Тактика",l.stanceLabel());npcField(p,"swords","Победы",String.valueOf(l.victories));}}
+            if(al&&known){npcField(p,"swords","Уровень",String.valueOf(a.level));npcMeter(p,"Опыт",a.xp,a.needXp(),accent());npcMeter(p,"Здоровье",a.health,a.maxHealth(),ITEM_UP);npcMeter(p,"Магия",a.mana,a.maxMana(),accent());npcField(p,"learn","Ранг",a.rank+" / 5");npcFields(p,"swords","Навык",a.skillsLabel());npcField(p,"shield","Тактика",a.stanceLabel());npcField(p,"swords","Победы",String.valueOf(a.victories));}
+        }else if(index==4){
+            if(it){npcField(p,"bag","Личное снаряжение",ItachiProfile.EQUIPMENT);if(known){npcFields(p,"bag","Экипировка",i.life.gearLabel());npcField(p,"bag","Припасы",i.supplies+" / 5");npcField(p,"bag","Вес",String.format(java.util.Locale.ROOT,"%.2f / 35 кг",i.life.weight()));if(i.life.access(game,i)&&!livingBusy()){livingLink(p,"Передать экипировку","","inventory",()->itachiInventory(true));livingLink(p,"Забрать экипировку","","inventory",()->itachiInventory(false));livingLink(p,"Сменить экипировку","","inventory",this::itachiEquipment);}}}
+            if(li&&known){npcFields(p,"bag","Экипировка",l.life.gearLabel());npcField(p,"bag","Вес",String.format(java.util.Locale.ROOT,"%.2f / 35 кг",l.life.weight()));if(l.life.access(game,l)&&!livingBusy()){livingLink(p,"Передать экипировку","","inventory",()->liviaInventory(true));livingLink(p,"Забрать экипировку","","inventory",()->liviaInventory(false));livingLink(p,"Сменить экипировку","","inventory",this::liviaEquipment);}}
+            if(ka&&known){npcField(p,"shield","Одеяние",KatherineCompanion.GEAR[c.gear]);npcField(p,"bag","Магический фокус",KatherineCompanion.FOCUS[c.focus]);npcField(p,"bag","Лечебные зелья",String.valueOf(c.healthPotions));npcField(p,"bag","Зелья магии",String.valueOf(c.magicPotions));}
+            if(al&&known){npcFields(p,"bag","Имущество",a.inventoryLabel());npcField(p,"bag","Вес",String.format(java.util.Locale.ROOT,"%.2f / 35 кг",a.packWeight()));if(!a.terminalLoss()&&a.present(game)&&!livingBusy()){livingLink(p,"Передать предмет","","bag",()->almaInventory(true));livingLink(p,"Забрать предмет","","bag",()->almaInventory(false));livingLink(p,"Экипировка","","bag",this::almaEquipment);}}
+        }else if(index==5&&known){
+            org.json.JSONArray events=it?i.memories:li?l.history:ka?k.memory:a.memory;
+            for(int n=events.length()-1;n>=Math.max(0,events.length()-100);n--){String event=events.optString(n);if(!event.trim().isEmpty())npcField(p,"book","Событие",event);}
+        }
+        if(!npcAddonEnabled(name))npcField(p,"id","Дополнение","Отключено");
+        else if(!known)npcField(p,"id","Сведения прохождения","Откроются после знакомства.");
+        if(p.getChildCount()==0)npcField(p,"book","Сведения","Пока нет записей.");
+        npcSectionDialog(name,index,p);
+    }
+
     private void npcLegacyDetails(String name){
+        NpcProfiles.Profile entry=NpcProfiles.find(name);if(entry!=null&&entry.author){npcAuthorSection(entry.name,0);return;}
         LinearLayout panel=column();panel.setGravity(Gravity.CENTER);panel.setPadding(dp(12),dp(12),dp(12),dp(12));
         NpcProfiles.Profile profile=NpcProfiles.find(name);
         if(profile!=null){livingLine(panel,"Имя",profile.name,accent());livingLine(panel,"Раса",profile.race,TEXT);livingLine(panel,"Пол",profile.gender,TEXT);livingLine(panel,"Роль",profile.role,TEXT);if(profile.child)addText(panel,"Ребёнок",13,MUTED,false,8);}
