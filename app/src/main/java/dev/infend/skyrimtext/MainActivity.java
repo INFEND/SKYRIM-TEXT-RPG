@@ -3838,7 +3838,7 @@ public final class MainActivity extends Activity {
         if(!item.weapon()&&!item.wearable())return false;
         return e.contains("зачар")||e.contains("поглощ")||e.contains("захват душ")||
             e.contains("сопротивлен")||e.contains("паралич")||e.contains("при ношении")||
-            e.contains("регенерац")||ItemEffectStyle.damageEnchantment(e);
+            e.contains("регенерац")||item.name.toLowerCase(java.util.Locale.ROOT).contains("зачарован")||ItemEffectStyle.damageEnchantment(e);
     }
     private View itemPicture(ItemCatalog.Item item,int size){
         android.widget.FrameLayout tile=new android.widget.FrameLayout(this);
@@ -4076,6 +4076,31 @@ public final class MainActivity extends Activity {
         }
         host.addView(line,lp(-1,-2));space(host,9);
     }
+    private void itemCondition(LinearLayout host,ItemCatalog.Item item,AlertDialog[] owner){
+        if(!game.progress.tracksCondition(item)||game.progress.quantity(item.id)<1)return;
+        int percent=game.progress.conditionPercent(item);
+        int color=percent>=65?0xff66bb6a:percent>=30?0xffffb74d:0xffef5350;
+        space(host,5);host.addView(itemText("Состояние предмета",14,TEXT,true),lp(-1,-2));space(host,8);
+        LinearLayout line=row();line.setGravity(Gravity.CENTER_VERTICAL);
+        line.addView(new ItemStatGlyph(this,"shield",color),lp(20,20));
+        TextView label=itemText("Прочность",14,TEXT,true);
+        LinearLayout.LayoutParams lpLabel=new LinearLayout.LayoutParams(0,-2,1);lpLabel.leftMargin=dp(8);line.addView(label,lpLabel);
+        line.addView(itemText(percent+"%",14,color,false),lp(-2,-2));host.addView(line,lp(-1,-2));space(host,7);
+        ProgressBar bar=new ProgressBar(this,null,android.R.attr.progressBarStyleHorizontal);
+        bar.setMax(100);bar.setProgress(percent);bar.setProgressTintList(ColorStateList.valueOf(color));
+        bar.setProgressBackgroundTintList(ColorStateList.valueOf((color&0x00ffffff)|0x33000000));host.addView(bar,lp(-1,5));space(host,8);
+        if(percent<100){
+            String blocked=game.progress.repairBlock(item,game);
+            if(blocked.isEmpty()){
+                TextView repair=itemAction("Ремонт • "+item.temperMaterial());host.addView(repair,lp(-1,42));
+                repair.setOnClickListener(v->new RuneDialogBuilder(this,accent()).setTitle("Восстановить прочность?")
+                    .setMessage("Расход: 1 × "+item.temperMaterial()).setNegativeButton("Отмена",null)
+                    .setPositiveButton("Ремонт",(d,w)->{if(game.progress.repair(item,game)){
+                        save();if(owner[0]!=null)owner[0].dismiss();render();itemDialog(item);
+                    }else toast(game.progress.repairBlock(item,game));}).show());
+            }else host.addView(itemText(blocked,11,MUTED,false),lp(-1,-2));
+        }
+    }
     private void itemEffectPreview(LinearLayout host,ItemCatalog.Item item){
         int restoration=potionRestore(item);
         if(restoration<=0||game.progress.quantity(item.id)<=0)return;
@@ -4236,6 +4261,7 @@ public final class MainActivity extends Activity {
         action.setPadding(dp(5),dp(6),dp(5),dp(6));return action;
     }
     private void itemDialog(ItemCatalog.Item item){
+        final AlertDialog[] owner=new AlertDialog[1];
         LinearLayout view=column();
         view.setPadding(dp(12),dp(12),dp(12),dp(12));
         view.setBackground(itemBackground(0xff000000,0,16));
@@ -4281,10 +4307,11 @@ public final class MainActivity extends Activity {
         if(item.weapon()||item.wearable()){
             if(!material.isEmpty())itemProperty(view,"layers","Материал",material,0xffa3a3a3);
             if(!itemSlotLabel(item).isEmpty())itemProperty(view,item.weapon()?"hand":"shirt","Слот",itemSlotLabel(item),0xffa3a3a3);
-            if(!item.temperMaterial().isEmpty())itemProperty(view,"hammer","Улучшение",game.progress.quantity(item.id)>0?game.progress.temperQualityName(item.id):"Нет",0xffa3a3a3);
+            if(!item.temperMaterial().isEmpty())itemProperty(view,"hammer","Улучшение",game.progress.temperQuality(item.id)>0?game.progress.temperQualityName(item.id):"Нет",0xffa3a3a3);
             itemProperty(view,"magic","Зачарование",itemEnchanted(item)?"Есть":"Нет",0xffa3a3a3);
         }
         itemEffect(view,item);
+        itemCondition(view,item,owner);
         int artifact=CompensationPowers.itemIndex(item.id);if(artifact>=0){addText(view,game.compensation.bound[artifact]?"Привязка к душе":"Системное снаряжение | нельзя потерять",12,ITEM_MAGIC,true,5);if(game.compensation.passive[artifact])addText(view,game.compensation.passiveLabel(artifact)+" при экипировке",13,ITEM_UP,false,6);}
         itemEffectPreview(view,item);
         itemDivider(view,7);
@@ -4309,7 +4336,7 @@ public final class MainActivity extends Activity {
             }
         }
         ScrollView itemScroll=new ScrollView(this);itemScroll.setFillViewport(false);itemScroll.addView(view);
-        AlertDialog dialog=new RuneDialogBuilder(this,accent()).customPanel().setView(itemScroll).create();
+        AlertDialog dialog=new RuneDialogBuilder(this,accent()).customPanel().setView(itemScroll).create();owner[0]=dialog;
         LinearLayout actions=row();space(view,9);view.addView(actions,lp(-1,-2));
         boolean owned=game.progress.quantity(item.id)>0;
         boolean worn=game.progress.equipped(item.id);

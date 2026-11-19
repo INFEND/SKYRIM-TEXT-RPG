@@ -727,11 +727,22 @@ public final class GameEngine {
         compensation.tick();
         if(!"CANON_SHOUT".equals(action)&&canonicalShoutCooldown>0)canonicalShoutCooldown--;
         String kathSupply=katherine.companion.useSupplies(katherine);if(!kathSupply.isEmpty())actionText+="\n"+kathSupply;
+        boolean weaponHit=damage>0&&("ATTACK".equals(action)||"HEAVY".equals(action));
+        boolean chillParalyzed=false;
+        if(weaponHit){
+            progress.wearWeapon("HEAVY".equals(action));
+            if(progress.equipped("Охладитель")){
+                damage=nonnegativeAdd(damage,30);actionText+="\nОхладитель: урон морозом +30.";
+                if(!road.groupActive(this)&&"WILD".equals(battleKind)&&!enemyName.toLowerCase(java.util.Locale.ROOT).contains("карстааг")&&random.nextInt(100)<25){
+                    chillParalyzed=true;actionText+="\nОхладитель: цель парализована на один ответный ход.";
+                }
+            }
+        }
         int kathBurn=katherine.active()?katherine.companion.ongoingDamage(Math.max(0,enemyHp-damage)):0;
         if(kathBurn>0){damage+=kathBurn;actionText+="\nКэтрин: остаточное пламя, −"+kathBurn+" здоровья врагу.";}
         int kathDamage=katherine.assist(this,battleTurns+1,Math.max(0,enemyHp-damage));
         if(kathDamage>0){damage+=kathDamage;actionText+="\nКэтрин: "+katherine.companion.lastSpell+", −"+kathDamage+" здоровья врагу.";}
-        if(damage>0&&("ATTACK".equals(action)||"HEAVY".equals(action))){String weapon=progress.equippedName("weapon");int bonus=0;switch(weapon){
+        if(weaponHit){String weapon=progress.equippedName("weapon");int bonus=0;switch(weapon){
             case "Эбонитовый клинок":case "Клинок Горя":int drain=Math.min(10,Math.min(Math.max(0,maxHp-hp),Math.max(0,enemyHp)));hp+=drain;lastHealing+=drain;bonus=10;actionText+="\n"+weapon+": поглощение здоровья +"+drain+".";break;
             case "Молот Волендранг":int restoredStamina=Math.min(50,Math.max(0,maxStamina-stamina));stamina+=restoredStamina;actionText+="\nВолендранг: запас сил +"+restoredStamina+".";break;
             case "Булава Молаг Бала":artifactWeakness=8;progress.artifacts.trapTurns=Math.max(3,progress.artifacts.trapTurns);actionText+="\nБулава Молаг Бала ослабляет ответ врага и накладывает захват души.";break;
@@ -739,7 +750,7 @@ public final class GameEngine {
             case "Лук Ауриэля":bonus=RoadArtifacts.undead(enemyName)?30:10;actionText+="\nСолнечный урон +"+bonus+".";break;
             case "Вутрад":if(RoadArtifacts.elf(enemyName)){bonus=Math.max(1,damage/2);actionText+="\nВутрад: дополнительный урон эльфам +"+bonus+".";}break;
         }damage=nonnegativeAdd(damage,bonus);}
-        if(damage>0&&("ATTACK".equals(action)||"HEAVY".equals(action))&&progress.equipped("Бритва Мерунеса")&&"WILD".equals(battleKind)&&!enemyName.toLowerCase(java.util.Locale.ROOT).contains("карстааг")&&random.nextInt(10000)<198){damage=enemyHp;actionText+="\nБритва Мерунеса срабатывает: противник падает замертво.";}
+        if(weaponHit&&progress.equipped("Бритва Мерунеса")&&"WILD".equals(battleKind)&&!enemyName.toLowerCase(java.util.Locale.ROOT).contains("карстааг")&&random.nextInt(10000)<198){damage=enemyHp;actionText+="\nБритва Мерунеса срабатывает: противник падает замертво.";}
         if(progress.equipped("Эбонитовая кольчуга")&&enemyHp>damage){int aura=Math.min(5,enemyHp-damage);damage+=aura;actionText+="\nЯдовитая аура Эбонитовой кольчуги: −"+aura+" здоровья врагу.";}
         if("ACTIVE".equals(progress.questOutcome("road_boethiah_hireling"))&&enemyHp>damage){int assist=Math.min(3,enemyHp-damage);damage+=assist;actionText+="\nНаёмник из Виндхельма помогает в бою: −"+assist+" здоровья врагу.";}
         if(road.hasDog(this)&&enemyHp>damage&&(battleTurns+1)%3==0){damage+=3;actionText+="\nБродячий пёс помогает в бою: −3 здоровья врагу.";}
@@ -764,7 +775,8 @@ public final class GameEngine {
         baseIncoming=Math.max(1,baseIncoming-compensation.passiveBonus(this,1));
         int rawIncoming=Math.max(1,baseIncoming-(defending?enemyDamage/2+3+2*progress.branches.rank(3)+(progress.advanced.has(AdvancedPerks.QUICK_REFLEXES)?2:0)+(progress.advanced.has(AdvancedPerks.SHIELD_WALL)&&!"Не надето".equals(progress.equippedName("shield"))?3:0)+(progress.advanced.has(AdvancedPerks.SHIELD_CHARGE)&&!"Не надето".equals(progress.equippedName("shield"))?4:0):0));
         int incoming=Math.max(1,(int)Math.round(rawIncoming*(1-progress.damageReduction())));
-        if(road.magicalEnemy(enemyName))incoming=progress.artifacts.magicAdjust(progress,incoming);
+        if(road.magicalEnemy(enemyName)){incoming=progress.artifacts.magicAdjust(progress,incoming);if(progress.equipped("Шкура Спасителя"))incoming=(int)Math.round(incoming*.85);}
+        if(chillParalyzed&&!defeatedTarget){lastBlocked+=incoming;incoming=0;}
         if(progress.equipped(SolitudeCourt.SHIELD)){
             if(road.magicalEnemy(enemyName)||(SolitudeWolf.KIND+"potema_boss").equals(battleKind))incoming=Math.max(1,(int)Math.round(incoming*.80));
             if(defending)incoming=Math.max(1,(int)Math.round(incoming*.75));
@@ -788,6 +800,8 @@ public final class GameEngine {
         int aegis=fixShop.gifts.absorb(incoming);if(aegis>0){incoming-=aegis;lastBlocked+=aegis;actionText+="\nЭгида Этериуса поглощает "+aegis+" урона.";}
         int manaWard=fixShop.seals.ward(this,incoming);if(manaWard>0){incoming-=manaWard;lastBlocked+=manaWard;actionText+="\nЗеркало чар: −"+manaWard+" магии, поглощено "+manaWard+" урона.";}
         int poisoned=poisonTurns>0?Math.max(1,maxHp/40):0;
+        if(progress.equipped("Шкура Спасителя"))poisoned=(int)Math.ceil(poisoned*.5);
+        if(incoming>0)progress.wearArmor(defending);
         if(poisonTurns>0)poisonTurns--;if(frostTurns>0){frostTurns--;stamina=Math.max(0,stamina-4);}
         String foe=enemyName.toLowerCase(java.util.Locale.ROOT);
         if(!fixShop.gifts.on(FixShopGifts.WARD)&&!defending&&foe.contains("морозный паук"))poisonTurns=2;

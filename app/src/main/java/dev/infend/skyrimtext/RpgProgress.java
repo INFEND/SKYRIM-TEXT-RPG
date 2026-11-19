@@ -33,6 +33,38 @@ public final class RpgProgress {
     private boolean equipmentInitialized;
     // One improved exemplar per item ID until the inventory supports individual instances.
     private final LinkedHashMap<String,Integer> tempered=new LinkedHashMap<>();
+    // Like tempering, condition is tracked per catalog ID until individual instances exist.
+    private final LinkedHashMap<String,Integer> condition=new LinkedHashMap<>();
+    public boolean tracksCondition(ItemCatalog.Item item){
+        return item!=null&&item.baseStat>0&&!item.temperMaterial().isEmpty()
+            &&(item.weapon()||item.wearable())&&!"Боеприпасы".equals(item.category);
+    }
+    public int conditionPercent(ItemCatalog.Item item){
+        return tracksCondition(item)&&quantity(item.id)>0?condition.getOrDefault(item.id,100):100;
+    }
+    public double conditionMultiplier(ItemCatalog.Item item){return 0.5+conditionPercent(item)/200.0;}
+    public void wearItem(ItemCatalog.Item item,int amount){
+        if(!tracksCondition(item)||quantity(item.id)<1||amount<=0)return;
+        condition.put(item.id,Math.max(0,conditionPercent(item)-Math.min(100,amount)));
+    }
+    public void wearWeapon(boolean heavy){wearItem(ItemCatalog.find(equippedName("weapon")),heavy?2:1);}
+    public void wearArmor(boolean defending){
+        for(String slot:new String[]{"head","body","hands","feet","shield"}){
+            if("shield".equals(slot)&&!defending)continue;
+            wearItem(ItemCatalog.find(equippedName(slot)),1);
+        }
+    }
+    public String repairBlock(ItemCatalog.Item item,GameEngine g){
+        if(!tracksCondition(item)||quantity(item.id)!=1)return "Для ремонта нужен одиночный экземпляр";
+        if(conditionPercent(item)>=100)return "Ремонт не требуется";
+        if(g.solitude.custody()||g.road.pending()||"COMBAT".equals(g.mode)||(!atForge()&&!(g.fixShop.home.room(3)&&!g.fixShop.home.here(g).isEmpty())&&!(g.fixShop.gifts.on(FixShopGifts.FORGE)&&FixShopWorld.safe(g))))return "Нужна кузница вне боя";
+        if(quantity(item.temperMaterial())<1)return "Не хватает материала: "+item.temperMaterial();
+        return "";
+    }
+    public boolean repair(ItemCatalog.Item item,GameEngine g){
+        if(!repairBlock(item,g).isEmpty()||!removeItem(item.temperMaterial(),1))return false;
+        condition.remove(item.id);return true;
+    }
     private static final String[] QUALITY={"Обычное","Хорошее","Отличное","Превосходное","Безупречное","Эпическое","Легендарное"};
     private static final int[] TEMPER_LEVELS={0,14,31,65,100,134,168};
     public int temperQuality(String id){return quantity(id)>0?tempered.getOrDefault(id,0):0;}
@@ -205,7 +237,7 @@ public final class RpgProgress {
         cleanEquipment();
     }
     public void quantity(String id,int n){
-        try{inventory.put(id,Math.max(0,n));if(n<=0)tempered.remove(id);}catch(Exception ignored){}
+        try{inventory.put(id,Math.max(0,n));if(n<=0){tempered.remove(id);condition.remove(id);}}catch(Exception ignored){}
     }
     public int quantity(String id){return inventory.optInt(id,0);}
     public int fixCarryBonus=0;
@@ -404,7 +436,7 @@ public final class RpgProgress {
              .put("questOutcomes",new JSONObject(questOutcomes)).put("roadArtifacts",artifacts.save())
              .put("fixCarryBonus",fixCarryBonus).put("perks",perkPoints).put("combatPerks",new JSONArray(combatPerks)).put("studyPerks",new JSONArray(studyPerks)).put("talentBranches",branches.toJson()).put("advancedPerks",advanced.toJson())
              .put("equipmentInitialized",equipmentInitialized).put("equipped",new JSONObject(equipped))
-             .put("tempered",new JSONObject(tempered))
+             .put("tempered",new JSONObject(tempered)).put("equipmentCondition",new JSONObject(condition))
              .put("activePowerDay",activePowerDay).put("difficulty",difficulty)
              .put("actionDay",actionDay).put("attemptedToday",new JSONArray(attemptedToday))
              .put("dragonStage",dragonStage).put("dragonInsight",dragonInsight)
@@ -475,6 +507,12 @@ public final class RpgProgress {
             String id=keys.next();ItemCatalog.Item item=ItemCatalog.find(id);int quality=temper.optInt(id,0);
             if(item!=null&&p.quantity(id)>0&&!item.temperMaterial().isEmpty()&&quality>0&&quality<=6)
                 p.tempered.put(id,quality);
+        }}
+        JSONObject wear=obj.optJSONObject("equipmentCondition");
+        if(wear!=null){Iterator<String> keys=wear.keys();while(keys.hasNext()){
+            String id=keys.next();ItemCatalog.Item item=ItemCatalog.find(id);
+            int value=wear.optInt(id,100);
+            if(p.tracksCondition(item)&&p.quantity(id)>0&&value>=0&&value<100)p.condition.put(id,value);
         }}
         p.cleanEquipment();
         JSONArray done=obj.optJSONArray("completed"),bad=obj.optJSONArray("failed");
