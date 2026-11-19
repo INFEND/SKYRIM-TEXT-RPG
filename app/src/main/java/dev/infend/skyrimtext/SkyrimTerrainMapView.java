@@ -340,13 +340,25 @@ public final class SkyrimTerrainMapView extends View {
             float tw=ink.measureText(title);
             // Do not clamp label X to a screen edge. A clamped label slides
             // relative to its pin during panning and looks like map jitter.
-            float tx=pin.x+pin.sizeDp*density*.58f+4*density;
-            float ty=pin.y-5*density;
-            if(tx<5*density||tx+tw>getWidth()-5*density||
-               ty<20*density||ty>getHeight()-31*density)continue;
-            RectF rect=new RectF(tx-3*density,ty-17*density,tx+tw+3*density,ty+4*density);
-            boolean overlap=false;for(RectF old:labels)if(RectF.intersects(old,rect)){overlap=true;break;}
-            if(overlap)continue;labels.add(rect);
+            float offset=pin.sizeDp*density*.58f+4*density;
+            float tx=0,ty=0;
+            RectF rect=null;
+            // Capitals at the eastern edge must not lose their names simply
+            // because their right-hand labels fall outside the viewport.
+            float[][] positions={{pin.x+offset,pin.y-5*density},
+                {pin.x-offset-tw,pin.y-5*density},
+                {pin.x-tw*.5f,pin.y-offset-3*density},
+                {pin.x-tw*.5f,pin.y+offset+13*density}};
+            for(float[] position:positions){
+                float x=position[0],y=position[1];
+                if(x<5*density||x+tw>getWidth()-5*density||
+                   y<20*density||y>getHeight()-31*density)continue;
+                RectF candidate=new RectF(x-3*density,y-17*density,x+tw+3*density,y+4*density);
+                boolean overlap=false;
+                for(RectF old:labels)if(RectF.intersects(old,candidate)){overlap=true;break;}
+                if(!overlap){tx=x;ty=y;rect=candidate;break;}
+            }
+            if(rect==null)continue;labels.add(rect);
             ink.setColor(0xff080d11);ink.setStyle(Paint.Style.STROKE);ink.setStrokeWidth(3*density);
             canvas.drawText(title,tx,ty,ink);
             ink.setStyle(Paint.Style.FILL);ink.setColor(pin.player?0xfff2dc98:0xfff0f1eb);
