@@ -107,7 +107,7 @@ public final class AiGameTurn {
             else normalizeModelInt(e,field,true);
         }
         for(String field:new String[]{"location","quest","questStatus","katherineIntent",
-                "inventory","skills","enemy","sceneFacts"})normalizeOptionalModelField(e,field);
+                "inventory","skills","enemy","sceneFacts","questUpdates"})normalizeOptionalModelField(e,field);
         JSONArray inventory=e.optJSONArray("inventory");
         if(inventory!=null)for(int i=0;i<inventory.length();i++){
             JSONObject item=inventory.optJSONObject(i);
@@ -525,6 +525,50 @@ public final class AiGameTurn {
                 nextSceneState.confirm(kind,id,title,status);
             }
         }
+        // Per-quest stage and objective updates are checked on a detached ledger.
+        // No result is applied if any item is malformed or rolls back a quest.
+        JSONObject validatedQuests=null;
+        if(e.has("questUpdates")){
+            if(!(e.opt("questUpdates") instanceof JSONArray))
+                throw new JSONException("Обновления заданий должны быть массивом");
+            JSONArray updates=e.getJSONArray("questUpdates");
+            if(updates.length()>8)throw new JSONException("Не более восьми заданий за ход");
+            validatedQuests=new JSONObject(g.progress.aiQuestRecords.toString());
+            java.util.HashSet<String> seenQuests=new java.util.HashSet<>();
+            for(int i=0;i<updates.length();i++){
+                JSONObject update=updates.optJSONObject(i);
+                if(update==null)throw new JSONException("Неверная запись задания");
+                String id=update.optString("id","");
+                String title=update.optString("title","").trim();
+                String objective=update.optString("objective","").trim();
+                String status=update.optString("status","ACTIVE");
+                Object stageValue=update.opt("stage");
+                if(!id.matches("[a-z0-9_]{1,48}")||!seenQuests.add(id)||
+                        title.isEmpty()||title.length()>120||objective.length()>240||
+                        !(stageValue instanceof Number))
+                    throw new JSONException("Некорректное название, ID или стадия задания");
+                double stageNumber=((Number)stageValue).doubleValue();
+                if(!Double.isFinite(stageNumber)||stageNumber!=Math.rint(stageNumber)||
+                        stageNumber<0||stageNumber>100)
+                    throw new JSONException("Стадия задания должна быть числом 0–100");
+                if(!("ACTIVE".equals(status)||"COMPLETED".equals(status)||"FAILED".equals(status)))
+                    throw new JSONException("Неизвестный статус задания");
+                JSONObject prior=validatedQuests.optJSONObject(id);
+                if(prior==null&&validatedQuests.length()>=64)
+                    throw new JSONException("Достигнут предел авторских заданий");
+                if(prior!=null){
+                    String previous=prior.optString("status","ACTIVE");
+                    if(("COMPLETED".equals(previous)||"FAILED".equals(previous))&&
+                            !previous.equals(status))
+                        throw new JSONException("Нельзя переписать финал задания");
+                    if(stageNumber<prior.optInt("stage",0))
+                        throw new JSONException("Нельзя откатить стадию задания");
+                }
+                validatedQuests.put(id,new JSONObject().put("title",title)
+                    .put("objective",objective).put("stage",(int)stageNumber)
+                    .put("status",status));
+            }
+        }
         // Commit only after all model-controlled fields have passed validation.
         for(String name:inventoryChanges.keySet())
             g.progress.quantity(name,g.progress.quantity(name)+inventoryChanges.get(name));
@@ -559,6 +603,13 @@ public final class AiGameTurn {
             g.aiJournal=quest+" | "+state;
             if("COMPLETED".equals(state)&&!g.progress.completed.contains(quest))g.progress.completed.add(quest);
             if("FAILED".equals(state)&&!g.progress.failed.contains(quest))g.progress.failed.add(quest);
+        }
+        if(validatedQuests!=null){
+            java.util.Iterator<String> ids=validatedQuests.keys();
+            while(ids.hasNext()){
+                String id=ids.next();
+                g.progress.aiQuestRecords.put(id,validatedQuests.getJSONObject(id));
+            }
         }
         if(nextSceneState!=null)g.sceneState=nextSceneState;
         if(e.opt("katherineIntent") instanceof String)KatherineInitiative.apply(g,e.optString("katherineIntent"),acted);

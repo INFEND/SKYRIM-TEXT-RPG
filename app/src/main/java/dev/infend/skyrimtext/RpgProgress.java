@@ -10,6 +10,8 @@ public final class RpgProgress {
     public final ArrayList<String> failed = new ArrayList<>();
     // Quest outcomes are separate from repeatable skill-check history.
     public final LinkedHashMap<String,String> questOutcomes = new LinkedHashMap<>();
+    /** AI-created quests use stable IDs and their own save-compatible stage ledger. */
+    public final JSONObject aiQuestRecords=new JSONObject();
     public void setQuestOutcome(String id,String state){
         if(id==null||!id.matches("[a-z0-9_]{1,48}"))return;
         if(!("ACTIVE".equals(state)||"COMPLETED".equals(state)||"FAILED".equals(state)))return;
@@ -422,7 +424,7 @@ public final class RpgProgress {
              .put("skillXp",new JSONArray(skillXp)).put("trainingLevel",trainingLevel)
              .put("trainingsThisLevel",trainingsThisLevel).put("inventory",inventory)
              .put("completed",new JSONArray(completed)).put("failed",new JSONArray(failed))
-             .put("questOutcomes",new JSONObject(questOutcomes)).put("roadArtifacts",artifacts.save())
+             .put("questOutcomes",new JSONObject(questOutcomes)).put("aiQuestRecords",aiQuestRecords).put("roadArtifacts",artifacts.save())
              .put("fixCarryBonus",fixCarryBonus).put("perks",perkPoints).put("combatPerks",new JSONArray(combatPerks)).put("studyPerks",new JSONArray(studyPerks)).put("talentBranches",branches.toJson()).put("advancedPerks",advanced.toJson())
              .put("equipmentInitialized",equipmentInitialized).put("equipped",new JSONObject(equipped))
              .put("tempered",new JSONObject(tempered)).put("weaponPoisons",new JSONObject(weaponPoisons))
@@ -513,6 +515,23 @@ public final class RpgProgress {
         if(outcomes!=null){Iterator<String> keys=outcomes.keys();while(keys.hasNext()){
             String id=keys.next();p.setQuestOutcome(id,outcomes.optString(id,""));
         }}
+        JSONObject ai=obj.optJSONObject("aiQuestRecords");
+        if(ai!=null){
+            Iterator<String> keys=ai.keys();int count=0;
+            while(keys.hasNext()&&count<64){
+                String key=keys.next();JSONObject q=ai.optJSONObject(key);
+                if(q==null||!key.matches("[a-z0-9_]{1,48}"))continue;
+                String title=q.optString("title",""),status=q.optString("status","");
+                int stage=q.optInt("stage",-1);
+                if(title.isEmpty()||title.length()>120||stage<0||stage>100||
+                        !("ACTIVE".equals(status)||"COMPLETED".equals(status)||"FAILED".equals(status)))continue;
+                try{p.aiQuestRecords.put(key,new JSONObject().put("title",title)
+                    .put("objective",q.optString("objective","").substring(0,
+                        Math.min(240,q.optString("objective","").length())))
+                    .put("stage",stage).put("status",status));count++;
+                }catch(Exception ignored){}
+            }
+        }
         return p;
     }
 }

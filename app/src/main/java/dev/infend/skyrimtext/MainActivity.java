@@ -5311,9 +5311,11 @@ public final class MainActivity extends Activity {
         if(game.itachi.enabled&&game.itachi.stage>0)actionButton("Итачи | "+game.itachi.relation(),game.itachi.objective(game),false,()->npcDetails(ItachiStory.NAME));
         if(game.livia.enabled&&game.livia.stage>0)actionButton(LiviaStory.TITLE,game.livia.objective(),false,()->{if(!game.aiNarrativeMode&&!livingBusy()&&game.livia.available(game)){game.choose("LIVIA:open");save();tab=0;render();}else npcDetails(LiviaStory.NAME);});
         if(game.alma.enabled&&game.alma.stage>0)actionButton("Алая Бессмертная",game.alma.objective()+" | "+game.alma.stage+"/12",false,()->new RuneDialogBuilder(this,accent()).setTitle("Алая Бессмертная").setMessage(game.alma.objective()+"\n\n"+(game.alma.companion?"Альма путешествует с тобой.":game.alma.terminalLoss()?"История завершена.":"Ищи Альму: "+game.alma.location(game))).setPositiveButton("Закрыть",null).show());
-        String[] entries=game.aiJournal.isEmpty()?
-            new String[]{"Путь Довакина","Драконий след","Пепельные печати","Опасные дороги"}:
-            new String[]{"Путь Довакина","Драконий след","Пепельные печати","Опасные дороги","Задание ИИ"};
+        java.util.ArrayList<String> entries=new java.util.ArrayList<>(
+            java.util.Arrays.asList("Путь Довакина","Драконий след","Пепельные печати","Опасные дороги"));
+        if(!game.aiJournal.isEmpty())entries.add("Задание ИИ");
+        java.util.Iterator<String> questIds=game.progress.aiQuestRecords.keys();
+        while(questIds.hasNext())entries.add("ИИ:"+questIds.next());
         boolean present=false;for(String e:entries)if(e.equals(selectedJournalEntry))present=true;
         if(!present)selectedJournalEntry=entries[0];
         LinearLayout list=card();
@@ -5345,8 +5347,18 @@ public final class MainActivity extends Activity {
         }else if("Опасные дороги".equals(title)){
             description="Заказ у доски объявлений. Северные тракты полны разбойников и опасных существ.";
             objective=game.sideQuest==0?"Поручение пока не принято.":"Победы над противниками: "+game.sideKills+"/3";
+        }else if(title.startsWith("ИИ:")){
+            JSONObject quest=game.progress.aiQuestRecords.optJSONObject(title.substring(3));
+            description=quest==null?"Авторское задание":quest.optString("objective","Задание ожидает развития");
+            String status=quest==null?"ACTIVE":quest.optString("status","ACTIVE");
+            String statusLabel="COMPLETED".equals(status)?"Завершено":
+                "FAILED".equals(status)?"Провалено":"Выполняется";
+            objective=statusLabel+" | Стадия "+(quest==null?0:quest.optInt("stage",0));
         }else{description="Приключение, созданное игровым ИИ-мастером.";objective=game.aiJournal;}
-        TextView questTitle=text(title.toUpperCase(java.util.Locale.ROOT),22,TEXT,true);
+        JSONObject selectedAiQuest=title.startsWith("ИИ:")?
+            game.progress.aiQuestRecords.optJSONObject(title.substring(3)):null;
+        String heading=selectedAiQuest==null?title:selectedAiQuest.optString("title",title);
+        TextView questTitle=text(heading.toUpperCase(java.util.Locale.ROOT),22,TEXT,true);
         questTitle.setGravity(Gravity.CENTER);focus.addView(questTitle);
         focus.addView(new SkyrimRuleView(this,accent()),lp(-1,23));
         addText(focus,description,15,TEXT,false,13);
