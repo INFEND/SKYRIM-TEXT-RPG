@@ -114,7 +114,7 @@ public final class AiGameTurn {
             else normalizeModelInt(e,field,true);
         }
         for(String field:new String[]{"location","quest","questStatus","katherineIntent",
-                "inventory","skills","enemy","sceneFacts","questUpdates","npcRewrites"})normalizeOptionalModelField(e,field);
+                "inventory","skills","enemy","sceneFacts","questUpdates","npcRewrites","equipmentChanges"})normalizeOptionalModelField(e,field);
         JSONArray inventory=e.optJSONArray("inventory");
         if(inventory!=null)for(int i=0;i<inventory.length();i++){
             JSONObject item=inventory.optJSONObject(i);
@@ -615,6 +615,8 @@ public final class AiGameTurn {
                     .put("status",status));
             }
         }
+        ArrayList<AiEquipmentActions.Change> equipmentChanges=
+            AiEquipmentActions.prepare(g,e,inventoryChanges);
         // Commit only after all model-controlled fields have passed validation.
         for(String name:inventoryChanges.keySet())
             g.progress.quantity(name,g.progress.quantity(name)+inventoryChanges.get(name));
@@ -660,6 +662,7 @@ public final class AiGameTurn {
         if(nextSceneState!=null)g.sceneState=nextSceneState;
         if(e.opt("katherineIntent") instanceof String)KatherineInitiative.apply(g,e.optString("katherineIntent"),acted);
         if(!journal.isEmpty()){g.progress.recent=journal;if(g.aiJournal.isEmpty())g.aiJournal=journal;}
+        AiEquipmentActions.commit(g,equipmentChanges);
         g.progress.sync(g);
     }
 }
