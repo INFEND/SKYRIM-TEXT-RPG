@@ -112,6 +112,7 @@ final class SolitudeHome {
             if(g.itachi.enabled&&g.itachi.married&&g.itachi.life.sharedHome)s.add("SOLITUDE:home:itachi","Поговорить с Итачи","Совместный дом");
             if(g.livia.enabled&&g.livia.life.married&&g.livia.life.sharedHome&&g.livia.survivor())s.add("SOLITUDE:home:livia","Поговорить с Ливией","Совместный дом");
             s.add("SOLITUDE:home:sleep","Поспать","8 часов | бесплатно");
+            s.add("SOLITUDE:home:rest-hour","Отдохнуть один час","Короткий отдых | бесплатно");
             if(room(1)&&lastMeal!=g.day)s.add("SOLITUDE:home:meal","Поесть и выпить воды","Один раз в день");
             if(room(3)&&lastAlchemy!=g.day&&g.hour<23)s.add("SOLITUDE:home:study:7","Практиковать алхимию","1 час | один урок в день");
             if(room(4)&&lastEnchant!=g.day&&g.hour<23)s.add("SOLITUDE:home:study:8","Изучить зачарование","1 час | один урок в день");
@@ -136,6 +137,10 @@ final class SolitudeHome {
         }
         if(a.equals("SOLITUDE:home:itachi")){if(g.itachi.enabled&&g.itachi.married&&g.itachi.life.sharedHome){g.mode="WORLD";g.choose("ITACHI:open");if(ItachiStory.MODE.equals(g.mode))g.itachi.life.homeReturn=true;else g.mode=MODE;}return;}
         if(a.equals("SOLITUDE:home:livia")){if(g.livia.enabled&&g.livia.life.sharedHome&&g.livia.life.married&&g.livia.survivor()){g.mode="WORLD";g.choose("LIVIA:open");if(LiviaStory.MODE.equals(g.mode))g.livia.homeReturn=true;else g.mode=MODE;}return;}
+        if(a.equals("SOLITUDE:home:rest-hour")){
+            if(!g.restHours(1,true))return;
+            report(g,"Ты провёл час в спокойствии Высокого шпиля.");return;
+        }
         if(a.equals("SOLITUDE:home:sleep")){
             if(!g.restHours(8,true))return;
             if(room(0)){g.hp=g.maxHp;g.magicka=g.maxMagicka;g.stamina=g.maxStamina;}
