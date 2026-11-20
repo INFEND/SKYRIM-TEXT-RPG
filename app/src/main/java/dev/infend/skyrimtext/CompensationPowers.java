@@ -25,8 +25,18 @@ public final class CompensationPowers {
  public boolean upgrade(int i){if(ranks[i]<1||ranks[i]>=20)return false;ranks[i]++;return true;}
  public boolean reduce(int i){if(ranks[i]<1||cost(i)<=1)return false;discounts[i]++;return true;}
  public boolean removeSide(int i){if(ranks[i]<1||safe[i])return false;safe[i]=true;return true;}
- public boolean buyItem(GameEngine g,int i){if(i<0||i>=3||owned[i])return false;ItemCatalog.Item item=ItemCatalog.find(itemId(i));if(item==null||g.progress.carryWeight()+item.weight>50.00001)return false;owned[i]=true;g.progress.quantity(itemId(i),1);return true;}
- public boolean createItem(GameEngine g,String name,int type,int stat,double weight,String description){name=label(name,60);description=label(description,400);if(name.isEmpty()||type<0||type>2||stat<0||stat>500||!Double.isFinite(weight)||weight<.01||weight>50||g.progress.carryWeight()+weight>50.00001)return false;for(int i=0;i<SLOTS;i++)if(!itemNames[i].isEmpty()&&name.equalsIgnoreCase(itemNames[i]))return false;for(int i=3;i<SLOTS;i++)if(!owned[i]){itemNames[i]=name;itemDescriptions[i]=description;itemType[i]=type;itemStat[i]=type==2?0:stat;itemWeight[i]=weight;owned[i]=true;register(i);g.progress.quantity(itemId(i),1);return true;}return false;}
+ public boolean buyItem(GameEngine g,int i){if(i<0||i>=3||owned[i])return false;ItemCatalog.Item item=ItemCatalog.find(itemId(i));if(item==null||g.progress.carryWeight()+item.weight>g.progress.carryLimit()+0.00001)return false;owned[i]=true;g.progress.quantity(itemId(i),1);return true;}
+ public boolean createItem(GameEngine g,String name,int type,int stat,double weight,String description){name=label(name,60);description=label(description,400);if(name.isEmpty()||type<0||type>2||stat<0||stat>500||!Double.isFinite(weight)||weight<.01||weight>50||g.progress.carryWeight()+weight>g.progress.carryLimit()+0.00001)return false;for(int i=0;i<SLOTS;i++)if(!itemNames[i].isEmpty()&&name.equalsIgnoreCase(itemNames[i]))return false;for(int i=3;i<SLOTS;i++)if(!owned[i]){itemNames[i]=name;itemDescriptions[i]=description;itemType[i]=type;itemStat[i]=type==2?0:stat;itemWeight[i]=weight;owned[i]=true;register(i);g.progress.quantity(itemId(i),1);return true;}return false;}
+ /** Revise a durable AI-created or manually created item without changing its save ID. */
+ public boolean updateCustomItem(GameEngine g,int i,String name,int type,int stat,double weight,String description){
+  name=label(name,60);description=label(description,400);
+  if(i<3||i>=SLOTS||!owned[i]||name.isEmpty()||type!=itemType[i]||stat<0||stat>500||
+      !Double.isFinite(weight)||weight<.01||weight>50)return false;
+  for(int j=0;j<SLOTS;j++)if(j!=i&&!itemNames[j].isEmpty()&&name.equalsIgnoreCase(itemNames[j]))return false;
+  if(g.progress.carryWeight()-itemWeight[i]+weight>g.progress.carryLimit()+0.00001)return false;
+  itemNames[i]=name;itemDescriptions[i]=description;itemStat[i]=type==2?0:stat;itemWeight[i]=weight;
+  register(i);return true;
+ }
  private void register(int i){ItemCatalog.registerCustom(itemId(i),itemNames[i],itemType[i],itemStat[i],itemWeight[i],itemDescriptions[i]);}
  public void installCatalog(){ItemCatalog.clearCustom();for(int i=3;i<SLOTS;i++)if(owned[i])register(i);}
  public boolean bind(int i){if(!owned[i]||bound[i])return false;bound[i]=true;return true;}
