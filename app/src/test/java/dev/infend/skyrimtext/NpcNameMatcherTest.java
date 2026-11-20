@@ -35,7 +35,7 @@ public class NpcNameMatcherTest {
     @Test public void lowercaseEverydayWordsDoNotBecomeNpcLinks(){
         Map<String,String> names=new LinkedHashMap<>();
         NpcNameMatcher.add(names,"Мир");
-        NpcNameMatcher.add(names,"Серана");
+        NpcNameMatcher.add(names,"Серана","Серану");
         NpcNameMatcher matcher=new NpcNameMatcher(names);
         List<NpcNameMatcher.Match> hits=matcher.find("В обычном тексте мир важнее, чем легенда. Мир встретил Серану. серана здесь только слово.");
         assertEquals(2,hits.size());
