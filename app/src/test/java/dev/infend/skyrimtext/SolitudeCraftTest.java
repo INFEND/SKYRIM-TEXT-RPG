@@ -121,13 +121,16 @@ public class SolitudeCraftTest {
     }
     @Test public void batchSmithingStopsWhenWorkshopCloses() {
         GameEngine g=city(5);
-        g.hour=19;
+        g.hour=18;
         g.progress.quantity("Железный слиток",10);
         g.progress.quantity("Кожаные полоски",5);
         int before=g.progress.quantity("Железный меч");
         g.choose("SOLITUDE:craft:make-batch:0");
         assertEquals(before+1,g.progress.quantity("Железный меч"));
-        assertEquals(20,g.hour);
+        assertEquals(19,g.hour);
         assertEquals(8,g.progress.quantity("Железный слиток"));
+        g.choose("SOLITUDE:craft:make-batch:0");
+        assertEquals(before+1,g.progress.quantity("Железный меч"));
+        assertEquals(19,g.hour);
     }
 }
