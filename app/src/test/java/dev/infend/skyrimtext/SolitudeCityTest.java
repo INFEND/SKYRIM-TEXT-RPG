@@ -41,18 +41,40 @@ public class SolitudeCityTest {
         g.choose("SOLITUDE:open");
         g.choose("SOLITUDE:visit:0");
         g.choose("SOLITUDE:job:0");
-        assertEquals("MET",g.sceneState.status("npc","solitude_evette"));
+        assertEquals("MET",g.sceneState.status("npc","solitude_jala"));
         g=GameEngine.fromJson(g.toJson().toString());
         int gold=g.gold;
         g.choose("SOLITUDE:job:0");
         assertEquals(gold,g.gold);
-        assertEquals("MET",g.sceneState.status("npc","solitude_evette"));
+        assertEquals("MET",g.sceneState.status("npc","solitude_jala"));
         g.day++;
         g.hour=8;
         g.choose("SOLITUDE:job:0");
-        assertEquals("INFORMED",g.sceneState.status("npc","solitude_evette"));
+        assertEquals("INFORMED",g.sceneState.status("npc","solitude_jala"));
         g=GameEngine.fromJson(g.toJson().toString());
-        assertEquals("INFORMED",g.sceneState.status("npc","solitude_evette"));
+        assertEquals("INFORMED",g.sceneState.status("npc","solitude_jala"));
     }
 
+    @Test public void dockShiftCreditsVittoriaEvenAfterHerClosingHour() throws Exception {
+        GameEngine g=city();g.hour=16;
+        g.choose("SOLITUDE:open");g.choose("SOLITUDE:visit:7");
+        int before=g.gold;
+        g.choose("SOLITUDE:job:14");
+        assertEquals(19,g.hour);
+        assertEquals(before+30,g.gold);
+        assertEquals("MET",g.sceneState.status("npc","solitude_vittoria"));
+        g=GameEngine.fromJson(g.toJson().toString());
+        assertEquals("MET",g.sceneState.status("npc","solitude_vittoria"));
+        int paid=g.gold;
+        g.choose("SOLITUDE:job:14");
+        assertEquals(paid,g.gold);
+    }
+    @Test public void marketShiftCreditsActualSupervisorAtStart() throws Exception {
+        GameEngine g=city();g.hour=17;
+        g.choose("SOLITUDE:open");g.choose("SOLITUDE:visit:0");
+        g.choose("SOLITUDE:job:0");
+        assertEquals(19,g.hour);
+        assertEquals("MET",g.sceneState.status("npc","solitude_jala"));
+        assertEquals("",g.sceneState.status("npc","solitude_evette"));
+    }
 }
