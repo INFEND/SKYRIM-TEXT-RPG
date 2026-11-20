@@ -125,4 +125,22 @@ public class SolitudeHomeTest {
         g.choose("SOLITUDE:home:withdrawAll:13");assertEquals(5,g.progress.quantity("Золотой слиток"));
         g.choose("SOLITUDE:home:withdrawAll:13");assertEquals(5,g.progress.quantity("Золотой слиток"));
     }
+    @Test public void batchEnchantingConsumesOnlyAvailableGemsAndPersists() throws Exception {
+        GameEngine g=city();g.fixShop.home.buy(4);g.choose("SOLITUDE:visit:2");
+        g.choose("SOLITUDE:furnish:4");g.choose("SOLITUDE:back");g.choose("SOLITUDE:home");
+        g.stamina=50;
+        g.progress.quantity(SolitudeCraft.BASE_RING,5);
+        g.progress.quantity(SolitudeCraft.SOUL_GEM,3);
+        int before=g.progress.quantity(SolitudeCraft.ENCHANT_RING);
+        g.choose("SOLITUDE:craft:enchant-batch:ring");
+        assertEquals(before+3,g.progress.quantity(SolitudeCraft.ENCHANT_RING));
+        assertEquals(2,g.progress.quantity(SolitudeCraft.BASE_RING));
+        assertEquals(0,g.progress.quantity(SolitudeCraft.SOUL_GEM));
+        assertEquals(13,g.hour);
+        assertEquals(41,g.stamina);
+        g=GameEngine.fromJson(g.toJson().toString());
+        g.choose("SOLITUDE:craft:enchant-batch:ring");
+        assertEquals(before+3,g.progress.quantity(SolitudeCraft.ENCHANT_RING));
+        assertEquals(2,g.progress.quantity(SolitudeCraft.BASE_RING));
+    }
 }
