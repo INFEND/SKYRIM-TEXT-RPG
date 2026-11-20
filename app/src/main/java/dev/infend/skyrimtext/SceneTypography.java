@@ -34,7 +34,6 @@ public final class SceneTypography {
         }
         // Unclosed markup is not a license to bold the rest of the narration.
         // Style only matched ** pairs; malformed tokens are harmless.
-
     }
 
     // Display-only migration; never rewrite saved quest identifiers or raw AI data.
@@ -48,14 +47,14 @@ public final class SceneTypography {
         // The provider sometimes produces "смотришь. Стражник:" in a prose line.
         // Move a marked (or a clearly unmarked) speaker to its own paragraph.
         text=text.replaceAll("([.!?…])\\h+(\\*\\*[А-ЯЁ][^:\\n]{1,55}:\\*\\*)","$1\n$2");
-        text=text.replaceAll("([.!?…])\\h+([А-ЯЁ][а-яА-ЯЁё \\-]{1,48}:)(?=\\h*(?:\\n|\\*\\*|[—-]))","$1\n\n$2");
+        text=text.replaceAll("([.!?…])\\h+([А-ЯЁ][а-яА-ЯЁё \\-]{1,48}:)(?=\\h*(?:\\n|\\*\\*|[—-]))","$1\n$2");
         // Keep the speaker and the dash even when the AI streams both on one line.
         text=text.replaceAll("(\\*\\*[^\\n:]{1,55}:\\*\\*)\\h*(?=(?:\\*\\*)?[—-])","$1\n");
         text=text.replaceAll("(:)\\h+(?=(?:\\*\\*)?[—-]\\h)","$1\n");
         // Models sometimes put narration directly after the closing ** of a
         // spoken sentence. It is a NEW paragraph, never part of the dialogue.
-        text=text.replaceAll("(?m)^(\\h*>?\\h*\\*\\*[—-][^\\n]*?\\*\\*)\\h+([^\\n]+)$","$1\n\n$2");
-        return text;
+        text=text.replaceAll("(?m)^(\\h*>?\\h*\\*\\*[—-][^\\n]*?\\*\\*)\\h+([^\\n]+)$","$1\n$2");
+        return text.replaceAll("\\n{3,}","\\n\\n");
     }
 
     public static SpannableStringBuilder render(String raw,int accent){
@@ -88,13 +87,10 @@ public final class SceneTypography {
             int end=result.length();
             if(i<lines.length-1){
                 result.append("\n");
-                // Always leave an additional breath after a spoken line,
-                // unless the following line is already blank.
-                if(spoken&&!lines[i+1].trim().isEmpty())result.append("\n");
+                // One line break is enough; source paragraphs may provide spacing.
             }
             if(end<=start)continue;
             if(thought||event||action){
-                result.setSpan(new StyleSpan(thought?Typeface.ITALIC:Typeface.BOLD),start,end,Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
                 result.setSpan(new ForegroundColorSpan(thought?0xffaab8ca:event?0xffdbc18b:accent),start,end,Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
             }else if(spoken){
                 result.setSpan(new StyleSpan(Typeface.BOLD),start,end,Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
@@ -104,10 +100,6 @@ public final class SceneTypography {
                 result.setSpan(new ForegroundColorSpan(heroSpeaker?heroColor:accent),
                     start,end,Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
                 result.setSpan(new RelativeSizeSpan(1.03f),start,end,Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-            }else{
-                // The authorial narrative always has italic styling, even if
-                // AI omitted Markdown or this is a previously saved story.
-                result.setSpan(new StyleSpan(Typeface.ITALIC),start,end,Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
             }
         }
         return result;
