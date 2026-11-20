@@ -69,7 +69,11 @@ final class SolitudeCraft {
         if(canEnchant(g,BASE_NECK,ENCHANT_NECK))s.add(PREFIX+"enchant:neck","Зачаровать серебряное ожерелье","Авторский рецепт | +15 брони при ношении | заполненный малый камень душ | 1 ч.");
         if(canEnchant(g,BASE_RING,ENCHANT_RING))s.add(PREFIX+"enchant:ring","Зачаровать серебряное кольцо","Авторский рецепт | +10 кг при ношении | заполненный малый камень душ | 1 ч.");
         if(forge(g)){
-            for(int i=0;i<OUTPUT.length;i++)if(canMake(g,i))s.add(PREFIX+"make:"+i,"Изготовить: "+OUTPUT[i]+" ×"+COUNT[i],METAL[i]+" × "+MATERIAL[i]+(STRIPS[i]>0?" + "+STRIPS[i]+" × Кожаные полоски":"")+" | 1 ч. | 5 запаса сил");
+            for(int i=0;i<OUTPUT.length;i++)if(canMake(g,i)){
+                s.add(PREFIX+"make:"+i,"Изготовить: "+OUTPUT[i]+" ×"+COUNT[i],METAL[i]+" × "+MATERIAL[i]+(STRIPS[i]>0?" + "+STRIPS[i]+" × Кожаные полоски":"")+" | 1 ч. | 5 запаса сил");
+                if(g.progress.quantity(MATERIAL[i])>=METAL[i]*2&&g.progress.quantity("Кожаные полоски")>=STRIPS[i]*2)
+                    s.add(PREFIX+"make-batch:"+i,"Изготовить до 5: "+OUTPUT[i],"Каждое изделие отдельно проверяет материалы, вес, часы и выносливость");
+            }
             for(ItemCatalog.Item item:g.progress.owned("Все","Название"))if(!item.temperMaterial().isEmpty()&&g.progress.temperBlock(item,g).isEmpty())
                 s.add(PREFIX+"temper:"+item.id,"Улучшить: "+item.name,"1 × "+item.temperMaterial()+" | "+g.progress.temperTargetName(item)+" | 1 ч.");
         }
@@ -101,6 +105,12 @@ final class SolitudeCraft {
         if(a.startsWith(PREFIX+"temper:")){
             ItemCatalog.Item item=ItemCatalog.find(a.substring((PREFIX+"temper:").length()));
             if(item!=null&&g.progress.temper(item,g))finish(g,"У Бейранда улучшено: "+item.name+" | "+g.progress.temperQualityName(item.id),5);
+            return true;
+        }
+        for(int i=0;i<OUTPUT.length;i++)if(a.equals(PREFIX+"make-batch:"+i)){
+            // Delegate each portion to the existing single-item transaction.
+            // The recursive call revalidates all requirements after each hour.
+            for(int n=0;n<5&&canMake(g,i);n++)choose(g,PREFIX+"make:"+i);
             return true;
         }
         for(int i=0;i<OUTPUT.length;i++)if(a.equals(PREFIX+"make:"+i)){

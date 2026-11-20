@@ -105,5 +105,29 @@ public class SolitudeCraftTest {
         g=GameEngine.fromJson(g.toJson().toString());
         assertFalse(FixShopHome.canBrew(g));
     }
+    @Test public void batchSmithingStopsWhenMaterialsRunOutAndPersists() throws Exception {
+        GameEngine g=city(5);
+        g.progress.quantity("Железный слиток",6);
+        g.progress.quantity("Кожаные полоски",3);
+        int before=g.progress.quantity("Железный меч");
+        g.choose("SOLITUDE:craft:make-batch:0");
+        assertEquals(before+3,g.progress.quantity("Железный меч"));
+        assertEquals(0,g.progress.quantity("Железный слиток"));
+        assertEquals(0,g.progress.quantity("Кожаные полоски"));
+        assertEquals(12,g.hour);
+        g=GameEngine.fromJson(g.toJson().toString());
+        g.choose("SOLITUDE:craft:make-batch:0");
+        assertEquals(before+3,g.progress.quantity("Железный меч"));
+    }
+    @Test public void batchSmithingStopsWhenWorkshopCloses() {
+        GameEngine g=city(5);
+        g.hour=19;
+        g.progress.quantity("Железный слиток",10);
+        g.progress.quantity("Кожаные полоски",5);
+        int before=g.progress.quantity("Железный меч");
+        g.choose("SOLITUDE:craft:make-batch:0");
+        assertEquals(before+1,g.progress.quantity("Железный меч"));
+        assertEquals(20,g.hour);
+        assertEquals(8,g.progress.quantity("Железный слиток"));
+    }
 }
-
