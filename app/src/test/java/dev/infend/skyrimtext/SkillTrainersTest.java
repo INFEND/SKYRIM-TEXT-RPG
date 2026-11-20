@@ -13,7 +13,7 @@ public class SkillTrainersTest {
         }
         for(int i=0;i<have.length;i++)assertTrue(RpgContent.SKILLS[i],have[i]);
     }
-    @Test public void paidTrainingIsAtomicLimitedAndSaveSafe(){
+    @Test public void paidTrainingIsAtomicLimitedAndSaveSafe() throws Exception{
         GameEngine g=new GameEngine();g.start("Герой","Норд","Воин");g.mode="WORLD";g.gold=100000;
         SkillTrainers.Trainer t=SkillTrainers.find("Аркадия");
         assertNotNull(t);int before=g.progress.skillLevel(t.skill);
