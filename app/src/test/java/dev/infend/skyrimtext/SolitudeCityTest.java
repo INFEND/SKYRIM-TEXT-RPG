@@ -56,11 +56,11 @@ public class SolitudeCityTest {
     }
 
     @Test public void dockShiftCreditsVittoriaEvenAfterHerClosingHour() throws Exception {
-        GameEngine g=city();g.hour=16;
+        GameEngine g=city();g.hour=15;
         g.choose("SOLITUDE:open");g.choose("SOLITUDE:visit:7");
         int before=g.gold;
         g.choose("SOLITUDE:job:14");
-        assertEquals(19,g.hour);
+        assertEquals(18,g.hour);
         assertEquals(before+30,g.gold);
         assertEquals("MET",g.sceneState.status("npc","solitude_vittoria"));
         g=GameEngine.fromJson(g.toJson().toString());
