@@ -5344,7 +5344,7 @@ public final class MainActivity extends Activity {
         java.util.Iterator<String> questIds=game.progress.aiQuestRecords.keys();
         while(questIds.hasNext())entries.add("ИИ:"+questIds.next());
         boolean present=false;for(String e:entries)if(e.equals(selectedJournalEntry))present=true;
-        if(!present)selectedJournalEntry=entries[0];
+        if(!present)selectedJournalEntry=entries.get(0);
         LinearLayout list=card();
         addText(list,"ЗАДАНИЯ",12,accent(),true,9);
         for(String entry:entries){
