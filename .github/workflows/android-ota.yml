@@ -61,7 +61,23 @@ jobs:
             | sha256sum --check --strict
           echo "Exact font files verified against uploaded ZIP; fonts included in APK."
       - name: Assemble debug APK
-        run: gradle --no-daemon --stacktrace :app:testDebugUnitTest :app:assembleDebug :engine:assembleDebug
+        shell: bash
+        run: |
+          set -euo pipefail
+          for attempt in 1 2 3; do
+            log="$(mktemp)"
+            if gradle --no-daemon --stacktrace :app:testDebugUnitTest :app:assembleDebug :engine:assembleDebug 2>&1 | tee "$log"; then
+              rm -f "$log"
+              exit 0
+            fi
+            if [[ "$attempt" -eq 3 ]] || ! grep -Eqi '(status code 429|Too Many Requests|status code 50[234]|Read timed out|Connection reset|ConnectException)' "$log"; then
+              rm -f "$log"
+              exit 1
+            fi
+            rm -f "$log"
+            echo "Transient dependency download failure; retry $attempt of 3"
+            sleep $((25 * attempt))
+          done
       - name: Verify Sovngarde TTF and license inside debug APK
         shell: bash
         run: |
