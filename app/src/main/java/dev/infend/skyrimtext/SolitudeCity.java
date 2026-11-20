@@ -108,8 +108,8 @@ final class SolitudeCity {
         try{
             g.sceneState.setContext(g.day,g.hour,"Солитьюд");
             String status=g.sceneState.status("npc",key);
-            if(status.isEmpty())g.sceneState.confirm("npc",key,SolitudeResidents.NAMES[resident],"MET");
-            else if("MET".equals(status))g.sceneState.confirm("npc",key,SolitudeResidents.NAMES[resident],"INFORMED");
+            if(status.isEmpty())g.sceneState.confirm("npc",key,name,"MET");
+            else if("MET".equals(status))g.sceneState.confirm("npc",key,name,"INFORMED");
             else g.sceneState.revisitNpc(key);
         }catch(org.json.JSONException ignored){/* Never undo an already completed shift. */}
     }

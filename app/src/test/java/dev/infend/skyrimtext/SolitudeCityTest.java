@@ -77,4 +77,34 @@ public class SolitudeCityTest {
         assertEquals("MET",g.sceneState.status("npc","solitude_jala"));
         assertEquals("",g.sceneState.status("npc","solitude_evette"));
     }
+    @Test public void templeAndForgeShiftsRememberTheirSupervisorsWithoutResidentFallback() throws Exception {
+        for(int district:new int[]{4,5}){
+            GameEngine g=city();g.hour=9;
+            g.choose("SOLITUDE:open");g.choose("SOLITUDE:visit:"+district);
+            int job=district*2;
+            String key=district==4?"solitude_rorlund":"solitude_beirand";
+            String name=district==4?"Рорлунд":"Бейранд";
+            int gold=g.gold;
+            g.choose("SOLITUDE:job:"+job);
+            assertEquals("Shift should complete",district==4?11:11,g.hour);
+            assertEquals("MET",g.sceneState.status("npc",key));
+            boolean found=false;
+            org.json.JSONArray facts=g.sceneState.npcFacts();
+            for(int i=0;i<facts.length();i++){
+                org.json.JSONObject fact=facts.optJSONObject(i);
+                if(fact!=null&&key.equals(fact.optString("id"))){
+                    assertEquals(name,fact.optString("title"));found=true;
+                }
+            }
+            assertTrue("Supervisor must be stored under the canonical name",found);
+            g=GameEngine.fromJson(g.toJson().toString());
+            assertEquals("MET",g.sceneState.status("npc",key));
+            int paid=g.gold;
+            g.choose("SOLITUDE:job:"+job);
+            assertEquals(paid,g.gold);
+            g.day++;g.hour=9;
+            g.choose("SOLITUDE:job:"+job);
+            assertEquals("INFORMED",g.sceneState.status("npc",key));
+        }
+    }
 }
