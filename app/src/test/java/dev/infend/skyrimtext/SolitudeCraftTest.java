@@ -43,6 +43,30 @@ public class SolitudeCraftTest {
         assertEquals(0,g.progress.quantity("Пшеница"));assertEquals(0,g.progress.quantity("Голубой горноцвет"));
         g=GameEngine.fromJson(g.toJson().toString());g.choose("SOLITUDE:craft:brew");assertEquals(before+1,g.potions);
     }
+    @Test public void manaAlchemySynchronizesCounterInventoryAndSave() throws Exception {
+        GameEngine g=city(0);
+        g.choose("SOLITUDE:store:1");
+        g.progress.quantity("Красный горноцвет",1);
+        g.progress.quantity("Снежные ягоды",1);
+        int before=g.manaPotions;
+        g.progress.sync(g);
+        double weightBefore=g.progress.carryWeight();
+        ItemCatalog.Item a=ItemCatalog.find("Красный горноцвет");
+        ItemCatalog.Item b=ItemCatalog.find("Снежные ягоды");
+        ItemCatalog.Item potion=ItemCatalog.find("Зелье магии");
+        assertNotNull(a);assertNotNull(b);assertNotNull(potion);
+        g.choose("SOLITUDE:craft:mix:0");
+        assertEquals(before+1,g.manaPotions);
+        assertEquals(g.manaPotions,g.progress.quantity("Зелье магии"));
+        assertEquals(0,g.progress.quantity("Красный горноцвет"));
+        assertEquals(0,g.progress.quantity("Снежные ягоды"));
+        assertEquals(weightBefore-a.weight-b.weight+potion.weight,g.progress.carryWeight(),0.011);
+        g=GameEngine.fromJson(g.toJson().toString());
+        assertEquals(before+1,g.manaPotions);
+        assertEquals(g.manaPotions,g.progress.quantity("Зелье магии"));
+        g.choose("SOLITUDE:craft:mix:0");
+        assertEquals(before+1,g.manaPotions);
+    }
     @Test public void homeAlchemyUsesConsumedIngredientWeight() throws Exception {
         GameEngine g=city(0);
         g.progress.quantity("Пшеница",1);g.progress.quantity("Голубой горноцвет",1);
