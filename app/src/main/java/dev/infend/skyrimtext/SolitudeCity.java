@@ -94,6 +94,21 @@ final class SolitudeCity {
         if(j.gold>0&&g.gold>Integer.MAX_VALUE-j.gold)return "Кошелёк переполнен";
         return "";
     }
+    // Existing residents supervise local shifts. Work strengthens the shared NPC ledger,
+    // rather than creating a second, incompatible relationship system.
+    private static final int[] WORK_CONTACT={8,7,0,3,-1,-1,1,2};
+    private static void rememberWork(GameEngine g,int district){
+        int resident=WORK_CONTACT[district];
+        if(resident<0||!SolitudeResidents.present(g,resident,district))return;
+        String key="solitude_"+SolitudeResidents.IDS[resident];
+        try{
+            g.sceneState.setContext(g.day,g.hour,"Солитьюд");
+            String status=g.sceneState.status("npc",key);
+            if(status.isEmpty())g.sceneState.confirm("npc",key,SolitudeResidents.NAMES[resident],"MET");
+            else if("MET".equals(status))g.sceneState.confirm("npc",key,SolitudeResidents.NAMES[resident],"INFORMED");
+            else g.sceneState.revisitNpc(key);
+        }catch(org.json.JSONException ignored){/* Never undo an already completed shift. */}
+    }
     private String detail(GameEngine g,int i){
         Job j=JOBS[i];String why=blocked(g,i);
         return (why.isEmpty()?"":why+" | ")+"Авторское занятие | "+j.hours+" ч."+(j.stamina>0?" | −"+j.stamina+" запаса сил":"")+
@@ -181,6 +196,7 @@ final class SolitudeCity {
             if(i==13){g.needs.eat();g.needs.drink();g.stamina=Math.min(g.maxStamina,GameEngine.nonnegativeAdd(g.stamina,15));}
             if(j.skill>=0)g.progress.skillExperience(g,j.skill,j.xp);
             if(j.rep>0)g.holdReputation[3]=Math.min(100,g.holdReputation[3]+j.rep);
+            rememberWork(g,d);
             g.message=j.result;
             g.progress.recent=g.message;
             g.recordVisualEvent(j.title+": "+j.result);
