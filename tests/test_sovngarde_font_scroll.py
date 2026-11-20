@@ -51,7 +51,7 @@ class GlobalFontScroll(unittest.TestCase):
     def test_dialogue_speaker_line_and_narration_italic_without_rule(self):
         renderer=code("SceneTypography.java")
         ai=code("AiStoryClient.java")
-        self.assertIn("new StyleSpan(Typeface.ITALIC)",renderer)
+        self.assertNotIn("new StyleSpan(Typeface.ITALIC)",renderer)
         self.assertIn("new StyleSpan(Typeface.BOLD)",renderer)
         self.assertNotIn("new QuoteSpan(",renderer)
         self.assertIn('line.substring(1).trim()',renderer)

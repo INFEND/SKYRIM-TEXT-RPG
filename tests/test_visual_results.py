@@ -10,4 +10,4 @@ class VisualResults(unittest.TestCase):
         self.assertIn('lastHeavyHit="HEAVY".equals(action)&&lastDealt>0',g)
         self.assertIn('new VisualEffectsView.EdgeDrawable(colors)',s)
         self.assertIn('Уже добавлено в инвентарь',s)
-        self.assertIn('RadialGradient', (ROOT/"SkyrimTerrainMapView.java").read_text())
+        self.assertNotIn('RadialGradient', (ROOT/"SkyrimTerrainMapView.java").read_text())

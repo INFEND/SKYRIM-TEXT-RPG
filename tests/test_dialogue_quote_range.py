@@ -20,7 +20,7 @@ class DialogueQuoteRangeTests(unittest.TestCase):
         source=SOURCE.read_text(encoding="utf-8")
         self.assertIn("String[] lines=normalize(raw).split",source)
         self.assertIn('text.replaceAll("([.!?…])',source)
-        self.assertIn("new StyleSpan(Typeface.ITALIC)",source)
+        self.assertNotIn("new StyleSpan(Typeface.ITALIC)",source)
         self.assertIn("new StyleSpan(Typeface.BOLD)",source)
         self.assertIn("return result;",source)
         prose=PROSE.read_text(encoding="utf-8")

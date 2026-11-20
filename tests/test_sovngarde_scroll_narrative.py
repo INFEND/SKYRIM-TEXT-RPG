@@ -36,7 +36,7 @@ class FontAndScrollContracts(unittest.TestCase):
         self.assertIn("Verify Sovngarde TTF and license inside debug APK",workflow)
     def test_speaker_separate_and_narrative_italic_without_quote_line(self):
         x=SCENE.read_text(encoding="utf-8")
-        self.assertIn("new StyleSpan(Typeface.ITALIC)",x)
+        self.assertNotIn("new StyleSpan(Typeface.ITALIC)",x)
         self.assertIn("new StyleSpan(Typeface.BOLD)",x)
         self.assertNotIn("new QuoteSpan(",x)
         self.assertIn('line.startsWith(">")',x)

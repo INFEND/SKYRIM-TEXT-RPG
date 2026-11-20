@@ -49,7 +49,7 @@ class PlayerInteractionOverhaul(unittest.TestCase):
         self.assertIn('prefs.edit().putBoolean("settings_group_"+key,expanded)', UI)
 
     def test_spacing_reasoning_summary_and_truthful_progress(self):
-        self.assertIn("if(spoken&&!lines[i+1].trim().isEmpty())result.append", TYPO)
+        self.assertNotIn("if(spoken&&!lines[i+1].trim().isEmpty())result.append", TYPO)
         self.assertIn("Unclosed markup is not a license", TYPO)
         self.assertIn("spinner.setIndeterminate(true)", UI)
         self.assertIn("aiProgressInfo.setText", UI)

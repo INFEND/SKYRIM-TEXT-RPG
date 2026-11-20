@@ -27,7 +27,7 @@ class NarrativeContracts(unittest.TestCase):
         self.assertIn('line.startsWith(">")',formatter)
         self.assertIn('line.replace("**","")',formatter)
         self.assertNotIn('new QuoteSpan(',formatter)
-        self.assertIn('Typeface.ITALIC',formatter)
+        self.assertNotIn('Typeface.ITALIC',formatter)
         self.assertIn('new ForegroundColorSpan(0xfff0f0ef)',formatter)
         self.assertNotIn('new QuoteSpan(',formatter)
         self.assertIn('body.setText(SceneTypography.render(s.body,accent(),game.name,heroColor()));',view)
@@ -62,7 +62,7 @@ class NarrativeContracts(unittest.TestCase):
         self.assertIn('Меняй ритм длинных и коротких абзацев',client)
         self.assertIn('**Персонаж:**',client)
         self.assertIn('**— Его реплика**',client)
-        self.assertIn('Все абзацы повествования выделяй *курсивом*',client)
+        self.assertIn('Описания и действия пиши обычным текстом',client)
         self.assertIn('только игровым движком',client)
         self.assertIn('SceneTypography.render(accumulated,accent(),game.name,heroColor())',ui)
 
