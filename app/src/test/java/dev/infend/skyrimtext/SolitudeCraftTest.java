@@ -133,4 +133,20 @@ public class SolitudeCraftTest {
         assertEquals(before+1,g.progress.quantity("Железный меч"));
         assertEquals(18,g.hour);
     }
+    @Test public void batchSmithingRejectsWrongDistrictAndOverweightWithoutConsumingResources() {
+        GameEngine g=city(0);
+        g.progress.quantity("Железный слиток",10);
+        g.progress.quantity("Кожаные полоски",5);
+        int before=g.progress.quantity("Железный меч");
+        g.choose("SOLITUDE:craft:make-batch:0");
+        assertEquals(before,g.progress.quantity("Железный меч"));
+        assertEquals(10,g.progress.quantity("Железный слиток"));
+        assertEquals(5,g.progress.quantity("Кожаные полоски"));
+        g.choose("SOLITUDE:back");g.choose("SOLITUDE:visit:5");
+        g.progress.quantity("Стальной слиток",100);
+        g.choose("SOLITUDE:craft:make-batch:0");
+        assertEquals(before,g.progress.quantity("Железный меч"));
+        assertEquals(10,g.progress.quantity("Железный слиток"));
+        assertEquals(5,g.progress.quantity("Кожаные полоски"));
+    }
 }
