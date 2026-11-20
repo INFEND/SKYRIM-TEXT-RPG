@@ -163,4 +163,21 @@ public class SolitudeHomeTest {
         assertEquals(before+1,g.progress.quantity(SolitudeCraft.ENCHANT_RING));
         assertEquals(4,g.progress.quantity(SolitudeCraft.SOUL_GEM));
     }
+    @Test public void shortRestRequiresOwnedHomeAndPersistsClock() throws Exception {
+        GameEngine g=city();
+        g.choose("SOLITUDE:home");
+        g.choose("SOLITUDE:home:rest-hour");
+        assertEquals(10,g.hour);
+        g.fixShop.home.buy(4);
+        g.choose("SOLITUDE:home:rest-hour");
+        assertEquals(11,g.hour);
+        g=GameEngine.fromJson(g.toJson().toString());
+        assertEquals(SolitudeHome.MODE,g.mode);
+        assertEquals(11,g.hour);
+        g.choose("SOLITUDE:home:rest-hour");
+        assertEquals(12,g.hour);
+        g.choose("SOLITUDE:back");
+        g.choose("SOLITUDE:home:rest-hour");
+        assertEquals(12,g.hour);
+    }
 }
