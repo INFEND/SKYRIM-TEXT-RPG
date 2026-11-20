@@ -6,8 +6,8 @@ import org.json.JSONObject;
 /** Authored daily itineraries for existing Skyrim residents, not exact original AI packages. */
 final class SolitudeResidents {
     private SolitudeResidents(){}
-    private static final String[] NAMES={"Элисиф Прекрасная","Сорекс Виний","Аддвар","Пантея Атейя","Сибилла Стентор","Гисли","Эрикул","Ахтар","Иветта Сан","Илди","Ностер Орлиный Глаз","Гирауд Жиман","Инге Шесть Пальцев","Лисетта","Джала"};
-    private static final String[] IDS={"elisif","sorex","addvar","pantea","sybille","gisli","erikur","ahtar","evette","illdi","noster","giraud","inge","lisette","jala"};
+    static final String[] NAMES={"Элисиф Прекрасная","Сорекс Виний","Аддвар","Пантея Атейя","Сибилла Стентор","Гисли","Эрикул","Ахтар","Иветта Сан","Илди","Ностер Орлиный Глаз","Гирауд Жиман","Инге Шесть Пальцев","Лисетта","Джала"};
+    static final String[] IDS={"elisif","sorex","addvar","pantea","sybille","gisli","erikur","ahtar","evette","illdi","noster","giraud","inge","lisette","jala"};
     private static final String[] LINES={
         "Хаафингар нуждается в спокойствии. В Синем дворце я выслушиваю тех, кто приходит с прошениями.",
         "В трактире всегда найдётся работа. Путники приносят вести из всех владений.",
@@ -81,7 +81,7 @@ final class SolitudeResidents {
             default:return -1;
         }
     }
-    private static boolean present(GameEngine g,int i,int d){
+    static boolean present(GameEngine g,int i,int d){
         if(d<0||i<0||i>=NAMES.length||district(i,g.hour)!=d)return false;
         String status=g.sceneState.npcStatusByName(NAMES[i]);
         return !"DEAD".equals(status)&&!"MISSING".equals(status)&&!"HOSTILE".equals(status);
@@ -99,9 +99,11 @@ final class SolitudeResidents {
             if(f!=null&&"MET".equals(f.optString("status")))s.add("SOLITUDE:resident:trust:"+i,"Поделиться впечатлениями: "+NAMES[i],"Авторский диалог | Однократное знакомство ближе");
             if(f!=null&&f.optInt("relation",50)>=60)s.add("SOLITUDE:resident:advice:"+i,"Попросить совета: "+NAMES[i],"Авторский совет | Отношение от 60");
             if(f!=null)s.add("SOLITUDE:resident:memory:"+i,"Вспомнить встречу: "+NAMES[i],"Общая память NPC");
+            SolitudeFavors.choices(g,s,i);
         }
     }
     static boolean choose(GameEngine g,int d,String a){
+        if(SolitudeFavors.choose(g,d,a))return true;
         if(!a.startsWith("SOLITUDE:resident:"))return false;
         for(int i=0;i<NAMES.length;i++)if(present(g,i,d)){
             boolean memory=a.equals("SOLITUDE:resident:memory:"+i);
@@ -118,7 +120,7 @@ final class SolitudeResidents {
                 else if(trust)g.sceneState.confirm("npc",f.optString("id"),NAMES[i],"INFORMED");
                 else if(!memory)g.sceneState.revisitNpc(f.optString("id"));
             }catch(org.json.JSONException ignored){return true;}
-            g.message=NAMES[i]+": "+(memory?"Отношение: "+f.optInt("relation",50)+"/100 | Последняя встреча: день "+f.optInt("lastDay"):(f==null?"":"Снова встретились. ")+(trust?"Спасибо за рассказ. Теперь мы немного лучше знакомы.":advice?ADVICE[i]:topic?TOPICS[i]:LINES[i]));
+            g.message=NAMES[i]+": "+(memory?"Отношение: "+f.optInt("relation",50)+"/100 | Последняя встреча: день "+f.optInt("lastDay")+SolitudeFavors.memory(g,i):(f==null?"":"Снова встретились. ")+(trust?"Спасибо за рассказ. Теперь мы немного лучше знакомы.":advice?ADVICE[i]:topic?TOPICS[i]:LINES[i]));
             g.progress.recent=g.message;g.recordVisualEvent(g.message);g.progress.sync(g);return true;
         }
         return true;
