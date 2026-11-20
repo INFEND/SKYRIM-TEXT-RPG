@@ -44,13 +44,60 @@ public final class FixShopCatalog {
         Bundle(String name,int price,String... items){this.name=name;this.price=price;this.items=items;}
         String description(){return String.join(", ",items);}
     }
-    static final Bundle[] BUNDLES={
+    // Old bundle names and prices remain stable so pending saved vouchers are redeemable.
+    static final Bundle[] LEGACY_BUNDLES={
         new Bundle("Облачение Чёрной крепости",650,"Эбонитовый меч","Эбонитовая кираса","Эбонитовый шлем","Эбонитовые перчатки","Эбонитовые сапоги"),
         new Bundle("Снаряжение Лунной стражи",450,"Стеклянный меч","Стеклянная кираса","Стеклянный шлем","Стеклянные перчатки","Стеклянные сапоги"),
         new Bundle("Клинки Обливиона",500,"Даэдрический меч","Даэдрический кинжал","Даэдрическая булава"),
         new Bundle("Северный охотник",200,"Кожаная кираса","Кожаный шлем","Кожаные сапоги","Стальной лук")
     };
-    static boolean validBundle(Bundle b){if(b==null||b.price<1||b.items.length<2||b.items.length>12)return false;java.util.HashSet<String> unique=new java.util.HashSet<>();for(String id:b.items)if(!unique.add(id)||!valid(new Offer(id,1,b.price)))return false;return true;}
+    private static void bundle(java.util.List<Bundle> out,String name,String... items){
+        long value=0;
+        for(String id:items){
+            ItemCatalog.Item item=ItemCatalog.find(id);
+            if(item==null||item.value<=0)return;
+            value+=item.value;
+        }
+        int price=(int)Math.min(200000L,Math.max(20L,value/8L));
+        Bundle candidate=new Bundle(name,price,items);
+        if(validBundle(candidate))out.add(candidate);
+    }
+    private static Bundle[] completeBundles(){
+        ArrayList<Bundle> out=new ArrayList<>();
+        java.util.Collections.addAll(out,LEGACY_BUNDLES);
+        String[] base={"Железный","Стальной","Орочий","Двемерский","Эльфийский","Стеклянный","Эбонитовый","Даэдрический","Драконий","Нордский","Сталгримовый"};
+        String[] female={"Железная","Стальная","Орочья","Двемерская","Эльфийская","Стеклянная","Эбонитовая","Даэдрическая","Драконья","Нордская резная","Сталгримовая"};
+        String[] plural={"Железные","Стальные","Орочьи","Двемерские","Эльфийские","Стеклянные","Эбонитовые","Даэдрические","Драконьи","Нордские резные","Сталгримовые"};
+        for(int i=0;i<base.length;i++){
+            String noun=base[i],adjective=female[i].replace(" резная","");
+            bundle(out,noun+" оружейный набор",
+                noun+" меч",noun+" боевой топор",noun+" кинжал",
+                adjective+" булава",noun+" двуручный меч",adjective+" секира",
+                noun+" боевой молот",noun+" лук");
+            String helmet=i==9?"Нордский резной шлем":noun+" шлем";
+            if(i==10)bundle(out,noun+" комплект доспехов",helmet,female[i]+" кираса",plural[i]+" перчатки",plural[i]+" сапоги");
+            else bundle(out,noun+" комплект доспехов",helmet,female[i]+" кираса",plural[i]+" перчатки",plural[i]+" сапоги",noun+" щит");
+        }
+        bundle(out,"Кожаный комплект доспехов","Кожаный шлем","Кожаная кираса","Кожаные наручи","Кожаные сапоги");
+        bundle(out,"Комплект доспехов из шкур","Шлем из шкур","Кираса из шкур","Наручи из шкур","Сапоги из шкур","Щит из шкур");
+        bundle(out,"Стальной пластинчатый комплект доспехов","Стальной пластинчатый шлем","Стальная пластинчатая кираса","Стальные пластинчатые перчатки","Стальные пластинчатые сапоги");
+        bundle(out,"Драконий чешуйчатый комплект доспехов","Драконий чешуйчатый шлем","Драконья чешуйчатая кираса","Драконьи чешуйчатые перчатки","Драконьи чешуйчатые сапоги","Драконий чешуйчатый щит");
+        bundle(out,"Костяной комплект доспехов","Костяной шлем","Костяная кираса","Костяные перчатки","Костяные сапоги","Костяной щит");
+        bundle(out,"Тяжёлый хитиновый комплект доспехов","Тяжёлый хитиновый шлем","Тяжёлая хитиновая кираса","Тяжёлые хитиновые перчатки","Тяжёлые хитиновые сапоги");
+        return out.toArray(new Bundle[0]);
+    }
+    static final Bundle[] BUNDLES=completeBundles();
+    static boolean validBundle(Bundle b){
+        if(b==null||b.price<1||b.items.length<2||b.items.length>12)return false;
+        java.util.HashSet<String> unique=new java.util.HashSet<>();
+        for(String id:b.items){
+            ItemCatalog.Item item=ItemCatalog.find(id);
+            if(!unique.add(id)||item==null||item.value<=0||
+                    CompensationPowers.itemIndex(id)>=0||
+                    !("Оружие".equals(item.category)||"Броня".equals(item.category)))return false;
+        }
+        return true;
+    }
     static Bundle bundle(String name){for(Bundle b:BUNDLES)if(b.name.equals(name))return b;return null;}
     static boolean redeemBundle(GameEngine g,Bundle b){
         if(!validBundle(b))return false;
