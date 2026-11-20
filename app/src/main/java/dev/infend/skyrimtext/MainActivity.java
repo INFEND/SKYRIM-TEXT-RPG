@@ -845,7 +845,7 @@ public final class MainActivity extends Activity {
         }
         LinearLayout panel=column();
         panel.setPadding(dp(14),dp(10),dp(14),dp(12));
-        addText(panel,trainer.skillName()+"  •  "+game.progress.skillLevel(trainer.skill)+"/"+trainer.maximum,17,accent(),true,8);
+        addText(panel,trainer.skillName()+"  |  "+game.progress.skillLevel(trainer.skill)+"/"+trainer.maximum,17,accent(),true,8);
         addText(panel,"Учитель: "+trainer.name+" | "+trainer.location,13,MUTED,false,6);
         addText(panel,"До "+limit+" занятий за текущий уровень героя. Оплата септимами.",13,TEXT,false,8);
         android.widget.SeekBar count=new android.widget.SeekBar(this);
