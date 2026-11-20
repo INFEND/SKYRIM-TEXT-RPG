@@ -5579,7 +5579,10 @@ public final class MainActivity extends Activity {
         FixOffer offer=new FixOffer(t,d,c,g,rarity[tier],colors[tier],price,action);offer.tier=tier;a.add(offer);
     }
     private void fixDirect(java.util.ArrayList<FixOffer> a,String t,String d,String c,String g,int tier,int price,java.util.function.BooleanSupplier effect){
-        fixOffer(a,t,d,c,g,tier,price,()->fixConfirm(t,d,price,effect,this::livingFixShop));
+        fixOffer(a,t,d,c,g,tier,price,()->{
+            if("Улучшения".equals(c)&&price>0)fixConfirmQuantity(t,d,price,effect,this::livingFixShop);
+            else fixConfirm(t,d,price,effect,this::livingFixShop);
+        });
     }
     private boolean fixApply(String title,String detail,int price,java.util.function.BooleanSupplier effect){
         if(!fixShopCanChange())return false;if(price<=0||game.fixSpent>Long.MAX_VALUE-price||!effect.getAsBoolean()){toast("Покупка недоступна");return false;}
@@ -5589,6 +5592,62 @@ public final class MainActivity extends Activity {
     private void fixConfirm(String title,String detail,int price,java.util.function.BooleanSupplier effect,Runnable refresh){
         new RuneDialogBuilder(this,accent()).setTitle(title).setMessage(detail+" | "+price+" F. Только для текущего сохранения.")
             .setNegativeButton("Отмена",null).setPositiveButton("Купить",(d,w)->{if(fixApply(title,detail,price,effect))refresh.run();}).show();
+    }
+    /** Inclusive 1–1000 quantity control. Multiplication never exceeds the cap. */
+    private android.widget.SeekBar fixQuantityControl(LinearLayout panel,String unit,int price){
+        addText(panel,"КОЛИЧЕСТВО",12,accent(),true,5);
+        LinearLayout controls=row();controls.setGravity(Gravity.CENTER_VERTICAL);
+        android.widget.SeekBar quantity=new android.widget.SeekBar(this);
+        quantity.setMax(999);quantity.setProgress(0);
+        quantity.setProgressTintList(ColorStateList.valueOf(accent()));
+        quantity.setThumbTintList(ColorStateList.valueOf(accent()));
+        controls.addView(quantity,new LinearLayout.LayoutParams(0,dp(48),1));
+        TextView twice=text("×2",18,accent(),true);
+        twice.setGravity(Gravity.CENTER);
+        twice.setBackground(bg(0xff191919,accent(),10));
+        twice.setContentDescription("Удвоить количество");
+        controls.addView(twice,lp(dp(62),dp(44)));
+        panel.addView(controls,lp(-1,-2));
+        TextView summary=text("",14,TEXT,true);panel.addView(summary,lp(-1,-2));
+        Runnable refresh=()->summary.setText((quantity.getProgress()+1)+" "+unit+
+            " | Итого: "+((long)price*(quantity.getProgress()+1))+" F");
+        twice.setOnClickListener(v->quantity.setProgress(Math.min(999,(quantity.getProgress()+1)*2-1)));
+        quantity.setOnSeekBarChangeListener(new android.widget.SeekBar.OnSeekBarChangeListener(){
+            public void onStartTrackingTouch(android.widget.SeekBar b){}
+            public void onStopTrackingTouch(android.widget.SeekBar b){}
+            public void onProgressChanged(android.widget.SeekBar b,int progress,boolean user){refresh.run();}
+        });
+        refresh.run();return quantity;
+    }
+    private int fixApplyQuantity(String title,String detail,int price,int desired,java.util.function.BooleanSupplier effect){
+        if(!fixShopCanChange()||price<=0)return 0;
+        int applied=0;
+        for(int i=0;i<Math.min(1000,Math.max(1,desired));i++){
+            if(game.fixSpent>Long.MAX_VALUE-price||(long)(applied+1)*price>Integer.MAX_VALUE)break;
+            if(!effect.getAsBoolean())break;
+            game.fixSpent+=price;applied++;
+        }
+        if(applied==0){toast("Покупка недоступна");return 0;}
+        game.fixShop.record(title,detail+" | Количество: "+applied,applied*price,game.day);
+        game.progress.sync(game);
+        game.recordVisualEvent("Этернис: "+title+" × "+applied);
+        save();render();
+        toast(applied<desired?"Применено "+applied+" из "+desired:"Покупка применена: "+applied);
+        return applied;
+    }
+    private void fixConfirmQuantity(String title,String detail,int price,java.util.function.BooleanSupplier effect,Runnable refresh){
+        if(!fixShopCanChange())return;
+        LinearLayout panel=column();panel.setPadding(dp(12),dp(9),dp(12),dp(10));
+        addText(panel,detail,14,TEXT,false,10);
+        android.widget.SeekBar quantity=fixQuantityControl(panel,"шт.",price);
+        addText(panel,"Применение останавливается при достижении предела параметра. Оплачиваются только выполненные улучшения.",12,MUTED,false,6);
+        AlertDialog dialog=new RuneDialogBuilder(this,accent()).setTitle(title).setView(panel)
+            .setNegativeButton("Отмена",null).setPositiveButton("Купить",null).create();
+        dialog.show();
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v->{
+            int applied=fixApplyQuantity(title,detail,price,quantity.getProgress()+1,effect);
+            if(applied>0){dialog.dismiss();refresh.run();}
+        });
     }
     private void fixSealDialog(int n){
         if(livingBusy())return;FixShopSeals f=game.fixShop.seals;LinearLayout panel=column();addText(panel,FixShopSeals.DESC[n],15,TEXT,false,10);addText(panel,f.status(n,game),14,accent(),true,8);
@@ -5908,9 +5967,30 @@ public final class MainActivity extends Activity {
             });
         }).setNegativeButton("Отмена",null).show();
     }
-    private void livingFixSkill(boolean level){new RuneDialogBuilder(this,accent()).setTitle(level?"Повысить навык на 1":"Добавить 100 опыта навыка").setItems(RpgContent.SKILLS,(d,index)->{new RuneDialogBuilder(this,accent()).setTitle(RpgContent.SKILLS[index]).setMessage("Стоимость: 1 F").setNegativeButton("Отмена",null).setPositiveButton("Купить",(dd,w)->{
-        if(livingBusy()||game.progress.skillLevel(index)>=100||game.fixSpent==Long.MAX_VALUE){toast("Покупка недоступна");return;}
-        if(!game.progress.buyFixSkill(game,index,level)){toast("Покупка недоступна");return;}game.fixShop.record(level?"Уровень навыка":"Опыт навыка",RpgContent.SKILLS[index],1,game.day);save();render();livingFixShop();toast("Покупка применена");}).show();}).setNegativeButton("Отмена",null).show();}
+    private void livingFixSkill(boolean level){
+        new RuneDialogBuilder(this,accent()).setTitle(level?"Повысить навык":"Добавить опыт навыка")
+            .setItems(RpgContent.SKILLS,(d,index)->{
+                LinearLayout panel=column();panel.setPadding(dp(12),dp(8),dp(12),dp(9));
+                addText(panel,"Навык: "+RpgContent.SKILLS[index],16,accent(),true,8);
+                addText(panel,level?"+1 уровень за покупку":"+100 опыта за покупку",13,MUTED,false,8);
+                android.widget.SeekBar quantity=fixQuantityControl(panel,"покупок",1);
+                AlertDialog dialog=new RuneDialogBuilder(this,accent()).setTitle(RpgContent.SKILLS[index])
+                    .setView(panel).setNegativeButton("Отмена",null).setPositiveButton("Купить",null).create();
+                dialog.show();dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v->{
+                    if(!fixShopCanChange())return;
+                    int requested=quantity.getProgress()+1,applied=0;
+                    for(int n=0;n<requested;n++){
+                        if(!game.progress.buyFixSkill(game,index,level))break;
+                        applied++;
+                    }
+                    if(applied==0){toast("Покупка недоступна");return;}
+                    game.fixShop.record(level?"Уровень навыка":"Опыт навыка",
+                        RpgContent.SKILLS[index]+" | Количество: "+applied,applied,game.day);
+                    save();render();dialog.dismiss();livingFixShop();
+                    toast(applied<requested?"Применено "+applied+" из "+requested:"Покупка применена: "+applied);
+                });
+            }).setNegativeButton("Отмена",null).show();
+    }
     private boolean livingFixGold(int amount){if(game.gold>Integer.MAX_VALUE-amount)return false;game.gold+=amount;return true;}
     private void livingFixRow(LinearLayout host,String title,String detail,int price,java.util.function.BooleanSupplier purchase){
         livingFixRow(host,title,detail,price,purchase,this::livingFixShop);
