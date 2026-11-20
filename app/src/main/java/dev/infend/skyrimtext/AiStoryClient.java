@@ -116,6 +116,19 @@ public final class AiStoryClient {
             +"следом **— Реплика**. Не изменяй самостоятельно здоровье, квесты, "
             +"инвентарь или локацию. Не управляй героем. Верни только сюжетный текст. /no_think";
     }
+    private static String authoredEquipment(GameEngine game){
+        StringBuilder b=new StringBuilder();
+        for(int i=3;i<CompensationPowers.SLOTS;i++){
+            if(!game.compensation.owned[i])continue;
+            if(b.length()>0)b.append("; ");
+            b.append("slot=").append(i).append(": ")
+                .append(game.compensation.itemNames[i])
+                .append(" (тип ").append(game.compensation.itemType[i])
+                .append(", характеристика ").append(game.compensation.itemStat[i])
+                .append(", вес ").append(game.compensation.itemWeight[i]).append(" кг)");
+        }
+        return b.length()==0?"Нет, свободные слоты 3–11":b.toString();
+    }
     private static String genderInstruction(GameEngine game){
         return CharacterIdentity.FEMALE.equals(game.gender)?
             "Персонаж игрока — женщина. Согласуй обращения и действия в женском роде.\n":
@@ -197,6 +210,7 @@ public final class AiStoryClient {
             localSection(b,"Альма: ",game.alma.compactContext(game),220,budget);
         if(aiControlled){localSection(b,"Итачи: ",game.itachi.aiContext(game),210,budget);localSection(b,"Ливия: ",game.livia.aiContext(game),210,budget);}
         localSection(b,"Авторский спутник: ",game.fixShop.world.context(),240,budget);
+        localSection(b,"Собственное снаряжение (для equipmentChanges): ",authoredEquipment(game),210,budget);
         String facts=game.sceneState==null?"":game.sceneState.confirmedContext();
         if(!game.alma.enabled){
             StringBuilder filtered=new StringBuilder();
@@ -517,6 +531,8 @@ public final class AiStoryClient {
         out.append("Сюжет Пепельные печати: ").append(game.questStatus()).append(", ").append(game.questDetails()).append('\n');
         out.append("Драконий сюжет: ").append(DragonArc.status(game)).append('\n');
         out.append("Авторские задания ИИ с подтверждёнными стадиями: ").append(aiQuestSummary(game,1600)).append('\n');
+        out.append("Собственное снаряжение (ID слотов для equipmentChanges): ")
+            .append(authoredEquipment(game)).append('\n');
         if(game.enemyHp>0)
             out.append("ПРОТИВНИК: ").append(game.enemyName).append(", HP ").append(game.enemyHp)
                     .append('/').append(game.enemyMaxHp).append(", урон ").append(game.enemyDamage).append('\n');
