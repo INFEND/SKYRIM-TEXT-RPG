@@ -97,10 +97,14 @@ final class SolitudeCity {
     // Existing residents supervise local shifts. Work strengthens the shared NPC ledger,
     // rather than creating a second, incompatible relationship system.
     private static final int[] WORK_CONTACT={8,7,0,3,-1,-1,1,2};
-    private static void rememberWork(GameEngine g,int district){
+    private static void rememberWork(GameEngine g,int district,boolean residentPresent,boolean supervisorPresent){
         int resident=WORK_CONTACT[district];
-        if(resident<0||!SolitudeResidents.present(g,resident,district))return;
-        String key="solitude_"+SolitudeResidents.IDS[resident];
+        if(!residentPresent&&!supervisorPresent)return;
+        // Prefer the actual district supervisor, including Vittoria at the docks.
+        // A resident is credited only if present when the shift began.
+        String key=supervisorPresent?"solitude_"+new String[]{"jala","tullius","falk","viarmo","rorlund","beirand","corpulus","vittoria"}[district]:
+            "solitude_"+SolitudeResidents.IDS[resident];
+        String name=supervisorPresent?SolitudeEncounters.NAMES[district]:SolitudeResidents.NAMES[resident];
         try{
             g.sceneState.setContext(g.day,g.hour,"Солитьюд");
             String status=g.sceneState.status("npc",key);
@@ -189,14 +193,20 @@ final class SolitudeCity {
         if((PREFIX+"livia").equals(action)&&d==1){g.mode="WORLD";if(g.livia.available(g)){g.choose("LIVIA:open");g.livia.castleReturn=LiviaStory.MODE.equals(g.mode);}else g.mode=PREFIX+d;return;}
         for(int i=0;i<JOBS.length;i++)if(jobDistrict(i)==d&&(PREFIX+"job:"+i).equals(action)){
             if(!blocked(g,i).isEmpty())return;
-            Job j=JOBS[i];lastDay[i]=g.day;
+            Job j=JOBS[i];
+            // Snapshot attendance before advancing time: the supervisor may leave
+            // during a legitimate shift, but completed work must still count.
+            int resident=WORK_CONTACT[d];
+            boolean residentPresent=resident>=0&&SolitudeResidents.present(g,resident,d);
+            boolean supervisorPresent=SolitudeEncounters.present(g,d);
+            lastDay[i]=g.day;
             g.stamina-=j.stamina;g.gold=GameEngine.nonnegativeAdd(g.gold,j.gold);
             g.hour+=j.hours; // opening hours prevent a midnight rollover
             g.syncLivingSystems();
             if(i==13){g.needs.eat();g.needs.drink();g.stamina=Math.min(g.maxStamina,GameEngine.nonnegativeAdd(g.stamina,15));}
             if(j.skill>=0)g.progress.skillExperience(g,j.skill,j.xp);
             if(j.rep>0)g.holdReputation[3]=Math.min(100,g.holdReputation[3]+j.rep);
-            rememberWork(g,d);
+            rememberWork(g,d,residentPresent,supervisorPresent);
             g.message=j.result;
             g.progress.recent=g.message;
             g.recordVisualEvent(j.title+": "+j.result);
