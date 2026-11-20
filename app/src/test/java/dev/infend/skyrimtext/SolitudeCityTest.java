@@ -70,10 +70,10 @@ public class SolitudeCityTest {
         assertEquals(paid,g.gold);
     }
     @Test public void marketShiftCreditsActualSupervisorAtStart() throws Exception {
-        GameEngine g=city();g.hour=17;
+        GameEngine g=city();g.hour=16;
         g.choose("SOLITUDE:open");g.choose("SOLITUDE:visit:0");
         g.choose("SOLITUDE:job:0");
-        assertEquals(19,g.hour);
+        assertEquals(18,g.hour);
         assertEquals("MET",g.sceneState.status("npc","solitude_jala"));
         assertEquals("",g.sceneState.status("npc","solitude_evette"));
     }
