@@ -51,7 +51,6 @@ public final class SkyrimTerrainMapView extends View {
     private final ArrayList<RectF> labels=new ArrayList<>();
     private java.util.List<String> visualRoute=java.util.Collections.emptyList();
     private long routeStart;private boolean animateRoute;
-    private long fogStart;private String fogLocation="";
 
     public SkyrimTerrainMapView(Context context,GameEngine game,OnPlace callback,Set<String> hiddenTypes){
         super(context);this.game=game;this.callback=callback;
@@ -278,25 +277,6 @@ public final class SkyrimTerrainMapView extends View {
         super.onDraw(canvas);canvas.drawColor(0xff080c0e);
         Bitmap image;synchronized(IMAGES){image=IMAGES[sheet];}
         if(image!=null)canvas.drawBitmap(image,null,new RectF(left,top,left+WIDTH[sheet]*scale,top+HEIGHT[sheet]*scale),imagePaint);
-        if(prefs.getBoolean("visual_fog",true)){
-            if(!fogLocation.equals(game.progress.location)){fogLocation=game.progress.location;fogStart=android.os.SystemClock.uptimeMillis();}
-            float reveal=prefs.getBoolean("animations",true)?Math.min(1f,(android.os.SystemClock.uptimeMillis()-fogStart)/600f):1f;
-            if(reveal<1&&isShown())postInvalidateOnAnimation();
-            android.graphics.Path clear=new android.graphics.Path();
-            for(String visited:game.visitedVisual){SkyrimMapCatalog.Site discovered=SkyrimMapCatalog.find(visited);
-                if(discovered!=null&&discovered.sheet==sheet)clear.addCircle(left+discovered.x*scale,top+discovered.y*scale,145f*scale*(visited.equals(fogLocation)?Math.max(.12f,reveal):1f),android.graphics.Path.Direction.CW);}
-            int layer=canvas.save();canvas.clipOutPath(clear);
-            ink.setStyle(Paint.Style.FILL);ink.setColor(0x99000000);
-            canvas.drawRect(left,top,left+WIDTH[sheet]*scale,top+HEIGHT[sheet]*scale,ink);
-            // Feather the boundary on the explored side, without obscuring location pins.
-            canvas.restoreToCount(layer);
-            int feather=canvas.save();canvas.clipPath(clear);
-            for(String visited:game.visitedVisual){SkyrimMapCatalog.Site discovered=SkyrimMapCatalog.find(visited);
-                if(discovered!=null&&discovered.sheet==sheet){
-                    float x=left+discovered.x*scale,y=top+discovered.y*scale,r=145f*scale*(visited.equals(fogLocation)?Math.max(.12f,reveal):1f);
-                    if(r>0){ink.setShader(new android.graphics.RadialGradient(x,y,r,new int[]{0x00000000,0x00000000,0x66000000},new float[]{0f,.72f,1f},android.graphics.Shader.TileMode.CLAMP));canvas.drawCircle(x,y,r,ink);ink.setShader(null);}
-                }}canvas.restoreToCount(feather);
-        }
         drawVisualRoute(canvas);
         ArrayList<MapPinLayout.Pin> shown=renderedPins();labels.clear();
         // Markers never collapse into moving numeric clusters: each icon has
