@@ -24,7 +24,7 @@ public final class SkyrimMapCatalog {
             x=v.length>9?Float.parseFloat(v[8]):2048f+worldX/128f;
             y=v.length>9?Float.parseFloat(v[9]):2048f-worldY/128f;
             registered=v.length<=10||!v[10].equals("interpolated");
-            search=normalize(name+" "+english+" "+type);
+            search=normalize(name+" "+name.replace(": "," - ")+" "+english+" "+type);
         }
         public boolean matches(String query){return search.contains(normalize(query));}
         public boolean capital(){return type.equals("Столица");}
@@ -39,6 +39,8 @@ public final class SkyrimMapCatalog {
             SITES.add(site);
             INDEX.put(normalize(site.id),site);
             INDEX.put(normalize(site.name),site);
+            // Old saves and user searches may still refer to the former hyphenated label.
+            INDEX.putIfAbsent(normalize(site.name.replace(": "," - ")),site);
             INDEX.putIfAbsent(normalize(site.english),site);
         }
         alias("Камень Шора","Shor's Stone");
