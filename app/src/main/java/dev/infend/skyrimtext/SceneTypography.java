@@ -11,14 +11,14 @@ import android.text.style.StyleSpan;
  * A dialogue is always two independent lines:
  * **Персонаж:**
  * **— Реплика**
- * The quote decoration is NEVER drawn; all other narration is italic.
+ * Quote decoration is omitted; narration and actions remain plain text.
  * Supports historic >**— ...** output for old saved AI stories.
  */
 public final class SceneTypography {
     private SceneTypography(){}
 
     private static void appendRich(SpannableStringBuilder out,String source){
-        int bold=-1,italic=-1;
+        int bold=-1;
         for(int i=0;i<source.length();){
             if(source.startsWith("**",i)){
                 if(bold<0)bold=out.length();
@@ -29,21 +29,12 @@ public final class SceneTypography {
                 }
                 i+=2;continue;
             }
-            if(source.charAt(i)=='*'){
-                if(italic<0)italic=out.length();
-                else{
-                    if(out.length()>italic)
-                        out.setSpan(new StyleSpan(Typeface.ITALIC),italic,out.length(),Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-                    italic=-1;
-                }
-                i++;continue;
-            }
+            if(source.charAt(i)=='*'){i++;continue;}
             out.append(source.charAt(i++));
         }
         // Unclosed markup is not a license to bold the rest of the narration.
         // Style only matched ** pairs; malformed tokens are harmless.
-        if(italic>=0&&out.length()>italic)
-            out.setSpan(new StyleSpan(Typeface.ITALIC),italic,out.length(),Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+
     }
 
     // Display-only migration; never rewrite saved quest identifiers or raw AI data.
@@ -56,7 +47,7 @@ public final class SceneTypography {
         String text=displaySeparators(raw).replace("\r\n","\n").replace('\r','\n');
         // The provider sometimes produces "смотришь. Стражник:" in a prose line.
         // Move a marked (or a clearly unmarked) speaker to its own paragraph.
-        text=text.replaceAll("([.!?…])\\h+(\\*\\*[А-ЯЁ][^:\\n]{1,55}:\\*\\*)","$1\n\n$2");
+        text=text.replaceAll("([.!?…])\\h+(\\*\\*[А-ЯЁ][^:\\n]{1,55}:\\*\\*)","$1\n$2");
         text=text.replaceAll("([.!?…])\\h+([А-ЯЁ][а-яА-ЯЁё \\-]{1,48}:)(?=\\h*(?:\\n|\\*\\*|[—-]))","$1\n\n$2");
         // Keep the speaker and the dash even when the AI streams both on one line.
         text=text.replaceAll("(\\*\\*[^\\n:]{1,55}:\\*\\*)\\h*(?=(?:\\*\\*)?[—-])","$1\n");
