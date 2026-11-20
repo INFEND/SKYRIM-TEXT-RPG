@@ -33,6 +33,10 @@ final class NpcNameMatcher {
         }
         Matcher m=pattern.matcher(normalized);
         while(m.find()){
+            int start=offsets[m.start()];
+            // Canonical names are proper nouns. Ignore lowercase everyday words
+            // that happen to share an alias with an NPC (including declensions).
+            if(Character.isLetter(source.charAt(start))&&!Character.isUpperCase(source.charAt(start)))continue;
             int end=offsets[m.end()-1]+1;
             while(end<source.length()&&source.charAt(end)=='\u0301')end++;
             result.add(new Match(offsets[m.start()],end,names.get(m.group())));
