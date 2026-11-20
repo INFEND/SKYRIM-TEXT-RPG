@@ -36,4 +36,23 @@ public class SolitudeCityTest {
         g.gold=40;g.choose("SOLITUDE:job:11");assertEquals(22,g.gold);assertEquals(10,g.hour);
         g.choose("SOLITUDE:shop");assertEquals("SHOP",g.mode);
     }
+    @Test public void completedShiftBuildsSharedResidentMemoryWithoutRepeatedCredit() throws Exception {
+        GameEngine g=city();
+        g.choose("SOLITUDE:open");
+        g.choose("SOLITUDE:visit:0");
+        g.choose("SOLITUDE:job:0");
+        assertEquals("MET",g.sceneState.status("npc","solitude_evette"));
+        g=GameEngine.fromJson(g.toJson().toString());
+        int gold=g.gold;
+        g.choose("SOLITUDE:job:0");
+        assertEquals(gold,g.gold);
+        assertEquals("MET",g.sceneState.status("npc","solitude_evette"));
+        g.day++;
+        g.hour=8;
+        g.choose("SOLITUDE:job:0");
+        assertEquals("INFORMED",g.sceneState.status("npc","solitude_evette"));
+        g=GameEngine.fromJson(g.toJson().toString());
+        assertEquals("INFORMED",g.sceneState.status("npc","solitude_evette"));
+    }
+
 }
