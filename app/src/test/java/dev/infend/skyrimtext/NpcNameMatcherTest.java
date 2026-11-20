@@ -32,6 +32,16 @@ public class NpcNameMatcherTest {
         assertNotNull(NpcProfiles.find("Капитан Алдис"));
         assertNotNull(NpcProfiles.find("Лоб"));
     }
+    @Test public void lowercaseEverydayWordsDoNotBecomeNpcLinks(){
+        Map<String,String> names=new LinkedHashMap<>();
+        NpcNameMatcher.add(names,"Мир");
+        NpcNameMatcher.add(names,"Серана");
+        NpcNameMatcher matcher=new NpcNameMatcher(names);
+        List<NpcNameMatcher.Match> hits=matcher.find("В обычном тексте мир важнее, чем легенда. Мир встретил Серану. серана здесь только слово.");
+        assertEquals(2,hits.size());
+        assertEquals("Мир",hits.get(0).name);
+        assertEquals("Серана",hits.get(1).name);
+    }
     @Test public void accentsAndApostrophesKeepOriginalTextOffsets(){
         NpcNameMatcher m=new NpcNameMatcher(NpcProfiles.linkNames());
         String source="Сера\u0301на встретила М’Айка.";
