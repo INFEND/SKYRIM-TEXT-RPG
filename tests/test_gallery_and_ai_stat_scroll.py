@@ -14,7 +14,7 @@ class GalleryAndAiStats(unittest.TestCase):
         self.assertIn("private static final String[][] PHOTO_LABELS",GALLERY)
         self.assertIn('"Рынок"',GALLERY)
         self.assertIn('"Главные ворота"',GALLERY)
-        self.assertIn("page.setText(captionFor(location,index))",GALLERY)
+        self.assertIn("page.setText(captionFor(location,frame))",GALLERY)
         self.assertNotIn('page.setText((index+1)+" / "+imageCount(location))',GALLERY)
         self.assertNotIn("Главный вид · ",GALLERY)
         self.assertNotIn("Проведи вбок или нажми на фото",GALLERY)

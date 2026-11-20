@@ -65,14 +65,46 @@
     ]
   },
   {
-    "name": "Солитьюд - Лесопилка",
+    "name": "Лесопилка у Скального ручья",
     "slug": "solitudesawmill",
     "aliases": [
-      "Solitude Sawmill"
+      "Solitude Sawmill",
+      "Солитьюд - Лесопилка",
+      "Лесопилка Солитьюда"
     ],
     "captions": [
-      "Лесопилка под скалами Солитьюда"
-    ]
+      "Лесопилка у Скального ручья"
+    ],
+    "parent": "Солитьюд",
+    "artwork": {
+      "date": "2026-11-20",
+      "kind": "original_generated_illustration",
+      "format": "WebP",
+      "encoder_method": 6,
+      "frames": [
+        {
+          "frame": 1,
+          "source_sha256": "4e8ee603f512cc6ef4afe220824e62a0a162a036df740d87d465f39513e04643",
+          "source_bytes": 3784218,
+          "source_dimensions": [
+            1672,
+            941
+          ],
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 554196,
+          "quality": 86,
+          "sha256": "59376f1e74256a6c5f386a71124f771d0e0d93127201c168bf31a8a3f0baec68",
+          "full_resolution_luma_ssim": 0.985551,
+          "worst_128px_luma_ssim": 0.979114,
+          "chroma_mean_absolute_error": 1.997783,
+          "chroma_95th_percentile_error": 6.0,
+          "scene": "A small half-open cedar sawmill beneath pale sea cliffs, visible waterwheel rotating in a tumbling freshwater stream, squared timbers on rough carts, damp cut wood and strips of morning light, cozy grounded craft scene."
+        }
+      ]
+    }
   },
   {
     "name": "Душник-Йал",
@@ -269,16 +301,46 @@
   },
   {
     "slug": "winking_skeever",
-    "name": "Таверна «Смеющаяся крыса»",
+    "name": "Таверна «Соляной очаг»",
     "parent": "Солитьюд",
     "captions": [
-      "Зал таверны, стойка и лестница"
+      "Зал таверны «Соляной очаг»"
     ],
     "aliases": [
       "The Winking Skeever",
       "Таверна Смеющаяся крыса",
-      "Смеющаяся крыса"
-    ]
+      "Смеющаяся крыса",
+      "Таверна «Смеющаяся крыса»"
+    ],
+    "artwork": {
+      "date": "2026-11-20",
+      "kind": "original_generated_illustration",
+      "format": "WebP",
+      "encoder_method": 6,
+      "frames": [
+        {
+          "frame": 1,
+          "source_sha256": "c8a78c2ee94aa2ffd1c5d67e75adc9a3a4db53331f03ffeb86056d8a9a762147",
+          "source_bytes": 3477075,
+          "source_dimensions": [
+            1672,
+            941
+          ],
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 561658,
+          "quality": 88,
+          "sha256": "a52b5ffd63aeecad811db05ebf6b77cd3b2b471fe3e07bae297e059cbe75bf5a",
+          "full_resolution_luma_ssim": 0.985103,
+          "worst_128px_luma_ssim": 0.975761,
+          "chroma_mean_absolute_error": 2.180164,
+          "chroma_95th_percentile_error": 6.0,
+          "scene": "Original medieval cliff-port inn with a barrel-vaulted limestone ceiling, hexagonal brazier, counter from an old ship beam and cool harbor light."
+        }
+      ]
+    }
   },
   {
     "slug": "candlehearth_hall",
@@ -496,62 +558,213 @@
   },
   {
     "slug": "bits_and_pieces",
-    "name": "«Всякая всячина»",
+    "name": "Лавка «Медный ящик»",
     "parent": "Солитьюд",
     "captions": [
-      "Прилавок и товары городской лавки"
+      "Лавка «Медный ящик»"
     ],
     "aliases": [
       "Bits and Pieces",
-      "Всякая всячина"
-    ]
+      "Всякая всячина",
+      "«Всякая всячина»"
+    ],
+    "artwork": {
+      "date": "2026-11-20",
+      "kind": "original_generated_illustration",
+      "format": "WebP",
+      "encoder_method": 6,
+      "frames": [
+        {
+          "frame": 1,
+          "source_sha256": "7152c973c2fba7c5c32e7f51251f6afacbd7792fd9f3dfe26c6acd82514d0f95",
+          "source_bytes": 3281760,
+          "source_dimensions": [
+            1672,
+            941
+          ],
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 522598,
+          "quality": 89,
+          "sha256": "39dadcd448c0630197fe6c79a74c644ba0892683d1af1dc02fd3c7f358a65da6",
+          "full_resolution_luma_ssim": 0.985993,
+          "worst_128px_luma_ssim": 0.977791,
+          "chroma_mean_absolute_error": 1.647523,
+          "chroma_95th_percentile_error": 5.0,
+          "scene": "Beeswax-lit general-goods shop in a coastal limestone town. Central waist-high copper-cornered chest on an oak counter, coils of rope, oil lamps, small iron tools and neatly ordered crates. A mullioned window faces the rainy port. A grounded three-quarter interior view."
+        }
+      ]
+    }
   },
   {
     "slug": "angelines_aromatics",
-    "name": "«Ароматы Анжелины»",
+    "name": "Аптека «Морская мята»",
     "parent": "Солитьюд",
     "captions": [
-      "Прилавок аптекаря и ингредиенты"
+      "Аптека «Морская мята»"
     ],
     "aliases": [
       "Angeline's Aromatics",
-      "Ароматы Анжелины"
-    ]
+      "Ароматы Анжелины",
+      "«Ароматы Анжелины»"
+    ],
+    "artwork": {
+      "date": "2026-11-20",
+      "kind": "original_generated_illustration",
+      "format": "WebP",
+      "encoder_method": 6,
+      "frames": [
+        {
+          "frame": 1,
+          "source_sha256": "1c374df2a4fe0cb05f939bedeb6fbbb273a0dcd3dd86e82fa7dc08669941f04e",
+          "source_bytes": 3368800,
+          "source_dimensions": [
+            1672,
+            941
+          ],
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 532222,
+          "quality": 89,
+          "sha256": "1f8d99affe841e4a7c6f85f2b82f5c5b48d39b30dfe446a2e0f482c400147f7c",
+          "full_resolution_luma_ssim": 0.985778,
+          "worst_128px_luma_ssim": 0.978014,
+          "chroma_mean_absolute_error": 1.751913,
+          "chroma_95th_percentile_error": 5.0,
+          "scene": "Cliff-city herbal apothecary with a moss green worktop set in the center, ceramic tincture jars, hanging sea mint and amber stills along the wall, mortar with crushed green leaves, airy stone alcove. Soft sea-green daylight and warm candles. Wide eye-level from the side of the worktable."
+        }
+      ]
+    }
   },
   {
     "slug": "radiant_raiment",
-    "name": "«Сияющие одежды»",
+    "name": "Ателье «Золотая нить»",
     "parent": "Солитьюд",
     "captions": [
-      "Зал одежды и украшений"
+      "Ателье «Золотая нить»"
     ],
     "aliases": [
       "Radiant Raiment",
-      "Сияющие одежды"
-    ]
+      "Сияющие одежды",
+      "«Сияющие одежды»"
+    ],
+    "artwork": {
+      "date": "2026-11-20",
+      "kind": "original_generated_illustration",
+      "format": "WebP",
+      "encoder_method": 6,
+      "frames": [
+        {
+          "frame": 1,
+          "source_sha256": "8f805f8174e6d0fabd5549f8bac38454bf293a51933646554222e627de01c178",
+          "source_bytes": 3247353,
+          "source_dimensions": [
+            1672,
+            941
+          ],
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 502638,
+          "quality": 89,
+          "sha256": "427038d853187483ac92abb95e776a93b945f987d93b6ce531ced0caebd752f4",
+          "full_resolution_luma_ssim": 0.985022,
+          "worst_128px_luma_ssim": 0.977034,
+          "chroma_mean_absolute_error": 1.6474,
+          "chroma_95th_percentile_error": 5.0,
+          "scene": "An elegant small medieval tailor atelier in a northern cliff capital, unwound gold thread beside scissors in the foreground, peacock-blue wool and ivory linen folded on walnut tables, decorative geometric embroidered coats displayed on wooden forms. Side lighting, wide natural perspective, no people."
+        }
+      ]
+    }
   },
   {
     "slug": "fletcher",
-    "name": "Лавка Флетчера",
+    "name": "Лавка «Ясеневое перо»",
     "parent": "Солитьюд",
     "captions": [
-      "Луки, стрелы и стол мастера"
+      "Лавка «Ясеневое перо»"
     ],
     "aliases": [
       "Fletcher",
-      "Флетчер"
-    ]
+      "Флетчер",
+      "Лавка Флетчера",
+      "Лучник"
+    ],
+    "artwork": {
+      "date": "2026-11-20",
+      "kind": "original_generated_illustration",
+      "format": "WebP",
+      "encoder_method": 6,
+      "frames": [
+        {
+          "frame": 1,
+          "source_sha256": "a4ed285a47eb14da1f5ae3741a2e7ef7116d6e3f74a282b8fc8540dee52e0914",
+          "source_bytes": 3360252,
+          "source_dimensions": [
+            1672,
+            941
+          ],
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 551110,
+          "quality": 90,
+          "sha256": "bc6e1aef17f5d6659e2d9b0f6be153ed74ab52802b023f6e10e6439643dd121e",
+          "full_resolution_luma_ssim": 0.986181,
+          "worst_128px_luma_ssim": 0.977281,
+          "chroma_mean_absolute_error": 1.483337,
+          "chroma_95th_percentile_error": 4.0,
+          "scene": "A fletcher's workshop with uncocked simple ash bows on curved wood pegs, goose-feather fletching and shafts on a notch-cut workbench, hobnail chest and salt-latticed windows with a glimmer of harbor. Careful woodwork, side-on wide view."
+        }
+      ]
+    }
   },
   {
     "slug": "solitude_blacksmith",
-    "name": "Кузница Солитьюда",
+    "name": "Кузница «Соль и сталь»",
     "parent": "Солитьюд",
     "captions": [
-      "Внутренний зал оружейной"
+      "Кузница «Соль и сталь»"
     ],
     "aliases": [
-      "Solitude Blacksmith"
-    ]
+      "Solitude Blacksmith",
+      "Кузница Солитьюда"
+    ],
+    "artwork": {
+      "date": "2026-11-20",
+      "kind": "original_generated_illustration",
+      "format": "WebP",
+      "encoder_method": 6,
+      "frames": [
+        {
+          "frame": 1,
+          "source_sha256": "68fea9801cd553c3e0da33ca99024b7abf11fe4edfe24a28633c23a1dccd8988",
+          "source_bytes": 3104419,
+          "source_dimensions": [
+            1672,
+            941
+          ],
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 534160,
+          "quality": 92,
+          "sha256": "98a9617987d8516b187a9f25a49bcc132d1b0de1840afd71f89aae3e70255e39",
+          "full_resolution_luma_ssim": 0.98648,
+          "worst_128px_luma_ssim": 0.979665,
+          "chroma_mean_absolute_error": 1.519135,
+          "chroma_95th_percentile_error": 5.0,
+          "scene": "A sheltered working forge in original northern coastal architecture, anvil and tongs under a vaulted limewashed arcade, wet stone and naturally orange coal fire, simple iron hardware cooling by a trough. View from outside at late dusk, no people close up."
+        }
+      ]
+    }
   },
   {
     "slug": "arnleif_and_sons",
@@ -1430,76 +1643,46 @@
   },
   {
     "slug": "katlas_farm",
-    "name": "Ферма Катлы",
+    "name": "Ферма и конюшни у Приливной дороги",
     "parent": "Солитьюд",
     "aliases": [
       "Katla's Farm",
       "Solitude Stables",
       "Конюшни Солитьюда",
-      "Солитьюд - Конюшни"
+      "Солитьюд - Конюшни",
+      "Ферма Катлы"
     ],
     "captions": [
-      "Ферма Катлы у дороги к Солитьюду"
+      "Ферма и конюшни у Приливной дороги"
     ],
     "artwork": {
-      "date": "2026-11-17",
-      "generator": "image_gen",
-      "kind": "generated artistic interpretation",
-      "prompt": "Use case: stylized-concept. Asset type: one landscape location illustration for the Android game SKYRIM TEXT RPG. Create a SINGLE continuous full-bleed scene, aspect ratio 16:9, around 1672 x 941 or larger. Style: consistent with a polished photorealistic Nordic fantasy environment illustration, very detailed physically grounded stone, timber and foliage, restrained natural color, atmospheric depth, believable architecture, immersive eye-level 28–35 mm view, sharp but not oversharpened. A newly generated artistic interpretation of the named Skyrim place, not a collage. Main subjects fit fully inside the frame and remain legible on a phone. No people close to the camera, no HUD, no UI, no text, no captions, no logos, no watermark, no border, no modern objects, no magical effects. Avoid malformed horse anatomy, repeated objects, extreme bloom, shallow focus and painterly brush strokes. Scene: Katla's Farm, Haafingar, Skyrim: a prosperous small Nordic working farm and the Solitude stables below the road to Solitude. Foreground orderly low crop plots with cabbages, leeks, potatoes and a little wheat, rough split-rail fences; middle ground weathered timber farmhouse with steep thatch roof and an adjacent open horse shelter with a palomino horse; an unmistakable modest wooden WINDMILL on the farm. Far background the great natural stone arch carrying the fortified city of Solitude above the river valley, distant and correctly subordinate to the farm. Cool evergreen slopes, damp dirt road, late autumn grass, soft cloudy daylight with restrained warm window light. Keep the working farm and windmill as main subjects; no waterwheel or sawmill.",
-      "source_sha256": "02974b75c8e82bfc0839b15a77c3f7e005759d60aa3008f4c986dd5c12903cd4",
-      "source_bytes": 3851246,
-      "source_dimensions": [
-        1672,
-        941
-      ],
-      "archive_sha256": "94d2baf35f5c432be084a343870afe044f8001ba910dd2042877a99b880aabfa",
-      "archive_bytes": 593812,
-      "compression": {
-        "format": "WebP",
-        "dimensions": [
-          1672,
-          941
-        ],
-        "quality": 88,
-        "full_resolution_luma_ssim": 0.9896625876426697,
-        "worst_128px_luma_ssim": 0.9785141348838806,
-        "chroma_mean_absolute_error": 1.7266692386700497,
-        "chroma_95th_percentile_error": 5,
-        "trials": [
-          {
-            "quality": 76,
-            "bytes": 374546,
-            "full_resolution_luma_ssim": 0.9680706858634949,
-            "worst_128px_luma_ssim": 0.9461992383003235,
-            "chroma_mean_absolute_error": 2.1442544325745287,
-            "chroma_95th_percentile_error": 6
-          },
-          {
-            "quality": 80,
-            "bytes": 436050,
-            "full_resolution_luma_ssim": 0.9772051572799683,
-            "worst_128px_luma_ssim": 0.9583112001419067,
-            "chroma_mean_absolute_error": 1.999640894091087,
-            "chroma_95th_percentile_error": 6
-          },
-          {
-            "quality": 84,
-            "bytes": 493852,
-            "full_resolution_luma_ssim": 0.9832003712654114,
-            "worst_128px_luma_ssim": 0.9680134057998657,
-            "chroma_mean_absolute_error": 1.896014369321042,
-            "chroma_95th_percentile_error": 6
-          },
-          {
-            "quality": 88,
-            "bytes": 593700,
-            "full_resolution_luma_ssim": 0.9896625876426697,
-            "worst_128px_luma_ssim": 0.9785141348838806,
-            "chroma_mean_absolute_error": 1.7266692386700497,
-            "chroma_95th_percentile_error": 5
-          }
-        ]
-      }
+      "date": "2026-11-20",
+      "kind": "original_generated_illustration",
+      "format": "WebP",
+      "encoder_method": 6,
+      "frames": [
+        {
+          "frame": 1,
+          "source_sha256": "a12475ad5b442b41a00a391f8d1cc6fa8ba413b79fc976a60ef2cbd7b0a1a9ed",
+          "source_bytes": 3455207,
+          "source_dimensions": [
+            1672,
+            941
+          ],
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 531062,
+          "quality": 88,
+          "sha256": "af31152ee075e444368b7601b504195e8a512f6e3f0c78109deb0306694919b7",
+          "full_resolution_luma_ssim": 0.986235,
+          "worst_128px_luma_ssim": 0.978182,
+          "chroma_mean_absolute_error": 2.015693,
+          "chroma_95th_percentile_error": 6.0,
+          "scene": "A windswept seaside farm and horse stables outside a northern medieval capital, rough dry stone folds, half-timbered stable with open stall doors, grazing horse small in background, fields striped by golden hour against cold water. Clear original design; stable and pasture equally legible."
+        }
+      ]
     }
   },
   {
@@ -8244,6 +8427,161 @@
           }
         ]
       }
+    }
+  },
+  {
+    "slug": "solitude",
+    "aliases": [],
+    "name": "Солитьюд",
+    "captions": [
+      "Ворота Ветрового гребня",
+      "Рынок под парусами",
+      "Дворец Лазурной террасы",
+      "Площадь Медного колокола",
+      "Арка над Приливным проливом",
+      "Причалы Кедровых мачт"
+    ],
+    "cityPlaces": [
+      "Главные ворота",
+      "Рыночная площадь",
+      "Синий дворец",
+      "Площадь казни",
+      "Городская арка",
+      "Гавань Солитьюда"
+    ],
+    "artwork": {
+      "date": "2026-11-20",
+      "kind": "original_generated_illustration",
+      "format": "WebP",
+      "encoder_method": 6,
+      "frames": [
+        {
+          "frame": 1,
+          "source_sha256": "d2c9d629867329a0f34fcd0723ec9cbfea6be6eb2524089fca6196772f1fec10",
+          "source_bytes": 3337587,
+          "source_dimensions": [
+            1672,
+            941
+          ],
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 463456,
+          "quality": 88,
+          "sha256": "62dac0f1db8a11fe461794638f822ad7957b29f9309ead4f7a4dd487d434e720",
+          "full_resolution_luma_ssim": 0.986149,
+          "worst_128px_luma_ssim": 0.978741,
+          "chroma_mean_absolute_error": 1.554249,
+          "chroma_95th_percentile_error": 5.0,
+          "scene": "Low stone city gate at the top of a sweeping cliff road, two offset round towers with copper ridge tops, worn gate planks and misty sea visible in the slit to the right. Cool dawn, readable pale limestone."
+        },
+        {
+          "frame": 2,
+          "source_sha256": "8de704eea011a4ce5367ef6f82543a2c1c90d80ff268d6f30251a3c23abaabc2",
+          "source_bytes": 3432958,
+          "source_dimensions": [
+            1672,
+            941
+          ],
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 504184,
+          "quality": 88,
+          "sha256": "7adc343e4b45ee51fb755377a3c60d8d89b799797cdfbfd9783ae6927ef90098",
+          "full_resolution_luma_ssim": 0.985843,
+          "worst_128px_luma_ssim": 0.971857,
+          "chroma_mean_absolute_error": 1.625568,
+          "chroma_95th_percentile_error": 5.0,
+          "scene": "A medieval northern port market under salvaged red and ivory sailcloth, well-spaced stalls of herbs, bread and smoked fish, crooked pale stone shopfronts and a break in clouds. View across a cobbled square from eye level."
+        },
+        {
+          "frame": 3,
+          "source_sha256": "7211e1e95f02ccfb5d965d607eb28caa63c058721e76d3f757f1222af1ccaa9d",
+          "source_bytes": 3473016,
+          "source_dimensions": [
+            1672,
+            941
+          ],
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 496462,
+          "quality": 87,
+          "sha256": "fdc65e3fc57b53b470895376ad1222fd2968eeb0370cbd48681fdcb9900cccc5",
+          "full_resolution_luma_ssim": 0.986442,
+          "worst_128px_luma_ssim": 0.976891,
+          "chroma_mean_absolute_error": 1.785424,
+          "chroma_95th_percentile_error": 5.0,
+          "scene": "Original limestone palace overlooking a cold bay, jade-blue copper roofs ranged around a crescent terrace, stairway, restrained banners with abstract patterns. Architectural three-quarter view at clear midday, human scale."
+        },
+        {
+          "frame": 4,
+          "source_sha256": "a4964dc64170c847ca36a317616a073d3143785358e8121a540f1437f3572d10",
+          "source_bytes": 3265450,
+          "source_dimensions": [
+            1672,
+            941
+          ],
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 496602,
+          "quality": 89,
+          "sha256": "71654b54fd6e5e066939eb31b8b43816f3531cb965aa6e6fc030dd776b6c010f",
+          "full_resolution_luma_ssim": 0.985489,
+          "worst_128px_luma_ssim": 0.979695,
+          "chroma_mean_absolute_error": 1.735689,
+          "chroma_95th_percentile_error": 5.0,
+          "scene": "Broad sloped civic square paved with square gray stone, a freestanding bell frame with weathered bronze bell, raised stone speaker platform and rain channels. Warm lights in a blue after-rain evening."
+        },
+        {
+          "frame": 5,
+          "source_sha256": "e6155641a5f1c6e530628adc0ff0e17937a425d9e696bef9119a1ca7c1324886",
+          "source_bytes": 3231701,
+          "source_dimensions": [
+            1672,
+            941
+          ],
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 533992,
+          "quality": 91,
+          "sha256": "ab90ccb2a3ba05410be2a60e7a688af98de0fb6654ed3a0ed7040211d70a6410",
+          "full_resolution_luma_ssim": 0.987421,
+          "worst_128px_luma_ssim": 0.97893,
+          "chroma_mean_absolute_error": 1.407231,
+          "chroma_95th_percentile_error": 4.0,
+          "scene": "Dramatic original natural rock span low over turbulent turquoise sound, a small stone footbridge visible above on the wind-cut headland, foam and drifting sea birds. View from the opposite cliff at late afternoon, strong silhouette."
+        },
+        {
+          "frame": 6,
+          "source_sha256": "f8748b347e058a5fdc1f8c0924341efff86a5ceef2da1f3b0aac16230151f381",
+          "source_bytes": 3457508,
+          "source_dimensions": [
+            1672,
+            941
+          ],
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 498792,
+          "quality": 87,
+          "sha256": "862fa47dda63ed040c42b3d09d269b6c7eef4270b81fc9b319c6bb8c49217a5a",
+          "full_resolution_luma_ssim": 0.985557,
+          "worst_128px_luma_ssim": 0.975531,
+          "chroma_mean_absolute_error": 1.829676,
+          "chroma_95th_percentile_error": 6.0,
+          "scene": "Stone quay and two independent cargo jetties, tapering cedar masts of medieval coastal ships, capstans and rope, warm warehouse doors below terrace houses, morning fog thinning. View at quay level."
+        }
+      ]
     }
   }
 ]

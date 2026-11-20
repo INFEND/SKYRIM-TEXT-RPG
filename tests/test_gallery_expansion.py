@@ -14,11 +14,8 @@ ASSETS = ROOT / "app/src/main/assets/gallery"
 JAVA = ROOT / "app/src/main/java/dev/infend/skyrimtext/LocationGalleryView.java"
 
 def historical_archive(name):
-    # Riverwood was explicitly replaced in v1.0.101. Preserve and verify the
-    # original bytes outside Android assets; all other archives remain active.
-    if name in ("riverwood.zip","riverwood_extra.zip"):
-        return ROOT/"artwork_history/gallery"/name
-    return ASSETS/name
+    history = ROOT/"artwork_history/gallery"/name
+    return history if history.is_file() else ASSETS/name
 
 def webp_dimensions(data):
     if data[:4] != b"RIFF" or data[8:12] != b"WEBP":
@@ -117,14 +114,22 @@ class GalleryExpansion(unittest.TestCase):
         # Dynamic registry and archive coverage are independently checked.
         begin=static.index("    private static final class GalleryDefinition")
         end=static.index("    private static String locationKey",begin)
-        static=static[:begin]+"""    private static class GalleryDefinition {String[] captions,archives;}
-    private static class GalleryRegistry {Map<String,GalleryDefinition> slugs; ArrayList<String> locations;}
+        static=static[:begin]+"""    private static class GalleryDefinition {
+        String name,parent;String[] captions,archives;
+        Map<String,Integer> cityFrames=new HashMap<>();
+    }
+    private static class GalleryRegistry {
+        Map<String,GalleryDefinition> names=new HashMap<>(),slugs=new HashMap<>();
+        ArrayList<String> locations;
+    }
     private static GalleryRegistry registry;
-    private static GalleryDefinition definition(String location){return null;}
+    private static GalleryDefinition definition(String location){
+        return registry==null?null:registry.names.get(locationKey(location));
+    }
 """+static[end:]
         methods = []
-        for name in ("archive","captionFor"):
-            match = re.search(r"    private static String "+name+r"\(.*?\n    \}",viewer,re.S)
+        for name in ("archive","captionFor","displayName","cityInterior","cityPlaceTitle"):
+            match = re.search(r"    (?:private )?static (?:String|GalleryDefinition) "+name+r"\(.*?\n    \}",viewer,re.S)
             self.assertIsNotNone(match,name)
             methods.append(match.group(0))
         probe = r'''
@@ -160,6 +165,22 @@ class GalleryExpansion(unittest.TestCase):
             if(!captionFor("Ривервуд",n).equals(riverwood[n]))throw new AssertionError("Riverwood view order");
             if(!archive("riverwood",n+1).equals("riverwood.zip"))throw new AssertionError("Riverwood pack");
         }
+        registry=new GalleryRegistry();
+        GalleryDefinition city=new GalleryDefinition();
+        city.captions=new String[]{"Рынок под парусами"};
+        city.cityFrames.put(locationKey("Рыночная площадь"),0);
+        registry.names.put(locationKey("Солитьюд"),city);
+        GalleryDefinition interior=new GalleryDefinition();
+        interior.name="Лавка «Ясеневое перо»";
+        interior.parent="Солитьюд";
+        registry.names.put(locationKey("Лучник"),interior);
+        if(!cityPlaceTitle("Солитьюд","Рыночная площадь").equals("Рынок под парусами"))
+            throw new AssertionError("city overview frame title");
+        if(!cityPlaceTitle("Солитьюд","Лучник").equals(displayName("Лучник")))
+            throw new AssertionError("city interior alias title");
+        if(!cityPlaceTitle("Маркарт","Лучник").equals("Лучник")
+            ||!cityPlaceTitle("Солитьюд","Маяк").equals("Маяк"))
+            throw new AssertionError("unrelated city places");
     }
 '''
         source = "import java.util.*;\npublic final class GalleryProbe {\n"+catalog+static+"\n".join(methods)+probe+"\n}"

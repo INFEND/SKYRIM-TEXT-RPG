@@ -106,6 +106,7 @@ public final class LocationGalleryView extends LinearLayout {
     }
     private static final class GalleryDefinition {
         final String name,slug,parent;final String[] captions,archives;
+        final Map<String,Integer> cityFrames=new HashMap<>();
         GalleryDefinition(org.json.JSONObject entry)throws Exception{
             name=entry.getString("name");slug=entry.getString("slug");parent=entry.optString("parent","");
             org.json.JSONArray c=entry.getJSONArray("captions"),a=entry.getJSONArray("archives");
@@ -114,6 +115,13 @@ public final class LocationGalleryView extends LinearLayout {
             for(int i=0;i<c.length();i++){
                 captions[i]=c.getString(i);archives[i]=a.getString(i);
                 if(captions[i].trim().isEmpty()||!(archives[i].equals(slug+".zip")||archives[i].equals(slug+"_extra.zip")))throw new IllegalArgumentException("Неверный кадр галереи");
+            }
+            org.json.JSONArray places=entry.optJSONArray("cityPlaces");
+            if(places==null)return;
+            if(!parent.isEmpty()||places.length()!=captions.length)throw new IllegalArgumentException("Неверная привязка городских кадров");
+            for(int i=0;i<places.length();i++){
+                String place=locationKey(places.getString(i));
+                if(!place.isEmpty()&&cityFrames.put(place,i)!=null)throw new IllegalArgumentException("Повтор городской локации");
             }
         }
     }
@@ -157,7 +165,39 @@ public final class LocationGalleryView extends LinearLayout {
     }
     public static String[] locations(){GalleryRegistry r=registry;return r==null?CITIES.clone():r.locations.toArray(new String[0]);}
 
-    private final String location,slug;
+    private final String location,slug,title;
+    private final int cityFrame;
+
+    static String displayName(String location){
+        GalleryDefinition gallery=definition(location);
+        return gallery==null?location:gallery.name;
+    }
+
+    private static GalleryDefinition cityInterior(String city,String place){
+        GalleryDefinition gallery=definition(place);
+        return gallery!=null&&city.equals(gallery.parent)?gallery:null;
+    }
+
+    static String cityPlaceTitle(String city,String place){
+        GalleryDefinition interior=cityInterior(city,place);
+        if(interior!=null)return interior.name;
+        GalleryDefinition overview=definition(city);
+        Integer frame=overview==null?null:overview.cityFrames.get(locationKey(place));
+        return frame==null?place:overview.captions[frame];
+    }
+
+    static LocationGalleryView cityPlaceGallery(Context context,String city,String place,int accent){
+        GalleryDefinition interior=cityInterior(city,place);
+        if(interior!=null)return new LocationGalleryView(context,interior.name,accent,false);
+        GalleryDefinition overview=definition(city);
+        Integer frame=overview==null?null:overview.cityFrames.get(locationKey(place));
+        if(frame!=null)return new LocationGalleryView(context,city,accent,false,frame,overview.captions[frame]);
+        return hasGallery(place)?new LocationGalleryView(context,place,accent,false):null;
+    }
+
+    private int visibleImageCount(){return cityFrame<0?imageCount(location):1;}
+    private int archiveFrame(int index){return cityFrame<0?index:cityFrame;}
+
     private final int accent;
     private final boolean fullscreen;
     private final ImageView photo;
@@ -202,6 +242,7 @@ public final class LocationGalleryView extends LinearLayout {
     }
     /** Decode the city's compact previews once, ahead of swipes. No loading overlay. */
     private void prefetch(){
+        if(cityFrame>=0)return;
         if(!PREFETCHING.add(slug))return;
         Context context=getContext().getApplicationContext();
         IO.execute(()->{
@@ -216,9 +257,14 @@ public final class LocationGalleryView extends LinearLayout {
         });
     }
     public LocationGalleryView(Context context,String location,int accent,boolean fullscreen){
+        this(context,location,accent,fullscreen,-1,displayName(location));
+    }
+
+    private LocationGalleryView(Context context,String location,int accent,boolean fullscreen,int cityFrame,String title){
         super(context);
         if(!hasGallery(location))throw new IllegalArgumentException("Галерея не найдена: "+location);
         this.location=location;GalleryDefinition d=definition(location);this.slug=d==null?ID_BY_CITY.get(locationKey(location)):d.slug;
+        this.cityFrame=cityFrame;this.title=title;
         this.accent=accent;this.fullscreen=fullscreen;
         setOrientation(VERTICAL);
         setPadding(dp(2),dp(4),dp(2),dp(8));
@@ -229,7 +275,7 @@ public final class LocationGalleryView extends LinearLayout {
         addView(header,new LayoutParams(-1,dp(48)));
         View pin=galleryGlyph(0,0xffc5aa80);
         header.addView(pin,new LayoutParams(dp(26),dp(26)));
-        TextView heading=text(location.toUpperCase(new Locale("ru")),18,Color.WHITE);
+        TextView heading=text(title.toUpperCase(new Locale("ru")),18,Color.WHITE);
         heading.setTypeface(SovngardeTypeface.face(context,true));
         heading.setMaxLines(2);
         LayoutParams headingParams=new LayoutParams(0,-2,1);
@@ -241,13 +287,13 @@ public final class LocationGalleryView extends LinearLayout {
         galleryBody=new AccordionLayout(context);
         galleryBody.setOrientation(VERTICAL);
         addView(galleryBody,new LayoutParams(-1,-2));
-        header.setContentDescription("Свернуть галерею "+location);
+        header.setContentDescription("Свернуть галерею "+title);
         header.setOnClickListener(v->{
             collapsed=!collapsed;
             boolean animate=getContext().getSharedPreferences("skyrim_text_v1",Context.MODE_PRIVATE).getBoolean("animations",true);
             galleryBody.setExpanded(!collapsed,animate);
             AccordionLayout.rotateArrow(collapseArrow,collapsed,animate);
-            header.setContentDescription((collapsed?"Развернуть":"Свернуть")+" галерею "+location);
+            header.setContentDescription((collapsed?"Развернуть":"Свернуть")+" галерею "+title);
         });
 
         FrameLayout viewport=new FrameLayout(context){
@@ -266,7 +312,7 @@ public final class LocationGalleryView extends LinearLayout {
 
         photo=new ImageView(context);
         photo.setScaleType(fullscreen?ImageView.ScaleType.FIT_CENTER:ImageView.ScaleType.CENTER_CROP);
-        photo.setContentDescription("Изображение локации "+location);
+        photo.setContentDescription("Изображение локации "+title);
         photo.setFocusable(true);
         viewport.addView(photo,new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.MATCH_PARENT));
         missingPhoto=text("ЗАГРУЗИТЬ ИЗОБРАЖЕНИЯ",16,accent);
@@ -315,7 +361,7 @@ public final class LocationGalleryView extends LinearLayout {
             }
         });
         photo.setOnClickListener(v->{
-            if(!ResourceStore.has(getContext(),"gallery/"+archive(slug,current+1))){
+            if(!ResourceStore.has(getContext(),"gallery/"+archive(slug,archiveFrame(current)+1))){
                 openResourceManager();
             }else if(!fullscreen)openFullscreen();
         });
@@ -336,24 +382,24 @@ public final class LocationGalleryView extends LinearLayout {
         next.setContentDescription("Следующий вид");
         next.setOnClickListener(v->move(1));
         controls.addView(next,new LayoutParams(dp(48),dp(48)));
-        if(imageCount(location)==1){previous.setVisibility(View.INVISIBLE);next.setVisibility(View.INVISIBLE);}
+        if(visibleImageCount()==1){previous.setVisibility(View.INVISIBLE);next.setVisibility(View.INVISIBLE);}
 
         indicators=new LinearLayout(context);
         indicators.setGravity(Gravity.CENTER);
         LayoutParams dotsParams=new LayoutParams(-1,dp(28));
         galleryBody.addView(indicators,dotsParams);
-        for(int i=0;i<imageCount(location);i++){
+        for(int i=0;i<visibleImageCount();i++){
             final int index=i;
             FrameLayout hit=new FrameLayout(context);
             View dot=new View(context);
             hit.addView(dot,new FrameLayout.LayoutParams(dp(7),dp(7),Gravity.CENTER));
-            hit.setContentDescription(captionFor(location,index));
+            hit.setContentDescription(captionFor(location,archiveFrame(index)));
             hit.setOnClickListener(v->show(index));
             indicators.addView(hit,new LayoutParams(dp(16),dp(28)));
         }
         show(0);
         prefetch();
-        if(!fullscreen)addInteriorLinks();
+        if(!fullscreen&&cityFrame<0)addInteriorLinks();
     }
     /** Interiors have their own captions and packs, never mixed with exterior views. */
     private void addInteriorLinks(){
@@ -433,17 +479,18 @@ public final class LocationGalleryView extends LinearLayout {
         }
     }
     private void move(int delta){
-        int count=imageCount(location);
-        if(count>0)show(Math.floorMod(current+delta,count));
+        int count=visibleImageCount();
+        if(count>1)show(Math.floorMod(current+delta,count));
     }
     private void show(int index){
-        int count=imageCount(location);if(count==0)return;
+        int count=visibleImageCount();if(count==0)return;
         if(index<0||index>=count){show(Math.max(0,Math.min(index,count-1)));return;}
         current=index;
         final int target=++requested;
-        page.setText(captionFor(location,index));
+        int frame=archiveFrame(index);
+        page.setText(captionFor(location,frame));
         updateIndicators();
-        String resourcePath="gallery/"+archive(slug,index+1);
+        String resourcePath="gallery/"+archive(slug,frame+1);
         if(!ResourceStore.has(getContext(),resourcePath)){
             photo.setImageDrawable(null);
             missingPhoto.setVisibility(View.VISIBLE);
@@ -454,18 +501,18 @@ public final class LocationGalleryView extends LinearLayout {
             return;
         }
         missingPhoto.setVisibility(View.GONE);
-        photo.setContentDescription(location+": "+captionFor(location,index));
+        photo.setContentDescription(title+": "+captionFor(location,frame));
         photo.animate().cancel();
         // Keep the previous picture visible while the next cached preview resolves.
         // Never show a "loading" banner during manual swiping.
-        final String key=cacheKey(slug,index+1,fullscreen);
+        final String key=cacheKey(slug,frame+1,fullscreen);
         Bitmap cached=CACHE.get(key);
         if(cached!=null&&!cached.isRecycled()){
             present(target,cached);
             return;
         }
         IO.execute(()->{
-            Bitmap bitmap=decode(getContext().getApplicationContext(),slug,index+1,fullscreen);
+            Bitmap bitmap=decode(getContext().getApplicationContext(),slug,frame+1,fullscreen);
             if(bitmap!=null)CACHE.put(key,bitmap);
             post(()->{
                 if(target!=requested)return;
@@ -513,7 +560,7 @@ public final class LocationGalleryView extends LinearLayout {
         backdrop.setBackgroundColor(0xf206090b);
         ImageView image=new ImageView(getContext());
         image.setScaleType(ImageView.ScaleType.FIT_CENTER);
-        image.setContentDescription("Полноэкранное фото локации "+location);
+        image.setContentDescription("Полноэкранное фото локации "+title);
         backdrop.addView(image,new FrameLayout.LayoutParams(-1,-1));
 
         final int[] selected={current};
@@ -521,7 +568,7 @@ public final class LocationGalleryView extends LinearLayout {
         final Runnable[] render={null};
         final Context context=getContext().getApplicationContext();
         render[0]=()->{
-            int number=selected[0]+1;
+            int number=archiveFrame(selected[0])+1;
             int ticket=++generation[0];
             if(!ResourceStore.has(context,"gallery/"+archive(slug,number))){image.setImageDrawable(null);return;}
             String fullKey=cacheKey(slug,number,true);
@@ -549,7 +596,8 @@ public final class LocationGalleryView extends LinearLayout {
                     if(start==null||end==null)return false;
                     float dx=end.getX()-start.getX(),dy=end.getY()-start.getY();
                     if(Math.abs(dx)<=dp(45)||Math.abs(dx)<=Math.abs(dy)*1.1f)return false;
-                    int count=imageCount(location);
+                    int count=visibleImageCount();
+                    if(count<2)return false;
                     selected[0]=(selected[0]+(dx<0?1:-1)+count)%count;
                     render[0].run();
                     return true;

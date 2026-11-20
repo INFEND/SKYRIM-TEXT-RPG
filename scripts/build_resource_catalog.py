@@ -155,6 +155,12 @@ def gallery_registry():
         labels=entry["captions"]
         if not labels or any(not isinstance(x,str) or not x.strip() for x in labels) or set(photos)!=set(range(1,len(labels)+1)):
             raise ValueError("Captions/frames mismatch "+slug)
+        if "cityPlaces" in entry:
+            places=entry["cityPlaces"]
+            if entry.get("parent") or not isinstance(places,list) or len(places)!=len(labels) or any(not isinstance(p,str) for p in places):
+                raise ValueError("Invalid city frames "+slug)
+            keys=[p.strip().lower().replace("ё","е") for p in places if p.strip()]
+            if len(keys)!=len(set(keys)):raise ValueError("Duplicate city place "+slug)
         entry["archives"]=[photos[i] for i in range(1,len(labels)+1)]
     for entry in result:
         parent=entry.get("parent","")

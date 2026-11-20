@@ -2172,7 +2172,7 @@ public final class MainActivity extends Activity {
     private AccordionLayout cityCategoryEntries(String city,int index,java.util.List<String> places){
         AccordionLayout entries=new AccordionLayout(this);entries.setPadding(dp(8),0,dp(8),dp(6));
         for(String place:places){
-            TextView entry=text(place,15,TEXT,false);entry.setPadding(dp(10),dp(8),dp(10),dp(8));
+            TextView entry=text(LocationGalleryView.cityPlaceTitle(city,place),15,TEXT,false);entry.setPadding(dp(10),dp(8),dp(10),dp(8));
             entry.setMinHeight(dp(48));entry.setGravity(Gravity.CENTER_VERTICAL);
             entry.setBackground(bg(0xff1b1b1b,Color.TRANSPARENT,10));
             LinearLayout.LayoutParams itemSize=lp(-1,-2);itemSize.bottomMargin=dp(4);entries.addView(entry,itemSize);
@@ -2251,8 +2251,10 @@ public final class MainActivity extends Activity {
     }
     private void cityPlaceDialog(String city,int category,String place){
         if(game.aiNarrativeMode&&livingBusy()){toast("Сначала заверши или отмени текущий ход");return;}
+        String title=LocationGalleryView.cityPlaceTitle(city,place);
         LinearLayout panel=column();addText(panel,city+" | "+CityArchitecture.CATEGORIES[category],14,MUTED,false,8);
-        if(LocationGalleryView.hasGallery(place))panel.addView(new LocationGalleryView(this,place,accent(),false),lp(-1,-2));
+        LocationGalleryView gallery=LocationGalleryView.cityPlaceGallery(this,city,place,accent());
+        if(gallery!=null)panel.addView(gallery,lp(-1,-2));
         int d=-1;
         if("Солитьюд".equals(city)){
             String[] names={"Главные ворота","Мрачный замок","Синий дворец","Коллегия бардов","Храм Богов","Кузница Солитьюда","Смеющаяся крыса","Гавань Солитьюда"};
@@ -2262,14 +2264,14 @@ public final class MainActivity extends Activity {
         }
         if("Солитьюд".equals(city)&&("Дом Аддвара".equals(place)||"Катакомбы Солитьюда".equals(place)||"Зал мёртвых".equals(place))){
             final String destination="Дом Аддвара".equals(place)?SolitudeCanonical.ADDVAR:SolitudeCanonical.CATACOMBS;
-            new RuneDialogBuilder(this,accent()).setTitle(place).setView(panel).setPositiveButton("Посетить",(dialog,w)->{
+            new RuneDialogBuilder(this,accent()).setTitle(title).setView(panel).setPositiveButton("Посетить",(dialog,w)->{
                 if(!city.equals(game.progress.location)||!"WORLD".equals(game.mode)||game.road.pending())return;
                 if(aiClient!=null)aiClient.cancel();if(localAiClient!=null)localAiClient.cancel();
                 game.choose("SOLITUDE:open");game.choose(destination);save();tab=0;render();
             }).setNegativeButton("Закрыть",null).show();return;
         }
         if("Солитьюд".equals(city)&&"Высокий шпиль".equals(place)){
-            new RuneDialogBuilder(this,accent()).setTitle(place).setView(panel).setPositiveButton("Посетить",(dialog,w)->{
+            new RuneDialogBuilder(this,accent()).setTitle(title).setView(panel).setPositiveButton("Посетить",(dialog,w)->{
                 if(!city.equals(game.progress.location)||!"WORLD".equals(game.mode)||game.road.pending())return;
                 if(aiClient!=null)aiClient.cancel();if(localAiClient!=null)localAiClient.cancel();
                 game.choose("SOLITUDE:open");game.choose("SOLITUDE:home");save();tab=0;render();
@@ -2278,13 +2280,13 @@ public final class MainActivity extends Activity {
         final int district=d;
         int shop=-1;if("Солитьюд".equals(city))for(int i=0;i<SolitudeShops.NAMES.length;i++)if(SolitudeShops.NAMES[i].equals(place))shop=i;
         final int localShop=shop;
-        if(localShop>=0){new RuneDialogBuilder(this,accent()).setTitle(place).setView(panel).setPositiveButton("Посетить лавку",(dialog,w)->{
+        if(localShop>=0){new RuneDialogBuilder(this,accent()).setTitle(title).setView(panel).setPositiveButton("Посетить лавку",(dialog,w)->{
             if(!city.equals(game.progress.location)||!"WORLD".equals(game.mode)||game.road.pending())return;
             if(aiClient!=null)aiClient.cancel();if(localAiClient!=null)localAiClient.cancel();
             game.choose("SOLITUDE:open");game.choose("SOLITUDE:visit:"+SolitudeShops.district(localShop));game.choose("SOLITUDE:store:"+localShop);save();tab=0;render();
         }).setNegativeButton("Закрыть",null).show();return;}
         if(district>=0){
-            new RuneDialogBuilder(this,accent()).setTitle(place).setView(panel).setPositiveButton("Местные занятия",(dialog,w)->{
+            new RuneDialogBuilder(this,accent()).setTitle(title).setView(panel).setPositiveButton("Местные занятия",(dialog,w)->{
                 if(!city.equals(game.progress.location)||!"WORLD".equals(game.mode)||game.road.pending())return;
                 if(aiClient!=null)aiClient.cancel();if(localAiClient!=null)localAiClient.cancel();
                 game.choose("SOLITUDE:open");game.choose("SOLITUDE:visit:"+district);if("Подземелье Мрачного замка".equals(place))game.choose(SolitudeJustice.MODE);save();tab=0;render();
@@ -2292,10 +2294,10 @@ public final class MainActivity extends Activity {
         }
         WorldAtlas.Place target=WorldAtlas.find(place);
         if(target!=null&&!city.equals(target.name)){
-            new RuneDialogBuilder(this,accent()).setTitle(place).setView(panel).setPositiveButton("На карте",(dialog,w)->locationDialog(target)).setNegativeButton("Закрыть",null).show();return;
+            new RuneDialogBuilder(this,accent()).setTitle(title).setView(panel).setPositiveButton("На карте",(dialog,w)->locationDialog(target)).setNegativeButton("Закрыть",null).show();return;
         }
         addText(panel,"Локация оригинального города. Индивидуальные действия пока не добавлены.",14,TEXT,false,4);
-        new RuneDialogBuilder(this,accent()).setTitle(place).setView(panel).setPositiveButton("Закрыть",null).show();
+        new RuneDialogBuilder(this,accent()).setTitle(title).setView(panel).setPositiveButton("Закрыть",null).show();
     }
 
     private void renderStoryJournal(){
@@ -3884,7 +3886,7 @@ public final class MainActivity extends Activity {
         LinearLayout panel=column();
         panel.setBackground(AmoledAppearance.window(0xff080808,accent()));
         panel.setPadding(dp(14),dp(13),dp(14),dp(14));
-        addText(panel,place.name,22,TEXT,true,9);
+        addText(panel,LocationGalleryView.displayName(place.name),22,TEXT,true,9);
 
         ScrollView scroller=new ScrollView(this);
         scroller.setVerticalScrollBarEnabled(false);

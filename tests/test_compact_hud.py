@@ -21,7 +21,7 @@ class CompactHud(unittest.TestCase):
         self.assertIn('overview.addView(sceneGallery(game.progress.location)',UI)
     def test_borderless_gallery_without_counter(self):
         for token in ('setBackgroundColor(Color.BLACK)', 'header.addView(heading,headingParams)',
-                      'controls.addView(page', 'page.setText(captionFor(location,index))',
+                      'controls.addView(page', 'page.setText(captionFor(location,frame))',
                       'v->move(-1)', 'v->move(1)', 'v->show(index)',
                       'updateIndicators();', 'galleryBody.setExpanded(!collapsed,animate)',
                       'viewport.setClipToOutline(true)'):
@@ -29,7 +29,7 @@ class CompactHud(unittest.TestCase):
         for token in ('new RuneFrameDrawable', 'header.addView(page', 'String.format("%02d / %02d"'):
             self.assertNotIn(token,GALLERY)
     def test_gallery_uses_equal_round_dots_in_current_accent(self):
-        for token in ('for(int i=0;i<imageCount(location);i++)',
+        for token in ('for(int i=0;i<visibleImageCount();i++)',
                       'new FrameLayout.LayoutParams(dp(7),dp(7),Gravity.CENTER)',
                       'new LayoutParams(dp(16),dp(28))',
                       'marker.setShape(GradientDrawable.OVAL)',
