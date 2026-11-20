@@ -2522,9 +2522,9 @@ public final class MainActivity extends Activity {
             // A probability-only request has no story, so never create an empty panel.
             if(!aiTurnProposal){
                 LinearLayout live=card();
-                aiTurnText=text("",18,TEXT,false);
+                aiTurnText=text("",16,TEXT,false);
                 aiTurnText.setTypeface(SovngardeTypeface.face(this,false));
-                aiTurnText.setLineSpacing(dp(7),1.16f);
+                aiTurnText.setLineSpacing(dp(2),1.05f);
                 if(aiTurnPreview.isEmpty())aiTurnText.setText(aiLiveDots(android.os.SystemClock.elapsedRealtime()-aiLocalStartedAt));
                 else aiTurnText.setText(SceneTypography.render(aiTurnPreview,accent(),game.name,heroColor()));
                 live.addView(aiTurnText,lp(-1,-2));
