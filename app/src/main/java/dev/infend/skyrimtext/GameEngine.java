@@ -889,7 +889,25 @@ public final class GameEngine {
         if(amount<=0)return;xp=nonnegativeAdd(xp,amount);
         while(level<100 && xp>=experienceRequired()){xp-=experienceRequired();level++;maxHp=nonnegativeAdd(maxHp,10);maxStamina=nonnegativeAdd(maxStamina,10);maxMagicka=nonnegativeAdd(maxMagicka,10);progress.perkPoints=nonnegativeAdd(progress.perkPoints,1);hp=maxHp;stamina=maxStamina;magicka=maxMagicka;}
     }
-    /** Time-limited rest available outside combat, tracked in the old save schema. */
+    /** Instant location change, no days, stamina, magicka, septims or route cost. */
+    public boolean fastTravel(String destination,boolean visitedOnly){
+        if(!started||road.pending()||solitude.custody()||
+                (!"WORLD".equals(mode)&&!"RESULT".equals(mode)))return false;
+        SkyrimMapCatalog.Site site=SkyrimMapCatalog.find(destination);
+        WorldAtlas.Place place=WorldAtlas.find(destination);
+        if(site==null&&place==null)return false;
+        String name=site!=null?site.name:place.name;
+        int regionId=site!=null?site.region:place.region;
+        if(regionId<0||regionId>=REGIONS.length||name.equals(progress.location))return false;
+        if(visitedOnly&&!visitedVisual.contains(name))return false;
+        region=regionId;progress.location=name;mode="WORLD";
+        visitedVisual.add(name);
+        message="Быстрое перемещение: "+name;
+        recordVisualEvent(message);
+        katherine.observeTravel(this);alma.observeTravel(this);
+        return true;
+    }
+    /** Old editor teleport is kept only for migration of existing saves. */
     public boolean fixTeleport(String name){
         return fixShop.editorEnabled&&fixTravelToVisited(name);
     }

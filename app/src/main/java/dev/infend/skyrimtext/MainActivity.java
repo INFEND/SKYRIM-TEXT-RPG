@@ -451,6 +451,20 @@ public final class MainActivity extends Activity {
             });
         }
     }
+    private void fastTravelSettings(){
+        int start=content.getChildCount();
+        LinearLayout panel=card();
+        Switch visited=new Switch(this);
+        visited.setText("Быстрое перемещение только в посещённые локации");
+        visited.setTextColor(TEXT);visited.setTextSize(sp(14));
+        visited.setThumbTintList(ColorStateList.valueOf(accent()));
+        visited.setChecked(prefs.getBoolean("fast_travel_visited_only",false));
+        panel.addView(visited,lp(-1,-2));
+        visited.setOnCheckedChangeListener((v,on)->
+            prefs.edit().putBoolean("fast_travel_visited_only",on).apply());
+        addText(panel,"По умолчанию выключено. Быстрое перемещение не расходует время, септимы или силы. Во время боя и незавершённой дорожной встречи перемещение запрещено.",12,MUTED,false,7);
+        foldSettingsSection("fast_travel","БЫСТРОЕ ПЕРЕМЕЩЕНИЕ",start);
+    }
     private View sceneGallery(String location){
         return new LocationGalleryView(this,location,accent(),false);
     }
@@ -3724,7 +3738,28 @@ public final class MainActivity extends Activity {
         WorldAtlas.Place place=WorldAtlas.find(SkyrimMapCatalog.travelDestination(site));
         if(place!=null){locationDialog(place);return;}
         new RuneDialogBuilder(this,accent()).setTitle(site.name)
-            .setMessage(site.type+" | "+site.grid).setNegativeButton("Закрыть",null).show();
+            .setMessage(site.type+" | "+site.grid)
+            .setNeutralButton("Быстрое перемещение",(d,w)->fastTravelFromMap(site.name))
+            .setNegativeButton("Закрыть",null).show();
+    }
+    private boolean fastTravelFromMap(String destination){
+        if(livingBusy()){toast("Заверши текущее действие перед перемещением");return false;}
+        boolean visitedOnly=prefs.getBoolean("fast_travel_visited_only",false);
+        if(!game.fastTravel(destination,visitedOnly)){
+            toast(visitedOnly?"Доступны только ранее посещённые локации":"Быстрое перемещение сейчас недоступно");
+            return false;
+        }
+        game.progress.sync(game);
+        String arrived=game.progress.location;
+        if(game.aiNarrativeMode&&!game.nativeSceneRequired()){
+            String outcome=game.message;game.aiTurn=null;
+            selectedAiChoices.clear();aiOwnDraft="";clearAiDraft();clearAiPending();
+            aiMemory.add(aiSession,"event",outcome);save();tab=0;
+            requestAiTurn("Движок уже подтвердил быстрое перемещение в "+arrived+
+                ". Опиши прибытие, не трать дни или ресурсы повторно и предложи новые действия.",false);
+            if(!aiTurnBusy)render();
+        }else{save();tab=1;render();}
+        return true;
     }
     private void searchSkyrimAtlas(){
         searchSkyrimAtlas(null);
@@ -3933,6 +3968,12 @@ public final class MainActivity extends Activity {
                     requestAiTurn("Движок уже разрешил переход: "+outcome+"\nОпиши фактическое прибытие, не повторяй перемещение и эффекты. Создай новые варианты.",false);
                     if(!aiTurnBusy)render();
                 }else{save();tab=0;render();}
+            });
+            space(footer,6);
+        }
+        if(!place.name.equals(game.progress.location)){
+            visualSummaryLink(footer,"БЫСТРОЕ ПЕРЕМЕЩЕНИЕ",()->{
+                if(fastTravelFromMap(place.name))dialog.dismiss();
             });
             space(footer,6);
         }
@@ -6122,6 +6163,7 @@ public final class MainActivity extends Activity {
         amoledSettings();
         npcNameSettings();
         visualSettings();
+        fastTravelSettings();
         int aiStart=content.getChildCount();
         space(content,6);addText(content,"ИИ-ПРИКЛЮЧЕНИЕ",11,accent(),true,11);
         LinearLayout aiCard=card();
