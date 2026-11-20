@@ -143,4 +143,24 @@ public class SolitudeHomeTest {
         assertEquals(before+3,g.progress.quantity(SolitudeCraft.ENCHANT_RING));
         assertEquals(2,g.progress.quantity(SolitudeCraft.BASE_RING));
     }
+    @Test public void batchEnchantingStopsAtNightAndRejectsRemoteCommands() throws Exception {
+        GameEngine g=city();g.fixShop.home.buy(4);g.choose("SOLITUDE:visit:2");
+        g.choose("SOLITUDE:furnish:4");g.choose("SOLITUDE:back");g.choose("SOLITUDE:home");
+        g.stamina=50;g.progress.quantity(SolitudeCraft.BASE_RING,5);
+        g.progress.quantity(SolitudeCraft.SOUL_GEM,5);
+        int before=g.progress.quantity(SolitudeCraft.ENCHANT_RING);
+        g.hour=22;
+        g.choose("SOLITUDE:craft:enchant-batch:ring");
+        assertEquals(before+1,g.progress.quantity(SolitudeCraft.ENCHANT_RING));
+        assertEquals(23,g.hour);
+        assertEquals(4,g.progress.quantity(SolitudeCraft.SOUL_GEM));
+        assertEquals(4,g.progress.quantity(SolitudeCraft.BASE_RING));
+        g=GameEngine.fromJson(g.toJson().toString());
+        g.choose("SOLITUDE:craft:enchant-batch:ring");
+        assertEquals(before+1,g.progress.quantity(SolitudeCraft.ENCHANT_RING));
+        g.hour=10;g.choose("SOLITUDE:back");
+        g.choose("SOLITUDE:craft:enchant-batch:ring");
+        assertEquals(before+1,g.progress.quantity(SolitudeCraft.ENCHANT_RING));
+        assertEquals(4,g.progress.quantity(SolitudeCraft.SOUL_GEM));
+    }
 }
