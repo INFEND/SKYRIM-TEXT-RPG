@@ -65,9 +65,9 @@ final class SolitudeCraft {
         g.progress.skillExperience(g,8,25);finish(g,"В Высоком шпиле зачаровано: "+out,3);
     }
     static void choices(GameEngine g,GameEngine.Scene s){
-        if(canEnchant(g,BASE_SWORD,ENCHANT_SWORD))s.add(PREFIX+"enchant:sword","Зачаровать железный меч","Авторский рецепт | +3 базового урона | заполненный малый камень душ | 1 ч.");
-        if(canEnchant(g,BASE_NECK,ENCHANT_NECK))s.add(PREFIX+"enchant:neck","Зачаровать серебряное ожерелье","Авторский рецепт | +15 брони при ношении | заполненный малый камень душ | 1 ч.");
-        if(canEnchant(g,BASE_RING,ENCHANT_RING))s.add(PREFIX+"enchant:ring","Зачаровать серебряное кольцо","Авторский рецепт | +10 кг при ношении | заполненный малый камень душ | 1 ч.");
+        if(canEnchant(g,BASE_SWORD,ENCHANT_SWORD)){s.add(PREFIX+"enchant:sword","Зачаровать железный меч","Авторский рецепт | +3 базового урона | заполненный малый камень душ | 1 ч.");if(g.progress.quantity(BASE_SWORD)>=2&&g.progress.quantity(SOUL_GEM)>=2)s.add(PREFIX+"enchant-batch:sword","Зачаровать до 5 железных мечей","Каждый предмет требует отдельный заполненный камень душ и 3 запаса сил");}
+        if(canEnchant(g,BASE_NECK,ENCHANT_NECK)){s.add(PREFIX+"enchant:neck","Зачаровать серебряное ожерелье","Авторский рецепт | +15 брони при ношении | заполненный малый камень душ | 1 ч.");if(g.progress.quantity(BASE_NECK)>=2&&g.progress.quantity(SOUL_GEM)>=2)s.add(PREFIX+"enchant-batch:neck","Зачаровать до 5 серебряных ожерелий","Каждое зачарование проверяет ресурсы, вес и время");}
+        if(canEnchant(g,BASE_RING,ENCHANT_RING)){s.add(PREFIX+"enchant:ring","Зачаровать серебряное кольцо","Авторский рецепт | +10 кг при ношении | заполненный малый камень душ | 1 ч.");if(g.progress.quantity(BASE_RING)>=2&&g.progress.quantity(SOUL_GEM)>=2)s.add(PREFIX+"enchant-batch:ring","Зачаровать до 5 серебряных колец","Каждое зачарование проверяет ресурсы, вес и время");}
         if(forge(g)){
             for(int i=0;i<OUTPUT.length;i++)if(canMake(g,i)){
                 s.add(PREFIX+"make:"+i,"Изготовить: "+OUTPUT[i]+" ×"+COUNT[i],METAL[i]+" × "+MATERIAL[i]+(STRIPS[i]>0?" + "+STRIPS[i]+" × Кожаные полоски":"")+" | 1 ч. | 5 запаса сил");
@@ -86,6 +86,9 @@ final class SolitudeCraft {
     }
     static boolean choose(GameEngine g,String a){
         if(!a.startsWith(PREFIX))return false;
+        if(a.equals(PREFIX+"enchant-batch:sword")){for(int n=0;n<5&&canEnchant(g,BASE_SWORD,ENCHANT_SWORD);n++)enchant(g,BASE_SWORD,ENCHANT_SWORD);return true;}
+        if(a.equals(PREFIX+"enchant-batch:neck")){for(int n=0;n<5&&canEnchant(g,BASE_NECK,ENCHANT_NECK);n++)enchant(g,BASE_NECK,ENCHANT_NECK);return true;}
+        if(a.equals(PREFIX+"enchant-batch:ring")){for(int n=0;n<5&&canEnchant(g,BASE_RING,ENCHANT_RING);n++)enchant(g,BASE_RING,ENCHANT_RING);return true;}
         if(a.equals(PREFIX+"enchant:sword")){enchant(g,BASE_SWORD,ENCHANT_SWORD);return true;}
         if(a.equals(PREFIX+"enchant:ring")){enchant(g,BASE_RING,ENCHANT_RING);return true;}
         if(a.equals(PREFIX+"enchant:neck")){enchant(g,BASE_NECK,ENCHANT_NECK);return true;}
