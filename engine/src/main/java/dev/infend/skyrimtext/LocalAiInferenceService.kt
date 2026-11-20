@@ -141,7 +141,7 @@ class LocalAiInferenceService : Service() {
                 val outputBudget=if(inputTokens==null) limit-previousTokens else
                     minOf(limit-previousTokens,contextCapacity-inputTokens-16)
                 if(outputBudget<24)error("Недостаточно места для ответа в контексте модели.")
-                status(receiver, id, "Генерация ответа, токены появятся по мере готовности…")
+                status(receiver, id, "Генерация ответа")
                 val started = SystemClock.elapsedRealtime()
                 val result = engine.launchCompletion(context, mapOf(
                     "prompt" to (direct + prefix),

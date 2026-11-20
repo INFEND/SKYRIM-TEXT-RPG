@@ -62,13 +62,22 @@ class LocalAiClient(private val context: Context) {
                 val partial=reply.data.getString("text").orEmpty()
                 val tokens=reply.data.getInt("tokens",0)
                 if(partial.isNotEmpty()) {
-                    // Reset the inactivity watchdog only when generation advances.
-                    if(tokens>lastTokens)armWatchdog(id)
-                    lastPartial=partial
-                    lastTokens=tokens
-                    listener.onText(partial)
+                    // A model restart must not erase the already displayed scene.
+                    // Abort the same request rather than silently rerolling its story.
+                    val rewound=tokens+2<lastTokens || partial.length+64<lastPartial.length
+                    if(rewound) {
+                        failGeneration(id,"Локальный движок сбросил генерацию. Полученный до сбоя текст не перезаписан; проверь совместимый режим GGUF.")
+                        try { messenger?.send(Message.obtain(null,LocalAiProtocol.MSG_CANCEL)) } catch (_:Exception) {}
+                    } else if(partial.length>=lastPartial.length &&
+                              (partial!=lastPartial || tokens>lastTokens)) {
+                        // Reset the inactivity watchdog only when generation advances.
+                        if(tokens>lastTokens)armWatchdog(id)
+                        lastPartial=partial
+                        lastTokens=maxOf(lastTokens,tokens)
+                        listener.onText(partial)
+                    }
                 }
-                if(tokens>0)listener.onLocalStatus("Генерация: "+tokens+" токенов")
+                if(tokens>0&&currentGeneration(id))listener.onLocalStatus("Генерация ответа")
             }
         }else if(reply.what==LocalAiProtocol.MSG_RESULT) {
             val id=reply.data.getLong("id",-1L)
