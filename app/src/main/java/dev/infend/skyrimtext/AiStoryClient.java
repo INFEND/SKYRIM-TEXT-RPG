@@ -65,6 +65,7 @@ public final class AiStoryClient {
             "enemy:{name,hp,maxHp,damage}, если в сцене появился или исчез противник; hp=0 для исчезновения. "+
             "skills:[{index,xp}], index 0..17, xp целое 0..250 за ход, каждый индекс только один раз; xpDelta 0..10000. Не указывай XP без заслуженной награды. quest:string, questStatus:ACTIVE|COMPLETED|FAILED. journal: краткая запись нового события. "+
             "questUpdates:[{id,title,objective,stage,status}] для создания и обновления авторских заданий. ID из [a-z0-9_], stage 0..100, status ACTIVE|COMPLETED|FAILED, objective до 240 символов. Не откатывай стадии и завершённые исходы; обновляй только после подтверждённого действия игрока. "+
+            "npcRewrites:[{id,relation,resurrect}] позволяет изменить отношение существующего NPC (relation 0..100) или воскресить погибшего (resurrect:true). ID должен существовать в подтверждённых фактах NPC. Не меняй системных и защищённых спутников; изменение возможно только после результата действия героя. "+
             "sceneFacts:[{kind,id,title,status}] допускается только ПОСЛЕ подтверждённого действия игрока, максимум 12 фактов за ход. "+
             "kind=npc со статусами MET|INFORMED|HELPED|HOSTILE|DEAD|MISSING; kind=clue со статусами FOUND|EXAMINED|USED; kind=sublocation со статусами DISCOVERED|VISITED|CLEARED. "+
             "id: уникальный стабильный латинский идентификатор 1..48 символов [A-Za-z0-9_-], title: непустое название до 120 символов. "+

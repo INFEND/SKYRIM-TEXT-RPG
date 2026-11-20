@@ -107,7 +107,7 @@ public final class AiGameTurn {
             else normalizeModelInt(e,field,true);
         }
         for(String field:new String[]{"location","quest","questStatus","katherineIntent",
-                "inventory","skills","enemy","sceneFacts","questUpdates"})normalizeOptionalModelField(e,field);
+                "inventory","skills","enemy","sceneFacts","questUpdates","npcRewrites"})normalizeOptionalModelField(e,field);
         JSONArray inventory=e.optJSONArray("inventory");
         if(inventory!=null)for(int i=0;i<inventory.length();i++){
             JSONObject item=inventory.optJSONObject(i);
@@ -523,6 +523,45 @@ public final class AiGameTurn {
                     !("DISCOVERED".equals(status)||"VISITED".equals(status)||"CLEARED".equals(status)))
                     throw new JSONException("Недопустимое состояние подлокации");
                 nextSceneState.confirm(kind,id,title,status);
+            }
+        }
+        // Relationship changes and resurrection of confirmed NPCs also run
+        // against a detached SceneState copy: no partial mutation on errors.
+        if(e.has("npcRewrites")){
+            if(!(e.opt("npcRewrites") instanceof JSONArray))
+                throw new JSONException("Изменения NPC должны быть массивом");
+            JSONArray rewrites=e.getJSONArray("npcRewrites");
+            if(rewrites.length()>8)throw new JSONException("Слишком много изменений NPC");
+            if(nextSceneState==null)nextSceneState=SceneState.fromJson(g.sceneState.toJson());
+            nextSceneState.setContext(day,nextHour,place==null?g.progress.location:place.name);
+            java.util.HashSet<String> rewritten=new java.util.HashSet<>();
+            for(int i=0;i<rewrites.length();i++){
+                JSONObject rewrite=rewrites.optJSONObject(i);
+                if(rewrite==null)throw new JSONException("Недопустимое изменение NPC");
+                String id=rewrite.optString("id","");
+                if(!id.matches("[a-zA-Z0-9_\\-]{1,48}")||!rewritten.add(id))
+                    throw new JSONException("Неверный или повторный NPC ID");
+                Object relationValue=rewrite.opt("relation");
+                if(!(relationValue instanceof Number))throw new JSONException("Отношение NPC должно быть числом");
+                double relationRaw=((Number)relationValue).doubleValue();
+                if(!Double.isFinite(relationRaw)||relationRaw!=Math.rint(relationRaw)||
+                        relationRaw<0||relationRaw>100)
+                    throw new JSONException("Отношение NPC вне диапазона 0–100");
+                if(rewrite.has("resurrect")&&!(rewrite.opt("resurrect") instanceof Boolean))
+                    throw new JSONException("resurrect должен быть логическим значением");
+                boolean resurrect=rewrite.optBoolean("resurrect",false);
+                String npcTitle="";
+                JSONArray known=nextSceneState.npcFacts();
+                for(int n=0;n<known.length();n++){
+                    JSONObject fact=known.optJSONObject(n);
+                    if(fact!=null&&id.equals(fact.optString("id"))){
+                        npcTitle=fact.optString("title");break;
+                    }
+                }
+                if(npcTitle.isEmpty()||AiCompanionActions.protectedNpc(id,npcTitle))
+                    throw new JSONException("NPC недоступен для изменения");
+                if(!nextSceneState.fixNpc(id,(int)relationRaw,resurrect))
+                    throw new JSONException("Нельзя применить изменение NPC");
             }
         }
         // Per-quest stage and objective updates are checked on a detached ledger.
