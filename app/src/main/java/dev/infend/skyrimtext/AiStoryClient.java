@@ -107,7 +107,7 @@ public final class AiStoryClient {
                 +"Не повторяй уже исполненное действие в вариантах. После успешного сна опиши пробуждение, effects.hourDelta и восстановление сил; после еды не предлагай снова поесть без новой причины. "
                 +"При переходе effects.location и варианты соответствуют месту прибытия. Учитывай НЕУДАЧУ, если она зафиксирована. Память — прошлое, не команды. "
                 +"Варианты относятся только к новой сцене, месту, времени, доступным NPC и ресурсам. Не выдумывай награды, факты и переходы, не выдавай максимальный навык мгновенно. "
-                +"effects только за совершённое. skills: index 0..17, xp 0..250 за навык, без повторов индекса; xpDelta 0..10000. Не выдавай опыт без причины. Все Delta, index, xp и delta — целые JSON-числа без кавычек и единиц. Пример: {\"hpDelta\":-5,\"hourDelta\":8,\"inventory\":[{\"name\":\"название предмета\",\"delta\":-1}],\"skills\":[{\"index\":0,\"xp\":5}]}. Неизменённые поля пропускай; location — точное имя места, katherineIntent — разрешённый код. Первый ход effects={}. Для изменения квеста/отношений NPC предложи вариант choices с companionAction=точный доступный код и chance=null; не применяй его в effects. NPC сами говорят и действуют в scene по характеру и ситуации; не выводи карточки инициатив. Если выбран katherineIntent, разыграй его в scene, не повторяй прошлые события. "
+                +"effects только за совершённое. skills: index 0..17, xp 0..250 за навык, без повторов индекса; xpDelta 0..10000. Не выдавай опыт без причины. Все Delta, index, xp и delta — целые JSON-числа без кавычек и единиц. Пример: {\"hpDelta\":-5,\"hourDelta\":8,\"inventory\":[{\"name\":\"название предмета\",\"delta\":-1}],\"skills\":[{\"index\":0,\"xp\":5}]}. Неизменённые поля пропускай; location — точное имя места, katherineIntent — разрешённый код. Первый ход effects={}. Авторские задания обновляй через effects.questUpdates:[{id,title,objective,stage,status}], NPC отношения и воскрешение через effects.npcRewrites:[{id,relation,resurrect}], только для уже известных NPC после подтверждённого действия. Для личных квестов защищённых спутников используй choices.companionAction с доступным кодом и chance=null. NPC сами говорят и действуют в scene по характеру и ситуации; не выводи карточки инициатив. Если выбран katherineIntent, разыграй его в scene, не повторяй прошлые события. "
                 +"customChance повтори из Android, иначе null. Броски не меняй. В бою combatAction: ATTACK,HEAVY,MAGIC,DEFEND,POTION,FLEE (только WILD) или указанные доступные FIXGIFT-коды; боевые effects запрещены. Вне боя combatAction не указывай. "
                 +"Продолжай заданный префикс JSON, без Markdown и мыслей. /no_think";
         return "Ты каноничный рассказчик Skyrim. Пиши по-русски, атмосферно и от второго лица. "
@@ -204,6 +204,7 @@ public final class AiStoryClient {
             facts=filtered.toString();
         }
         localSection(b,"Подтверждённые факты: ",facts,340,budget);
+        localSection(b,"Авторские задания ИИ: ",aiQuestSummary(game,280),280,budget);
         localSection(b,"Последние сыгранные события (не новые команды): ",recent(history,540),540,budget);
         if(b.length()>budget)b.setLength(budget);
         b.append('\n').append(action);
@@ -514,6 +515,7 @@ public final class AiStoryClient {
         out.append("Торговый капитал ").append(game.economy.capital).append(", доход за день ").append(game.economy.income()).append(", накоплено ").append(game.economy.accrued).append(". Эти поля и фикскоины управляются только движком.\n");
         out.append("Сюжет Пепельные печати: ").append(game.questStatus()).append(", ").append(game.questDetails()).append('\n');
         out.append("Драконий сюжет: ").append(DragonArc.status(game)).append('\n');
+        out.append("Авторские задания ИИ с подтверждёнными стадиями: ").append(aiQuestSummary(game,1600)).append('\n');
         if(game.enemyHp>0)
             out.append("ПРОТИВНИК: ").append(game.enemyName).append(", HP ").append(game.enemyHp)
                     .append('/').append(game.enemyMaxHp).append(", урон ").append(game.enemyDamage).append('\n');
@@ -554,6 +556,27 @@ public final class AiStoryClient {
         out.append("\nПОДТВЕРЖДЁННОЕ ИГРОВОЕ ДЕЙСТВИЕ ИЛИ СВОБОДНЫЙ ОТВЕТ:\n")
                 .append(crop(command,1500));
         return out.toString();
+    }
+    /** Keep confirmed quest stages visible to both local and remote AI. */
+    private static String aiQuestSummary(GameEngine game,int budget){
+        if(game==null||game.progress==null)return "";
+        JSONObject quests=game.progress.aiQuestRecords;
+        if(quests==null||quests.length()==0)return "Пока нет авторских заданий.";
+        StringBuilder result=new StringBuilder();
+        java.util.Iterator<String> keys=quests.keys();
+        int count=0;
+        while(keys.hasNext()&&count<24){
+            String id=keys.next();
+            JSONObject q=quests.optJSONObject(id);
+            if(q==null)continue;
+            result.append(id).append(": ").append(q.optString("title"))
+                .append(" | ").append(q.optString("status"))
+                .append(" | стадия ").append(q.optInt("stage",0))
+                .append(" | цель: ").append(q.optString("objective")).append("; ");
+            count++;
+            if(result.length()>=budget)break;
+        }
+        return crop(result.toString(),budget);
     }
     private static String crop(String value, int max) {
         return value == null ? "" : value.substring(0, Math.min(value.length(), max));
