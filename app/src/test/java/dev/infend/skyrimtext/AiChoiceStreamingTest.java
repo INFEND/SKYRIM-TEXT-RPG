@@ -29,6 +29,13 @@ public class AiChoiceStreamingTest {
         assertEquals("А",AiGameTurn.previewChoices("{\"choices\":[{\"title\":\"А\\u04").get(0).title);
         assertEquals("Аб",AiGameTurn.previewChoices("{\"choices\":[{\"title\":\"А\\u0431").get(0).title);
     }
+    @Test public void onlyFullyGeneratedChoiceIsReady(){
+        String start="{\"scene\":\"В Ривервуде тихо.\",\"choices\":[{\"title\":\"Поговорить\",\"detail\":\"Узнать новости\"";
+        assertFalse(AiGameTurn.previewChoices(start).get(0).ready);
+        String complete=start+",\"skill\":\"Речь\",\"chance\":null}";
+        assertTrue(AiGameTurn.previewChoices(complete).get(0).ready);
+        assertEquals("Поговорить",AiGameTurn.previewChoices(complete).get(0).title);
+    }
     @Test public void finalParserStillRejectsIncompleteTurn(){
         try{
             AiGameTurn.parse("{\"scene\":\"Текст\",\"choices\":[{\"title\":\"Осмотреть");

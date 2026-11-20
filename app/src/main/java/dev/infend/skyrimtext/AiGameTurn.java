@@ -11,8 +11,15 @@ public final class AiGameTurn {
     public static final class Option {
         public final String title,detail,skill,combatAction,companionAction;
         public final int chance;
-        Option(String t,String d,String s,int c,String a){this(t,d,s,c,a,"");}
-        Option(String t,String d,String s,int c,String a,String n){title=t;detail=d;skill=s;companionAction=AiCompanionActions.code(n);chance=companionAction.isEmpty()?c:-1;combatAction=a;}
+        /** A streamed preview is selectable only after its entire JSON object closes. */
+        public final boolean ready;
+        Option(String t,String d,String s,int c,String a){this(t,d,s,c,a,"",true);}
+        Option(String t,String d,String s,int c,String a,String n){this(t,d,s,c,a,n,true);}
+        Option(String t,String d,String s,int c,String a,String n,boolean complete){
+            title=t;detail=d;skill=s;companionAction=AiCompanionActions.code(n);
+            chance=companionAction.isEmpty()?c:-1;combatAction=a;
+            ready=complete&&t!=null&&t.trim().length()>=4&&d!=null&&d.trim().length()>=8;
+        }
     }
     private static final SecureRandom DICE=new SecureRandom();
     public final String scene,journal;
@@ -310,7 +317,7 @@ public final class AiGameTurn {
                 }catch(JSONException ignored){}
             }
             if(!title.isEmpty()||!detail.isEmpty())
-                out.add(new Option(limited(title,110),limited(detail,270),limited(skill,65),chance,action));
+                out.add(new Option(limited(title,110),limited(detail,270),limited(skill,65),chance,action,"",end>=0));
             if(end<0)break;
             i=previewSpace(partial,end+1);
             if(i>=partial.length()||partial.charAt(i)!=',')break;

@@ -113,6 +113,8 @@ public final class MainActivity extends Activity {
     private TextView aiChoiceLiveHeader;
     private final java.util.ArrayList<AiGameTurn.Option> aiChoicePreview=new java.util.ArrayList<>();
     private final java.util.ArrayList<TextView[]> aiChoiceLiveRows=new java.util.ArrayList<>();
+    private final java.util.ArrayList<LinearLayout> aiChoiceLiveCards=new java.util.ArrayList<>();
+    private final java.util.LinkedHashSet<String> aiPreviewSelected=new java.util.LinkedHashSet<>();
     private Runnable aiDotsTicker;
     private String aiReasoningPreview="";
     private final java.util.LinkedHashSet<Integer> selectedAiChoices=new java.util.LinkedHashSet<>();
@@ -2523,7 +2525,7 @@ public final class MainActivity extends Activity {
         if(aiElapsedText!=null&&aiDotsTicker!=null)aiElapsedText.removeCallbacks(aiDotsTicker);
         aiDotsTicker=null;
         aiTurnText=null;aiProgressInfo=null;aiElapsedText=null;aiReasoningText=null;
-        aiChoiceLive=null;aiChoiceLiveHeader=null;aiChoiceLiveCount=null;aiChoiceLiveRows.clear();
+        aiChoiceLive=null;aiChoiceLiveHeader=null;aiChoiceLiveCount=null;aiChoiceLiveRows.clear();aiChoiceLiveCards.clear();
     }
     private static String aiLiveDots(long millis){
         switch((int)((millis/420L)%4)){case 1:return ".";case 2:return "..";case 3:return "…";default:return "";}
@@ -2878,14 +2880,14 @@ public final class MainActivity extends Activity {
         if(!aiTurnBusy)render();
     }
 
-    /** Keep preview rows stable while streaming; never make uncommitted actions clickable. */
+    /** Streamed cards can be selected once complete; the game stays immutable until validation. */
     private void syncAiChoicePreview(){
         if(aiChoiceLive==null||aiChoiceLiveHeader==null)return;
         aiChoiceLive.setVisibility(View.VISIBLE);
         if(aiChoiceLiveCount!=null)aiChoiceLiveCount.setText(aiChoicePreview.size()+"/10");
         while(aiChoiceLiveRows.size()>aiChoicePreview.size()){
             int last=aiChoiceLiveRows.size()-1;
-            aiChoiceLive.removeViewAt(last+1);aiChoiceLiveRows.remove(last);
+            aiChoiceLive.removeViewAt(last+1);aiChoiceLiveRows.remove(last);aiChoiceLiveCards.remove(last);
         }
         for(int i=0;i<aiChoicePreview.size();i++){
             AiGameTurn.Option option=aiChoicePreview.get(i);
@@ -2902,6 +2904,18 @@ public final class MainActivity extends Activity {
                 LinearLayout.LayoutParams p=lp(-1,-2);p.topMargin=dp(6);
                 aiChoiceLive.addView(row,p);
                 aiChoiceLiveRows.add(new TextView[]{title,detail,meta});
+                aiChoiceLiveCards.add(row);
+                final int index=i;
+                row.setOnClickListener(v->{
+                    if(!aiTurnBusy||index>=aiChoicePreview.size())return;
+                    AiGameTurn.Option candidate=aiChoicePreview.get(index);
+                    if(!candidate.ready)return; // Incomplete JSON is display-only.
+                    boolean was=aiPreviewSelected.contains(candidate.title);
+                    if("COMBAT".equals(game.mode)&&game.enemyHp>0)aiPreviewSelected.clear();
+                    if(was)aiPreviewSelected.remove(candidate.title);
+                    else aiPreviewSelected.add(candidate.title);
+                    syncAiChoicePreview(); // Selection never mutates game before the full turn.
+                });
             }
             TextView[] views=aiChoiceLiveRows.get(i);
             String title=(showChoiceNumbers()?(i+1)+". ":"")+option.title;
@@ -2910,6 +2924,13 @@ public final class MainActivity extends Activity {
             if(!option.detail.contentEquals(views[1].getText()))views[1].setText(option.detail);
             if(!meta.contentEquals(views[2].getText()))views[2].setText(meta);
             views[2].setVisibility(meta.isEmpty()?View.GONE:View.VISIBLE);
+            LinearLayout card=aiChoiceLiveCards.get(i);
+            boolean selected=aiPreviewSelected.contains(option.title);
+            card.setEnabled(option.ready);
+            card.setAlpha(option.ready?1f:0.65f);
+            card.setBackground(bg(selected?0xff292929:0xff141414,Color.TRANSPARENT,18));
+            card.setContentDescription((option.ready?"Вариант готов к выбору":"Вариант ещё генерируется")+
+                ": "+option.title+(selected?", выбран":""));
         }
     }
 
@@ -3002,7 +3023,7 @@ public final class MainActivity extends Activity {
         final String saved;
         try{saved=game.toJson().toString();}
         catch(Exception ex){aiTurnStatus="Не удалось прочитать состояние героя";render();return;}
-        aiTurnBusy=true;aiTurnPreview="";aiReasoningPreview="";aiChoicePreview.clear();
+        aiTurnBusy=true;aiTurnPreview="";aiReasoningPreview="";aiChoicePreview.clear();aiPreviewSelected.clear();
         final long requestId=++aiRequestSerial;
         aiTurnProposal=proposalOnly;
         aiLocalStartedAt=android.os.SystemClock.elapsedRealtime();
@@ -3083,7 +3104,12 @@ public final class MainActivity extends Activity {
                     commitAiSave(next);
                     game=next;
                     lastNarrative=completed.scene;
-                    selectedAiChoices.clear();aiOwnDraft="";
+                    selectedAiChoices.clear();
+                    // Preserve early selections by stable title, not by a potentially shifted index.
+                    for(int i=0;i<completed.choices.size();i++)
+                        if(aiPreviewSelected.contains(completed.choices.get(i).title))
+                            selectedAiChoices.add(i+1);
+                    aiPreviewSelected.clear();aiOwnDraft="";
                     captureItemGains(before,next,!actionResolved);
                     if(actionResolved)enqueueLivingResult(game.lastLivingResult);
                     aiMemory.add(aiSession,"user",instruction);
@@ -3179,6 +3205,7 @@ public final class MainActivity extends Activity {
         aiTurnBusy=false;
         aiTurnPreview="";
         aiReasoningPreview="";
+        aiPreviewSelected.clear();
         if(aiClient!=null)aiClient.cancel();
         if(localAiClient!=null)localAiClient.cancel();
     }
