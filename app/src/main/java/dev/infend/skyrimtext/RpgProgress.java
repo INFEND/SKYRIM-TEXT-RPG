@@ -21,6 +21,8 @@ public final class RpgProgress {
 
     public final int[] skillLevels = new int[RpgContent.SKILLS.length];
     public final int[] skillXp = new int[RpgContent.SKILLS.length];
+    // Five paid training sessions per hero level; these counters live in the save.
+    public int trainingLevel=-1,trainingsThisLevel=0;
     private final int[] combatPerks=new int[6];
     private final int[] studyPerks=new int[RpgContent.SKILLS.length];
     TalentBranches branches=new TalentBranches();
@@ -417,7 +419,8 @@ public final class RpgProgress {
         try{
             o.put("startId",startId).put("location",location).put("recent",recent)
              .put("points",new JSONArray(spent)).put("skillLevels",new JSONArray(skillLevels))
-             .put("skillXp",new JSONArray(skillXp)).put("inventory",inventory)
+             .put("skillXp",new JSONArray(skillXp)).put("trainingLevel",trainingLevel)
+             .put("trainingsThisLevel",trainingsThisLevel).put("inventory",inventory)
              .put("completed",new JSONArray(completed)).put("failed",new JSONArray(failed))
              .put("questOutcomes",new JSONObject(questOutcomes)).put("roadArtifacts",artifacts.save())
              .put("fixCarryBonus",fixCarryBonus).put("perks",perkPoints).put("combatPerks",new JSONArray(combatPerks)).put("studyPerks",new JSONArray(studyPerks)).put("talentBranches",branches.toJson()).put("advancedPerks",advanced.toJson())
@@ -465,6 +468,8 @@ public final class RpgProgress {
             String key=attempted.optString(i,"");
             if(key.matches("ACT:[0-9]"))p.attemptedToday.add(key);
         }
+        p.trainingLevel=obj.optInt("trainingLevel",-1);
+        p.trainingsThisLevel=Math.max(0,Math.min(5,obj.optInt("trainingsThisLevel",0)));
         JSONArray levels=obj.optJSONArray("skillLevels"),xp=obj.optJSONArray("skillXp"),pts=obj.optJSONArray("points");
         for(int i=0;i<p.skillLevels.length;i++){
             if(levels!=null)p.skillLevels[i]=Math.max(0,Math.min(100,levels.optInt(i,15)));

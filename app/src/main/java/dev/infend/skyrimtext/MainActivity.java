@@ -672,6 +672,14 @@ public final class MainActivity extends Activity {
         View rule=new View(this);rule.setBackgroundColor(0xff292929);panel.addView(rule,lp(-1,1));space(panel,12);
         if(profile!=null&&profile.template)addText(panel,"Типовая запись. Внешность, пол, отношения и состояние зависят от конкретного экземпляра.",13,MUTED,false,8);
         npcGrid(panel,NPC_SECTIONS,NPC_SECTION_ICONS,accent(),index->npcSection(display,index));
+        SkillTrainers.Trainer trainer=SkillTrainers.find(display);
+        if(trainer!=null&&npcInCurrentScene(display)&&!"DEAD".equals(status)&&!"MISSING".equals(status)){
+            space(panel,8);
+            livingLink(panel,"Обучиться: "+trainer.skillName(),
+                "До "+trainer.maximum+" уровня | "+trainer.location,"learn",()->{
+                    dialog.dismiss();npcTrainingDialog(display);
+                });
+        }
         if(profile!=null&&!profile.template&&!profile.mentioned&&!profile.author&&game.started&&!livingBusy()&&(!game.aiNarrativeMode||game.nativeSceneRequired())){
             java.util.ArrayList<GameEngine.Choice> available=npcNativeChoices(display);
             if(!available.isEmpty()){
@@ -790,6 +798,9 @@ public final class MainActivity extends Activity {
         npcGrid(panel,labelsForMenu,iconsForMenu,TEXT,slot->{
             int index=allowed[slot];
             if(!game.started||!npcAddonEnabled(name)||"DEAD".equals(npcKnownStatus(name))||"MISSING".equals(npcKnownStatus(name))||livingBusy()){toast("Персонаж или действие сейчас недоступны");return;}
+            if(index==5&&SkillTrainers.find(name)!=null){
+                menu.dismiss();parent.dismiss();npcTrainingDialog(name);return;
+            }
             if(game.aiNarrativeMode&&!game.nativeSceneRequired()){
                 if(!npcInCurrentScene(name)){toast("Персонаж не участвует в текущей сцене");return;}
                 String draft=NPC_ACTION_TEXT[index]+": "+name+".";
@@ -820,6 +831,49 @@ public final class MainActivity extends Activity {
                 menu.dismiss();parent.dismiss();executeStoryChoice(chosen);
             }).setNegativeButton("Отмена",null).show();
         });menu.show();
+    }
+    private void npcTrainingDialog(String npcName){
+        SkillTrainers.Trainer trainer=SkillTrainers.find(npcName);
+        if(trainer==null||!npcInCurrentScene(npcName)||
+                "DEAD".equals(npcKnownStatus(npcName))||
+                "MISSING".equals(npcKnownStatus(npcName))||livingBusy()){
+            toast("Обучение доступно только при встрече с живым учителем");return;
+        }
+        int limit=SkillTrainers.remaining(game,trainer);
+        if(limit<1){
+            toast("Достигнут предел учителя или 5 занятий за уровень героя");return;
+        }
+        LinearLayout panel=column();
+        panel.setPadding(dp(14),dp(10),dp(14),dp(12));
+        addText(panel,trainer.skillName()+"  •  "+game.progress.skillLevel(trainer.skill)+"/"+trainer.maximum,17,accent(),true,8);
+        addText(panel,"Учитель: "+trainer.name+" | "+trainer.location,13,MUTED,false,6);
+        addText(panel,"До "+limit+" занятий за текущий уровень героя. Оплата септимами.",13,TEXT,false,8);
+        android.widget.SeekBar count=new android.widget.SeekBar(this);
+        count.setMax(limit-1);count.setProgress(0);
+        count.setProgressTintList(ColorStateList.valueOf(accent()));
+        count.setThumbTintList(ColorStateList.valueOf(accent()));
+        panel.addView(count,lp(-1,48));
+        TextView cost=text("",16,accent(),true);panel.addView(cost,lp(-1,-2));
+        Runnable refresh=()->{
+            int n=count.getProgress()+1,price=SkillTrainers.quote(game,trainer,n);
+            cost.setText("Уровней: +"+n+" | Цена: "+price+" септимов | В наличии: "+game.gold);
+        };
+        count.setOnSeekBarChangeListener(new android.widget.SeekBar.OnSeekBarChangeListener(){
+            public void onStartTrackingTouch(android.widget.SeekBar v){}
+            public void onStopTrackingTouch(android.widget.SeekBar v){}
+            public void onProgressChanged(android.widget.SeekBar v,int p,boolean user){refresh.run();}
+        });
+        AlertDialog dialog=new RuneDialogBuilder(this,accent()).setTitle("Обучение: "+trainer.name).setView(panel)
+            .setNegativeButton("Назад",null).setPositiveButton("Оплатить",null).create();
+        dialog.show();refresh.run();
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v->{
+            if(!npcInCurrentScene(npcName)||livingBusy()||
+                    !SkillTrainers.train(game,trainer,count.getProgress()+1)){
+                toast("Обучение недоступно: проверь септимы и предел навыка");return;
+            }
+            save();dialog.dismiss();render();npcDetails(npcName);
+            toast("Обучение завершено");
+        });
     }
     private String npcRaceLabel(NpcProfiles.Profile p){
         if("Женский".equals(p.gender)){if("Имперец".equals(p.race))return "Имперка";if("Бретон".equals(p.race))return "Бретонка";}return p.race;
