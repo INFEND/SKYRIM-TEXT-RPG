@@ -73,7 +73,11 @@ final class SolitudeCraft {
             for(ItemCatalog.Item item:g.progress.owned("Все","Название"))if(!item.temperMaterial().isEmpty()&&g.progress.temperBlock(item,g).isEmpty())
                 s.add(PREFIX+"temper:"+item.id,"Улучшить: "+item.name,"1 × "+item.temperMaterial()+" | "+g.progress.temperTargetName(item)+" | 1 ч.");
         }
-        for(int i=0;i<ALCHEMY_OUT.length;i++)if(canMix(g,i))s.add(PREFIX+"mix:"+i,"Сварить: "+ALCHEMY_OUT[i],ALCHEMY_A[i]+" + "+ALCHEMY_B[i]+" | Адаптированный рецепт | 1 ч. | 3 запаса сил");
+        for(int i=0;i<ALCHEMY_OUT.length;i++)if(canMix(g,i)){
+            s.add(PREFIX+"mix:"+i,"Сварить: "+ALCHEMY_OUT[i],ALCHEMY_A[i]+" + "+ALCHEMY_B[i]+" | Адаптированный рецепт | 1 ч. | 3 запаса сил");
+            if(g.progress.quantity(ALCHEMY_A[i])>=2&&g.progress.quantity(ALCHEMY_B[i])>=2)
+                s.add(PREFIX+"mix-batch:"+i,"Сварить до 5: "+ALCHEMY_OUT[i],"Проверка ресурсов, веса и времени перед каждой порцией");
+        }
         if(lab(g)&&FixShopHome.canBrew(g))s.add(PREFIX+"brew","Сварить лечебное зелье","Пшеница + голубой горноцвет | 1 ч. | 3 запаса сил");
     }
     static boolean choose(GameEngine g,String a){
@@ -81,7 +85,14 @@ final class SolitudeCraft {
         if(a.equals(PREFIX+"enchant:sword")){enchant(g,BASE_SWORD,ENCHANT_SWORD);return true;}
         if(a.equals(PREFIX+"enchant:ring")){enchant(g,BASE_RING,ENCHANT_RING);return true;}
         if(a.equals(PREFIX+"enchant:neck")){enchant(g,BASE_NECK,ENCHANT_NECK);return true;}
-        for(int i=0;i<ALCHEMY_OUT.length;i++)if(a.equals(PREFIX+"mix:"+i)){mix(g,i);return true;}
+        for(int i=0;i<ALCHEMY_OUT.length;i++){
+            if(a.equals(PREFIX+"mix:"+i)){mix(g,i);return true;}
+            if(a.equals(PREFIX+"mix-batch:"+i)){
+                // Each portion rechecks the workshop, inventory, weight and stamina.
+                for(int n=0;n<5&&canMix(g,i);n++)mix(g,i);
+                return true;
+            }
+        }
         if(a.equals(PREFIX+"brew")){
             if(!lab(g)||!FixShopHome.canBrew(g))return true;
             String mode=g.mode;if(FixShopHome.brew(g)){g.mode=mode;finish(g,g.solitude.homeLaboratory(g)?"В Высоком шпиле приготовлено лечебное зелье.":"В лаборатории Анжелины приготовлено лечебное зелье.",3);}return true;

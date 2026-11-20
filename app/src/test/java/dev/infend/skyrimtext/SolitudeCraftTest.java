@@ -67,6 +67,33 @@ public class SolitudeCraftTest {
         g.choose("SOLITUDE:craft:mix:0");
         assertEquals(before+1,g.manaPotions);
     }
+    @Test public void batchAlchemyStopsAtResourcesAndSurvivesSave() throws Exception {
+        GameEngine g=city(0);
+        g.choose("SOLITUDE:store:1");
+        g.progress.quantity("Красный горноцвет",3);
+        g.progress.quantity("Снежные ягоды",3);
+        int before=g.manaPotions;
+        g.choose("SOLITUDE:craft:mix-batch:0");
+        assertEquals(before+3,g.manaPotions);
+        assertEquals(0,g.progress.quantity("Красный горноцвет"));
+        assertEquals(0,g.progress.quantity("Снежные ягоды"));
+        assertEquals(12,g.hour);
+        g=GameEngine.fromJson(g.toJson().toString());
+        g.choose("SOLITUDE:craft:mix-batch:0");
+        assertEquals(before+3,g.manaPotions);
+    }
+    @Test public void batchAlchemyStopsAtClosingTime() {
+        GameEngine g=city(0);
+        g.choose("SOLITUDE:store:1");
+        g.hour=19;
+        g.progress.quantity("Красный горноцвет",5);
+        g.progress.quantity("Снежные ягоды",5);
+        int before=g.manaPotions;
+        g.choose("SOLITUDE:craft:mix-batch:0");
+        assertEquals(before+1,g.manaPotions);
+        assertEquals(20,g.hour);
+        assertEquals(4,g.progress.quantity("Красный горноцвет"));
+    }
     @Test public void homeAlchemyUsesConsumedIngredientWeight() throws Exception {
         GameEngine g=city(0);
         g.progress.quantity("Пшеница",1);g.progress.quantity("Голубой горноцвет",1);
