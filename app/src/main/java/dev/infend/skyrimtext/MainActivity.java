@@ -108,7 +108,7 @@ public final class MainActivity extends Activity {
     private long aiLocalStartedAt=0L;
     private long aiRequestSerial;
     private boolean aiTurnProposal;
-    private TextView aiTurnText,aiProgressInfo,aiElapsedText,aiReasoningText;
+    private TextView aiTurnText,aiProgressInfo,aiElapsedText,aiReasoningText,aiChoiceLiveCount;
     private LinearLayout aiChoiceLive;
     private TextView aiChoiceLiveHeader;
     private final java.util.ArrayList<AiGameTurn.Option> aiChoicePreview=new java.util.ArrayList<>();
@@ -413,12 +413,12 @@ public final class MainActivity extends Activity {
         });
     }
 
-    private boolean visual(String key){return prefs.getBoolean("visual_"+key,true);}
+    private boolean visual(String key){if("status".equals(key)||"fog".equals(key)||"travel".equals(key))return false;return prefs.getBoolean("visual_"+key,true);}
     private void visualSettings(){
         int start=content.getChildCount();
         LinearLayout panel=card();
         addText(panel,"Каждый эффект можно отключить отдельно. Игровые правила не меняются.",13,MUTED,false,12);
-        String[][] options={{"status","Эффекты состояния"},{"portraits","Собеседники и аватары"},{"narrative","Оформление повествования"},{"choices","Расширенные карточки действий"},{"reveal","Плавное раскрытие текста"},{"stars","Созвездия навыков"},{"gear","Силуэт и экипировка"},{"damage","Показатели урона"},{"victory","Итоги победы"},{"fog","Туман войны"},{"travel","Маршрут путешествия"},{"chronicle","Хроника приключений"},{"reputation","Репутация и отношения"},{"loot","Карточки добычи"},{"trade","Панель торговли"},{"defeat","Экран поражения"},{"notice","Тематические уведомления"}};
+        String[][] options={{"portraits","Собеседники и аватары"},{"narrative","Оформление повествования"},{"choices","Расширенные карточки действий"},{"reveal","Плавное раскрытие текста"},{"stars","Созвездия навыков"},{"gear","Силуэт и экипировка"},{"damage","Показатели урона"},{"victory","Итоги победы"},{"chronicle","Хроника приключений"},{"reputation","Репутация и отношения"},{"loot","Карточки добычи"},{"trade","Панель торговли"},{"defeat","Экран поражения"},{"notice","Тематические уведомления"}};
         for(String[] option:options){
             Switch toggle=new Switch(this);
             toggle.setText(option[1]);toggle.setTextColor(TEXT);toggle.setTextSize(sp(14));
@@ -426,7 +426,30 @@ public final class MainActivity extends Activity {
             toggle.setMinHeight(dp(46));panel.addView(toggle,lp(-1,-2));
             toggle.setOnCheckedChangeListener((v,on)->prefs.edit().putBoolean("visual_"+option[0],on).apply());
         }
-        foldSettingsSection("visual","ВИЗУАЛЬНЫЕ ЭФФЕКТЫ",start);
+        hudSettingsGroup(panel,"metrics","УРОВЕНЬ, ОПЫТ, ВЕС И СЕПТИМЫ");
+        hudSettingsGroup(panel,"resources","ЗДОРОВЬЕ, ВЫНОСЛИВОСТЬ И МАГИЯ");
+        foldSettingsSection("visual","ВИЗУАЛЬНЫЕ ЭФФЕКТЫ И HUD",start);
+    }
+    private boolean hudSetting(String group,String part){
+        return prefs.getBoolean("hud_"+group+"_"+part,true);
+    }
+    private void hudSettingsGroup(LinearLayout panel,String group,String heading){
+        addText(panel,heading,12,accent(),true,8);
+        for(String mode:new String[]{"text","icons"}){
+            Switch toggle=new Switch(this);
+            toggle.setText("text".equals(mode)?"Текст":"Иконки");
+            toggle.setTextColor(TEXT);toggle.setTextSize(sp(14));
+            toggle.setThumbTintList(ColorStateList.valueOf(accent()));
+            toggle.setChecked(hudSetting(group,mode));panel.addView(toggle,lp(-1,46));
+            toggle.setOnCheckedChangeListener((v,on)->{
+                String other="text".equals(mode)?"icons":"text";
+                if(!on&&!hudSetting(group,other)){
+                    toggle.setChecked(true);toast("Текст и иконки нельзя отключить одновременно");return;
+                }
+                prefs.edit().putBoolean("hud_"+group+"_"+mode,on).apply();
+                render();
+            });
+        }
     }
     private View sceneGallery(String location){
         return new LocationGalleryView(this,location,accent(),false);
@@ -613,13 +636,13 @@ public final class MainActivity extends Activity {
         dialog.requestWindowFeature(android.view.Window.FEATURE_NO_TITLE);
         LinearLayout panel=column();panel.setPadding(dp(14),dp(10),dp(14),dp(14));panel.setBackgroundColor(Color.BLACK);
         LinearLayout header=row();TextView back=npcCentered("‹",30,TEXT,true);header.addView(back,lp(42,42));back.setContentDescription("Назад");back.setOnClickListener(v->dialog.dismiss());
-        header.addView(npcCentered(profile!=null&&profile.author?"АВТОРСКИЙ NPC":profile!=null&&profile.mentioned?"УПОМИНАНИЕ":profile!=null&&profile.template?"ТИПОВОЙ NPC":"ПЕРСОНАЖ",18,TEXT,true),new LinearLayout.LayoutParams(0,dp(42),1));
-        TextView more=npcCentered("⋮",25,TEXT,true);header.addView(more,lp(42,42));more.setContentDescription("Дополнительно");
-        more.setOnClickListener(v->{android.widget.PopupMenu menu=new android.widget.PopupMenu(this,more);menu.getMenu().add("Открыть подробное досье");menu.getMenu().add("Открыть галерею");menu.setOnMenuItemClickListener(item->{if(item.getTitle().toString().contains("галерею"))npcGallerySection(display);else npcSection(display,0);return true;});menu.show();});
+        TextView npcHeaderName=npcCentered(display,23,accent(),true);
+        npcHeaderName.setTag("npc_no_self_link");
+        header.addView(npcHeaderName,new LinearLayout.LayoutParams(0,dp(42),1));
+        header.addView(new View(this),lp(42,42));
         panel.addView(header,lp(-1,-2));space(panel,8);
         activeNpcPortrait=new android.widget.FrameLayout(this);panel.addView(activeNpcPortrait,lp(-1,280));space(panel,14);
-        TextView npcNameTitle=npcCentered(display,23,accent(),true);npcNameTitle.setTag("npc_no_self_link");panel.addView(npcNameTitle,lp(-1,-2));space(panel,7);
-        if(profile!=null&&!profile.role.isEmpty()){TextView role=npcCentered(profile.role,14,MUTED,false);role.setTag("npc_no_self_link");panel.addView(role,lp(-1,-2));}
+        {String roleLabel=profile!=null&&!profile.role.isEmpty()?profile.role:profile!=null&&profile.author?"Авторский персонаж":profile!=null&&profile.mentioned?"Упоминаемый персонаж":profile!=null&&profile.template?"Типовой персонаж":"Житель Скайрима";TextView role=npcCentered(roleLabel,14,MUTED,false);role.setTag("npc_no_self_link");panel.addView(role,lp(-1,-2));}
         space(panel,16);
         String status=profile!=null&&profile.template?"":npcKnownStatus(display);boolean female=profile!=null&&"Женский".equals(profile.gender);
         boolean alive=npcInCurrentScene(display)||"MET".equals(status)||"INFORMED".equals(status)||"HELPED".equals(status)||"HOSTILE".equals(status)||npcAuthorKnown(display);
@@ -1686,7 +1709,7 @@ public final class MainActivity extends Activity {
         LinearLayout details=row();stats.addView(details,lp(-1,-2));
         hudMetric(details,"Уровень","level",String.valueOf(game.level),ITEM_GOLD,1f,()->{tab=3;render();});
         hudMetric(details,"Опыт","experience",game.xp+" / "+(game.level>=100?"MAX":String.valueOf(next)),ITEM_GOLD,1.65f,()->{tab=3;render();});
-        hudMetric(details,"Вес, кг","bag",itemNumber(weight)+"/"+itemNumber(game.progress.carryLimit()),weight>game.progress.carryLimit()?ITEM_DOWN:weight>=game.progress.carryLimit()*0.9?0xffe1ac70:TEXT,1.2f,()->{tab=2;render();});
+        hudMetric(details,"Вес","bag",itemNumber(weight)+"/"+itemNumber(game.progress.carryLimit()),ITEM_GOLD,1.2f,()->{tab=2;render();});
         hudMetric(details,"Септимы","septims",String.valueOf(game.gold),ITEM_GOLD,1f,()->{tab=2;render();});
         hudBar(stats,"xp",game.level>=100?1:game.xp,game.level>=100?1:next,ITEM_GOLD,3);
     }
@@ -1694,12 +1717,12 @@ public final class MainActivity extends Activity {
         LinearLayout col=column();col.setPadding(dp(3),0,dp(3),0);
         host.addView(col,new LinearLayout.LayoutParams(0,-2,1));
         LinearLayout line=row();line.setGravity(Gravity.CENTER);
-        line.addView(new HudGlyphView(this,glyph,color),lp(16,16));
+        if(hudSetting("resources","icons"))line.addView(new HudGlyphView(this,glyph,color),lp(16,16));
         TextView num=hudText(value+"/"+max,13,color,true);
         LinearLayout.LayoutParams np=lp(-2,-2);np.leftMargin=dp(3);line.addView(num,np);
         col.addView(line,lp(-1,-2));
         hudBar(col,glyph,value,max,color,6);
-        col.addView(hudText(name,10,MUTED,false),lp(-1,-2));
+        if(hudSetting("resources","text"))col.addView(hudText(name,10,MUTED,false),lp(-1,-2));
         col.setContentDescription(name+": "+value+" из "+max);
         col.setOnClickListener(v->{tab=3;render();});
     }
@@ -1714,12 +1737,12 @@ public final class MainActivity extends Activity {
         LinearLayout col=column();col.setPadding(dp(1),dp(3),dp(1),dp(3));
         host.addView(col,new LinearLayout.LayoutParams(0,-2,weight));
         LinearLayout line=row();line.setGravity(Gravity.CENTER);
-        line.addView(new HudGlyphView(this,glyph,color),lp(14,14));
+        if(hudSetting("metrics","icons"))line.addView(new HudGlyphView(this,glyph,color),lp(14,14));
         TextView number=hudText(value,12,color,true);
         LinearLayout.LayoutParams np=lp(-2,-2);np.leftMargin=dp(2);
         number.setMaxWidth(dp(glyph.equals("experience")?104:72));
         line.addView(number,np);col.addView(line,lp(-1,-2));
-        col.addView(hudText(label,10,MUTED,false),lp(-1,-2));
+        if(hudSetting("metrics","text"))col.addView(hudText(label,10,MUTED,false),lp(-1,-2));
         col.setContentDescription(label+": "+value);col.setOnClickListener(v->action.run());
     }
     private void hudBar(LinearLayout host,String key,int value,int max,int color,int height){
@@ -2430,13 +2453,21 @@ public final class MainActivity extends Activity {
         if(aiElapsedText!=null&&aiDotsTicker!=null)aiElapsedText.removeCallbacks(aiDotsTicker);
         aiDotsTicker=null;
         aiTurnText=null;aiProgressInfo=null;aiElapsedText=null;aiReasoningText=null;
-        aiChoiceLive=null;aiChoiceLiveHeader=null;aiChoiceLiveRows.clear();
+        aiChoiceLive=null;aiChoiceLiveHeader=null;aiChoiceLiveCount=null;aiChoiceLiveRows.clear();
+    }
+    private static String aiLiveDots(long millis){
+        switch((int)((millis/420L)%4)){case 1:return ".";case 2:return "..";case 3:return "…";default:return "";}
     }
     private void updateAiElapsed(){
         if(aiElapsedText==null||aiLocalStartedAt<=0)return;
-        long seconds=Math.max(0L,(android.os.SystemClock.elapsedRealtime()-aiLocalStartedAt)/1000L);
+        long elapsed=Math.max(0L,android.os.SystemClock.elapsedRealtime()-aiLocalStartedAt);
+        long seconds=elapsed/1000L;
         String label=String.format(java.util.Locale.ROOT,"Прошло %02d:%02d",seconds/60,seconds%60);
         if(!label.contentEquals(aiElapsedText.getText()))aiElapsedText.setText(label);
+        String dots=aiLiveDots(elapsed);
+        if(aiTurnText!=null&&aiTurnPreview.isEmpty())aiTurnText.setText(dots);
+        if(aiChoiceLiveHeader!=null)aiChoiceLiveHeader.setText("ГЕНЕРАЦИЯ ВАРИАНТОВ"+dots);
+        if(aiProgressInfo!=null&&aiLocalPhase.contains("Генерац"))aiProgressInfo.setText("Генерация ответа"+dots);
     }
 
     /** AI mode replaces the entire offline story, not just its dialogue panel. */
@@ -2494,13 +2525,18 @@ public final class MainActivity extends Activity {
                 aiTurnText=text("",18,TEXT,false);
                 aiTurnText.setTypeface(SovngardeTypeface.face(this,false));
                 aiTurnText.setLineSpacing(dp(7),1.16f);
-                if(aiTurnPreview.isEmpty())aiTurnText.setText("Ожидание текста сцены…");
+                if(aiTurnPreview.isEmpty())aiTurnText.setText(aiLiveDots(android.os.SystemClock.elapsedRealtime()-aiLocalStartedAt));
                 else aiTurnText.setText(SceneTypography.render(aiTurnPreview,accent(),game.name,heroColor()));
                 live.addView(aiTurnText,lp(-1,-2));
                 // card() already attaches the panel to content.
                 aiChoiceLive=column();
+                LinearLayout choicesHead=row();choicesHead.setGravity(Gravity.CENTER_VERTICAL);
                 aiChoiceLiveHeader=text("ГЕНЕРАЦИЯ ВАРИАНТОВ",12,MUTED,true);
-                aiChoiceLive.addView(aiChoiceLiveHeader,lp(-1,-2));
+                choicesHead.addView(aiChoiceLiveHeader,new LinearLayout.LayoutParams(0,-2,1));
+                aiChoiceLiveCount=text("0/10",12,accent(),true);
+                aiChoiceLiveCount.setGravity(Gravity.RIGHT);
+                choicesHead.addView(aiChoiceLiveCount,lp(-2,-2));
+                aiChoiceLive.addView(choicesHead,lp(-1,-2));
                 content.addView(aiChoiceLive,lp(-1,-2));
                 syncAiChoicePreview();
             }
@@ -2775,8 +2811,8 @@ public final class MainActivity extends Activity {
     /** Keep preview rows stable while streaming; never make uncommitted actions clickable. */
     private void syncAiChoicePreview(){
         if(aiChoiceLive==null||aiChoiceLiveHeader==null)return;
-        aiChoiceLive.setVisibility(aiChoicePreview.isEmpty()?View.GONE:View.VISIBLE);
-        aiChoiceLiveHeader.setText("ГЕНЕРАЦИЯ ВАРИАНТОВ | "+aiChoicePreview.size()+"/10");
+        aiChoiceLive.setVisibility(View.VISIBLE);
+        if(aiChoiceLiveCount!=null)aiChoiceLiveCount.setText(aiChoicePreview.size()+"/10");
         while(aiChoiceLiveRows.size()>aiChoicePreview.size()){
             int last=aiChoiceLiveRows.size()-1;
             aiChoiceLive.removeViewAt(last+1);aiChoiceLiveRows.remove(last);
@@ -2791,7 +2827,7 @@ public final class MainActivity extends Activity {
                 title.setTypeface(SovngardeTypeface.face(this,true));
                 TextView detail=text("",14,MUTED,false);
                 TextView meta=text("",12,MUTED,false);
-                row.addView(title,lp(-1,-2));space(row,5);
+                LinearLayout titleRow=row();titleRow.setGravity(Gravity.CENTER_VERTICAL);titleRow.addView(new SkyrimIconView(this,"journal",accent()),lp(22,22));titleRow.addView(title,new LinearLayout.LayoutParams(0,-2,1));row.addView(titleRow,lp(-1,-2));space(row,5);
                 row.addView(detail,lp(-1,-2));row.addView(meta,lp(-1,-2));
                 LinearLayout.LayoutParams p=lp(-1,-2);p.topMargin=dp(6);
                 aiChoiceLive.addView(row,p);
@@ -4737,7 +4773,7 @@ public final class MainActivity extends Activity {
         if(!value.isEmpty())line.addView(text(value,13,MUTED,false),lp(-2,-2));TextView arrow=text("›",24,MUTED,false);line.addView(arrow,lp(20,-2));tile.addView(line,lp(-1,-2));tile.setOnClickListener(v->action.run());
     }
     private AlertDialog activeLivingDialog;
-    private void closeLivingDialog(){AlertDialog old=activeLivingDialog;activeLivingDialog=null;if(old!=null&&old.isShowing())old.dismiss();}
+    private void closeLivingDialog(){AlertDialog old=activeLivingDialog;activeLivingDialog=null;activeFixShopScroll=null;if(old!=null&&old.isShowing())old.dismiss();}
     private void livingDialog(String title,LinearLayout panel){
         closeLivingDialog();
         panel.setPadding(dp(14),dp(10),dp(14),dp(10));ScrollView sc=new ScrollView(this);sc.setFillViewport(false);sc.addView(panel);
@@ -5464,9 +5500,10 @@ public final class MainActivity extends Activity {
     }
 
     private int fixShopPage=0,fixShopSort=0,fixCatalogPage=0,fixRarity=-1;
+    private ScrollView activeFixShopScroll;
     private static final int FIX_PAGE_SIZE=30;
     private String fixShopCategory="Все",fixShopQuery="";
-    private static final String[] FIX_CATEGORIES={"Все","Снаряжение","Оружие","Броня","Боеприпасы","Материалы","Ингредиенты","Зелья и яды","Провизия","Инструменты","Драгоценности","Магия","Улучшения","Навыки","Септимы","Внешность","Оформление","Редактор мира","Наборы","Недвижимость","Транспорт","Питомцы","Персонажи","Дополнения","Коллекции","Дары судьбы","Печати мастерства"};
+    private static final String[] FIX_CATEGORIES={"Все","Снаряжение","Оружие","Броня","Боеприпасы","Материалы","Ингредиенты","Зелья и яды","Провизия","Инструменты","Драгоценности","Магия","Улучшения","Септимы","Внешность","Оформление","Наборы","Недвижимость","Транспорт","Питомцы","Персонажи","Дополнения","Коллекции","Дары судьбы","Печати мастерства"};
     private static final class FixOffer {
         final String title,detail,category,glyph,rarity;final int price,color;final Runnable action;String itemId="";int tier;
         FixOffer(String t,String d,String c,String g,String rr,int col,int p,Runnable a){title=t;detail=d;category=c;glyph=g;rarity=rr;color=col;price=p;action=a;}
@@ -5478,7 +5515,7 @@ public final class MainActivity extends Activity {
         for(int i=0;i<FixShopGifts.NAME.length;i++){final int n=i;String title=FixShopGifts.NAME[i];if(game.fixShop.gifts.owns(i))fixOffer(a,title,game.fixShop.gifts.status(i,game)+" | "+FixShopGifts.DESC[i],"Дары судьбы","magic",5,0,()->fixGiftDialog(n));else fixDirect(a,title,FixShopGifts.DESC[i],"Дары судьбы","magic",5,FixShopGifts.PRICE[i],()->game.fixShop.gifts.buy(n));}
         fixOffer(a,"Уникальные предметы","Создание, привязка к душе и пассивные эффекты","Снаряжение","armor",4,50,this::livingArtifactShop);
         fixOffer(a,"Уникальные способности","Создание и улучшение собственной магии","Магия","magic",4,50,this::livingPowerShop);
-        fixDirect(a,"Безграничная ноша","+50 кг вместимости","Улучшения","armor",3,150,()->{if(game.progress.fixCarryBonus>999950)return false;game.progress.fixCarryBonus+=50;return true;});
+        fixDirect(a,"Увеличение переносимого веса","+50 кг вместимости","Улучшения","armor",3,150,()->{if(game.progress.fixCarryBonus>999950)return false;game.progress.fixCarryBonus+=50;return true;});
         fixDirect(a,"Уровень персонажа","+1 уровень","Улучшения","hero",1,10,()->{if(game.level>=100)return false;game.addXp(game.experienceRequired()-game.xp);return true;});
         fixDirect(a,"Максимальное здоровье","+10 единиц","Улучшения","health",0,1,()->{if(game.maxHp>Integer.MAX_VALUE-10)return false;game.maxHp+=10;return true;});
         fixDirect(a,"Максимальная магия","+10 единиц","Магия","magic",0,1,()->{if(game.maxMagicka>Integer.MAX_VALUE-10)return false;game.maxMagicka+=10;return true;});
@@ -5490,9 +5527,9 @@ public final class MainActivity extends Activity {
         String[] stats={"здоровья","магии","выносливости"};
         for(int i=0;i<3;i++){final int index=i;fixDirect(a,"Регенерация "+stats[i],"+1 ед. / боевой ход","Улучшения","health",1,5,()->{if(game.regenBonus[index]>=1000000)return false;game.regenBonus[index]++;return true;});}
         fixDirect(a,"Игнорировать штрафы регенерации","Постоянный эффект","Улучшения","shield",2,15,()->{if(game.regenIgnorePenalty)return false;game.regenIgnorePenalty=true;return true;});
-        fixOffer(a,"Опыт навыка","+100 опыта выбранного навыка","Навыки","skills",0,1,()->livingFixSkill(false));
-        fixOffer(a,"Уровень навыка","+1 уровень выбранного навыка","Навыки","skills",0,1,()->livingFixSkill(true));
-        fixDirect(a,"Очки талантов","+5 свободных очков","Навыки","skills",2,50,()->{if(game.progress.perkPoints>Integer.MAX_VALUE-5)return false;game.progress.perkPoints+=5;return true;});
+        fixOffer(a,"Опыт навыка","+100 опыта выбранного навыка","Улучшения","skills",0,1,()->livingFixSkill(false));
+        fixOffer(a,"Уровень навыка","+1 уровень выбранного навыка","Улучшения","skills",0,1,()->livingFixSkill(true));
+        fixDirect(a,"Очки талантов","+5 свободных очков","Улучшения","skills",2,50,()->{if(game.progress.perkPoints>Integer.MAX_VALUE-5)return false;game.progress.perkPoints+=5;return true;});
         fixOffer(a,"Новое имя","Переименовать героя","Внешность","hero",1,25,this::fixRename);
         fixOffer(a,"Новый облик","Выбрать портрет героя","Внешность","hero",2,50,this::fixPortrait);
         for(int i=0;i<4;i++){final int n=i;for(boolean frame:new boolean[]{false,true}){String name=frame?FixShopCosmetics.FRAMES[i]:FixShopCosmetics.TITLES[i];String detail=frame?"Декоративная рамка портрета":"Титул на странице героя";if(game.fixShop.cosmetics.owns(frame,i))fixOffer(a,name,detail+" | "+((frame?game.fixShop.cosmetics.frame:game.fixShop.cosmetics.title)==i?"Выбрано":"Приобретено"),"Оформление","hero",3,0,()->{if(!livingBusy()&&game.fixShop.cosmetics.select(frame,n)){save();render();livingFixShop();}});else fixDirect(a,name,detail,"Оформление","hero",3,frame?80:60,()->game.fixShop.cosmetics.buy(frame,n));}}
@@ -5500,7 +5537,7 @@ public final class MainActivity extends Activity {
         fixOffer(a,"Новое наследие","Сменить расу; сохранить характеристики и навыки","Внешность","hero",3,150,this::fixRace);
         fixDirect(a,"Благословение исцеления","Полностью восстановить здоровье, магию и силы","Улучшения","health",2,25,()->{if(game.hp==game.maxHp&&game.magicka==game.maxMagicka&&game.stamina==game.maxStamina)return false;game.hp=game.maxHp;game.magicka=game.maxMagicka;game.stamina=game.maxStamina;return true;});
         fixDirect(a,"Сердце Довакина","+5 к регенерации здоровья, магии и выносливости. Однократно.","Магия","health",4,500,()->{if(game.fixShop.count(FixShopState.key("Сердце Довакина",500))>0)return false;for(int v:game.regenBonus)if(v>999995)return false;for(int i=0;i<3;i++)game.regenBonus[i]+=5;return true;});
-        fixDirect(a,"Перераспределение перков","Вернуть очки всех купленных талантов, сохранив навыки","Навыки","skills",3,100,()->game.progress.resetFixPerks());
+        fixDirect(a,"Перераспределение перков","Вернуть очки всех купленных талантов, сохранив навыки","Улучшения","skills",3,100,()->game.progress.resetFixPerks());
         for(int region:new int[]{5,7,8}){
             String estate=RoadEvents.estate(region);
             fixDirect(a,estate,"Право на участок и связанные события усадьбы","Недвижимость","map",3,300,()->{if(RoadEvents.ownsEstate(game,region)||game.progress.questOutcome("road_estate_"+region)!=null)return false;game.progress.setQuestOutcome("road_estate_"+region,"COMPLETED");return true;});
@@ -5534,20 +5571,6 @@ public final class MainActivity extends Activity {
         java.util.HashSet<String> gearSeen=new java.util.HashSet<>();
         for(FixShopCatalog.Bundle bundle:FixShopCatalog.BUNDLES)if(FixShopCatalog.validBundle(bundle))fixOffer(a,bundle.name,bundle.description(),"Наборы","armor",4,bundle.price,()->fixReserveBundle(bundle));
         for(FixShopCatalog.Offer offer:gear){if(!gearSeen.add(offer.key()))continue;ItemCatalog.Item item=ItemCatalog.find(offer.item);if(item==null)continue;fixOffer(a,offer.title(),item.category+" | "+item.weight*offer.quantity+" кг | "+(offer.quantity>1?"набор "+offer.quantity+" шт.":"за 1 шт."),FixShopCatalog.category(item),item.icon,FixShopCatalog.rarity(item),offer.price,()->fixReserve(offer));a.get(a.size()-1).itemId=offer.item;}
-        if(game.fixShop.editorEnabled){
-            fixOffer(a,"Создать NPC","Имя, характер, класс и отношения","Редактор мира","hero",5,300,()->fixCreateCharacter(false));
-            fixOffer(a,"Создать локацию","Авторское место внутри текущей локации карты","Редактор мира","map",5,500,this::fixCreatePlace);
-            fixOffer(a,"Создать задание","Собственное поручение с двумя местами и целью","Редактор мира","journal",5,300,this::fixCreateQuest);
-            fixOffer(a,"Нити судьбы","Изменить финал приключения или выбранное решение главной истории","Редактор мира","journal",5,250,this::fixRewriteEnding);
-            fixOffer(a,"Дорожное предзнаменование",game.fixShop.world.queuedEncounter.isEmpty()?"Выбрать повторяемую встречу на подходящем маршруте":"Ожидает: "+RoadEvents.fixEventName(game.fixShop.world.queuedEncounter),"Редактор мира","map",3,100,this::fixQueueEncounter);
-            if("Последний поединок".equals(game.livia.ending))fixDirect(a,"Воскресить Ливию","Возвращение после гибели в поединке; без повторного опыта","Редактор мира","health",5,300,()->game.livia.fixRestore(game));
-            fixOffer(a,"Печать принадлежности","Вступление или выход из фракции до сюжетных наград","Редактор мира","shield",3,150,this::fixMembership);
-            fixOffer(a,"Врата странника","Мгновенный переход в посещённую локацию","Редактор мира","map",4,100,this::fixTeleportChoice);
-            fixDirect(a,"Слава героя","+10 репутации","Редактор мира","hero",2,50,()->{if(game.reputation>Integer.MAX_VALUE-10)return false;game.reputation+=10;return true;});
-            fixOffer(a,"Второй шанс","Воскресить NPC из журнала ИИ-сцен; не откатывает сюжетные квесты","Редактор мира","health",2,300,()->fixNpcChoice(true,false));
-            fixOffer(a,"Чистый лист","Сбросить отношение NPC из журнала ИИ-сцен до 50","Редактор мира","hero",2,150,()->fixNpcChoice(false,true));
-            fixOffer(a,"Нити отношений","Изменить отношение NPC из журнала ИИ-сцен","Редактор мира","hero",3,150,()->fixNpcChoice(false,false));
-        }
         return a;
     }
     private void fixOffer(java.util.ArrayList<FixOffer> a,String t,String d,String c,String g,int tier,int price,Runnable action){
@@ -5765,7 +5788,7 @@ public final class MainActivity extends Activity {
     }
     private void livingFixShop(){
         if(!game.started){toast("Этернис доступен после начала игры.");return;}
-        closeLivingDialog();ResourceStore.requestAutomaticSync(this);LinearLayout root=column();root.setBackgroundColor(Color.BLACK);root.setPadding(dp(14),dp(12),dp(14),dp(8));
+        int previousScroll=activeFixShopScroll==null?0:activeFixShopScroll.getScrollY();closeLivingDialog();ResourceStore.requestAutomaticSync(this);LinearLayout root=column();root.setBackgroundColor(Color.BLACK);root.setPadding(dp(14),dp(12),dp(14),dp(8));
         LinearLayout head=row();head.setGravity(Gravity.CENTER_VERTICAL);head.addView(text("ЭТЕРНИС",23,accent(),true),new LinearLayout.LayoutParams(0,-2,1));
         head.addView(text("∞ F",23,accent(),true),lp(-2,-2));TextView close=text(" × ",28,MUTED,true);close.setOnClickListener(v->closeLivingDialog());head.addView(close,lp(-2,-2));root.addView(head,lp(-1,-2));
         String lock=fixShopLockReason();if(!lock.isEmpty())addText(root,"Режим просмотра · "+lock+" Покупки и изменения станут доступны после завершения действия.",12,accent(),false,8);
@@ -5773,18 +5796,18 @@ public final class MainActivity extends Activity {
         ScrollView scroll=new ScrollView(this);scroll.setFillViewport(false);LinearLayout items=column();scroll.addView(items);root.addView(scroll,new LinearLayout.LayoutParams(-1,0,1));
         LinearLayout nav=row();root.addView(nav,lp(-1,56));String[] names={"Каталог","Избранное","Покупки","История"};String[] glyphs={"inventory","heart","armor","journal"};
         for(int i=0;i<names.length;i++){final int index=i;LinearLayout cell=column();cell.setGravity(Gravity.CENTER);nav.addView(cell,new LinearLayout.LayoutParams(0,-1,1));
-            cell.addView(new SkyrimIconView(this,glyphs[i],fixShopPage==i?accent():MUTED),lp(22,22));TextView label=text(names[i],11,fixShopPage==i?accent():MUTED,true);label.setGravity(Gravity.CENTER);cell.addView(label,lp(-1,-2));cell.setOnClickListener(v->{fixShopPage=index;fixShopCategory="Все";fixShopQuery="";fixCatalogPage=0;fixRarity=-1;livingFixShop();});
+            cell.addView(new SkyrimIconView(this,glyphs[i],fixShopPage==i?accent():MUTED),lp(22,22));TextView label=text(names[i],11,fixShopPage==i?accent():MUTED,true);label.setGravity(Gravity.CENTER);cell.addView(label,lp(-1,-2));cell.setOnClickListener(v->{fixShopPage=index;fixShopCategory="Все";fixShopQuery="";fixCatalogPage=0;fixRarity=-1;activeFixShopScroll=null;livingFixShop();});
         }
         if(fixShopPage<2){
             HorizontalScrollView categories=new HorizontalScrollView(this);categories.setHorizontalScrollBarEnabled(false);LinearLayout strip=row();categories.addView(strip);filters.addView(categories,lp(-1,-2));
-            for(String cat:FIX_CATEGORIES){TextView chip=text(cat,13,cat.equals(fixShopCategory)?TEXT:MUTED,true);chip.setPadding(dp(12),dp(9),dp(12),dp(9));chip.setBackground(bg(cat.equals(fixShopCategory)?0xff303030:Color.BLACK,Color.TRANSPARENT,20));strip.addView(chip,lp(-2,-2));if(cat.equals(fixShopCategory))categories.post(()->categories.smoothScrollTo(Math.max(0,chip.getLeft()-dp(12)),0));chip.setOnClickListener(v->{fixShopCategory=cat;fixCatalogPage=0;livingFixShop();});}
+            for(String cat:FIX_CATEGORIES){TextView chip=text(cat,13,cat.equals(fixShopCategory)?TEXT:MUTED,true);chip.setPadding(dp(12),dp(9),dp(12),dp(9));chip.setBackground(bg(cat.equals(fixShopCategory)?0xff303030:Color.BLACK,Color.TRANSPARENT,20));strip.addView(chip,lp(-2,-2));if(cat.equals(fixShopCategory))categories.post(()->categories.smoothScrollTo(Math.max(0,chip.getLeft()-dp(12)),0));chip.setOnClickListener(v->{fixShopCategory=cat;fixCatalogPage=0;activeFixShopScroll=null;livingFixShop();});}
             LinearLayout searchRow=row();EditText search=new EditText(this);search.setSingleLine(true);search.setTextColor(TEXT);search.setHintTextColor(MUTED);search.setTextSize(sp(13));search.setHint("Поиск товаров");search.setText(fixShopQuery);search.setPadding(dp(10),dp(4),dp(10),dp(4));search.setBackground(bg(0xff141414,Color.TRANSPARENT,14));searchRow.addView(search,new LinearLayout.LayoutParams(0,dp(42),1));
-            TextView sort=text(new String[]{"По умолчанию","Цена ↑","Цена ↓","А–Я"}[fixShopSort],12,accent(),true);sort.setPadding(dp(10),dp(10),dp(4),dp(10));searchRow.addView(sort,lp(-2,-2));sort.setOnClickListener(v->{fixShopSort=(fixShopSort+1)%4;fixCatalogPage=0;livingFixShop();});filters.addView(searchRow,lp(-1,-2));space(filters,8);
+            TextView sort=text(new String[]{"По умолчанию","Цена ↑","Цена ↓","А–Я"}[fixShopSort],12,accent(),true);sort.setPadding(dp(10),dp(10),dp(4),dp(10));searchRow.addView(sort,lp(-2,-2));sort.setOnClickListener(v->{fixShopSort=(fixShopSort+1)%4;fixCatalogPage=0;activeFixShopScroll=null;livingFixShop();});filters.addView(searchRow,lp(-1,-2));space(filters,8);
             search.addTextChangedListener(new android.text.TextWatcher(){public void beforeTextChanged(CharSequence s,int st,int c,int a){}public void onTextChanged(CharSequence s,int st,int before,int count){fixShopQuery=s.toString();fixCatalogPage=0;fixRenderOffers(items);}public void afterTextChanged(android.text.Editable e){}});
-            TextView rarity=text("Редкость: "+(fixRarity<0?"Все":new String[]{"Обычный","Необычный","Редкий","Эпический","Легендарный","Мифический","Божественный"}[fixRarity]),12,accent(),true);rarity.setPadding(dp(8),dp(4),dp(8),dp(6));filters.addView(rarity,lp(-1,-2));rarity.setOnClickListener(v->new RuneDialogBuilder(this,accent()).setTitle("Редкость").setItems(new String[]{"Все","Обычный","Необычный","Редкий","Эпический","Легендарный","Мифический","Божественный"},(d,i)->{fixRarity=i-1;fixCatalogPage=0;livingFixShop();}).show());
+            TextView rarity=text("Редкость: "+(fixRarity<0?"Все":new String[]{"Обычный","Необычный","Редкий","Эпический","Легендарный","Мифический","Божественный"}[fixRarity]),12,accent(),true);rarity.setPadding(dp(8),dp(4),dp(8),dp(6));filters.addView(rarity,lp(-1,-2));rarity.setOnClickListener(v->new RuneDialogBuilder(this,accent()).setTitle("Редкость").setItems(new String[]{"Все","Обычный","Необычный","Редкий","Эпический","Легендарный","Мифический","Божественный"},(d,i)->{fixRarity=i-1;fixCatalogPage=0;activeFixShopScroll=null;livingFixShop();}).show());
             fixRenderOffers(items);
         }else fixRenderLedger(items);
-        activeLivingDialog=new RuneDialogBuilder(this,accent()).setView(root).create();activeLivingDialog.show();
+        activeLivingDialog=new RuneDialogBuilder(this,accent()).setView(root).create();activeLivingDialog.show();activeFixShopScroll=scroll;scroll.post(()->scroll.scrollTo(0,previousScroll));
         if(activeLivingDialog.getWindow()!=null){activeLivingDialog.getWindow().setBackgroundDrawable(new android.graphics.drawable.ColorDrawable(Color.BLACK));activeLivingDialog.getWindow().setLayout(-1,-1);activeLivingDialog.getWindow().setSoftInputMode(android.view.WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);}
     }
     private void fixRenderOffers(LinearLayout items){
