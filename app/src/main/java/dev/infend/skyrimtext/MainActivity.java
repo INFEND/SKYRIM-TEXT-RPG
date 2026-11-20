@@ -114,6 +114,7 @@ public final class MainActivity extends Activity {
     private final java.util.ArrayList<AiGameTurn.Option> aiChoicePreview=new java.util.ArrayList<>();
     private final java.util.ArrayList<TextView[]> aiChoiceLiveRows=new java.util.ArrayList<>();
     private final java.util.ArrayList<LinearLayout> aiChoiceLiveCards=new java.util.ArrayList<>();
+    private final java.util.ArrayList<android.widget.FrameLayout> aiChoiceLiveIconHosts=new java.util.ArrayList<>();
     private final java.util.LinkedHashSet<String> aiPreviewSelected=new java.util.LinkedHashSet<>();
     private Runnable aiDotsTicker;
     private String aiReasoningPreview="";
@@ -2525,7 +2526,7 @@ public final class MainActivity extends Activity {
         if(aiElapsedText!=null&&aiDotsTicker!=null)aiElapsedText.removeCallbacks(aiDotsTicker);
         aiDotsTicker=null;
         aiTurnText=null;aiProgressInfo=null;aiElapsedText=null;aiReasoningText=null;
-        aiChoiceLive=null;aiChoiceLiveHeader=null;aiChoiceLiveCount=null;aiChoiceLiveRows.clear();aiChoiceLiveCards.clear();
+        aiChoiceLive=null;aiChoiceLiveHeader=null;aiChoiceLiveCount=null;aiChoiceLiveRows.clear();aiChoiceLiveCards.clear();aiChoiceLiveIconHosts.clear();
     }
     private static String aiLiveDots(long millis){
         switch((int)((millis/420L)%4)){case 1:return ".";case 2:return "..";case 3:return "…";default:return "";}
@@ -2887,7 +2888,7 @@ public final class MainActivity extends Activity {
         if(aiChoiceLiveCount!=null)aiChoiceLiveCount.setText(aiChoicePreview.size()+"/10");
         while(aiChoiceLiveRows.size()>aiChoicePreview.size()){
             int last=aiChoiceLiveRows.size()-1;
-            aiChoiceLive.removeViewAt(last+1);aiChoiceLiveRows.remove(last);aiChoiceLiveCards.remove(last);
+            aiChoiceLive.removeViewAt(last+1);aiChoiceLiveRows.remove(last);aiChoiceLiveCards.remove(last);aiChoiceLiveIconHosts.remove(last);
         }
         for(int i=0;i<aiChoicePreview.size();i++){
             AiGameTurn.Option option=aiChoicePreview.get(i);
@@ -2899,7 +2900,11 @@ public final class MainActivity extends Activity {
                 title.setTypeface(SovngardeTypeface.face(this,true));
                 TextView detail=text("",14,MUTED,false);
                 TextView meta=text("",12,MUTED,false);
-                LinearLayout titleRow=row();titleRow.setGravity(Gravity.CENTER_VERTICAL);titleRow.addView(new SkyrimIconView(this,"journal",accent()),lp(22,22));titleRow.addView(title,new LinearLayout.LayoutParams(0,-2,1));row.addView(titleRow,lp(-1,-2));space(row,5);
+                LinearLayout titleRow=row();titleRow.setGravity(Gravity.CENTER_VERTICAL);
+                android.widget.FrameLayout iconHost=new android.widget.FrameLayout(this);
+                titleRow.addView(iconHost,lp(26,26));
+                aiChoiceLiveIconHosts.add(iconHost);
+                titleRow.addView(title,new LinearLayout.LayoutParams(0,-2,1));row.addView(titleRow,lp(-1,-2));space(row,5);
                 row.addView(detail,lp(-1,-2));row.addView(meta,lp(-1,-2));
                 LinearLayout.LayoutParams p=lp(-1,-2);p.topMargin=dp(6);
                 aiChoiceLive.addView(row,p);
@@ -2918,6 +2923,14 @@ public final class MainActivity extends Activity {
                 });
             }
             TextView[] views=aiChoiceLiveRows.get(i);
+            android.widget.FrameLayout iconHost=aiChoiceLiveIconHosts.get(i);
+            String glyph=option.skill.isEmpty()?
+                SkyrimIconView.iconForLabel(option.title):skillGlyph(option.skill);
+            if(!glyph.equals(iconHost.getTag())){
+                iconHost.removeAllViews();
+                iconHost.addView(new SkyrimIconView(this,glyph,accent()),new android.widget.FrameLayout.LayoutParams(-1,-1));
+                iconHost.setTag(glyph);
+            }
             String title=(showChoiceNumbers()?(i+1)+". ":"")+option.title;
             String meta=option.chance>=0?(option.skill.isEmpty()?"":option.skill+" | ")+option.chance+"%":option.skill;
             if(!title.contentEquals(views[0].getText()))views[0].setText(title);
@@ -6478,7 +6491,16 @@ public final class MainActivity extends Activity {
     }
     public void toast(String message){themedNotice(message);}
     int currentAccent(){return accent();}
-    @Override public void onBackPressed(){if(titleOpen){super.onBackPressed();return;}
+    @Override public void onBackPressed(){
+        // An open sheet is one navigation step: close it without also
+        // returning to another tab or exiting the game.
+        if(activeNpcDialog!=null&&activeNpcDialog.isShowing()){
+            activeNpcDialog.dismiss();return;
+        }
+        if(activeLivingDialog!=null&&activeLivingDialog.isShowing()){
+            activeLivingDialog.dismiss();return;
+        }
+        if(titleOpen){super.onBackPressed();return;}
         if(!game.started||tab==5){titleOpen=true;render();return;}
         if(tab==6){tab=4;render();return;}
         if(game.started&&tab!=0){tab=0;render();return;}
