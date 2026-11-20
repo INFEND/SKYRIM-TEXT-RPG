@@ -149,4 +149,21 @@ public class SolitudeCraftTest {
         assertEquals(10,g.progress.quantity("Железный слиток"));
         assertEquals(5,g.progress.quantity("Кожаные полоски"));
     }
+    @Test public void batchSmithingStopsAtStaminaBoundaryWithoutExtraConsumption() throws Exception {
+        GameEngine g=city(5);
+        g.stamina=9;
+        g.progress.quantity("Железный слиток",10);
+        g.progress.quantity("Кожаные полоски",5);
+        int before=g.progress.quantity("Железный меч");
+        g.choose("SOLITUDE:craft:make-batch:0");
+        assertEquals(before+1,g.progress.quantity("Железный меч"));
+        assertEquals(8,g.progress.quantity("Железный слиток"));
+        assertEquals(4,g.progress.quantity("Кожаные полоски"));
+        assertEquals(4,g.stamina);
+        assertEquals(10,g.hour);
+        g=GameEngine.fromJson(g.toJson().toString());
+        g.choose("SOLITUDE:craft:make-batch:0");
+        assertEquals(before+1,g.progress.quantity("Железный меч"));
+        assertEquals(8,g.progress.quantity("Железный слиток"));
+    }
 }
