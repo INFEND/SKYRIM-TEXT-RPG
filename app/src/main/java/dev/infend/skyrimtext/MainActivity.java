@@ -474,7 +474,7 @@ public final class MainActivity extends Activity {
         foldSettingsSection("fast_travel","БЫСТРОЕ ПЕРЕМЕЩЕНИЕ",start);
     }
     private View sceneGallery(String location){
-        android.widget.ImageView local=WorkImageEditor.primaryView(this,"location",location,accent());
+        android.widget.ImageView local=WorkImageEditor.primaryView(this,"location",location,accent(),this::render);
         return local!=null?local:new LocationGalleryView(this,location,accent(),false);
     }
     private void stateEffects(){
@@ -506,7 +506,7 @@ public final class MainActivity extends Activity {
         switch(status){case "MET":return "Знакомство";case "HELPED":return "Благодарность";case "INFORMED":return "Обмен сведениями";case "HOSTILE":return "Враждебность";case "DEAD":return "Погиб";case "MISSING":return "Пропал";default:return "Отношение неизвестно";}
     }
     private View npcPortrait(String name){
-        android.widget.ImageView local=WorkImageEditor.primaryView(this,"npc",name,accent());
+        android.widget.ImageView local=WorkImageEditor.primaryView(this,"npc",name,accent(),()->{refreshNpcPortrait();render();});
         if(local!=null)return local;
         if(ItachiProfile.matches(name)){
             java.io.File chosen=LocalCharacterGallery.selected(this);
@@ -2338,7 +2338,7 @@ public final class MainActivity extends Activity {
         LinearLayout panel=column();addText(panel,city+" | "+CityArchitecture.CATEGORIES[category],14,MUTED,false,8);
         LocationGalleryView gallery=LocationGalleryView.cityPlaceGallery(this,city,place,accent());
         String assetId=city+" / "+place;
-        android.widget.ImageView local=WorkImageEditor.primaryView(this,"location",assetId,accent());
+        android.widget.ImageView local=WorkImageEditor.primaryView(this,"location",assetId,accent(),this::render);
         if(local!=null)panel.addView(local,lp(-1,-2));
         else if(gallery!=null)panel.addView(gallery,lp(-1,-2));
         livingLink(panel,"СОЗДАТЬ / ЗАМЕНИТЬ ИЗОБРАЖЕНИЕ",
@@ -4284,7 +4284,7 @@ public final class MainActivity extends Activity {
     private View itemPicture(ItemCatalog.Item item,int size){
         android.widget.FrameLayout tile=new android.widget.FrameLayout(this);
         tile.setBackground(itemBackground(0xff202020,0xff333333,13));
-        android.widget.ImageView edited=WorkImageEditor.primaryView(this,"item",item.id,accent());
+        android.widget.ImageView edited=WorkImageEditor.primaryView(this,"item",item.id,accent(),this::render);
         if(edited!=null){
             tile.addView(edited,new android.widget.FrameLayout.LayoutParams(-1,-1));
             return tile;
