@@ -362,6 +362,7 @@ public final class WorkImageEditor {
                 String first = null;
                 for (Uri uri : inputs) {
                     Bitmap bitmap = readScaled(host, uri, 2048);
+                    int width = bitmap.getWidth(), height = bitmap.getHeight();
                     String filename = UUID.randomUUID().toString() + ".webp";
                     File dest = new File(folder, filename);
                     newFiles.add(dest);
@@ -375,7 +376,9 @@ public final class WorkImageEditor {
                         .put("prompt", target.optString("prompt"))
                         .put("source", "chatgpt-work-manual")
                         .put("created", System.currentTimeMillis())
-                        .put("bytes", dest.length());
+                        .put("bytes", dest.length())
+                        .put("width", width)
+                        .put("height", height);
                     images.put(record);
                 }
                 meta.put("images", images);
