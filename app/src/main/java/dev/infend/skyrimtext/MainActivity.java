@@ -5491,6 +5491,19 @@ public final class MainActivity extends Activity {
         TextView target=text("ЦЕЛИ",15,accent(),true);
         target.setGravity(Gravity.CENTER);focus.addView(target,lp(-1,35));
         addText(focus,"◇  "+objective,15,TEXT,false,11);
+        if(selectedAiQuest!=null){
+            int rewardGold=selectedAiQuest.optInt("rewardGold",0);
+            int rewardXp=selectedAiQuest.optInt("rewardXp",0);
+            if(rewardGold>0||rewardXp>0){
+                addText(focus,"НАГРАДА",12,accent(),true,6);
+                String reward=(rewardGold>0?rewardGold+" септимов":"")+
+                    (rewardGold>0&&rewardXp>0?" | ":"")+
+                    (rewardXp>0?rewardXp+" опыта":"");
+                boolean paid="COMPLETED".equals(selectedAiQuest.optString("status"));
+                addText(focus,reward+(paid?" | Получена":" | За завершение"),14,
+                    paid?ITEM_UP:TEXT,false,10);
+            }
+        }
         if(game.aiNarrativeMode){actionButton("Вернуться к ИИ-повествованию","Продолжить игру в текущей сцене",true,()->{tab=0;render();});}
         else if("Путь Довакина".equals(title)){
             actionButton("Продолжить главную историю","Перейти к текущему заданию",true,()->{game.choose("CANON_OPEN");save();tab=0;render();});
