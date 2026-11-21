@@ -218,6 +218,7 @@ public final class MainActivity extends Activity {
     }
     @Override protected void onActivityResult(int requestCode,int resultCode,Intent data){
         super.onActivityResult(requestCode,resultCode,data);
+        if(WorkImageEditor.onActivityResult(this,requestCode,resultCode,data,accent(),this::render))return;
         if(requestCode==REQUEST_ITACHI_REPLACE_ART){
             String target=itachiReplaceTarget;itachiReplaceTarget="";
             if(resultCode==RESULT_OK&&data!=null&&data.getData()!=null&&!target.isEmpty()){
@@ -473,7 +474,8 @@ public final class MainActivity extends Activity {
         foldSettingsSection("fast_travel","БЫСТРОЕ ПЕРЕМЕЩЕНИЕ",start);
     }
     private View sceneGallery(String location){
-        return new LocationGalleryView(this,location,accent(),false);
+        android.widget.ImageView local=WorkImageEditor.primaryView(this,"location",location,accent());
+        return local!=null?local:new LocationGalleryView(this,location,accent(),false);
     }
     private void stateEffects(){
         if(!visual("status")||!game.started||titleOpen)return;
@@ -504,6 +506,8 @@ public final class MainActivity extends Activity {
         switch(status){case "MET":return "Знакомство";case "HELPED":return "Благодарность";case "INFORMED":return "Обмен сведениями";case "HOSTILE":return "Враждебность";case "DEAD":return "Погиб";case "MISSING":return "Пропал";default:return "Отношение неизвестно";}
     }
     private View npcPortrait(String name){
+        android.widget.ImageView local=WorkImageEditor.primaryView(this,"npc",name,accent());
+        if(local!=null)return local;
         if(ItachiProfile.matches(name)){
             java.io.File chosen=LocalCharacterGallery.selected(this);
             if(chosen!=null){try{android.widget.ImageView portrait=new android.widget.ImageView(this);portrait.setImageBitmap(LocalCharacterGallery.photo(chosen));portrait.setAdjustViewBounds(true);portrait.setScaleType(android.widget.ImageView.ScaleType.FIT_CENTER);portrait.setContentDescription("Итачи");portrait.setOnClickListener(v->itachiLocalGallery(itachiArtIndex(chosen)));return portrait;}catch(java.io.IOException ignored){}}
@@ -662,6 +666,13 @@ public final class MainActivity extends Activity {
         header.addView(npcHeaderName,new LinearLayout.LayoutParams(0,dp(42),1));
         header.addView(new View(this),lp(42,42));
         panel.addView(header,lp(-1,-2));space(panel,8);
+        livingLink(panel,"СОЗДАТЬ / ЗАМЕНИТЬ ИЗОБРАЖЕНИЕ",
+            "ChatGPT Work · описание можно изменить","hero",()->{
+                dialog.dismiss();
+                String facts=profile==null?"":("Раса: "+profile.race+". Пол: "+profile.gender+". Роль: "+profile.role+".");
+                WorkImageEditor.open(this,"npc",display,display,facts,accent(),this::render);
+            });
+        space(panel,7);
         activeNpcPortrait=new android.widget.FrameLayout(this);panel.addView(activeNpcPortrait,lp(-1,280));space(panel,14);
         {String roleLabel=profile!=null&&!profile.role.isEmpty()?profile.role:profile!=null&&profile.author?"Авторский персонаж":profile!=null&&profile.mentioned?"Упоминаемый персонаж":profile!=null&&profile.template?"Типовой персонаж":"Житель Скайрима";TextView role=npcCentered(roleLabel,14,MUTED,false);role.setTag("npc_no_self_link");panel.addView(role,lp(-1,-2));}
         space(panel,16);
@@ -710,6 +721,10 @@ public final class MainActivity extends Activity {
         watchNpcNames(panel);
     }
     private void npcGallerySection(String name){
+        if(WorkImageEditor.hasPrimary(this,"npc",name)){
+            WorkImageEditor.showGallery(this,"npc",name,accent(),()->{refreshNpcPortrait();render();});
+            return;
+        }
         if(ItachiProfile.matches(name)){java.io.File selected=LocalCharacterGallery.selected(this);itachiLocalGallery(selected==null?0:itachiArtIndex(selected));return;}
         if(ElisifGallery.matches(name)){elisifGallery(ElisifGallery.primary(this));return;}
         if(LiviaStory.matches(name)){liviaPortrait();return;}
@@ -2135,12 +2150,15 @@ public final class MainActivity extends Activity {
             if(opponent!=null)actionButton("БЕСТИАРИЙ | "+opponent.name,opponent.shortLabel(),false,()->showBestiaryEntry(opponent));
         }
         if(LiviaStory.MODE.equals(game.mode)&&game.livia.stage==4&&game.livia.survivor())actionButton("Ливия | Спутница и отношения",game.livia.life.gearLabel(),false,()->npcDetails(LiviaStory.NAME));
-        if(LocationGalleryView.hasGallery(game.progress.location)){
+        if(LocationGalleryView.hasGallery(game.progress.location)||WorkImageEditor.hasPrimary(this,"location",game.progress.location)){
             content.addView(sceneGallery(game.progress.location),lp(-1,-2));
             renderLocationWeather(content);
         }else{
             content.addView(new NordicArtView(this,NordicArtView.STORY),lp(-1,188));
         }
+        actionButton("ИЗОБРАЖЕНИЕ ЛОКАЦИИ","Создать / заменить через Work",false,()->
+            WorkImageEditor.open(this,"location",game.progress.location,game.progress.location,
+                "Локация текущего прохождения.",accent(),this::render));
         space(content,16);
         LinearLayout narrative=card();
         addText(narrative,"ᚱ  ГЛАВА  |  "+s.kicker.toUpperCase(java.util.Locale.ROOT),11,accent(),false,13);
@@ -2319,7 +2337,14 @@ public final class MainActivity extends Activity {
         String title=LocationGalleryView.cityPlaceTitle(city,place);
         LinearLayout panel=column();addText(panel,city+" | "+CityArchitecture.CATEGORIES[category],14,MUTED,false,8);
         LocationGalleryView gallery=LocationGalleryView.cityPlaceGallery(this,city,place,accent());
-        if(gallery!=null)panel.addView(gallery,lp(-1,-2));
+        String assetId=city+" / "+place;
+        android.widget.ImageView local=WorkImageEditor.primaryView(this,"location",assetId,accent());
+        if(local!=null)panel.addView(local,lp(-1,-2));
+        else if(gallery!=null)panel.addView(gallery,lp(-1,-2));
+        livingLink(panel,"СОЗДАТЬ / ЗАМЕНИТЬ ИЗОБРАЖЕНИЕ",
+            "Через ChatGPT Work · редактируемое описание","hero",()->
+                WorkImageEditor.open(this,"location",assetId,title,
+                    "Город: "+city+". Район: "+CityArchitecture.CATEGORIES[category]+".",accent(),this::render));
         int d=-1;
         if("Солитьюд".equals(city)){
             String[] names={"Главные ворота","Мрачный замок","Синий дворец","Коллегия бардов","Храм Богов","Кузница Солитьюда","Смеющаяся крыса","Гавань Солитьюда"};
@@ -2553,11 +2578,14 @@ public final class MainActivity extends Activity {
 
     /** AI mode replaces the entire offline story, not just its dialogue panel. */
     private void renderAiGame(){
+        actionButton("ИЗОБРАЖЕНИЕ ЛОКАЦИИ","Создать / заменить через Work",false,()->
+            WorkImageEditor.open(this,"location",game.progress.location,game.progress.location,
+                "Локация текущего прохождения.",accent(),this::render));
         String source=resolvedAiProvider();
         boolean ready="aipaca".equals(source)||("local".equals(source)?localModelReady():
             "chatgpt".equals(source)?chatGptOAuth.hasAuthorizedPlan():
             "api".equals(source)&&AiKeyVault.configured(this));
-        if(LocationGalleryView.hasGallery(game.progress.location)){
+        if(LocationGalleryView.hasGallery(game.progress.location)||WorkImageEditor.hasPrimary(this,"location",game.progress.location)){
             content.addView(sceneGallery(game.progress.location),lp(-1,-2));
             renderLocationWeather(content);
             space(content,13);
@@ -3774,10 +3802,13 @@ public final class MainActivity extends Activity {
         fullMap.setOnClickListener(v->openFullscreenWorldMap());
         addText(overview,"Масштаб — двумя пальцами или кнопками. Группы меток раскрываются при увеличении. Поиск работает по русским и оригинальным названиям.",12,MUTED,false,6);
         addText(overview,"Два полных листа рельефа работают без интернета. Масштаб и положение каждого листа сохраняются отдельно.",11,MUTED,false,7);
-        if(LocationGalleryView.hasGallery(game.progress.location)){
+        if(LocationGalleryView.hasGallery(game.progress.location)||WorkImageEditor.hasPrimary(this,"location",game.progress.location)){
             overview.addView(sceneGallery(game.progress.location),lp(-1,-2));
             renderLocationWeather(overview);
         }
+        actionButton("РЕДАКТОР ИЗОБРАЖЕНИЯ ЛОКАЦИИ","Создать / заменить через Work",false,()->
+            WorkImageEditor.open(this,"location",game.progress.location,game.progress.location,
+                "Текущая локация на карте Скайрима.",accent(),this::render));
         addText(content,"МЕСТА И ПЕРЕХОДЫ",11,accent(),true,10);
         actionButton("ПОИСК ПО ВСЕМ ТОЧКАМ АТЛАСА",SkyrimMapCatalog.size()+" локаций материка и Солстейма",false,()->searchSkyrimAtlas(terrainMap));
         String[] regions=new String[GameEngine.REGIONS.length+1];regions[0]="Все области маршрутов";
@@ -4077,8 +4108,8 @@ public final class MainActivity extends Activity {
         wrapper.setPadding(0,0,0,dp(8));
         scroller.addView(wrapper,new ScrollView.LayoutParams(-1,-2));
         panel.addView(scroller,new LinearLayout.LayoutParams(-1,0,1));
-        if(LocationGalleryView.hasGallery(place.name)){
-            wrapper.addView(new LocationGalleryView(this,place.name,accent(),false),lp(-1,-2));
+        if(LocationGalleryView.hasGallery(place.name)||WorkImageEditor.hasPrimary(this,"location",place.name)){
+            wrapper.addView(sceneGallery(place.name),lp(-1,-2));
             if(place.name.equalsIgnoreCase(game.progress.location))renderLocationWeather(wrapper);
             space(wrapper,10);
         }
@@ -4095,6 +4126,10 @@ public final class MainActivity extends Activity {
             addText(details,"Положение метки на рельефе ориентировочное.",12,MUTED,false,0);
         }
         wrapper.addView(details,lp(-1,-2));
+        livingLink(wrapper,"СОЗДАТЬ / ЗАМЕНИТЬ ИЗОБРАЖЕНИЕ",
+            "ChatGPT Work · можно изменить описание","hero",()->
+                WorkImageEditor.open(this,"location",place.name,place.name,
+                    place.description,accent(),this::render));
 
         if(canTravel){
             space(wrapper,10);
@@ -4249,6 +4284,11 @@ public final class MainActivity extends Activity {
     private View itemPicture(ItemCatalog.Item item,int size){
         android.widget.FrameLayout tile=new android.widget.FrameLayout(this);
         tile.setBackground(itemBackground(0xff202020,0xff333333,13));
+        android.widget.ImageView edited=WorkImageEditor.primaryView(this,"item",item.id,accent());
+        if(edited!=null){
+            tile.addView(edited,new android.widget.FrameLayout.LayoutParams(-1,-1));
+            return tile;
+        }
         String file=null;
         String n=item.name.toLowerCase(java.util.Locale.ROOT);
         if(n.equals("эбонитовый меч"))file="ebony_sword";
@@ -4666,6 +4706,11 @@ public final class MainActivity extends Activity {
         view.setBackground(itemBackground(0xff000000,0,16));
         LinearLayout heading=row();heading.setGravity(Gravity.CENTER_VERTICAL);
         view.addView(heading,lp(-1,-2));
+        livingLink(view,"СОЗДАТЬ / ЗАМЕНИТЬ ИЗОБРАЖЕНИЕ",
+            "Через ChatGPT Work · редактируемое описание","hero",()->{
+                WorkImageEditor.open(this,"item",item.id,item.name,
+                    "Тип: "+item.category+". Вес: "+item.weight+".",accent(),this::render);
+            });
         if(hasItemStat(item))heading.addView(itemPicture(item,94),lp(94,94));
         else heading.addView(itemPicture(item,64),lp(64,64));
         View preview=heading.getChildAt(0);preview.setContentDescription("Увеличить изображение: "+item.name);
