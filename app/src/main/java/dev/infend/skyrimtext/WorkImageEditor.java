@@ -20,6 +20,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
+import android.text.InputType;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -46,6 +49,8 @@ import java.util.UUID;
  */
 public final class WorkImageEditor {
     public static final int REQUEST_IMPORT = 8319;
+    public static final int REQUEST_API_REFERENCE = 8320;
+    private static final String API_REFERENCE_PENDING = "pending_api_reference";
     private static final String PREF = "work_image_editor";
     private static final String PENDING = "pending_target";
     private static final int MAX_IMPORT = 5;
@@ -69,6 +74,155 @@ public final class WorkImageEditor {
     }
     private static File directory(Context c, String kind, String id) {
         return new File(new File(c.getFilesDir(), "work_images"), stableKey(kind, id));
+    }
+    private static File apiReference(Context c, String kind, String id) {
+        return new File(new File(c.getFilesDir(), "work_image_references"),
+            stableKey(kind, id) + ".webp");
+    }
+    private static Spinner picker(Activity host, LinearLayout panel, String label,
+                                  String[] options, String preference, String fallback) {
+        panel.addView(label(host, label, 12, MUTED));
+        Spinner spinner = new Spinner(host);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(host,
+            android.R.layout.simple_spinner_dropdown_item, options);
+        spinner.setAdapter(adapter);
+        String current = prefs(host).getString(preference, fallback);
+        for (int i = 0; i < options.length; i++) {
+            if (options[i].equals(current)) { spinner.setSelection(i); break; }
+        }
+        spinner.setOnItemSelectedListener(new android.widget.AdapterView.OnItemSelectedListener() {
+            public void onNothingSelected(android.widget.AdapterView<?> view) {}
+            public void onItemSelected(android.widget.AdapterView<?> view, View selected,
+                                       int position, long rowId) {
+                prefs(host).edit().putString(preference, options[position]).apply();
+            }
+        });
+        panel.addView(spinner);
+        return spinner;
+    }
+    private static File selectedPrimary(Context host, String kind, String id) {
+        File file = safeFile(host, kind, id,
+            metadata(host, kind, id).optString("primary", ""));
+        return file != null && file.isFile() ? file : null;
+    }
+    private static void apiKeyDialog(Activity host) {
+        EditText field = new EditText(host);
+        field.setHint("sk-…");
+        field.setSingleLine(true);
+        field.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+        LinearLayout frame = container(host);
+        frame.addView(label(host, "Ключ хранится в Android Keystore и используется только для"
+            + " прямых HTTPS-запросов к OpenAI. Подписка ChatGPT/Work не оплачивает API.", 13, WHITE));
+        frame.addView(field);
+        new AlertDialog.Builder(host).setTitle("КЛЮЧ OPENAI API")
+            .setView(frame).setPositiveButton("Сохранить", (dialog, which) -> {
+                try {
+                    AiKeyVault.save(host, field.getText().toString());
+                    Toast.makeText(host, "API-ключ сохранён", Toast.LENGTH_SHORT).show();
+                } catch (Exception error) {
+                    Toast.makeText(host, "Ошибка ключа: " + error.getMessage(), Toast.LENGTH_LONG).show();
+                }
+            }).setNegativeButton("Отмена", null).show();
+    }
+    private static void requestApi(Activity host, String kind, String id, String prompt,
+                                   String model, String size, String quality, int mode,
+                                   int accent, Runnable onUpdated) {
+        if (!AiKeyVault.configured(host)) {
+            apiKeyDialog(host);
+            return;
+        }
+        File source = null;
+        if (mode == 1) {
+            source = apiReference(host, kind, id);
+            if (!source.isFile()) {
+                Toast.makeText(host, "Сначала выбери исходное изображение", Toast.LENGTH_LONG).show();
+                return;
+            }
+        } else if (mode == 2) {
+            source = selectedPrimary(host, kind, id);
+            if (source == null) {
+                Toast.makeText(host, "Основное пользовательское изображение не выбрано", Toast.LENGTH_LONG).show();
+                return;
+            }
+        }
+        final File reference = source;
+        String action = reference == null ? "Генерация" : "Редактирование";
+        String message = action + " через OpenAI API.\nМодель: " + model
+            + "\nРазмер: " + size + "\nКачество: " + quality
+            + "\n\nЗапрос оплачивается отдельно по тарифам OpenAI API. "
+            + "Ни деньги, ни изображение не будут списаны или заменены без подтверждения. "
+            + "При редактировании исходный файл отправляется OpenAI.";
+        new AlertDialog.Builder(host).setTitle("ПЛАТНЫЙ ЗАПРОС · " + action)
+            .setMessage(message).setPositiveButton("Отправить запрос", (dialog, which) -> {
+                AlertDialog progress = new AlertDialog.Builder(host)
+                    .setTitle("OpenAI Images API")
+                    .setMessage("Создаётся изображение. Не закрывай приложение до окончания запроса.")
+                    .setNegativeButton("Прервать", null).create();
+                progress.setCancelable(false);
+                progress.show();
+                final OpenAiImageApi.Request[] active = new OpenAiImageApi.Request[1];
+                active[0] = OpenAiImageApi.request(host, prompt, model, size, quality,
+                    reference, (bytes, error) -> {
+                        progress.dismiss();
+                        if (host.isFinishing() || host.isDestroyed()) return;
+                        if (error != null || bytes == null) {
+                            new AlertDialog.Builder(host).setTitle("Ошибка OpenAI API")
+                                .setMessage(error == null ? "Изображение не получено" : error)
+                                .setPositiveButton("Закрыть", null).show();
+                            return;
+                        }
+                        BitmapFactory.Options previewOptions = new BitmapFactory.Options();
+                        previewOptions.inSampleSize = 2;
+                        Bitmap preview = BitmapFactory.decodeByteArray(bytes, 0, bytes.length, previewOptions);
+                        if (preview == null) {
+                            Toast.makeText(host, "Не удалось показать полученное изображение",
+                                Toast.LENGTH_LONG).show();
+                            return;
+                        }
+                        LinearLayout result = container(host);
+                        result.addView(label(host, "Результат не заменит текущую картинку, пока"
+                            + " ты не подтвердишь сохранение.", 13, WHITE));
+                        ImageView art = new ImageView(host);
+                        art.setImageBitmap(preview);
+                        art.setAdjustViewBounds(true);
+                        result.addView(art, new LinearLayout.LayoutParams(-1, -2));
+                        ScrollView scroll = new ScrollView(host);
+                        scroll.addView(result);
+                        JSONObject target = new JSONObject();
+                        try {
+                            target.put("kind", kind).put("id", id).put("prompt", prompt)
+                                  .put("model", model);
+                        } catch (Exception ignored) {}
+                        new AlertDialog.Builder(host).setTitle("ПРЕДПРОСМОТР · OpenAI API")
+                            .setView(scroll)
+                            .setPositiveButton("Заменить основное", (d, w) ->
+                                installApiResult(host, target, bytes, true, onUpdated))
+                            .setNeutralButton("Добавить в галерею", (d, w) ->
+                                installApiResult(host, target, bytes, false, onUpdated))
+                            .setNegativeButton("Не сохранять", null).show();
+                    });
+                progress.getButton(AlertDialog.BUTTON_NEGATIVE).setOnClickListener(v -> {
+                    if (active[0] != null) active[0].cancel();
+                    progress.dismiss();
+                    Toast.makeText(host, "Запрос прерван. Уже начатая обработка может"
+                        + " тарифицироваться OpenAI.", Toast.LENGTH_LONG).show();
+                });
+            }).setNegativeButton("Отмена", null).show();
+    }
+    private static void installApiResult(Activity host, JSONObject target, byte[] result,
+                                         boolean primary, Runnable onUpdated) {
+        File temp = new File(host.getCacheDir(), "skyrim_api_" + UUID.randomUUID() + ".webp");
+        try (FileOutputStream out = new FileOutputStream(temp)) {
+            out.write(result);
+            out.flush();
+            ArrayList<Uri> files = new ArrayList<>();
+            files.add(Uri.fromFile(temp));
+            installAsync(host, target, files, primary, onUpdated, "openai-api");
+        } catch (Exception e) {
+            temp.delete();
+            Toast.makeText(host, "Не удалось сохранить результат: " + e.getMessage(),
+                Toast.LENGTH_LONG).show();
+        }
     }
     private static JSONObject metadata(Context c, String kind, String id) {
         try {
@@ -248,6 +402,58 @@ public final class WorkImageEditor {
             if (value.isEmpty()) { editor.setError("Напиши описание"); return; }
             launchChatGpt(host, "Создай " + requested[0] + (requested[0] == 1 ? " отдельное изображение. " : requested[0] == 3 ? " отдельных изображения. " : " отдельных изображений. ") + value);
         });
+        panel.addView(label(host, "OPENAI IMAGES API · ПРЯМО В ИГРЕ", 15, accent));
+        panel.addView(label(host, "Автоматическая генерация или редактирование изображения."
+            + " Требуется отдельный API-ключ, используются платные запросы.", 12, MUTED));
+        Button keyButton = button(host, AiKeyVault.configured(host)
+            ? "Изменить OpenAI API-ключ" : "Добавить OpenAI API-ключ", accent);
+        panel.addView(keyButton);
+        keyButton.setOnClickListener(v -> apiKeyDialog(host));
+        String prefPrefix = "image_api_" + stableKey(kind, id);
+        Spinner modelSelect = picker(host, panel, "МОДЕЛЬ", OpenAiImageApi.MODELS,
+            "image_api_model", OpenAiImageApi.MODELS[0]);
+        Spinner sizeSelect = picker(host, panel, "РАЗМЕР", OpenAiImageApi.SIZES,
+            "image_api_size", OpenAiImageApi.SIZES[0]);
+        Spinner qualitySelect = picker(host, panel, "КАЧЕСТВО", OpenAiImageApi.QUALITIES,
+            "image_api_quality", OpenAiImageApi.QUALITIES[1]);
+        String[] actions = {"Создать с нуля", "Изменить выбранный файл",
+            "Изменить основное из моей галереи"};
+        Spinner operation = picker(host, panel, "РЕЖИМ", actions,
+            prefPrefix + "_operation", actions[0]);
+        File existingReference = apiReference(host, kind, id);
+        panel.addView(label(host, existingReference.isFile()
+            ? "Исходный файл выбран: " + (existingReference.length() / 1024) + " КБ"
+            : "Для редактирования можно выбрать исходную картинку из файлов.", 12, MUTED));
+        Button selectReference = button(host, "Выбрать картинку для редактирования", accent);
+        panel.addView(selectReference);
+        selectReference.setOnClickListener(v -> {
+            try {
+                JSONObject pending = new JSONObject();
+                pending.put("kind", kind).put("id", id).put("name", name)
+                    .put("facts", facts);
+                if (!prefs(host).edit().putString(API_REFERENCE_PENDING, pending.toString()).commit())
+                    throw new IllegalStateException("Ошибка сохранения выбора");
+                Intent select = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+                select.addCategory(Intent.CATEGORY_OPENABLE);
+                select.setType("image/*");
+                host.startActivityForResult(select, REQUEST_API_REFERENCE);
+            } catch (Exception e) {
+                Toast.makeText(host, "Не удалось выбрать изображение: " + e.getMessage(),
+                    Toast.LENGTH_LONG).show();
+            }
+        });
+        Button apiGenerate = button(host, "СОЗДАТЬ / ИЗМЕНИТЬ ЧЕРЕЗ API", accent);
+        panel.addView(apiGenerate);
+        apiGenerate.setOnClickListener(v -> {
+            String value = editor.getText().toString().trim();
+            if (value.isEmpty()) { editor.setError("Опиши новое изображение или правку"); return; }
+            if (!AiKeyVault.configured(host)) { apiKeyDialog(host); return; }
+            requestApi(host, kind, id, value,
+                String.valueOf(modelSelect.getSelectedItem()),
+                String.valueOf(sizeSelect.getSelectedItem()),
+                String.valueOf(qualitySelect.getSelectedItem()),
+                operation.getSelectedItemPosition(), accent, onUpdated);
+        });
         Button importButton = button(host, "Импортировать изображение", accent);
         panel.addView(importButton);
         importButton.setOnClickListener(v -> {
@@ -276,6 +482,50 @@ public final class WorkImageEditor {
     }
     public static boolean onActivityResult(Activity host, int request, int result, Intent data,
                                            int accent, Runnable onUpdated) {
+        if (request == REQUEST_API_REFERENCE) {
+            String pending = prefs(host).getString(API_REFERENCE_PENDING, "");
+            if (result != Activity.RESULT_OK || data == null || data.getData() == null
+                || pending.isEmpty()) return true;
+            try {
+                JSONObject saved = new JSONObject(pending);
+                String kind = saved.getString("kind"), id = saved.getString("id");
+                Uri imageUri = data.getData();
+                new Thread(() -> {
+                    File destination = apiReference(host, kind, id);
+                    File temp = new File(destination.getParentFile(), destination.getName() + ".tmp");
+                    try {
+                        if (!destination.getParentFile().isDirectory()
+                            && !destination.getParentFile().mkdirs())
+                            throw new IllegalStateException("Не удалось создать каталог");
+                        Bitmap bitmap = readScaled(host, imageUri, 2048);
+                        try (FileOutputStream out = new FileOutputStream(temp)) {
+                            if (!bitmap.compress(Bitmap.CompressFormat.WEBP, 88, out))
+                                throw new IllegalStateException("Ошибка записи исходного файла");
+                        } finally { bitmap.recycle(); }
+                        if (!temp.renameTo(destination))
+                            throw new IllegalStateException("Не удалось сохранить исходный файл");
+                        prefs(host).edit().remove(API_REFERENCE_PENDING)
+                            .putString("image_api_" + stableKey(kind, id) + "_operation",
+                                "Изменить выбранный файл").apply();
+                        host.runOnUiThread(() -> {
+                            if (host.isFinishing() || host.isDestroyed()) return;
+                            Toast.makeText(host, "Исходная картинка готова для редактирования",
+                                Toast.LENGTH_SHORT).show();
+                            open(host, kind, id, saved.optString("name"),
+                                saved.optString("facts"), accent, onUpdated);
+                        });
+                    } catch (Exception | OutOfMemoryError error) {
+                        temp.delete();
+                        host.runOnUiThread(() -> Toast.makeText(host, "Ошибка исходного изображения: "
+                            + error.getMessage(), Toast.LENGTH_LONG).show());
+                    }
+                }, "image-api-source").start();
+            } catch (Exception e) {
+                Toast.makeText(host, "Не удалось подготовить исходное изображение",
+                    Toast.LENGTH_LONG).show();
+            }
+            return true;
+        }
         if (request != REQUEST_IMPORT) return false;
         String saved = prefs(host).getString(PENDING, "");
         if (result != Activity.RESULT_OK || data == null || saved.isEmpty()) return true;
@@ -303,9 +553,9 @@ public final class WorkImageEditor {
                 .setTitle("Импорт: " + target.optString("name"))
                 .setView(panel)
                 .setPositiveButton("Заменить основное", (d, w) ->
-                    installAsync(host, target, files, true, onUpdated))
+                    installAsync(host, target, files, true, onUpdated, "chatgpt-work-manual"))
                 .setNeutralButton("Добавить в галерею", (d, w) ->
-                    installAsync(host, target, files, false, onUpdated))
+                    installAsync(host, target, files, false, onUpdated, "chatgpt-work-manual"))
                 .setNegativeButton("Отмена", null).show();
         } catch (Exception e) {
             Toast.makeText(host, "Ошибка подготовки импорта", Toast.LENGTH_LONG).show();
@@ -346,7 +596,7 @@ public final class WorkImageEditor {
         return bitmap;
     }
     private static void installAsync(Activity host, JSONObject target, ArrayList<Uri> inputs,
-                                     boolean makePrimary, Runnable onUpdated) {
+                                     boolean makePrimary, Runnable onUpdated, String origin) {
         new Thread(() -> {
             String kind = target.optString("kind"), id = target.optString("id");
             File folder = directory(host, kind, id);
@@ -374,7 +624,7 @@ public final class WorkImageEditor {
                     JSONObject record = new JSONObject()
                         .put("file", filename)
                         .put("prompt", target.optString("prompt"))
-                        .put("source", "chatgpt-work-manual")
+                        .put("source", origin).put("model", target.optString("model", ""))
                         .put("created", System.currentTimeMillis())
                         .put("bytes", dest.length())
                         .put("width", width)
@@ -397,6 +647,14 @@ public final class WorkImageEditor {
                 for (File file : newFiles) file.delete();
                 host.runOnUiThread(() -> Toast.makeText(host,
                     "Импорт не выполнен: " + error.getMessage(), Toast.LENGTH_LONG).show());
+            } finally {
+                if ("openai-api".equals(origin)) for (Uri uri : inputs) {
+                    if ("file".equals(uri.getScheme())) {
+                        File temporary = new File(uri.getPath());
+                        if (temporary.getParentFile().equals(host.getCacheDir())
+                            && temporary.getName().startsWith("skyrim_api_")) temporary.delete();
+                    }
+                }
             }
         }, "work-image-import").start();
     }
