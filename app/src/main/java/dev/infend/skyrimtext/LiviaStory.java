@@ -100,7 +100,7 @@ final class LiviaStory {
         remember(g,memory);g.addXp(100);
     }
     boolean fixRestore(GameEngine g){
-        if(!g.fixShop.editorEnabled||stage!=4||!"Последний поединок".equals(ending)||!"WORLD".equals(g.mode)&&!"RESULT".equals(g.mode))return false;
+        if(!false||stage!=4||!"Последний поединок".equals(ending)||!"WORLD".equals(g.mode)&&!"RESULT".equals(g.mode))return false;
         ending="Прощение";following=false;romance=false;life.endRomance();trust=Math.max(35,trust);memory="Ливия возвращена к жизни магией фикскоинов. Она свободна, но отношения предстоит восстановить.";
         try{g.sceneState.setContext(g.day,g.hour,g.progress.location);org.json.JSONArray facts=g.sceneState.npcFacts();for(int i=0;i<facts.length();i++){org.json.JSONObject n=facts.optJSONObject(i);if(n!=null&&matches(n.optString("title"))&&"DEAD".equals(n.optString("status")))g.sceneState.fixNpc(n.optString("id"),50,true);}}catch(Exception ignored){}
         return true;
