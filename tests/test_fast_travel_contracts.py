@@ -8,7 +8,7 @@ UI=(BASE/"MainActivity.java").read_text(encoding="utf-8")
 
 class FastTravelContracts(unittest.TestCase):
     def test_instant_travel_has_no_resource_charges(self):
-        block=ENGINE.split("public boolean fastTravel(",1)[1].split("public boolean fixTeleport(",1)[0]
+        block=ENGINE.split("public boolean fastTravel(",1)[1].split("public boolean waitHours(",1)[0]
         self.assertIn('visitedOnly&&!visitedVisual.contains(name)',block)
         self.assertIn('visitedVisual.add(name)',block)
         self.assertIn('mode="WORLD"',block)
