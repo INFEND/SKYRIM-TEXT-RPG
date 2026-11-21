@@ -907,14 +907,6 @@ public final class GameEngine {
         katherine.observeTravel(this);alma.observeTravel(this);
         return true;
     }
-    /** Old editor teleport is kept only for migration of existing saves. */
-    public boolean fixTeleport(String name){
-        return fixShop.editorEnabled&&fixTravelToVisited(name);
-    }
-    boolean fixTravelToVisited(String name){
-        if(!started||road.pending()||!"WORLD".equals(mode)&&!"RESULT".equals(mode)||!visitedVisual.contains(name)||name.equals(progress.location))return false;
-        WorldAtlas.Place target=WorldAtlas.find(name);if(target==null)return false;region=target.region;progress.location=target.name;katherine.observeTravel(this);alma.observeTravel(this);mode="WORLD";message="Магический переход: "+target.name;recordVisualEvent(message);return true;
-    }
     public boolean waitHours(int hours){return restHours(hours,hours>=6);}
     public boolean restHours(int hours,boolean sleep){if(solitude.custody())return false;return restHoursInternal(hours,sleep);}
     boolean restPrisonDay(){return solitude.confined()&&SolitudeJustice.CELL.equals(mode)&&restHoursInternal(24,true);}
