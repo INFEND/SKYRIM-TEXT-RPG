@@ -42,4 +42,20 @@ public class SolitudeLifeStage25Test {
         assertEquals(gold,g.gold);assertEquals(rep,g.holdReputation[3]);
         g.hour=23;String before=g.message;g.choose("SOLITUDE:local:7");assertEquals(before,g.message);
     }
+    @Test public void repeatedPaidShiftsAdvanceSharedNpcTrustAndPersist() throws Exception {
+        GameEngine g=new GameEngine();g.start("Тест","Норд","Воин");
+        g.region=3;g.progress.location="Солитьюд";g.mode="WORLD";
+        g.choose("SOLITUDE:open");g.choose("SOLITUDE:visit:0");
+        for(int day=1;day<=3;day++){
+            g.day=day;g.hour=10;g.stamina=g.maxStamina;
+            g.choose("SOLITUDE:job:0");
+            assertEquals(day==1?"MET":day==2?"INFORMED":"HELPED",
+                g.sceneState.npcStatusByName("Яла"));
+        }
+        int gold=g.gold;
+        g=GameEngine.fromJson(g.toJson().toString());
+        assertEquals("HELPED",g.sceneState.npcStatusByName("Яла"));
+        g.choose("SOLITUDE:job:0");
+        assertEquals(gold,g.gold);
+    }
 }
