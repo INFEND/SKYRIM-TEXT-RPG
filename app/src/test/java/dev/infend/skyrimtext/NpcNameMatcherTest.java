@@ -50,4 +50,10 @@ public class NpcNameMatcherTest {
         assertEquals("Сера\u0301на",source.substring(hits.get(0).start,hits.get(0).end));
         assertEquals("М’Айка",source.substring(hits.get(1).start,hits.get(1).end));
     }
+    @Test public void ambiguousCommonNounsAreNotLinkedToNpcs(){
+        NpcNameMatcher matcher=new NpcNameMatcher(NpcProfiles.linkNames());
+        assertEquals(0,matcher.find("Дельфин вынырнул из реки. Гурман приготовил ужин.").size());
+        assertEquals("Дельфина",matcher.find("Дельфина объяснила дальнейший путь.").get(0).name);
+        assertFalse(NpcProfiles.linkNames().containsKey("дельфин"));
+    }
 }
