@@ -78,4 +78,25 @@ public class SolitudeResidentsTest {
         g.choose("SOLITUDE:resident:memory:1");assertTrue(g.message.contains("60/100"));
         assertEquals(gold,g.gold);assertEquals(rep,g.holdReputation[3]);
     }
+    @Test public void relationshipTimelineIsReadOnlyAndSurvivesSave() throws Exception {
+        GameEngine g=new GameEngine();g.start("Тест","Норд","Воин");
+        g.region=3;g.progress.location="Солитьюд";g.mode="WORLD";g.hour=9;
+        g.choose("SOLITUDE:open");g.choose("SOLITUDE:visit:0");
+        g.choose("SOLITUDE:resident:talk:1");
+        g.choose("SOLITUDE:resident:trust:1");
+        org.json.JSONObject before=g.sceneState.toJson();
+        g.choose("SOLITUDE:resident:history:1");
+        assertTrue(g.message.contains("Доверительный разговор"));
+        assertTrue(g.message.contains("+10"));
+        assertEquals(before.toString(),g.sceneState.toJson().toString());
+        g=GameEngine.fromJson(g.toJson().toString());
+        org.json.JSONObject restored=g.sceneState.toJson();
+        g.choose("SOLITUDE:resident:history:1");
+        assertTrue(g.message.contains("60/100"));
+        assertEquals(restored.toString(),g.sceneState.toJson().toString());
+        int gold=g.gold;
+        g.choose("SOLITUDE:resident:history:1");
+        assertEquals(gold,g.gold);
+    }
+
 }
