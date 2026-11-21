@@ -279,9 +279,8 @@ public final class SkyrimTerrainMapView extends View {
         if(image!=null)canvas.drawBitmap(image,null,new RectF(left,top,left+WIDTH[sheet]*scale,top+HEIGHT[sheet]*scale),imagePaint);
         drawVisualRoute(canvas);
         ArrayList<MapPinLayout.Pin> shown=renderedPins();labels.clear();
-        // Markers never collapse into moving numeric clusters: each icon has
-        // one immutable location ID and world coordinate. Size changes only
-        // as a continuous function of zoom, and is capped in dp.
+        // Nearby locations share a stable, counted marker. Tapping the marker
+        // reveals every location it contains; zoom separates dense groups.
         for(MapPinLayout.Pin pin:shown){
             float diameter=pin.sizeDp*density;
             float margin=diameter*.65f;
@@ -296,6 +295,23 @@ public final class SkyrimTerrainMapView extends View {
                 pin.player?"маркер игрока":iconForSite(site),color,pin.x,pin.y,diameter)){
                 ink.setColor(color);
                 canvas.drawCircle(pin.x,pin.y,Math.max(2f*density,diameter*.24f),ink);
+            }
+            if(pin.sites.size()>1){
+                // Draw the number of reachable locations on every grouped pin.
+                String total=pin.sites.size()>99?"99+":Integer.toString(pin.sites.size());
+                ink.setTypeface(android.graphics.Typeface.DEFAULT_BOLD);
+                ink.setTextSize(10f*density);
+                float textWidth=ink.measureText(total);
+                float halfWidth=Math.max(8f*density,textWidth*.5f+4f*density);
+                float badgeHeight=8.5f*density;
+                float bx=pin.x+diameter*.43f,by=pin.y-diameter*.42f;
+                ink.setStyle(Paint.Style.FILL);
+                ink.setColor(0xffd9bd84);
+                canvas.drawRoundRect(bx-halfWidth,by-badgeHeight,
+                    bx+halfWidth,by+badgeHeight,badgeHeight,badgeHeight,ink);
+                ink.setColor(0xff081014);
+                canvas.drawText(total,bx-textWidth*.5f,
+                    by-(ink.ascent()+ink.descent())*.5f,ink);
             }
             if(pin.player||pin.focus){
                 ink.setStyle(Paint.Style.STROKE);
@@ -362,9 +378,9 @@ public final class SkyrimTerrainMapView extends View {
         focusId=site.id;changed();
         WorldAtlas.Place place=WorldAtlas.find(SkyrimMapCatalog.travelDestination(site));
         if(catalogCallback!=null){
-            ArrayList<SkyrimMapCatalog.Site> selected=new ArrayList<>(1);
-            selected.add(site);
-            catalogCallback.selected(selected);
+            // Never send only the anchor: otherwise close-by pins vanish from
+            // interaction even though they exist in the geographic catalog.
+            catalogCallback.selected(new ArrayList<>(pin.sites));
         }else if(place!=null&&callback!=null)callback.selected(place);
         performClick();
     }
