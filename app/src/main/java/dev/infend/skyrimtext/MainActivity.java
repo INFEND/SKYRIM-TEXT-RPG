@@ -97,6 +97,8 @@ public final class MainActivity extends Activity {
     private LocalAiClient localAiClient;
     private AiPacaClient aipacaClient;
     private static final int REQUEST_LOCAL_GGUF=7107;
+    private static final int REQUEST_ITEM_ARTWORK=7318;
+    private int pendingArtworkSlot=-1;
     private String aiSession;
     private static final String AI_PENDING_ACTION="ai_pending_action";
     private static final String AI_PENDING_CHANCE="ai_pending_chance";
@@ -250,6 +252,26 @@ public final class MainActivity extends Activity {
         if(requestCode==REQUEST_SERANA_GALLERY){if(resultCode==RESULT_OK&&data!=null&&data.getData()!=null){try{SeranaGallery.install(this,data.getData());seranaGallery(1);}catch(Exception e){toast("Не удалось импортировать галерею: "+e.getMessage());}}return;}
         if(requestCode==REQUEST_KATHERINE_GALLERY){if(resultCode==RESULT_OK&&data!=null&&data.getData()!=null){try{KatherineGallery.install(this,data.getData());refreshNpcPortrait();katherineGallery(npcGalleryPrimary("katherine",1,KatherineGallery.COUNT));}catch(Exception e){toast("Не удалось импортировать галерею: "+e.getMessage());}}return;}
         if(requestCode==LocalAiEngineModule.REQUEST_ACTIVATE){if(localAiClient!=null)localAiClient.onEngineActivationResult(resultCode==RESULT_OK);return;}
+        if(requestCode==REQUEST_ITEM_ARTWORK){
+            final int slot=pendingArtworkSlot;pendingArtworkSlot=-1;
+            if(resultCode==RESULT_OK&&data!=null&&data.getData()!=null&&slot>=3){
+                final Uri imageUri=data.getData();
+                new Thread(()->{
+                    try{
+                        String path=ItemArtworkStorage.install(getApplicationContext(),imageUri);
+                        runOnUiThread(()->{
+                            if(isDestroyed()||isFinishing())return;
+                            if(slot<CompensationPowers.ITEM_SLOTS&&game.compensation.owned[slot]){
+                                game.compensation.attachArtwork(slot,path,game.compensation.itemArtPrompts[slot]);
+                                save();render();toast("Изображение сохранено в WebP");
+                            }
+                        });
+                    }catch(Exception e){
+                        runOnUiThread(()->{if(!isFinishing()&&!isDestroyed())toast("Импорт не удался: "+e.getMessage());});
+                    }
+                },"item-artwork-import").start();
+            }return;
+        }
         if(requestCode==REQUEST_LOCAL_GGUF&&resultCode==RESULT_OK&&data!=null&&data.getData()!=null)
             importLocalModel(data.getData());
     }
@@ -4249,6 +4271,18 @@ public final class MainActivity extends Activity {
     private View itemPicture(ItemCatalog.Item item,int size){
         android.widget.FrameLayout tile=new android.widget.FrameLayout(this);
         tile.setBackground(itemBackground(0xff202020,0xff333333,13));
+        int customSlot=CompensationPowers.itemIndex(item.id);
+        if(customSlot>=3&&customSlot<CompensationPowers.ITEM_SLOTS){
+            android.graphics.Bitmap art=ItemArtworkStorage.preview(this,
+                    game.compensation.itemArtPaths[customSlot],Math.max(256,size*3));
+            if(art!=null){
+                android.widget.ImageView image=new android.widget.ImageView(this);
+                image.setImageBitmap(art);
+                image.setScaleType(android.widget.ImageView.ScaleType.FIT_CENTER);
+                tile.addView(image,new android.widget.FrameLayout.LayoutParams(-1,-1));
+                return tile;
+            }
+        }
         String file=null;
         String n=item.name.toLowerCase(java.util.Locale.ROOT);
         if(n.equals("эбонитовый меч"))file="ebony_sword";
@@ -4649,6 +4683,7 @@ public final class MainActivity extends Activity {
             t.setOnClickListener(clicked->{selectedSort=field;render();});
         }
         content.addView(new SkyrimRuleView(this,0xff92999b),lp(-1,18));
+        actionButton("✦ Мастерская предметов","Ручное создание | ChatGPT Work | изображения",true,()->showItemWorkshop(-1));
         actionButton("Полный справочник предметов","Каталог, поиск и характеристики всех вещей",false,this::showItemCatalog);
         actionButton("Кодекс и бестиарий","Народы, существа, история и древние места",false,()->{tab=6;render();});
         actionButton("Личная библиотека","Твои документы, легенды и записи",false,this::showLibrary);
@@ -4720,6 +4755,10 @@ public final class MainActivity extends Activity {
         itemEffect(view,item);
         itemCondition(view,item,owner);
         int artifact=CompensationPowers.itemIndex(item.id);if(artifact>=0){addText(view,game.compensation.bound[artifact]?"Привязка к душе":"Системное снаряжение | нельзя потерять",12,ITEM_MAGIC,true,5);if(game.compensation.passive[artifact])addText(view,game.compensation.passiveLabel(artifact)+" при экипировке",13,ITEM_UP,false,6);}
+        if(artifact>=3){
+            itemProperty(view,"star","Редкость",ItemWorkshopSpec.RARITIES[
+                    ItemWorkshopSpec.normalizeRarity(game.compensation.itemRarity[artifact])],ITEM_GOLD);
+        }
         itemEffectPreview(view,item);
         itemDivider(view,7);
         TextView description=itemText(item.description,14,0xffa3a3a3,false);
@@ -4786,8 +4825,18 @@ public final class MainActivity extends Activity {
         more.setOnClickListener(v->{
             android.widget.PopupMenu menu=new android.widget.PopupMenu(this,more);
             if(canDiscardItem(item))menu.getMenu().add("Выбросить");
+            if(artifact>=3){
+                menu.getMenu().add("Редактировать предмет");
+                menu.getMenu().add("Изображение предмета");
+            }
             menu.getMenu().add("Закрыть");
             menu.setOnMenuItemClickListener(choice->{
+                if("Редактировать предмет".contentEquals(choice.getTitle())){
+                    dialog.dismiss();showItemWorkshop(artifact);return true;
+                }
+                if("Изображение предмета".contentEquals(choice.getTitle())){
+                    dialog.dismiss();showItemArtwork(artifact);return true;
+                }
                 if(!"Выбросить".contentEquals(choice.getTitle())){dialog.dismiss();return true;}
                 new RuneDialogBuilder(this,accent()).setTitle("Выбросить предмет?")
                     .setMessage(item.name+" ×1").setNegativeButton("Отмена",null)
@@ -6192,8 +6241,8 @@ public final class MainActivity extends Activity {
     }
     private void livingArtifactShop(){
         if(livingBusy())return;LinearLayout panel=column();String[] effects={"+8 к атаке","−5 входящего урона","+3 к регенерации магии"};
-        livingLink(panel,"Создать свой предмет","50 F","armor",()->livingCreate(true));
-        for(int i=0;i<CompensationPowers.SLOTS;i++){final int index=i;String name=game.compensation.itemName(i);if(i>=3&&!game.compensation.owned[i])continue;if(!game.compensation.owned[i])livingFixRow(panel,name,"Уникальное снаряжение",50,()->game.compensation.buyItem(game,index),this::livingArtifactShop);
+        livingLink(panel,"Расширенное создание предмета","50 F | ИИ Работа/Codex | арт","armor",()->showItemWorkshop(-1));
+        for(int i=0;i<CompensationPowers.ITEM_SLOTS;i++){final int index=i;String name=game.compensation.itemName(i);if(i>=3&&!game.compensation.owned[i])continue;if(!game.compensation.owned[i])livingFixRow(panel,name,"Уникальное снаряжение",50,()->game.compensation.buyItem(game,index),this::livingArtifactShop);
             else{addText(panel,name,17,ITEM_MAGIC,true,5);if(!game.compensation.bound[i])livingFixRow(panel,"Привязка к душе","Отметка в карточке предмета",20,()->game.compensation.bind(index),this::livingArtifactShop);
                 if(!game.compensation.passive[i])livingFixRow(panel,"Пассивный эффект",game.compensation.passiveLabel(i),25,()->game.compensation.addPassive(index),this::livingArtifactShop);else addText(panel,game.compensation.passiveLabel(i)+" при экипировке",13,ITEM_UP,false,8);}}
         livingDialog("Уникальные предметы",panel);
