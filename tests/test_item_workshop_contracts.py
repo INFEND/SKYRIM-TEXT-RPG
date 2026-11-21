@@ -33,12 +33,25 @@ class ExpandedItemWorkshop(unittest.TestCase):
 
     def test_ai_suggestions_never_directly_commit_game_state(self):
         self.assertIn('chatGptOAuth.getToken',MAIN)
-        self.assertIn('ItemWorkshopAi.draft(token,model,prompt',MAIN)
+        self.assertIn('ItemWorkshopAi.draft(token,model,request',MAIN)
         self.assertIn('setPositiveButton(editing?"Сохранить":"Создать за 50 F"',MAIN)
         self.assertIn('game.compensation.createDetailedItem',MAIN)
         self.assertNotIn('GameEngine',AI)
         self.assertIn('put("store",false).put("stream",true)',AI)
         self.assertIn('response.completed',AI)
+
+    def test_workshop_controls_display_feedback_and_commit_once(self):
+        self.assertIn('panel.addView(workshopStatus,lp(-1,-2))',MAIN)
+        self.assertIn('createInline.setOnClickListener(v->createItem.run())',MAIN)
+        self.assertIn('dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v->createItem.run())',MAIN)
+        self.assertIn('game.compensation.createDetailedItem',MAIN)
+        self.assertIn('game.fixSpent+=50',MAIN)
+        self.assertIn('chatGptOAuth.loadModels((models,error)->',MAIN)
+        self.assertIn('work.setOnClickListener(v->{',MAIN)
+        self.assertIn('if(!dialog.isShowing()||isDestroyed()||isFinishing())return;',MAIN)
+        self.assertIn('status.accept("Ошибка авторизации:',MAIN)
+        self.assertIn('name.setError("Такой предмет уже существует")',MAIN)
+        self.assertIn('if(game.progress.carryWeight()+addedWeight>',MAIN)
 
     def test_images_use_work_and_manual_import_not_paid_api(self):
         self.assertNotIn('/v1/images/generations', AI)
