@@ -6383,6 +6383,8 @@ public final class MainActivity extends Activity {
      */
     private void showItemWorkshop(int editingSlot){
         if(livingBusy()){toast("Сначала заверши текущее игровое действие");return;}
+        // Avoid leaving the EterNis parent dialog over the refreshed inventory.
+        if(activeLivingDialog!=null&&activeLivingDialog.isShowing())closeLivingDialog();
         boolean editing=editingSlot>=3&&editingSlot<CompensationPowers.ITEM_SLOTS
                 &&game.compensation.owned[editingSlot];
         final CompensationPowers state=game.compensation;
@@ -6456,53 +6458,26 @@ public final class MainActivity extends Activity {
         idea.setSingleLine(false);idea.setMinLines(2);idea.setMaxLines(4);
         idea.setInputType(InputType.TYPE_CLASS_TEXT|InputType.TYPE_TEXT_FLAG_MULTI_LINE);
         TextView work=itemAction("✦ ПРЕДЛОЖИТЬ ПАРАМЕТРЫ");
-        panel.addView(work,lp(-1,44));
-        addText(panel,"Используется уже подключённый аккаунт ChatGPT и модель Работа/Codex. "+
-                "ИИ только заполняет поля, сохранение выполняется вручную.",11,MUTED,false,8);
-        work.setOnClickListener(v->{
-            if(!chatGptOAuth.hasAuthorizedPlan()){
-                toast("Сначала подключи ChatGPT Work в настройках ИИ");return;
-            }
-            final String prompt=idea.getText().toString().trim();
-            final String model=prefs.getString("ai_chatgpt_model","");
-            if(prompt.isEmpty()){toast("Сначала опиши задумку предмета");return;}
-            if(model.isEmpty()){toast("Выбери модель Работа/Codex в настройках");return;}
-            work.setEnabled(false);work.setText("✦ ИИ ПОДБИРАЕТ ПАРАМЕТРЫ…");
-            chatGptOAuth.getToken((token,error)->{
-                if(error!=null||token==null||token.isEmpty()){
-                    runOnUiThread(()->{
-                        work.setEnabled(true);work.setText("✦ ПРЕДЛОЖИТЬ ПАРАМЕТРЫ");
-                        toast(error==null?"Не удалось получить токен ChatGPT":error);
-                    });return;
-                }
-                ItemWorkshopAi.draft(token,model,prompt,(result,failure)->{
-                    if(isDestroyed()||isFinishing())return;
-                    work.setEnabled(true);work.setText("✦ ПРЕДЛОЖИТЬ ПАРАМЕТРЫ");
-                    if(failure!=null){toast(failure);return;}
-                    int generatedType=ItemWorkshopSpec.normalizeType(result.optInt("type",0));
-                    if(!editing){
-                        kind[0]=generatedType;
-                        typeChoice.setText("ТИП  |  "+ItemWorkshopSpec.TYPES[kind[0]]);
-                        stat.setEnabled(ItemWorkshopSpec.hasStat(kind[0]));
-                    }else if(generatedType!=kind[0]){
-                        toast("Тип предмета сохранён: ИИ изменил только остальные свойства");
-                    }
-                    name.setText(result.optString("name",""));
-                    stat.setText(String.valueOf(ItemWorkshopSpec.normalizedStat(kind[0],result.optInt("stat",0))));
-                    weight.setText(String.valueOf(result.optDouble("weight",1)));
-                    value.setText(String.valueOf(result.optInt("value",0)));
-                    rarity[0]=ItemWorkshopSpec.normalizeRarity(result.optInt("rarity",0));
-                    rarityChoice.setText("РЕДКОСТЬ  |  "+ItemWorkshopSpec.RARITIES[rarity[0]]);
-                    description.setText(result.optString("description",""));
-                    effects.setText(result.optString("effect",""));
-                    artPrompt.setText(result.optString("art_prompt",""));
-                    toast("Параметры предложены. Проверь перед сохранением.");
-                });
-            });
-        });
+        panel.addView(work,lp(-1,46));
+        addText(panel,"Используется подключённый аккаунт ChatGPT и модель Работа/Codex. "+
+                "ИИ лишь заполняет поля, а решение сохранить предмет остаётся за игроком.",
+                11,MUTED,false,8);
+        TextView workshopStatus=itemText("Заполни название или описание, затем создай предмет. "+
+                "Подбор параметров через ИИ необязателен.",12,MUTED,false);
+        panel.addView(workshopStatus,lp(-1,-2));
+        space(panel,10);
+        TextView createInline=itemAction(editing?"✓ СОХРАНИТЬ ИЗМЕНЕНИЯ":"✓ СОЗДАТЬ ПРЕДМЕТ · 50 F");
+        panel.addView(createInline,lp(-1,49));
 
         ScrollView scroll=new ScrollView(this);
         scroll.setFillViewport(false);scroll.addView(panel);
+        java.util.function.Consumer<String> status=message->{
+            workshopStatus.setText(message);
+            workshopStatus.setTextColor(message.startsWith("✓")?ITEM_UP:
+                    message.startsWith("Подключение")?MUTED:ITEM_DOWN);
+            scroll.post(()->{if(scroll.isAttachedToWindow())
+                scroll.smoothScrollTo(0,Math.max(0,workshopStatus.getTop()-dp(35)));});
+        };
         AlertDialog dialog=new RuneDialogBuilder(this,accent())
             .setTitle(editing?"Изменить предмет":"Мастерская предметов")
             .setView(scroll).setNegativeButton("Отмена",null)
@@ -6514,28 +6489,177 @@ public final class MainActivity extends Activity {
                     Math.min(getResources().getDisplayMetrics().heightPixels-dp(80),dp(790)));
             dialog.getWindow().setSoftInputMode(android.view.WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
         }
-        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v->{
-            if(livingBusy())return;
+
+        Runnable unlockWork=()->{
+            if(!isDestroyed()&&!isFinishing()&&dialog.isShowing()){
+                work.setEnabled(true);
+                work.setText("✦ ПРЕДЛОЖИТЬ ПАРАМЕТРЫ");
+            }
+        };
+        work.setOnClickListener(v->{
+            if(!chatGptOAuth.hasAuthorizedPlan()){
+                status.accept("Подбор через ИИ недоступен: подключи ChatGPT "+
+                        "и разреши использование модели Работа/Codex в настройках ИИ.");
+                return;
+            }
+            String prompt=idea.getText().toString().trim();
+            if(prompt.isEmpty()){
+                String title=name.getText().toString().trim();
+                if(title.isEmpty()){
+                    status.accept("Для ИИ введи идею предмета или хотя бы его название.");
+                    idea.setError("Опиши предмет");
+                    return;
+                }
+                prompt="Предложи характеристики предмета «"+title+"». Тип: "+
+                        ItemWorkshopSpec.TYPES[kind[0]]+". "+
+                        description.getText().toString().trim()+" "+
+                        effects.getText().toString().trim();
+            }
+            final String request=prompt;
+            work.setEnabled(false);
+            work.setText("✦ ПОДКЛЮЧЕНИЕ К CHATGPT…");
+            status.accept("Подключение к ChatGPT Work. Текущие поля пока не меняются.");
+            java.util.function.Consumer<String> generate=model->
+                chatGptOAuth.getToken((token,error)->{
+                    if(!dialog.isShowing()||isDestroyed()||isFinishing())return;
+                    if(error!=null||token==null||token.isEmpty()){
+                        unlockWork.run();
+                        status.accept("Ошибка авторизации: "+(error==null?
+                                "не получен токен ChatGPT":error));
+                        return;
+                    }
+                    work.setText("✦ ИИ ПОДБИРАЕТ ПАРАМЕТРЫ…");
+                    ItemWorkshopAi.draft(token,model,request,(result,failure)->{
+                        if(!dialog.isShowing()||isDestroyed()||isFinishing())return;
+                        unlockWork.run();
+                        if(failure!=null||result==null){
+                            status.accept("Не удалось предложить параметры: "+
+                                    (failure==null?"пустой ответ модели":failure));
+                            return;
+                        }
+                        int generatedType=ItemWorkshopSpec.normalizeType(result.optInt("type",0));
+                        if(!editing){
+                            kind[0]=generatedType;
+                            typeChoice.setText("ТИП  |  "+ItemWorkshopSpec.TYPES[kind[0]]);
+                            stat.setEnabled(ItemWorkshopSpec.hasStat(kind[0]));
+                        }
+                        name.setText(result.optString("name",""));
+                        stat.setText(String.valueOf(ItemWorkshopSpec.normalizedStat(kind[0],
+                                result.optInt("stat",0))));
+                        weight.setText(String.valueOf(result.optDouble("weight",1)));
+                        value.setText(String.valueOf(result.optInt("value",0)));
+                        rarity[0]=ItemWorkshopSpec.normalizeRarity(result.optInt("rarity",0));
+                        rarityChoice.setText("РЕДКОСТЬ  |  "+ItemWorkshopSpec.RARITIES[rarity[0]]);
+                        description.setText(result.optString("description",""));
+                        effects.setText(result.optString("effect",""));
+                        artPrompt.setText(result.optString("art_prompt",""));
+                        status.accept("✓ Параметры предложены. Проверь их и нажми «Создать» "+
+                                "или «Сохранить». Предмет пока не добавлен.");
+                    });
+                });
+            String model=prefs.getString("ai_chatgpt_model","");
+            if(!model.isEmpty()){
+                generate.accept(model);
+            }else{
+                chatGptOAuth.loadModels((models,error)->{
+                    if(!dialog.isShowing()||isDestroyed()||isFinishing())return;
+                    if(error!=null||models==null||models.isEmpty()){
+                        unlockWork.run();
+                        status.accept("Не удалось выбрать модель Работа/Codex: "+
+                                (error==null?"нет доступных моделей":error));
+                        return;
+                    }
+                    // Reuse a real model returned by this account, never invent an ID.
+                    String selected=models.get(0).slug;
+                    for(ChatGptOAuth.ModelOption candidate:models)
+                        if("gpt-6.1-sol".equals(candidate.slug))selected=candidate.slug;
+                    prefs.edit().putString("ai_chatgpt_model",selected).apply();
+                    generate.accept(selected);
+                });
+            }
+        });
+
+        Runnable createItem=()->{
+            if(livingBusy()){
+                status.accept("Создание заблокировано текущим игровым действием. "+
+                        "Заверши бой, дорогу или ответ ИИ.");
+                return;
+            }
             if(!editing&&game.fixSpent>Long.MAX_VALUE-50){
-                toast("Лимит компенсации исчерпан");return;
+                status.accept("Лимит компенсации исчерпан.");return;
+            }
+            String title=name.getText().toString().trim();
+            if(title.isEmpty()||title.length()>60){
+                name.setError("Название обязательно, не более 60 символов");
+                status.accept("Укажи название предмета длиной до 60 символов.");
+                return;
+            }
+            int base,price;
+            double kg;
+            try{
+                base=ItemWorkshopSpec.hasStat(kind[0])?
+                        Integer.parseInt(stat.getText().toString().trim()):0;
+                kg=Double.parseDouble(weight.getText().toString().trim().replace(',','.'));
+                price=Integer.parseInt(value.getText().toString().trim());
+            }catch(NumberFormatException error){
+                status.accept("Проверь числа: урон / броня, вес и стоимость. "+
+                        "Для веса используй, например, 0.5 или 0,5.");
+                return;
+            }
+            if(base<0||base>500){
+                stat.setError("Допустимо от 0 до 500");
+                status.accept("Урон или броня должны быть от 0 до 500.");return;
+            }
+            if(!Double.isFinite(kg)||kg<.01||kg>50){
+                weight.setError("От 0.01 до 50 кг");
+                status.accept("Вес должен быть от 0.01 до 50 кг.");return;
+            }
+            if(price<0||price>999999){
+                value.setError("От 0 до 999999");
+                status.accept("Стоимость должна быть от 0 до 999999 септимов.");return;
+            }
+            for(int i=0;i<CompensationPowers.ITEM_SLOTS;i++){
+                if((!editing||i!=editingSlot)&&title.equalsIgnoreCase(state.itemNames[i])){
+                    name.setError("Такой предмет уже существует");
+                    status.accept("Название «"+title+"» уже занято. Укажи другое.");
+                    return;
+                }
+            }
+            if(!editing){
+                boolean slotAvailable=false;
+                for(int i=3;i<CompensationPowers.ITEM_SLOTS;i++)
+                    if(!state.owned[i]){slotAvailable=true;break;}
+                if(!slotAvailable){
+                    status.accept("Все 61 авторских слота заняты. Отредактируй существующий предмет.");
+                    return;
+                }
+            }
+            double addedWeight=editing?kg-state.itemWeight[editingSlot]:kg;
+            if(game.progress.carryWeight()+addedWeight>
+                    game.progress.carryLimit()+0.00001){
+                weight.setError("Недостаточно грузоподъёмности");
+                status.accept("Не хватает места в инвентаре: освободи вес или "+
+                        "уменьши массу предмета.");
+                return;
             }
             try{
-                String title=name.getText().toString().trim();
-                int base=Integer.parseInt(stat.getText().toString().trim());
-                double kg=Double.parseDouble(weight.getText().toString().trim().replace(',','.'));
-                int price=Integer.parseInt(value.getText().toString().trim());
-                String text=description.getText().toString(),effect=effects.getText().toString(),
-                        picture=artPrompt.getText().toString();
+                String details=description.getText().toString();
+                String enchant=effects.getText().toString();
+                String picture=artPrompt.getText().toString();
                 boolean valid=editing?
                     game.compensation.updateDetailedItem(game,editingSlot,title,kind[0],
-                        base,kg,price,rarity[0],text,effect,picture):
+                        base,kg,price,rarity[0],details,enchant,picture):
                     game.compensation.createDetailedItem(game,title,kind[0],base,kg,
-                        price,rarity[0],text,effect,picture,"");
-                if(!valid){toast("Проверь название, характеристики, вместимость или свободные слоты");return;}
+                        price,rarity[0],details,enchant,picture,"");
+                if(!valid){
+                    status.accept("Предмет не создан: проверь сохранение, "+
+                            "свободные слоты и ограничения характеристик.");
+                    return;
+                }
                 int slot=editingSlot;
                 if(!editing){
                     for(int i=3;i<CompensationPowers.ITEM_SLOTS;i++)
-                        if(game.compensation.owned[i]&&title.equals(game.compensation.itemNames[i])){
+                        if(state.owned[i]&&title.equals(state.itemNames[i])){
                             slot=i;break;
                         }
                     game.fixSpent+=50;
@@ -6543,7 +6667,10 @@ public final class MainActivity extends Activity {
                 }
                 game.progress.sync(game);
                 game.recordVisualEvent(editing?"Изменён авторский предмет":"Создан авторский предмет: "+title);
-                save();dialog.dismiss();render();toast(editing?"Изменения сохранены":"Предмет создан");
+                save();
+                dialog.dismiss();
+                render();
+                toast(editing?"Изменения сохранены":"Предмет создан");
                 final int artSlot=slot;
                 if(!editing&&artSlot>=3)
                     new RuneDialogBuilder(this,accent()).setTitle("Изображение предмета")
@@ -6551,8 +6678,13 @@ public final class MainActivity extends Activity {
                         .setNegativeButton("Позже",null)
                         .setPositiveButton("Выбрать или создать",(d,w)->showItemArtwork(artSlot))
                         .show();
-            }catch(Exception error){toast("Укажи корректные числовые значения");}
-        });
+            }catch(Exception error){
+                status.accept("Ошибка сохранения: "+(error.getMessage()==null?
+                        error.getClass().getSimpleName():error.getMessage()));
+            }
+        };
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v->createItem.run());
+        createInline.setOnClickListener(v->createItem.run());
     }
 
     private void showItemArtwork(int slot){
