@@ -88,7 +88,7 @@ public final class WorkImageEditor {
         File file = safeFile(c, kind, id, meta.optString("primary", ""));
         return file != null && file.isFile();
     }
-    public static ImageView primaryView(Activity host, String kind, String id, int accent) {
+    public static ImageView primaryView(Activity host, String kind, String id, int accent, Runnable onUpdated) {
         JSONObject meta = metadata(host, kind, id);
         File f = safeFile(host, kind, id, meta.optString("primary", ""));
         if (f == null || !f.isFile()) return null;
@@ -100,7 +100,7 @@ public final class WorkImageEditor {
         view.setAdjustViewBounds(true);
         view.setBackgroundColor(BG);
         view.setContentDescription("Пользовательское изображение. Открыть галерею");
-        view.setOnClickListener(v -> showGallery(host, kind, id, accent, () -> {}));
+        view.setOnClickListener(v -> showGallery(host, kind, id, accent, onUpdated));
         return view;
     }
     private static Bitmap sampledFile(File file, int max) {
@@ -152,6 +152,14 @@ public final class WorkImageEditor {
             core = "Создай фотореалистичное изображение локации " + name +
                 " из The Elder Scrolls V: Skyrim. " + facts +
                 " Сохрани каноничную географию, архитектуру и узнаваемые ориентиры.";
+        if ("location".equals(kind) && count == 5 &&
+            ("Солитьюд".equals(name) || "Вайтран".equals(name) || "Рифтен".equals(name) ||
+             "Маркарт".equals(name) || "Виндхельм".equals(name) || "Фолкрит".equals(name) ||
+             "Ривервуд".equals(name) || "Винтерхолд".equals(name) ||
+             "Данстар".equals(name) || "Морфал".equals(name)))
+            core += "\nПять отдельных каноничных ракурсов города: 1) главный вход, " +
+                "2) сразу после входа, 3) рынок или главная улица, 4) центр, " +
+                "5) узнаваемая уникальная достопримечательность. Без коллажей.";
         return core + "\nВысочайшая детализация, современная next-gen графика, естественное освещение, " +
             "единый художественный стиль, без текста и элементов интерфейса." +
             (count > 1 ? "\nПодготовь " + count + " отдельных разных вариантов, не коллаж." : "") +
@@ -230,7 +238,7 @@ public final class WorkImageEditor {
         copy.setOnClickListener(v -> {
             String value = editor.getText().toString().trim();
             if (value.isEmpty()) { editor.setError("Напиши описание"); return; }
-            copyPrompt(host, "Создай " + requested[0] + " изображение(й). " + value);
+            copyPrompt(host, "Создай " + requested[0] + (requested[0] == 1 ? " изображение. " : requested[0] == 3 ? " изображения. " : " изображений. ") + value);
             Toast.makeText(host, "Описание скопировано", Toast.LENGTH_SHORT).show();
         });
         Button open = button(host, "Открыть ChatGPT / Work", accent);
@@ -238,7 +246,7 @@ public final class WorkImageEditor {
         open.setOnClickListener(v -> {
             String value = editor.getText().toString().trim();
             if (value.isEmpty()) { editor.setError("Напиши описание"); return; }
-            launchChatGpt(host, "Создай " + requested[0] + " отдельное(ых) изображение(й). " + value);
+            launchChatGpt(host, "Создай " + requested[0] + (requested[0] == 1 ? " отдельное изображение. " : requested[0] == 3 ? " отдельных изображения. " : " отдельных изображений. ") + value);
         });
         Button importButton = button(host, "Импортировать изображение", accent);
         panel.addView(importButton);
