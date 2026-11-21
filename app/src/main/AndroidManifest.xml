@@ -42,6 +42,11 @@
             </intent-filter>
         </receiver>
         <provider
+            android:name=".ImageShareProvider"
+            android:authorities="${applicationId}.workimages"
+            android:exported="false"
+            android:grantUriPermissions="true" />
+        <provider
             android:name=".OtaFileProvider"
             android:authorities="${applicationId}.updates"
             android:exported="false"
