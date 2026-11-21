@@ -146,8 +146,12 @@ final class SolitudeCity {
             if(JOBS[i].gold>0&&freeBlock.isEmpty())s.add(PREFIX+"volunteer:"+i,"Помочь без оплаты: "+JOBS[i].title,
                 "Авторская добровольная помощь | без заработка | общая память отношений NPC | тот же дневной лимит");
             if(!paidBlock.isEmpty()&&!freeBlock.isEmpty())s=newBlocked(s,g,i);
-            else if(!paidBlock.isEmpty())s=new GameEngine.Scene(s.kicker,s.title,
-                s.body+"\n\n"+JOBS[i].title+": "+paidBlock+" (оплачиваемая смена).");
+            else if(!paidBlock.isEmpty()){
+                GameEngine.Scene next=new GameEngine.Scene(s.kicker,s.title,
+                    s.body+"\n\n"+JOBS[i].title+": "+paidBlock+" (оплачиваемая смена).");
+                next.choices.addAll(s.choices);
+                s=next;
+            }
         }
         if(d==0||d==5)s.add(PREFIX+"shop","Открыть торговлю","Существующий торговый инвентарь города");
         if(d==6)s.add(PREFIX+"rest","Снять комнату","20 септимов | существующий отдых в трактире");
