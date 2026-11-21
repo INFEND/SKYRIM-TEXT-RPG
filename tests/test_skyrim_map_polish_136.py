@@ -17,9 +17,11 @@ class TerrainMapPolish(unittest.TestCase):
         self.assertIn("pins=null",MAP)
         self.assertNotIn("game.progress.location=",MAP)
 
-    def test_individual_icons_replace_all_screen_cell_number_clusters(self):
+    def test_overlapping_map_icons_remain_reachable_via_group_picker(self):
         self.assertNotIn('String count=String.valueOf(pin.sites.size())',MAP)
-        self.assertNotIn('if(pin.sites.size()>1)',MAP)
+        self.assertIn('if(pin.sites.size()>1)',MAP)
+        self.assertIn('nearest.sites.add(c.site)',LAYOUT)
+        self.assertIn('catalogCallback.selected(new ArrayList<>(pin.sites))',MAP)
         self.assertIn('pin.sizeDp*density',MAP)
         self.assertIn('MapPinLayout.translate(pins,dx,dy)',MAP)
         self.assertIn('MapPinLayout.hit(renderedPins()',MAP)
