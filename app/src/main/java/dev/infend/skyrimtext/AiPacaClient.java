@@ -1,0 +1,312 @@
+package dev.infend.skyrimtext;
+
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.os.Handler;
+import android.os.Looper;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.ConnectException;
+import java.net.HttpURLConnection;
+import java.net.Proxy;
+import java.net.SocketTimeoutException;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+/**
+ * Thin HTTP adapter for the independently installed AiPaca llama-server.
+ * Never executes the generated text or mutates GameEngine. Connections cannot
+ * leave loopback, and no downloaded executable/model enters the game APK.
+ */
+final class AiPacaClient {
+    private static final String BASE = "http://127.0.0.1:8080/v1/";
+    private static final int MAX_RESPONSE = 240_000;
+    private final Context context;
+    private final Handler main = new Handler(Looper.getMainLooper());
+    private final ExecutorService worker = Executors.newSingleThreadExecutor();
+    private volatile HttpURLConnection connection;
+    private boolean running;
+    private boolean closed;
+    private int generation;
+
+    interface ProbeListener {
+        void onResult(boolean available, String description);
+    }
+
+    AiPacaClient(Context context) {
+        this.context = context.getApplicationContext();
+    }
+
+    synchronized boolean isRunning() {
+        return running;
+    }
+
+    private synchronized boolean active(int id) {
+        return !closed && running && id == generation;
+    }
+
+    private HttpURLConnection connect(String route, String key, boolean post) throws IOException {
+        // Only constant, trusted loopback routes are used. No user URL, DNS,
+        // cleartext LAN access, redirects, or system HTTP proxy is accepted.
+        if (!"models".equals(route) && !"chat/completions".equals(route))
+            throw new IOException("Недопустимый маршрут AiPaca");
+        URL url = new URL(BASE + route);
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection(Proxy.NO_PROXY);
+        conn.setInstanceFollowRedirects(false);
+        conn.setRequestMethod(post ? "POST" : "GET");
+        conn.setConnectTimeout(5000);
+        conn.setReadTimeout(post ? 180_000 : 8000);
+        conn.setRequestProperty("Accept", post ? "text/event-stream" : "application/json");
+        if (key != null && !key.isEmpty())
+            conn.setRequestProperty("Authorization", "Bearer " + key);
+        if (post) {
+            conn.setRequestProperty("Content-Type", "application/json; charset=utf-8");
+            conn.setDoOutput(true);
+        }
+        return conn;
+    }
+
+    private static String readSmall(InputStream stream) throws IOException {
+        StringBuilder text = new StringBuilder();
+        try (BufferedReader reader = new BufferedReader(
+                new InputStreamReader(stream, StandardCharsets.UTF_8))) {
+            char[] buffer = new char[1024];
+            int n;
+            while ((n = reader.read(buffer)) != -1) {
+                if (text.length() + n > 64_000) throw new IOException("Ответ AiPaca слишком большой");
+                text.append(buffer, 0, n);
+            }
+        }
+        return text.toString();
+    }
+
+    private String model(String key) throws Exception {
+        HttpURLConnection conn = connect("models", key, false);
+        try {
+            int code = conn.getResponseCode();
+            if (code == 401 || code == 403)
+                throw new IOException("AiPaca отклонила API-ключ");
+            if (code != 200)
+                throw new IOException("Сервер AiPaca вернул HTTP " + code);
+            JSONObject result = new JSONObject(readSmall(conn.getInputStream()));
+            JSONArray models = result.optJSONArray("data");
+            if (models == null || models.length() == 0)
+                throw new IOException("AiPaca запущена, но модель не загружена");
+            String selected = context.getSharedPreferences("skyrim_text_v1", Context.MODE_PRIVATE)
+                    .getString("ai_aipaca_model", "");
+            String first = "";
+            for (int i = 0; i < models.length(); i++) {
+                JSONObject item = models.optJSONObject(i);
+                if (item == null) continue;
+                String id = item.optString("id", "").trim();
+                if (id.isEmpty()) continue;
+                if (first.isEmpty()) first = id;
+                if (id.equals(selected)) return id;
+            }
+            if (first.isEmpty()) throw new IOException("AiPaca не сообщила идентификатор модели");
+            return first;
+        } finally {
+            conn.disconnect();
+        }
+    }
+
+    void probe(ProbeListener callback) {
+        if (isRunning()) {
+            main.post(() -> callback.onResult(false, "Сначала заверши генерацию"));
+            return;
+        }
+        worker.execute(() -> {
+            boolean ok = false;
+            String message;
+            try {
+                String key = AiPacaKeyVault.read(context);
+                String id = model(key);
+                context.getSharedPreferences("skyrim_text_v1", Context.MODE_PRIVATE)
+                        .edit().putString("ai_aipaca_last_model", id).apply();
+                message = "AiPaca доступна. Модель: " + id;
+                ok = true;
+            } catch (Exception e) {
+                message = friendlyError(e);
+            }
+            final boolean success = ok;
+            final String result = message;
+            main.post(() -> callback.onResult(success, result));
+        });
+    }
+
+    synchronized boolean generate(GameEngine game, String history, String command,
+                                  boolean controlled, boolean chanceOnly,
+                                  AiStoryClient.Listener listener) {
+        if (running || closed) return false;
+        running = true;
+        final int id = ++generation;
+        // Capture the authoritative game facts on the UI thread.
+        final String system = AiStoryClient.localSystemPrompt(controlled, chanceOnly);
+        final String prompt = chanceOnly
+                ? AiStoryClient.localChancePrompt(game, command)
+                : AiStoryClient.localUserPrompt(game, history, command, controlled);
+        final int maxTokens = chanceOnly ? 128 : controlled ? 4096 : 1024;
+        worker.execute(() -> execute(id, system, prompt, maxTokens, listener));
+        return true;
+    }
+
+    private void execute(int id, String system, String prompt, int maxTokens,
+                         AiStoryClient.Listener listener) {
+        HttpURLConnection conn = null;
+        try {
+            String key = AiPacaKeyVault.read(context);
+            notifyStatus(id, listener, "Подключение к AiPaca…");
+            String loadedModel = model(key);
+            if (!active(id)) return;
+            context.getSharedPreferences("skyrim_text_v1", Context.MODE_PRIVATE)
+                    .edit().putString("ai_aipaca_last_model", loadedModel).apply();
+            notifyStatus(id, listener, "Модель: " + loadedModel + " | генерация…");
+
+            JSONObject payload = new JSONObject();
+            payload.put("model", loadedModel);
+            payload.put("stream", true);
+            payload.put("max_tokens", maxTokens);
+            payload.put("temperature", 0.65);
+            JSONArray messages = new JSONArray();
+            messages.put(new JSONObject().put("role", "system").put("content", system));
+            messages.put(new JSONObject().put("role", "user").put("content", prompt));
+            payload.put("messages", messages);
+            byte[] body = payload.toString().getBytes(StandardCharsets.UTF_8);
+            conn = connect("chat/completions", key, true);
+            synchronized (this) {
+                if (!active(id)) return;
+                connection = conn;
+            }
+            try (OutputStream out = conn.getOutputStream()) {
+                out.write(body);
+            }
+            int code = conn.getResponseCode();
+            if (code == 401 || code == 403)
+                throw new IOException("AiPaca отклонила API-ключ");
+            if (code < 200 || code >= 300)
+                throw new IOException("Ошибка генерации AiPaca: HTTP " + code);
+
+            StringBuilder answer = new StringBuilder();
+            StringBuilder event = new StringBuilder();
+            boolean done = false;
+            boolean finishSeen = false;
+            long lastUpdate = 0L;
+            try (BufferedReader reader = new BufferedReader(
+                    new InputStreamReader(conn.getInputStream(), StandardCharsets.UTF_8))) {
+                String line;
+                while (active(id) && (line = reader.readLine()) != null) {
+                    if (line.startsWith("data:")) {
+                        if (event.length() > 0) event.append('\n');
+                        event.append(line.substring(5).trim());
+                    } else if (!line.isEmpty() || event.length() == 0) {
+                        continue;
+                    }
+                    // llama-server sends one data line per SSE event. Also
+                    // accept multi-line data frames and a terminal [DONE].
+                    if (line.isEmpty() && event.length() > 0) {
+                        String data = event.toString();
+                        event.setLength(0);
+                        if ("[DONE]".equals(data)) { done = true; break; }
+                        JSONObject frame = new JSONObject(data);
+                        if (frame.has("error")) throw new IOException("AiPaca сообщила об ошибке генерации");
+                        JSONArray choices = frame.optJSONArray("choices");
+                        if (choices == null || choices.length() == 0) continue;
+                        JSONObject choice = choices.optJSONObject(0);
+                        if (choice == null) continue;
+                        JSONObject delta = choice.optJSONObject("delta");
+                        String part = delta == null ? "" : delta.optString("content", "");
+                        if (!part.isEmpty()) {
+                            if (answer.length() + part.length() > MAX_RESPONSE)
+                                throw new IOException("Превышен размер ответа ИИ");
+                            answer.append(part);
+                            long now = android.os.SystemClock.elapsedRealtime();
+                            if (now - lastUpdate >= 90L) {
+                                String snapshot = answer.toString();
+                                main.post(() -> { if (active(id)) listener.onText(snapshot); });
+                                lastUpdate = now;
+                            }
+                        }
+                        if (!choice.isNull("finish_reason") && choice.has("finish_reason"))
+                            finishSeen = true;
+                    }
+                }
+                if (!done && active(id) && event.length() > 0) {
+                    String data = event.toString();
+                    if ("[DONE]".equals(data)) done = true;
+                    else {
+                        JSONObject frame = new JSONObject(data);
+                        JSONArray choices = frame.optJSONArray("choices");
+                        if (choices != null && choices.length() > 0) {
+                            JSONObject choice = choices.optJSONObject(0);
+                            if (choice != null && choice.has("finish_reason") &&
+                                    !choice.isNull("finish_reason")) finishSeen = true;
+                        }
+                    }
+                }
+            }
+            if (!active(id)) return;
+            if (!done && !finishSeen)
+                throw new IOException("Поток AiPaca прервался до завершения ответа");
+            if (answer.length() == 0)
+                throw new IOException("AiPaca вернула пустой ответ");
+            String full = answer.toString();
+            main.post(() -> {
+                if (!active(id)) return;
+                synchronized (AiPacaClient.this) { running = false; }
+                listener.onText(full);
+                listener.onComplete(full);
+            });
+        } catch (Exception e) {
+            String message = friendlyError(e);
+            main.post(() -> {
+                if (!active(id)) return;
+                synchronized (AiPacaClient.this) { running = false; }
+                listener.onError(message);
+            });
+        } finally {
+            synchronized (this) {
+                if (connection == conn) connection = null;
+            }
+            if (conn != null) conn.disconnect();
+        }
+    }
+
+    private void notifyStatus(int id, AiStoryClient.Listener listener, String message) {
+        main.post(() -> { if (active(id)) listener.onLocalStatus(message); });
+    }
+
+    private static String friendlyError(Exception exception) {
+        if (exception instanceof ConnectException)
+            return "AiPaca не отвечает на 127.0.0.1:8080. Запусти API-сервер и загрузи модель";
+        if (exception instanceof SocketTimeoutException)
+            return "AiPaca слишком долго не отвечает";
+        if (exception instanceof java.net.UnknownServiceException)
+            return "Локальный HTTP запрещён настройками Android";
+        if (exception instanceof IOException)
+            return exception.getMessage() == null ? "Ошибка связи с AiPaca" : exception.getMessage();
+        return "AiPaca: ошибка формата ответа или настроек сервера";
+    }
+
+    synchronized void cancel() {
+        generation++;
+        running = false;
+        HttpURLConnection conn = connection;
+        if (conn != null) conn.disconnect();
+        connection = null;
+    }
+
+    synchronized void shutdown() {
+        cancel();
+        closed = true;
+        worker.shutdownNow();
+    }
+}

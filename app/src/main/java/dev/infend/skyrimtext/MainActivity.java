@@ -95,6 +95,7 @@ public final class MainActivity extends Activity {
     private AiStoryMemory aiMemory;
     private AiStoryClient aiClient;
     private LocalAiClient localAiClient;
+    private AiPacaClient aipacaClient;
     private static final int REQUEST_LOCAL_GGUF=7107;
     private String aiSession;
     private static final String AI_PENDING_ACTION="ai_pending_action";
@@ -135,6 +136,7 @@ public final class MainActivity extends Activity {
         aiMemory=new AiStoryMemory(this);
         aiClient=new AiStoryClient();
         localAiClient=new LocalAiClient(this);
+        aipacaClient=new AiPacaClient(this);
         chatGptOAuth=new ChatGptOAuth(this);
         ResourceStore.start(this);
         new Thread(()->{CanonicalCampaign.loadLocal(getApplicationContext());runOnUiThread(()->{if(!isDestroyed()&&!titleOpen&&tab==0&&"CANON".equals(game.mode))render();});},"canonical-dialogues").start();
@@ -199,6 +201,7 @@ public final class MainActivity extends Activity {
         if(updater!=null)updater.onHostDestroy();
         if(aiClient!=null)aiClient.shutdown();
         if(localAiClient!=null)localAiClient.shutdown();
+        if(aipacaClient!=null)aipacaClient.shutdown();
         if(chatGptOAuth!=null)chatGptOAuth.shutdown();
         if(aiMemory!=null)aiMemory.close();
         super.onDestroy();
@@ -2168,7 +2171,7 @@ public final class MainActivity extends Activity {
     }
 
     private void executeStoryChoice(GameEngine.Choice c){
-                if(aiClient!=null)aiClient.cancel();if(localAiClient!=null)localAiClient.cancel();
+                if(aiClient!=null)aiClient.cancel();if(localAiClient!=null)localAiClient.cancel();if(aipacaClient!=null)aipacaClient.cancel();
                 int old=game.questStage;
                 java.util.Map<String,Integer> before=itemSnapshot(game);
                 VisualSnapshot visualBefore=new VisualSnapshot(game,c.action);
@@ -2328,14 +2331,14 @@ public final class MainActivity extends Activity {
             final String destination="Дом Аддвара".equals(place)?SolitudeCanonical.ADDVAR:SolitudeCanonical.CATACOMBS;
             new RuneDialogBuilder(this,accent()).setTitle(title).setView(panel).setPositiveButton("Посетить",(dialog,w)->{
                 if(!city.equals(game.progress.location)||!"WORLD".equals(game.mode)||game.road.pending())return;
-                if(aiClient!=null)aiClient.cancel();if(localAiClient!=null)localAiClient.cancel();
+                if(aiClient!=null)aiClient.cancel();if(localAiClient!=null)localAiClient.cancel();if(aipacaClient!=null)aipacaClient.cancel();
                 game.choose("SOLITUDE:open");game.choose(destination);save();tab=0;render();
             }).setNegativeButton("Закрыть",null).show();return;
         }
         if("Солитьюд".equals(city)&&"Высокий шпиль".equals(place)){
             new RuneDialogBuilder(this,accent()).setTitle(title).setView(panel).setPositiveButton("Посетить",(dialog,w)->{
                 if(!city.equals(game.progress.location)||!"WORLD".equals(game.mode)||game.road.pending())return;
-                if(aiClient!=null)aiClient.cancel();if(localAiClient!=null)localAiClient.cancel();
+                if(aiClient!=null)aiClient.cancel();if(localAiClient!=null)localAiClient.cancel();if(aipacaClient!=null)aipacaClient.cancel();
                 game.choose("SOLITUDE:open");game.choose("SOLITUDE:home");save();tab=0;render();
             }).setNegativeButton("Закрыть",null).show();return;
         }
@@ -2344,13 +2347,13 @@ public final class MainActivity extends Activity {
         final int localShop=shop;
         if(localShop>=0){new RuneDialogBuilder(this,accent()).setTitle(title).setView(panel).setPositiveButton("Посетить лавку",(dialog,w)->{
             if(!city.equals(game.progress.location)||!"WORLD".equals(game.mode)||game.road.pending())return;
-            if(aiClient!=null)aiClient.cancel();if(localAiClient!=null)localAiClient.cancel();
+            if(aiClient!=null)aiClient.cancel();if(localAiClient!=null)localAiClient.cancel();if(aipacaClient!=null)aipacaClient.cancel();
             game.choose("SOLITUDE:open");game.choose("SOLITUDE:visit:"+SolitudeShops.district(localShop));game.choose("SOLITUDE:store:"+localShop);save();tab=0;render();
         }).setNegativeButton("Закрыть",null).show();return;}
         if(district>=0){
             new RuneDialogBuilder(this,accent()).setTitle(title).setView(panel).setPositiveButton("Местные занятия",(dialog,w)->{
                 if(!city.equals(game.progress.location)||!"WORLD".equals(game.mode)||game.road.pending())return;
-                if(aiClient!=null)aiClient.cancel();if(localAiClient!=null)localAiClient.cancel();
+                if(aiClient!=null)aiClient.cancel();if(localAiClient!=null)localAiClient.cancel();if(aipacaClient!=null)aipacaClient.cancel();
                 game.choose("SOLITUDE:open");game.choose("SOLITUDE:visit:"+district);if("Подземелье Мрачного замка".equals(place))game.choose(SolitudeJustice.MODE);save();tab=0;render();
             }).setNegativeButton("Закрыть",null).show();return;
         }
@@ -2551,9 +2554,9 @@ public final class MainActivity extends Activity {
     /** AI mode replaces the entire offline story, not just its dialogue panel. */
     private void renderAiGame(){
         String source=resolvedAiProvider();
-        boolean ready="local".equals(source)?localModelReady():
+        boolean ready="aipaca".equals(source)||("local".equals(source)?localModelReady():
             "chatgpt".equals(source)?chatGptOAuth.hasAuthorizedPlan():
-            "api".equals(source)&&AiKeyVault.configured(this);
+            "api".equals(source)&&AiKeyVault.configured(this));
         if(LocationGalleryView.hasGallery(game.progress.location)){
             content.addView(sceneGallery(game.progress.location),lp(-1,-2));
             renderLocationWeather(content);
@@ -2563,7 +2566,7 @@ public final class MainActivity extends Activity {
             LinearLayout card=card();
             addText(card,"ИИ-ИГРА НЕ ПОДКЛЮЧЕНА",14,accent(),true,11);
             addText(card,"Подключи выбранный источник в настройках. Обычный текст игры скрыт, поскольку выбран режим ИИ.",14,TEXT,false,13);
-            actionButton("НАСТРОИТЬ ИИ","Выбор GGUF, ChatGPT или OpenAI API",true,()->{tab=5;render();});
+            actionButton("НАСТРОИТЬ ИИ","AiPaca, GGUF, ChatGPT или OpenAI API",true,()->{tab=5;render();});
             return;
         }
         if(aiTurnBusy) {
@@ -3042,11 +3045,11 @@ public final class MainActivity extends Activity {
     }
     private void requestAiTurn(String instruction,boolean actionResolved,
                                boolean proposalOnly,int expectedChance,String customAction,int repairAttempt){
-        if(!game.aiNarrativeMode||aiTurnBusy||aiClient.isRunning()||localAiClient.isRunning()||!game.started||game.nativeSceneRequired())return;
+        if(!game.aiNarrativeMode||aiTurnBusy||aiClient.isRunning()||localAiClient.isRunning()||aipacaClient.isRunning()||!game.started||game.nativeSceneRequired())return;
         game.setAiNarrativeMode(true);
         final String source=resolvedAiProvider();
-        final boolean local="local".equals(source),chat="chatgpt".equals(source);
-        final String model=local?"Qwen3.5-9B":prefs.getString(chat?"ai_chatgpt_model":"ai_api_model",
+        final boolean external="aipaca".equals(source),local="local".equals(source)||external,chat="chatgpt".equals(source);
+        final String model=local?(external?"AiPaca":"Qwen3.5-9B"):prefs.getString(chat?"ai_chatgpt_model":"ai_api_model",
                 chat?"":AiModelCatalog.DEFAULT_API);
         if(model.isEmpty()){aiTurnStatus="Сначала выбери модель в настройках";render();return;}
         final String effort=selectedReasoningEffort(),history=aiMemory.context(aiSession)+(local?"":"\n"+game.katherine.aiContext(game)+"\n"+game.alma.aiContext())+"\n"+game.livia.aiContext(game)+"\n"+game.itachi.aiContext(game);
@@ -3059,9 +3062,9 @@ public final class MainActivity extends Activity {
         aiTurnProposal=proposalOnly;
         aiLocalStartedAt=android.os.SystemClock.elapsedRealtime();
         aiLocalPhase=proposalOnly?"Определение вероятности действия…":
-            local?"Запуск модели…":chat?"Подключение к ChatGPT…":"Подключение к API…";
+            external?"Подключение к AiPaca…":local?"Запуск модели…":chat?"Подключение к ChatGPT…":"Подключение к API…";
         aiTurnStatus=proposalOnly?"Определение вероятности действия…":
-            local?"Локальная генерация без интернета…":chat?"Подключение к ChatGPT…":"Создание игровой сцены…";
+            external?"Генерация через AiPaca…":local?"Локальная генерация без интернета…":chat?"Подключение к ChatGPT…":"Создание игровой сцены…";
         render();
         final AiStoryClient.Listener listener=new AiStoryClient.Listener(){
             private boolean active(){return aiTurnBusy&&requestId==aiRequestSerial&&!isDestroyed()&&!isFinishing();}
@@ -3148,7 +3151,7 @@ public final class MainActivity extends Activity {
                     if(!completed.journal.isEmpty())aiMemory.add(aiSession,"event",completed.journal);
                     aiTurnStatus="";
                  }catch(Exception ex){
-                    if(!local&&repairAttempt==0&&game==originalGame&&ex instanceof org.json.JSONException){
+                    if((!local||external)&&repairAttempt==0&&game==originalGame&&ex instanceof org.json.JSONException){
                         aiTurnBusy=false;aiTurnPreview="";
                         String fix=proposalOnly?
                             "\nИсправление: верни только JSON {\"customChance\":42} либо {\"customChance\":null}; число без кавычек.":
@@ -3170,7 +3173,12 @@ public final class MainActivity extends Activity {
                 if(tab==0)render();
             }
         };
-        if(local){
+        if(external){
+            boolean started=generateAiPaca(game,history,instruction,true,proposalOnly,listener);
+            if(!started){
+                aiTurnBusy=false;aiTurnStatus="AiPaca выполняет другой запрос";render();
+            }
+        }else if(local){
             if(!localModelReady()){
                 aiTurnBusy=false;aiTurnStatus="GGUF не импортирован. Выбери модель в настройках";render();return;
             }
@@ -3206,11 +3214,69 @@ public final class MainActivity extends Activity {
         }
     }
 
+
+    /**
+     * On a transport failure, retry the same immutable turn with the existing
+     * local worker. No dice, effects, narrative memory or save are committed
+     * before AiGameTurn validates the complete new answer.
+     */
+    private boolean generateAiPaca(GameEngine current,String history,String instruction,
+                                   boolean controlled,boolean chanceOnly,AiStoryClient.Listener listener){
+        AiStoryClient.Listener bridged=new AiStoryClient.Listener(){
+            @Override public void onText(String text){listener.onText(text);}
+            @Override public void onReasoningSummary(String summary){listener.onReasoningSummary(summary);}
+            @Override public void onLocalStatus(String state){listener.onLocalStatus(state);}
+            @Override public void onLocalMetrics(int n,float tps,long elapsed){listener.onLocalMetrics(n,tps,elapsed);}
+            @Override public void onComplete(String answer){listener.onComplete(answer);}
+            @Override public void onError(String message){
+                if(prefs.getBoolean("ai_aipaca_fallback",true)
+                        &&localModelReady()&&LocalAiEngineModule.installed(MainActivity.this)
+                        &&!localAiClient.isRunning()){
+                    listener.onLocalStatus("AiPaca недоступна. Запуск локального резерва…");
+                    boolean started=localAiClient.generate(LocalAiModelStore.path(prefs),
+                        current,history,instruction,controlled,chanceOnly,listener);
+                    if(started)return;
+                }
+                listener.onError(message+(prefs.getBoolean("ai_aipaca_fallback",true)
+                    ?" | Резервный локальный движок недоступен.":""));
+            }
+        };
+        return aipacaClient.generate(current,history,instruction,controlled,chanceOnly,bridged);
+    }
+
+    private void testAiPacaConnection(){
+        if(aipacaClient.isRunning()){toast("Сначала останови текущую генерацию");return;}
+        TextView label=text("Проверка http://127.0.0.1:8080/v1/models…",14,TEXT,false);
+        label.setPadding(dp(16),dp(14),dp(16),dp(14));
+        AlertDialog dialog=new RuneDialogBuilder(this,accent())
+            .setTitle("ПОДКЛЮЧЕНИЕ AiPaca").setView(label)
+            .setNegativeButton("Закрыть",null).create();
+        dialog.show();
+        aipacaClient.probe((ok,message)->{
+            if(!isFinishing()&&!isDestroyed()&&dialog.isShowing())
+                label.setText(message+(ok?"\nПодключение готово, сохранения не затронуты.":"\nЗапусти сервер и загрузи GGUF в AiPaca."));
+        });
+    }
+
+    private void aiPacaKeyDialog(){
+        EditText key=new EditText(this);
+        key.setSingleLine(true);
+        key.setInputType(InputType.TYPE_CLASS_TEXT|InputType.TYPE_TEXT_VARIATION_PASSWORD);
+        key.setHint("Ключ из настроек API AiPaca");
+        new RuneDialogBuilder(this,accent()).setTitle("API-КЛЮЧ AiPaca")
+            .setView(key)
+            .setNegativeButton("Отмена",null)
+            .setPositiveButton("Сохранить",(dialog,which)->{
+                try{AiPacaKeyVault.save(this,key.getText().toString());toast("Ключ AiPaca сохранён");render();}
+                catch(Exception e){toast("Не удалось сохранить ключ AiPaca");}
+            }).show();
+    }
+
     /** Story-only AI assistant: real game rules and quest transitions stay in GameEngine. */
 
     private String aiProviderMode(){
         String mode=prefs.getString("ai_provider","auto");
-        return ("chatgpt".equals(mode)||"api".equals(mode)||"local".equals(mode))?mode:"auto";
+        return ("chatgpt".equals(mode)||"api".equals(mode)||"local".equals(mode)||"aipaca".equals(mode))?mode:"auto";
     }
     private boolean usingChatGpt(){
         return "chatgpt".equals(resolvedAiProvider());
@@ -3218,12 +3284,13 @@ public final class MainActivity extends Activity {
     private void aiProviderDialog(){
         String[] labels={"Автоматически | Работа/Codex → API → офлайн",
                 "ChatGPT | расход лимитов Работа/Codex","OpenAI API | отдельная оплата",
-                "Локальная модель | GGUF | без интернета"};
+                "Локальная модель | GGUF | без интернета",
+                "AiPaca | внешний локальный API | 127.0.0.1"};
         String mode=aiProviderMode();
-        int selected="chatgpt".equals(mode)?1:"api".equals(mode)?2:"local".equals(mode)?3:0;
+        int selected="chatgpt".equals(mode)?1:"api".equals(mode)?2:"local".equals(mode)?3:"aipaca".equals(mode)?4:0;
         new RuneDialogBuilder(this,accent()).setTitle("Источник ИИ")
             .setSingleChoiceItems(labels,selected,(dialog,which)->{
-                prefs.edit().putString("ai_provider",which==1?"chatgpt":which==2?"api":which==3?"local":"auto").apply();
+                prefs.edit().putString("ai_provider",which==1?"chatgpt":which==2?"api":which==3?"local":which==4?"aipaca":"auto").apply();
                 cancelAiForSourceChange();
                 dialog.dismiss();render();
             }).setNegativeButton("Закрыть",null).show();
@@ -3238,7 +3305,7 @@ public final class MainActivity extends Activity {
         aiReasoningPreview="";
         aiPreviewSelected.clear();
         if(aiClient!=null)aiClient.cancel();
-        if(localAiClient!=null)localAiClient.cancel();
+        if(localAiClient!=null)localAiClient.cancel();if(aipacaClient!=null)aipacaClient.cancel();
     }
     private String selectedReasoningEffort(){
         return AiReasoningEffort.normalize(prefs.getString("ai_reasoning_effort",AiReasoningEffort.DEFAULT));
@@ -3250,7 +3317,7 @@ public final class MainActivity extends Activity {
             .setSingleChoiceItems(choices,selected,(dialog,which)->{
                 String effort=AiReasoningEffort.VALUES[which];
                 prefs.edit().putString("ai_reasoning_effort",effort).apply();
-                if(aiClient!=null)aiClient.cancel();if(localAiClient!=null)localAiClient.cancel();
+                if(aiClient!=null)aiClient.cancel();if(localAiClient!=null)localAiClient.cancel();if(aipacaClient!=null)aipacaClient.cancel();
                 awaitingAiToken=false;
                 dialog.dismiss();
                 render();
@@ -3262,7 +3329,7 @@ public final class MainActivity extends Activity {
         new RuneDialogBuilder(this,accent()).setTitle("Модель OpenAI API")
             .setSingleChoiceItems(AiModelCatalog.LABELS,current,(dialog,which)->{
                 prefs.edit().putString("ai_api_model",AiModelCatalog.IDS[which]).apply();
-                if(aiClient!=null)aiClient.cancel();if(localAiClient!=null)localAiClient.cancel();
+                if(aiClient!=null)aiClient.cancel();if(localAiClient!=null)localAiClient.cancel();if(aipacaClient!=null)aipacaClient.cancel();
                 dialog.dismiss();render();
             }).setNegativeButton("Закрыть",null).show();
     }
@@ -3324,7 +3391,7 @@ public final class MainActivity extends Activity {
             new RuneDialogBuilder(this,accent()).setTitle("Модели | Работа/Codex")
                 .setSingleChoiceItems(labels,selected,(dialog,which)->{
                     prefs.edit().putString("ai_chatgpt_model",models.get(which).slug).apply();
-                    if(aiClient!=null)aiClient.cancel();if(localAiClient!=null)localAiClient.cancel();
+                    if(aiClient!=null)aiClient.cancel();if(localAiClient!=null)localAiClient.cancel();if(aipacaClient!=null)aipacaClient.cancel();
                     dialog.dismiss();render();
                 }).setNegativeButton("Закрыть",null).show();
         });
@@ -3333,14 +3400,14 @@ public final class MainActivity extends Activity {
     private void renderAiStoryPanel(){
         LinearLayout panel=card();
         String source=resolvedAiProvider();
-        addText(panel,"ᚱ  ИИ-МАСТЕР | "+("local".equals(source)?"ОФЛАЙН GGUF":usingChatGpt()?"РАБОТА / CODEX":"OPENAI API"),11,accent(),true,8);
+        addText(panel,"ᚱ  ИИ-МАСТЕР | "+("aipaca".equals(source)?"AiPaca | ОФЛАЙН":"local".equals(source)?"ОФЛАЙН GGUF":usingChatGpt()?"РАБОТА / CODEX":"OPENAI API"),11,accent(),true,8);
         addText(panel,"Свободный диалог и повествование. Инвентарь, бой, награды и перемещения изменяются только игровыми действиями.",12,MUTED,false,12);
         boolean chatgpt=usingChatGpt();
-        boolean local="local".equals(source);
-        boolean ready=local?localModelReady():chatgpt?chatGptOAuth.hasAuthorizedPlan():AiKeyVault.configured(this);
+        boolean local="local".equals(source),external="aipaca".equals(source);
+        boolean ready=external||local&&localModelReady()||chatgpt&&chatGptOAuth.hasAuthorizedPlan()||"api".equals(source)&&AiKeyVault.configured(this);
         if(!ready){
             addText(panel,chatgpt?"Войди через ChatGPT и разреши использование лимитов в настройках.":
-                "Выбери GGUF из памяти или добавь OpenAI API-ключ в настройках.",13,TEXT,false,8);
+                "Выбери GGUF, AiPaca или добавь OpenAI API-ключ в настройках.",13,TEXT,false,8);
             TextView setup=text("НАСТРОИТЬ ИИ",14,accent(),true);
             setup.setPadding(dp(10),dp(12),dp(10),dp(12));
             setup.setBackground(new RuneFrameDrawable(PANEL_2,accent(),false));
@@ -3365,9 +3432,9 @@ public final class MainActivity extends Activity {
         prompt.setPadding(dp(12),dp(10),dp(12),dp(10));
         panel.addView(prompt,lp(-1,-2));
         space(panel,9);
-        String selectedModel=local?"Qwen3.5-9B":prefs.getString(chatgpt?"ai_chatgpt_model":"ai_api_model",chatgpt?"":AiModelCatalog.DEFAULT_API);
-        String modelLabel=selectedModel.isEmpty()?"не выбрана":local?"Qwen3.5-9B | GGUF":chatgpt?selectedModel:AiModelCatalog.label(selectedModel);
-        String providerLabel=local?"Источник: локальная модель | без интернета":chatgpt?"Источник: ChatGPT | лимиты Работа/Codex":
+        String selectedModel=external?prefs.getString("ai_aipaca_last_model","Автоматически"):local?"Qwen3.5-9B":prefs.getString(chatgpt?"ai_chatgpt_model":"ai_api_model",chatgpt?"":AiModelCatalog.DEFAULT_API);
+        String modelLabel=selectedModel.isEmpty()?"не выбрана":external?selectedModel:local?"Qwen3.5-9B | GGUF":chatgpt?selectedModel:AiModelCatalog.label(selectedModel);
+        String providerLabel=external?"Источник: AiPaca | локальный API | без интернета":local?"Источник: локальная модель | без интернета":chatgpt?"Источник: ChatGPT | лимиты Работа/Codex":
                 "Источник: OpenAI API | отдельная оплата";
         TextView status=text(providerLabel+"\nМодель (выбрана в игре): "+modelLabel+
                 "\nРазмышление (настройка игры): "+AiReasoningEffort.label(selectedReasoningEffort()),11,MUTED,false);
@@ -3379,9 +3446,9 @@ public final class MainActivity extends Activity {
         send.setBackground(new RuneFrameDrawable(PANEL_2,accent(),false));
         panel.addView(send);
         send.setOnClickListener(v->{
-            if(aiClient.isRunning()||localAiClient.isRunning()||awaitingAiToken){
+            if(aiClient.isRunning()||localAiClient.isRunning()||aipacaClient.isRunning()||awaitingAiToken){
                 awaitingAiToken=false;
-                aiClient.cancel();if(localAiClient!=null)localAiClient.cancel();
+                aiClient.cancel();if(localAiClient!=null)localAiClient.cancel();if(aipacaClient!=null)aipacaClient.cancel();
                 status.setText("Генерация остановлена. Игровой прогресс не изменён.");
                 send.setText("СОЗДАТЬ ПРОДОЛЖЕНИЕ");
                 return;
@@ -3394,7 +3461,7 @@ public final class MainActivity extends Activity {
             if(chatgpt&&selectedModel.isEmpty()){
                 status.setText("Сначала выбери модель ChatGPT в настройках.");return;
             }
-            status.setText(local?"Генерация локальной моделью…":chatgpt?"Проверка сессии ChatGPT…":"ИИ создаёт сцену…");
+            status.setText(external?"Генерация через AiPaca…":local?"Генерация локальной моделью…":chatgpt?"Проверка сессии ChatGPT…":"ИИ создаёт сцену…");
             reply.setText("");
             send.setText("ОСТАНОВИТЬ");
             AiStoryClient.Listener responseListener=new AiStoryClient.Listener(){
@@ -3419,7 +3486,10 @@ public final class MainActivity extends Activity {
                     send.setText("ПОВТОРИТЬ");
                 }
             };
-            if(local){
+            if(external){
+                boolean started=generateAiPaca(game,history,request,false,false,responseListener);
+                if(!started){status.setText("AiPaca уже генерирует ответ");send.setText("ПОВТОРИТЬ");}
+            }else if(local){
                 boolean started=localAiClient.generate(LocalAiModelStore.path(prefs),game,history,
                     request,false,false,responseListener);
                 if(!started){status.setText("Локальная модель занята");send.setText("ПОВТОРИТЬ");}
@@ -6331,6 +6401,7 @@ public final class MainActivity extends Activity {
             "chatgpt".equals(provider)?"ChatGPT | Работа/Codex":
             "api".equals(provider)?"OpenAI API | отдельная оплата":
             "local".equals(provider)?"Локальная GGUF | офлайн":
+            "aipaca".equals(provider)?"AiPaca | API на устройстве":
                 "Автоматически | Работа/Codex → API → GGUF",
             true,this::aiProviderDialog);
         // AUTO shows only the effectively selected engine, never every engine.
@@ -6338,7 +6409,8 @@ public final class MainActivity extends Activity {
         if("auto".equals(provider)){
             String chosen="chatgpt".equals(effectiveProvider)?"ChatGPT | Работа/Codex":
                 "api".equals(effectiveProvider)?"OpenAI API":
-                "local".equals(effectiveProvider)?"Локальная GGUF":"не найден";
+                "local".equals(effectiveProvider)?"Локальная GGUF":
+                "aipaca".equals(effectiveProvider)?"AiPaca":"не найден";
             addText(content,"Автоматический выбор: "+chosen+
                 ". Приоритет: ChatGPT → API → GGUF. Платный API "+
                 "не запускается скрыто после исчерпания лимитов ChatGPT.",
@@ -6361,6 +6433,26 @@ public final class MainActivity extends Activity {
                 "свободного места. Локальная CPU-генерация может занимать "+
                 "несколько минут; стадия и время отображаются в игровом режиме.",
                 12,MUTED,false,10);
+        }else if("aipaca".equals(effectiveProvider)){
+            addText(content,"AiPaca запускается отдельным приложением. Skyrim использует его API на 127.0.0.1:8080, без импорта модели или дополнительных библиотек.",12,MUTED,false,9);
+            actionButton("ПРОВЕРИТЬ ПОДКЛЮЧЕНИЕ AiPaca",
+                "GET /v1/models | проверить сервер и загруженную модель",false,this::testAiPacaConnection);
+            actionButton("API-ключ AiPaca",
+                AiPacaKeyVault.configured(this)?"Сохранён отдельно в Android Keystore":"Не задан | сервер может разрешать доступ без ключа",
+                false,this::aiPacaKeyDialog);
+            if(AiPacaKeyVault.configured(this))
+                actionButton("Удалить API-ключ AiPaca","Не влияет на ключ OpenAI",false,()->{
+                    AiPacaKeyVault.clear(this);render();toast("Ключ AiPaca удалён");
+                });
+            Switch aipacaFallback=new Switch(this);
+            aipacaFallback.setText("Резервное подключение | Local AI Engine");
+            aipacaFallback.setTextSize(sp(14));aipacaFallback.setTextColor(TEXT);
+            aipacaFallback.setThumbTintList(ColorStateList.valueOf(accent()));
+            aipacaFallback.setChecked(prefs.getBoolean("ai_aipaca_fallback",true));
+            aipacaFallback.setOnCheckedChangeListener((v,on)->
+                prefs.edit().putBoolean("ai_aipaca_fallback",on).apply());
+            content.addView(aipacaFallback,lp(-1,48));
+            addText(content,"Потоковая генерация включена. При сбое AiPaca резерв работает только при установленном отдельном движке и импортированной GGUF; облачные источники автоматически не вызываются.",12,MUTED,false,9);
         }else if("chatgpt".equals(effectiveProvider)){
             boolean signedIn=chatGptOAuth.hasSignedInAccount();
             boolean authorized=chatGptOAuth.hasAuthorizedPlan();
@@ -6406,7 +6498,7 @@ public final class MainActivity extends Activity {
                         new RuneDialogBuilder(this,accent()).setTitle("Удалить ключ API?")
                             .setNegativeButton("Отмена",null).setPositiveButton("Удалить",(d,w)->{
                                 if(aiClient!=null)aiClient.cancel();
-                                if(localAiClient!=null)localAiClient.cancel();
+                                if(localAiClient!=null)localAiClient.cancel();if(aipacaClient!=null)aipacaClient.cancel();
                                 AiKeyVault.clear(this);render();
                             }).show();
                     });
