@@ -475,7 +475,8 @@ public final class MainActivity extends Activity {
     }
     private View sceneGallery(String location){
         android.widget.ImageView local=WorkImageEditor.primaryView(this,"location",location,accent(),this::render);
-        return local!=null?local:new LocationGalleryView(this,location,accent(),false);
+        if(local!=null)return local;
+        return new LocationGalleryView(this,location,accent(),false);
     }
     private void stateEffects(){
         if(!visual("status")||!game.started||titleOpen)return;
@@ -4109,7 +4110,8 @@ public final class MainActivity extends Activity {
         scroller.addView(wrapper,new ScrollView.LayoutParams(-1,-2));
         panel.addView(scroller,new LinearLayout.LayoutParams(-1,0,1));
         if(LocationGalleryView.hasGallery(place.name)||WorkImageEditor.hasPrimary(this,"location",place.name)){
-            wrapper.addView(sceneGallery(place.name),lp(-1,-2));
+            android.widget.ImageView local=WorkImageEditor.primaryView(this,"location",place.name,accent(),this::render);
+            wrapper.addView(local!=null?local:new LocationGalleryView(this,place.name,accent(),false),lp(-1,-2));
             if(place.name.equalsIgnoreCase(game.progress.location))renderLocationWeather(wrapper);
             space(wrapper,10);
         }
