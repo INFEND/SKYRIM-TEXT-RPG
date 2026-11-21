@@ -30,6 +30,7 @@ final class SolitudeShops {
     SolitudeShops(){for(int i=0;i<sold.length;i++){sold[i]=new int[ITEMS[i].length];cycle[i]=-1;resale.add(new java.util.LinkedHashMap<>());}}
     static int index(String mode){for(int i=0;i<NAMES.length;i++)if((MODE+i).equals(mode))return i;return -1;}
     static int district(int s){return s==4?5:0;}
+    private static boolean onDuty(GameEngine g,int s){return s>=0&&s<NAMES.length&&g.hour>=8&&g.hour<20;}
     static boolean open(GameEngine g,int s){
         String status=g.sceneState.npcStatusByName(OWNERS[s]);
         return g.hour>=8&&g.hour<20&&!"DEAD".equals(status)&&!"MISSING".equals(status)&&!"HOSTILE".equals(status);
@@ -108,6 +109,8 @@ final class SolitudeShops {
     GameEngine.Scene scene(GameEngine g,int s){
         refresh(g,s);
         GameEngine.Scene scene=new GameEngine.Scene("СОЛИТЬЮД | ТОРГОВЛЯ",NAMES[s],OWNERS[s]+" | Кошелёк: "+budget[s]+" септимов.\nПополнение через каждые два игровых дня.\n\n"+g.message);
+        if(onDuty(g,s)&&"HOSTILE".equals(g.sceneState.npcStatusByName(OWNERS[s])))
+            scene.add("SOLITUDE:merchant:reconcile:"+s,"Примириться: "+OWNERS[s],"Авторское действие | 1 час | 10 сил | без награды");
         if(open(g,s)){
             JSONObject f=fact(g,s);
             scene.add("SOLITUDE:merchant:talk:"+s,"Поговорить: "+OWNERS[s],f==null?"Знакомство | авторский диалог":"Отношение: "+f.optInt("relation",50)+"/100");
@@ -132,7 +135,19 @@ final class SolitudeShops {
         return scene.add("SOLITUDE:back","Вернуться на улицу","Покинуть лавку").add("GO_WORLD","Завершить прогулку","Вернуться к приключению");
     }
     void choose(GameEngine g,int s,String action){
-        refresh(g,s);if(!open(g,s))return;
+        refresh(g,s);
+        if(action.equals("SOLITUDE:merchant:reconcile:"+s)){
+            if(!onDuty(g,s)||!"HOSTILE".equals(g.sceneState.npcStatusByName(OWNERS[s])))return;
+            if(g.hour>=23||g.stamina<10){g.message="Для примирения нужны один час и 10 единиц запаса сил.";return;}
+            try{
+                g.sceneState.setContext(g.day,g.hour,"Солитьюд");
+                g.sceneState.confirm("npc",npcKey(g,s),OWNERS[s],"INFORMED");
+            }catch(org.json.JSONException ignored){return;}
+            g.stamina-=10;g.hour++;g.syncLivingSystems();
+            g.message=OWNERS[s]+": Конфликт улажен. Торговля снова доступна.";
+            g.progress.recent=g.message;g.recordVisualEvent(g.message);g.progress.sync(g);return;
+        }
+        if(!open(g,s))return;
         if(action.equals("SOLITUDE:merchant:talk:"+s)){conversation(g,s,false);return;}
         if(action.equals("SOLITUDE:merchant:memory:"+s)){conversation(g,s,true);return;}
         for(java.util.Map.Entry<String,Integer> e:resale.get(s).entrySet()){

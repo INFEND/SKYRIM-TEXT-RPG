@@ -60,6 +60,7 @@ final class SolitudeEncounters {
         for(int i=0;i<a.length();i++){JSONObject o=a.optJSONObject(i);if(o!=null&&NAMES[d].equalsIgnoreCase(o.optString("title")))return o.optString("id");}
         return "solitude_"+IDS[d];
     }
+    private static boolean onDuty(GameEngine g,int d){return d>=0&&d<NAMES.length&&g.hour>=OPEN[d]&&g.hour<CLOSE[d];}
     static boolean present(GameEngine g,int d){
         if(d<0||d>=NAMES.length)return false;
         String status=g.sceneState.npcStatusByName(NAMES[d]);
@@ -92,6 +93,10 @@ final class SolitudeEncounters {
         g.message=message;g.progress.recent=message;g.recordVisualEvent(message);g.progress.sync(g);
     }
     static void choices(GameEngine g,GameEngine.Scene s,int d){
+        if(onDuty(g,d)&&"HOSTILE".equals(g.sceneState.npcStatusByName(NAMES[d]))){
+            s.add("SOLITUDE:supervisor:reconcile:"+d,"Примириться: "+NAMES[d],"Авторское действие | 1 час | 10 сил | без награды");
+            return;
+        }
         if(!present(g,d))return;
         JSONObject f=fact(g,d);
         s.add("SOLITUDE:talk:"+d,"Поговорить: "+NAMES[d],f==null?"Разговор и знакомство":"Отношение: "+f.optInt("relation",50)+"/100");
@@ -110,6 +115,16 @@ final class SolitudeEncounters {
     }
     private static boolean canWork(GameEngine g,int d,Quest q){return present(g,d)&&g.hour+q.hours<=CLOSE[d]&&g.stamina>=q.stamina;}
     static boolean choose(GameEngine g,int d,String action){
+        if(action.equals("SOLITUDE:supervisor:reconcile:"+d)){
+            if(!onDuty(g,d)||!"HOSTILE".equals(g.sceneState.npcStatusByName(NAMES[d])))return true;
+            if(g.hour>=23||g.stamina<10){report(g,"Для примирения нужны один час и 10 единиц запаса сил.");return true;}
+            try{
+                g.sceneState.setContext(g.day,g.hour,"Солитьюд");
+                g.sceneState.confirm("npc",npcKey(g,d),NAMES[d],"INFORMED");
+            }catch(org.json.JSONException ignored){return true;}
+            g.stamina-=10;g.hour++;g.syncLivingSystems();
+            report(g,NAMES[d]+": Конфликт улажен. Доступ к городским занятиям восстановлен.");return true;
+        }
         if(!action.startsWith("SOLITUDE:talk:")&&!action.startsWith("SOLITUDE:quest:")&&!action.startsWith("SOLITUDE:local:")&&!action.startsWith("SOLITUDE:memory:"))return false;
         if(!present(g,d))return true;
         if(action.equals("SOLITUDE:talk:"+d)){
