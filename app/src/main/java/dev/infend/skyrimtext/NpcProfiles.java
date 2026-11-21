@@ -1427,6 +1427,12 @@ final class NpcProfiles {
         addGeneratedForms(out);
         // Fully qualified type names are safe reference links. Bare types are context-only.
         templateLinkNames().forEach((alias,canonical)->{if(alias.contains(" "))out.putIfAbsent(alias,canonical);});
+        // An NPC's nickname must not turn everyday nouns at sentence starts into links.
+        // The full canonical names remain clickable and the lookup index stays intact.
+        for(String ordinary:new String[]{"дельфин","гурман","воровка","жрица"}){
+            String canonical=out.get(ordinary);
+            if(canonical!=null&&!NpcNameMatcher.key(canonical).equals(ordinary))out.remove(ordinary);
+        }
         return out;
     }
     private static final java.util.Map<String,String> LINK_NAMES=java.util.Collections.unmodifiableMap(buildLinkNames());
