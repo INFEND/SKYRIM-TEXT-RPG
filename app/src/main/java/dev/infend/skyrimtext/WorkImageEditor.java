@@ -272,7 +272,7 @@ public final class WorkImageEditor {
             Toast.makeText(host, "Предыдущая генерация ещё выполняется", Toast.LENGTH_LONG).show();
             return;
         }
-        String model = target.optString("model", "gpt-image-2.5-sunburst");
+        String model = target.optString("model", "gpt-image-2.6-sunburst");
         String quality = target.optString("quality", "high");
         int count = target.optInt("count", 1);
         new AlertDialog.Builder(host).setTitle(reference == null
@@ -487,9 +487,11 @@ public final class WorkImageEditor {
         Button key = button(host, "Настроить API-ключ", accent);
         panel.addView(key);
         key.setOnClickListener(v -> showApiKeyEditor(host));
-        String[] modelIds = {"gpt-image-2.5-sunburst", "gpt-image-2.5-flare", "gpt-image-1.5"};
-        String[] modelNames = {"Sunburst 2.5 · точное редактирование",
-            "Flare 2.5 · быстрее", "GPT Image 1.5 · совместимость"};
+        String[] modelIds = {"gpt-image-2.6-sunburst", "gpt-image-2.6-flare",
+            "gpt-image-2.5-sunburst", "gpt-image-2.5-flare", "gpt-image-1.5"};
+        String[] modelNames = {"Sunburst 2.6 · максимум качества", "Flare 2.6 · быстрее",
+            "Sunburst 2.5 · точное редактирование", "Flare 2.5 · быстрее",
+            "GPT Image 1.5 · совместимость"};
         final int[] selectedModel = {0};
         String savedModel = prefs(host).getString("image_api_model", modelIds[0]);
         for (int i = 0; i < modelIds.length; i++)
