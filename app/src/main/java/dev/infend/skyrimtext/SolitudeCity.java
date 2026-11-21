@@ -140,12 +140,14 @@ final class SolitudeCity {
         GameEngine.Scene s=new GameEngine.Scene("СОЛИТЬЮД | "+g.hour+":00",PLACES[d],PROSE[d]+
             "\n\n"+(g.message.isEmpty()?"Выбери занятие или вернись на улицу.":g.message));
         for(int i=0;i<JOBS.length;i++)if(jobDistrict(i)==d){
-            if(blocked(g,i).isEmpty()){
-                s.add(PREFIX+"job:"+i,JOBS[i].title,detail(g,i));
-                if(JOBS[i].gold>0)s.add(PREFIX+"volunteer:"+i,"Помочь без оплаты: "+JOBS[i].title,
-                    "Авторская добровольная помощь | без заработка | общая память отношений NPC | тот же дневной лимит");
-            }
-            else s=newBlocked(s,g,i);
+            String paidBlock=blocked(g,i);
+            String freeBlock=JOBS[i].gold>0?blocked(g,i,true):paidBlock;
+            if(paidBlock.isEmpty())s.add(PREFIX+"job:"+i,JOBS[i].title,detail(g,i));
+            if(JOBS[i].gold>0&&freeBlock.isEmpty())s.add(PREFIX+"volunteer:"+i,"Помочь без оплаты: "+JOBS[i].title,
+                "Авторская добровольная помощь | без заработка | общая память отношений NPC | тот же дневной лимит");
+            if(!paidBlock.isEmpty()&&!freeBlock.isEmpty())s=newBlocked(s,g,i);
+            else if(!paidBlock.isEmpty())s=new GameEngine.Scene(s.kicker,s.title,
+                s.body+"\n\n"+JOBS[i].title+": "+paidBlock+" (оплачиваемая смена).");
         }
         if(d==0||d==5)s.add(PREFIX+"shop","Открыть торговлю","Существующий торговый инвентарь города");
         if(d==6)s.add(PREFIX+"rest","Снять комнату","20 септимов | существующий отдых в трактире");
