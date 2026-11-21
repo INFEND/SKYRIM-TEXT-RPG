@@ -107,4 +107,31 @@ public class SolitudeCityTest {
             assertEquals("INFORMED",g.sceneState.status("npc",key));
         }
     }
+    @Test public void volunteerWorkHasRealCostsAndPersistsRelationshipWithoutDuplicateWages() throws Exception {
+        GameEngine g=city();g.choose("SOLITUDE:open");g.choose("SOLITUDE:visit:0");
+        assertTrue(g.scene().choices.stream().anyMatch(x->x.action.equals("SOLITUDE:volunteer:0")));
+        int gold=g.gold, stamina=g.stamina;
+        g.choose("SOLITUDE:volunteer:0");
+        assertEquals(gold,g.gold);assertEquals(stamina-10,g.stamina);
+        assertEquals(10,g.hour);assertEquals("HELPED",g.sceneState.status("npc","solitude_jala"));
+        g=GameEngine.fromJson(g.toJson().toString());
+        g.choose("SOLITUDE:job:0");g.choose("SOLITUDE:volunteer:0");
+        assertEquals(gold,g.gold);
+        g.day++;g.hour=8;
+        g.choose("SOLITUDE:job:0");
+        assertEquals(gold+18,g.gold);
+        assertEquals("HELPED",g.sceneState.status("npc","solitude_jala"));
+    }
+    @Test public void volunteerActionCannotBypassLocationTimeOrDailyLimit() throws Exception {
+        GameEngine g=city();int gold=g.gold;
+        g.choose("SOLITUDE:volunteer:0");assertEquals(8,g.hour);
+        g.choose("SOLITUDE:open");g.choose("SOLITUDE:visit:7");
+        g.choose("SOLITUDE:volunteer:0");assertEquals(8,g.hour);
+        g.choose("SOLITUDE:volunteer:14");assertEquals(11,g.hour);
+        assertEquals(gold,g.gold);
+        g.choose("SOLITUDE:volunteer:14");assertEquals(11,g.hour);
+        g.day++;g.hour=23;g.choose("SOLITUDE:volunteer:14");assertEquals(23,g.hour);
+        assertEquals("HELPED",g.sceneState.status("npc","solitude_vittoria"));
+    }
+
 }

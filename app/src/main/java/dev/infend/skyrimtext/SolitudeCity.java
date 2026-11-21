@@ -83,7 +83,8 @@ final class SolitudeCity {
         return -1;
     }
     static boolean validMode(String mode){return MODE.equals(mode)||district(mode)>=0||SolitudeShops.index(mode)>=0||SolitudeHome.MODE.equals(mode)||SolitudeJustice.MODE.equals(mode)||SolitudeJustice.CELL.equals(mode)||SolitudeCanonical.graceMode(mode);}
-    private String blocked(GameEngine g,int i){
+    private String blocked(GameEngine g,int i){return blocked(g,i,false);}
+    private String blocked(GameEngine g,int i,boolean volunteer){
         Job j=JOBS[i];
         if(lastDay[i]>=g.day)return "Уже выполнено сегодня";
         int d=jobDistrict(i);int start=d==6?6:8, end=d==6?23:20;
@@ -91,13 +92,13 @@ final class SolitudeCity {
         if(!SolitudeEncounters.availableForWork(g,d,j.hours))return "Ответственный житель недоступен | "+SolitudeEncounters.workHours(d);
         if(g.stamina<j.stamina)return "Не хватает запаса сил";
         if(j.gold<0&&g.gold< -j.gold)return "Не хватает септимов";
-        if(j.gold>0&&g.gold>Integer.MAX_VALUE-j.gold)return "Кошелёк переполнен";
+        if(j.gold>0&&!volunteer&&g.gold>Integer.MAX_VALUE-j.gold)return "Кошелёк переполнен";
         return "";
     }
     // Existing residents supervise local shifts. Work strengthens the shared NPC ledger,
     // rather than creating a second, incompatible relationship system.
     private static final int[] WORK_CONTACT={8,7,0,3,-1,-1,1,2};
-    private static void rememberWork(GameEngine g,int district,boolean residentPresent,boolean supervisorPresent){
+    private static void rememberWork(GameEngine g,int district,boolean residentPresent,boolean supervisorPresent,boolean volunteer){
         int resident=WORK_CONTACT[district];
         if(!residentPresent&&!supervisorPresent)return;
         // Prefer the actual district supervisor, including Vittoria at the docks.
@@ -108,7 +109,8 @@ final class SolitudeCity {
         try{
             g.sceneState.setContext(g.day,g.hour,"Солитьюд");
             String status=g.sceneState.status("npc",key);
-            if(status.isEmpty())g.sceneState.confirm("npc",key,name,"MET");
+            if(volunteer&&!"HELPED".equals(status)&&!"DEAD".equals(status)&&!"MISSING".equals(status)&&!"HOSTILE".equals(status))g.sceneState.confirm("npc",key,name,"HELPED");
+            else if(status.isEmpty())g.sceneState.confirm("npc",key,name,"MET");
             else if("MET".equals(status))g.sceneState.confirm("npc",key,name,"INFORMED");
             else g.sceneState.revisitNpc(key);
         }catch(org.json.JSONException ignored){/* Never undo an already completed shift. */}
@@ -138,7 +140,11 @@ final class SolitudeCity {
         GameEngine.Scene s=new GameEngine.Scene("СОЛИТЬЮД | "+g.hour+":00",PLACES[d],PROSE[d]+
             "\n\n"+(g.message.isEmpty()?"Выбери занятие или вернись на улицу.":g.message));
         for(int i=0;i<JOBS.length;i++)if(jobDistrict(i)==d){
-            if(blocked(g,i).isEmpty())s.add(PREFIX+"job:"+i,JOBS[i].title,detail(g,i));
+            if(blocked(g,i).isEmpty()){
+                s.add(PREFIX+"job:"+i,JOBS[i].title,detail(g,i));
+                if(JOBS[i].gold>0)s.add(PREFIX+"volunteer:"+i,"Помочь без оплаты: "+JOBS[i].title,
+                    "Авторская добровольная помощь | без заработка | общая память отношений NPC | тот же дневной лимит");
+            }
             else s=newBlocked(s,g,i);
         }
         if(d==0||d==5)s.add(PREFIX+"shop","Открыть торговлю","Существующий торговый инвентарь города");
@@ -191,8 +197,9 @@ final class SolitudeCity {
         if((PREFIX+"shop").equals(action)&&(d==0||d==5)){g.mode="WORLD";g.choose("SHOP");return;}
         if((PREFIX+"rest").equals(action)&&d==6){g.mode="WORLD";g.choose("REST");return;}
         if((PREFIX+"livia").equals(action)&&d==1){g.mode="WORLD";if(g.livia.available(g)){g.choose("LIVIA:open");g.livia.castleReturn=LiviaStory.MODE.equals(g.mode);}else g.mode=PREFIX+d;return;}
-        for(int i=0;i<JOBS.length;i++)if(jobDistrict(i)==d&&(PREFIX+"job:"+i).equals(action)){
-            if(!blocked(g,i).isEmpty())return;
+        for(int i=0;i<JOBS.length;i++)if(jobDistrict(i)==d&&((PREFIX+"job:"+i).equals(action)||(JOBS[i].gold>0&&(PREFIX+"volunteer:"+i).equals(action)))){
+            boolean volunteer=(PREFIX+"volunteer:"+i).equals(action);
+            if(!blocked(g,i,volunteer).isEmpty())return;
             Job j=JOBS[i];
             // Snapshot attendance before advancing time: the supervisor may leave
             // during a legitimate shift, but completed work must still count.
@@ -200,14 +207,14 @@ final class SolitudeCity {
             boolean residentPresent=resident>=0&&SolitudeResidents.present(g,resident,d);
             boolean supervisorPresent=SolitudeEncounters.present(g,d);
             lastDay[i]=g.day;
-            g.stamina-=j.stamina;g.gold=GameEngine.nonnegativeAdd(g.gold,j.gold);
+            g.stamina-=j.stamina;g.gold=GameEngine.nonnegativeAdd(g.gold,volunteer?0:j.gold);
             g.hour+=j.hours; // opening hours prevent a midnight rollover
             g.syncLivingSystems();
             if(i==13){g.needs.eat();g.needs.drink();g.stamina=Math.min(g.maxStamina,GameEngine.nonnegativeAdd(g.stamina,15));}
             if(j.skill>=0)g.progress.skillExperience(g,j.skill,j.xp);
             if(j.rep>0)g.holdReputation[3]=Math.min(100,g.holdReputation[3]+j.rep);
-            rememberWork(g,d,residentPresent,supervisorPresent);
-            g.message=j.result;
+            rememberWork(g,d,residentPresent,supervisorPresent,volunteer);
+            g.message=j.result+(volunteer?" Ты отказался от платы и помог безвозмездно.":"");
             g.progress.recent=g.message;
             g.recordVisualEvent(j.title+": "+j.result);
             g.progress.sync(g);return;
