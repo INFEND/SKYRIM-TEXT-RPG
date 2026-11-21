@@ -101,7 +101,7 @@ final class FactionStories {
         else{beastDecision=true;beast=choice+1;g.progress.setQuestOutcome(choice==0?"werewolf_retained":"werewolf_cured","COMPLETED");g.message=choice==0?"Ты сохранил дар зверя.":"Ты отказался от дара зверя.";}
         g.recordVisualEvent(g.message);return true;
     }
-    boolean canRewrite(GameEngine g,int f){return g.fixShop.editorEnabled&&FixShopWorld.safe(g)&&(f==3&&cicero>0&&index[3]>8||f==0&&beastDecision&&index[0]>5);}
+    boolean canRewrite(GameEngine g,int f){return false&&FixShopWorld.safe(g)&&(f==3&&cicero>0&&index[3]>8||f==0&&beastDecision&&index[0]>5);}
     boolean rewrite(GameEngine g,int f){
         if(!canRewrite(g,f))return false;
         if(f==3){cicero=3-cicero;g.progress.questOutcomes.remove("cicero_spared");g.progress.questOutcomes.remove("cicero_slain");g.progress.setQuestOutcome(cicero==1?"cicero_spared":"cicero_slain","COMPLETED");g.message=cicero==1?"Судьба Цицерона изменена: жив.":"Судьба Цицерона изменена: погиб.";}
