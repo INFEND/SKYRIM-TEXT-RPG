@@ -7166,5 +7166,47 @@
     "displayX": 1561.0,
     "displayY": 938.0,
     "pinSource": "anchor"
+  },
+  {
+    "id": "skyrim-2493",
+    "category": "region",
+    "name": "Dunmeth Pass",
+    "x": 176127.0,
+    "y": 38485.0,
+    "nameRu": "Перевал Данмет",
+    "type": "Переход",
+    "sheet": 0,
+    "region": 2,
+    "displayX": 3423.9922,
+    "displayY": 1747.3359,
+    "pinSource": "geographic"
+  },
+  {
+    "id": "skyrim-2494",
+    "category": "region",
+    "name": "Pale Pass",
+    "x": 27698.0,
+    "y": -116567.0,
+    "nameRu": "Бледный перевал",
+    "type": "Переход",
+    "sheet": 0,
+    "region": 5,
+    "displayX": 2264.3906,
+    "displayY": 2958.6797,
+    "pinSource": "geographic"
+  },
+  {
+    "id": "skyrim-910",
+    "category": "unique",
+    "name": "Shrine to Malacath",
+    "x": 134978.0,
+    "y": -111112.0,
+    "nameRu": "Святилище Малаката",
+    "type": "Святилище",
+    "sheet": 0,
+    "region": 1,
+    "displayX": 3102.5156,
+    "displayY": 2916.0625,
+    "pinSource": "geographic"
   }
 ]
