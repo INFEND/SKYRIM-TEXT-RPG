@@ -41,7 +41,7 @@ final class ItemWorkshopSpec {
     static int normalizedStat(int type,int stat){return hasStat(type)?Math.max(0,Math.min(500,stat)):0;}
     static String clip(String value,int maximum){
         if(value==null)return "";
-        String clean=value.trim().replace('\u0000',' ');
+        String clean=value.trim().replace((char)0,' ');
         return clean.length()>maximum?clean.substring(0,maximum):clean;
     }
 }
