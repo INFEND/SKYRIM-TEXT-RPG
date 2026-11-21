@@ -1,0 +1,32 @@
+{
+  "source": "Локации Скайрим (ChatGPT Library)",
+  "original_images": 59,
+  "locations": 10,
+  "original_bytes": 579240533,
+  "asset_bytes": 25951026,
+  "reduction_percent": 95.52,
+  "max_dimensions": [
+    1920,
+    1080
+  ],
+  "format": "WebP",
+  "adaptive_quality": [
+    81,
+    84,
+    87
+  ],
+  "minimum_sampled_ssim": 0.99098,
+  "per_city": {
+    "whiterun": 6,
+    "windhelm": 6,
+    "winterhold": 6,
+    "dawnstar": 6,
+    "markarth": 6,
+    "morthal": 6,
+    "riverwood": 5,
+    "riften": 6,
+    "solitude": 6,
+    "falkreath": 6
+  },
+  "note": "SSIM measured against resized originals at 480x270; this is not a lossless encoding or proof of imperceptible differences."
+}

@@ -1,0 +1,151 @@
+package dev.infend.skyrimtext;
+
+import org.junit.Test;
+import static org.junit.Assert.*;
+
+public class SolitudeCityTest {
+    private GameEngine city(){
+        GameEngine g=new GameEngine();g.start("Тест","Норд","Воин");g.region=3;g.progress.location="Солитьюд";g.mode="WORLD";g.hour=8;return g;
+    }
+    @Test public void cityMenuAndWorkSurviveReload() throws Exception {
+        GameEngine g=city();
+        assertTrue(g.scene().choices.stream().anyMatch(c->c.action.equals("SOLITUDE:open")));
+        g.choose("SOLITUDE:open");
+        for(int d=0;d<8;d++){final String action="SOLITUDE:visit:"+d;assertTrue(g.scene().choices.stream().anyMatch(c->c.action.equals(action)));}
+        for(String action:new String[]{SolitudeCanonical.ADDVAR,SolitudeCanonical.CATACOMBS,SolitudeHome.MODE,"GO_WORLD"})assertTrue(g.scene().choices.stream().anyMatch(c->c.action.equals(action)));
+        g.choose("SOLITUDE:visit:7");int gold=g.gold, stamina=g.stamina;
+        g.choose("SOLITUDE:job:14");assertEquals(gold+30,g.gold);assertEquals(stamina-18,g.stamina);
+        assertEquals(11,g.hour);assertEquals("Солитьюд",g.progress.location);
+        g=GameEngine.fromJson(g.toJson().toString());assertEquals("SOLITUDE:7",g.mode);
+        g.choose("SOLITUDE:job:14");assertEquals(gold+30,g.gold);
+        g.day++;g.hour=8;g.choose("SOLITUDE:job:14");assertEquals(gold+60,g.gold);
+    }
+    @Test public void forgedOrUnavailableActionsDoNotReward(){
+        GameEngine g=city();int gold=g.gold;
+        g.choose("SOLITUDE:job:14");assertEquals(gold,g.gold);
+        g.choose("SOLITUDE:open");g.choose("SOLITUDE:visit:0");
+        g.choose("SOLITUDE:job:14");g.choose("SOLITUDE:job:00");assertEquals(gold,g.gold);
+        g.hour=23;g.choose("SOLITUDE:job:0");assertEquals(gold,g.gold);
+        g.hour=8;g.stamina=0;g.choose("SOLITUDE:job:0");assertEquals(gold,g.gold);
+        g.choose("GO_WORLD");g.mode="COMBAT";g.choose("SOLITUDE:open");assertEquals("COMBAT",g.mode);
+        g.mode="WORLD";g.progress.location="Морфал";g.choose("SOLITUDE:open");assertEquals("WORLD",g.mode);
+    }
+    @Test public void paidLessonAndExistingShop(){
+        GameEngine g=city();g.choose("SOLITUDE:open");g.choose("SOLITUDE:visit:5");
+        g.gold=0;g.choose("SOLITUDE:job:11");assertEquals(8,g.hour);
+        g.gold=40;g.choose("SOLITUDE:job:11");assertEquals(22,g.gold);assertEquals(10,g.hour);
+        g.choose("SOLITUDE:shop");assertEquals("SHOP",g.mode);
+    }
+    @Test public void completedShiftBuildsSharedResidentMemoryWithoutRepeatedCredit() throws Exception {
+        GameEngine g=city();
+        g.choose("SOLITUDE:open");
+        g.choose("SOLITUDE:visit:0");
+        g.choose("SOLITUDE:job:0");
+        assertEquals("MET",g.sceneState.status("npc","solitude_jala"));
+        g=GameEngine.fromJson(g.toJson().toString());
+        int gold=g.gold;
+        g.choose("SOLITUDE:job:0");
+        assertEquals(gold,g.gold);
+        assertEquals("MET",g.sceneState.status("npc","solitude_jala"));
+        g.day++;
+        g.hour=8;
+        g.choose("SOLITUDE:job:0");
+        assertEquals("INFORMED",g.sceneState.status("npc","solitude_jala"));
+        g=GameEngine.fromJson(g.toJson().toString());
+        assertEquals("INFORMED",g.sceneState.status("npc","solitude_jala"));
+    }
+
+    @Test public void dockShiftCreditsVittoriaEvenAfterHerClosingHour() throws Exception {
+        GameEngine g=city();g.hour=15;
+        g.choose("SOLITUDE:open");g.choose("SOLITUDE:visit:7");
+        int before=g.gold;
+        g.choose("SOLITUDE:job:14");
+        assertEquals(18,g.hour);
+        assertEquals(before+30,g.gold);
+        assertEquals("MET",g.sceneState.status("npc","solitude_vittoria"));
+        g=GameEngine.fromJson(g.toJson().toString());
+        assertEquals("MET",g.sceneState.status("npc","solitude_vittoria"));
+        int paid=g.gold;
+        g.choose("SOLITUDE:job:14");
+        assertEquals(paid,g.gold);
+    }
+    @Test public void marketShiftCreditsActualSupervisorAtStart() throws Exception {
+        GameEngine g=city();g.hour=16;
+        g.choose("SOLITUDE:open");g.choose("SOLITUDE:visit:0");
+        g.choose("SOLITUDE:job:0");
+        assertEquals(18,g.hour);
+        assertEquals("MET",g.sceneState.status("npc","solitude_jala"));
+        assertEquals("",g.sceneState.status("npc","solitude_evette"));
+    }
+    @Test public void templeAndForgeShiftsRememberTheirSupervisorsWithoutResidentFallback() throws Exception {
+        for(int district:new int[]{4,5}){
+            GameEngine g=city();g.hour=9;
+            g.choose("SOLITUDE:open");g.choose("SOLITUDE:visit:"+district);
+            int job=district*2;
+            String key=district==4?"solitude_rorlund":"solitude_beirand";
+            String name=district==4?"Рорлунд":"Бейранд";
+            int gold=g.gold;
+            g.choose("SOLITUDE:job:"+job);
+            assertEquals("Shift should complete",district==4?11:11,g.hour);
+            assertEquals("MET",g.sceneState.status("npc",key));
+            boolean found=false;
+            org.json.JSONArray facts=g.sceneState.npcFacts();
+            for(int i=0;i<facts.length();i++){
+                org.json.JSONObject fact=facts.optJSONObject(i);
+                if(fact!=null&&key.equals(fact.optString("id"))){
+                    assertEquals(name,fact.optString("title"));found=true;
+                }
+            }
+            assertTrue("Supervisor must be stored under the canonical name",found);
+            g=GameEngine.fromJson(g.toJson().toString());
+            assertEquals("MET",g.sceneState.status("npc",key));
+            int paid=g.gold;
+            g.choose("SOLITUDE:job:"+job);
+            assertEquals(paid,g.gold);
+            g.day++;g.hour=9;
+            g.choose("SOLITUDE:job:"+job);
+            assertEquals("INFORMED",g.sceneState.status("npc",key));
+        }
+    }
+    @Test public void volunteerWorkHasRealCostsAndPersistsRelationshipWithoutDuplicateWages() throws Exception {
+        GameEngine g=city();g.choose("SOLITUDE:open");g.choose("SOLITUDE:visit:0");
+        assertTrue(g.scene().choices.stream().anyMatch(x->x.action.equals("SOLITUDE:volunteer:0")));
+        int gold=g.gold, stamina=g.stamina;
+        g.choose("SOLITUDE:volunteer:0");
+        assertEquals(gold,g.gold);assertEquals(stamina-10,g.stamina);
+        assertEquals(10,g.hour);assertEquals("HELPED",g.sceneState.status("npc","solitude_jala"));
+        g=GameEngine.fromJson(g.toJson().toString());
+        g.choose("SOLITUDE:job:0");g.choose("SOLITUDE:volunteer:0");
+        assertEquals(gold,g.gold);
+        g.day++;g.hour=8;
+        g.choose("SOLITUDE:job:0");
+        assertEquals(gold+18,g.gold);
+        assertEquals("HELPED",g.sceneState.status("npc","solitude_jala"));
+    }
+    @Test public void volunteerActionCannotBypassLocationTimeOrDailyLimit() throws Exception {
+        GameEngine g=city();int gold=g.gold;
+        g.choose("SOLITUDE:volunteer:0");assertEquals(8,g.hour);
+        g.choose("SOLITUDE:open");g.choose("SOLITUDE:visit:7");
+        g.choose("SOLITUDE:volunteer:0");assertEquals(8,g.hour);
+        g.choose("SOLITUDE:volunteer:14");assertEquals(11,g.hour);
+        assertEquals(gold,g.gold);
+        g.choose("SOLITUDE:volunteer:14");assertEquals(11,g.hour);
+        g.day++;g.hour=23;g.choose("SOLITUDE:volunteer:14");assertEquals(23,g.hour);
+        assertEquals("HELPED",g.sceneState.status("npc","solitude_vittoria"));
+    }
+
+    @Test public void volunteerRemainsAvailableWhenPaidWagesWouldOverflowWallet() throws Exception {
+        GameEngine g=city();g.gold=Integer.MAX_VALUE;
+        g.choose("SOLITUDE:open");g.choose("SOLITUDE:visit:0");
+        assertFalse(g.scene().choices.stream().anyMatch(c->c.action.equals("SOLITUDE:job:0")));
+        assertTrue(g.scene().choices.stream().anyMatch(c->c.action.equals("SOLITUDE:volunteer:0")));
+        g.choose("SOLITUDE:job:0");assertEquals(8,g.hour);
+        g.choose("SOLITUDE:volunteer:0");
+        assertEquals(Integer.MAX_VALUE,g.gold);assertEquals(10,g.hour);
+        assertEquals("HELPED",g.sceneState.status("npc","solitude_jala"));
+        g=GameEngine.fromJson(g.toJson().toString());
+        g.choose("SOLITUDE:volunteer:0");assertEquals(10,g.hour);
+        assertEquals(Integer.MAX_VALUE,g.gold);
+    }
+
+}

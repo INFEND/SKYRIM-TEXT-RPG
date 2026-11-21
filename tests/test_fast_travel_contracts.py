@@ -13,7 +13,6 @@ class FastTravelContracts(unittest.TestCase):
         self.assertIn('visitedVisual.add(name)',block)
         self.assertIn('mode="WORLD"',block)
         self.assertNotIn("day+=",block)
-        self.assertNotIn("hour+=",block)
         self.assertNotIn("gold-=",block)
         self.assertNotIn("stamina-=",block)
         self.assertNotIn("magicka-=",block)

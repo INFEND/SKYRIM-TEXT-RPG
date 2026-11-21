@@ -1,0 +1,2549 @@
+{
+  "category": "cave",
+  "atlas_total": 91,
+  "image_count": 35,
+  "format": "WebP",
+  "max_dimensions": [
+    1920,
+    1080
+  ],
+  "quality_floor": {
+    "full_resolution_luma_ssim": 0.985,
+    "worst_128px_luma_ssim": 0.965,
+    "maximum_chroma_mean_absolute_error": 2.5,
+    "maximum_chroma_95th_percentile_error": 7
+  },
+  "note": "One original AI environment interpretation per mapped cave. Compression scores compare decoded WebP with the source at the encoded dimensions; they are not a claim of exact in-game visual fidelity. No upscaling; existing archives remain byte-identical.",
+  "original_bytes": 110516807,
+  "archive_bytes": 18758784,
+  "photos": [
+    {
+      "id": "skyrim-2491",
+      "name": "Остров Чёрной Кости",
+      "english_name": "Blackbone Isle (CC)",
+      "slug": "blackbone_isle",
+      "archive": "blackbone_isle.zip",
+      "archive_sha256": "27573518bcb39490b8645657475923d7c899bc46a86a2c6c9861bfa02ece87c0",
+      "archive_bytes": 445456,
+      "generation_mode": "built-in image_gen",
+      "generated_image_file": "exec-1c169c3b-37c0-4837-847b-dde5f0609929.png",
+      "source_sha256": "d03b782e55b7ba3b41b450723c9612a4ad0599a85c79ea5e44b25e478d145bd3",
+      "source_bytes": 2882331,
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "dimensions": [
+        1672,
+        941
+      ],
+      "quality": 92,
+      "webp_sha256": "ed8d377aea624f55e06f460e789ab4e7f58d8add1016ee5baaad2806cfc1e401",
+      "webp_bytes": 445344,
+      "reference_url": "https://en.uesp.net/wiki/Skyrim:Blackbone_Isle",
+      "prompt": "Use case: stylized-concept. Asset type: one finished landscape environment illustration for the Android game SKYRIM TEXT RPG, 16:9 widescreen, 1536x864. Location: Blackbone Isle Grotto, Skyrim Creation Club (Остров Чёрной Кости). Scene: Inside a huge dark sea cavern, the old wooden sailing ship Dead Man's Dread rests in still seawater, weathered hull and tall masts under a vaulted natural rock ceiling, rough wooden landing and wet stones in foreground, cold northern daylight from a distant opening, tiny warm lanterns along the ship, mist close to the water. Emphasize an enclosed haunted pirate grotto, not an open-ocean ship. Style: highly detailed realistic cinematic northern fantasy environment illustration, lifelike rock and wood textures, painterly polish, dramatic but readable lighting, restrained cold slate and amber palette, deep layered composition consistent with existing Skyrim location artwork. Environment only, no people, no protagonist, no UI, no text, no lettering, no captions, no border, no watermark. Single continuous scene, no collage or panels.",
+      "full_resolution_luma_ssim": 0.9855966567993164,
+      "worst_128px_luma_ssim": 0.9791774749755859,
+      "chroma_mean_absolute_error": 0.9467541274934026,
+      "chroma_95th_percentile_error": 3.0,
+      "trials": [
+        {
+          "quality": 76,
+          "bytes": 191884,
+          "full_resolution_luma_ssim": 0.9447938203811646,
+          "worst_128px_luma_ssim": 0.927036702632904,
+          "chroma_mean_absolute_error": 1.2960287971159665,
+          "chroma_95th_percentile_error": 4.0
+        },
+        {
+          "quality": 80,
+          "bytes": 227724,
+          "full_resolution_luma_ssim": 0.9577351212501526,
+          "worst_128px_luma_ssim": 0.9434903860092163,
+          "chroma_mean_absolute_error": 1.2296415551001938,
+          "chroma_95th_percentile_error": 4.0
+        },
+        {
+          "quality": 84,
+          "bytes": 278636,
+          "full_resolution_luma_ssim": 0.9660248756408691,
+          "worst_128px_luma_ssim": 0.9510436654090881,
+          "chroma_mean_absolute_error": 1.1412519258246088,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 88,
+          "bytes": 339446,
+          "full_resolution_luma_ssim": 0.976590633392334,
+          "worst_128px_luma_ssim": 0.9676295518875122,
+          "chroma_mean_absolute_error": 1.0402274888264038,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 92,
+          "bytes": 445344,
+          "full_resolution_luma_ssim": 0.9855966567993164,
+          "worst_128px_luma_ssim": 0.9791774749755859,
+          "chroma_mean_absolute_error": 0.9467541274934026,
+          "chroma_95th_percentile_error": 3.0
+        }
+      ]
+    },
+    {
+      "id": "skyrim-76",
+      "name": "Пещера Холодный Берег",
+      "english_name": "Bleakcoast Cave",
+      "slug": "bleakcoast_cave",
+      "archive": "bleakcoast_cave.zip",
+      "archive_sha256": "83e1ef54a79bcd2bafbb4ce88189ac6020926f6e5a3c8a7547db05bd7a731223",
+      "archive_bytes": 466940,
+      "generation_mode": "built-in image_gen",
+      "generated_image_file": "exec-578898d3-a2ad-4ea6-950f-f3bc424dd8c3.png",
+      "source_sha256": "27d0fc9e6e84299d227aa263a741932e12b52c3fa048792a0b1587a7bea8423f",
+      "source_bytes": 3109137,
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "dimensions": [
+        1672,
+        941
+      ],
+      "quality": 92,
+      "webp_sha256": "02165a91bf3f304dca2e177fff26faf8ef6b8d0dea52b15b99977af9a2629045",
+      "webp_bytes": 466828,
+      "reference_url": "https://en.uesp.net/wiki/Skyrim:Bleakcoast_Cave",
+      "prompt": "Use case: stylized-concept. Asset type: a single finished environment illustration for the Android game SKYRIM TEXT RPG. Landscape 16:9, 1536x864 requested. Style: highly detailed realistic cinematic northern fantasy environment illustration; lifelike natural materials, painterly polish, strong depth and composition, dramatic but readable illumination, restrained colors; consistent with Skyrim location artwork. No UI, no text, no letters, no captions, no border, no watermark, no collage or panels. No protagonist or posed portrait; focus on the place. Location: Пещера Холодный Берег. Scene specification: Bleakcoast Cave, Skyrim. Interior of a small remote northern coast cave, broad circular chamber carved from gray stone and pale blue ice, icicles and gritty snow at entrance, dim cold sea daylight from the tunnel behind, scattered old animal bones as subtle environmental detail, frost troll den atmosphere. View from a rocky ledge toward a smaller dark side chamber. Environment only, no creatures.",
+      "full_resolution_luma_ssim": 0.9866814017295837,
+      "worst_128px_luma_ssim": 0.9805349111557007,
+      "chroma_mean_absolute_error": 0.829265796846478,
+      "chroma_95th_percentile_error": 2.0,
+      "trials": [
+        {
+          "quality": 76,
+          "bytes": 202776,
+          "full_resolution_luma_ssim": 0.9464254975318909,
+          "worst_128px_luma_ssim": 0.9243552684783936,
+          "chroma_mean_absolute_error": 1.1282780331419797,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 80,
+          "bytes": 242362,
+          "full_resolution_luma_ssim": 0.9588711261749268,
+          "worst_128px_luma_ssim": 0.9432349801063538,
+          "chroma_mean_absolute_error": 1.0722457530164897,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 84,
+          "bytes": 287734,
+          "full_resolution_luma_ssim": 0.9683184027671814,
+          "worst_128px_luma_ssim": 0.9555284380912781,
+          "chroma_mean_absolute_error": 1.0050497282235635,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 88,
+          "bytes": 353618,
+          "full_resolution_luma_ssim": 0.9767993092536926,
+          "worst_128px_luma_ssim": 0.9655126929283142,
+          "chroma_mean_absolute_error": 0.9162571376271806,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 92,
+          "bytes": 466828,
+          "full_resolution_luma_ssim": 0.9866814017295837,
+          "worst_128px_luma_ssim": 0.9805349111557007,
+          "chroma_mean_absolute_error": 0.829265796846478,
+          "chroma_95th_percentile_error": 2.0
+        }
+      ]
+    },
+    {
+      "id": "skyrim-75",
+      "name": "Пещера Отвесный Утес",
+      "english_name": "Blind Cliff Cave",
+      "slug": "blind_cliff_cave",
+      "archive": "blind_cliff_cave.zip",
+      "archive_sha256": "8b1430b7c121e99c6fcab8ad1d3de0f37956175aecaeeb1fdb706a49efef08eb",
+      "archive_bytes": 599164,
+      "generation_mode": "built-in image_gen",
+      "generated_image_file": "exec-7c5907bb-cab9-4cb3-82fa-658f332d9bf8.png",
+      "source_sha256": "dd707ad61b206423339311967f1e589cf729c2b3e40c1f1bbcc350b8f96418e5",
+      "source_bytes": 3444846,
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "dimensions": [
+        1672,
+        941
+      ],
+      "quality": 92,
+      "webp_sha256": "b5ac23db755249255847afc194193311249776ff5ebb0dd422fd8096e3241a05",
+      "webp_bytes": 599052,
+      "reference_url": "https://en.uesp.net/wiki/Skyrim:Blind_Cliff_Cave",
+      "prompt": "Use case: stylized-concept. Asset type: a single finished environment illustration for the Android game SKYRIM TEXT RPG. Landscape 16:9, 1536x864 requested. Style: highly detailed realistic cinematic northern fantasy environment illustration; lifelike natural materials, painterly polish, strong depth and composition, dramatic but readable illumination, restrained colors; consistent with Skyrim location artwork. No UI, no text, no letters, no captions, no border, no watermark, no collage or panels. No protagonist or posed portrait; focus on the place. Location: Пещера Отвесный Утес. Scene specification: Blind Cliff Cave, Skyrim Reach. A huge sinkhole cavern with a partially collapsed roof and actual daylight streaming down, an ancient rough stone tower rises inside the cavern, wooden Forsworn walkways wrap the tower and connect rocky ledges, hanging moss, juniper and sparse flowers grow in the light, a shallow stream crosses the foreground. Vertical rocky scale within a wide frame. Uninhabited scene.",
+      "full_resolution_luma_ssim": 0.9894464015960693,
+      "worst_128px_luma_ssim": 0.9813144207000732,
+      "chroma_mean_absolute_error": 1.2245689457921685,
+      "chroma_95th_percentile_error": 4.0,
+      "trials": [
+        {
+          "quality": 76,
+          "bytes": 290060,
+          "full_resolution_luma_ssim": 0.9555191397666931,
+          "worst_128px_luma_ssim": 0.9384870529174805,
+          "chroma_mean_absolute_error": 1.6789710757668976,
+          "chroma_95th_percentile_error": 5.0
+        },
+        {
+          "quality": 80,
+          "bytes": 343342,
+          "full_resolution_luma_ssim": 0.9654038548469543,
+          "worst_128px_luma_ssim": 0.9490288496017456,
+          "chroma_mean_absolute_error": 1.5729512531207257,
+          "chroma_95th_percentile_error": 5.0
+        },
+        {
+          "quality": 84,
+          "bytes": 405916,
+          "full_resolution_luma_ssim": 0.9751411080360413,
+          "worst_128px_luma_ssim": 0.9633693695068359,
+          "chroma_mean_absolute_error": 1.4654514692198568,
+          "chroma_95th_percentile_error": 4.0
+        },
+        {
+          "quality": 88,
+          "bytes": 495068,
+          "full_resolution_luma_ssim": 0.9839949011802673,
+          "worst_128px_luma_ssim": 0.9746122360229492,
+          "chroma_mean_absolute_error": 1.3415275157752367,
+          "chroma_95th_percentile_error": 4.0
+        },
+        {
+          "quality": 92,
+          "bytes": 599052,
+          "full_resolution_luma_ssim": 0.9894464015960693,
+          "worst_128px_luma_ssim": 0.9813144207000732,
+          "chroma_mean_absolute_error": 1.2245689457921685,
+          "chroma_95th_percentile_error": 4.0
+        }
+      ]
+    },
+    {
+      "id": "skyrim-74",
+      "name": "Грот Утопленника",
+      "english_name": "Bloated Man's Grotto",
+      "slug": "bloated_mans_grotto",
+      "archive": "bloated_mans_grotto.zip",
+      "archive_sha256": "ab7ede9e9497ec68116f831e013d54fcc6735d07b3896a618f9a022d7d1ee766",
+      "archive_bytes": 571758,
+      "generation_mode": "built-in image_gen",
+      "generated_image_file": "exec-abbf679a-9f22-40c6-b122-733beb4bbcce.png",
+      "source_sha256": "c4cb94a9c3850e5f9f6d83d89ce71fdd03d9f203fb9ad1fc30c6f0013785a523",
+      "source_bytes": 3224692,
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "dimensions": [
+        1672,
+        941
+      ],
+      "quality": 92,
+      "webp_sha256": "17d77ff96dcf4e33a0d756c57fe2f05ba6f02149ad905ad2497933e76cbce854",
+      "webp_bytes": 571646,
+      "reference_url": "https://en.uesp.net/wiki/Skyrim:Bloated_Man's_Grotto",
+      "prompt": "Use case: stylized-concept. Asset type: a single finished environment illustration for the Android game SKYRIM TEXT RPG. Landscape 16:9, 1536x864 requested. Style: highly detailed realistic cinematic northern fantasy environment illustration; lifelike natural materials, painterly polish, strong depth and composition, dramatic but readable illumination, restrained colors; consistent with Skyrim location artwork. No UI, no text, no letters, no captions, no border, no watermark, no collage or panels. No protagonist or posed portrait; focus on the place. Location: Грот Утопленника. Scene specification: Bloated Man's Grotto, Skyrim, peaceful normal version before the hunt. Secret lush open-roofed grotto enclosed by high rock walls, natural cave mouth in foreground frames small pine trees, ferns, moss and a shallow mountain pond, weathered little Talos shrine with an old curved Akaviri sword resting near it off to one side, afternoon sunlight and drifting mist. Not underwater, no drowned people, no Bloodmoon, no characters.",
+      "full_resolution_luma_ssim": 0.988214910030365,
+      "worst_128px_luma_ssim": 0.9799277782440186,
+      "chroma_mean_absolute_error": 1.3310832540969852,
+      "chroma_95th_percentile_error": 4.0,
+      "trials": [
+        {
+          "quality": 76,
+          "bytes": 261302,
+          "full_resolution_luma_ssim": 0.9499658942222595,
+          "worst_128px_luma_ssim": 0.9266165494918823,
+          "chroma_mean_absolute_error": 1.813895110566485,
+          "chroma_95th_percentile_error": 6.0
+        },
+        {
+          "quality": 80,
+          "bytes": 309974,
+          "full_resolution_luma_ssim": 0.9613677859306335,
+          "worst_128px_luma_ssim": 0.9436130523681641,
+          "chroma_mean_absolute_error": 1.6978330341843402,
+          "chroma_95th_percentile_error": 5.0
+        },
+        {
+          "quality": 84,
+          "bytes": 365880,
+          "full_resolution_luma_ssim": 0.9709537029266357,
+          "worst_128px_luma_ssim": 0.957748293876648,
+          "chroma_mean_absolute_error": 1.5964240678500425,
+          "chroma_95th_percentile_error": 5.0
+        },
+        {
+          "quality": 88,
+          "bytes": 449322,
+          "full_resolution_luma_ssim": 0.980430543422699,
+          "worst_128px_luma_ssim": 0.9705138802528381,
+          "chroma_mean_absolute_error": 1.4668173428450848,
+          "chroma_95th_percentile_error": 4.0
+        },
+        {
+          "quality": 92,
+          "bytes": 571646,
+          "full_resolution_luma_ssim": 0.988214910030365,
+          "worst_128px_luma_ssim": 0.9799277782440186,
+          "chroma_mean_absolute_error": 1.3310832540969852,
+          "chroma_95th_percentile_error": 4.0
+        }
+      ]
+    },
+    {
+      "id": "skyrim-2498",
+      "name": "Пещера Кровавый Холод",
+      "english_name": "Bloodchill Cavern (CC)",
+      "slug": "bloodchill_cavern",
+      "archive": "bloodchill_cavern.zip",
+      "archive_sha256": "cd41cdfea406764dcba40d1f691595b50ed6a017363cde3a20db058c1816cae7",
+      "archive_bytes": 546154,
+      "generation_mode": "built-in image_gen",
+      "generated_image_file": "exec-10b60311-b546-42c1-bd21-b34d42d7fdb7.png",
+      "source_sha256": "c58c332b080523c67a2882305b8a50fe3bd27dd8b57d6ac863e06dab31c305c5",
+      "source_bytes": 3115359,
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "dimensions": [
+        1672,
+        941
+      ],
+      "quality": 92,
+      "webp_sha256": "110e7f9d05dc1a385a6f1ebfa0f8b329a201b7d53d6be0b5b7bb5eee6d2b2e51",
+      "webp_bytes": 546042,
+      "reference_url": "https://en.uesp.net/wiki/Skyrim:Bloodchill_Cavern",
+      "prompt": "Use case: stylized-concept. Asset type: a single finished environment illustration for the Android game SKYRIM TEXT RPG. Landscape 16:9, 1536x864 requested. Style: highly detailed realistic cinematic northern fantasy environment illustration; lifelike natural materials, painterly polish, strong depth and composition, dramatic but readable illumination, restrained colors; consistent with Skyrim location artwork. No UI, no text, no letters, no captions, no border, no watermark, no collage or panels. No protagonist or posed portrait; focus on the place. Location: Пещера Кровавый Холод. Scene specification: Bloodchill Cavern, Skyrim Creation Club. Wide establishing view within a cold blue ice cavern containing an elegant subterranean vampire manor: dark gothic timber and carved stone facade with pointed windows, a short bridge over dark water leads toward its door, candles and muted crimson fabrics near the entrance, jagged ice and hanging icicles surrounding the home. Cold blue natural ice glow contrasted with warm manor windows. Empty architecture, no vampires or people.",
+      "full_resolution_luma_ssim": 0.9880856871604919,
+      "worst_128px_luma_ssim": 0.9830124378204346,
+      "chroma_mean_absolute_error": 1.4269114603725042,
+      "chroma_95th_percentile_error": 4.0,
+      "trials": [
+        {
+          "quality": 76,
+          "bytes": 241196,
+          "full_resolution_luma_ssim": 0.9503844380378723,
+          "worst_128px_luma_ssim": 0.9331053495407104,
+          "chroma_mean_absolute_error": 1.9980357224575302,
+          "chroma_95th_percentile_error": 6.0
+        },
+        {
+          "quality": 80,
+          "bytes": 286828,
+          "full_resolution_luma_ssim": 0.9622272253036499,
+          "worst_128px_luma_ssim": 0.9470701217651367,
+          "chroma_mean_absolute_error": 1.8669871713386452,
+          "chroma_95th_percentile_error": 6.0
+        },
+        {
+          "quality": 84,
+          "bytes": 342580,
+          "full_resolution_luma_ssim": 0.971488893032074,
+          "worst_128px_luma_ssim": 0.9599817991256714,
+          "chroma_mean_absolute_error": 1.734211098342901,
+          "chroma_95th_percentile_error": 5.0
+        },
+        {
+          "quality": 88,
+          "bytes": 424042,
+          "full_resolution_luma_ssim": 0.9805323481559753,
+          "worst_128px_luma_ssim": 0.9733683466911316,
+          "chroma_mean_absolute_error": 1.5785736440415115,
+          "chroma_95th_percentile_error": 5.0
+        },
+        {
+          "quality": 92,
+          "bytes": 546042,
+          "full_resolution_luma_ssim": 0.9880856871604919,
+          "worst_128px_luma_ssim": 0.9830124378204346,
+          "chroma_mean_absolute_error": 1.4269114603725042,
+          "chroma_95th_percentile_error": 4.0
+        }
+      ]
+    },
+    {
+      "id": "skyrim-10",
+      "name": "Сквозняковый проход",
+      "english_name": "Bonechill Passage",
+      "slug": "bonechill_passage",
+      "archive": "bonechill_passage.zip",
+      "archive_sha256": "3dbc0abab1fd89dfb6344d3bbd875138fc7d42d8886245e3fe26d5259f8eb68f",
+      "archive_bytes": 507982,
+      "generation_mode": "built-in image_gen",
+      "generated_image_file": "exec-3320e246-b9a3-4168-8b61-86010f607dd6.png",
+      "source_sha256": "a10ba9127065c15ffcd60d963c5ec85c84002517c7c25e0cb5789749be8cbf05",
+      "source_bytes": 3206686,
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "dimensions": [
+        1672,
+        941
+      ],
+      "quality": 92,
+      "webp_sha256": "7b236b4542eaedd81771a7be64d95d04884969d898c51cf18874c2942825940e",
+      "webp_bytes": 507870,
+      "reference_url": "https://en.uesp.net/wiki/Skyrim:Bonechill_Passage",
+      "prompt": "Use case: stylized-concept. Asset type: a single finished environment illustration for the Android game SKYRIM TEXT RPG. Landscape 16:9, 1536x864 requested. Style: highly detailed realistic cinematic northern fantasy environment illustration; lifelike natural materials, painterly polish, strong depth and composition, dramatic but readable illumination, restrained colors; consistent with Skyrim location artwork. No UI, no text, no letters, no captions, no border, no watermark, no collage or panels. No protagonist or posed portrait; focus on the place. Location: Сквозняковый проход. Scene specification: Bonechill Passage, Skyrim. View down a narrow winding mountain ice tunnel, thick translucent blue ice with dirty limestone edges and hanging frost, snow-covered rock floor leads to a distant sunlit exit toward Ancient's Ascent, small old mammoth skull half buried on the right and a forgotten travel pack on a low ledge. A bitter icy draft is suggested by fine powder in the light. Readable naturally lit empty passage, no people or creatures.",
+      "full_resolution_luma_ssim": 0.986666738986969,
+      "worst_128px_luma_ssim": 0.9808957576751709,
+      "chroma_mean_absolute_error": 0.9088582847322151,
+      "chroma_95th_percentile_error": 2.0,
+      "trials": [
+        {
+          "quality": 76,
+          "bytes": 216510,
+          "full_resolution_luma_ssim": 0.9445541501045227,
+          "worst_128px_luma_ssim": 0.925796627998352,
+          "chroma_mean_absolute_error": 1.2634010062592478,
+          "chroma_95th_percentile_error": 4.0
+        },
+        {
+          "quality": 80,
+          "bytes": 258628,
+          "full_resolution_luma_ssim": 0.9565482139587402,
+          "worst_128px_luma_ssim": 0.9431650638580322,
+          "chroma_mean_absolute_error": 1.20259960898769,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 84,
+          "bytes": 308236,
+          "full_resolution_luma_ssim": 0.9670006632804871,
+          "worst_128px_luma_ssim": 0.9565551280975342,
+          "chroma_mean_absolute_error": 1.1240523417518775,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 88,
+          "bytes": 393014,
+          "full_resolution_luma_ssim": 0.9784739017486572,
+          "worst_128px_luma_ssim": 0.9707560539245605,
+          "chroma_mean_absolute_error": 1.0168849691613828,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 92,
+          "bytes": 507870,
+          "full_resolution_luma_ssim": 0.986666738986969,
+          "worst_128px_luma_ssim": 0.9808957576751709,
+          "chroma_mean_absolute_error": 0.9088582847322151,
+          "chroma_95th_percentile_error": 2.0
+        }
+      ]
+    },
+    {
+      "id": "skyrim-12",
+      "name": "Камнепадная пещера",
+      "english_name": "Boulderfall Cave",
+      "slug": "boulderfall_cave",
+      "archive": "boulderfall_cave.zip",
+      "archive_sha256": "e7a927cac61bc2b9f816b69c9529c0997d060e6aad6c386f1e482b09dc24fe79",
+      "archive_bytes": 638982,
+      "generation_mode": "built-in image_gen",
+      "generated_image_file": "exec-7bad1c42-4d13-4f52-b912-5cfd6c7e7c8b.png",
+      "source_sha256": "76d3b7583b27ed344de9bf5788ece17eeec55dba3a7b48a83d8867d3e40b326c",
+      "source_bytes": 2921511,
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "dimensions": [
+        1672,
+        941
+      ],
+      "quality": 96,
+      "webp_sha256": "d45601724687b1e73ae9259d9ae169b6543ce47dfc0afefe73f3e43fb2cbb681",
+      "webp_bytes": 638870,
+      "reference_url": "https://en.uesp.net/wiki/Skyrim:Boulderfall_Cave",
+      "prompt": "Use case: stylized-concept. Asset type: a single finished environment illustration for the Android game SKYRIM TEXT RPG. Landscape 16:9, 1536x864 requested. Style: highly detailed realistic cinematic northern fantasy environment illustration; lifelike natural materials, painterly polish, strong depth and composition, dramatic but readable illumination, restrained colors; consistent with Skyrim location artwork. No UI, no text, no letters, no captions, no border, no watermark, no collage or panels. No protagonist or posed portrait; focus on the place. Location: Камнепадная пещера. Scene specification: Boulderfall Cave: small Rift necromancer cave. A descending rock tunnel opens onto a wooden ramp above a compact earthy chamber. Bone chimes hang beside the ramp, an alchemy table with glass bottles and a single dim candle stands below, red mushrooms near worn rocks. A flagpole is visible through the far entrance. Empty, no people or corpses.",
+      "full_resolution_luma_ssim": 0.9909808039665222,
+      "worst_128px_luma_ssim": 0.9862662553787231,
+      "chroma_mean_absolute_error": 0.9006239544615572,
+      "chroma_95th_percentile_error": 3.0,
+      "trials": [
+        {
+          "quality": 76,
+          "bytes": 183418,
+          "full_resolution_luma_ssim": 0.9364110827445984,
+          "worst_128px_luma_ssim": 0.9074286222457886,
+          "chroma_mean_absolute_error": 1.473254872399819,
+          "chroma_95th_percentile_error": 4.0
+        },
+        {
+          "quality": 80,
+          "bytes": 220880,
+          "full_resolution_luma_ssim": 0.948602020740509,
+          "worst_128px_luma_ssim": 0.9278299808502197,
+          "chroma_mean_absolute_error": 1.385842456106453,
+          "chroma_95th_percentile_error": 4.0
+        },
+        {
+          "quality": 84,
+          "bytes": 268560,
+          "full_resolution_luma_ssim": 0.9616974592208862,
+          "worst_128px_luma_ssim": 0.9492923021316528,
+          "chroma_mean_absolute_error": 1.285572141516965,
+          "chroma_95th_percentile_error": 4.0
+        },
+        {
+          "quality": 88,
+          "bytes": 343808,
+          "full_resolution_luma_ssim": 0.9731671810150146,
+          "worst_128px_luma_ssim": 0.9633723497390747,
+          "chroma_mean_absolute_error": 1.1509106036030081,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 92,
+          "bytes": 463810,
+          "full_resolution_luma_ssim": 0.9841544032096863,
+          "worst_128px_luma_ssim": 0.9779165983200073,
+          "chroma_mean_absolute_error": 1.032323345316242,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 96,
+          "bytes": 638870,
+          "full_resolution_luma_ssim": 0.9909808039665222,
+          "worst_128px_luma_ssim": 0.9862662553787231,
+          "chroma_mean_absolute_error": 0.9006239544615572,
+          "chroma_95th_percentile_error": 3.0
+        }
+      ]
+    },
+    {
+      "id": "skyrim-24",
+      "name": "Грот Соленая Вода",
+      "english_name": "Brinewater Grotto",
+      "slug": "brinewater_grotto",
+      "archive": "brinewater_grotto.zip",
+      "archive_sha256": "6a5cfdc831266380e22589126dca818c6150a07f29c37f7b4b4e94b335e8582a",
+      "archive_bytes": 506202,
+      "generation_mode": "built-in image_gen",
+      "generated_image_file": "exec-6ff6dbaa-105b-45cb-925b-a5df34db4886.png",
+      "source_sha256": "90d14903eb96b660558930f9784e82e4aaa59ace5ea334db62a92eeebcf061e3",
+      "source_bytes": 3114753,
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "dimensions": [
+        1672,
+        941
+      ],
+      "quality": 92,
+      "webp_sha256": "ecc95888d0b75d650c3ecabdebdc2ce87771e9dd097ca990b49120f896e09e4c",
+      "webp_bytes": 506090,
+      "reference_url": "https://en.uesp.net/wiki/Skyrim:Brinewater_Grotto",
+      "prompt": "Use case: stylized-concept. Asset type: a single finished environment illustration for the Android game SKYRIM TEXT RPG. Landscape 16:9, 1536x864 requested. Style: highly detailed realistic cinematic northern fantasy environment illustration; lifelike natural materials, painterly polish, strong depth and composition, dramatic but readable illumination, restrained colors; consistent with Skyrim location artwork. No UI, no text, no letters, no captions, no border, no watermark, no collage or panels. No protagonist or posed portrait; focus on the place. Location: Грот Соленая Вода. Scene specification: Brinewater Grotto: sea cave north of Solitude. View from a low rocky mouth across shallow tidal seawater into an irregular gray stone chamber; a rough smugglers' wooden landing, cargo barrels and stacked crates tucked into a side opening, distant cold coastal light and a small warm hanging lantern. Salt-stained stone, calm water, no giant ship, no people.",
+      "full_resolution_luma_ssim": 0.986720860004425,
+      "worst_128px_luma_ssim": 0.9795710444450378,
+      "chroma_mean_absolute_error": 0.993379739562412,
+      "chroma_95th_percentile_error": 3.0,
+      "trials": [
+        {
+          "quality": 76,
+          "bytes": 218436,
+          "full_resolution_luma_ssim": 0.9440773129463196,
+          "worst_128px_luma_ssim": 0.9184855818748474,
+          "chroma_mean_absolute_error": 1.360380893786006,
+          "chroma_95th_percentile_error": 4.0
+        },
+        {
+          "quality": 80,
+          "bytes": 262274,
+          "full_resolution_luma_ssim": 0.956929087638855,
+          "worst_128px_luma_ssim": 0.9384048581123352,
+          "chroma_mean_absolute_error": 1.2866821919061977,
+          "chroma_95th_percentile_error": 4.0
+        },
+        {
+          "quality": 84,
+          "bytes": 312528,
+          "full_resolution_luma_ssim": 0.9671134948730469,
+          "worst_128px_luma_ssim": 0.9544112086296082,
+          "chroma_mean_absolute_error": 1.2014580971073225,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 88,
+          "bytes": 385554,
+          "full_resolution_luma_ssim": 0.9770153164863586,
+          "worst_128px_luma_ssim": 0.966574490070343,
+          "chroma_mean_absolute_error": 1.09253650804143,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 92,
+          "bytes": 506090,
+          "full_resolution_luma_ssim": 0.986720860004425,
+          "worst_128px_luma_ssim": 0.9795710444450378,
+          "chroma_mean_absolute_error": 0.993379739562412,
+          "chroma_95th_percentile_error": 3.0
+        }
+      ]
+    },
+    {
+      "id": "skyrim-72",
+      "name": "Пещера Сломанный Клык",
+      "english_name": "Broken Fang Cave",
+      "slug": "broken_fang_cave",
+      "archive": "broken_fang_cave.zip",
+      "archive_sha256": "9826a544c6e1ef3c22172637ca40269fd215ac48fe84b9089384685a5e333edc",
+      "archive_bytes": 538208,
+      "generation_mode": "built-in image_gen",
+      "generated_image_file": "exec-1eb0a1d5-d1f8-435e-b9b4-92734a98ccdc.png",
+      "source_sha256": "ec9596530b7b64034a45318f6da00bc47e869e646e92b4e0e4e350b687739377",
+      "source_bytes": 3174179,
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "dimensions": [
+        1672,
+        941
+      ],
+      "quality": 92,
+      "webp_sha256": "fffc0adb49305da1e75420782ee4ed199e8ed049c36befc56db6636d94e3500d",
+      "webp_bytes": 538096,
+      "reference_url": "https://en.uesp.net/wiki/Skyrim:Broken_Fang_Cave",
+      "prompt": "Use case: stylized-concept. Asset type: a single finished environment illustration for the Android game SKYRIM TEXT RPG. Landscape 16:9, 1536x864 requested. Style: highly detailed realistic cinematic northern fantasy environment illustration; lifelike natural materials, painterly polish, strong depth and composition, dramatic but readable illumination, restrained colors; consistent with Skyrim location artwork. No UI, no text, no letters, no captions, no border, no watermark, no collage or panels. No protagonist or posed portrait; focus on the place. Location: Пещера Сломанный Клык. Scene specification: Broken Fang Cave: intimate vampire den in a natural cave southeast of Rorikstead. Weathered decorated wooden coffins stand on raised rocky landings reached by short irregular stairs, pale candles around stone pillars, an alchemy workbench in a deeper alcove, red wine bottles and dusty rugs. Dusky charcoal rock and warm candlelight, subtly ominous. Empty, no vampires or graphic remains.",
+      "full_resolution_luma_ssim": 0.9870549440383911,
+      "worst_128px_luma_ssim": 0.9815123677253723,
+      "chroma_mean_absolute_error": 1.2043741642048316,
+      "chroma_95th_percentile_error": 3.0,
+      "trials": [
+        {
+          "quality": 76,
+          "bytes": 222502,
+          "full_resolution_luma_ssim": 0.9388319849967957,
+          "worst_128px_luma_ssim": 0.9171521663665771,
+          "chroma_mean_absolute_error": 1.7051232019281126,
+          "chroma_95th_percentile_error": 5.0
+        },
+        {
+          "quality": 80,
+          "bytes": 270366,
+          "full_resolution_luma_ssim": 0.9551146626472473,
+          "worst_128px_luma_ssim": 0.9399380683898926,
+          "chroma_mean_absolute_error": 1.5895591069258501,
+          "chroma_95th_percentile_error": 4.0
+        },
+        {
+          "quality": 84,
+          "bytes": 325814,
+          "full_resolution_luma_ssim": 0.9663374423980713,
+          "worst_128px_luma_ssim": 0.9533995389938354,
+          "chroma_mean_absolute_error": 1.4952696535803813,
+          "chroma_95th_percentile_error": 4.0
+        },
+        {
+          "quality": 88,
+          "bytes": 419790,
+          "full_resolution_luma_ssim": 0.9785193800926208,
+          "worst_128px_luma_ssim": 0.9689614772796631,
+          "chroma_mean_absolute_error": 1.3468534059765394,
+          "chroma_95th_percentile_error": 4.0
+        },
+        {
+          "quality": 92,
+          "bytes": 538096,
+          "full_resolution_luma_ssim": 0.9870549440383911,
+          "worst_128px_luma_ssim": 0.9815123677253723,
+          "chroma_mean_absolute_error": 1.2043741642048316,
+          "chroma_95th_percentile_error": 3.0
+        }
+      ]
+    },
+    {
+      "id": "skyrim-71",
+      "name": "Лощина Сломанный Шлем",
+      "english_name": "Broken Helm Hollow",
+      "slug": "broken_helm_hollow",
+      "archive": "broken_helm_hollow.zip",
+      "archive_sha256": "f13c873ee0bd06ab85f33e048b8b64a39be1dcccd9ba2a40511e20bb7e0b936d",
+      "archive_bytes": 496502,
+      "generation_mode": "built-in image_gen",
+      "generated_image_file": "exec-483ef7c9-9be1-4690-8966-a11cf778bf58.png",
+      "source_sha256": "5e4f2e940459f3f6d6b336d94173172c4709142409c199204de95ea10a9e4b19",
+      "source_bytes": 2991240,
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "dimensions": [
+        1672,
+        941
+      ],
+      "quality": 92,
+      "webp_sha256": "c3fa0ca30fd8e01af96df0fabbdb8518f977f3228b092860f9b22805d8aea873",
+      "webp_bytes": 496390,
+      "reference_url": "https://en.uesp.net/wiki/Skyrim:Broken_Helm_Hollow",
+      "prompt": "Use case: stylized-concept. Asset type: a single finished environment illustration for the Android game SKYRIM TEXT RPG. Landscape 16:9, 1536x864 requested. Style: highly detailed realistic cinematic northern fantasy environment illustration; lifelike natural materials, painterly polish, strong depth and composition, dramatic but readable illumination, restrained colors; consistent with Skyrim location artwork. No UI, no text, no letters, no captions, no border, no watermark, no collage or panels. No protagonist or posed portrait; focus on the place. Location: Лощина Сломанный Шлем. Scene specification: Broken Helm Hollow: small bandit cave in the Rift. A rugged main chamber with a simple camp of bedrolls, timber tables and cooking fire, an upper rock shelf overlooking the camp with a wooden ladder, moss and small mushrooms, faint daylight from a twisting entrance and warm firelight. Establishing angle from the entrance shelf. Empty camp, no people.",
+      "full_resolution_luma_ssim": 0.9853581786155701,
+      "worst_128px_luma_ssim": 0.9775643944740295,
+      "chroma_mean_absolute_error": 1.2245950048050278,
+      "chroma_95th_percentile_error": 4.0,
+      "trials": [
+        {
+          "quality": 76,
+          "bytes": 210830,
+          "full_resolution_luma_ssim": 0.9437998533248901,
+          "worst_128px_luma_ssim": 0.9124879837036133,
+          "chroma_mean_absolute_error": 1.7525614102883524,
+          "chroma_95th_percentile_error": 5.0
+        },
+        {
+          "quality": 80,
+          "bytes": 255328,
+          "full_resolution_luma_ssim": 0.9568312764167786,
+          "worst_128px_luma_ssim": 0.9381313920021057,
+          "chroma_mean_absolute_error": 1.622376620107897,
+          "chroma_95th_percentile_error": 5.0
+        },
+        {
+          "quality": 84,
+          "bytes": 303372,
+          "full_resolution_luma_ssim": 0.966134786605835,
+          "worst_128px_luma_ssim": 0.9491629600524902,
+          "chroma_mean_absolute_error": 1.520626344263712,
+          "chroma_95th_percentile_error": 4.0
+        },
+        {
+          "quality": 88,
+          "bytes": 376786,
+          "full_resolution_luma_ssim": 0.9760538935661316,
+          "worst_128px_luma_ssim": 0.9622463583946228,
+          "chroma_mean_absolute_error": 1.3844629173891156,
+          "chroma_95th_percentile_error": 4.0
+        },
+        {
+          "quality": 92,
+          "bytes": 496390,
+          "full_resolution_luma_ssim": 0.9853581786155701,
+          "worst_128px_luma_ssim": 0.9775643944740295,
+          "chroma_mean_absolute_error": 1.2245950048050278,
+          "chroma_95th_percentile_error": 4.0
+        }
+      ]
+    },
+    {
+      "id": "skyrim-16",
+      "name": "Сломанное Весло",
+      "english_name": "Broken Oar Grotto",
+      "slug": "broken_oar_grotto",
+      "archive": "broken_oar_grotto.zip",
+      "archive_sha256": "05576a2780e685995301874d7314c72b472fdb2cc4fc7be2c6c475eb576c2698",
+      "archive_bytes": 617036,
+      "generation_mode": "built-in image_gen",
+      "generated_image_file": "exec-68f6b870-0281-4a57-bb38-a8b28ea31e6e.png",
+      "source_sha256": "faf7bbe94603c0d68573c965ebc3305d9471abf24b7d688e3315eb0288b0308f",
+      "source_bytes": 3415909,
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "dimensions": [
+        1672,
+        941
+      ],
+      "quality": 92,
+      "webp_sha256": "e8c4a027d64c8eb67aa2903dc27e3f46c82af126740b1d91b66c37922d78514b",
+      "webp_bytes": 616924,
+      "reference_url": "https://en.uesp.net/wiki/Skyrim:Broken_Oar_Grotto",
+      "prompt": "Use case: stylized-concept. Asset type: a single finished environment illustration for the Android game SKYRIM TEXT RPG. Landscape 16:9, 1536x864 requested. Style: highly detailed realistic cinematic northern fantasy environment illustration; lifelike natural materials, painterly polish, strong depth and composition, dramatic but readable illumination, restrained colors; consistent with Skyrim location artwork. No UI, no text, no letters, no captions, no border, no watermark, no collage or panels. No protagonist or posed portrait; focus on the place. Location: Сломанное Весло. Scene specification: Broken Oar Grotto: huge flooded pirate cave north of Solitude. Multiple improvised wooden walkways, stairs and huts cling to rocky walls around dark seawater, small longboats moored below, collapsed stone blocks the large old sea opening, a broken wooden boat caught under fallen boulders. Cold damp cavern light with lanterns and cookfires, richly detailed timber construction. No full sailing ship, no people.",
+      "full_resolution_luma_ssim": 0.9902696013450623,
+      "worst_128px_luma_ssim": 0.9827713966369629,
+      "chroma_mean_absolute_error": 1.329627445098109,
+      "chroma_95th_percentile_error": 4.0,
+      "trials": [
+        {
+          "quality": 76,
+          "bytes": 293784,
+          "full_resolution_luma_ssim": 0.9557525515556335,
+          "worst_128px_luma_ssim": 0.9315069913864136,
+          "chroma_mean_absolute_error": 1.835812329345245,
+          "chroma_95th_percentile_error": 5.0
+        },
+        {
+          "quality": 80,
+          "bytes": 341328,
+          "full_resolution_luma_ssim": 0.9665123820304871,
+          "worst_128px_luma_ssim": 0.9467054605484009,
+          "chroma_mean_absolute_error": 1.7331169375956557,
+          "chroma_95th_percentile_error": 5.0
+        },
+        {
+          "quality": 84,
+          "bytes": 410952,
+          "full_resolution_luma_ssim": 0.9762775897979736,
+          "worst_128px_luma_ssim": 0.963430643081665,
+          "chroma_mean_absolute_error": 1.5973285062719595,
+          "chroma_95th_percentile_error": 5.0
+        },
+        {
+          "quality": 88,
+          "bytes": 489840,
+          "full_resolution_luma_ssim": 0.9834365844726562,
+          "worst_128px_luma_ssim": 0.9721197485923767,
+          "chroma_mean_absolute_error": 1.4794842476445196,
+          "chroma_95th_percentile_error": 4.0
+        },
+        {
+          "quality": 92,
+          "bytes": 616924,
+          "full_resolution_luma_ssim": 0.9902696013450623,
+          "worst_128px_luma_ssim": 0.9827713966369629,
+          "chroma_mean_absolute_error": 1.329627445098109,
+          "chroma_95th_percentile_error": 4.0
+        }
+      ]
+    },
+    {
+      "id": "skyrim-20",
+      "name": "Пещера Бронзовая Вода",
+      "english_name": "Bronze Water Cave",
+      "slug": "bronze_water_cave",
+      "archive": "bronze_water_cave.zip",
+      "archive_sha256": "21cc45de703489c0526b545b6e90bc13811c662a727bba753f81a12f3345eb1c",
+      "archive_bytes": 469972,
+      "generation_mode": "built-in image_gen",
+      "generated_image_file": "exec-dc812d78-1e7f-465f-9788-4cabf4836573.png",
+      "source_sha256": "0f5e9fd688f6cc332c824973364d0d3df384643abaf42ff85bdd649b777d8c56",
+      "source_bytes": 2948302,
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "dimensions": [
+        1672,
+        941
+      ],
+      "quality": 92,
+      "webp_sha256": "356af4315fde57df278590fb64452812a2185f0a282057612f36553f30503704",
+      "webp_bytes": 469860,
+      "reference_url": "https://en.uesp.net/wiki/Skyrim:Bronze_Water_Cave",
+      "prompt": "Use case: stylized-concept. Asset type: a single finished environment illustration for the Android game SKYRIM TEXT RPG. Landscape 16:9, 1536x864 requested. Style: highly detailed realistic cinematic northern fantasy environment illustration; lifelike natural materials, painterly polish, strong depth and composition, dramatic but readable illumination, restrained colors; consistent with Skyrim location artwork. No UI, no text, no letters, no captions, no border, no watermark, no collage or panels. No protagonist or posed portrait; focus on the place. Location: Пещера Бронзовая Вода. Scene specification: Bronze Water Cave: small cave by Lake Yorgrim west of Windhelm. Massive aged Dwemer bronze pipes hug the cave walls and discharge warm steaming water into a shallow rocky pool, a small engraved bronze chest lies on a ledge, rough natural tunnel curves into darkness. Exterior icy light softly enters, warm steam contrasts against cool gray limestone. Environment only.",
+      "full_resolution_luma_ssim": 0.9851235747337341,
+      "worst_128px_luma_ssim": 0.978044867515564,
+      "chroma_mean_absolute_error": 1.0557090848074684,
+      "chroma_95th_percentile_error": 3.0,
+      "trials": [
+        {
+          "quality": 76,
+          "bytes": 193866,
+          "full_resolution_luma_ssim": 0.9413837194442749,
+          "worst_128px_luma_ssim": 0.9164109826087952,
+          "chroma_mean_absolute_error": 1.525315059821324,
+          "chroma_95th_percentile_error": 5.0
+        },
+        {
+          "quality": 80,
+          "bytes": 230566,
+          "full_resolution_luma_ssim": 0.9539007544517517,
+          "worst_128px_luma_ssim": 0.9345394968986511,
+          "chroma_mean_absolute_error": 1.4257874270983226,
+          "chroma_95th_percentile_error": 4.0
+        },
+        {
+          "quality": 84,
+          "bytes": 286008,
+          "full_resolution_luma_ssim": 0.9652680158615112,
+          "worst_128px_luma_ssim": 0.9497122764587402,
+          "chroma_mean_absolute_error": 1.3041264764655334,
+          "chroma_95th_percentile_error": 4.0
+        },
+        {
+          "quality": 88,
+          "bytes": 353480,
+          "full_resolution_luma_ssim": 0.9724897146224976,
+          "worst_128px_luma_ssim": 0.9578933715820312,
+          "chroma_mean_absolute_error": 1.1892233905699423,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 92,
+          "bytes": 469860,
+          "full_resolution_luma_ssim": 0.9851235747337341,
+          "worst_128px_luma_ssim": 0.978044867515564,
+          "chroma_mean_absolute_error": 1.0557090848074684,
+          "chroma_95th_percentile_error": 3.0
+        }
+      ]
+    },
+    {
+      "id": "skyrim-70",
+      "name": "Разводная пещера",
+      "english_name": "Brood Cavern",
+      "slug": "brood_cavern",
+      "archive": "brood_cavern.zip",
+      "archive_sha256": "6fdb522b157ce3e0aed0310ae69f7ff9861d2d3f79f944112d70583b47a0e93f",
+      "archive_bytes": 603012,
+      "generation_mode": "built-in image_gen",
+      "generated_image_file": "exec-96921aca-2eff-42b1-a0d1-362f63e529c8.png",
+      "source_sha256": "7335950ba12e2460e96bc213ec6ba5dcc5ae543ebbdad83614de03755f9c82c6",
+      "source_bytes": 3386695,
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "dimensions": [
+        1672,
+        941
+      ],
+      "quality": 92,
+      "webp_sha256": "a6ae87431c31b90ef5ad5fd5d76c1105b13cc5a4bbd74e6ced631ac91ec2d667",
+      "webp_bytes": 602900,
+      "reference_url": "https://en.uesp.net/wiki/Skyrim:Brood_Cavern",
+      "prompt": "Use case: stylized-concept. Asset type: a single finished environment illustration for the Android game SKYRIM TEXT RPG. Landscape 16:9, 1536x864 requested. Style: highly detailed realistic cinematic northern fantasy environment illustration; lifelike natural materials, painterly polish, strong depth and composition, dramatic but readable illumination, restrained colors; consistent with Skyrim location artwork. No UI, no text, no letters, no captions, no border, no watermark, no collage or panels. No protagonist or posed portrait; focus on the place. Location: Разводная пещера. Scene specification: Brood Cavern: lush partly flooded animal cave southwest of Morthal. Two small waterfalls descend opposing mossy cave walls into a winding stream with islands of exposed stone, hanging moss and red mushrooms, daylight filters in from the cave mouth behind the viewer. A modest wooden chest in a shadow behind one waterfall. Serene but wild natural den, no buildings, no people or creatures.",
+      "full_resolution_luma_ssim": 0.9898918867111206,
+      "worst_128px_luma_ssim": 0.9841114282608032,
+      "chroma_mean_absolute_error": 1.3996279917017933,
+      "chroma_95th_percentile_error": 4.0,
+      "trials": [
+        {
+          "quality": 76,
+          "bytes": 287180,
+          "full_resolution_luma_ssim": 0.9566131830215454,
+          "worst_128px_luma_ssim": 0.9378789663314819,
+          "chroma_mean_absolute_error": 1.918598635270429,
+          "chroma_95th_percentile_error": 6.0
+        },
+        {
+          "quality": 80,
+          "bytes": 337212,
+          "full_resolution_luma_ssim": 0.9666330814361572,
+          "worst_128px_luma_ssim": 0.9530035257339478,
+          "chroma_mean_absolute_error": 1.7912495105990267,
+          "chroma_95th_percentile_error": 5.0
+        },
+        {
+          "quality": 84,
+          "bytes": 397914,
+          "full_resolution_luma_ssim": 0.9753287434577942,
+          "worst_128px_luma_ssim": 0.9652228355407715,
+          "chroma_mean_absolute_error": 1.682087034560607,
+          "chroma_95th_percentile_error": 5.0
+        },
+        {
+          "quality": 88,
+          "bytes": 482318,
+          "full_resolution_luma_ssim": 0.9832176566123962,
+          "worst_128px_luma_ssim": 0.9751845598220825,
+          "chroma_mean_absolute_error": 1.5424498141547474,
+          "chroma_95th_percentile_error": 5.0
+        },
+        {
+          "quality": 92,
+          "bytes": 602900,
+          "full_resolution_luma_ssim": 0.9898918867111206,
+          "worst_128px_luma_ssim": 0.9841114282608032,
+          "chroma_mean_absolute_error": 1.3996279917017933,
+          "chroma_95th_percentile_error": 4.0
+        }
+      ]
+    },
+    {
+      "id": "skyrim-69",
+      "name": "Оплот Прыжок Брюсы",
+      "english_name": "Bruca's Leap Redoubt",
+      "slug": "brucas_leap_redoubt",
+      "archive": "brucas_leap_redoubt.zip",
+      "archive_sha256": "1673a724ab4e50f7e74fbc1ca710b60c6d4de58cf0e793df4e2f7af40f7cb545",
+      "archive_bytes": 499180,
+      "generation_mode": "built-in image_gen",
+      "generated_image_file": "exec-9e036897-895f-4b6f-9f7a-8bcce399b31c.png",
+      "source_sha256": "f9f882cb76909717be00023eae02b6e14b1acc7dd5c0b970d2380171b9d3d44e",
+      "source_bytes": 2985349,
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "dimensions": [
+        1672,
+        941
+      ],
+      "quality": 92,
+      "webp_sha256": "d97591c2abcdacb995c978f609ad1cd9fa335955c7cb6ccf4e3afd1bec8e3794",
+      "webp_bytes": 499068,
+      "reference_url": "https://en.uesp.net/wiki/Skyrim:Bruca's_Leap_Redoubt",
+      "prompt": "Use case: stylized-concept. Asset type: a single finished environment illustration for the Android game SKYRIM TEXT RPG. Landscape 16:9, 1536x864 requested. Style: highly detailed realistic cinematic northern fantasy environment illustration; lifelike natural materials, painterly polish, strong depth and composition, dramatic but readable illumination, restrained colors; consistent with Skyrim location artwork. No UI, no text, no letters, no captions, no border, no watermark, no collage or panels. No protagonist or posed portrait; focus on the place. Location: Оплот Прыжок Брюсы. Scene specification: Bruca's Leap Redoubt: compact Forsworn cave in the Reach. View through a natural window-like gap in the entrance passage down into a small subterranean chamber, crude timber scaffolding and animal-hide ritual camp below, woven twigs, antler ornaments, bedrolls and a simple brazier against warm brown craggy rock. Faint daylight from upper fissure, no Forsworn characters.",
+      "full_resolution_luma_ssim": 0.9852379560470581,
+      "worst_128px_luma_ssim": 0.9785220623016357,
+      "chroma_mean_absolute_error": 1.1773223665142956,
+      "chroma_95th_percentile_error": 3.0,
+      "trials": [
+        {
+          "quality": 76,
+          "bytes": 203410,
+          "full_resolution_luma_ssim": 0.9404231309890747,
+          "worst_128px_luma_ssim": 0.9240330457687378,
+          "chroma_mean_absolute_error": 1.7762337989210297,
+          "chroma_95th_percentile_error": 5.0
+        },
+        {
+          "quality": 80,
+          "bytes": 247438,
+          "full_resolution_luma_ssim": 0.9542946219444275,
+          "worst_128px_luma_ssim": 0.9416254162788391,
+          "chroma_mean_absolute_error": 1.627268087497267,
+          "chroma_95th_percentile_error": 5.0
+        },
+        {
+          "quality": 84,
+          "bytes": 296638,
+          "full_resolution_luma_ssim": 0.9649611115455627,
+          "worst_128px_luma_ssim": 0.9529867172241211,
+          "chroma_mean_absolute_error": 1.5165226853240725,
+          "chroma_95th_percentile_error": 4.0
+        },
+        {
+          "quality": 88,
+          "bytes": 368646,
+          "full_resolution_luma_ssim": 0.9748926162719727,
+          "worst_128px_luma_ssim": 0.9643887877464294,
+          "chroma_mean_absolute_error": 1.371923765311259,
+          "chroma_95th_percentile_error": 4.0
+        },
+        {
+          "quality": 92,
+          "bytes": 499068,
+          "full_resolution_luma_ssim": 0.9852379560470581,
+          "worst_128px_luma_ssim": 0.9785220623016357,
+          "chroma_mean_absolute_error": 1.1773223665142956,
+          "chroma_95th_percentile_error": 3.0
+        }
+      ]
+    },
+    {
+      "id": "skyrim-68",
+      "name": "Провал Сквозняков",
+      "english_name": "Chillwind Depths",
+      "slug": "chillwind_depths",
+      "archive": "chillwind_depths.zip",
+      "archive_sha256": "b2381600ebbcc3dcf2c8e48937f13f96a76075f7bb47292d55994df57b128361",
+      "archive_bytes": 506252,
+      "generation_mode": "built-in image_gen",
+      "generated_image_file": "exec-c0250793-46dc-4175-b060-a21811df664d.png",
+      "source_sha256": "9faab522df73221806c23a9d73df0f5e8e7c3f8b0f59514d5c3efdbf5b5e24eb",
+      "source_bytes": 3084839,
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "dimensions": [
+        1672,
+        941
+      ],
+      "quality": 92,
+      "webp_sha256": "c7eb6d3c18321a603887550ea11ee293f68060f576c58971c828c7f6e16e28c9",
+      "webp_bytes": 506140,
+      "reference_url": "https://en.uesp.net/wiki/Skyrim:Chillwind_Depths",
+      "prompt": "Use case: stylized-concept. Asset type: a single finished environment illustration for the Android game SKYRIM TEXT RPG. Landscape 16:9, 1536x864 requested. Style: highly detailed realistic cinematic northern fantasy environment illustration; lifelike natural materials, painterly polish, strong depth and composition, dramatic but readable illumination, restrained colors; consistent with Skyrim location artwork. No UI, no text, no letters, no captions, no border, no watermark, no collage or panels. No protagonist or posed portrait; focus on the place. Location: Провал Сквозняков. Scene specification: Chillwind Depths: damp Falmer cave near Dragon Bridge. A low winding cavern with water-filled channels, masses of varied small mushrooms carpeting rocks, thin spider webs, primitive chitin shelters and a few amber glowing chaurus egg sacs deep in the background. Broad moody establishing composition, restrained teal reflection and natural gray rock, readable texture. No oversized Blackreach mushrooms, no people.",
+      "full_resolution_luma_ssim": 0.9864529371261597,
+      "worst_128px_luma_ssim": 0.9805188179016113,
+      "chroma_mean_absolute_error": 1.0296665971759658,
+      "chroma_95th_percentile_error": 3.0,
+      "trials": [
+        {
+          "quality": 76,
+          "bytes": 224060,
+          "full_resolution_luma_ssim": 0.9477511644363403,
+          "worst_128px_luma_ssim": 0.926643967628479,
+          "chroma_mean_absolute_error": 1.4612260956225942,
+          "chroma_95th_percentile_error": 4.0
+        },
+        {
+          "quality": 80,
+          "bytes": 267080,
+          "full_resolution_luma_ssim": 0.9582576155662537,
+          "worst_128px_luma_ssim": 0.9428408145904541,
+          "chroma_mean_absolute_error": 1.3690801549812122,
+          "chroma_95th_percentile_error": 4.0
+        },
+        {
+          "quality": 84,
+          "bytes": 320740,
+          "full_resolution_luma_ssim": 0.9698695540428162,
+          "worst_128px_luma_ssim": 0.9581484794616699,
+          "chroma_mean_absolute_error": 1.2714071612709679,
+          "chroma_95th_percentile_error": 4.0
+        },
+        {
+          "quality": 88,
+          "bytes": 403408,
+          "full_resolution_luma_ssim": 0.9790871143341064,
+          "worst_128px_luma_ssim": 0.9695615768432617,
+          "chroma_mean_absolute_error": 1.1477339463769074,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 92,
+          "bytes": 506140,
+          "full_resolution_luma_ssim": 0.9864529371261597,
+          "worst_128px_luma_ssim": 0.9805188179016113,
+          "chroma_mean_absolute_error": 1.0296665971759658,
+          "chroma_95th_percentile_error": 3.0
+        }
+      ]
+    },
+    {
+      "id": "skyrim-67",
+      "name": "Пещера Крегслейн",
+      "english_name": "Cragslane Cavern",
+      "slug": "cragslane_cavern",
+      "archive": "cragslane_cavern.zip",
+      "archive_sha256": "35d8cba07a92c0804d0f24adfe83d29f6c0fcbe6f69b388dd50a65fc8cbcaf12",
+      "archive_bytes": 563878,
+      "generation_mode": "built-in image_gen",
+      "generated_image_file": "exec-117aad75-02f9-41ba-8645-a90520495244.png",
+      "source_sha256": "ae9bdbf8189c7159a8d2e1caeb9048da74d33621c2ae7fd6ea69515c6ba4f481",
+      "source_bytes": 3116197,
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "dimensions": [
+        1672,
+        941
+      ],
+      "quality": 92,
+      "webp_sha256": "cdb582cf9393fe58888de5e9d163f823f9e5cd91bf82c334afcb0bff3cbf0d37",
+      "webp_bytes": 563766,
+      "reference_url": "https://en.uesp.net/wiki/Skyrim:Cragslane_Cavern",
+      "prompt": "Use case: stylized-concept. Asset type: a single finished environment illustration for the Android game SKYRIM TEXT RPG. Landscape 16:9, 1536x864 requested. Style: highly detailed realistic cinematic northern fantasy environment illustration; lifelike natural materials, painterly polish, strong depth and composition, dramatic but readable illumination, restrained colors; consistent with Skyrim location artwork. No UI, no text, no letters, no captions, no border, no watermark, no collage or panels. No protagonist or posed portrait; focus on the place. Location: Пещера Крегслейн. Scene specification: Cragslane Cavern: underground bandit gambling den in the Rift. Natural rock chamber with a sunken central fighting pit, crude wooden railings and spectator chairs around it, empty iron animal cages near the side, an improvised wooden bar with unlabelled bottles and casks in the back. Warm lantern lighting and smoky cave ceiling, viewpoint from raised entrance walkway. No animals fighting, no people.",
+      "full_resolution_luma_ssim": 0.9875243902206421,
+      "worst_128px_luma_ssim": 0.9820936918258667,
+      "chroma_mean_absolute_error": 1.439810671737793,
+      "chroma_95th_percentile_error": 4.0,
+      "trials": [
+        {
+          "quality": 76,
+          "bytes": 233870,
+          "full_resolution_luma_ssim": 0.9449014067649841,
+          "worst_128px_luma_ssim": 0.9266288876533508,
+          "chroma_mean_absolute_error": 2.067281193273978,
+          "chroma_95th_percentile_error": 6.0
+        },
+        {
+          "quality": 80,
+          "bytes": 281502,
+          "full_resolution_luma_ssim": 0.9571495056152344,
+          "worst_128px_luma_ssim": 0.9439758062362671,
+          "chroma_mean_absolute_error": 1.9251410364622792,
+          "chroma_95th_percentile_error": 5.0
+        },
+        {
+          "quality": 84,
+          "bytes": 342210,
+          "full_resolution_luma_ssim": 0.9685348868370056,
+          "worst_128px_luma_ssim": 0.958527684211731,
+          "chroma_mean_absolute_error": 1.787754107154661,
+          "chroma_95th_percentile_error": 5.0
+        },
+        {
+          "quality": 88,
+          "bytes": 440862,
+          "full_resolution_luma_ssim": 0.9797502160072327,
+          "worst_128px_luma_ssim": 0.9731021523475647,
+          "chroma_mean_absolute_error": 1.5994701122190076,
+          "chroma_95th_percentile_error": 5.0
+        },
+        {
+          "quality": 92,
+          "bytes": 563766,
+          "full_resolution_luma_ssim": 0.9875243902206421,
+          "worst_128px_luma_ssim": 0.9820936918258667,
+          "chroma_mean_absolute_error": 1.439810671737793,
+          "chroma_95th_percentile_error": 4.0
+        }
+      ]
+    },
+    {
+      "id": "skyrim-66",
+      "name": "Откос Крегвеллоу",
+      "english_name": "Cragwallow Slope",
+      "slug": "cragwallow_slope",
+      "archive": "cragwallow_slope.zip",
+      "archive_sha256": "358c6a6fef32a462b37ec9945f6d5559b74c53cd1a9702a76d37592c1a3172b0",
+      "archive_bytes": 360046,
+      "generation_mode": "built-in image_gen",
+      "generated_image_file": "exec-3fc963c5-71a0-452f-b508-88d94d63c6b4.png",
+      "source_sha256": "a8ee19e56b9453d7dbb071faf11adc2cbd9196648e673856859068d85a1eb703",
+      "source_bytes": 2582057,
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "dimensions": [
+        1672,
+        941
+      ],
+      "quality": 92,
+      "webp_sha256": "99da9a5ce132838de3c2bfa688141297922206398156820d28c0c3a7caad7f8b",
+      "webp_bytes": 359934,
+      "reference_url": "https://en.uesp.net/wiki/Skyrim:Cragwallow_Slope",
+      "prompt": "Use case: stylized-concept. Asset type: a single finished environment illustration for the Android game SKYRIM TEXT RPG. Landscape 16:9, 1536x864 requested. Style: highly detailed realistic cinematic northern fantasy environment illustration; lifelike natural materials, painterly polish, strong depth and composition, dramatic but readable illumination, restrained colors; consistent with Skyrim location artwork. No UI, no text, no letters, no captions, no border, no watermark, no collage or panels. No protagonist or posed portrait; focus on the place. Location: Откос Крегвеллоу. Scene specification: Cragwallow Slope: conjurers' earthy cave southeast of Windhelm. A winding low earthen tunnel opens around a rock pillar into a ritual workspace: plain timber platform, candlelit table with a dark spellbook and a few violet soul gems, patches of roots and mushrooms, curving corridor continues in background. Subtle contained magical light, no giant portal, no people.",
+      "full_resolution_luma_ssim": 0.9852392673492432,
+      "worst_128px_luma_ssim": 0.980798602104187,
+      "chroma_mean_absolute_error": 0.925894523285317,
+      "chroma_95th_percentile_error": 3.0,
+      "trials": [
+        {
+          "quality": 76,
+          "bytes": 146268,
+          "full_resolution_luma_ssim": 0.9488582611083984,
+          "worst_128px_luma_ssim": 0.9250120520591736,
+          "chroma_mean_absolute_error": 1.3760544366422771,
+          "chroma_95th_percentile_error": 4.0
+        },
+        {
+          "quality": 80,
+          "bytes": 173680,
+          "full_resolution_luma_ssim": 0.9600231051445007,
+          "worst_128px_luma_ssim": 0.9413180351257324,
+          "chroma_mean_absolute_error": 1.2873142818644525,
+          "chroma_95th_percentile_error": 4.0
+        },
+        {
+          "quality": 84,
+          "bytes": 210548,
+          "full_resolution_luma_ssim": 0.9686060547828674,
+          "worst_128px_luma_ssim": 0.9544038772583008,
+          "chroma_mean_absolute_error": 1.180471693556178,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 88,
+          "bytes": 267080,
+          "full_resolution_luma_ssim": 0.977169394493103,
+          "worst_128px_luma_ssim": 0.967765212059021,
+          "chroma_mean_absolute_error": 1.044692160431995,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 92,
+          "bytes": 359934,
+          "full_resolution_luma_ssim": 0.9852392673492432,
+          "worst_128px_luma_ssim": 0.980798602104187,
+          "chroma_mean_absolute_error": 0.925894523285317,
+          "chroma_95th_percentile_error": 3.0
+        }
+      ]
+    },
+    {
+      "id": "skyrim-65",
+      "name": "Пещера Кронвангр",
+      "english_name": "Cronvangr Cave",
+      "slug": "cronvangr_cave",
+      "archive": "cronvangr_cave.zip",
+      "archive_sha256": "bc551aae9fc6595358122bbe89cb9d8593283a0d21c86429a5d253ff69a0ba65",
+      "archive_bytes": 582468,
+      "generation_mode": "built-in image_gen",
+      "generated_image_file": "exec-a1b0f1d9-21a5-4caa-87d4-8a5b17611883.png",
+      "source_sha256": "9852421dfcd3de1494434b650be708af6f083fa6a630401f70c1a42376645523",
+      "source_bytes": 3416271,
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "dimensions": [
+        1672,
+        941
+      ],
+      "quality": 92,
+      "webp_sha256": "22fd3253281a1342347ccc09c60f9b3f8279bb12d7c1b674a796abd45e7a40fd",
+      "webp_bytes": 582356,
+      "reference_url": "https://en.uesp.net/wiki/Skyrim:Cronvangr_Cave",
+      "prompt": "Use case: stylized-concept. Asset type: a single finished environment illustration for the Android game SKYRIM TEXT RPG. Landscape 16:9, 1536x864 requested. Style: highly detailed realistic cinematic northern fantasy environment illustration; lifelike natural materials, painterly polish, strong depth and composition, dramatic but readable illumination, restrained colors; consistent with Skyrim location artwork. No UI, no text, no letters, no captions, no border, no watermark, no collage or panels. No protagonist or posed portrait; focus on the place. Location: Пещера Кронвангр. Scene specification: Cronvangr Cave: eerie Eastmarch spider cave with hidden vampire lodging. Interior cavern with thick white webs strung between limestone columns and small egg sacs on rocks; beyond a partly open natural stone door, an old wooden house stands on a raised wooden platform lit by candles. Shallow damp floor, faint cold cavern light. Balanced scene focused on webbed cave and tucked-away structure, no spiders or vampires.",
+      "full_resolution_luma_ssim": 0.9896951913833618,
+      "worst_128px_luma_ssim": 0.9827532768249512,
+      "chroma_mean_absolute_error": 1.0369472311345458,
+      "chroma_95th_percentile_error": 3.0,
+      "trials": [
+        {
+          "quality": 76,
+          "bytes": 273120,
+          "full_resolution_luma_ssim": 0.9557442665100098,
+          "worst_128px_luma_ssim": 0.9372496008872986,
+          "chroma_mean_absolute_error": 1.415188400307115,
+          "chroma_95th_percentile_error": 4.0
+        },
+        {
+          "quality": 80,
+          "bytes": 315260,
+          "full_resolution_luma_ssim": 0.9646896719932556,
+          "worst_128px_luma_ssim": 0.9487935304641724,
+          "chroma_mean_absolute_error": 1.353541674081833,
+          "chroma_95th_percentile_error": 4.0
+        },
+        {
+          "quality": 84,
+          "bytes": 380782,
+          "full_resolution_luma_ssim": 0.9753827452659607,
+          "worst_128px_luma_ssim": 0.9635965824127197,
+          "chroma_mean_absolute_error": 1.2593116479973967,
+          "chroma_95th_percentile_error": 4.0
+        },
+        {
+          "quality": 88,
+          "bytes": 452860,
+          "full_resolution_luma_ssim": 0.982711911201477,
+          "worst_128px_luma_ssim": 0.9726296067237854,
+          "chroma_mean_absolute_error": 1.173672833542653,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 92,
+          "bytes": 582356,
+          "full_resolution_luma_ssim": 0.9896951913833618,
+          "worst_128px_luma_ssim": 0.9827532768249512,
+          "chroma_mean_absolute_error": 1.0369472311345458,
+          "chroma_95th_percentile_error": 3.0
+        }
+      ]
+    },
+    {
+      "id": "skyrim-64",
+      "name": "Кристаллическая пещера",
+      "english_name": "Crystaldrift Cave",
+      "slug": "crystaldrift_cave",
+      "archive": "crystaldrift_cave.zip",
+      "archive_sha256": "beec3c777f3536e84376680b383360938b6e77984e903cb28b82dc1cd7ded677",
+      "archive_bytes": 480152,
+      "generation_mode": "built-in image_gen",
+      "generated_image_file": "exec-0427cad3-402a-4ea0-aa8e-0dff5ef438d9.png",
+      "source_sha256": "59bcaf5d730a68e9d9a9810d6074649906c16e289c6c8d9d1ca721912375a4ae",
+      "source_bytes": 3048290,
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "dimensions": [
+        1672,
+        941
+      ],
+      "quality": 92,
+      "webp_sha256": "13719064cb264f7f952de9d04bf22651fd8cdab507432cd617dbb87887e8f6b9",
+      "webp_bytes": 480040,
+      "reference_url": "https://en.uesp.net/wiki/Skyrim:Crystaldrift_Cave",
+      "prompt": "Use case: stylized-concept. Asset type: a single finished environment illustration for the Android game SKYRIM TEXT RPG. Landscape 16:9, 1536x864 requested. Style: highly detailed realistic cinematic northern fantasy environment illustration; lifelike natural materials, painterly polish, strong depth and composition, dramatic but readable illumination, restrained colors; consistent with Skyrim location artwork. No UI, no text, no letters, no captions, no border, no watermark, no collage or panels. No protagonist or posed portrait; focus on the place. Location: Кристаллическая пещера. Scene specification: Crystaldrift Cave: natural animal cave southwest of Riften with a small shrine of Kynareth. View into a rounded rock chamber lined with patches of pale snow and blue ice, a modest small birdlike stone shrine on a flat rock ledge, ferns near the entrance and a forgotten travel pack. Cold soft light enters through a natural opening, gentle tranquil memorial atmosphere. No fantasy crystal palace, no visible corpse or people.",
+      "full_resolution_luma_ssim": 0.9860208630561829,
+      "worst_128px_luma_ssim": 0.9770947694778442,
+      "chroma_mean_absolute_error": 0.9771986815410665,
+      "chroma_95th_percentile_error": 3.0,
+      "trials": [
+        {
+          "quality": 76,
+          "bytes": 202778,
+          "full_resolution_luma_ssim": 0.9460644721984863,
+          "worst_128px_luma_ssim": 0.9213420152664185,
+          "chroma_mean_absolute_error": 1.406367424454286,
+          "chroma_95th_percentile_error": 4.0
+        },
+        {
+          "quality": 80,
+          "bytes": 243638,
+          "full_resolution_luma_ssim": 0.9578248262405396,
+          "worst_128px_luma_ssim": 0.9409982562065125,
+          "chroma_mean_absolute_error": 1.316151439728681,
+          "chroma_95th_percentile_error": 4.0
+        },
+        {
+          "quality": 84,
+          "bytes": 292390,
+          "full_resolution_luma_ssim": 0.9673435688018799,
+          "worst_128px_luma_ssim": 0.9521386623382568,
+          "chroma_mean_absolute_error": 1.2119373159979459,
+          "chroma_95th_percentile_error": 4.0
+        },
+        {
+          "quality": 88,
+          "bytes": 370086,
+          "full_resolution_luma_ssim": 0.9775540232658386,
+          "worst_128px_luma_ssim": 0.9638136625289917,
+          "chroma_mean_absolute_error": 1.0923242224244798,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 92,
+          "bytes": 480040,
+          "full_resolution_luma_ssim": 0.9860208630561829,
+          "worst_128px_luma_ssim": 0.9770947694778442,
+          "chroma_mean_absolute_error": 0.9771986815410665,
+          "chroma_95th_percentile_error": 3.0
+        }
+      ]
+    },
+    {
+      "id": "skyrim-2284",
+      "name": "Пещера Вечерняя Пустота",
+      "english_name": "Darkfall Cave (DG)",
+      "slug": "darkfall_cave",
+      "archive": "darkfall_cave.zip",
+      "archive_sha256": "b832eccad7669974747d747a4c8e04cb4ef5e96a7b06a94cff818da2ba54ff6e",
+      "archive_bytes": 590134,
+      "generation_mode": "built-in image_gen",
+      "generated_image_file": "exec-bb451de5-846e-4df0-995d-19e9a8b6f160.png",
+      "source_sha256": "f4cc199c1bf004dfef27d8cf1223bfce344f9a2227ab9eef30a039a9031c2411",
+      "source_bytes": 2874455,
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "dimensions": [
+        1672,
+        941
+      ],
+      "quality": 96,
+      "webp_sha256": "551747b455b95e1fe62478da5f7b9359e8f4b0c99ec2e32b4d0132867a14a366",
+      "webp_bytes": 590022,
+      "reference_url": "https://en.uesp.net/wiki/Skyrim:Darkfall_Cave",
+      "prompt": "Use case: stylized-concept. Asset type: a single finished environment illustration for the Android game SKYRIM TEXT RPG. Landscape 16:9, 1536x864 requested. Style: highly detailed realistic cinematic northern fantasy environment illustration; lifelike natural materials, painterly polish, strong depth and composition, dramatic but readable illumination, restrained colors; consistent with Skyrim location artwork. No UI, no text, no letters, no captions, no border, no watermark, no collage or panels. No protagonist or posed portrait; focus on the place. The entire picture, including all four corners, must contain only scenery, absolutely no corner titles, signatures or small lettering. Scene specification: Darkfall Cave, Dawnguard. A dark river cavern with a narrow weathered wooden footbridge over a deep black underground stream, steep limestone walls and sparse webs, a distant small ancient snow-elven wayshrine glows softly beyond a bend. Low blue light reveals wet rock texture and a few tiny glowing mushrooms. Profound darkness with readable foreground, no people.",
+      "full_resolution_luma_ssim": 0.9905899167060852,
+      "worst_128px_luma_ssim": 0.9854335784912109,
+      "chroma_mean_absolute_error": 0.8008951588709965,
+      "chroma_95th_percentile_error": 2.0,
+      "trials": [
+        {
+          "quality": 76,
+          "bytes": 178020,
+          "full_resolution_luma_ssim": 0.9420051574707031,
+          "worst_128px_luma_ssim": 0.9190909266471863,
+          "chroma_mean_absolute_error": 1.2796055809507345,
+          "chroma_95th_percentile_error": 4.0
+        },
+        {
+          "quality": 80,
+          "bytes": 211186,
+          "full_resolution_luma_ssim": 0.9526028037071228,
+          "worst_128px_luma_ssim": 0.9373872876167297,
+          "chroma_mean_absolute_error": 1.2171367246490297,
+          "chroma_95th_percentile_error": 4.0
+        },
+        {
+          "quality": 84,
+          "bytes": 261184,
+          "full_resolution_luma_ssim": 0.9652336835861206,
+          "worst_128px_luma_ssim": 0.9537477493286133,
+          "chroma_mean_absolute_error": 1.1256997798331205,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 88,
+          "bytes": 322082,
+          "full_resolution_luma_ssim": 0.9742593169212341,
+          "worst_128px_luma_ssim": 0.9648529291152954,
+          "chroma_mean_absolute_error": 1.0265277572977947,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 92,
+          "bytes": 428726,
+          "full_resolution_luma_ssim": 0.9844940900802612,
+          "worst_128px_luma_ssim": 0.9783585071563721,
+          "chroma_mean_absolute_error": 0.9256263061285713,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 96,
+          "bytes": 590022,
+          "full_resolution_luma_ssim": 0.9905899167060852,
+          "worst_128px_luma_ssim": 0.9854335784912109,
+          "chroma_mean_absolute_error": 0.8008951588709965,
+          "chroma_95th_percentile_error": 2.0
+        }
+      ]
+    },
+    {
+      "id": "skyrim-18",
+      "name": "Глубокая Тень",
+      "english_name": "Darkshade",
+      "slug": "darkshade",
+      "archive": "darkshade.zip",
+      "archive_sha256": "23d803c9def3c37a990734dc5c456df866aed9947d8899981521e9d353679f7a",
+      "archive_bytes": 620986,
+      "generation_mode": "built-in image_gen",
+      "generated_image_file": "exec-8f2b9ef5-3121-489f-8917-8528c1813796.png",
+      "source_sha256": "b88f26d20b917d1fce4b10fd30790c160464751bcd4b36fee1589a6c3eb8aa1d",
+      "source_bytes": 3545803,
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "dimensions": [
+        1672,
+        941
+      ],
+      "quality": 92,
+      "webp_sha256": "fce202c816fb18adcee47c57cf57037059fddb3d97a14291a63ee684a1c8999d",
+      "webp_bytes": 620874,
+      "reference_url": "https://en.uesp.net/wiki/Skyrim:Darkshade",
+      "prompt": "Use case: stylized-concept. Asset type: a single finished environment illustration for the Android game SKYRIM TEXT RPG. Landscape 16:9, 1536x864 requested. Style: highly detailed realistic cinematic northern fantasy environment illustration; lifelike natural materials, painterly polish, strong depth and composition, dramatic but readable illumination, restrained colors; consistent with Skyrim location artwork. No UI, no text, no letters, no captions, no border, no watermark, no collage or panels. No protagonist or posed portrait; focus on the place. The entire picture, including all four corners, must contain only scenery, absolutely no corner titles, signatures or small lettering. Scene specification: Darkshade, Skyrim: abandoned miners' campsite now a troll den by the White River. A compact cavern with broken wooden scaffolding, toppled table and old pickaxe, gold-bearing rock vein on the rear wall, ferns and mushrooms reclaiming the floor, a gentle river reflection illuminates the entrance. Wide low angle, earth tones and pale river daylight. No people, no visible corpses or trolls.",
+      "full_resolution_luma_ssim": 0.9903180599212646,
+      "worst_128px_luma_ssim": 0.9810503721237183,
+      "chroma_mean_absolute_error": 1.263906296874444,
+      "chroma_95th_percentile_error": 4.0,
+      "trials": [
+        {
+          "quality": 76,
+          "bytes": 301034,
+          "full_resolution_luma_ssim": 0.9558131098747253,
+          "worst_128px_luma_ssim": 0.9384639263153076,
+          "chroma_mean_absolute_error": 1.7246356822885152,
+          "chroma_95th_percentile_error": 5.0
+        },
+        {
+          "quality": 80,
+          "bytes": 352656,
+          "full_resolution_luma_ssim": 0.9663721323013306,
+          "worst_128px_luma_ssim": 0.9506601095199585,
+          "chroma_mean_absolute_error": 1.6317508732947237,
+          "chroma_95th_percentile_error": 5.0
+        },
+        {
+          "quality": 84,
+          "bytes": 417392,
+          "full_resolution_luma_ssim": 0.9760243892669678,
+          "worst_128px_luma_ssim": 0.9635477066040039,
+          "chroma_mean_absolute_error": 1.527537067356828,
+          "chroma_95th_percentile_error": 4.0
+        },
+        {
+          "quality": 88,
+          "bytes": 511836,
+          "full_resolution_luma_ssim": 0.9847827553749084,
+          "worst_128px_luma_ssim": 0.9730510711669922,
+          "chroma_mean_absolute_error": 1.3948788955046296,
+          "chroma_95th_percentile_error": 4.0
+        },
+        {
+          "quality": 92,
+          "bytes": 620874,
+          "full_resolution_luma_ssim": 0.9903180599212646,
+          "worst_128px_luma_ssim": 0.9810503721237183,
+          "chroma_mean_absolute_error": 1.263906296874444,
+          "chroma_95th_percentile_error": 4.0
+        }
+      ]
+    },
+    {
+      "id": "skyrim-63",
+      "name": "Черный проход",
+      "english_name": "Darkwater Pass",
+      "slug": "darkwater_pass",
+      "archive": "darkwater_pass.zip",
+      "archive_sha256": "e0a8f01eb0a3a329eeedc9c16becb88678c10d1cf2ee27ee1d53fb1bad5e7f27",
+      "archive_bytes": 469442,
+      "generation_mode": "built-in image_gen",
+      "generated_image_file": "exec-31915e53-c1e2-4c70-8092-180b3bffd923.png",
+      "source_sha256": "e9879937447cf9128abd159131eff32ba8db7a493760f4b1280ab68315e6c742",
+      "source_bytes": 2979965,
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "dimensions": [
+        1672,
+        941
+      ],
+      "quality": 92,
+      "webp_sha256": "d90a00efc84c1aa0c023a1dc796eb25c9e1e60eafd0e0f6c17ffdf580698babe",
+      "webp_bytes": 469330,
+      "reference_url": "https://en.uesp.net/wiki/Skyrim:Darkwater_Pass",
+      "prompt": "Use case: stylized-concept. Asset type: a single finished environment illustration for the Android game SKYRIM TEXT RPG. Landscape 16:9, 1536x864 requested. Style: highly detailed realistic cinematic northern fantasy environment illustration; lifelike natural materials, painterly polish, strong depth and composition, dramatic but readable illumination, restrained colors; consistent with Skyrim location artwork. No UI, no text, no letters, no captions, no border, no watermark, no collage or panels. No protagonist or posed portrait; focus on the place. The entire picture, including all four corners, must contain only scenery, absolutely no corner titles, signatures or small lettering. Scene specification: Darkwater Pass. Misty partly flooded cave tunnel with simple Falmer chitin hive on a rising bank, rough ancient Nordic stone bridge spans a narrow black stream and leads to worn stone steps. A small caged alcove empty in the background. Damp mist, muted green-gray rock and restrained amber brazier glow. Natural cave with bits of ancient masonry, no open mountain road.",
+      "full_resolution_luma_ssim": 0.9855730533599854,
+      "worst_128px_luma_ssim": 0.9802135825157166,
+      "chroma_mean_absolute_error": 1.0446597455623408,
+      "chroma_95th_percentile_error": 3.0,
+      "trials": [
+        {
+          "quality": 76,
+          "bytes": 208672,
+          "full_resolution_luma_ssim": 0.9454373717308044,
+          "worst_128px_luma_ssim": 0.9289326667785645,
+          "chroma_mean_absolute_error": 1.3770882167499707,
+          "chroma_95th_percentile_error": 4.0
+        },
+        {
+          "quality": 80,
+          "bytes": 249742,
+          "full_resolution_luma_ssim": 0.9583202600479126,
+          "worst_128px_luma_ssim": 0.9456521272659302,
+          "chroma_mean_absolute_error": 1.3054313338655303,
+          "chroma_95th_percentile_error": 4.0
+        },
+        {
+          "quality": 84,
+          "bytes": 295502,
+          "full_resolution_luma_ssim": 0.9677714705467224,
+          "worst_128px_luma_ssim": 0.9576805830001831,
+          "chroma_mean_absolute_error": 1.2287657180338538,
+          "chroma_95th_percentile_error": 4.0
+        },
+        {
+          "quality": 88,
+          "bytes": 365448,
+          "full_resolution_luma_ssim": 0.9766920208930969,
+          "worst_128px_luma_ssim": 0.9691392779350281,
+          "chroma_mean_absolute_error": 1.1231186663887038,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 92,
+          "bytes": 469330,
+          "full_resolution_luma_ssim": 0.9855730533599854,
+          "worst_128px_luma_ssim": 0.9802135825157166,
+          "chroma_mean_absolute_error": 1.0446597455623408,
+          "chroma_95th_percentile_error": 3.0
+        }
+      ]
+    },
+    {
+      "id": "skyrim-2299",
+      "name": "Каньон Дневной Зари",
+      "english_name": "Dayspring Canyon (DG)",
+      "slug": "dayspring_canyon",
+      "archive": "dayspring_canyon.zip",
+      "archive_sha256": "320dde5caac203bf4531b8fe1fd9225fa5fe782019398ab45163f792265896ba",
+      "archive_bytes": 514214,
+      "generation_mode": "built-in image_gen",
+      "generated_image_file": "exec-c3a35db6-6dda-427e-87a8-5d2bff228a53.png",
+      "source_sha256": "61c31d1db120c79e36afb895e31258e85e46f560e53e5ef60e70c9b1fc6c9e52",
+      "source_bytes": 3515139,
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "dimensions": [
+        1672,
+        941
+      ],
+      "quality": 88,
+      "webp_sha256": "9df29d0836d546c2ae2f61244b7b2492925d4b058bfb3d604174faca3847d012",
+      "webp_bytes": 514102,
+      "reference_url": "https://en.uesp.net/wiki/Skyrim:Dayspring_Canyon",
+      "prompt": "Use case: stylized-concept. Asset type: a single finished environment illustration for the Android game SKYRIM TEXT RPG. Landscape 16:9, 1536x864 requested. Style: highly detailed realistic cinematic northern fantasy environment illustration; lifelike natural materials, painterly polish, strong depth and composition, dramatic but readable illumination, restrained colors; consistent with Skyrim location artwork. No UI, no text, no letters, no captions, no border, no watermark, no collage or panels. No protagonist or posed portrait; focus on the place. The entire picture, including all four corners, must contain only scenery, absolutely no corner titles, signatures or small lettering. Scene specification: Dayspring Canyon, Dawnguard. Looking out from a narrow shadowed rock fissure into a secluded fertile mountain canyon, stream and clear pond fed by thin waterfalls, conifers and ferns, sparse snow on tall peaks, the great fortress Dawnguard stands in the far distance on a rocky rise. Bright cool morning, cinematic rocky foreground framing a green valley, no people.",
+      "full_resolution_luma_ssim": 0.9851366281509399,
+      "worst_128px_luma_ssim": 0.9762635827064514,
+      "chroma_mean_absolute_error": 1.5045228276952647,
+      "chroma_95th_percentile_error": 5.0,
+      "trials": [
+        {
+          "quality": 76,
+          "bytes": 308980,
+          "full_resolution_luma_ssim": 0.9588706493377686,
+          "worst_128px_luma_ssim": 0.9408035278320312,
+          "chroma_mean_absolute_error": 1.8952983820530942,
+          "chroma_95th_percentile_error": 6.0
+        },
+        {
+          "quality": 80,
+          "bytes": 357020,
+          "full_resolution_luma_ssim": 0.9677411913871765,
+          "worst_128px_luma_ssim": 0.9518706202507019,
+          "chroma_mean_absolute_error": 1.7806399966441075,
+          "chroma_95th_percentile_error": 5.0
+        },
+        {
+          "quality": 84,
+          "bytes": 421512,
+          "full_resolution_luma_ssim": 0.9769191741943359,
+          "worst_128px_luma_ssim": 0.9650374054908752,
+          "chroma_mean_absolute_error": 1.6627073916072181,
+          "chroma_95th_percentile_error": 5.0
+        },
+        {
+          "quality": 88,
+          "bytes": 514102,
+          "full_resolution_luma_ssim": 0.9851366281509399,
+          "worst_128px_luma_ssim": 0.9762635827064514,
+          "chroma_mean_absolute_error": 1.5045228276952647,
+          "chroma_95th_percentile_error": 5.0
+        }
+      ]
+    },
+    {
+      "id": "skyrim-2285",
+      "name": "Крипта Ночной Пустоты",
+      "english_name": "Dimhollow Crypt (DG)",
+      "slug": "dimhollow_crypt",
+      "archive": "dimhollow_crypt.zip",
+      "archive_sha256": "a1cdcdc3501e4fab99721edbcd9bb92fcc17fdef204bb02dd1c5d46ab81c2efc",
+      "archive_bytes": 438330,
+      "generation_mode": "built-in image_gen",
+      "generated_image_file": "exec-82a2c8fa-0af8-443c-9150-ce3e4ec7e855.png",
+      "source_sha256": "bd9f92dbb69bc0c2b60b276d738cee58a0e6ccae7ecaac90b0761c86299eff5b",
+      "source_bytes": 2937694,
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "dimensions": [
+        1672,
+        941
+      ],
+      "quality": 92,
+      "webp_sha256": "4d7169a28156edce54473288156585e236f884fd12a9c9dd5b1f9bcfb314383d",
+      "webp_bytes": 438218,
+      "reference_url": "https://en.uesp.net/wiki/Skyrim:Dimhollow_Crypt",
+      "prompt": "Use case: stylized-concept. Asset type: a single finished environment illustration for the Android game SKYRIM TEXT RPG. Landscape 16:9, 1536x864 requested. Style: highly detailed realistic cinematic northern fantasy environment illustration; lifelike natural materials, painterly polish, strong depth and composition, dramatic but readable illumination, restrained colors; consistent with Skyrim location artwork. No UI, no text, no letters, no captions, no border, no watermark, no collage or panels. No protagonist or posed portrait; focus on the place. The entire picture, including all four corners, must contain only scenery, absolutely no corner titles, signatures or small lettering. Scene specification: Dimhollow Crypt, Dawnguard: enormous natural cavern containing ancient Nordic masonry. A circular carved stone island platform with radial stone channels and a closed upright stone sarcophagus at its center stands above dark water, massive ancient arch and burial alcoves behind, faint violet light in the channels and small warm braziers. Solemn imposing space. The sarcophagus is closed; no Serana or other figures.",
+      "full_resolution_luma_ssim": 0.9851890206336975,
+      "worst_128px_luma_ssim": 0.9786701798439026,
+      "chroma_mean_absolute_error": 0.9288598482729866,
+      "chroma_95th_percentile_error": 3.0,
+      "trials": [
+        {
+          "quality": 76,
+          "bytes": 183126,
+          "full_resolution_luma_ssim": 0.9416030049324036,
+          "worst_128px_luma_ssim": 0.9140117168426514,
+          "chroma_mean_absolute_error": 1.223656244756418,
+          "chroma_95th_percentile_error": 4.0
+        },
+        {
+          "quality": 80,
+          "bytes": 219912,
+          "full_resolution_luma_ssim": 0.9535510540008545,
+          "worst_128px_luma_ssim": 0.9332448244094849,
+          "chroma_mean_absolute_error": 1.1679312703069624,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 84,
+          "bytes": 268708,
+          "full_resolution_luma_ssim": 0.9658072590827942,
+          "worst_128px_luma_ssim": 0.9518876075744629,
+          "chroma_mean_absolute_error": 1.0952936787190661,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 88,
+          "bytes": 330238,
+          "full_resolution_luma_ssim": 0.9753440022468567,
+          "worst_128px_luma_ssim": 0.9661192297935486,
+          "chroma_mean_absolute_error": 1.0153284198323071,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 92,
+          "bytes": 438218,
+          "full_resolution_luma_ssim": 0.9851890206336975,
+          "worst_128px_luma_ssim": 0.9786701798439026,
+          "chroma_mean_absolute_error": 0.9288598482729866,
+          "chroma_95th_percentile_error": 3.0
+        }
+      ]
+    },
+    {
+      "id": "skyrim-61",
+      "name": "Закатная расщелина",
+      "english_name": "Duskglow Crevice",
+      "slug": "duskglow_crevice",
+      "archive": "duskglow_crevice.zip",
+      "archive_sha256": "ad97b617213186f6bd3cfdba7ad4fa954f8d3f2362aeeaa77ccaa097f5e14dd2",
+      "archive_bytes": 531814,
+      "generation_mode": "built-in image_gen",
+      "generated_image_file": "exec-ce603314-8af0-4cc1-ac22-4d7c900ca4cd.png",
+      "source_sha256": "8f04228a8105ba7e92022805c4525e45acc553122c241ebec9e841cdbcb74aec",
+      "source_bytes": 3160554,
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "dimensions": [
+        1672,
+        941
+      ],
+      "quality": 92,
+      "webp_sha256": "4f3de0016f4056665b29fd2725ae939a58a0acdf96a87ddbc22661b4f1cdb8d0",
+      "webp_bytes": 531702,
+      "reference_url": "https://en.uesp.net/wiki/Skyrim:Duskglow_Crevice",
+      "prompt": "Use case: stylized-concept. Asset type: a single finished environment illustration for the Android game SKYRIM TEXT RPG. Landscape 16:9, 1536x864 requested. Style: highly detailed realistic cinematic northern fantasy environment illustration; lifelike natural materials, painterly polish, strong depth and composition, dramatic but readable illumination, restrained colors; consistent with Skyrim location artwork. No UI, no text, no letters, no captions, no border, no watermark, no collage or panels. No protagonist or posed portrait; focus on the place. The entire picture, including all four corners, must contain only scenery, absolutely no corner titles, signatures or small lettering. Scene specification: Duskglow Crevice. A high fissured natural cavern with a waterfall falling into a pool, rough timber planks across stepped rocks, discarded bandit camp supplies on one side and simple pale Falmer chitin structures on the other, hanging moss and mushrooms. A small chest on a ledge near the falling water. Soft dusk-colored light filtered from a crack above, no people.",
+      "full_resolution_luma_ssim": 0.9866234064102173,
+      "worst_128px_luma_ssim": 0.9802436828613281,
+      "chroma_mean_absolute_error": 1.154572212702561,
+      "chroma_95th_percentile_error": 3.0,
+      "trials": [
+        {
+          "quality": 76,
+          "bytes": 227884,
+          "full_resolution_luma_ssim": 0.944279134273529,
+          "worst_128px_luma_ssim": 0.9256789684295654,
+          "chroma_mean_absolute_error": 1.6261942654917654,
+          "chroma_95th_percentile_error": 5.0
+        },
+        {
+          "quality": 80,
+          "bytes": 274824,
+          "full_resolution_luma_ssim": 0.9573570489883423,
+          "worst_128px_luma_ssim": 0.9442497491836548,
+          "chroma_mean_absolute_error": 1.5256210943259996,
+          "chroma_95th_percentile_error": 5.0
+        },
+        {
+          "quality": 84,
+          "bytes": 327864,
+          "full_resolution_luma_ssim": 0.9673737287521362,
+          "worst_128px_luma_ssim": 0.9572899341583252,
+          "chroma_mean_absolute_error": 1.4269435574493183,
+          "chroma_95th_percentile_error": 4.0
+        },
+        {
+          "quality": 88,
+          "bytes": 417100,
+          "full_resolution_luma_ssim": 0.9786255359649658,
+          "worst_128px_luma_ssim": 0.9706448912620544,
+          "chroma_mean_absolute_error": 1.2859080485485765,
+          "chroma_95th_percentile_error": 4.0
+        },
+        {
+          "quality": 92,
+          "bytes": 531702,
+          "full_resolution_luma_ssim": 0.9866234064102173,
+          "worst_128px_luma_ssim": 0.9802436828613281,
+          "chroma_mean_absolute_error": 1.154572212702561,
+          "chroma_95th_percentile_error": 3.0
+        }
+      ]
+    },
+    {
+      "id": "skyrim-34",
+      "name": "Святилище Великого Древа",
+      "english_name": "Eldergleam Sanctuary",
+      "slug": "eldergleam_sanctuary",
+      "archive": "eldergleam_sanctuary.zip",
+      "archive_sha256": "7a271ac48fecfa259f94d6feec51a0c234acab615414d19850d4037abb1ec532",
+      "archive_bytes": 565842,
+      "generation_mode": "built-in image_gen",
+      "generated_image_file": "exec-b9f1ec5f-0d86-4c04-9a1d-303c1954c943.png",
+      "source_sha256": "b41c2c5dee36bf729b3fe9e6cd8d7acf443e217c4a0cdad4736f9ef94408a461",
+      "source_bytes": 3586753,
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "dimensions": [
+        1672,
+        941
+      ],
+      "quality": 88,
+      "webp_sha256": "2d6936cea90f283094153f4226b8be4b6112c32f05fb455d73b35f61c61abf7b",
+      "webp_bytes": 565730,
+      "reference_url": "https://en.uesp.net/wiki/Skyrim:Eldergleam_Sanctuary",
+      "prompt": "Use case: stylized-concept. Asset type: a single finished environment illustration for the Android game SKYRIM TEXT RPG. Landscape 16:9, 1536x864 requested. Style: highly detailed realistic cinematic northern fantasy environment illustration; lifelike natural materials, painterly polish, strong depth and composition, dramatic but readable illumination, restrained colors; consistent with Skyrim location artwork. No UI, no text, no letters, no captions, no border, no watermark, no collage or panels. No protagonist or posed portrait; focus on the place. The entire picture, including all four corners, must contain only scenery, absolutely no corner titles, signatures or small lettering. Scene specification: Eldergleam Sanctuary. A magnificent ancient broad-canopied tree with enormous twisting roots stands on a central raised green island inside a gigantic naturally lit cavern. Several waterfalls, clear streams, lush ferns, wildflowers and soft golden sunlight through a collapsed roof. Wide view from the lower path across the pool toward the huge tree, sacred peaceful Kynareth atmosphere. No architecture or characters.",
+      "full_resolution_luma_ssim": 0.9863690137863159,
+      "worst_128px_luma_ssim": 0.9785531759262085,
+      "chroma_mean_absolute_error": 2.0529172747103,
+      "chroma_95th_percentile_error": 7.0,
+      "trials": [
+        {
+          "quality": 76,
+          "bytes": 349438,
+          "full_resolution_luma_ssim": 0.963046133518219,
+          "worst_128px_luma_ssim": 0.946970522403717,
+          "chroma_mean_absolute_error": 2.532205761965536,
+          "chroma_95th_percentile_error": 8.0
+        },
+        {
+          "quality": 80,
+          "bytes": 409108,
+          "full_resolution_luma_ssim": 0.972335696220398,
+          "worst_128px_luma_ssim": 0.9596325755119324,
+          "chroma_mean_absolute_error": 2.376448817556402,
+          "chroma_95th_percentile_error": 8.0
+        },
+        {
+          "quality": 84,
+          "bytes": 481430,
+          "full_resolution_luma_ssim": 0.9802591800689697,
+          "worst_128px_luma_ssim": 0.9704093337059021,
+          "chroma_mean_absolute_error": 2.1986459482684104,
+          "chroma_95th_percentile_error": 7.0
+        },
+        {
+          "quality": 88,
+          "bytes": 565730,
+          "full_resolution_luma_ssim": 0.9863690137863159,
+          "worst_128px_luma_ssim": 0.9785531759262085,
+          "chroma_mean_absolute_error": 2.0529172747103,
+          "chroma_95th_percentile_error": 7.0
+        }
+      ]
+    },
+    {
+      "id": "skyrim-60",
+      "name": "Пещера Жёлтый Камень",
+      "english_name": "Fallowstone Cave",
+      "slug": "fallowstone_cave",
+      "archive": "fallowstone_cave.zip",
+      "archive_sha256": "28b292573de0248d89c12a2b8d6bd5fce6da156864e3e130b5410cb4f03b0052",
+      "archive_bytes": 551804,
+      "generation_mode": "built-in image_gen",
+      "generated_image_file": "exec-877cbf2a-6b9b-4aed-9fa8-3c99fbe4d01b.png",
+      "source_sha256": "9db63f58a7ef1990254af50c30708f155d476e34e50b638adcb710573d56e503",
+      "source_bytes": 3226852,
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "dimensions": [
+        1672,
+        941
+      ],
+      "quality": 92,
+      "webp_sha256": "f522ce3ec0020e92613a2a39fbed05af2a5e31044fb7f038e81da4bf54bef41f",
+      "webp_bytes": 551692,
+      "reference_url": "https://en.uesp.net/wiki/Skyrim:Fallowstone_Cave",
+      "prompt": "Use case: stylized-concept. Asset type: a single finished environment illustration for the Android game SKYRIM TEXT RPG. Landscape 16:9, 1536x864 requested. Style: highly detailed realistic cinematic northern fantasy environment illustration; lifelike natural materials, painterly polish, strong depth and composition, dramatic but readable illumination, restrained colors; consistent with Skyrim location artwork. No UI, no text, no letters, no captions, no border, no watermark, no collage or panels. No protagonist or posed portrait; focus on the place. The entire picture, including all four corners, must contain only scenery, absolutely no corner titles, signatures or small lettering. Scene specification: Fallowstone Cave. Vast raw limestone cavern northeast of Riften, steep natural passage descends toward large boulders and a small underground waterfall, rock faces near the entrance carry crude giant-painted ochre patterns, a few gigantic old mammoth bones on a distant ledge suggest scale. Brown-gray rock, sparse moss and cool daylight from a high cleft. Broad natural chamber, no constructed city, no giants or people.",
+      "full_resolution_luma_ssim": 0.9880551695823669,
+      "worst_128px_luma_ssim": 0.9818775653839111,
+      "chroma_mean_absolute_error": 1.0214662707391606,
+      "chroma_95th_percentile_error": 3.0,
+      "trials": [
+        {
+          "quality": 76,
+          "bytes": 233754,
+          "full_resolution_luma_ssim": 0.9474663734436035,
+          "worst_128px_luma_ssim": 0.9270926713943481,
+          "chroma_mean_absolute_error": 1.4741189511310884,
+          "chroma_95th_percentile_error": 4.0
+        },
+        {
+          "quality": 80,
+          "bytes": 276866,
+          "full_resolution_luma_ssim": 0.9596320986747742,
+          "worst_128px_luma_ssim": 0.9431414604187012,
+          "chroma_mean_absolute_error": 1.3996553218860115,
+          "chroma_95th_percentile_error": 4.0
+        },
+        {
+          "quality": 84,
+          "bytes": 335436,
+          "full_resolution_luma_ssim": 0.9703480005264282,
+          "worst_128px_luma_ssim": 0.9584437608718872,
+          "chroma_mean_absolute_error": 1.3039126018843845,
+          "chroma_95th_percentile_error": 4.0
+        },
+        {
+          "quality": 88,
+          "bytes": 418286,
+          "full_resolution_luma_ssim": 0.9800739288330078,
+          "worst_128px_luma_ssim": 0.9715666770935059,
+          "chroma_mean_absolute_error": 1.1803086658293884,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 92,
+          "bytes": 551692,
+          "full_resolution_luma_ssim": 0.9880551695823669,
+          "worst_128px_luma_ssim": 0.9818775653839111,
+          "chroma_mean_absolute_error": 1.0214662707391606,
+          "chroma_95th_percentile_error": 3.0
+        }
+      ]
+    },
+    {
+      "id": "skyrim-2286",
+      "name": "Убежище Предков",
+      "english_name": "Forebears' Holdout (DG)",
+      "slug": "forebears_holdout",
+      "archive": "forebears_holdout.zip",
+      "archive_sha256": "3d86fbc2fb6b2a14664c2bb375b454dfcfddffcbf654ae07b5ac62fa468de86b",
+      "archive_bytes": 477036,
+      "generation_mode": "built-in image_gen",
+      "generated_image_file": "exec-12c66c10-0b28-4ddd-a098-288fe70b5848.png",
+      "source_sha256": "afff121b18a9eea24f0d048dae817c1ddda177f6baa423d355e4b0032e810e5e",
+      "source_bytes": 2964281,
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "dimensions": [
+        1672,
+        941
+      ],
+      "quality": 92,
+      "webp_sha256": "5c7b215ea63edad7216e2dc8fbb8d3c9acbdd9b2b172257a166e4611a977fd19",
+      "webp_bytes": 476924,
+      "reference_url": "https://en.uesp.net/wiki/Skyrim:Forebears'_Holdout",
+      "prompt": "Use case: stylized-concept. Asset type: a single finished environment illustration for the Android game SKYRIM TEXT RPG. Landscape 16:9, 1536x864 requested. Style: highly detailed realistic cinematic northern fantasy environment illustration; lifelike natural materials, painterly polish, strong depth and composition, dramatic but readable illumination, restrained colors; consistent with Skyrim location artwork. No UI, no text, no letters, no captions, no border, no watermark, no collage or panels. No protagonist or posed portrait; focus on the place. The entire picture, including all four corners, must contain only scenery, absolutely no corner titles, signatures or small lettering. Scene specification: Forebears' Holdout, Dawnguard. A cavernous ancient Nordic ruin hidden in a natural cave; wide timber scaffolds and rough stairs descend to a large chamber where an empty circular magical barrier of muted blue energy stands on an ancient stone platform, plain braziers and weathered tomb arches around it. View from upper entrance looking down. Warm fire and subtle cool magic, no Moth Priest or combat.",
+      "full_resolution_luma_ssim": 0.9857110381126404,
+      "worst_128px_luma_ssim": 0.9795054197311401,
+      "chroma_mean_absolute_error": 1.1440574010138862,
+      "chroma_95th_percentile_error": 3.0,
+      "trials": [
+        {
+          "quality": 76,
+          "bytes": 200950,
+          "full_resolution_luma_ssim": 0.9439160823822021,
+          "worst_128px_luma_ssim": 0.924635648727417,
+          "chroma_mean_absolute_error": 1.6146764996008522,
+          "chroma_95th_percentile_error": 5.0
+        },
+        {
+          "quality": 80,
+          "bytes": 241192,
+          "full_resolution_luma_ssim": 0.9563234448432922,
+          "worst_128px_luma_ssim": 0.9398666620254517,
+          "chroma_mean_absolute_error": 1.5058664558217105,
+          "chroma_95th_percentile_error": 5.0
+        },
+        {
+          "quality": 84,
+          "bytes": 291724,
+          "full_resolution_luma_ssim": 0.9666335582733154,
+          "worst_128px_luma_ssim": 0.9530045986175537,
+          "chroma_mean_absolute_error": 1.3973719803324367,
+          "chroma_95th_percentile_error": 4.0
+        },
+        {
+          "quality": 88,
+          "bytes": 362320,
+          "full_resolution_luma_ssim": 0.976557731628418,
+          "worst_128px_luma_ssim": 0.9665371179580688,
+          "chroma_mean_absolute_error": 1.275187624892586,
+          "chroma_95th_percentile_error": 4.0
+        },
+        {
+          "quality": 92,
+          "bytes": 476924,
+          "full_resolution_luma_ssim": 0.9857110381126404,
+          "worst_128px_luma_ssim": 0.9795054197311401,
+          "chroma_mean_absolute_error": 1.1440574010138862,
+          "chroma_95th_percentile_error": 3.0
+        }
+      ]
+    },
+    {
+      "id": "skyrim-59",
+      "name": "Забытая пещера",
+      "english_name": "Forsaken Cave",
+      "slug": "forsaken_cave",
+      "archive": "forsaken_cave.zip",
+      "archive_sha256": "86872d6acf6e88ab589fc9ad6e7fd7d055837fd6ff2c5e797105f45f7ff4d708",
+      "archive_bytes": 577676,
+      "generation_mode": "built-in image_gen",
+      "generated_image_file": "exec-1b41e1cc-cff7-495e-a0ac-f2c23b395663.png",
+      "source_sha256": "d217b4a4dbfa6ebe90676c011b7c1b1423db10515698f4344ef8bca6ee2b05e1",
+      "source_bytes": 3365561,
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "dimensions": [
+        1672,
+        941
+      ],
+      "quality": 92,
+      "webp_sha256": "d660268161aa4d6473f87763f7e614409f6df3c809a40831bc8d86e0d09de12a",
+      "webp_bytes": 577564,
+      "reference_url": "https://en.uesp.net/wiki/Skyrim:Forsaken_Cave",
+      "prompt": "Use case: stylized-concept. Asset type: a single finished environment illustration for the Android game SKYRIM TEXT RPG. Landscape 16:9, 1536x864 requested. Style: highly detailed realistic cinematic northern fantasy environment illustration; lifelike natural materials, painterly polish, strong depth and composition, dramatic but readable illumination, restrained colors; consistent with Skyrim location artwork. No UI, no text, no letters, no captions, no border, no watermark, no collage or panels. No protagonist or posed portrait; focus on the place. The entire picture, including all four corners, must contain only scenery, absolutely no corner titles, signatures or small lettering. Scene specification: Forsaken Cave west of Windhelm. Icy natural passage opens into an ancient Nordic burial chamber, rounded blue ice walls give way to weathered interlaced stone doorway, many old burial urns on rock shelves, a small wooden cart with an old chest at the edge of the ice. Cold dawn light, softly lit distant brazier, grounded Nordic ruin texture. No undead or people.",
+      "full_resolution_luma_ssim": 0.9889042377471924,
+      "worst_128px_luma_ssim": 0.9821733832359314,
+      "chroma_mean_absolute_error": 1.1515944937941414,
+      "chroma_95th_percentile_error": 3.0,
+      "trials": [
+        {
+          "quality": 76,
+          "bytes": 255494,
+          "full_resolution_luma_ssim": 0.9482025504112244,
+          "worst_128px_luma_ssim": 0.9299055933952332,
+          "chroma_mean_absolute_error": 1.6437440572738968,
+          "chroma_95th_percentile_error": 5.0
+        },
+        {
+          "quality": 80,
+          "bytes": 303766,
+          "full_resolution_luma_ssim": 0.9602999687194824,
+          "worst_128px_luma_ssim": 0.9482063055038452,
+          "chroma_mean_absolute_error": 1.5418812827644417,
+          "chroma_95th_percentile_error": 4.0
+        },
+        {
+          "quality": 84,
+          "bytes": 363136,
+          "full_resolution_luma_ssim": 0.9704657196998596,
+          "worst_128px_luma_ssim": 0.9619290828704834,
+          "chroma_mean_absolute_error": 1.430973488450137,
+          "chroma_95th_percentile_error": 4.0
+        },
+        {
+          "quality": 88,
+          "bytes": 450680,
+          "full_resolution_luma_ssim": 0.9806140065193176,
+          "worst_128px_luma_ssim": 0.9725391864776611,
+          "chroma_mean_absolute_error": 1.2989413684922382,
+          "chroma_95th_percentile_error": 4.0
+        },
+        {
+          "quality": 92,
+          "bytes": 577564,
+          "full_resolution_luma_ssim": 0.9889042377471924,
+          "worst_128px_luma_ssim": 0.9821733832359314,
+          "chroma_mean_absolute_error": 1.1515944937941414,
+          "chroma_95th_percentile_error": 3.0
+        }
+      ]
+    },
+    {
+      "id": "skyrim-2497",
+      "name": "Пещера Морозного Корня",
+      "english_name": "Frostroot Cave (CC)",
+      "slug": "frostroot_cave",
+      "archive": "frostroot_cave.zip",
+      "archive_sha256": "177cfb3f2257a572795f7a4882806b9695b2be4d31e65ec08afa5f8fab2b2223",
+      "archive_bytes": 576062,
+      "generation_mode": "built-in image_gen",
+      "generated_image_file": "exec-fd08e44a-7b9d-47e0-b727-0385d4e3cf79.png",
+      "source_sha256": "3ae94d1e38e60e8dfd3ac44c77e85f4105eddaefa939532cf4817a08dfb6abad",
+      "source_bytes": 3270023,
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "dimensions": [
+        1672,
+        941
+      ],
+      "quality": 92,
+      "webp_sha256": "a486c78f10e5dc6867567430e3360bb3489a4f807d35491d1072f79f4ec41f26",
+      "webp_bytes": 575950,
+      "reference_url": "https://en.uesp.net/wiki/Skyrim:Frostroot_Cave",
+      "prompt": "Use case: stylized-concept. Asset type: a single finished environment illustration for the Android game SKYRIM TEXT RPG. Landscape 16:9, 1536x864 requested. Style: highly detailed realistic cinematic northern fantasy environment illustration; lifelike natural materials, painterly polish, strong depth and composition, dramatic but readable illumination, restrained colors; consistent with Skyrim location artwork. No UI, no text, no letters, no captions, no border, no watermark, no collage or panels. No protagonist or posed portrait; focus on the place. The entire picture, including all four corners, must contain only scenery, absolutely no corner titles, signatures or small lettering. Scene specification: Frostroot Cave, Skyrim Creation Club. Snow-covered natural passage opens into a cold icy cavern, a monumental Dwemer bronze-and-stone door to Nchuanthumz embedded in the far rock wall, curved bronze pipework and geometric carved stone around it, abandoned digging tools and a few crates off to the side. Subtle warm light behind the old door contrasts with blue frost. No people.",
+      "full_resolution_luma_ssim": 0.9891834855079651,
+      "worst_128px_luma_ssim": 0.9832329750061035,
+      "chroma_mean_absolute_error": 1.2617329116434213,
+      "chroma_95th_percentile_error": 4.0,
+      "trials": [
+        {
+          "quality": 76,
+          "bytes": 256876,
+          "full_resolution_luma_ssim": 0.9530016779899597,
+          "worst_128px_luma_ssim": 0.9351480007171631,
+          "chroma_mean_absolute_error": 1.8409723316842004,
+          "chroma_95th_percentile_error": 5.0
+        },
+        {
+          "quality": 80,
+          "bytes": 303990,
+          "full_resolution_luma_ssim": 0.963383674621582,
+          "worst_128px_luma_ssim": 0.9493247270584106,
+          "chroma_mean_absolute_error": 1.7055887684383406,
+          "chroma_95th_percentile_error": 5.0
+        },
+        {
+          "quality": 84,
+          "bytes": 362826,
+          "full_resolution_luma_ssim": 0.9726420640945435,
+          "worst_128px_luma_ssim": 0.9610763192176819,
+          "chroma_mean_absolute_error": 1.5716165231937926,
+          "chroma_95th_percentile_error": 5.0
+        },
+        {
+          "quality": 88,
+          "bytes": 450092,
+          "full_resolution_luma_ssim": 0.9816871285438538,
+          "worst_128px_luma_ssim": 0.972596287727356,
+          "chroma_mean_absolute_error": 1.4193597491216206,
+          "chroma_95th_percentile_error": 4.0
+        },
+        {
+          "quality": 92,
+          "bytes": 575950,
+          "full_resolution_luma_ssim": 0.9891834855079651,
+          "worst_128px_luma_ssim": 0.9832329750061035,
+          "chroma_mean_absolute_error": 1.2617329116434213,
+          "chroma_95th_percentile_error": 4.0
+        }
+      ]
+    },
+    {
+      "id": "skyrim-2716",
+      "name": "Зуб Великана",
+      "english_name": "Giant's Tooth (CC)",
+      "slug": "giants_tooth",
+      "archive": "giants_tooth.zip",
+      "archive_sha256": "b92fadebca324aef3f921db0668826925928199e4ba3dde70ea4a8501abd5190",
+      "archive_bytes": 587922,
+      "generation_mode": "built-in image_gen",
+      "generated_image_file": "exec-a62cee39-78ee-40bc-a50f-d90d12af1700.png",
+      "source_sha256": "3c15b948053f53a6b1682c00e8417c90c25a1741476bb8c98b7be8a614436e68",
+      "source_bytes": 3322509,
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "dimensions": [
+        1672,
+        941
+      ],
+      "quality": 92,
+      "webp_sha256": "04bb2ed728468aca152b2bd73f1d93391b283b69be36b82d0530dcbc18b4f844",
+      "webp_bytes": 587810,
+      "reference_url": "https://en.uesp.net/wiki/Skyrim:Giant's_Tooth",
+      "prompt": "Use case: stylized-concept. Asset type: a single finished environment illustration for the Android game SKYRIM TEXT RPG. Landscape 16:9, 1536x864 requested. Style: highly detailed realistic cinematic northern fantasy environment illustration; lifelike natural materials, painterly polish, strong depth and composition, dramatic but readable illumination, restrained colors; consistent with Skyrim location artwork. No UI, no text, no letters, no captions, no border, no watermark, no collage or panels. No protagonist or posed portrait; focus on the place. The entire picture, including all four corners, must contain only scenery, absolutely no corner titles, signatures or small lettering. Scene specification: Giant's Tooth and Iron Tusk Cave. Inside an isolated northern island cavern, six unusual ironwood fruit trees flourish on earthy terraces despite blue ice and snow near the cave mouth; small rounded fruit among gnarled branches, moisture and soft natural light from a wide roof fissure, a few massive giant-sized camp objects and old mammoth tusk near the entrance. Focus on the rare underground grove, no people or spriggans.",
+      "full_resolution_luma_ssim": 0.9885844588279724,
+      "worst_128px_luma_ssim": 0.9820722937583923,
+      "chroma_mean_absolute_error": 1.3655154726977816,
+      "chroma_95th_percentile_error": 4.0,
+      "trials": [
+        {
+          "quality": 76,
+          "bytes": 270592,
+          "full_resolution_luma_ssim": 0.9510672092437744,
+          "worst_128px_luma_ssim": 0.9333693981170654,
+          "chroma_mean_absolute_error": 1.8587391759758782,
+          "chroma_95th_percentile_error": 6.0
+        },
+        {
+          "quality": 80,
+          "bytes": 320118,
+          "full_resolution_luma_ssim": 0.9619936347007751,
+          "worst_128px_luma_ssim": 0.9461340308189392,
+          "chroma_mean_absolute_error": 1.7352699840849346,
+          "chroma_95th_percentile_error": 6.0
+        },
+        {
+          "quality": 84,
+          "bytes": 377244,
+          "full_resolution_luma_ssim": 0.9714715480804443,
+          "worst_128px_luma_ssim": 0.9583337306976318,
+          "chroma_mean_absolute_error": 1.6350927827974922,
+          "chroma_95th_percentile_error": 5.0
+        },
+        {
+          "quality": 88,
+          "bytes": 463134,
+          "full_resolution_luma_ssim": 0.9807412028312683,
+          "worst_128px_luma_ssim": 0.9719081521034241,
+          "chroma_mean_absolute_error": 1.4978409154467658,
+          "chroma_95th_percentile_error": 5.0
+        },
+        {
+          "quality": 92,
+          "bytes": 587810,
+          "full_resolution_luma_ssim": 0.9885844588279724,
+          "worst_128px_luma_ssim": 0.9820722937583923,
+          "chroma_mean_absolute_error": 1.3655154726977816,
+          "chroma_95th_percentile_error": 4.0
+        }
+      ]
+    },
+    {
+      "id": "skyrim-57",
+      "name": "Гленморильский ковен",
+      "english_name": "Glenmoril Coven",
+      "slug": "glenmoril_coven",
+      "archive": "glenmoril_coven.zip",
+      "archive_sha256": "24f7fac2718107a78f1c82128440b52131cb3d33a308a11ae213fefd2e84bfc4",
+      "archive_bytes": 602568,
+      "generation_mode": "built-in image_gen",
+      "generated_image_file": "exec-dec8c6a2-a9df-40cc-ae0d-6e799ea30820.png",
+      "source_sha256": "da1c04bbe7546d3e2538fe2aad1e02dfc468293fac05c260ed6ff8f4be2d729b",
+      "source_bytes": 3258342,
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "dimensions": [
+        1672,
+        941
+      ],
+      "quality": 92,
+      "webp_sha256": "f7efc9cea7f67c3a5f8f64bc1c8a9c44c3465efa951d65804ef0a46d1c69ca0a",
+      "webp_bytes": 602456,
+      "reference_url": "https://en.uesp.net/wiki/Skyrim:Glenmoril_Coven",
+      "prompt": "Use case: stylized-concept. Asset type: a single finished environment illustration for the Android game SKYRIM TEXT RPG. Landscape 16:9, 1536x864 requested. Style: highly detailed realistic cinematic northern fantasy environment illustration; lifelike natural materials, painterly polish, strong depth and composition, dramatic but readable illumination, restrained colors; consistent with Skyrim location artwork. No UI, no text, no letters, no captions, no border, no watermark, no collage or panels. No protagonist or posed portrait; focus on the place. The entire picture, including all four corners, must contain only scenery, absolutely no corner titles, signatures or small lettering. Scene specification: Glenmoril Coven. Eerie natural woodland cave with a wide central chamber and several side tunnels at different heights, crude branch-and-antler witch totems, feather ornaments, ragged hides, a low smoking cauldron near a campfire, dried roots and dark mushrooms. Twisted cave roots, dark earthy rock and moody amber firelight. Empty witches' den, no witches or graphic remains.",
+      "full_resolution_luma_ssim": 0.9886353611946106,
+      "worst_128px_luma_ssim": 0.9826440215110779,
+      "chroma_mean_absolute_error": 1.5688933563500094,
+      "chroma_95th_percentile_error": 5.0,
+      "trials": [
+        {
+          "quality": 76,
+          "bytes": 277388,
+          "full_resolution_luma_ssim": 0.9528014063835144,
+          "worst_128px_luma_ssim": 0.9367579817771912,
+          "chroma_mean_absolute_error": 2.181027513232894,
+          "chroma_95th_percentile_error": 7.0
+        },
+        {
+          "quality": 80,
+          "bytes": 328104,
+          "full_resolution_luma_ssim": 0.9628641605377197,
+          "worst_128px_luma_ssim": 0.9490689039230347,
+          "chroma_mean_absolute_error": 2.0299719960949614,
+          "chroma_95th_percentile_error": 6.0
+        },
+        {
+          "quality": 84,
+          "bytes": 385884,
+          "full_resolution_luma_ssim": 0.9725238084793091,
+          "worst_128px_luma_ssim": 0.9632269144058228,
+          "chroma_mean_absolute_error": 1.899208187360489,
+          "chroma_95th_percentile_error": 6.0
+        },
+        {
+          "quality": 88,
+          "bytes": 473824,
+          "full_resolution_luma_ssim": 0.9814393520355225,
+          "worst_128px_luma_ssim": 0.9734847545623779,
+          "chroma_mean_absolute_error": 1.7382798000701687,
+          "chroma_95th_percentile_error": 5.0
+        },
+        {
+          "quality": 92,
+          "bytes": 602456,
+          "full_resolution_luma_ssim": 0.9886353611946106,
+          "worst_128px_luma_ssim": 0.9826440215110779,
+          "chroma_mean_absolute_error": 1.5688933563500094,
+          "chroma_95th_percentile_error": 5.0
+        }
+      ]
+    },
+    {
+      "id": "skyrim-56",
+      "name": "Мрачный Предел",
+      "english_name": "Gloomreach",
+      "slug": "gloomreach",
+      "archive": "gloomreach.zip",
+      "archive_sha256": "a020950914e684c6bb638cd9cc642ad4d0a052fb0e30b7d68fe9f40e08aa5676",
+      "archive_bytes": 578864,
+      "generation_mode": "built-in image_gen",
+      "generated_image_file": "exec-64fc7444-f715-4eed-be88-e032b9af83a8.png",
+      "source_sha256": "8bd87a6adb1ceaa2ae144e1f995fe0f3d2825b6fdf27ac94e59c06e407920c31",
+      "source_bytes": 2808906,
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "dimensions": [
+        1672,
+        941
+      ],
+      "quality": 96,
+      "webp_sha256": "4d6375c87134e9be317442a40d3b06cd8d96570198739229e6c52b542342f3ee",
+      "webp_bytes": 578752,
+      "reference_url": "https://en.uesp.net/wiki/Skyrim:Gloomreach",
+      "prompt": "Use case: stylized-concept. Asset type: a single finished environment illustration for the Android game SKYRIM TEXT RPG. Landscape 16:9, 1536x864 requested. Style: highly detailed realistic cinematic northern fantasy environment illustration; lifelike natural materials, painterly polish, strong depth and composition, dramatic but readable illumination, restrained colors; consistent with Skyrim location artwork. No UI, no text, no letters, no captions, no border, no watermark, no collage or panels. No protagonist or posed portrait; focus on the place. The entire picture, including all four corners, must contain only scenery, absolutely no corner titles, signatures or small lettering. Scene specification: Gloomreach. Deep vertical cavern with natural rock pillars, a tree grows in an isolated pool of daylight falling through a narrow crack above, rock ledges descend toward dark Falmer tunnels and a few tiny luminous mushrooms. A winding path and chitin totem visible on the far ledge. Strong depth, gray-green rock, understated amber lights deep down, no giant mushroom city, no people.",
+      "full_resolution_luma_ssim": 0.9907610416412354,
+      "worst_128px_luma_ssim": 0.9852977395057678,
+      "chroma_mean_absolute_error": 0.8253966690225709,
+      "chroma_95th_percentile_error": 2.0,
+      "trials": [
+        {
+          "quality": 76,
+          "bytes": 174108,
+          "full_resolution_luma_ssim": 0.9448703527450562,
+          "worst_128px_luma_ssim": 0.9177575707435608,
+          "chroma_mean_absolute_error": 1.2824151874469285,
+          "chroma_95th_percentile_error": 4.0
+        },
+        {
+          "quality": 80,
+          "bytes": 208668,
+          "full_resolution_luma_ssim": 0.9557572603225708,
+          "worst_128px_luma_ssim": 0.93387371301651,
+          "chroma_mean_absolute_error": 1.204694817180135,
+          "chroma_95th_percentile_error": 4.0
+        },
+        {
+          "quality": 84,
+          "bytes": 257518,
+          "full_resolution_luma_ssim": 0.967186450958252,
+          "worst_128px_luma_ssim": 0.9512681365013123,
+          "chroma_mean_absolute_error": 1.1200649949915849,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 88,
+          "bytes": 316894,
+          "full_resolution_luma_ssim": 0.9756516814231873,
+          "worst_128px_luma_ssim": 0.9649920463562012,
+          "chroma_mean_absolute_error": 1.0220471960502164,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 92,
+          "bytes": 419942,
+          "full_resolution_luma_ssim": 0.9849308133125305,
+          "worst_128px_luma_ssim": 0.9801987409591675,
+          "chroma_mean_absolute_error": 0.9317549410430723,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 96,
+          "bytes": 578752,
+          "full_resolution_luma_ssim": 0.9907610416412354,
+          "worst_128px_luma_ssim": 0.9852977395057678,
+          "chroma_mean_absolute_error": 0.8253966690225709,
+          "chroma_95th_percentile_error": 2.0
+        }
+      ]
+    },
+    {
+      "id": "skyrim-55",
+      "name": "Серозимняя застава",
+      "english_name": "Graywinter Watch",
+      "slug": "graywinter_watch",
+      "archive": "graywinter_watch.zip",
+      "archive_sha256": "52926b175cd2759ae3e687cc73508e2bbea309d468c6212c07bb72967bc371ec",
+      "archive_bytes": 511510,
+      "generation_mode": "built-in image_gen",
+      "generated_image_file": "exec-9ee0ef9c-b8ac-4370-99c9-4624bc038016.png",
+      "source_sha256": "0be5616f7897fc3ac724f3bf10b33a93a13a0807f592c678db0dc1e69146b108",
+      "source_bytes": 3199469,
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "dimensions": [
+        1672,
+        941
+      ],
+      "quality": 92,
+      "webp_sha256": "f5498e877796c82113d1f20980703cc663d9a18484636ff41db0cafe822c66d0",
+      "webp_bytes": 511398,
+      "reference_url": "https://en.uesp.net/wiki/Skyrim:Graywinter_Watch",
+      "prompt": "Use case: stylized-concept. Asset type: a single finished environment illustration for the Android game SKYRIM TEXT RPG. Landscape 16:9, 1536x864 requested. Style: highly detailed realistic cinematic northern fantasy environment illustration; lifelike natural materials, painterly polish, strong depth and composition, dramatic but readable illumination, restrained colors; consistent with Skyrim location artwork. No UI, no text, no letters, no captions, no border, no watermark, no collage or panels. No protagonist or posed portrait; focus on the place. The entire picture, including all four corners, must contain only scenery, absolutely no corner titles, signatures or small lettering. Scene specification: Graywinter Watch: small troll cave under the Ritual Stone by the White River. View into a two-tier raw rock chamber, an earthy ramp climbs the right side to a high shelf, a small abandoned campfire and an old bow beside a chest rest on the upper ledge, patches of white and red mushrooms on the damp lower floor. Cool river daylight at the entrance, gray-brown stone, no buildings or inhabitants.",
+      "full_resolution_luma_ssim": 0.9874122142791748,
+      "worst_128px_luma_ssim": 0.9808329939842224,
+      "chroma_mean_absolute_error": 0.8907895372427784,
+      "chroma_95th_percentile_error": 2.0,
+      "trials": [
+        {
+          "quality": 76,
+          "bytes": 213116,
+          "full_resolution_luma_ssim": 0.9428526163101196,
+          "worst_128px_luma_ssim": 0.9244183301925659,
+          "chroma_mean_absolute_error": 1.1686920663653144,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 80,
+          "bytes": 256872,
+          "full_resolution_luma_ssim": 0.9562361240386963,
+          "worst_128px_luma_ssim": 0.9408525228500366,
+          "chroma_mean_absolute_error": 1.1266461669098842,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 84,
+          "bytes": 310686,
+          "full_resolution_luma_ssim": 0.9678406119346619,
+          "worst_128px_luma_ssim": 0.9544593691825867,
+          "chroma_mean_absolute_error": 1.0686566006843987,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 88,
+          "bytes": 387866,
+          "full_resolution_luma_ssim": 0.9786912202835083,
+          "worst_128px_luma_ssim": 0.9702330231666565,
+          "chroma_mean_absolute_error": 0.9922474436743971,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 92,
+          "bytes": 511398,
+          "full_resolution_luma_ssim": 0.9874122142791748,
+          "worst_128px_luma_ssim": 0.9808329939842224,
+          "chroma_mean_absolute_error": 0.8907895372427784,
+          "chroma_95th_percentile_error": 2.0
+        }
+      ]
+    },
+    {
+      "id": "skyrim-54",
+      "name": "Грот Серая Вода",
+      "english_name": "Greywater Grotto",
+      "slug": "greywater_grotto",
+      "archive": "greywater_grotto.zip",
+      "archive_sha256": "989fcb77e961ee9a1d652c53045c5baf792279bca19a56e79129f01fce998cdf",
+      "archive_bytes": 565236,
+      "generation_mode": "built-in image_gen",
+      "generated_image_file": "exec-adbc5e28-bbfb-4726-be31-6c9ed6b6f020.png",
+      "source_sha256": "1188100cdd224875bf6a6bb99b7ad5d8b0e3e32604ef9caa3c781de68b3caa60",
+      "source_bytes": 3331858,
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "dimensions": [
+        1672,
+        941
+      ],
+      "quality": 92,
+      "webp_sha256": "408f83e3dc8cdeeccd8576bfaf79cf472bfb8576f21638e5d834b85f931aa878",
+      "webp_bytes": 565124,
+      "reference_url": "https://en.uesp.net/wiki/Skyrim:Greywater_Grotto",
+      "prompt": "Use case: stylized-concept. Asset type: a single finished environment illustration for the Android game SKYRIM TEXT RPG. Landscape 16:9, 1536x864 requested. Style: highly detailed realistic cinematic northern fantasy environment illustration; lifelike natural materials, painterly polish, strong depth and composition, dramatic but readable illumination, restrained colors; consistent with Skyrim location artwork. No UI, no text, no letters, no captions, no border, no watermark, no collage or panels. No protagonist or posed portrait; focus on the place. The entire picture, including all four corners, must contain only scenery, absolutely no corner titles, signatures or small lettering. Scene specification: Greywater Grotto east of Falkreath. A long natural descending cave corridor follows a slender stream over several stone terraces into a shallow pale pool. Earth ramps connect the levels, blue ice and snow near the opening transition to wet gray limestone, faint green moss, cool mist and soft light reflected in moving water. Empty animal den, no houses, no people.",
+      "full_resolution_luma_ssim": 0.9887375831604004,
+      "worst_128px_luma_ssim": 0.9831373691558838,
+      "chroma_mean_absolute_error": 1.0154329736765835,
+      "chroma_95th_percentile_error": 3.0,
+      "trials": [
+        {
+          "quality": 76,
+          "bytes": 245542,
+          "full_resolution_luma_ssim": 0.9476587772369385,
+          "worst_128px_luma_ssim": 0.9289048314094543,
+          "chroma_mean_absolute_error": 1.4396250807193813,
+          "chroma_95th_percentile_error": 4.0
+        },
+        {
+          "quality": 80,
+          "bytes": 292480,
+          "full_resolution_luma_ssim": 0.9606801867485046,
+          "worst_128px_luma_ssim": 0.946834146976471,
+          "chroma_mean_absolute_error": 1.356807948888742,
+          "chroma_95th_percentile_error": 4.0
+        },
+        {
+          "quality": 84,
+          "bytes": 346774,
+          "full_resolution_luma_ssim": 0.9706767797470093,
+          "worst_128px_luma_ssim": 0.9607862234115601,
+          "chroma_mean_absolute_error": 1.277740772567105,
+          "chroma_95th_percentile_error": 4.0
+        },
+        {
+          "quality": 88,
+          "bytes": 431644,
+          "full_resolution_luma_ssim": 0.9806436896324158,
+          "worst_128px_luma_ssim": 0.9730792045593262,
+          "chroma_mean_absolute_error": 1.161451792097382,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 92,
+          "bytes": 565124,
+          "full_resolution_luma_ssim": 0.9887375831604004,
+          "worst_128px_luma_ssim": 0.9831373691558838,
+          "chroma_mean_absolute_error": 1.0154329736765835,
+          "chroma_95th_percentile_error": 3.0
+        }
+      ]
+    }
+  ]
+}
