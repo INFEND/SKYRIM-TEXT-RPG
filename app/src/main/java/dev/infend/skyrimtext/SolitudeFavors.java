@@ -65,7 +65,12 @@ final class SolitudeFavors {
         }
         return "";
     }
+    /** A hostile resident will not negotiate new or unfinished favors until reconciled. */
+    private static boolean willing(GameEngine g,int resident){
+        return !"HOSTILE".equals(g.sceneState.npcStatusByName(SolitudeResidents.NAMES[resident]));
+    }
     static void choices(GameEngine g,GameEngine.Scene scene,int resident){
+        if(!willing(g,resident))return;
         for(int i=0;i<count();i++)if(RESIDENT[i]==resident){
             if(completed(g,i))continue;
             if(!active(g,i))scene.add(PREFIX+i+":accept","Помочь: "+TITLE[i],
@@ -108,6 +113,10 @@ final class SolitudeFavors {
             if(!action.startsWith(prefix))continue;
             int resident=RESIDENT[i];
             if(!SolitudeResidents.present(g,resident,district))return true;
+            if(!willing(g,resident)){
+                report(g,SolitudeResidents.NAMES[resident]+" отказывается обсуждать поручение до примирения.");
+                return true;
+            }
             if(action.equals(prefix+"accept")&&g.progress.questOutcome(key(i))==null){
                 g.progress.setQuestOutcome(key(i),"ACTIVE");
                 report(g,"Авторское поручение: "+TITLE[i]+". "+OFFER[i]
