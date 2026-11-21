@@ -399,10 +399,11 @@ public final class WorkImageEditor {
                 .setPositiveButton("Закрыть", null).show();
             return;
         }
-        String[] titles = new String[images.length() + 1];
+        final JSONArray galleryImages = images;
+        String[] titles = new String[galleryImages.length() + 1];
         titles[0] = "Вернуть встроенное изображение";
-        for (int i = 0; i < images.length(); i++) {
-            JSONObject record = images.optJSONObject(i);
+        for (int i = 0; i < galleryImages.length(); i++) {
+            JSONObject record = galleryImages.optJSONObject(i);
             boolean selected = record != null && record.optString("file")
                 .equals(meta.optString("primary"));
             long date = record == null ? 0 : record.optLong("created");
@@ -422,7 +423,7 @@ public final class WorkImageEditor {
                     return;
                 }
                 int index = which - 1;
-                JSONObject record = images.optJSONObject(index);
+                JSONObject record = galleryImages.optJSONObject(index);
                 if (record == null) return;
                 String filename = record.optString("file", "");
                 File imageFile = safeFile(host, kind, id, filename);
@@ -458,8 +459,8 @@ public final class WorkImageEditor {
                             .setPositiveButton("Удалить", (confirm, z) -> {
                                 try {
                                     JSONArray updated = new JSONArray();
-                                    for (int j = 0; j < images.length(); j++)
-                                        if (j != index) updated.put(images.opt(j));
+                                    for (int j = 0; j < galleryImages.length(); j++)
+                                        if (j != index) updated.put(galleryImages.opt(j));
                                     meta.put("images", updated);
                                     if (filename.equals(meta.optString("primary"))) meta.remove("primary");
                                     if (!writeMetadata(host, kind, id, meta)) throw new Exception();
