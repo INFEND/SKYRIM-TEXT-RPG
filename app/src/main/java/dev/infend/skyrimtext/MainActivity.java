@@ -169,6 +169,7 @@ public final class MainActivity extends Activity {
         getWindow().setStatusBarColor(BG);getWindow().setNavigationBarColor(BG);
         getWindow().getDecorView().setSystemUiVisibility(0);
         render();
+        WorkImageEditor.handleSharedIntent(this, getIntent(), accent(), this::render);
     }
     private final Runnable resourceRefreshTick=new Runnable(){
         @Override public void run(){
@@ -195,7 +196,7 @@ public final class MainActivity extends Activity {
         super.onSaveInstanceState(state);
     }
     @Override protected void onPause(){ResourceStore.UI.removeCallbacks(resourceRefreshTick);if(updater!=null)updater.onHostPause();save();super.onPause();}
-    @Override protected void onNewIntent(Intent intent){super.onNewIntent(intent);setIntent(intent);if(updater!=null&&intent.getBooleanExtra("ota_open_from_notification",false))updater.onNotificationIntent();}
+    @Override protected void onNewIntent(Intent intent){super.onNewIntent(intent);setIntent(intent);if(updater!=null&&intent.getBooleanExtra("ota_open_from_notification",false))updater.onNotificationIntent();WorkImageEditor.handleSharedIntent(this,intent,accent(),this::render);}
     @Override protected void onDestroy(){
         ResourceStore.UI.removeCallbacks(resourceRefreshTick);
         closeNpcDialog();
