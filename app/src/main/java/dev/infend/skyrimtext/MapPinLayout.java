@@ -8,9 +8,9 @@ import java.util.Set;
 
 /**
  * Stable world-anchored markers shared by the renderer and hit-testing.
- * No screen-cell clusters or numbers. Collision decisions depend ONLY on
- * world coordinates, zoom, marker priority and filters: panning cannot cause
- * any marker to move between groups or change its visible identity.
+ * Close-by places share a visible, tappable group instead of being discarded.
+ * Collision decisions depend ONLY on world coordinates, zoom, marker priority
+ * and filters: camera panning cannot change group membership.
  */
 public final class MapPinLayout {
     public static final class Pin {
@@ -19,7 +19,7 @@ public final class MapPinLayout {
         public final boolean player,focus;
         public final int priority;
         public final float sizeDp;
-        public final float touchRadius;
+        public float touchRadius;
         private Pin(SkyrimMapCatalog.Site site,boolean player,boolean focus,
                     int priority,float sizeDp,float x,float y,float density){
             sites.add(site);
@@ -98,20 +98,31 @@ public final class MapPinLayout {
             float mapX=c.site.x*scale,mapY=c.site.y*scale;
             int cx=(int)Math.floor(mapX/cell),cy=(int)Math.floor(mapY/cell);
             float size=sizeDp(zoom,c.priority);
-            boolean overlaps=false;
-            for(int gx=cx-1;gx<=cx+1&&!overlaps;gx++){
-                for(int gy=cy-1;gy<=cy+1&&!overlaps;gy++){
+            Pin nearest=null;
+            float nearestDistance=Float.POSITIVE_INFINITY;
+            for(int gx=cx-1;gx<=cx+1;gx++){
+                for(int gy=cy-1;gy<=cy+1;gy++){
                     ArrayList<Pin> bucket=buckets.get(key(gx,gy));
                     if(bucket==null)continue;
                     for(Pin other:bucket){
                         SkyrimMapCatalog.Site anchor=other.sites.get(0);
                         float dx=mapX-anchor.x*scale,dy=mapY-anchor.y*scale;
+                        float distance=dx*dx+dy*dy;
                         float gap=(size+other.sizeDp)*density*.5f+3f*density;
-                        if(dx*dx+dy*dy<gap*gap){overlaps=true;break;}
+                        if(distance<gap*gap&&distance<nearestDistance){
+                            nearest=other;
+                            nearestDistance=distance;
+                        }
                     }
                 }
             }
-            if(overlaps)continue;
+            if(nearest!=null){
+                // Every catalog location stays reachable via this group's picker.
+                nearest.sites.add(c.site);
+                nearest.touchRadius=Math.max(nearest.touchRadius,
+                    nearest.sizeDp*density*.69f+8f*density);
+                continue;
+            }
             Pin pin=new Pin(c.site,c.player,c.focus,c.priority,size,
                 left+mapX,top+mapY,density);
             shown.add(pin);
