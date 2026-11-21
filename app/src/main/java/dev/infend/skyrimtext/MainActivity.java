@@ -5278,7 +5278,7 @@ public final class MainActivity extends Activity {
             addText(content,"ᛟ  СПРАВОЧНИК ПЕРСОНАЖЕЙ",11,accent(),false,10);
             actionButton("Оригинальные NPC","Skyrim + три DLC | "+NpcProfiles.originalProfiles().size(),false,()->npcCatalogDialog("Оригинальные NPC",NpcProfiles.originalProfiles()));
             actionButton("Авторские NPC","Сюжетные дополнения | "+NpcProfiles.authorProfiles().size(),false,()->npcCatalogDialog("Авторские NPC",NpcProfiles.authorProfiles()));
-            actionButton("Мои персонажи","Созданные игроком | "+game.fixShop.world.characters.size(),false,this::fixCharacters);
+            if(!game.fixShop.world.characters.isEmpty())actionButton("Мои персонажи","Сохранённые ранее | "+game.fixShop.world.characters.size(),false,this::fixCharacters);
             actionButton("Упоминаемые персонажи","Канонические упоминания | "+NpcProfiles.mentionedProfiles().size(),false,()->npcCatalogDialog("Упоминаемые персонажи",NpcProfiles.mentionedProfiles()));
         }else{
             addText(content,"ᛟ  МЕСТА И ДОРОГИ",11,accent(),false,10);
@@ -5786,7 +5786,7 @@ public final class MainActivity extends Activity {
         for(int i=0;i<FixShopAdventure.TITLES.length;i++){final int n=i;String title=FixShopAdventure.TITLES[i];if(FixShopAdventure.stage(game,i)==0)fixDirect(a,title,"Авторское приключение: расследование, бой и два финала","Дополнения","journal",4,250,()->FixShopAdventure.unlock(game,n));else fixOffer(a,title,FixShopAdventure.objective(game,i),"Дополнения","journal",4,0,()->{closeLivingDialog();tab=4;render();});}
         fixOffer(a,"Галерея спутников","Кэтрин, Итачи, Ливия и Альма: портреты и истории","Персонажи","hero",4,0,this::fixCompanions);
         fixOffer(a,"Коллекция покупок","Уникальных применённых товаров: "+game.fixShop.distinctApplied(),"Коллекции","armor",3,0,this::fixCollections);
-        fixOffer(a,"Мои персонажи","Управление авторскими NPC и спутниками","Персонажи","hero",3,0,this::fixCharacters);
+        if(!game.fixShop.world.characters.isEmpty())fixOffer(a,"Мои персонажи","Просмотр персонажей из прежнего сохранения","Персонажи","hero",3,0,this::fixCharacters);
         if(game.fixShop.world.companionSlots<4)fixDirect(a,"Расширение отряда","+1 слот авторского спутника | до 4 одновременно","Персонажи","hero",3,250,()->game.fixShop.world.buySlot());
 
         for(int i=1;i<=FixShopWorld.MOUNTS.length;i++){final int n=i;if(game.fixShop.world.ownMount(i))fixOffer(a,FixShopWorld.MOUNTS[i-1],game.fixShop.world.mount==i?"Активен":"Приобретено | выбрать","Транспорт","map",4,0,()->{if(!livingBusy()&&game.fixShop.world.selectMount(n)){save();livingFixShop();}});else fixDirect(a,FixShopWorld.MOUNTS[i-1],"Снижение расхода сил в дороге","Транспорт","map",4,350,()->game.fixShop.world.buyMount(n));}
@@ -5907,6 +5907,25 @@ public final class MainActivity extends Activity {
             if(game.fixShop.collectionRewards.contains(goal))addText(tile,"Награда получена",13,MUTED,false,0);
             else if(count>=goal)livingLink(tile,"Получить "+(goal*10)+" опыта","","skills",()->{if(!livingBusy()&&game.fixShop.claimCollection(game,n)){save();render();fixCollections();}});
         }livingDialog("Коллекции и достижения",panel);
+    }
+    /** Read-only access to characters from old saves, without the removed editor. */
+    private void fixCharacters(){
+        if(game.fixShop.world.characters.isEmpty()){
+            toast("В этом сохранении нет созданных ранее персонажей");return;
+        }
+        LinearLayout panel=column();
+        for(JSONObject record:game.fixShop.world.characters){
+            LinearLayout tile=livingTile(panel);
+            addText(tile,record.optString("name","Без имени"),17,accent(),true,5);
+            int role=record.optInt("role",-1);
+            String roleLabel=role>=0&&role<FixShopWorld.ROLES.length?
+                FixShopWorld.ROLES[role]:"Неизвестная роль";
+            addText(tile,roleLabel+(record.optBoolean("companion")?" | Спутник":""),13,MUTED,false,5);
+            String description=record.optString("description","");
+            if(!description.isEmpty())addText(tile,description,13,TEXT,false,5);
+            addText(tile,"Место: "+record.optString("home","Неизвестно"),12,MUTED,false,5);
+        }
+        livingDialog("Ранее созданные персонажи",panel);
     }
     private void fixResidence(int i){
         if(livingBusy())return;String name=FixShopHome.NAME[i],city=FixShopHome.CITY[i];LinearLayout panel=column();addText(panel,city+" | "+name,18,accent(),true,8);
