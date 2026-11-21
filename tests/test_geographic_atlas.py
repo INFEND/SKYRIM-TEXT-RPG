@@ -17,14 +17,15 @@ class GeographicSource(unittest.TestCase):
         points=json.loads((ROOT/"tools/map_source/compiled.json").read_text())
         sources={p["id"]:p for file in ("skyrim.json","solstheim.json")
                  for p in json.loads((ROOT/"tools/map_source"/file).read_text())}
-        self.assertEqual(len(points),512)
-        self.assertEqual(len({p["id"] for p in points}),512)
-        self.assertEqual(len({p["nameRu"] for p in points}),512)
+        self.assertEqual(len(points),515)
+        self.assertEqual(len({p["id"] for p in points}),515)
+        self.assertEqual(len({p["nameRu"] for p in points}),515)
         self.assertEqual(sum(p["sheet"]==1 for p in points),57)
         for point in points:
             self.assertEqual((point["x"],point["y"]),(sources[point["id"]]["x"],sources[point["id"]]["y"]))
             self.assertRegex(point["nameRu"],"[А-Яа-яЁё]")
-        for name in ("Fort Dawnguard (DG)","Castle Volkihar (DG)",
+        for name in ("Dunmeth Pass","Pale Pass","Shrine to Malacath",
+                     "Fort Dawnguard (DG)","Castle Volkihar (DG)",
                      "Heljarchen Hall (HF)","Lakeview Manor (HF)","Windstad Manor (HF)",
                      "Temple of Miraak","Nchardak","Raven Rock"):
             self.assertIn(name,{p["name"] for p in points})
@@ -82,7 +83,7 @@ public class Probe {
  static void check(boolean ok,String reason){if(!ok)throw new AssertionError(reason);}
  public static void main(String[] args){
   ArrayList<SkyrimMapCatalog.Site> all=SkyrimMapCatalog.all();
-  check(all.size()==512,"catalog size");
+  check(all.size()==515,"catalog size");
   for(SkyrimMapCatalog.Site site:all){
    check(Float.isFinite(site.x)&&Float.isFinite(site.y),"finite coordinate");
    check(site.x>=0&&site.y>=0&&site.x<=(site.sheet==0?4096:2048)&&site.y<=(site.sheet==0?4096:2048),"sheet bounds: "+site.name);
@@ -93,6 +94,7 @@ public class Probe {
   check(SkyrimMapCatalog.find("ЧЁРНЫЙ БРОД")==SkyrimMapCatalog.find("Черный Брод"),"yo normalization");
   check(WorldAtlas.find("Камень Шора")==WorldAtlas.find("Шорский Камень"),"old save alias");
   check(WorldAtlas.find("Колбьорн")!=null,"island legacy key");
+  check(WorldAtlas.find("Перевал Бледной тропы")==WorldAtlas.find("Бледный перевал"),"legacy pale pass alias");
   check(SkyrimMapCatalog.travelDestination(SkyrimMapCatalog.find("To Solstheim (DB)")).equals("Воронья Скала"),"boarding point goes to island");
   check(SkyrimMapCatalog.travelDestination(SkyrimMapCatalog.find("To Skyrim")).equals("Виндхельм"),"return boarding point goes to Windhelm");
   check(WorldAtlas.find("Хелген").region==5,"Helgen travel district");
@@ -141,7 +143,7 @@ public class Probe {
      count++;
     }
    }
-   check(count==(sheet==0?455:57),
+   check(count==(sheet==0?458:57),
       "every catalog location must be tappable at zoom "+zoom+" sheet "+sheet+": "+count);
   }
   hidden.add("Пещера");
@@ -164,11 +166,11 @@ public class Probe {
   check(TravelPlanner.plan(game,WorldAtlas.find("Деревня скаалов")).stops.get(0).equals("Виндхельм"),"legacy region/location mismatch");
   game.progress.location="Камень Шора";
   check(TravelPlanner.plan(game,WorldAtlas.find("Шорский Камень")).days==0,"old name does not charge travel");
-  System.out.println("512 sites: projection, complete pin-group coverage, filtering, zoom, hit targets, ferry, weight and portals OK");
+  System.out.println("515 sites: projection, complete pin-group coverage, filtering, zoom, hit targets, ferry, weight and portals OK");
  }
 }''')
             compiled=subprocess.run(["javac","-encoding","UTF-8","-d",str(root),*[str(p) for p in root.glob("*.java")]],capture_output=True,text=True)
             self.assertEqual(compiled.returncode,0,compiled.stderr)
             ran=subprocess.run(["java","-cp",str(root),"dev.infend.skyrimtext.Probe"],capture_output=True,text=True)
             self.assertEqual(ran.returncode,0,ran.stdout+ran.stderr)
-            self.assertIn("512 sites",ran.stdout)
+            self.assertIn("515 sites",ran.stdout)
