@@ -1,0 +1,57 @@
+"""Resource migration and signed manifest contract; original files stay available to tests."""
+import importlib.util, pathlib, unittest
+ROOT=pathlib.Path(__file__).resolve().parents[1]
+JAVA=ROOT/"app/src/main/java/dev/infend/skyrimtext"
+spec=importlib.util.spec_from_file_location("resource_catalog",ROOT/"scripts/build_resource_catalog.py")
+catalog=importlib.util.module_from_spec(spec);spec.loader.exec_module(catalog)
+class ResourceStoreTest(unittest.TestCase):
+    def test_catalog_and_thin(self):
+        bridge=catalog.build("a"*40);thin=catalog.build("a"*40,True)
+        self.assertTrue(bridge["bundled"]);self.assertFalse(thin["bundled"])
+        self.assertEqual(bridge["files"],thin["files"])
+        self.assertGreaterEqual(len(bridge["files"]),89)
+        self.assertEqual(len({e["path"] for e in bridge["files"]}),len(bridge["files"]))
+        portraits=[e for e in bridge["files"] if e["path"].startswith("portraits/")]
+        self.assertEqual(len(portraits),60)
+        self.assertEqual(len({e["group"] for e in portraits}),10)
+        self.assertTrue(all(len(e["sha256"])==64 and e["size"]>0 for e in bridge["files"]))
+        self.assertNotIn("lore_bundle.zip",{e["path"] for e in bridge["files"]})
+        riverwood=[e for e in thin["files"] if e["group"]=="gallery:riverwood"]
+        self.assertEqual([e["path"] for e in riverwood],["gallery/riverwood.zip"])
+        self.assertNotIn("gallery/riverwood_extra.zip",{e["path"] for e in thin["files"]})
+    def test_store_and_ota(self):
+        s=(JAVA/"ResourceStore.java").read_text()
+        for token in ("getFilesDir()","MessageDigest.getInstance","ATOMIC_MOVE","removed:","Content-Range","TRANSPORT_WIFI","copyBundled"):
+            self.assertIn(token,s)
+        ui=(JAVA/"MainActivity.java").read_text();ota=(JAVA/"UpdateManager.java").read_text()
+        self.assertIn("ResourceStore.start(this)",ui);self.assertIn("Управление ресурсами",ui)
+        self.assertIn("ResourceStore.migrate(a",ota)
+        self.assertIn("automaticAllowed",s)
+        self.assertIn("!removed(app,e)",s)
+        self.assertIn("autoUpdate(app)",s)
+        self.assertIn("ResourceStore.requestGallery",(JAVA/"LocationGalleryView.java").read_text())
+        self.assertIn("initialGroup",(JAVA/"ResourceManagerDialog.java").read_text())
+        self.assertLess(ota.index("ResourceStore.migrate(a"),ota.index("launchVerifiedInstaller(a);"))
+        self.assertIn("ResourceStore.open(context,IMAGE)",(JAVA/"SkyrimIconAtlas.java").read_text())
+        self.assertIn("ResourceStore.open(app,TEXTURES[requested])",(JAVA/"SkyrimTerrainMapView.java").read_text())
+        p=(JAVA/"CharacterPortraitView.java").read_text()
+        self.assertIn("ResourceStore.open(app,assetPath)",p)
+        self.assertNotIn("app.getAssets().open(assetPath)",p)
+        self.assertIn("ResourceStore.generation()",p)
+        self.assertIn("ResourceStore.portraitGroup",ui)
+if __name__=="__main__":unittest.main()
+
+class ResourceUnitCounts(unittest.TestCase):
+    def test_counts_are_actual_archive_members_and_sprite_slots(self):
+        import zipfile
+        data=catalog.build("a"*40,True)
+        entries={e["path"]:e for e in data["files"]}
+        for path,e in entries.items():
+            if path.startswith("gallery/"):
+                with zipfile.ZipFile(catalog.ASSETS/path) as z:
+                    self.assertEqual(e["units"],sum(x.filename.endswith(".webp") for x in z.infolist()))
+        self.assertEqual(sum(e["units"] for e in entries.values() if e["group"].startswith("gallery:")),sum(len(g["captions"]) for g in catalog.gallery_registry()))
+        self.assertEqual(entries["icons/skyrim_icons_358_exact.webp"]["units"],358)
+        self.assertEqual(entries["icons/skyrim_icons_358_exact.json"]["units"],0)
+        self.assertEqual(entries["media/mapicons/settlement_icons.webp"]["units"],11)
+        self.assertEqual(entries["media/mapicons/location_icons.webp"]["units"],6)

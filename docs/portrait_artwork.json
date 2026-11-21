@@ -1,0 +1,546 @@
+{
+  "generator": "built-in image generation",
+  "asset_count": 60,
+  "portraits": [
+    {
+      "id": "nord_male_1",
+      "race": "nord",
+      "type": "Nord human",
+      "gender": "male",
+      "variant": 1,
+      "details": "broad Nordic face, light weathered skin, steel blue eyes, medium ash blond hair brushed back, short neat beard, age 30",
+      "prompt": "Use case: stylized-concept. Asset: individual character selection portrait for Skyrim Text RPG Android game. Create ONE finished portrait of an adult MALE Nord human, variant 1 of 3. Subject: broad Nordic face, light weathered skin, steel blue eyes, medium ash blond hair brushed back, short neat beard, age 30. Style: refined realistic dark fantasy painted illustration, natural anatomy and detailed lifelike face, restrained cinematic realism, grounded Elder Scrolls Nordic atmosphere, professional RPG character art. Composition: vertical 3:4 image, head and upper chest, centered, near frontal slight three-quarter angle, complete hair/head/ears/horns with a little headroom, both shoulders visible. Calm neutral expression. Clothing: simple plain charcoal grey linen tunic with modest collar and plain dark brown wool shoulder wrap, modest civilian gender-neutral travel clothing. Background: unobtrusive smoky dark charcoal grey, no scenery. Soft warm key light from upper left, subtle cool rim light, muted natural earthy colours, consistent exposure. Exactly one adult person, one portrait. No armour, weapons, hats, hood, jewelry, makeup, symbols, text, letters, border, collage or watermark. Opaque background."
+    },
+    {
+      "id": "nord_male_2",
+      "race": "nord",
+      "type": "Nord human",
+      "gender": "male",
+      "variant": 2,
+      "details": "square Nordic face, fair freckled skin, grey green eyes, close cropped reddish hair, reddish moustache and beard, age 45",
+      "prompt": "Use case: stylized-concept. Asset: individual character selection portrait for Skyrim Text RPG Android game. Create ONE finished portrait of an adult MALE Nord human, variant 2 of 3. Subject: square Nordic face, fair freckled skin, grey green eyes, close cropped reddish hair, reddish moustache and beard, age 45. Style: refined realistic dark fantasy painted illustration, natural anatomy and detailed lifelike face, restrained cinematic realism, grounded Elder Scrolls Nordic atmosphere, professional RPG character art. Composition: vertical 3:4 image, head and upper chest, centered, near frontal slight three-quarter angle, complete hair/head/ears/horns with a little headroom, both shoulders visible. Calm neutral expression. Clothing: simple plain charcoal grey linen tunic with modest collar and plain dark brown wool shoulder wrap, modest civilian gender-neutral travel clothing. Background: unobtrusive smoky dark charcoal grey, no scenery. Soft warm key light from upper left, subtle cool rim light, muted natural earthy colours, consistent exposure. Exactly one adult person, one portrait. No armour, weapons, hats, hood, jewelry, makeup, symbols, text, letters, border, collage or watermark. Opaque background."
+    },
+    {
+      "id": "nord_male_3",
+      "race": "nord",
+      "type": "Nord human",
+      "gender": "male",
+      "variant": 3,
+      "details": "lean Nordic face, pale skin, grey eyes, long dark brown tied back hair, clean shaven, age 25",
+      "prompt": "Use case: stylized-concept. Asset: individual character selection portrait for Skyrim Text RPG Android game. Create ONE finished portrait of an adult MALE Nord human, variant 3 of 3. Subject: lean Nordic face, pale skin, grey eyes, long dark brown tied back hair, clean shaven, age 25. Style: refined realistic dark fantasy painted illustration, natural anatomy and detailed lifelike face, restrained cinematic realism, grounded Elder Scrolls Nordic atmosphere, professional RPG character art. Composition: vertical 3:4 image, head and upper chest, centered, near frontal slight three-quarter angle, complete hair/head/ears/horns with a little headroom, both shoulders visible. Calm neutral expression. Clothing: simple plain charcoal grey linen tunic with modest collar and plain dark brown wool shoulder wrap, modest civilian gender-neutral travel clothing. Background: unobtrusive smoky dark charcoal grey, no scenery. Soft warm key light from upper left, subtle cool rim light, muted natural earthy colours, consistent exposure. Exactly one adult person, one portrait. No armour, weapons, hats, hood, jewelry, makeup, symbols, text, letters, border, collage or watermark. Opaque background."
+    },
+    {
+      "id": "nord_female_1",
+      "race": "nord",
+      "type": "Nord human",
+      "gender": "female",
+      "variant": 1,
+      "details": "strong Nordic face, fair skin, blue eyes, honey blond hair in a simple braid, age 28",
+      "prompt": "Use case: stylized-concept. Asset: individual character selection portrait for Skyrim Text RPG Android game. Create ONE finished portrait of an adult FEMALE Nord human, variant 1 of 3. Subject: strong Nordic face, fair skin, blue eyes, honey blond hair in a simple braid, age 28. Style: refined realistic dark fantasy painted illustration, natural anatomy and detailed lifelike face, restrained cinematic realism, grounded Elder Scrolls Nordic atmosphere, professional RPG character art. Composition: vertical 3:4 image, head and upper chest, centered, near frontal slight three-quarter angle, complete hair/head/ears/horns with a little headroom, both shoulders visible. Calm neutral expression. Clothing: simple plain charcoal grey linen tunic with modest collar and plain dark brown wool shoulder wrap, modest civilian gender-neutral travel clothing. Background: unobtrusive smoky dark charcoal grey, no scenery. Soft warm key light from upper left, subtle cool rim light, muted natural earthy colours, consistent exposure. Exactly one adult person, one portrait. No armour, weapons, hats, hood, jewelry, makeup, symbols, text, letters, border, collage or watermark. Opaque background."
+    },
+    {
+      "id": "nord_female_2",
+      "race": "nord",
+      "type": "Nord human",
+      "gender": "female",
+      "variant": 2,
+      "details": "oval Nordic face, fair freckled skin, hazel eyes, auburn hair loosely tied back, age 38",
+      "prompt": "Use case: stylized-concept. Asset: individual character selection portrait for Skyrim Text RPG Android game. Create ONE finished portrait of an adult FEMALE Nord human, variant 2 of 3. Subject: oval Nordic face, fair freckled skin, hazel eyes, auburn hair loosely tied back, age 38. Style: refined realistic dark fantasy painted illustration, natural anatomy and detailed lifelike face, restrained cinematic realism, grounded Elder Scrolls Nordic atmosphere, professional RPG character art. Composition: vertical 3:4 image, head and upper chest, centered, near frontal slight three-quarter angle, complete hair/head/ears/horns with a little headroom, both shoulders visible. Calm neutral expression. Clothing: simple plain charcoal grey linen tunic with modest collar and plain dark brown wool shoulder wrap, modest civilian gender-neutral travel clothing. Background: unobtrusive smoky dark charcoal grey, no scenery. Soft warm key light from upper left, subtle cool rim light, muted natural earthy colours, consistent exposure. Exactly one adult person, one portrait. No armour, weapons, hats, hood, jewelry, makeup, symbols, text, letters, border, collage or watermark. Opaque background."
+    },
+    {
+      "id": "nord_female_3",
+      "race": "nord",
+      "type": "Nord human",
+      "gender": "female",
+      "variant": 3,
+      "details": "angular Nordic face, pale skin, grey eyes, short wavy dark brown hair, age 24",
+      "prompt": "Use case: stylized-concept. Asset: individual character selection portrait for Skyrim Text RPG Android game. Create ONE finished portrait of an adult FEMALE Nord human, variant 3 of 3. Subject: angular Nordic face, pale skin, grey eyes, short wavy dark brown hair, age 24. Style: refined realistic dark fantasy painted illustration, natural anatomy and detailed lifelike face, restrained cinematic realism, grounded Elder Scrolls Nordic atmosphere, professional RPG character art. Composition: vertical 3:4 image, head and upper chest, centered, near frontal slight three-quarter angle, complete hair/head/ears/horns with a little headroom, both shoulders visible. Calm neutral expression. Clothing: simple plain charcoal grey linen tunic with modest collar and plain dark brown wool shoulder wrap, modest civilian gender-neutral travel clothing. Background: unobtrusive smoky dark charcoal grey, no scenery. Soft warm key light from upper left, subtle cool rim light, muted natural earthy colours, consistent exposure. Exactly one adult person, one portrait. No armour, weapons, hats, hood, jewelry, makeup, symbols, text, letters, border, collage or watermark. Opaque background."
+    },
+    {
+      "id": "breton_male_1",
+      "race": "breton",
+      "type": "Breton human",
+      "gender": "male",
+      "variant": 1,
+      "details": "fine Breton features, light olive skin, brown eyes, short wavy chestnut hair, clean shaven, age 27",
+      "prompt": "Use case: stylized-concept. Asset: individual character selection portrait for Skyrim Text RPG Android game. Create ONE finished portrait of an adult MALE Breton human, variant 1 of 3. Subject: fine Breton features, light olive skin, brown eyes, short wavy chestnut hair, clean shaven, age 27. Style: refined realistic dark fantasy painted illustration, natural anatomy and detailed lifelike face, restrained cinematic realism, grounded Elder Scrolls Nordic atmosphere, professional RPG character art. Composition: vertical 3:4 image, head and upper chest, centered, near frontal slight three-quarter angle, complete hair/head/ears/horns with a little headroom, both shoulders visible. Calm neutral expression. Clothing: simple plain charcoal grey linen tunic with modest collar and plain dark brown wool shoulder wrap, modest civilian gender-neutral travel clothing. Background: unobtrusive smoky dark charcoal grey, no scenery. Soft warm key light from upper left, subtle cool rim light, muted natural earthy colours, consistent exposure. Exactly one adult person, one portrait. No armour, weapons, hats, hood, jewelry, makeup, symbols, text, letters, border, collage or watermark. Opaque background."
+    },
+    {
+      "id": "breton_male_2",
+      "race": "breton",
+      "type": "Breton human",
+      "gender": "male",
+      "variant": 2,
+      "details": "narrow thoughtful Breton face, fair skin, grey eyes, shoulder length black hair and trimmed beard, age 42",
+      "prompt": "Use case: stylized-concept. Asset: individual character selection portrait for Skyrim Text RPG Android game. Create ONE finished portrait of an adult MALE Breton human, variant 2 of 3. Subject: narrow thoughtful Breton face, fair skin, grey eyes, shoulder length black hair and trimmed beard, age 42. Style: refined realistic dark fantasy painted illustration, natural anatomy and detailed lifelike face, restrained cinematic realism, grounded Elder Scrolls Nordic atmosphere, professional RPG character art. Composition: vertical 3:4 image, head and upper chest, centered, near frontal slight three-quarter angle, complete hair/head/ears/horns with a little headroom, both shoulders visible. Calm neutral expression. Clothing: simple plain charcoal grey linen tunic with modest collar and plain dark brown wool shoulder wrap, modest civilian gender-neutral travel clothing. Background: unobtrusive smoky dark charcoal grey, no scenery. Soft warm key light from upper left, subtle cool rim light, muted natural earthy colours, consistent exposure. Exactly one adult person, one portrait. No armour, weapons, hats, hood, jewelry, makeup, symbols, text, letters, border, collage or watermark. Opaque background."
+    },
+    {
+      "id": "breton_male_3",
+      "race": "breton",
+      "type": "Breton human",
+      "gender": "male",
+      "variant": 3,
+      "details": "rounded Breton face, lightly freckled skin, green eyes, curly dark blond hair, stubble, age 31",
+      "prompt": "Use case: stylized-concept. Asset: individual character selection portrait for Skyrim Text RPG Android game. Create ONE finished portrait of an adult MALE Breton human, variant 3 of 3. Subject: rounded Breton face, lightly freckled skin, green eyes, curly dark blond hair, stubble, age 31. Style: refined realistic dark fantasy painted illustration, natural anatomy and detailed lifelike face, restrained cinematic realism, grounded Elder Scrolls Nordic atmosphere, professional RPG character art. Composition: vertical 3:4 image, head and upper chest, centered, near frontal slight three-quarter angle, complete hair/head/ears/horns with a little headroom, both shoulders visible. Calm neutral expression. Clothing: simple plain charcoal grey linen tunic with modest collar and plain dark brown wool shoulder wrap, modest civilian gender-neutral travel clothing. Background: unobtrusive smoky dark charcoal grey, no scenery. Soft warm key light from upper left, subtle cool rim light, muted natural earthy colours, consistent exposure. Exactly one adult person, one portrait. No armour, weapons, hats, hood, jewelry, makeup, symbols, text, letters, border, collage or watermark. Opaque background."
+    },
+    {
+      "id": "breton_female_1",
+      "race": "breton",
+      "type": "Breton human",
+      "gender": "female",
+      "variant": 1,
+      "details": "fine Breton features, light olive skin, brown eyes, wavy chestnut hair gathered back, age 26",
+      "prompt": "Use case: stylized-concept. Asset: individual character selection portrait for Skyrim Text RPG Android game. Create ONE finished portrait of an adult FEMALE Breton human, variant 1 of 3. Subject: fine Breton features, light olive skin, brown eyes, wavy chestnut hair gathered back, age 26. Style: refined realistic dark fantasy painted illustration, natural anatomy and detailed lifelike face, restrained cinematic realism, grounded Elder Scrolls Nordic atmosphere, professional RPG character art. Composition: vertical 3:4 image, head and upper chest, centered, near frontal slight three-quarter angle, complete hair/head/ears/horns with a little headroom, both shoulders visible. Calm neutral expression. Clothing: simple plain charcoal grey linen tunic with modest collar and plain dark brown wool shoulder wrap, modest civilian gender-neutral travel clothing. Background: unobtrusive smoky dark charcoal grey, no scenery. Soft warm key light from upper left, subtle cool rim light, muted natural earthy colours, consistent exposure. Exactly one adult person, one portrait. No armour, weapons, hats, hood, jewelry, makeup, symbols, text, letters, border, collage or watermark. Opaque background."
+    },
+    {
+      "id": "breton_female_2",
+      "race": "breton",
+      "type": "Breton human",
+      "gender": "female",
+      "variant": 2,
+      "details": "narrow Breton face, fair skin, grey green eyes, short black curls, age 39",
+      "prompt": "Use case: stylized-concept. Asset: individual character selection portrait for Skyrim Text RPG Android game. Create ONE finished portrait of an adult FEMALE Breton human, variant 2 of 3. Subject: narrow Breton face, fair skin, grey green eyes, short black curls, age 39. Style: refined realistic dark fantasy painted illustration, natural anatomy and detailed lifelike face, restrained cinematic realism, grounded Elder Scrolls Nordic atmosphere, professional RPG character art. Composition: vertical 3:4 image, head and upper chest, centered, near frontal slight three-quarter angle, complete hair/head/ears/horns with a little headroom, both shoulders visible. Calm neutral expression. Clothing: simple plain charcoal grey linen tunic with modest collar and plain dark brown wool shoulder wrap, modest civilian gender-neutral travel clothing. Background: unobtrusive smoky dark charcoal grey, no scenery. Soft warm key light from upper left, subtle cool rim light, muted natural earthy colours, consistent exposure. Exactly one adult person, one portrait. No armour, weapons, hats, hood, jewelry, makeup, symbols, text, letters, border, collage or watermark. Opaque background."
+    },
+    {
+      "id": "breton_female_3",
+      "race": "breton",
+      "type": "Breton human",
+      "gender": "female",
+      "variant": 3,
+      "details": "rounded Breton face, freckles, hazel eyes, copper brown hair in a simple braid, age 30",
+      "prompt": "Use case: stylized-concept. Asset: individual character selection portrait for Skyrim Text RPG Android game. Create ONE finished portrait of an adult FEMALE Breton human, variant 3 of 3. Subject: rounded Breton face, freckles, hazel eyes, copper brown hair in a simple braid, age 30. Style: refined realistic dark fantasy painted illustration, natural anatomy and detailed lifelike face, restrained cinematic realism, grounded Elder Scrolls Nordic atmosphere, professional RPG character art. Composition: vertical 3:4 image, head and upper chest, centered, near frontal slight three-quarter angle, complete hair/head/ears/horns with a little headroom, both shoulders visible. Calm neutral expression. Clothing: simple plain charcoal grey linen tunic with modest collar and plain dark brown wool shoulder wrap, modest civilian gender-neutral travel clothing. Background: unobtrusive smoky dark charcoal grey, no scenery. Soft warm key light from upper left, subtle cool rim light, muted natural earthy colours, consistent exposure. Exactly one adult person, one portrait. No armour, weapons, hats, hood, jewelry, makeup, symbols, text, letters, border, collage or watermark. Opaque background."
+    },
+    {
+      "id": "dunmer_male_1",
+      "race": "dunmer",
+      "type": "Dunmer dark elf",
+      "gender": "male",
+      "variant": 1,
+      "details": "angular elven face, cool ash grey skin, pointed long elf ears, red eyes, black hair swept back, clean shaven, age 30",
+      "prompt": "Use case: stylized-concept. Asset: individual character selection portrait for Skyrim Text RPG Android game. Create ONE finished portrait of an adult MALE Dunmer dark elf, variant 1 of 3. Subject: angular elven face, cool ash grey skin, pointed long elf ears, red eyes, black hair swept back, clean shaven, age 30. Style: refined realistic dark fantasy painted illustration, natural anatomy and detailed lifelike face, restrained cinematic realism, grounded Elder Scrolls Nordic atmosphere, professional RPG character art. Composition: vertical 3:4 image, head and upper chest, centered, near frontal slight three-quarter angle, complete hair/head/ears/horns with a little headroom, both shoulders visible. Calm neutral expression. Clothing: simple plain charcoal grey linen tunic with modest collar and plain dark brown wool shoulder wrap, modest civilian gender-neutral travel clothing. Background: unobtrusive smoky dark charcoal grey, no scenery. Soft warm key light from upper left, subtle cool rim light, muted natural earthy colours, consistent exposure. Exactly one adult person, one portrait. No armour, weapons, hats, hood, jewelry, makeup, symbols, text, letters, border, collage or watermark. Opaque background."
+    },
+    {
+      "id": "dunmer_male_2",
+      "race": "dunmer",
+      "type": "Dunmer dark elf",
+      "gender": "male",
+      "variant": 2,
+      "details": "narrow elven face, slate grey skin, long pointed ears, ruby red eyes, shoulder length white hair, age 50",
+      "prompt": "Use case: stylized-concept. Asset: individual character selection portrait for Skyrim Text RPG Android game. Create ONE finished portrait of an adult MALE Dunmer dark elf, variant 2 of 3. Subject: narrow elven face, slate grey skin, long pointed ears, ruby red eyes, shoulder length white hair, age 50. Style: refined realistic dark fantasy painted illustration, natural anatomy and detailed lifelike face, restrained cinematic realism, grounded Elder Scrolls Nordic atmosphere, professional RPG character art. Composition: vertical 3:4 image, head and upper chest, centered, near frontal slight three-quarter angle, complete hair/head/ears/horns with a little headroom, both shoulders visible. Calm neutral expression. Clothing: simple plain charcoal grey linen tunic with modest collar and plain dark brown wool shoulder wrap, modest civilian gender-neutral travel clothing. Background: unobtrusive smoky dark charcoal grey, no scenery. Soft warm key light from upper left, subtle cool rim light, muted natural earthy colours, consistent exposure. Exactly one adult person, one portrait. No armour, weapons, hats, hood, jewelry, makeup, symbols, text, letters, border, collage or watermark. Opaque background."
+    },
+    {
+      "id": "dunmer_male_3",
+      "race": "dunmer",
+      "type": "Dunmer dark elf",
+      "gender": "male",
+      "variant": 3,
+      "details": "sharp cheekbones, charcoal grey skin, pointed ears, red eyes, short black hair, subtle black goatee, age 38",
+      "prompt": "Use case: stylized-concept. Asset: individual character selection portrait for Skyrim Text RPG Android game. Create ONE finished portrait of an adult MALE Dunmer dark elf, variant 3 of 3. Subject: sharp cheekbones, charcoal grey skin, pointed ears, red eyes, short black hair, subtle black goatee, age 38. Style: refined realistic dark fantasy painted illustration, natural anatomy and detailed lifelike face, restrained cinematic realism, grounded Elder Scrolls Nordic atmosphere, professional RPG character art. Composition: vertical 3:4 image, head and upper chest, centered, near frontal slight three-quarter angle, complete hair/head/ears/horns with a little headroom, both shoulders visible. Calm neutral expression. Clothing: simple plain charcoal grey linen tunic with modest collar and plain dark brown wool shoulder wrap, modest civilian gender-neutral travel clothing. Background: unobtrusive smoky dark charcoal grey, no scenery. Soft warm key light from upper left, subtle cool rim light, muted natural earthy colours, consistent exposure. Exactly one adult person, one portrait. No armour, weapons, hats, hood, jewelry, makeup, symbols, text, letters, border, collage or watermark. Opaque background."
+    },
+    {
+      "id": "dunmer_female_1",
+      "race": "dunmer",
+      "type": "Dunmer dark elf",
+      "gender": "female",
+      "variant": 1,
+      "details": "angular elven face, cool ash grey skin, long pointed ears, red eyes, black hair tied back, age 28",
+      "prompt": "Use case: stylized-concept. Asset: individual character selection portrait for Skyrim Text RPG Android game. Create ONE finished portrait of an adult FEMALE Dunmer dark elf, variant 1 of 3. Subject: angular elven face, cool ash grey skin, long pointed ears, red eyes, black hair tied back, age 28. Style: refined realistic dark fantasy painted illustration, natural anatomy and detailed lifelike face, restrained cinematic realism, grounded Elder Scrolls Nordic atmosphere, professional RPG character art. Composition: vertical 3:4 image, head and upper chest, centered, near frontal slight three-quarter angle, complete hair/head/ears/horns with a little headroom, both shoulders visible. Calm neutral expression. Clothing: simple plain charcoal grey linen tunic with modest collar and plain dark brown wool shoulder wrap, modest civilian gender-neutral travel clothing. Background: unobtrusive smoky dark charcoal grey, no scenery. Soft warm key light from upper left, subtle cool rim light, muted natural earthy colours, consistent exposure. Exactly one adult person, one portrait. No armour, weapons, hats, hood, jewelry, makeup, symbols, text, letters, border, collage or watermark. Opaque background."
+    },
+    {
+      "id": "dunmer_female_2",
+      "race": "dunmer",
+      "type": "Dunmer dark elf",
+      "gender": "female",
+      "variant": 2,
+      "details": "sharp elven cheekbones, slate grey skin, pointed ears, ruby eyes, short silver white hair, age 45",
+      "prompt": "Use case: stylized-concept. Asset: individual character selection portrait for Skyrim Text RPG Android game. Create ONE finished portrait of an adult FEMALE Dunmer dark elf, variant 2 of 3. Subject: sharp elven cheekbones, slate grey skin, pointed ears, ruby eyes, short silver white hair, age 45. Style: refined realistic dark fantasy painted illustration, natural anatomy and detailed lifelike face, restrained cinematic realism, grounded Elder Scrolls Nordic atmosphere, professional RPG character art. Composition: vertical 3:4 image, head and upper chest, centered, near frontal slight three-quarter angle, complete hair/head/ears/horns with a little headroom, both shoulders visible. Calm neutral expression. Clothing: simple plain charcoal grey linen tunic with modest collar and plain dark brown wool shoulder wrap, modest civilian gender-neutral travel clothing. Background: unobtrusive smoky dark charcoal grey, no scenery. Soft warm key light from upper left, subtle cool rim light, muted natural earthy colours, consistent exposure. Exactly one adult person, one portrait. No armour, weapons, hats, hood, jewelry, makeup, symbols, text, letters, border, collage or watermark. Opaque background."
+    },
+    {
+      "id": "dunmer_female_3",
+      "race": "dunmer",
+      "type": "Dunmer dark elf",
+      "gender": "female",
+      "variant": 3,
+      "details": "fine elongated elven face, charcoal grey skin, pointed ears, red eyes, long dark auburn hair swept back, age 33",
+      "prompt": "Use case: stylized-concept. Asset: individual character selection portrait for Skyrim Text RPG Android game. Create ONE finished portrait of an adult FEMALE Dunmer dark elf, variant 3 of 3. Subject: fine elongated elven face, charcoal grey skin, pointed ears, red eyes, long dark auburn hair swept back, age 33. Style: refined realistic dark fantasy painted illustration, natural anatomy and detailed lifelike face, restrained cinematic realism, grounded Elder Scrolls Nordic atmosphere, professional RPG character art. Composition: vertical 3:4 image, head and upper chest, centered, near frontal slight three-quarter angle, complete hair/head/ears/horns with a little headroom, both shoulders visible. Calm neutral expression. Clothing: simple plain charcoal grey linen tunic with modest collar and plain dark brown wool shoulder wrap, modest civilian gender-neutral travel clothing. Background: unobtrusive smoky dark charcoal grey, no scenery. Soft warm key light from upper left, subtle cool rim light, muted natural earthy colours, consistent exposure. Exactly one adult person, one portrait. No armour, weapons, hats, hood, jewelry, makeup, symbols, text, letters, border, collage or watermark. Opaque background."
+    },
+    {
+      "id": "khajiit_male_1",
+      "race": "khajiit",
+      "type": "Khajiit feline beastfolk",
+      "gender": "male",
+      "variant": 1,
+      "details": "authentic anthropomorphic Khajiit cat head, tawny brown tabby fur, short feline muzzle, broad black cat nose, whiskers, upright rounded triangular ears, amber slit pupil eyes, lynxlike cheek ruff, age 30",
+      "prompt": "Use case: stylized-concept. Asset: individual character selection portrait for Skyrim Text RPG Android game. Create ONE finished portrait of an adult MALE Khajiit feline beastfolk, variant 1 of 3. Subject: authentic anthropomorphic Khajiit cat head, tawny brown tabby fur, short feline muzzle, broad black cat nose, whiskers, upright rounded triangular ears, amber slit pupil eyes, lynxlike cheek ruff, age 30. Style: refined realistic dark fantasy painted illustration, natural anatomy and detailed lifelike face, restrained cinematic realism, grounded Elder Scrolls Nordic atmosphere, professional RPG character art. Composition: vertical 3:4 image, head and upper chest, centered, near frontal slight three-quarter angle, complete hair/head/ears/horns with a little headroom, both shoulders visible. Calm neutral expression. Clothing: simple plain charcoal grey linen tunic with modest collar and plain dark brown wool shoulder wrap, modest civilian gender-neutral travel clothing. Background: unobtrusive smoky dark charcoal grey, no scenery. Soft warm key light from upper left, subtle cool rim light, muted natural earthy colours, consistent exposure. Exactly one adult person, one portrait. No armour, weapons, hats, hood, jewelry, makeup, symbols, text, letters, border, collage or watermark. Opaque background."
+    },
+    {
+      "id": "khajiit_male_2",
+      "race": "khajiit",
+      "type": "Khajiit feline beastfolk",
+      "gender": "male",
+      "variant": 2,
+      "details": "authentic Khajiit feline head, silver grey fur with dark stripes, feline muzzle and whiskers, upright cat ears, pale green slit pupil eyes, age 42",
+      "prompt": "Use case: stylized-concept. Asset: individual character selection portrait for Skyrim Text RPG Android game. Create ONE finished portrait of an adult MALE Khajiit feline beastfolk, variant 2 of 3. Subject: authentic Khajiit feline head, silver grey fur with dark stripes, feline muzzle and whiskers, upright cat ears, pale green slit pupil eyes, age 42. Style: refined realistic dark fantasy painted illustration, natural anatomy and detailed lifelike face, restrained cinematic realism, grounded Elder Scrolls Nordic atmosphere, professional RPG character art. Composition: vertical 3:4 image, head and upper chest, centered, near frontal slight three-quarter angle, complete hair/head/ears/horns with a little headroom, both shoulders visible. Calm neutral expression. Clothing: simple plain charcoal grey linen tunic with modest collar and plain dark brown wool shoulder wrap, modest civilian gender-neutral travel clothing. Background: unobtrusive smoky dark charcoal grey, no scenery. Soft warm key light from upper left, subtle cool rim light, muted natural earthy colours, consistent exposure. Exactly one adult person, one portrait. No armour, weapons, hats, hood, jewelry, makeup, symbols, text, letters, border, collage or watermark. Opaque background."
+    },
+    {
+      "id": "khajiit_male_3",
+      "race": "khajiit",
+      "type": "Khajiit feline beastfolk",
+      "gender": "male",
+      "variant": 3,
+      "details": "authentic Khajiit feline head, dark brown near black fur with lighter muzzle, cat nose, whiskers, upright tufted cat ears, copper slit pupil eyes, age 26",
+      "prompt": "Use case: stylized-concept. Asset: individual character selection portrait for Skyrim Text RPG Android game. Create ONE finished portrait of an adult MALE Khajiit feline beastfolk, variant 3 of 3. Subject: authentic Khajiit feline head, dark brown near black fur with lighter muzzle, cat nose, whiskers, upright tufted cat ears, copper slit pupil eyes, age 26. Style: refined realistic dark fantasy painted illustration, natural anatomy and detailed lifelike face, restrained cinematic realism, grounded Elder Scrolls Nordic atmosphere, professional RPG character art. Composition: vertical 3:4 image, head and upper chest, centered, near frontal slight three-quarter angle, complete hair/head/ears/horns with a little headroom, both shoulders visible. Calm neutral expression. Clothing: simple plain charcoal grey linen tunic with modest collar and plain dark brown wool shoulder wrap, modest civilian gender-neutral travel clothing. Background: unobtrusive smoky dark charcoal grey, no scenery. Soft warm key light from upper left, subtle cool rim light, muted natural earthy colours, consistent exposure. Exactly one adult person, one portrait. No armour, weapons, hats, hood, jewelry, makeup, symbols, text, letters, border, collage or watermark. Opaque background."
+    },
+    {
+      "id": "khajiit_female_1",
+      "race": "khajiit",
+      "type": "Khajiit feline beastfolk",
+      "gender": "female",
+      "variant": 1,
+      "details": "authentic anthropomorphic Khajiit feline head, golden tawny fur with subtle dark stripes, refined feline muzzle, black cat nose, whiskers, upright cat ears, green slit pupil eyes, age 28",
+      "prompt": "Use case: stylized-concept. Asset: individual character selection portrait for Skyrim Text RPG Android game. Create ONE finished portrait of an adult FEMALE Khajiit feline beastfolk, variant 1 of 3. Subject: authentic anthropomorphic Khajiit feline head, golden tawny fur with subtle dark stripes, refined feline muzzle, black cat nose, whiskers, upright cat ears, green slit pupil eyes, age 28. Style: refined realistic dark fantasy painted illustration, natural anatomy and detailed lifelike face, restrained cinematic realism, grounded Elder Scrolls Nordic atmosphere, professional RPG character art. Composition: vertical 3:4 image, head and upper chest, centered, near frontal slight three-quarter angle, complete hair/head/ears/horns with a little headroom, both shoulders visible. Calm neutral expression. Clothing: simple plain charcoal grey linen tunic with modest collar and plain dark brown wool shoulder wrap, modest civilian gender-neutral travel clothing. Background: unobtrusive smoky dark charcoal grey, no scenery. Soft warm key light from upper left, subtle cool rim light, muted natural earthy colours, consistent exposure. Exactly one adult person, one portrait. No armour, weapons, hats, hood, jewelry, makeup, symbols, text, letters, border, collage or watermark. Opaque background."
+    },
+    {
+      "id": "khajiit_female_2",
+      "race": "khajiit",
+      "type": "Khajiit feline beastfolk",
+      "gender": "female",
+      "variant": 2,
+      "details": "authentic Khajiit feline head, silver grey spotted fur, narrow feline muzzle, cat nose and whiskers, tufted upright cat ears, blue grey slit pupil eyes, age 35",
+      "prompt": "Use case: stylized-concept. Asset: individual character selection portrait for Skyrim Text RPG Android game. Create ONE finished portrait of an adult FEMALE Khajiit feline beastfolk, variant 2 of 3. Subject: authentic Khajiit feline head, silver grey spotted fur, narrow feline muzzle, cat nose and whiskers, tufted upright cat ears, blue grey slit pupil eyes, age 35. Style: refined realistic dark fantasy painted illustration, natural anatomy and detailed lifelike face, restrained cinematic realism, grounded Elder Scrolls Nordic atmosphere, professional RPG character art. Composition: vertical 3:4 image, head and upper chest, centered, near frontal slight three-quarter angle, complete hair/head/ears/horns with a little headroom, both shoulders visible. Calm neutral expression. Clothing: simple plain charcoal grey linen tunic with modest collar and plain dark brown wool shoulder wrap, modest civilian gender-neutral travel clothing. Background: unobtrusive smoky dark charcoal grey, no scenery. Soft warm key light from upper left, subtle cool rim light, muted natural earthy colours, consistent exposure. Exactly one adult person, one portrait. No armour, weapons, hats, hood, jewelry, makeup, symbols, text, letters, border, collage or watermark. Opaque background."
+    },
+    {
+      "id": "khajiit_female_3",
+      "race": "khajiit",
+      "type": "Khajiit feline beastfolk",
+      "gender": "female",
+      "variant": 3,
+      "details": "authentic Khajiit feline head, rich dark russet fur, pale cream muzzle, whiskers, upright cat ears, amber slit pupil eyes, age 25",
+      "prompt": "Use case: stylized-concept. Asset: individual character selection portrait for Skyrim Text RPG Android game. Create ONE finished portrait of an adult FEMALE Khajiit feline beastfolk, variant 3 of 3. Subject: authentic Khajiit feline head, rich dark russet fur, pale cream muzzle, whiskers, upright cat ears, amber slit pupil eyes, age 25. Style: refined realistic dark fantasy painted illustration, natural anatomy and detailed lifelike face, restrained cinematic realism, grounded Elder Scrolls Nordic atmosphere, professional RPG character art. Composition: vertical 3:4 image, head and upper chest, centered, near frontal slight three-quarter angle, complete hair/head/ears/horns with a little headroom, both shoulders visible. Calm neutral expression. Clothing: simple plain charcoal grey linen tunic with modest collar and plain dark brown wool shoulder wrap, modest civilian gender-neutral travel clothing. Background: unobtrusive smoky dark charcoal grey, no scenery. Soft warm key light from upper left, subtle cool rim light, muted natural earthy colours, consistent exposure. Exactly one adult person, one portrait. No armour, weapons, hats, hood, jewelry, makeup, symbols, text, letters, border, collage or watermark. Opaque background."
+    },
+    {
+      "id": "imperial_male_1",
+      "race": "imperial",
+      "type": "Imperial human",
+      "gender": "male",
+      "variant": 1,
+      "details": "Mediterranean Imperial face, olive skin, deep brown eyes, short black wavy hair, clean shaven, age 29",
+      "prompt": "Use case: stylized-concept. Asset: individual character selection portrait for Skyrim Text RPG Android game. Create ONE finished portrait of an adult MALE Imperial human, variant 1 of 3. Subject: Mediterranean Imperial face, olive skin, deep brown eyes, short black wavy hair, clean shaven, age 29. Style: refined realistic dark fantasy painted illustration, natural anatomy and detailed lifelike face, restrained cinematic realism, grounded Elder Scrolls Nordic atmosphere, professional RPG character art. Composition: vertical 3:4 image, head and upper chest, centered, near frontal slight three-quarter angle, complete hair/head/ears/horns with a little headroom, both shoulders visible. Calm neutral expression. Clothing: simple plain charcoal grey linen tunic with modest collar and plain dark brown wool shoulder wrap, modest civilian gender-neutral travel clothing. Background: unobtrusive smoky dark charcoal grey, no scenery. Soft warm key light from upper left, subtle cool rim light, muted natural earthy colours, consistent exposure. Exactly one adult person, one portrait. No armour, weapons, hats, hood, jewelry, makeup, symbols, text, letters, border, collage or watermark. Opaque background."
+    },
+    {
+      "id": "imperial_male_2",
+      "race": "imperial",
+      "type": "Imperial human",
+      "gender": "male",
+      "variant": 2,
+      "details": "broad Imperial face, warm tan skin, hazel eyes, dark curly hair with silver at temples, trimmed dark beard, age 46",
+      "prompt": "Use case: stylized-concept. Asset: individual character selection portrait for Skyrim Text RPG Android game. Create ONE finished portrait of an adult MALE Imperial human, variant 2 of 3. Subject: broad Imperial face, warm tan skin, hazel eyes, dark curly hair with silver at temples, trimmed dark beard, age 46. Style: refined realistic dark fantasy painted illustration, natural anatomy and detailed lifelike face, restrained cinematic realism, grounded Elder Scrolls Nordic atmosphere, professional RPG character art. Composition: vertical 3:4 image, head and upper chest, centered, near frontal slight three-quarter angle, complete hair/head/ears/horns with a little headroom, both shoulders visible. Calm neutral expression. Clothing: simple plain charcoal grey linen tunic with modest collar and plain dark brown wool shoulder wrap, modest civilian gender-neutral travel clothing. Background: unobtrusive smoky dark charcoal grey, no scenery. Soft warm key light from upper left, subtle cool rim light, muted natural earthy colours, consistent exposure. Exactly one adult person, one portrait. No armour, weapons, hats, hood, jewelry, makeup, symbols, text, letters, border, collage or watermark. Opaque background."
+    },
+    {
+      "id": "imperial_male_3",
+      "race": "imperial",
+      "type": "Imperial human",
+      "gender": "male",
+      "variant": 3,
+      "details": "long Imperial face, light olive skin, brown eyes, straight dark brown hair, neat moustache, age 33",
+      "prompt": "Use case: stylized-concept. Asset: individual character selection portrait for Skyrim Text RPG Android game. Create ONE finished portrait of an adult MALE Imperial human, variant 3 of 3. Subject: long Imperial face, light olive skin, brown eyes, straight dark brown hair, neat moustache, age 33. Style: refined realistic dark fantasy painted illustration, natural anatomy and detailed lifelike face, restrained cinematic realism, grounded Elder Scrolls Nordic atmosphere, professional RPG character art. Composition: vertical 3:4 image, head and upper chest, centered, near frontal slight three-quarter angle, complete hair/head/ears/horns with a little headroom, both shoulders visible. Calm neutral expression. Clothing: simple plain charcoal grey linen tunic with modest collar and plain dark brown wool shoulder wrap, modest civilian gender-neutral travel clothing. Background: unobtrusive smoky dark charcoal grey, no scenery. Soft warm key light from upper left, subtle cool rim light, muted natural earthy colours, consistent exposure. Exactly one adult person, one portrait. No armour, weapons, hats, hood, jewelry, makeup, symbols, text, letters, border, collage or watermark. Opaque background."
+    },
+    {
+      "id": "imperial_female_1",
+      "race": "imperial",
+      "type": "Imperial human",
+      "gender": "female",
+      "variant": 1,
+      "details": "Mediterranean Imperial face, olive skin, dark brown eyes, wavy black hair loosely tied back, age 28",
+      "prompt": "Use case: stylized-concept. Asset: individual character selection portrait for Skyrim Text RPG Android game. Create ONE finished portrait of an adult FEMALE Imperial human, variant 1 of 3. Subject: Mediterranean Imperial face, olive skin, dark brown eyes, wavy black hair loosely tied back, age 28. Style: refined realistic dark fantasy painted illustration, natural anatomy and detailed lifelike face, restrained cinematic realism, grounded Elder Scrolls Nordic atmosphere, professional RPG character art. Composition: vertical 3:4 image, head and upper chest, centered, near frontal slight three-quarter angle, complete hair/head/ears/horns with a little headroom, both shoulders visible. Calm neutral expression. Clothing: simple plain charcoal grey linen tunic with modest collar and plain dark brown wool shoulder wrap, modest civilian gender-neutral travel clothing. Background: unobtrusive smoky dark charcoal grey, no scenery. Soft warm key light from upper left, subtle cool rim light, muted natural earthy colours, consistent exposure. Exactly one adult person, one portrait. No armour, weapons, hats, hood, jewelry, makeup, symbols, text, letters, border, collage or watermark. Opaque background."
+    },
+    {
+      "id": "imperial_female_2",
+      "race": "imperial",
+      "type": "Imperial human",
+      "gender": "female",
+      "variant": 2,
+      "details": "strong Imperial face, warm tan skin, hazel eyes, short dark curls with a few silver strands, age 43",
+      "prompt": "Use case: stylized-concept. Asset: individual character selection portrait for Skyrim Text RPG Android game. Create ONE finished portrait of an adult FEMALE Imperial human, variant 2 of 3. Subject: strong Imperial face, warm tan skin, hazel eyes, short dark curls with a few silver strands, age 43. Style: refined realistic dark fantasy painted illustration, natural anatomy and detailed lifelike face, restrained cinematic realism, grounded Elder Scrolls Nordic atmosphere, professional RPG character art. Composition: vertical 3:4 image, head and upper chest, centered, near frontal slight three-quarter angle, complete hair/head/ears/horns with a little headroom, both shoulders visible. Calm neutral expression. Clothing: simple plain charcoal grey linen tunic with modest collar and plain dark brown wool shoulder wrap, modest civilian gender-neutral travel clothing. Background: unobtrusive smoky dark charcoal grey, no scenery. Soft warm key light from upper left, subtle cool rim light, muted natural earthy colours, consistent exposure. Exactly one adult person, one portrait. No armour, weapons, hats, hood, jewelry, makeup, symbols, text, letters, border, collage or watermark. Opaque background."
+    },
+    {
+      "id": "imperial_female_3",
+      "race": "imperial",
+      "type": "Imperial human",
+      "gender": "female",
+      "variant": 3,
+      "details": "oval Imperial face, light olive skin, brown eyes, chestnut hair in a plain braid, age 32",
+      "prompt": "Use case: stylized-concept. Asset: individual character selection portrait for Skyrim Text RPG Android game. Create ONE finished portrait of an adult FEMALE Imperial human, variant 3 of 3. Subject: oval Imperial face, light olive skin, brown eyes, chestnut hair in a plain braid, age 32. Style: refined realistic dark fantasy painted illustration, natural anatomy and detailed lifelike face, restrained cinematic realism, grounded Elder Scrolls Nordic atmosphere, professional RPG character art. Composition: vertical 3:4 image, head and upper chest, centered, near frontal slight three-quarter angle, complete hair/head/ears/horns with a little headroom, both shoulders visible. Calm neutral expression. Clothing: simple plain charcoal grey linen tunic with modest collar and plain dark brown wool shoulder wrap, modest civilian gender-neutral travel clothing. Background: unobtrusive smoky dark charcoal grey, no scenery. Soft warm key light from upper left, subtle cool rim light, muted natural earthy colours, consistent exposure. Exactly one adult person, one portrait. No armour, weapons, hats, hood, jewelry, makeup, symbols, text, letters, border, collage or watermark. Opaque background."
+    },
+    {
+      "id": "orc_male_1",
+      "race": "orc",
+      "type": "Orsimer orc",
+      "gender": "male",
+      "variant": 1,
+      "details": "authentic Elder Scrolls orc face, muted moss green skin, broad heavy jaw, small natural upward lower tusks, pointed ears, deep set brown eyes, dark hair tied back, age 30",
+      "prompt": "Use case: stylized-concept. Asset: individual character selection portrait for Skyrim Text RPG Android game. Create ONE finished portrait of an adult MALE Orsimer orc, variant 1 of 3. Subject: authentic Elder Scrolls orc face, muted moss green skin, broad heavy jaw, small natural upward lower tusks, pointed ears, deep set brown eyes, dark hair tied back, age 30. Style: refined realistic dark fantasy painted illustration, natural anatomy and detailed lifelike face, restrained cinematic realism, grounded Elder Scrolls Nordic atmosphere, professional RPG character art. Composition: vertical 3:4 image, head and upper chest, centered, near frontal slight three-quarter angle, complete hair/head/ears/horns with a little headroom, both shoulders visible. Calm neutral expression. Clothing: simple plain charcoal grey linen tunic with modest collar and plain dark brown wool shoulder wrap, modest civilian gender-neutral travel clothing. Background: unobtrusive smoky dark charcoal grey, no scenery. Soft warm key light from upper left, subtle cool rim light, muted natural earthy colours, consistent exposure. Exactly one adult person, one portrait. No armour, weapons, hats, hood, jewelry, makeup, symbols, text, letters, border, collage or watermark. Opaque background."
+    },
+    {
+      "id": "orc_male_2",
+      "race": "orc",
+      "type": "Orsimer orc",
+      "gender": "male",
+      "variant": 2,
+      "details": "broad orc face, olive green skin, low brow ridge, restrained lower tusks, pointed ears, amber eyes, close shaven head and short dark beard, age 46",
+      "prompt": "Use case: stylized-concept. Asset: individual character selection portrait for Skyrim Text RPG Android game. Create ONE finished portrait of an adult MALE Orsimer orc, variant 2 of 3. Subject: broad orc face, olive green skin, low brow ridge, restrained lower tusks, pointed ears, amber eyes, close shaven head and short dark beard, age 46. Style: refined realistic dark fantasy painted illustration, natural anatomy and detailed lifelike face, restrained cinematic realism, grounded Elder Scrolls Nordic atmosphere, professional RPG character art. Composition: vertical 3:4 image, head and upper chest, centered, near frontal slight three-quarter angle, complete hair/head/ears/horns with a little headroom, both shoulders visible. Calm neutral expression. Clothing: simple plain charcoal grey linen tunic with modest collar and plain dark brown wool shoulder wrap, modest civilian gender-neutral travel clothing. Background: unobtrusive smoky dark charcoal grey, no scenery. Soft warm key light from upper left, subtle cool rim light, muted natural earthy colours, consistent exposure. Exactly one adult person, one portrait. No armour, weapons, hats, hood, jewelry, makeup, symbols, text, letters, border, collage or watermark. Opaque background."
+    },
+    {
+      "id": "orc_male_3",
+      "race": "orc",
+      "type": "Orsimer orc",
+      "gender": "male",
+      "variant": 3,
+      "details": "angular orc face, desaturated grey green skin, broad flat nose, small lower tusks, pointed ears, grey eyes, short dark brown hair, age 27",
+      "prompt": "Use case: stylized-concept. Asset: individual character selection portrait for Skyrim Text RPG Android game. Create ONE finished portrait of an adult MALE Orsimer orc, variant 3 of 3. Subject: angular orc face, desaturated grey green skin, broad flat nose, small lower tusks, pointed ears, grey eyes, short dark brown hair, age 27. Style: refined realistic dark fantasy painted illustration, natural anatomy and detailed lifelike face, restrained cinematic realism, grounded Elder Scrolls Nordic atmosphere, professional RPG character art. Composition: vertical 3:4 image, head and upper chest, centered, near frontal slight three-quarter angle, complete hair/head/ears/horns with a little headroom, both shoulders visible. Calm neutral expression. Clothing: simple plain charcoal grey linen tunic with modest collar and plain dark brown wool shoulder wrap, modest civilian gender-neutral travel clothing. Background: unobtrusive smoky dark charcoal grey, no scenery. Soft warm key light from upper left, subtle cool rim light, muted natural earthy colours, consistent exposure. Exactly one adult person, one portrait. No armour, weapons, hats, hood, jewelry, makeup, symbols, text, letters, border, collage or watermark. Opaque background."
+    },
+    {
+      "id": "orc_female_1",
+      "race": "orc",
+      "type": "Orsimer orc",
+      "gender": "female",
+      "variant": 1,
+      "details": "authentic Elder Scrolls female orc, muted moss green skin, strong broad jaw, small natural upward lower tusks, pointed ears, brown eyes, dark hair in simple braid, age 29",
+      "prompt": "Use case: stylized-concept. Asset: individual character selection portrait for Skyrim Text RPG Android game. Create ONE finished portrait of an adult FEMALE Orsimer orc, variant 1 of 3. Subject: authentic Elder Scrolls female orc, muted moss green skin, strong broad jaw, small natural upward lower tusks, pointed ears, brown eyes, dark hair in simple braid, age 29. Style: refined realistic dark fantasy painted illustration, natural anatomy and detailed lifelike face, restrained cinematic realism, grounded Elder Scrolls Nordic atmosphere, professional RPG character art. Composition: vertical 3:4 image, head and upper chest, centered, near frontal slight three-quarter angle, complete hair/head/ears/horns with a little headroom, both shoulders visible. Calm neutral expression. Clothing: simple plain charcoal grey linen tunic with modest collar and plain dark brown wool shoulder wrap, modest civilian gender-neutral travel clothing. Background: unobtrusive smoky dark charcoal grey, no scenery. Soft warm key light from upper left, subtle cool rim light, muted natural earthy colours, consistent exposure. Exactly one adult person, one portrait. No armour, weapons, hats, hood, jewelry, makeup, symbols, text, letters, border, collage or watermark. Opaque background."
+    },
+    {
+      "id": "orc_female_2",
+      "race": "orc",
+      "type": "Orsimer orc",
+      "gender": "female",
+      "variant": 2,
+      "details": "strong orc face, olive green skin, low brow ridge, subtle lower tusks, pointed ears, amber eyes, short dark cropped hair, age 42",
+      "prompt": "Use case: stylized-concept. Asset: individual character selection portrait for Skyrim Text RPG Android game. Create ONE finished portrait of an adult FEMALE Orsimer orc, variant 2 of 3. Subject: strong orc face, olive green skin, low brow ridge, subtle lower tusks, pointed ears, amber eyes, short dark cropped hair, age 42. Style: refined realistic dark fantasy painted illustration, natural anatomy and detailed lifelike face, restrained cinematic realism, grounded Elder Scrolls Nordic atmosphere, professional RPG character art. Composition: vertical 3:4 image, head and upper chest, centered, near frontal slight three-quarter angle, complete hair/head/ears/horns with a little headroom, both shoulders visible. Calm neutral expression. Clothing: simple plain charcoal grey linen tunic with modest collar and plain dark brown wool shoulder wrap, modest civilian gender-neutral travel clothing. Background: unobtrusive smoky dark charcoal grey, no scenery. Soft warm key light from upper left, subtle cool rim light, muted natural earthy colours, consistent exposure. Exactly one adult person, one portrait. No armour, weapons, hats, hood, jewelry, makeup, symbols, text, letters, border, collage or watermark. Opaque background."
+    },
+    {
+      "id": "orc_female_3",
+      "race": "orc",
+      "type": "Orsimer orc",
+      "gender": "female",
+      "variant": 3,
+      "details": "angular orc face, desaturated grey green skin, broad nose, small lower tusks, pointed ears, grey eyes, long dark brown hair tied back, age 26",
+      "prompt": "Use case: stylized-concept. Asset: individual character selection portrait for Skyrim Text RPG Android game. Create ONE finished portrait of an adult FEMALE Orsimer orc, variant 3 of 3. Subject: angular orc face, desaturated grey green skin, broad nose, small lower tusks, pointed ears, grey eyes, long dark brown hair tied back, age 26. Style: refined realistic dark fantasy painted illustration, natural anatomy and detailed lifelike face, restrained cinematic realism, grounded Elder Scrolls Nordic atmosphere, professional RPG character art. Composition: vertical 3:4 image, head and upper chest, centered, near frontal slight three-quarter angle, complete hair/head/ears/horns with a little headroom, both shoulders visible. Calm neutral expression. Clothing: simple plain charcoal grey linen tunic with modest collar and plain dark brown wool shoulder wrap, modest civilian gender-neutral travel clothing. Background: unobtrusive smoky dark charcoal grey, no scenery. Soft warm key light from upper left, subtle cool rim light, muted natural earthy colours, consistent exposure. Exactly one adult person, one portrait. No armour, weapons, hats, hood, jewelry, makeup, symbols, text, letters, border, collage or watermark. Opaque background."
+    },
+    {
+      "id": "redguard_male_1",
+      "race": "redguard",
+      "type": "Redguard human",
+      "gender": "male",
+      "variant": 1,
+      "details": "West African Redguard features, deep dark brown skin, brown eyes, short tight black curls, trimmed beard, age 31",
+      "prompt": "Use case: stylized-concept. Asset: individual character selection portrait for Skyrim Text RPG Android game. Create ONE finished portrait of an adult MALE Redguard human, variant 1 of 3. Subject: West African Redguard features, deep dark brown skin, brown eyes, short tight black curls, trimmed beard, age 31. Style: refined realistic dark fantasy painted illustration, natural anatomy and detailed lifelike face, restrained cinematic realism, grounded Elder Scrolls Nordic atmosphere, professional RPG character art. Composition: vertical 3:4 image, head and upper chest, centered, near frontal slight three-quarter angle, complete hair/head/ears/horns with a little headroom, both shoulders visible. Calm neutral expression. Clothing: simple plain charcoal grey linen tunic with modest collar and plain dark brown wool shoulder wrap, modest civilian gender-neutral travel clothing. Background: unobtrusive smoky dark charcoal grey, no scenery. Soft warm key light from upper left, subtle cool rim light, muted natural earthy colours, consistent exposure. Exactly one adult person, one portrait. No armour, weapons, hats, hood, jewelry, makeup, symbols, text, letters, border, collage or watermark. Opaque background."
+    },
+    {
+      "id": "redguard_male_2",
+      "race": "redguard",
+      "type": "Redguard human",
+      "gender": "male",
+      "variant": 2,
+      "details": "East African Redguard features, rich brown skin, narrow face, amber brown eyes, short black twists tied back, clean shaven, age 26",
+      "prompt": "Use case: stylized-concept. Asset: individual character selection portrait for Skyrim Text RPG Android game. Create ONE finished portrait of an adult MALE Redguard human, variant 2 of 3. Subject: East African Redguard features, rich brown skin, narrow face, amber brown eyes, short black twists tied back, clean shaven, age 26. Style: refined realistic dark fantasy painted illustration, natural anatomy and detailed lifelike face, restrained cinematic realism, grounded Elder Scrolls Nordic atmosphere, professional RPG character art. Composition: vertical 3:4 image, head and upper chest, centered, near frontal slight three-quarter angle, complete hair/head/ears/horns with a little headroom, both shoulders visible. Calm neutral expression. Clothing: simple plain charcoal grey linen tunic with modest collar and plain dark brown wool shoulder wrap, modest civilian gender-neutral travel clothing. Background: unobtrusive smoky dark charcoal grey, no scenery. Soft warm key light from upper left, subtle cool rim light, muted natural earthy colours, consistent exposure. Exactly one adult person, one portrait. No armour, weapons, hats, hood, jewelry, makeup, symbols, text, letters, border, collage or watermark. Opaque background."
+    },
+    {
+      "id": "redguard_male_3",
+      "race": "redguard",
+      "type": "Redguard human",
+      "gender": "male",
+      "variant": 3,
+      "details": "North African Redguard features, warm dark brown skin, hazel brown eyes, shaved head, short salt and pepper beard, age 47",
+      "prompt": "Use case: stylized-concept. Asset: individual character selection portrait for Skyrim Text RPG Android game. Create ONE finished portrait of an adult MALE Redguard human, variant 3 of 3. Subject: North African Redguard features, warm dark brown skin, hazel brown eyes, shaved head, short salt and pepper beard, age 47. Style: refined realistic dark fantasy painted illustration, natural anatomy and detailed lifelike face, restrained cinematic realism, grounded Elder Scrolls Nordic atmosphere, professional RPG character art. Composition: vertical 3:4 image, head and upper chest, centered, near frontal slight three-quarter angle, complete hair/head/ears/horns with a little headroom, both shoulders visible. Calm neutral expression. Clothing: simple plain charcoal grey linen tunic with modest collar and plain dark brown wool shoulder wrap, modest civilian gender-neutral travel clothing. Background: unobtrusive smoky dark charcoal grey, no scenery. Soft warm key light from upper left, subtle cool rim light, muted natural earthy colours, consistent exposure. Exactly one adult person, one portrait. No armour, weapons, hats, hood, jewelry, makeup, symbols, text, letters, border, collage or watermark. Opaque background."
+    },
+    {
+      "id": "redguard_female_1",
+      "race": "redguard",
+      "type": "Redguard human",
+      "gender": "female",
+      "variant": 1,
+      "details": "West African Redguard features, deep dark brown skin, brown eyes, natural coiled black hair gathered simply, age 29",
+      "prompt": "Use case: stylized-concept. Asset: individual character selection portrait for Skyrim Text RPG Android game. Create ONE finished portrait of an adult FEMALE Redguard human, variant 1 of 3. Subject: West African Redguard features, deep dark brown skin, brown eyes, natural coiled black hair gathered simply, age 29. Style: refined realistic dark fantasy painted illustration, natural anatomy and detailed lifelike face, restrained cinematic realism, grounded Elder Scrolls Nordic atmosphere, professional RPG character art. Composition: vertical 3:4 image, head and upper chest, centered, near frontal slight three-quarter angle, complete hair/head/ears/horns with a little headroom, both shoulders visible. Calm neutral expression. Clothing: simple plain charcoal grey linen tunic with modest collar and plain dark brown wool shoulder wrap, modest civilian gender-neutral travel clothing. Background: unobtrusive smoky dark charcoal grey, no scenery. Soft warm key light from upper left, subtle cool rim light, muted natural earthy colours, consistent exposure. Exactly one adult person, one portrait. No armour, weapons, hats, hood, jewelry, makeup, symbols, text, letters, border, collage or watermark. Opaque background."
+    },
+    {
+      "id": "redguard_female_2",
+      "race": "redguard",
+      "type": "Redguard human",
+      "gender": "female",
+      "variant": 2,
+      "details": "East African Redguard features, rich brown skin, narrow face, amber brown eyes, simple short black twists, age 25",
+      "prompt": "Use case: stylized-concept. Asset: individual character selection portrait for Skyrim Text RPG Android game. Create ONE finished portrait of an adult FEMALE Redguard human, variant 2 of 3. Subject: East African Redguard features, rich brown skin, narrow face, amber brown eyes, simple short black twists, age 25. Style: refined realistic dark fantasy painted illustration, natural anatomy and detailed lifelike face, restrained cinematic realism, grounded Elder Scrolls Nordic atmosphere, professional RPG character art. Composition: vertical 3:4 image, head and upper chest, centered, near frontal slight three-quarter angle, complete hair/head/ears/horns with a little headroom, both shoulders visible. Calm neutral expression. Clothing: simple plain charcoal grey linen tunic with modest collar and plain dark brown wool shoulder wrap, modest civilian gender-neutral travel clothing. Background: unobtrusive smoky dark charcoal grey, no scenery. Soft warm key light from upper left, subtle cool rim light, muted natural earthy colours, consistent exposure. Exactly one adult person, one portrait. No armour, weapons, hats, hood, jewelry, makeup, symbols, text, letters, border, collage or watermark. Opaque background."
+    },
+    {
+      "id": "redguard_female_3",
+      "race": "redguard",
+      "type": "Redguard human",
+      "gender": "female",
+      "variant": 3,
+      "details": "North African Redguard features, warm dark brown skin, hazel brown eyes, thick dark curls tied back, age 40",
+      "prompt": "Use case: stylized-concept. Asset: individual character selection portrait for Skyrim Text RPG Android game. Create ONE finished portrait of an adult FEMALE Redguard human, variant 3 of 3. Subject: North African Redguard features, warm dark brown skin, hazel brown eyes, thick dark curls tied back, age 40. Style: refined realistic dark fantasy painted illustration, natural anatomy and detailed lifelike face, restrained cinematic realism, grounded Elder Scrolls Nordic atmosphere, professional RPG character art. Composition: vertical 3:4 image, head and upper chest, centered, near frontal slight three-quarter angle, complete hair/head/ears/horns with a little headroom, both shoulders visible. Calm neutral expression. Clothing: simple plain charcoal grey linen tunic with modest collar and plain dark brown wool shoulder wrap, modest civilian gender-neutral travel clothing. Background: unobtrusive smoky dark charcoal grey, no scenery. Soft warm key light from upper left, subtle cool rim light, muted natural earthy colours, consistent exposure. Exactly one adult person, one portrait. No armour, weapons, hats, hood, jewelry, makeup, symbols, text, letters, border, collage or watermark. Opaque background."
+    },
+    {
+      "id": "altmer_male_1",
+      "race": "altmer",
+      "type": "Altmer high elf",
+      "gender": "male",
+      "variant": 1,
+      "details": "elongated high elf face, golden ochre skin, long clearly visible pointed ears, amber eyes, high cheekbones, straight platinum blond hair tucked back, age 32",
+      "prompt": "Use case: stylized-concept. Asset: individual character selection portrait for Skyrim Text RPG Android game. Create ONE finished portrait of an adult MALE Altmer high elf, variant 1 of 3. Subject: elongated high elf face, golden ochre skin, long clearly visible pointed ears, amber eyes, high cheekbones, straight platinum blond hair tucked back, age 32. Style: refined realistic dark fantasy painted illustration, natural anatomy and detailed lifelike face, restrained cinematic realism, grounded Elder Scrolls Nordic atmosphere, professional RPG character art. Composition: vertical 3:4 image, head and upper chest, centered, near frontal slight three-quarter angle, complete hair/head/ears/horns with a little headroom, both shoulders visible. Calm neutral expression. Clothing: simple plain charcoal grey linen tunic with modest collar and plain dark brown wool shoulder wrap, modest civilian gender-neutral travel clothing. Background: unobtrusive smoky dark charcoal grey, no scenery. Soft warm key light from upper left, subtle cool rim light, muted natural earthy colours, consistent exposure. Exactly one adult person, one portrait. No armour, weapons, hats, hood, jewelry, makeup, symbols, text, letters, border, collage or watermark. Opaque background."
+    },
+    {
+      "id": "altmer_male_2",
+      "race": "altmer",
+      "type": "Altmer high elf",
+      "gender": "male",
+      "variant": 2,
+      "details": "long narrow high elf face, warm golden skin, pointed long ears, golden brown eyes, swept back silver blond hair, age 51",
+      "prompt": "Use case: stylized-concept. Asset: individual character selection portrait for Skyrim Text RPG Android game. Create ONE finished portrait of an adult MALE Altmer high elf, variant 2 of 3. Subject: long narrow high elf face, warm golden skin, pointed long ears, golden brown eyes, swept back silver blond hair, age 51. Style: refined realistic dark fantasy painted illustration, natural anatomy and detailed lifelike face, restrained cinematic realism, grounded Elder Scrolls Nordic atmosphere, professional RPG character art. Composition: vertical 3:4 image, head and upper chest, centered, near frontal slight three-quarter angle, complete hair/head/ears/horns with a little headroom, both shoulders visible. Calm neutral expression. Clothing: simple plain charcoal grey linen tunic with modest collar and plain dark brown wool shoulder wrap, modest civilian gender-neutral travel clothing. Background: unobtrusive smoky dark charcoal grey, no scenery. Soft warm key light from upper left, subtle cool rim light, muted natural earthy colours, consistent exposure. Exactly one adult person, one portrait. No armour, weapons, hats, hood, jewelry, makeup, symbols, text, letters, border, collage or watermark. Opaque background."
+    },
+    {
+      "id": "altmer_male_3",
+      "race": "altmer",
+      "type": "Altmer high elf",
+      "gender": "male",
+      "variant": 3,
+      "details": "angular high elf face, pale golden skin, pointed long ears, amber eyes, straight dark honey hair tied back, age 27",
+      "prompt": "Use case: stylized-concept. Asset: individual character selection portrait for Skyrim Text RPG Android game. Create ONE finished portrait of an adult MALE Altmer high elf, variant 3 of 3. Subject: angular high elf face, pale golden skin, pointed long ears, amber eyes, straight dark honey hair tied back, age 27. Style: refined realistic dark fantasy painted illustration, natural anatomy and detailed lifelike face, restrained cinematic realism, grounded Elder Scrolls Nordic atmosphere, professional RPG character art. Composition: vertical 3:4 image, head and upper chest, centered, near frontal slight three-quarter angle, complete hair/head/ears/horns with a little headroom, both shoulders visible. Calm neutral expression. Clothing: simple plain charcoal grey linen tunic with modest collar and plain dark brown wool shoulder wrap, modest civilian gender-neutral travel clothing. Background: unobtrusive smoky dark charcoal grey, no scenery. Soft warm key light from upper left, subtle cool rim light, muted natural earthy colours, consistent exposure. Exactly one adult person, one portrait. No armour, weapons, hats, hood, jewelry, makeup, symbols, text, letters, border, collage or watermark. Opaque background."
+    },
+    {
+      "id": "altmer_female_1",
+      "race": "altmer",
+      "type": "Altmer high elf",
+      "gender": "female",
+      "variant": 1,
+      "details": "elongated high elf face, golden ochre skin, long clearly visible pointed ears, amber eyes, high cheekbones, platinum blond hair tucked back, age 30",
+      "prompt": "Use case: stylized-concept. Asset: individual character selection portrait for Skyrim Text RPG Android game. Create ONE finished portrait of an adult FEMALE Altmer high elf, variant 1 of 3. Subject: elongated high elf face, golden ochre skin, long clearly visible pointed ears, amber eyes, high cheekbones, platinum blond hair tucked back, age 30. Style: refined realistic dark fantasy painted illustration, natural anatomy and detailed lifelike face, restrained cinematic realism, grounded Elder Scrolls Nordic atmosphere, professional RPG character art. Composition: vertical 3:4 image, head and upper chest, centered, near frontal slight three-quarter angle, complete hair/head/ears/horns with a little headroom, both shoulders visible. Calm neutral expression. Clothing: simple plain charcoal grey linen tunic with modest collar and plain dark brown wool shoulder wrap, modest civilian gender-neutral travel clothing. Background: unobtrusive smoky dark charcoal grey, no scenery. Soft warm key light from upper left, subtle cool rim light, muted natural earthy colours, consistent exposure. Exactly one adult person, one portrait. No armour, weapons, hats, hood, jewelry, makeup, symbols, text, letters, border, collage or watermark. Opaque background."
+    },
+    {
+      "id": "altmer_female_2",
+      "race": "altmer",
+      "type": "Altmer high elf",
+      "gender": "female",
+      "variant": 2,
+      "details": "long refined high elf face, warm golden skin, long pointed ears, golden brown eyes, silver blond hair in plain braid, age 46",
+      "prompt": "Use case: stylized-concept. Asset: individual character selection portrait for Skyrim Text RPG Android game. Create ONE finished portrait of an adult FEMALE Altmer high elf, variant 2 of 3. Subject: long refined high elf face, warm golden skin, long pointed ears, golden brown eyes, silver blond hair in plain braid, age 46. Style: refined realistic dark fantasy painted illustration, natural anatomy and detailed lifelike face, restrained cinematic realism, grounded Elder Scrolls Nordic atmosphere, professional RPG character art. Composition: vertical 3:4 image, head and upper chest, centered, near frontal slight three-quarter angle, complete hair/head/ears/horns with a little headroom, both shoulders visible. Calm neutral expression. Clothing: simple plain charcoal grey linen tunic with modest collar and plain dark brown wool shoulder wrap, modest civilian gender-neutral travel clothing. Background: unobtrusive smoky dark charcoal grey, no scenery. Soft warm key light from upper left, subtle cool rim light, muted natural earthy colours, consistent exposure. Exactly one adult person, one portrait. No armour, weapons, hats, hood, jewelry, makeup, symbols, text, letters, border, collage or watermark. Opaque background."
+    },
+    {
+      "id": "altmer_female_3",
+      "race": "altmer",
+      "type": "Altmer high elf",
+      "gender": "female",
+      "variant": 3,
+      "details": "angular high elf face, pale golden skin, long pointed ears, amber eyes, shoulder length dark honey straight hair swept back, age 26",
+      "prompt": "Use case: stylized-concept. Asset: individual character selection portrait for Skyrim Text RPG Android game. Create ONE finished portrait of an adult FEMALE Altmer high elf, variant 3 of 3. Subject: angular high elf face, pale golden skin, long pointed ears, amber eyes, shoulder length dark honey straight hair swept back, age 26. Style: refined realistic dark fantasy painted illustration, natural anatomy and detailed lifelike face, restrained cinematic realism, grounded Elder Scrolls Nordic atmosphere, professional RPG character art. Composition: vertical 3:4 image, head and upper chest, centered, near frontal slight three-quarter angle, complete hair/head/ears/horns with a little headroom, both shoulders visible. Calm neutral expression. Clothing: simple plain charcoal grey linen tunic with modest collar and plain dark brown wool shoulder wrap, modest civilian gender-neutral travel clothing. Background: unobtrusive smoky dark charcoal grey, no scenery. Soft warm key light from upper left, subtle cool rim light, muted natural earthy colours, consistent exposure. Exactly one adult person, one portrait. No armour, weapons, hats, hood, jewelry, makeup, symbols, text, letters, border, collage or watermark. Opaque background."
+    },
+    {
+      "id": "bosmer_male_1",
+      "race": "bosmer",
+      "type": "Bosmer wood elf",
+      "gender": "male",
+      "variant": 1,
+      "details": "compact angular wood elf face, warm copper tan skin, pointed elf ears, dark brown eyes, medium brown hair swept back, clean shaven, age 28",
+      "prompt": "Use case: stylized-concept. Asset: individual character selection portrait for Skyrim Text RPG Android game. Create ONE finished portrait of an adult MALE Bosmer wood elf, variant 1 of 3. Subject: compact angular wood elf face, warm copper tan skin, pointed elf ears, dark brown eyes, medium brown hair swept back, clean shaven, age 28. Style: refined realistic dark fantasy painted illustration, natural anatomy and detailed lifelike face, restrained cinematic realism, grounded Elder Scrolls Nordic atmosphere, professional RPG character art. Composition: vertical 3:4 image, head and upper chest, centered, near frontal slight three-quarter angle, complete hair/head/ears/horns with a little headroom, both shoulders visible. Calm neutral expression. Clothing: simple plain charcoal grey linen tunic with modest collar and plain dark brown wool shoulder wrap, modest civilian gender-neutral travel clothing. Background: unobtrusive smoky dark charcoal grey, no scenery. Soft warm key light from upper left, subtle cool rim light, muted natural earthy colours, consistent exposure. Exactly one adult person, one portrait. No armour, weapons, hats, hood, jewelry, makeup, symbols, text, letters, border, collage or watermark. Opaque background."
+    },
+    {
+      "id": "bosmer_male_2",
+      "race": "bosmer",
+      "type": "Bosmer wood elf",
+      "gender": "male",
+      "variant": 2,
+      "details": "sharp cheekboned wood elf face, warm russet skin, pointed ears, amber eyes, short dark brown hair, subtle stubble, age 43",
+      "prompt": "Use case: stylized-concept. Asset: individual character selection portrait for Skyrim Text RPG Android game. Create ONE finished portrait of an adult MALE Bosmer wood elf, variant 2 of 3. Subject: sharp cheekboned wood elf face, warm russet skin, pointed ears, amber eyes, short dark brown hair, subtle stubble, age 43. Style: refined realistic dark fantasy painted illustration, natural anatomy and detailed lifelike face, restrained cinematic realism, grounded Elder Scrolls Nordic atmosphere, professional RPG character art. Composition: vertical 3:4 image, head and upper chest, centered, near frontal slight three-quarter angle, complete hair/head/ears/horns with a little headroom, both shoulders visible. Calm neutral expression. Clothing: simple plain charcoal grey linen tunic with modest collar and plain dark brown wool shoulder wrap, modest civilian gender-neutral travel clothing. Background: unobtrusive smoky dark charcoal grey, no scenery. Soft warm key light from upper left, subtle cool rim light, muted natural earthy colours, consistent exposure. Exactly one adult person, one portrait. No armour, weapons, hats, hood, jewelry, makeup, symbols, text, letters, border, collage or watermark. Opaque background."
+    },
+    {
+      "id": "bosmer_male_3",
+      "race": "bosmer",
+      "type": "Bosmer wood elf",
+      "gender": "male",
+      "variant": 3,
+      "details": "fine narrow wood elf face, tawny olive skin, pointed ears, brown eyes, long dark copper hair tied back, age 25",
+      "prompt": "Use case: stylized-concept. Asset: individual character selection portrait for Skyrim Text RPG Android game. Create ONE finished portrait of an adult MALE Bosmer wood elf, variant 3 of 3. Subject: fine narrow wood elf face, tawny olive skin, pointed ears, brown eyes, long dark copper hair tied back, age 25. Style: refined realistic dark fantasy painted illustration, natural anatomy and detailed lifelike face, restrained cinematic realism, grounded Elder Scrolls Nordic atmosphere, professional RPG character art. Composition: vertical 3:4 image, head and upper chest, centered, near frontal slight three-quarter angle, complete hair/head/ears/horns with a little headroom, both shoulders visible. Calm neutral expression. Clothing: simple plain charcoal grey linen tunic with modest collar and plain dark brown wool shoulder wrap, modest civilian gender-neutral travel clothing. Background: unobtrusive smoky dark charcoal grey, no scenery. Soft warm key light from upper left, subtle cool rim light, muted natural earthy colours, consistent exposure. Exactly one adult person, one portrait. No armour, weapons, hats, hood, jewelry, makeup, symbols, text, letters, border, collage or watermark. Opaque background."
+    },
+    {
+      "id": "bosmer_female_1",
+      "race": "bosmer",
+      "type": "Bosmer wood elf",
+      "gender": "female",
+      "variant": 1,
+      "details": "compact angular wood elf face, warm copper tan skin, pointed elf ears, dark brown eyes, chestnut hair in a plain braid, age 27",
+      "prompt": "Use case: stylized-concept. Asset: individual character selection portrait for Skyrim Text RPG Android game. Create ONE finished portrait of an adult FEMALE Bosmer wood elf, variant 1 of 3. Subject: compact angular wood elf face, warm copper tan skin, pointed elf ears, dark brown eyes, chestnut hair in a plain braid, age 27. Style: refined realistic dark fantasy painted illustration, natural anatomy and detailed lifelike face, restrained cinematic realism, grounded Elder Scrolls Nordic atmosphere, professional RPG character art. Composition: vertical 3:4 image, head and upper chest, centered, near frontal slight three-quarter angle, complete hair/head/ears/horns with a little headroom, both shoulders visible. Calm neutral expression. Clothing: simple plain charcoal grey linen tunic with modest collar and plain dark brown wool shoulder wrap, modest civilian gender-neutral travel clothing. Background: unobtrusive smoky dark charcoal grey, no scenery. Soft warm key light from upper left, subtle cool rim light, muted natural earthy colours, consistent exposure. Exactly one adult person, one portrait. No armour, weapons, hats, hood, jewelry, makeup, symbols, text, letters, border, collage or watermark. Opaque background."
+    },
+    {
+      "id": "bosmer_female_2",
+      "race": "bosmer",
+      "type": "Bosmer wood elf",
+      "gender": "female",
+      "variant": 2,
+      "details": "sharp cheekboned wood elf face, warm russet skin, pointed ears, amber eyes, short dark brown hair, age 39",
+      "prompt": "Use case: stylized-concept. Asset: individual character selection portrait for Skyrim Text RPG Android game. Create ONE finished portrait of an adult FEMALE Bosmer wood elf, variant 2 of 3. Subject: sharp cheekboned wood elf face, warm russet skin, pointed ears, amber eyes, short dark brown hair, age 39. Style: refined realistic dark fantasy painted illustration, natural anatomy and detailed lifelike face, restrained cinematic realism, grounded Elder Scrolls Nordic atmosphere, professional RPG character art. Composition: vertical 3:4 image, head and upper chest, centered, near frontal slight three-quarter angle, complete hair/head/ears/horns with a little headroom, both shoulders visible. Calm neutral expression. Clothing: simple plain charcoal grey linen tunic with modest collar and plain dark brown wool shoulder wrap, modest civilian gender-neutral travel clothing. Background: unobtrusive smoky dark charcoal grey, no scenery. Soft warm key light from upper left, subtle cool rim light, muted natural earthy colours, consistent exposure. Exactly one adult person, one portrait. No armour, weapons, hats, hood, jewelry, makeup, symbols, text, letters, border, collage or watermark. Opaque background."
+    },
+    {
+      "id": "bosmer_female_3",
+      "race": "bosmer",
+      "type": "Bosmer wood elf",
+      "gender": "female",
+      "variant": 3,
+      "details": "fine narrow wood elf face, tawny olive skin, pointed ears, brown eyes, long dark copper hair tied back, age 24",
+      "prompt": "Use case: stylized-concept. Asset: individual character selection portrait for Skyrim Text RPG Android game. Create ONE finished portrait of an adult FEMALE Bosmer wood elf, variant 3 of 3. Subject: fine narrow wood elf face, tawny olive skin, pointed ears, brown eyes, long dark copper hair tied back, age 24. Style: refined realistic dark fantasy painted illustration, natural anatomy and detailed lifelike face, restrained cinematic realism, grounded Elder Scrolls Nordic atmosphere, professional RPG character art. Composition: vertical 3:4 image, head and upper chest, centered, near frontal slight three-quarter angle, complete hair/head/ears/horns with a little headroom, both shoulders visible. Calm neutral expression. Clothing: simple plain charcoal grey linen tunic with modest collar and plain dark brown wool shoulder wrap, modest civilian gender-neutral travel clothing. Background: unobtrusive smoky dark charcoal grey, no scenery. Soft warm key light from upper left, subtle cool rim light, muted natural earthy colours, consistent exposure. Exactly one adult person, one portrait. No armour, weapons, hats, hood, jewelry, makeup, symbols, text, letters, border, collage or watermark. Opaque background."
+    },
+    {
+      "id": "argonian_male_1",
+      "race": "argonian",
+      "type": "Argonian reptilian beastfolk",
+      "gender": "male",
+      "variant": 1,
+      "details": "authentic Argonian lizardfolk head, olive green fine scales, long reptilian snout, no human nose, amber slit pupil eyes, low brow ridges and small swept back horns, age 30",
+      "prompt": "Use case: stylized-concept. Asset: individual character selection portrait for Skyrim Text RPG Android game. Create ONE finished portrait of an adult MALE Argonian reptilian beastfolk, variant 1 of 3. Subject: authentic Argonian lizardfolk head, olive green fine scales, long reptilian snout, no human nose, amber slit pupil eyes, low brow ridges and small swept back horns, age 30. Style: refined realistic dark fantasy painted illustration, natural anatomy and detailed lifelike face, restrained cinematic realism, grounded Elder Scrolls Nordic atmosphere, professional RPG character art. Composition: vertical 3:4 image, head and upper chest, centered, near frontal slight three-quarter angle, complete hair/head/ears/horns with a little headroom, both shoulders visible. Calm neutral expression. Clothing: simple plain charcoal grey linen tunic with modest collar and plain dark brown wool shoulder wrap, modest civilian gender-neutral travel clothing. Background: unobtrusive smoky dark charcoal grey, no scenery. Soft warm key light from upper left, subtle cool rim light, muted natural earthy colours, consistent exposure. Exactly one adult person, one portrait. No armour, weapons, hats, hood, jewelry, makeup, symbols, text, letters, border, collage or watermark. Opaque background."
+    },
+    {
+      "id": "argonian_male_2",
+      "race": "argonian",
+      "type": "Argonian reptilian beastfolk",
+      "gender": "male",
+      "variant": 2,
+      "details": "authentic Argonian lizardfolk head, slate teal scales with muted brown accents, reptilian snout, golden slit pupil eyes, short natural finlike cranial crest, age 44",
+      "prompt": "Use case: stylized-concept. Asset: individual character selection portrait for Skyrim Text RPG Android game. Create ONE finished portrait of an adult MALE Argonian reptilian beastfolk, variant 2 of 3. Subject: authentic Argonian lizardfolk head, slate teal scales with muted brown accents, reptilian snout, golden slit pupil eyes, short natural finlike cranial crest, age 44. Style: refined realistic dark fantasy painted illustration, natural anatomy and detailed lifelike face, restrained cinematic realism, grounded Elder Scrolls Nordic atmosphere, professional RPG character art. Composition: vertical 3:4 image, head and upper chest, centered, near frontal slight three-quarter angle, complete hair/head/ears/horns with a little headroom, both shoulders visible. Calm neutral expression. Clothing: simple plain charcoal grey linen tunic with modest collar and plain dark brown wool shoulder wrap, modest civilian gender-neutral travel clothing. Background: unobtrusive smoky dark charcoal grey, no scenery. Soft warm key light from upper left, subtle cool rim light, muted natural earthy colours, consistent exposure. Exactly one adult person, one portrait. No armour, weapons, hats, hood, jewelry, makeup, symbols, text, letters, border, collage or watermark. Opaque background."
+    },
+    {
+      "id": "argonian_male_3",
+      "race": "argonian",
+      "type": "Argonian reptilian beastfolk",
+      "gender": "male",
+      "variant": 3,
+      "details": "authentic Argonian lizardfolk head, rusty brown and olive scales, elongated reptilian snout, green slit pupil eyes, small blunt brow horns, age 27",
+      "prompt": "Use case: stylized-concept. Asset: individual character selection portrait for Skyrim Text RPG Android game. Create ONE finished portrait of an adult MALE Argonian reptilian beastfolk, variant 3 of 3. Subject: authentic Argonian lizardfolk head, rusty brown and olive scales, elongated reptilian snout, green slit pupil eyes, small blunt brow horns, age 27. Style: refined realistic dark fantasy painted illustration, natural anatomy and detailed lifelike face, restrained cinematic realism, grounded Elder Scrolls Nordic atmosphere, professional RPG character art. Composition: vertical 3:4 image, head and upper chest, centered, near frontal slight three-quarter angle, complete hair/head/ears/horns with a little headroom, both shoulders visible. Calm neutral expression. Clothing: simple plain charcoal grey linen tunic with modest collar and plain dark brown wool shoulder wrap, modest civilian gender-neutral travel clothing. Background: unobtrusive smoky dark charcoal grey, no scenery. Soft warm key light from upper left, subtle cool rim light, muted natural earthy colours, consistent exposure. Exactly one adult person, one portrait. No armour, weapons, hats, hood, jewelry, makeup, symbols, text, letters, border, collage or watermark. Opaque background."
+    },
+    {
+      "id": "argonian_female_1",
+      "race": "argonian",
+      "type": "Argonian reptilian beastfolk",
+      "gender": "female",
+      "variant": 1,
+      "details": "authentic female Argonian lizardfolk head, fine sage green scales, slender reptilian snout, no human nose, amber slit pupil eyes, modest small swept back horns, age 28",
+      "prompt": "Use case: stylized-concept. Asset: individual character selection portrait for Skyrim Text RPG Android game. Create ONE finished portrait of an adult FEMALE Argonian reptilian beastfolk, variant 1 of 3. Subject: authentic female Argonian lizardfolk head, fine sage green scales, slender reptilian snout, no human nose, amber slit pupil eyes, modest small swept back horns, age 28. Style: refined realistic dark fantasy painted illustration, natural anatomy and detailed lifelike face, restrained cinematic realism, grounded Elder Scrolls Nordic atmosphere, professional RPG character art. Composition: vertical 3:4 image, head and upper chest, centered, near frontal slight three-quarter angle, complete hair/head/ears/horns with a little headroom, both shoulders visible. Calm neutral expression. Clothing: simple plain charcoal grey linen tunic with modest collar and plain dark brown wool shoulder wrap, modest civilian gender-neutral travel clothing. Background: unobtrusive smoky dark charcoal grey, no scenery. Soft warm key light from upper left, subtle cool rim light, muted natural earthy colours, consistent exposure. Exactly one adult person, one portrait. No armour, weapons, hats, hood, jewelry, makeup, symbols, text, letters, border, collage or watermark. Opaque background."
+    },
+    {
+      "id": "argonian_female_2",
+      "race": "argonian",
+      "type": "Argonian reptilian beastfolk",
+      "gender": "female",
+      "variant": 2,
+      "details": "authentic female Argonian lizardfolk head, teal grey scales with muted copper accents, refined reptilian snout, golden slit pupil eyes, low delicate finlike cranial crest, age 38",
+      "prompt": "Use case: stylized-concept. Asset: individual character selection portrait for Skyrim Text RPG Android game. Create ONE finished portrait of an adult FEMALE Argonian reptilian beastfolk, variant 2 of 3. Subject: authentic female Argonian lizardfolk head, teal grey scales with muted copper accents, refined reptilian snout, golden slit pupil eyes, low delicate finlike cranial crest, age 38. Style: refined realistic dark fantasy painted illustration, natural anatomy and detailed lifelike face, restrained cinematic realism, grounded Elder Scrolls Nordic atmosphere, professional RPG character art. Composition: vertical 3:4 image, head and upper chest, centered, near frontal slight three-quarter angle, complete hair/head/ears/horns with a little headroom, both shoulders visible. Calm neutral expression. Clothing: simple plain charcoal grey linen tunic with modest collar and plain dark brown wool shoulder wrap, modest civilian gender-neutral travel clothing. Background: unobtrusive smoky dark charcoal grey, no scenery. Soft warm key light from upper left, subtle cool rim light, muted natural earthy colours, consistent exposure. Exactly one adult person, one portrait. No armour, weapons, hats, hood, jewelry, makeup, symbols, text, letters, border, collage or watermark. Opaque background."
+    },
+    {
+      "id": "argonian_female_3",
+      "race": "argonian",
+      "type": "Argonian reptilian beastfolk",
+      "gender": "female",
+      "variant": 3,
+      "details": "authentic female Argonian lizardfolk head, reddish brown and olive scales, slender reptilian snout, green slit pupil eyes, small blunt brow horns, age 25",
+      "prompt": "Use case: stylized-concept. Asset: individual character selection portrait for Skyrim Text RPG Android game. Create ONE finished portrait of an adult FEMALE Argonian reptilian beastfolk, variant 3 of 3. Subject: authentic female Argonian lizardfolk head, reddish brown and olive scales, slender reptilian snout, green slit pupil eyes, small blunt brow horns, age 25. Style: refined realistic dark fantasy painted illustration, natural anatomy and detailed lifelike face, restrained cinematic realism, grounded Elder Scrolls Nordic atmosphere, professional RPG character art. Composition: vertical 3:4 image, head and upper chest, centered, near frontal slight three-quarter angle, complete hair/head/ears/horns with a little headroom, both shoulders visible. Calm neutral expression. Clothing: simple plain charcoal grey linen tunic with modest collar and plain dark brown wool shoulder wrap, modest civilian gender-neutral travel clothing. Background: unobtrusive smoky dark charcoal grey, no scenery. Soft warm key light from upper left, subtle cool rim light, muted natural earthy colours, consistent exposure. Exactly one adult person, one portrait. No armour, weapons, hats, hood, jewelry, makeup, symbols, text, letters, border, collage or watermark. Opaque background."
+    }
+  ]
+}

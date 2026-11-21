@@ -1,0 +1,79 @@
+name: SKYRIM · Quality Monitor
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+  schedule:
+    - cron: '17 * * * *'
+    - cron: '37 3 * * *'
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: skyrim-quality-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  audit:
+    name: Game content, saves, OTA
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Run regression checks
+        id: contract
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -o pipefail
+          mkdir -p monitor
+          python3 -m unittest discover -s tests -p 'test_*.py' -v 2>&1 | tee monitor/regression.log
+      - name: Upload audit log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: skyrim-monitor-report
+          path: monitor/regression.log
+          if-no-files-found: warn
+          retention-days: 14
+      - name: Create a deduplicated issue if a scheduled check fails
+        if: steps.contract.outcome == 'failure' && github.event_name == 'schedule'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          title='[SKYRIM QA] Regression monitor failed'
+          open="$(gh issue list --repo "$GITHUB_REPOSITORY" --state open --json title,number --jq "[.[] | select(.title == \"$title\")] | length")"
+          if [ "$open" = "0" ]; then
+            gh issue create --repo "$GITHUB_REPOSITORY" --title "$title" --body "Automated checks failed: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+          fi
+      - name: Mark failed checks
+        if: steps.contract.outcome == 'failure'
+        run: exit 1
+
+  nightly-android:
+    if: github.event_name == 'schedule' && github.event.schedule == '37 3 * * *'
+    needs: audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.11.1'
+      - name: Android SDK
+        run: |
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --install 'platforms;android-35' 'build-tools;35.0.0'
+      - name: Build debug APK (no publishing)
+        run: gradle --no-daemon --stacktrace :app:assembleDebug

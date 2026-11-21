@@ -1,0 +1,17 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp" android:height="108dp"
+    android:viewportWidth="108" android:viewportHeight="108">
+    <!-- No background path. The launcher crest preserves true alpha. -->
+    <path android:fillColor="#00000000" android:strokeColor="#CCD5D9"
+        android:strokeWidth="1.7" android:pathData="M18,25 L25,18 L83,18 L90,25
+            M18,83 L25,90 L83,90 L90,83
+            M18,25 L18,83 M90,25 L90,83"/>
+    <path android:fillColor="#00000000" android:strokeColor="#F0F2F1"
+        android:strokeWidth="3.1" android:strokeLineJoin="miter"
+        android:pathData="M54,15 L54,91 M54,19 L36,51 L54,76 L72,51 Z
+            M36,51 L72,51 M54,19 L54,75"/>
+    <path android:fillColor="#E5ECEC"
+        android:pathData="M54,12 L58,19 L54,26 L50,19 Z
+            M18,18 L28,18 L18,28 Z M90,18 L80,18 L90,28 Z
+            M18,90 L28,90 L18,80 Z M90,90 L80,90 L90,80 Z"/>
+</vector>

@@ -1,0 +1,4667 @@
+{
+  "format": "WebP",
+  "image_count": 60,
+  "dimensions": [
+    576,
+    768
+  ],
+  "original_bytes": 146665992,
+  "encoded_bytes": 7089858,
+  "reduction_percent": 95.17,
+  "quality_steps": [
+    78,
+    82,
+    86,
+    90,
+    94,
+    95,
+    96,
+    97,
+    98
+  ],
+  "quality_floor": {
+    "full_resolution_luma_ssim": 0.985,
+    "worst_128px_luma_ssim": 0.965,
+    "maximum_chroma_mean_absolute_error": 2.5,
+    "maximum_chroma_95th_percentile_error": 7
+  },
+  "note": "Lossy WebP unless quality is lossless. Quality is measured against the Lanczos-downscaled 576x768 RGB reference, not the original larger PNG. No upscaling or face cropping. Full-resolution luma SSIM, worst 128px patch and chroma error are checked. These measurements do not prove perceptual identity. All 60 portraits remain bundled in both full and thin APKs so new-game selection is available offline.",
+  "portraits": [
+    {
+      "id": "altmer_female_1",
+      "file": "altmer_female_1.webp",
+      "original_bytes": 2431962,
+      "original_sha256": "06433d9010942fb84c8cc8718db10d19d67ae497e17058211ac37fc578be99a1",
+      "source_dimensions": [
+        1086,
+        1448
+      ],
+      "dimensions": [
+        576,
+        768
+      ],
+      "encoded_bytes": 123512,
+      "sha256": "87ce3ff41b6adadc83b0081c816892f83284c9ff8ec00e6fc009d5e34e8f371e",
+      "quality": 97,
+      "full_resolution_luma_ssim": 0.9870671033859253,
+      "worst_128px_luma_ssim": 0.9817578792572021,
+      "chroma_mean_absolute_error": 0.6923929850260416,
+      "chroma_95th_percentile_error": 2.0,
+      "trials": [
+        {
+          "quality": 78,
+          "bytes": 26786,
+          "full_resolution_luma_ssim": 0.925956130027771,
+          "worst_128px_luma_ssim": 0.8641829490661621,
+          "chroma_mean_absolute_error": 0.9173934371383102,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 82,
+          "bytes": 34942,
+          "full_resolution_luma_ssim": 0.941008985042572,
+          "worst_128px_luma_ssim": 0.8968800902366638,
+          "chroma_mean_absolute_error": 0.8852448640046297,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 86,
+          "bytes": 46532,
+          "full_resolution_luma_ssim": 0.9532859921455383,
+          "worst_128px_luma_ssim": 0.9237496852874756,
+          "chroma_mean_absolute_error": 0.8302420156973379,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 90,
+          "bytes": 61104,
+          "full_resolution_luma_ssim": 0.9671270251274109,
+          "worst_128px_luma_ssim": 0.9481900930404663,
+          "chroma_mean_absolute_error": 0.7997176558883102,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 94,
+          "bytes": 98006,
+          "full_resolution_luma_ssim": 0.9820326566696167,
+          "worst_128px_luma_ssim": 0.9770180583000183,
+          "chroma_mean_absolute_error": 0.7383954083478009,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 95,
+          "bytes": 109620,
+          "full_resolution_luma_ssim": 0.9841784834861755,
+          "worst_128px_luma_ssim": 0.9791882038116455,
+          "chroma_mean_absolute_error": 0.7192269784432871,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 96,
+          "bytes": 114242,
+          "full_resolution_luma_ssim": 0.9847113490104675,
+          "worst_128px_luma_ssim": 0.9790832996368408,
+          "chroma_mean_absolute_error": 0.7140265570746528,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 97,
+          "bytes": 123512,
+          "full_resolution_luma_ssim": 0.9870671033859253,
+          "worst_128px_luma_ssim": 0.9817578792572021,
+          "chroma_mean_absolute_error": 0.6923929850260416,
+          "chroma_95th_percentile_error": 2.0
+        }
+      ]
+    },
+    {
+      "id": "altmer_female_2",
+      "file": "altmer_female_2.webp",
+      "original_bytes": 2446475,
+      "original_sha256": "4278f08a3640c9a6612359968030f8009d8b9e1753bc7c0b823582cd262faa21",
+      "source_dimensions": [
+        1086,
+        1448
+      ],
+      "dimensions": [
+        576,
+        768
+      ],
+      "encoded_bytes": 108198,
+      "sha256": "cbfe0416b7f4af5540d3499c07475a59f3f7f4df2e88b5dda5af134ca11abcdd",
+      "quality": 95,
+      "full_resolution_luma_ssim": 0.985324501991272,
+      "worst_128px_luma_ssim": 0.9775820970535278,
+      "chroma_mean_absolute_error": 0.6858170120804398,
+      "chroma_95th_percentile_error": 2.0,
+      "trials": [
+        {
+          "quality": 78,
+          "bytes": 27702,
+          "full_resolution_luma_ssim": 0.9285457730293274,
+          "worst_128px_luma_ssim": 0.8729689717292786,
+          "chroma_mean_absolute_error": 0.8856065538194444,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 82,
+          "bytes": 35406,
+          "full_resolution_luma_ssim": 0.9437601566314697,
+          "worst_128px_luma_ssim": 0.9063609838485718,
+          "chroma_mean_absolute_error": 0.8501733850549769,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 86,
+          "bytes": 47086,
+          "full_resolution_luma_ssim": 0.956488311290741,
+          "worst_128px_luma_ssim": 0.9274916052818298,
+          "chroma_mean_absolute_error": 0.7951931423611112,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 90,
+          "bytes": 64872,
+          "full_resolution_luma_ssim": 0.9693735837936401,
+          "worst_128px_luma_ssim": 0.9512559175491333,
+          "chroma_mean_absolute_error": 0.7624387387876157,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 94,
+          "bytes": 96712,
+          "full_resolution_luma_ssim": 0.9825277328491211,
+          "worst_128px_luma_ssim": 0.9720171689987183,
+          "chroma_mean_absolute_error": 0.7058591489438657,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 95,
+          "bytes": 108198,
+          "full_resolution_luma_ssim": 0.985324501991272,
+          "worst_128px_luma_ssim": 0.9775820970535278,
+          "chroma_mean_absolute_error": 0.6858170120804398,
+          "chroma_95th_percentile_error": 2.0
+        }
+      ]
+    },
+    {
+      "id": "altmer_female_3",
+      "file": "altmer_female_3.webp",
+      "original_bytes": 2469994,
+      "original_sha256": "95693e731f171f3f0c326a862de7db19b9993a31a91498a91b7e9703f6b12fd1",
+      "source_dimensions": [
+        1086,
+        1448
+      ],
+      "dimensions": [
+        576,
+        768
+      ],
+      "encoded_bytes": 118284,
+      "sha256": "9d159c5f8668f79a58716f43cf049bcd06b9b2f56266f846ebfaafcaf78d71eb",
+      "quality": 96,
+      "full_resolution_luma_ssim": 0.985134482383728,
+      "worst_128px_luma_ssim": 0.9796509742736816,
+      "chroma_mean_absolute_error": 0.7538316514756944,
+      "chroma_95th_percentile_error": 2.0,
+      "trials": [
+        {
+          "quality": 78,
+          "bytes": 27784,
+          "full_resolution_luma_ssim": 0.9216002225875854,
+          "worst_128px_luma_ssim": 0.8674718141555786,
+          "chroma_mean_absolute_error": 0.9894996925636574,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 82,
+          "bytes": 36500,
+          "full_resolution_luma_ssim": 0.9381765723228455,
+          "worst_128px_luma_ssim": 0.8995117545127869,
+          "chroma_mean_absolute_error": 0.9459262424045138,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 86,
+          "bytes": 49098,
+          "full_resolution_luma_ssim": 0.953225314617157,
+          "worst_128px_luma_ssim": 0.9247865676879883,
+          "chroma_mean_absolute_error": 0.8838625307436343,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 90,
+          "bytes": 66540,
+          "full_resolution_luma_ssim": 0.9659212231636047,
+          "worst_128px_luma_ssim": 0.9403738379478455,
+          "chroma_mean_absolute_error": 0.8356051974826388,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 94,
+          "bytes": 102182,
+          "full_resolution_luma_ssim": 0.9811719059944153,
+          "worst_128px_luma_ssim": 0.9707767963409424,
+          "chroma_mean_absolute_error": 0.7743801540798612,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 95,
+          "bytes": 113464,
+          "full_resolution_luma_ssim": 0.9847496747970581,
+          "worst_128px_luma_ssim": 0.9798420667648315,
+          "chroma_mean_absolute_error": 0.7529522931134259,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 96,
+          "bytes": 118284,
+          "full_resolution_luma_ssim": 0.985134482383728,
+          "worst_128px_luma_ssim": 0.9796509742736816,
+          "chroma_mean_absolute_error": 0.7538316514756944,
+          "chroma_95th_percentile_error": 2.0
+        }
+      ]
+    },
+    {
+      "id": "altmer_male_1",
+      "file": "altmer_male_1.webp",
+      "original_bytes": 2537409,
+      "original_sha256": "f3d3a434a37135fece12a33cc9a6c5d75977d393b6b612a0368ae7ca26c8a04d",
+      "source_dimensions": [
+        1086,
+        1448
+      ],
+      "dimensions": [
+        576,
+        768
+      ],
+      "encoded_bytes": 116250,
+      "sha256": "7282599f328075200a54a472ce7ab6553fed350c43f645d8fe6440b880086b0f",
+      "quality": 95,
+      "full_resolution_luma_ssim": 0.9850196838378906,
+      "worst_128px_luma_ssim": 0.9810581207275391,
+      "chroma_mean_absolute_error": 0.7291271068431713,
+      "chroma_95th_percentile_error": 2.0,
+      "trials": [
+        {
+          "quality": 78,
+          "bytes": 29348,
+          "full_resolution_luma_ssim": 0.9182732701301575,
+          "worst_128px_luma_ssim": 0.8487857580184937,
+          "chroma_mean_absolute_error": 0.9332196270978009,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 82,
+          "bytes": 39552,
+          "full_resolution_luma_ssim": 0.9376660585403442,
+          "worst_128px_luma_ssim": 0.8916963338851929,
+          "chroma_mean_absolute_error": 0.8945188169126157,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 86,
+          "bytes": 52114,
+          "full_resolution_luma_ssim": 0.9516880512237549,
+          "worst_128px_luma_ssim": 0.9185012578964233,
+          "chroma_mean_absolute_error": 0.8445219816984953,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 90,
+          "bytes": 67942,
+          "full_resolution_luma_ssim": 0.9642969965934753,
+          "worst_128px_luma_ssim": 0.9416441917419434,
+          "chroma_mean_absolute_error": 0.8087146900318287,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 94,
+          "bytes": 103124,
+          "full_resolution_luma_ssim": 0.9801045060157776,
+          "worst_128px_luma_ssim": 0.9721066951751709,
+          "chroma_mean_absolute_error": 0.7519972059461806,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 95,
+          "bytes": 116250,
+          "full_resolution_luma_ssim": 0.9850196838378906,
+          "worst_128px_luma_ssim": 0.9810581207275391,
+          "chroma_mean_absolute_error": 0.7291271068431713,
+          "chroma_95th_percentile_error": 2.0
+        }
+      ]
+    },
+    {
+      "id": "altmer_male_2",
+      "file": "altmer_male_2.webp",
+      "original_bytes": 2581418,
+      "original_sha256": "2d7d53ca0a3a582a12ccce48c086ac305a8988f6f0248eae6875abe8b75ef8ac",
+      "source_dimensions": [
+        1086,
+        1448
+      ],
+      "dimensions": [
+        576,
+        768
+      ],
+      "encoded_bytes": 124164,
+      "sha256": "6699a7ff81b13f863306c5789b56905a8ec9780b3593f80ae09dfdcc0adb2596",
+      "quality": 95,
+      "full_resolution_luma_ssim": 0.9856274724006653,
+      "worst_128px_luma_ssim": 0.9805896282196045,
+      "chroma_mean_absolute_error": 0.7570879900896991,
+      "chroma_95th_percentile_error": 2.0,
+      "trials": [
+        {
+          "quality": 78,
+          "bytes": 33564,
+          "full_resolution_luma_ssim": 0.9196444153785706,
+          "worst_128px_luma_ssim": 0.8634303212165833,
+          "chroma_mean_absolute_error": 0.9795419198495371,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 82,
+          "bytes": 43078,
+          "full_resolution_luma_ssim": 0.9369362592697144,
+          "worst_128px_luma_ssim": 0.8982239365577698,
+          "chroma_mean_absolute_error": 0.9399549696180556,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 86,
+          "bytes": 55552,
+          "full_resolution_luma_ssim": 0.9515584111213684,
+          "worst_128px_luma_ssim": 0.9262804985046387,
+          "chroma_mean_absolute_error": 0.8917767560040509,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 90,
+          "bytes": 78540,
+          "full_resolution_luma_ssim": 0.970929741859436,
+          "worst_128px_luma_ssim": 0.9574005603790283,
+          "chroma_mean_absolute_error": 0.8413831922743056,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 94,
+          "bytes": 111960,
+          "full_resolution_luma_ssim": 0.984015166759491,
+          "worst_128px_luma_ssim": 0.9788625836372375,
+          "chroma_mean_absolute_error": 0.7821146647135416,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 95,
+          "bytes": 124164,
+          "full_resolution_luma_ssim": 0.9856274724006653,
+          "worst_128px_luma_ssim": 0.9805896282196045,
+          "chroma_mean_absolute_error": 0.7570879900896991,
+          "chroma_95th_percentile_error": 2.0
+        }
+      ]
+    },
+    {
+      "id": "altmer_male_3",
+      "file": "altmer_male_3.webp",
+      "original_bytes": 2454169,
+      "original_sha256": "405d5584d55602a50b44c41c4c4da2e75ef30c936787160f1f55365ca4721f95",
+      "source_dimensions": [
+        1086,
+        1448
+      ],
+      "dimensions": [
+        576,
+        768
+      ],
+      "encoded_bytes": 121958,
+      "sha256": "6a5d7ba1d1ee524347013c27c0548e142eeb99d3517e7d84e8c35b0e0cb307f9",
+      "quality": 97,
+      "full_resolution_luma_ssim": 0.9864357113838196,
+      "worst_128px_luma_ssim": 0.9821149706840515,
+      "chroma_mean_absolute_error": 0.7192868833188657,
+      "chroma_95th_percentile_error": 2.0,
+      "trials": [
+        {
+          "quality": 78,
+          "bytes": 25438,
+          "full_resolution_luma_ssim": 0.9183022379875183,
+          "worst_128px_luma_ssim": 0.844308614730835,
+          "chroma_mean_absolute_error": 0.9363278989438657,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 82,
+          "bytes": 33906,
+          "full_resolution_luma_ssim": 0.9373384714126587,
+          "worst_128px_luma_ssim": 0.8987181782722473,
+          "chroma_mean_absolute_error": 0.8987720630787037,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 86,
+          "bytes": 45506,
+          "full_resolution_luma_ssim": 0.9508984088897705,
+          "worst_128px_luma_ssim": 0.9262707829475403,
+          "chroma_mean_absolute_error": 0.8468334056712963,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 90,
+          "bytes": 60058,
+          "full_resolution_luma_ssim": 0.9633215069770813,
+          "worst_128px_luma_ssim": 0.9431057572364807,
+          "chroma_mean_absolute_error": 0.8106271249276621,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 94,
+          "bytes": 97006,
+          "full_resolution_luma_ssim": 0.9787039160728455,
+          "worst_128px_luma_ssim": 0.9691641330718994,
+          "chroma_mean_absolute_error": 0.7568585431134259,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 95,
+          "bytes": 107176,
+          "full_resolution_luma_ssim": 0.9816484451293945,
+          "worst_128px_luma_ssim": 0.9758515357971191,
+          "chroma_mean_absolute_error": 0.7376550745081019,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 96,
+          "bytes": 112696,
+          "full_resolution_luma_ssim": 0.9819003343582153,
+          "worst_128px_luma_ssim": 0.9754819869995117,
+          "chroma_mean_absolute_error": 0.7385016547309028,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 97,
+          "bytes": 121958,
+          "full_resolution_luma_ssim": 0.9864357113838196,
+          "worst_128px_luma_ssim": 0.9821149706840515,
+          "chroma_mean_absolute_error": 0.7192868833188657,
+          "chroma_95th_percentile_error": 2.0
+        }
+      ]
+    },
+    {
+      "id": "argonian_female_1",
+      "file": "argonian_female_1.webp",
+      "original_bytes": 2583536,
+      "original_sha256": "9c307f528467b1f648e6dfdc29d3185ee2074042623f9dc69dcb9e060ccddf8c",
+      "source_dimensions": [
+        1086,
+        1448
+      ],
+      "dimensions": [
+        576,
+        768
+      ],
+      "encoded_bytes": 116156,
+      "sha256": "6a1cce9fe2bd42f770272f472def993cc615d9d4fba2e0e029629d03e69561ab",
+      "quality": 94,
+      "full_resolution_luma_ssim": 0.9853577613830566,
+      "worst_128px_luma_ssim": 0.9825707077980042,
+      "chroma_mean_absolute_error": 0.8202876338252315,
+      "chroma_95th_percentile_error": 2.0,
+      "trials": [
+        {
+          "quality": 78,
+          "bytes": 41284,
+          "full_resolution_luma_ssim": 0.9322826266288757,
+          "worst_128px_luma_ssim": 0.8830447196960449,
+          "chroma_mean_absolute_error": 1.0078825774016205,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 82,
+          "bytes": 50748,
+          "full_resolution_luma_ssim": 0.9485586285591125,
+          "worst_128px_luma_ssim": 0.9135804176330566,
+          "chroma_mean_absolute_error": 0.9742895055700231,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 86,
+          "bytes": 65238,
+          "full_resolution_luma_ssim": 0.9642459154129028,
+          "worst_128px_luma_ssim": 0.9456051588058472,
+          "chroma_mean_absolute_error": 0.9236857096354166,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 90,
+          "bytes": 84424,
+          "full_resolution_luma_ssim": 0.9765558838844299,
+          "worst_128px_luma_ssim": 0.9684598445892334,
+          "chroma_mean_absolute_error": 0.8815567581741898,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 94,
+          "bytes": 116156,
+          "full_resolution_luma_ssim": 0.9853577613830566,
+          "worst_128px_luma_ssim": 0.9825707077980042,
+          "chroma_mean_absolute_error": 0.8202876338252315,
+          "chroma_95th_percentile_error": 2.0
+        }
+      ]
+    },
+    {
+      "id": "argonian_female_2",
+      "file": "argonian_female_2.webp",
+      "original_bytes": 2476303,
+      "original_sha256": "13f1d894c429b6249324682aa22070833d45ad043a00e3697f1e11d65546bc5c",
+      "source_dimensions": [
+        1086,
+        1448
+      ],
+      "dimensions": [
+        576,
+        768
+      ],
+      "encoded_bytes": 112182,
+      "sha256": "c14fee632fa8edd563d14ae1c5cee3475372866b95709f3679c8d48eabada822",
+      "quality": 94,
+      "full_resolution_luma_ssim": 0.9851934313774109,
+      "worst_128px_luma_ssim": 0.9790539145469666,
+      "chroma_mean_absolute_error": 0.8758420591001157,
+      "chroma_95th_percentile_error": 3.0,
+      "trials": [
+        {
+          "quality": 78,
+          "bytes": 36292,
+          "full_resolution_luma_ssim": 0.9291815161705017,
+          "worst_128px_luma_ssim": 0.8758691549301147,
+          "chroma_mean_absolute_error": 1.0963598180700231,
+          "chroma_95th_percentile_error": 4.0
+        },
+        {
+          "quality": 82,
+          "bytes": 46558,
+          "full_resolution_luma_ssim": 0.9461726546287537,
+          "worst_128px_luma_ssim": 0.9070762991905212,
+          "chroma_mean_absolute_error": 1.0510841652199074,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 86,
+          "bytes": 59338,
+          "full_resolution_luma_ssim": 0.9603949189186096,
+          "worst_128px_luma_ssim": 0.931320309638977,
+          "chroma_mean_absolute_error": 0.9975721571180556,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 90,
+          "bytes": 80146,
+          "full_resolution_luma_ssim": 0.9757489562034607,
+          "worst_128px_luma_ssim": 0.9625301957130432,
+          "chroma_mean_absolute_error": 0.9403200502748843,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 94,
+          "bytes": 112182,
+          "full_resolution_luma_ssim": 0.9851934313774109,
+          "worst_128px_luma_ssim": 0.9790539145469666,
+          "chroma_mean_absolute_error": 0.8758420591001157,
+          "chroma_95th_percentile_error": 3.0
+        }
+      ]
+    },
+    {
+      "id": "argonian_female_3",
+      "file": "argonian_female_3.webp",
+      "original_bytes": 2382326,
+      "original_sha256": "5fa33e345d4077d58088e3e19a67aac6eeb526c9ee24ebd6f5e2a53d5b72827e",
+      "source_dimensions": [
+        1086,
+        1448
+      ],
+      "dimensions": [
+        576,
+        768
+      ],
+      "encoded_bytes": 119774,
+      "sha256": "6f85b23728b03a829624673c9cb2a85f9c89bc3c13ae662ec2e913ffa4ec7963",
+      "quality": 95,
+      "full_resolution_luma_ssim": 0.9860315322875977,
+      "worst_128px_luma_ssim": 0.9779713749885559,
+      "chroma_mean_absolute_error": 0.8980543348524306,
+      "chroma_95th_percentile_error": 3.0,
+      "trials": [
+        {
+          "quality": 78,
+          "bytes": 32182,
+          "full_resolution_luma_ssim": 0.924403727054596,
+          "worst_128px_luma_ssim": 0.8644673824310303,
+          "chroma_mean_absolute_error": 1.1854157624421295,
+          "chroma_95th_percentile_error": 4.0
+        },
+        {
+          "quality": 82,
+          "bytes": 41146,
+          "full_resolution_luma_ssim": 0.9409052133560181,
+          "worst_128px_luma_ssim": 0.8984752893447876,
+          "chroma_mean_absolute_error": 1.1334782353153936,
+          "chroma_95th_percentile_error": 4.0
+        },
+        {
+          "quality": 86,
+          "bytes": 53654,
+          "full_resolution_luma_ssim": 0.9551565647125244,
+          "worst_128px_luma_ssim": 0.9253984093666077,
+          "chroma_mean_absolute_error": 1.0693958423755787,
+          "chroma_95th_percentile_error": 4.0
+        },
+        {
+          "quality": 90,
+          "bytes": 74684,
+          "full_resolution_luma_ssim": 0.9712640047073364,
+          "worst_128px_luma_ssim": 0.9521126747131348,
+          "chroma_mean_absolute_error": 1.007862232349537,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 94,
+          "bytes": 110156,
+          "full_resolution_luma_ssim": 0.9848947525024414,
+          "worst_128px_luma_ssim": 0.9760493636131287,
+          "chroma_mean_absolute_error": 0.9267363371672453,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 95,
+          "bytes": 119774,
+          "full_resolution_luma_ssim": 0.9860315322875977,
+          "worst_128px_luma_ssim": 0.9779713749885559,
+          "chroma_mean_absolute_error": 0.8980543348524306,
+          "chroma_95th_percentile_error": 3.0
+        }
+      ]
+    },
+    {
+      "id": "argonian_male_1",
+      "file": "argonian_male_1.webp",
+      "original_bytes": 2475919,
+      "original_sha256": "37e1935a5d9531fb0dcb8b4c75826840609281cc0448f308d3c32c97507d7b3a",
+      "source_dimensions": [
+        1086,
+        1448
+      ],
+      "dimensions": [
+        576,
+        768
+      ],
+      "encoded_bytes": 126084,
+      "sha256": "9d53f43f1ffd30f5882ef7fe5ab8f3ffbb25d2b5dbb1984ed7e2ded763c0a04b",
+      "quality": 95,
+      "full_resolution_luma_ssim": 0.9868532419204712,
+      "worst_128px_luma_ssim": 0.9805434942245483,
+      "chroma_mean_absolute_error": 0.8572986744068287,
+      "chroma_95th_percentile_error": 3.0,
+      "trials": [
+        {
+          "quality": 78,
+          "bytes": 36334,
+          "full_resolution_luma_ssim": 0.9238396883010864,
+          "worst_128px_luma_ssim": 0.8701155185699463,
+          "chroma_mean_absolute_error": 1.0945355450665508,
+          "chroma_95th_percentile_error": 4.0
+        },
+        {
+          "quality": 82,
+          "bytes": 47302,
+          "full_resolution_luma_ssim": 0.945219099521637,
+          "worst_128px_luma_ssim": 0.9119576811790466,
+          "chroma_mean_absolute_error": 1.0533582899305556,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 86,
+          "bytes": 58956,
+          "full_resolution_luma_ssim": 0.9588770866394043,
+          "worst_128px_luma_ssim": 0.9342098236083984,
+          "chroma_mean_absolute_error": 1.0050207067418981,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 90,
+          "bytes": 83056,
+          "full_resolution_luma_ssim": 0.972133219242096,
+          "worst_128px_luma_ssim": 0.9487438201904297,
+          "chroma_mean_absolute_error": 0.9518579553674769,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 94,
+          "bytes": 116258,
+          "full_resolution_luma_ssim": 0.9846023321151733,
+          "worst_128px_luma_ssim": 0.9750913977622986,
+          "chroma_mean_absolute_error": 0.8833358199508102,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 95,
+          "bytes": 126084,
+          "full_resolution_luma_ssim": 0.9868532419204712,
+          "worst_128px_luma_ssim": 0.9805434942245483,
+          "chroma_mean_absolute_error": 0.8572986744068287,
+          "chroma_95th_percentile_error": 3.0
+        }
+      ]
+    },
+    {
+      "id": "argonian_male_2",
+      "file": "argonian_male_2.webp",
+      "original_bytes": 2581743,
+      "original_sha256": "2b57da51690380625d81adf4a22e7fd531ae6f0e11dd233bc579a06d4c9746df",
+      "source_dimensions": [
+        1086,
+        1448
+      ],
+      "dimensions": [
+        576,
+        768
+      ],
+      "encoded_bytes": 113106,
+      "sha256": "eb18f84abff2bf4b0842ff1a635c10b29357cffabfd49bf5b55568be08c46547",
+      "quality": 94,
+      "full_resolution_luma_ssim": 0.9852747917175293,
+      "worst_128px_luma_ssim": 0.9772683382034302,
+      "chroma_mean_absolute_error": 0.8071108217592593,
+      "chroma_95th_percentile_error": 3.0,
+      "trials": [
+        {
+          "quality": 78,
+          "bytes": 37532,
+          "full_resolution_luma_ssim": 0.9255982637405396,
+          "worst_128px_luma_ssim": 0.8647671937942505,
+          "chroma_mean_absolute_error": 1.0062696668836806,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 82,
+          "bytes": 47784,
+          "full_resolution_luma_ssim": 0.9434031844139099,
+          "worst_128px_luma_ssim": 0.8990633487701416,
+          "chroma_mean_absolute_error": 0.9660248933015047,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 86,
+          "bytes": 59528,
+          "full_resolution_luma_ssim": 0.9586130380630493,
+          "worst_128px_luma_ssim": 0.926994264125824,
+          "chroma_mean_absolute_error": 0.9193782099971065,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 90,
+          "bytes": 81578,
+          "full_resolution_luma_ssim": 0.974923849105835,
+          "worst_128px_luma_ssim": 0.9576423168182373,
+          "chroma_mean_absolute_error": 0.8673683449074074,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 94,
+          "bytes": 113106,
+          "full_resolution_luma_ssim": 0.9852747917175293,
+          "worst_128px_luma_ssim": 0.9772683382034302,
+          "chroma_mean_absolute_error": 0.8071108217592593,
+          "chroma_95th_percentile_error": 3.0
+        }
+      ]
+    },
+    {
+      "id": "argonian_male_3",
+      "file": "argonian_male_3.webp",
+      "original_bytes": 2521161,
+      "original_sha256": "1c71d73675691bb86b87cff66486e1fe0a2ef88ba43187d0d4f42a1689293711",
+      "source_dimensions": [
+        1086,
+        1448
+      ],
+      "dimensions": [
+        576,
+        768
+      ],
+      "encoded_bytes": 131806,
+      "sha256": "2af52d5f2f5547cba39662ee3b190a53f3839827c94637483e0dd26f1b3e2f3b",
+      "quality": 95,
+      "full_resolution_luma_ssim": 0.9855827689170837,
+      "worst_128px_luma_ssim": 0.9756767153739929,
+      "chroma_mean_absolute_error": 0.9558749728732638,
+      "chroma_95th_percentile_error": 3.0,
+      "trials": [
+        {
+          "quality": 78,
+          "bytes": 39168,
+          "full_resolution_luma_ssim": 0.9254720211029053,
+          "worst_128px_luma_ssim": 0.8678979277610779,
+          "chroma_mean_absolute_error": 1.2614825213396992,
+          "chroma_95th_percentile_error": 4.0
+        },
+        {
+          "quality": 82,
+          "bytes": 50134,
+          "full_resolution_luma_ssim": 0.9445621967315674,
+          "worst_128px_luma_ssim": 0.9063953757286072,
+          "chroma_mean_absolute_error": 1.2082395200376157,
+          "chroma_95th_percentile_error": 4.0
+        },
+        {
+          "quality": 86,
+          "bytes": 64332,
+          "full_resolution_luma_ssim": 0.9598988890647888,
+          "worst_128px_luma_ssim": 0.9341816902160645,
+          "chroma_mean_absolute_error": 1.1423656322337963,
+          "chroma_95th_percentile_error": 4.0
+        },
+        {
+          "quality": 90,
+          "bytes": 86834,
+          "full_resolution_luma_ssim": 0.9738345742225647,
+          "worst_128px_luma_ssim": 0.9550803303718567,
+          "chroma_mean_absolute_error": 1.068073413990162,
+          "chroma_95th_percentile_error": 4.0
+        },
+        {
+          "quality": 94,
+          "bytes": 121782,
+          "full_resolution_luma_ssim": 0.9848423004150391,
+          "worst_128px_luma_ssim": 0.9756549596786499,
+          "chroma_mean_absolute_error": 0.9858194986979166,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 95,
+          "bytes": 131806,
+          "full_resolution_luma_ssim": 0.9855827689170837,
+          "worst_128px_luma_ssim": 0.9756767153739929,
+          "chroma_mean_absolute_error": 0.9558749728732638,
+          "chroma_95th_percentile_error": 3.0
+        }
+      ]
+    },
+    {
+      "id": "bosmer_female_1",
+      "file": "bosmer_female_1.webp",
+      "original_bytes": 2346859,
+      "original_sha256": "9ac4bf971d824aa8a44c8b29a1e573c8a5e2a10a7e240cecd08c827d6cf8962c",
+      "source_dimensions": [
+        1086,
+        1448
+      ],
+      "dimensions": [
+        576,
+        768
+      ],
+      "encoded_bytes": 118850,
+      "sha256": "7224677438c8e34866652972a7c86818d6dbc910f47d33bbfce164a68c15c502",
+      "quality": 97,
+      "full_resolution_luma_ssim": 0.9872400760650635,
+      "worst_128px_luma_ssim": 0.984822154045105,
+      "chroma_mean_absolute_error": 0.7375533492476852,
+      "chroma_95th_percentile_error": 2.0,
+      "trials": [
+        {
+          "quality": 78,
+          "bytes": 24018,
+          "full_resolution_luma_ssim": 0.922423243522644,
+          "worst_128px_luma_ssim": 0.853208065032959,
+          "chroma_mean_absolute_error": 1.0063103569878473,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 82,
+          "bytes": 30678,
+          "full_resolution_luma_ssim": 0.9371381402015686,
+          "worst_128px_luma_ssim": 0.8901505470275879,
+          "chroma_mean_absolute_error": 0.9612822356047453,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 86,
+          "bytes": 41520,
+          "full_resolution_luma_ssim": 0.9507498145103455,
+          "worst_128px_luma_ssim": 0.9207961559295654,
+          "chroma_mean_absolute_error": 0.9142738624855324,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 90,
+          "bytes": 58098,
+          "full_resolution_luma_ssim": 0.9646012187004089,
+          "worst_128px_luma_ssim": 0.9499117136001587,
+          "chroma_mean_absolute_error": 0.8550245496961806,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 94,
+          "bytes": 95606,
+          "full_resolution_luma_ssim": 0.9806220531463623,
+          "worst_128px_luma_ssim": 0.9762462377548218,
+          "chroma_mean_absolute_error": 0.7873557761863426,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 95,
+          "bytes": 100168,
+          "full_resolution_luma_ssim": 0.9806263446807861,
+          "worst_128px_luma_ssim": 0.9761271476745605,
+          "chroma_mean_absolute_error": 0.7781168619791666,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 96,
+          "bytes": 110366,
+          "full_resolution_luma_ssim": 0.9837756752967834,
+          "worst_128px_luma_ssim": 0.9801545143127441,
+          "chroma_mean_absolute_error": 0.7702919288917824,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 97,
+          "bytes": 118850,
+          "full_resolution_luma_ssim": 0.9872400760650635,
+          "worst_128px_luma_ssim": 0.984822154045105,
+          "chroma_mean_absolute_error": 0.7375533492476852,
+          "chroma_95th_percentile_error": 2.0
+        }
+      ]
+    },
+    {
+      "id": "bosmer_female_2",
+      "file": "bosmer_female_2.webp",
+      "original_bytes": 2337506,
+      "original_sha256": "33c4a7780dcebc76feb4a7216f613f1f4ccabbaabe36bdf1825043a39bf98440",
+      "source_dimensions": [
+        1086,
+        1448
+      ],
+      "dimensions": [
+        576,
+        768
+      ],
+      "encoded_bytes": 110644,
+      "sha256": "d44bbc3fb5bb2b1de0017d7ea0d338879e01ea28b54959044e0c71f706b32034",
+      "quality": 96,
+      "full_resolution_luma_ssim": 0.9858219027519226,
+      "worst_128px_luma_ssim": 0.9811367392539978,
+      "chroma_mean_absolute_error": 0.732391357421875,
+      "chroma_95th_percentile_error": 2.0,
+      "trials": [
+        {
+          "quality": 78,
+          "bytes": 25598,
+          "full_resolution_luma_ssim": 0.921513557434082,
+          "worst_128px_luma_ssim": 0.844941258430481,
+          "chroma_mean_absolute_error": 0.9411711516203703,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 82,
+          "bytes": 32620,
+          "full_resolution_luma_ssim": 0.9336403608322144,
+          "worst_128px_luma_ssim": 0.8751392364501953,
+          "chroma_mean_absolute_error": 0.9061550564236112,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 86,
+          "bytes": 42908,
+          "full_resolution_luma_ssim": 0.9534158706665039,
+          "worst_128px_luma_ssim": 0.9266142845153809,
+          "chroma_mean_absolute_error": 0.8655282479745371,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 90,
+          "bytes": 61380,
+          "full_resolution_luma_ssim": 0.9667485952377319,
+          "worst_128px_luma_ssim": 0.9443275928497314,
+          "chroma_mean_absolute_error": 0.8095612702546297,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 94,
+          "bytes": 95718,
+          "full_resolution_luma_ssim": 0.9827203750610352,
+          "worst_128px_luma_ssim": 0.976765513420105,
+          "chroma_mean_absolute_error": 0.7547935203269676,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 95,
+          "bytes": 101650,
+          "full_resolution_luma_ssim": 0.9835125207901001,
+          "worst_128px_luma_ssim": 0.976709246635437,
+          "chroma_mean_absolute_error": 0.7415059407552084,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 96,
+          "bytes": 110644,
+          "full_resolution_luma_ssim": 0.9858219027519226,
+          "worst_128px_luma_ssim": 0.9811367392539978,
+          "chroma_mean_absolute_error": 0.732391357421875,
+          "chroma_95th_percentile_error": 2.0
+        }
+      ]
+    },
+    {
+      "id": "bosmer_female_3",
+      "file": "bosmer_female_3.webp",
+      "original_bytes": 2304016,
+      "original_sha256": "b39f5c2f951e215b8544881bb4f5c1981825bb0442b7b97378bec279596c4dc8",
+      "source_dimensions": [
+        1086,
+        1448
+      ],
+      "dimensions": [
+        576,
+        768
+      ],
+      "encoded_bytes": 114650,
+      "sha256": "39119aba6290aa8eea4a94a2775005a0a80518a877470c03af90f1d8f1336f13",
+      "quality": 97,
+      "full_resolution_luma_ssim": 0.9857663512229919,
+      "worst_128px_luma_ssim": 0.9803376793861389,
+      "chroma_mean_absolute_error": 0.7614327889901621,
+      "chroma_95th_percentile_error": 2.0,
+      "trials": [
+        {
+          "quality": 78,
+          "bytes": 22478,
+          "full_resolution_luma_ssim": 0.9250466823577881,
+          "worst_128px_luma_ssim": 0.8562616109848022,
+          "chroma_mean_absolute_error": 1.0108891239872686,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 82,
+          "bytes": 28860,
+          "full_resolution_luma_ssim": 0.9375709295272827,
+          "worst_128px_luma_ssim": 0.8789622187614441,
+          "chroma_mean_absolute_error": 0.9694168655960648,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 86,
+          "bytes": 38958,
+          "full_resolution_luma_ssim": 0.9506709575653076,
+          "worst_128px_luma_ssim": 0.9114304780960083,
+          "chroma_mean_absolute_error": 0.9252816659432871,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 90,
+          "bytes": 55302,
+          "full_resolution_luma_ssim": 0.9656752943992615,
+          "worst_128px_luma_ssim": 0.9455207586288452,
+          "chroma_mean_absolute_error": 0.8616694697627315,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 94,
+          "bytes": 88260,
+          "full_resolution_luma_ssim": 0.9805178642272949,
+          "worst_128px_luma_ssim": 0.9739324450492859,
+          "chroma_mean_absolute_error": 0.7895982530381944,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 95,
+          "bytes": 96198,
+          "full_resolution_luma_ssim": 0.9821895360946655,
+          "worst_128px_luma_ssim": 0.9745967388153076,
+          "chroma_mean_absolute_error": 0.7778037742332176,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 96,
+          "bytes": 106134,
+          "full_resolution_luma_ssim": 0.9835187196731567,
+          "worst_128px_luma_ssim": 0.976662814617157,
+          "chroma_mean_absolute_error": 0.7738805700231481,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 97,
+          "bytes": 114650,
+          "full_resolution_luma_ssim": 0.9857663512229919,
+          "worst_128px_luma_ssim": 0.9803376793861389,
+          "chroma_mean_absolute_error": 0.7614327889901621,
+          "chroma_95th_percentile_error": 2.0
+        }
+      ]
+    },
+    {
+      "id": "bosmer_male_1",
+      "file": "bosmer_male_1.webp",
+      "original_bytes": 2407865,
+      "original_sha256": "d74b4a3352b807edaa2a6acce5bbe2493d9c8467603015c5f23cb99609f284de",
+      "source_dimensions": [
+        1086,
+        1448
+      ],
+      "dimensions": [
+        576,
+        768
+      ],
+      "encoded_bytes": 116572,
+      "sha256": "b28991009a07047d64bf62a45b0a53e786c09fd29d39e5f20e43643e0ece643e",
+      "quality": 96,
+      "full_resolution_luma_ssim": 0.9855397343635559,
+      "worst_128px_luma_ssim": 0.982172966003418,
+      "chroma_mean_absolute_error": 0.7491715042679398,
+      "chroma_95th_percentile_error": 2.0,
+      "trials": [
+        {
+          "quality": 78,
+          "bytes": 26520,
+          "full_resolution_luma_ssim": 0.9176333546638489,
+          "worst_128px_luma_ssim": 0.854560911655426,
+          "chroma_mean_absolute_error": 0.9738430447048612,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 82,
+          "bytes": 33844,
+          "full_resolution_luma_ssim": 0.9332812428474426,
+          "worst_128px_luma_ssim": 0.8884907960891724,
+          "chroma_mean_absolute_error": 0.9351851851851852,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 86,
+          "bytes": 44986,
+          "full_resolution_luma_ssim": 0.948595404624939,
+          "worst_128px_luma_ssim": 0.9169031381607056,
+          "chroma_mean_absolute_error": 0.8938881202980324,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 90,
+          "bytes": 62234,
+          "full_resolution_luma_ssim": 0.9631790518760681,
+          "worst_128px_luma_ssim": 0.9422074556350708,
+          "chroma_mean_absolute_error": 0.8478348343460648,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 94,
+          "bytes": 100744,
+          "full_resolution_luma_ssim": 0.9808298349380493,
+          "worst_128px_luma_ssim": 0.9733637571334839,
+          "chroma_mean_absolute_error": 0.7787147804542824,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 95,
+          "bytes": 107206,
+          "full_resolution_luma_ssim": 0.9810301065444946,
+          "worst_128px_luma_ssim": 0.9733941555023193,
+          "chroma_mean_absolute_error": 0.7679047761140047,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 96,
+          "bytes": 116572,
+          "full_resolution_luma_ssim": 0.9855397343635559,
+          "worst_128px_luma_ssim": 0.982172966003418,
+          "chroma_mean_absolute_error": 0.7491715042679398,
+          "chroma_95th_percentile_error": 2.0
+        }
+      ]
+    },
+    {
+      "id": "bosmer_male_2",
+      "file": "bosmer_male_2.webp",
+      "original_bytes": 2323005,
+      "original_sha256": "3f4dfe65218b85f9af558b8ae866319e35abc543d9078de2c70d3b111c60f649",
+      "source_dimensions": [
+        1086,
+        1448
+      ],
+      "dimensions": [
+        576,
+        768
+      ],
+      "encoded_bytes": 116618,
+      "sha256": "f45ba07ca7900f57ba68e1069bc4c0175811957becb48ee2321ab3d35f32663b",
+      "quality": 97,
+      "full_resolution_luma_ssim": 0.9872744083404541,
+      "worst_128px_luma_ssim": 0.9832963943481445,
+      "chroma_mean_absolute_error": 0.7003501609519676,
+      "chroma_95th_percentile_error": 2.0,
+      "trials": [
+        {
+          "quality": 78,
+          "bytes": 22716,
+          "full_resolution_luma_ssim": 0.9191200733184814,
+          "worst_128px_luma_ssim": 0.8592947125434875,
+          "chroma_mean_absolute_error": 0.9171346028645834,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 82,
+          "bytes": 29512,
+          "full_resolution_luma_ssim": 0.9332360029220581,
+          "worst_128px_luma_ssim": 0.8868101835250854,
+          "chroma_mean_absolute_error": 0.8855794270833334,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 86,
+          "bytes": 40448,
+          "full_resolution_luma_ssim": 0.9497371315956116,
+          "worst_128px_luma_ssim": 0.9201527833938599,
+          "chroma_mean_absolute_error": 0.8501134801793981,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 90,
+          "bytes": 58830,
+          "full_resolution_luma_ssim": 0.9652838110923767,
+          "worst_128px_luma_ssim": 0.9459757804870605,
+          "chroma_mean_absolute_error": 0.7916971842447916,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 94,
+          "bytes": 94426,
+          "full_resolution_luma_ssim": 0.9808887839317322,
+          "worst_128px_luma_ssim": 0.9722618460655212,
+          "chroma_mean_absolute_error": 0.7308643482349537,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 95,
+          "bytes": 99576,
+          "full_resolution_luma_ssim": 0.9810471534729004,
+          "worst_128px_luma_ssim": 0.9718488454818726,
+          "chroma_mean_absolute_error": 0.7258673773871528,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 96,
+          "bytes": 108498,
+          "full_resolution_luma_ssim": 0.9841523170471191,
+          "worst_128px_luma_ssim": 0.977713942527771,
+          "chroma_mean_absolute_error": 0.7142164442274306,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 97,
+          "bytes": 116618,
+          "full_resolution_luma_ssim": 0.9872744083404541,
+          "worst_128px_luma_ssim": 0.9832963943481445,
+          "chroma_mean_absolute_error": 0.7003501609519676,
+          "chroma_95th_percentile_error": 2.0
+        }
+      ]
+    },
+    {
+      "id": "bosmer_male_3",
+      "file": "bosmer_male_3.webp",
+      "original_bytes": 2338406,
+      "original_sha256": "cefdf9776abd2b802ac39343a36567f815a7a3d370f254e5362014c31adc7654",
+      "source_dimensions": [
+        1086,
+        1448
+      ],
+      "dimensions": [
+        576,
+        768
+      ],
+      "encoded_bytes": 119524,
+      "sha256": "812ce579d7fc6724c3a46cd8f471807ba61a45e956df10ebc18b9e9afcd8c52f",
+      "quality": 97,
+      "full_resolution_luma_ssim": 0.9870777130126953,
+      "worst_128px_luma_ssim": 0.9829949140548706,
+      "chroma_mean_absolute_error": 0.7342845775462963,
+      "chroma_95th_percentile_error": 2.0,
+      "trials": [
+        {
+          "quality": 78,
+          "bytes": 23930,
+          "full_resolution_luma_ssim": 0.9222748875617981,
+          "worst_128px_luma_ssim": 0.8562358617782593,
+          "chroma_mean_absolute_error": 0.9892691153067129,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 82,
+          "bytes": 32770,
+          "full_resolution_luma_ssim": 0.9374761581420898,
+          "worst_128px_luma_ssim": 0.888411819934845,
+          "chroma_mean_absolute_error": 0.9426687735098379,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 86,
+          "bytes": 44058,
+          "full_resolution_luma_ssim": 0.952885091304779,
+          "worst_128px_luma_ssim": 0.9220328330993652,
+          "chroma_mean_absolute_error": 0.8820201732494213,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 90,
+          "bytes": 58896,
+          "full_resolution_luma_ssim": 0.9647983312606812,
+          "worst_128px_luma_ssim": 0.9441722631454468,
+          "chroma_mean_absolute_error": 0.8381291142216435,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 94,
+          "bytes": 92336,
+          "full_resolution_luma_ssim": 0.9796343445777893,
+          "worst_128px_luma_ssim": 0.970759928226471,
+          "chroma_mean_absolute_error": 0.7752052589699074,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 95,
+          "bytes": 105444,
+          "full_resolution_luma_ssim": 0.982727587223053,
+          "worst_128px_luma_ssim": 0.9751173853874207,
+          "chroma_mean_absolute_error": 0.7526629412615741,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 96,
+          "bytes": 110932,
+          "full_resolution_luma_ssim": 0.9829532504081726,
+          "worst_128px_luma_ssim": 0.9744982123374939,
+          "chroma_mean_absolute_error": 0.7540079752604166,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 97,
+          "bytes": 119524,
+          "full_resolution_luma_ssim": 0.9870777130126953,
+          "worst_128px_luma_ssim": 0.9829949140548706,
+          "chroma_mean_absolute_error": 0.7342845775462963,
+          "chroma_95th_percentile_error": 2.0
+        }
+      ]
+    },
+    {
+      "id": "breton_female_1",
+      "file": "breton_female_1.webp",
+      "original_bytes": 2373283,
+      "original_sha256": "32e84d1fbe95faba54f35da00f98f8ae11d68fe441382b2d58410210fd0dacf8",
+      "source_dimensions": [
+        1086,
+        1448
+      ],
+      "dimensions": [
+        576,
+        768
+      ],
+      "encoded_bytes": 111506,
+      "sha256": "fab23744e3be54b948baee203845a810870b4546eafac649356b4d4989b2e472",
+      "quality": 95,
+      "full_resolution_luma_ssim": 0.985636830329895,
+      "worst_128px_luma_ssim": 0.9826201796531677,
+      "chroma_mean_absolute_error": 0.7733357747395834,
+      "chroma_95th_percentile_error": 2.0,
+      "trials": [
+        {
+          "quality": 78,
+          "bytes": 27716,
+          "full_resolution_luma_ssim": 0.9227746725082397,
+          "worst_128px_luma_ssim": 0.8501178026199341,
+          "chroma_mean_absolute_error": 0.9959253381799769,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 82,
+          "bytes": 36726,
+          "full_resolution_luma_ssim": 0.9400051236152649,
+          "worst_128px_luma_ssim": 0.8932714462280273,
+          "chroma_mean_absolute_error": 0.9531702112268519,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 86,
+          "bytes": 48204,
+          "full_resolution_luma_ssim": 0.9533669352531433,
+          "worst_128px_luma_ssim": 0.920536994934082,
+          "chroma_mean_absolute_error": 0.9031462492766203,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 90,
+          "bytes": 63892,
+          "full_resolution_luma_ssim": 0.9677392244338989,
+          "worst_128px_luma_ssim": 0.9486708641052246,
+          "chroma_mean_absolute_error": 0.8623815465856481,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 94,
+          "bytes": 101884,
+          "full_resolution_luma_ssim": 0.9818119406700134,
+          "worst_128px_luma_ssim": 0.9727926254272461,
+          "chroma_mean_absolute_error": 0.7963539406105324,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 95,
+          "bytes": 111506,
+          "full_resolution_luma_ssim": 0.985636830329895,
+          "worst_128px_luma_ssim": 0.9826201796531677,
+          "chroma_mean_absolute_error": 0.7733357747395834,
+          "chroma_95th_percentile_error": 2.0
+        }
+      ]
+    },
+    {
+      "id": "breton_female_2",
+      "file": "breton_female_2.webp",
+      "original_bytes": 2329808,
+      "original_sha256": "81d04e7dd5290e19d4a2d76536780155d3b4cadd9c7dc89cb3b34d405b6bd419",
+      "source_dimensions": [
+        1086,
+        1448
+      ],
+      "dimensions": [
+        576,
+        768
+      ],
+      "encoded_bytes": 113458,
+      "sha256": "350cd871dd8514e7ddaaa031ef03963ace5be5a387dda8cc025a47a7cf6428f5",
+      "quality": 97,
+      "full_resolution_luma_ssim": 0.9867851734161377,
+      "worst_128px_luma_ssim": 0.9831557273864746,
+      "chroma_mean_absolute_error": 0.6586665400752315,
+      "chroma_95th_percentile_error": 2.0,
+      "trials": [
+        {
+          "quality": 78,
+          "bytes": 22060,
+          "full_resolution_luma_ssim": 0.9209630489349365,
+          "worst_128px_luma_ssim": 0.8574986457824707,
+          "chroma_mean_absolute_error": 0.8386241771556713,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 82,
+          "bytes": 28662,
+          "full_resolution_luma_ssim": 0.9328147172927856,
+          "worst_128px_luma_ssim": 0.8868101835250854,
+          "chroma_mean_absolute_error": 0.8105434841579862,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 86,
+          "bytes": 39030,
+          "full_resolution_luma_ssim": 0.9483199119567871,
+          "worst_128px_luma_ssim": 0.9177794456481934,
+          "chroma_mean_absolute_error": 0.7785215024594907,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 90,
+          "bytes": 55136,
+          "full_resolution_luma_ssim": 0.9629842638969421,
+          "worst_128px_luma_ssim": 0.941380500793457,
+          "chroma_mean_absolute_error": 0.73663330078125,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 94,
+          "bytes": 87432,
+          "full_resolution_luma_ssim": 0.9797914028167725,
+          "worst_128px_luma_ssim": 0.9748761653900146,
+          "chroma_mean_absolute_error": 0.6913881655092593,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 95,
+          "bytes": 93458,
+          "full_resolution_luma_ssim": 0.9811884164810181,
+          "worst_128px_luma_ssim": 0.9752339124679565,
+          "chroma_mean_absolute_error": 0.6849489565248843,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 96,
+          "bytes": 105318,
+          "full_resolution_luma_ssim": 0.9829347133636475,
+          "worst_128px_luma_ssim": 0.976816713809967,
+          "chroma_mean_absolute_error": 0.6825030291521991,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 97,
+          "bytes": 113458,
+          "full_resolution_luma_ssim": 0.9867851734161377,
+          "worst_128px_luma_ssim": 0.9831557273864746,
+          "chroma_mean_absolute_error": 0.6586665400752315,
+          "chroma_95th_percentile_error": 2.0
+        }
+      ]
+    },
+    {
+      "id": "breton_female_3",
+      "file": "breton_female_3.webp",
+      "original_bytes": 2344883,
+      "original_sha256": "5758d4bb57aae97939f081de5a62fffd74bd2d77c361bb0ee1118a03f154b07c",
+      "source_dimensions": [
+        1086,
+        1448
+      ],
+      "dimensions": [
+        576,
+        768
+      ],
+      "encoded_bytes": 112478,
+      "sha256": "675a9b43e4d20b6b4b64650bba0a290debdbf5fac1fe3355febbfdb0884c511d",
+      "quality": 95,
+      "full_resolution_luma_ssim": 0.9859731197357178,
+      "worst_128px_luma_ssim": 0.9820560216903687,
+      "chroma_mean_absolute_error": 0.8391000253182871,
+      "chroma_95th_percentile_error": 2.0,
+      "trials": [
+        {
+          "quality": 78,
+          "bytes": 26538,
+          "full_resolution_luma_ssim": 0.9233981370925903,
+          "worst_128px_luma_ssim": 0.8628320693969727,
+          "chroma_mean_absolute_error": 1.0926570185908564,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 82,
+          "bytes": 35222,
+          "full_resolution_luma_ssim": 0.9370715618133545,
+          "worst_128px_luma_ssim": 0.8916254043579102,
+          "chroma_mean_absolute_error": 1.0479442455150463,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 86,
+          "bytes": 47304,
+          "full_resolution_luma_ssim": 0.9551745653152466,
+          "worst_128px_luma_ssim": 0.9302614331245422,
+          "chroma_mean_absolute_error": 0.9857889811197916,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 90,
+          "bytes": 62468,
+          "full_resolution_luma_ssim": 0.967979907989502,
+          "worst_128px_luma_ssim": 0.9521355628967285,
+          "chroma_mean_absolute_error": 0.9406320077401621,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 94,
+          "bytes": 101318,
+          "full_resolution_luma_ssim": 0.9835262298583984,
+          "worst_128px_luma_ssim": 0.9778746366500854,
+          "chroma_mean_absolute_error": 0.8626528139467593,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 95,
+          "bytes": 112478,
+          "full_resolution_luma_ssim": 0.9859731197357178,
+          "worst_128px_luma_ssim": 0.9820560216903687,
+          "chroma_mean_absolute_error": 0.8391000253182871,
+          "chroma_95th_percentile_error": 2.0
+        }
+      ]
+    },
+    {
+      "id": "breton_male_1",
+      "file": "breton_male_1.webp",
+      "original_bytes": 2421773,
+      "original_sha256": "ee067a7ae55fe83d6eb4ef8e3dbe1eb5ca8b796777199c4b48c88cb0b14e888b",
+      "source_dimensions": [
+        1086,
+        1448
+      ],
+      "dimensions": [
+        576,
+        768
+      ],
+      "encoded_bytes": 125224,
+      "sha256": "78ca0a0958d57714428ea6014f789c470d94f85fdc7859529b2d7bc0c2c547ea",
+      "quality": 97,
+      "full_resolution_luma_ssim": 0.9881044626235962,
+      "worst_128px_luma_ssim": 0.9833484292030334,
+      "chroma_mean_absolute_error": 0.7058275010850694,
+      "chroma_95th_percentile_error": 2.0,
+      "trials": [
+        {
+          "quality": 78,
+          "bytes": 29288,
+          "full_resolution_luma_ssim": 0.9213231801986694,
+          "worst_128px_luma_ssim": 0.8580387234687805,
+          "chroma_mean_absolute_error": 0.9031462492766203,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 82,
+          "bytes": 37668,
+          "full_resolution_luma_ssim": 0.9362804889678955,
+          "worst_128px_luma_ssim": 0.891472578048706,
+          "chroma_mean_absolute_error": 0.8724195692274306,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 86,
+          "bytes": 49834,
+          "full_resolution_luma_ssim": 0.9539405703544617,
+          "worst_128px_luma_ssim": 0.9234822988510132,
+          "chroma_mean_absolute_error": 0.827880859375,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 90,
+          "bytes": 64808,
+          "full_resolution_luma_ssim": 0.9669357538223267,
+          "worst_128px_luma_ssim": 0.9433872699737549,
+          "chroma_mean_absolute_error": 0.7915355541087963,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 94,
+          "bytes": 101482,
+          "full_resolution_luma_ssim": 0.9841771721839905,
+          "worst_128px_luma_ssim": 0.9780439138412476,
+          "chroma_mean_absolute_error": 0.7347525137442129,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 95,
+          "bytes": 110584,
+          "full_resolution_luma_ssim": 0.9839208722114563,
+          "worst_128px_luma_ssim": 0.9758474826812744,
+          "chroma_mean_absolute_error": 0.7142017505787037,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 96,
+          "bytes": 116446,
+          "full_resolution_luma_ssim": 0.9837685227394104,
+          "worst_128px_luma_ssim": 0.9749679565429688,
+          "chroma_mean_absolute_error": 0.7163436324508102,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 97,
+          "bytes": 125224,
+          "full_resolution_luma_ssim": 0.9881044626235962,
+          "worst_128px_luma_ssim": 0.9833484292030334,
+          "chroma_mean_absolute_error": 0.7058275010850694,
+          "chroma_95th_percentile_error": 2.0
+        }
+      ]
+    },
+    {
+      "id": "breton_male_2",
+      "file": "breton_male_2.webp",
+      "original_bytes": 2357341,
+      "original_sha256": "6fd24e30544d61b74a0ba8c8d5a509d73f57ad19e4d3ecc723d70228d735cc16",
+      "source_dimensions": [
+        1086,
+        1448
+      ],
+      "dimensions": [
+        576,
+        768
+      ],
+      "encoded_bytes": 118568,
+      "sha256": "df1f2fd2e45b4e7cfab71d6bf2e316df073e3050bdc77cc826cffc466588bf98",
+      "quality": 97,
+      "full_resolution_luma_ssim": 0.9885192513465881,
+      "worst_128px_luma_ssim": 0.9850482940673828,
+      "chroma_mean_absolute_error": 0.603302001953125,
+      "chroma_95th_percentile_error": 2.0,
+      "trials": [
+        {
+          "quality": 78,
+          "bytes": 25372,
+          "full_resolution_luma_ssim": 0.919043779373169,
+          "worst_128px_luma_ssim": 0.8670110702514648,
+          "chroma_mean_absolute_error": 0.7691028736255787,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 82,
+          "bytes": 32786,
+          "full_resolution_luma_ssim": 0.9343048334121704,
+          "worst_128px_luma_ssim": 0.892971396446228,
+          "chroma_mean_absolute_error": 0.7390634042245371,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 86,
+          "bytes": 43986,
+          "full_resolution_luma_ssim": 0.9502500891685486,
+          "worst_128px_luma_ssim": 0.9222538471221924,
+          "chroma_mean_absolute_error": 0.7134908040364584,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 90,
+          "bytes": 60850,
+          "full_resolution_luma_ssim": 0.964256227016449,
+          "worst_128px_luma_ssim": 0.9444319605827332,
+          "chroma_mean_absolute_error": 0.6692165798611112,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 94,
+          "bytes": 93408,
+          "full_resolution_luma_ssim": 0.9821032881736755,
+          "worst_128px_luma_ssim": 0.9747560024261475,
+          "chroma_mean_absolute_error": 0.6303315339265047,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 95,
+          "bytes": 102818,
+          "full_resolution_luma_ssim": 0.9848437905311584,
+          "worst_128px_luma_ssim": 0.9790410995483398,
+          "chroma_mean_absolute_error": 0.6147664388020834,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 96,
+          "bytes": 110826,
+          "full_resolution_luma_ssim": 0.9821415543556213,
+          "worst_128px_luma_ssim": 0.9731974601745605,
+          "chroma_mean_absolute_error": 0.6187970196759259,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 97,
+          "bytes": 118568,
+          "full_resolution_luma_ssim": 0.9885192513465881,
+          "worst_128px_luma_ssim": 0.9850482940673828,
+          "chroma_mean_absolute_error": 0.603302001953125,
+          "chroma_95th_percentile_error": 2.0
+        }
+      ]
+    },
+    {
+      "id": "breton_male_3",
+      "file": "breton_male_3.webp",
+      "original_bytes": 2507284,
+      "original_sha256": "3f44008b13408eb43f9cfd621e2ad80be849e86c359b8017e267454304f67e2d",
+      "source_dimensions": [
+        1086,
+        1448
+      ],
+      "dimensions": [
+        576,
+        768
+      ],
+      "encoded_bytes": 133228,
+      "sha256": "c39be1f184a6c7ff3027487beaecc697fb699de89c8cf6cd0347d120d1956192",
+      "quality": 97,
+      "full_resolution_luma_ssim": 0.9873795509338379,
+      "worst_128px_luma_ssim": 0.9825403094291687,
+      "chroma_mean_absolute_error": 0.7217701099537037,
+      "chroma_95th_percentile_error": 2.0,
+      "trials": [
+        {
+          "quality": 78,
+          "bytes": 29360,
+          "full_resolution_luma_ssim": 0.9168736934661865,
+          "worst_128px_luma_ssim": 0.8679953813552856,
+          "chroma_mean_absolute_error": 0.9601689091435185,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 82,
+          "bytes": 37690,
+          "full_resolution_luma_ssim": 0.9331940412521362,
+          "worst_128px_luma_ssim": 0.9002470970153809,
+          "chroma_mean_absolute_error": 0.9319864908854166,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 86,
+          "bytes": 50312,
+          "full_resolution_luma_ssim": 0.9493332505226135,
+          "worst_128px_luma_ssim": 0.9270495176315308,
+          "chroma_mean_absolute_error": 0.8829605667679398,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 90,
+          "bytes": 70704,
+          "full_resolution_luma_ssim": 0.9650074243545532,
+          "worst_128px_luma_ssim": 0.9464840888977051,
+          "chroma_mean_absolute_error": 0.8391158492476852,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 94,
+          "bytes": 106572,
+          "full_resolution_luma_ssim": 0.9803662300109863,
+          "worst_128px_luma_ssim": 0.9693232774734497,
+          "chroma_mean_absolute_error": 0.7694623028790509,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 95,
+          "bytes": 116992,
+          "full_resolution_luma_ssim": 0.9823229908943176,
+          "worst_128px_luma_ssim": 0.973263680934906,
+          "chroma_mean_absolute_error": 0.7458270037615741,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 96,
+          "bytes": 123500,
+          "full_resolution_luma_ssim": 0.9827215671539307,
+          "worst_128px_luma_ssim": 0.9733705520629883,
+          "chroma_mean_absolute_error": 0.7471234356915509,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 97,
+          "bytes": 133228,
+          "full_resolution_luma_ssim": 0.9873795509338379,
+          "worst_128px_luma_ssim": 0.9825403094291687,
+          "chroma_mean_absolute_error": 0.7217701099537037,
+          "chroma_95th_percentile_error": 2.0
+        }
+      ]
+    },
+    {
+      "id": "dunmer_female_1",
+      "file": "dunmer_female_1.webp",
+      "original_bytes": 2454604,
+      "original_sha256": "a9f4cf17da5d662239eff9ef78a20234f70942d6204cc658bc55ad7081ec538c",
+      "source_dimensions": [
+        1086,
+        1448
+      ],
+      "dimensions": [
+        576,
+        768
+      ],
+      "encoded_bytes": 105974,
+      "sha256": "15f4cce25e1a1ee0b48e8f6b1ef82410af37e072ca13fde0c2619665797a0349",
+      "quality": 94,
+      "full_resolution_luma_ssim": 0.9863843321800232,
+      "worst_128px_luma_ssim": 0.9806896448135376,
+      "chroma_mean_absolute_error": 0.6756648310908565,
+      "chroma_95th_percentile_error": 2.0,
+      "trials": [
+        {
+          "quality": 78,
+          "bytes": 33760,
+          "full_resolution_luma_ssim": 0.9239742159843445,
+          "worst_128px_luma_ssim": 0.8622894287109375,
+          "chroma_mean_absolute_error": 0.7945545337818287,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 82,
+          "bytes": 42334,
+          "full_resolution_luma_ssim": 0.945104718208313,
+          "worst_128px_luma_ssim": 0.9082014560699463,
+          "chroma_mean_absolute_error": 0.7721568919994213,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 86,
+          "bytes": 53608,
+          "full_resolution_luma_ssim": 0.9599102735519409,
+          "worst_128px_luma_ssim": 0.9366052746772766,
+          "chroma_mean_absolute_error": 0.7420281304253472,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 90,
+          "bytes": 72154,
+          "full_resolution_luma_ssim": 0.9744563698768616,
+          "worst_128px_luma_ssim": 0.9612800478935242,
+          "chroma_mean_absolute_error": 0.7100547507957176,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 94,
+          "bytes": 105974,
+          "full_resolution_luma_ssim": 0.9863843321800232,
+          "worst_128px_luma_ssim": 0.9806896448135376,
+          "chroma_mean_absolute_error": 0.6756648310908565,
+          "chroma_95th_percentile_error": 2.0
+        }
+      ]
+    },
+    {
+      "id": "dunmer_female_2",
+      "file": "dunmer_female_2.webp",
+      "original_bytes": 2490006,
+      "original_sha256": "fe589eba80bfe8c1f0699d8edd645c5f3bf07b26591c9e496740123d8a64a656",
+      "source_dimensions": [
+        1086,
+        1448
+      ],
+      "dimensions": [
+        576,
+        768
+      ],
+      "encoded_bytes": 110978,
+      "sha256": "1f2465c2a05f9aabd21a0a8e08331623202fa61facc65e846eb1cf2b8a2e655f",
+      "quality": 95,
+      "full_resolution_luma_ssim": 0.9859694242477417,
+      "worst_128px_luma_ssim": 0.9775087237358093,
+      "chroma_mean_absolute_error": 0.6635968243634259,
+      "chroma_95th_percentile_error": 2.0,
+      "trials": [
+        {
+          "quality": 78,
+          "bytes": 32688,
+          "full_resolution_luma_ssim": 0.9254674911499023,
+          "worst_128px_luma_ssim": 0.8411450386047363,
+          "chroma_mean_absolute_error": 0.8038680465133102,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 82,
+          "bytes": 41130,
+          "full_resolution_luma_ssim": 0.943813145160675,
+          "worst_128px_luma_ssim": 0.894122838973999,
+          "chroma_mean_absolute_error": 0.7741586190682871,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 86,
+          "bytes": 52764,
+          "full_resolution_luma_ssim": 0.9576967358589172,
+          "worst_128px_luma_ssim": 0.9272572994232178,
+          "chroma_mean_absolute_error": 0.7448640046296297,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 90,
+          "bytes": 74386,
+          "full_resolution_luma_ssim": 0.9756476879119873,
+          "worst_128px_luma_ssim": 0.961297333240509,
+          "chroma_mean_absolute_error": 0.7058625397858797,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 94,
+          "bytes": 104770,
+          "full_resolution_luma_ssim": 0.9844684600830078,
+          "worst_128px_luma_ssim": 0.9750379920005798,
+          "chroma_mean_absolute_error": 0.6692640516493056,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 95,
+          "bytes": 110978,
+          "full_resolution_luma_ssim": 0.9859694242477417,
+          "worst_128px_luma_ssim": 0.9775087237358093,
+          "chroma_mean_absolute_error": 0.6635968243634259,
+          "chroma_95th_percentile_error": 2.0
+        }
+      ]
+    },
+    {
+      "id": "dunmer_female_3",
+      "file": "dunmer_female_3.webp",
+      "original_bytes": 2364895,
+      "original_sha256": "ef7407d4fe1e6d23edd52e8945d99949f8191f486df2834827d029839040ed20",
+      "source_dimensions": [
+        1086,
+        1448
+      ],
+      "dimensions": [
+        576,
+        768
+      ],
+      "encoded_bytes": 108524,
+      "sha256": "7f7c227186b321310e19db0694e7d5dcee46fc978fd3a7e6092d00cb88cd6d7a",
+      "quality": 96,
+      "full_resolution_luma_ssim": 0.9860127568244934,
+      "worst_128px_luma_ssim": 0.9812973737716675,
+      "chroma_mean_absolute_error": 0.7018929940682871,
+      "chroma_95th_percentile_error": 2.0,
+      "trials": [
+        {
+          "quality": 78,
+          "bytes": 24370,
+          "full_resolution_luma_ssim": 0.9210534691810608,
+          "worst_128px_luma_ssim": 0.8589538931846619,
+          "chroma_mean_absolute_error": 0.8948646827980324,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 82,
+          "bytes": 31372,
+          "full_resolution_luma_ssim": 0.9340903759002686,
+          "worst_128px_luma_ssim": 0.8847453594207764,
+          "chroma_mean_absolute_error": 0.8532240125868056,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 86,
+          "bytes": 42284,
+          "full_resolution_luma_ssim": 0.9481006264686584,
+          "worst_128px_luma_ssim": 0.9091317653656006,
+          "chroma_mean_absolute_error": 0.8171409324363426,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 90,
+          "bytes": 61314,
+          "full_resolution_luma_ssim": 0.9682359099388123,
+          "worst_128px_luma_ssim": 0.9446789026260376,
+          "chroma_mean_absolute_error": 0.7568223741319444,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 94,
+          "bytes": 96582,
+          "full_resolution_luma_ssim": 0.9835914373397827,
+          "worst_128px_luma_ssim": 0.9781990051269531,
+          "chroma_mean_absolute_error": 0.7019438566984953,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 95,
+          "bytes": 98672,
+          "full_resolution_luma_ssim": 0.9841741323471069,
+          "worst_128px_luma_ssim": 0.9783469438552856,
+          "chroma_mean_absolute_error": 0.6989723488136574,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 96,
+          "bytes": 108524,
+          "full_resolution_luma_ssim": 0.9860127568244934,
+          "worst_128px_luma_ssim": 0.9812973737716675,
+          "chroma_mean_absolute_error": 0.7018929940682871,
+          "chroma_95th_percentile_error": 2.0
+        }
+      ]
+    },
+    {
+      "id": "dunmer_male_1",
+      "file": "dunmer_male_1.webp",
+      "original_bytes": 2398856,
+      "original_sha256": "763ad1beb301672a3d4ec6c36622cabf65063be8b24555c98a2989237f05b928",
+      "source_dimensions": [
+        1086,
+        1448
+      ],
+      "dimensions": [
+        576,
+        768
+      ],
+      "encoded_bytes": 107204,
+      "sha256": "a587335e4011ce31a1dbe75f1af0cb0ae436c2c1d71af21cf0645d865aec026a",
+      "quality": 96,
+      "full_resolution_luma_ssim": 0.9851266741752625,
+      "worst_128px_luma_ssim": 0.9806668162345886,
+      "chroma_mean_absolute_error": 0.6101944534866898,
+      "chroma_95th_percentile_error": 2.0,
+      "trials": [
+        {
+          "quality": 78,
+          "bytes": 25194,
+          "full_resolution_luma_ssim": 0.9179936051368713,
+          "worst_128px_luma_ssim": 0.8516576290130615,
+          "chroma_mean_absolute_error": 0.7314351399739584,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 82,
+          "bytes": 33720,
+          "full_resolution_luma_ssim": 0.9372168779373169,
+          "worst_128px_luma_ssim": 0.898322343826294,
+          "chroma_mean_absolute_error": 0.7069769965277778,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 86,
+          "bytes": 45332,
+          "full_resolution_luma_ssim": 0.953022301197052,
+          "worst_128px_luma_ssim": 0.928429365158081,
+          "chroma_mean_absolute_error": 0.6763543023003472,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 90,
+          "bytes": 59672,
+          "full_resolution_luma_ssim": 0.9669914841651917,
+          "worst_128px_luma_ssim": 0.9521557092666626,
+          "chroma_mean_absolute_error": 0.6559459544994213,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 94,
+          "bytes": 95000,
+          "full_resolution_luma_ssim": 0.9831854701042175,
+          "worst_128px_luma_ssim": 0.97837895154953,
+          "chroma_mean_absolute_error": 0.6183505588107638,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 95,
+          "bytes": 103530,
+          "full_resolution_luma_ssim": 0.9847576022148132,
+          "worst_128px_luma_ssim": 0.9804772138595581,
+          "chroma_mean_absolute_error": 0.6101741084346065,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 96,
+          "bytes": 107204,
+          "full_resolution_luma_ssim": 0.9851266741752625,
+          "worst_128px_luma_ssim": 0.9806668162345886,
+          "chroma_mean_absolute_error": 0.6101944534866898,
+          "chroma_95th_percentile_error": 2.0
+        }
+      ]
+    },
+    {
+      "id": "dunmer_male_2",
+      "file": "dunmer_male_2.webp",
+      "original_bytes": 2617489,
+      "original_sha256": "d8429eb5b4ed29e834f602c005d2965eccac0446d3150b4bcc9c7da71b9e9191",
+      "source_dimensions": [
+        1086,
+        1448
+      ],
+      "dimensions": [
+        576,
+        768
+      ],
+      "encoded_bytes": 122358,
+      "sha256": "af161de232417026af2e15d7f2112c944d04bba8bcbe133a3e1e39ddb01f2d31",
+      "quality": 95,
+      "full_resolution_luma_ssim": 0.9863497018814087,
+      "worst_128px_luma_ssim": 0.9806724786758423,
+      "chroma_mean_absolute_error": 0.6701524522569444,
+      "chroma_95th_percentile_error": 2.0,
+      "trials": [
+        {
+          "quality": 78,
+          "bytes": 33722,
+          "full_resolution_luma_ssim": 0.9207139015197754,
+          "worst_128px_luma_ssim": 0.8559485673904419,
+          "chroma_mean_absolute_error": 0.8355814615885416,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 82,
+          "bytes": 42858,
+          "full_resolution_luma_ssim": 0.9395402073860168,
+          "worst_128px_luma_ssim": 0.8982948660850525,
+          "chroma_mean_absolute_error": 0.8115596064814815,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 86,
+          "bytes": 55674,
+          "full_resolution_luma_ssim": 0.9540788531303406,
+          "worst_128px_luma_ssim": 0.9231258034706116,
+          "chroma_mean_absolute_error": 0.7698714644820602,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 90,
+          "bytes": 79436,
+          "full_resolution_luma_ssim": 0.9721785187721252,
+          "worst_128px_luma_ssim": 0.9567415714263916,
+          "chroma_mean_absolute_error": 0.7292842158564815,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 94,
+          "bytes": 112674,
+          "full_resolution_luma_ssim": 0.9827631711959839,
+          "worst_128px_luma_ssim": 0.9762446880340576,
+          "chroma_mean_absolute_error": 0.6864183213975694,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 95,
+          "bytes": 122358,
+          "full_resolution_luma_ssim": 0.9863497018814087,
+          "worst_128px_luma_ssim": 0.9806724786758423,
+          "chroma_mean_absolute_error": 0.6701524522569444,
+          "chroma_95th_percentile_error": 2.0
+        }
+      ]
+    },
+    {
+      "id": "dunmer_male_3",
+      "file": "dunmer_male_3.webp",
+      "original_bytes": 2416343,
+      "original_sha256": "d3d57d8a678e281db3f079849bc47a7577a248a54da2aec7d3f41f4f0844d8b3",
+      "source_dimensions": [
+        1086,
+        1448
+      ],
+      "dimensions": [
+        576,
+        768
+      ],
+      "encoded_bytes": 102614,
+      "sha256": "cf368d35bd34852212671e3c154dcc9357bfaea0862d703b1c8a7118ce52d17e",
+      "quality": 95,
+      "full_resolution_luma_ssim": 0.985765814781189,
+      "worst_128px_luma_ssim": 0.9800139665603638,
+      "chroma_mean_absolute_error": 0.6486488624855324,
+      "chroma_95th_percentile_error": 2.0,
+      "trials": [
+        {
+          "quality": 78,
+          "bytes": 25702,
+          "full_resolution_luma_ssim": 0.9143897891044617,
+          "worst_128px_luma_ssim": 0.8540598750114441,
+          "chroma_mean_absolute_error": 0.780853271484375,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 82,
+          "bytes": 35008,
+          "full_resolution_luma_ssim": 0.935847818851471,
+          "worst_128px_luma_ssim": 0.8915078639984131,
+          "chroma_mean_absolute_error": 0.7554875126591435,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 86,
+          "bytes": 45902,
+          "full_resolution_luma_ssim": 0.9476958513259888,
+          "worst_128px_luma_ssim": 0.9127177000045776,
+          "chroma_mean_absolute_error": 0.7250241880063657,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 90,
+          "bytes": 63246,
+          "full_resolution_luma_ssim": 0.9684956073760986,
+          "worst_128px_luma_ssim": 0.9424244165420532,
+          "chroma_mean_absolute_error": 0.6926190411603009,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 94,
+          "bytes": 96510,
+          "full_resolution_luma_ssim": 0.9845632910728455,
+          "worst_128px_luma_ssim": 0.9789906144142151,
+          "chroma_mean_absolute_error": 0.6550756383825231,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 95,
+          "bytes": 102614,
+          "full_resolution_luma_ssim": 0.985765814781189,
+          "worst_128px_luma_ssim": 0.9800139665603638,
+          "chroma_mean_absolute_error": 0.6486488624855324,
+          "chroma_95th_percentile_error": 2.0
+        }
+      ]
+    },
+    {
+      "id": "imperial_female_1",
+      "file": "imperial_female_1.webp",
+      "original_bytes": 2386328,
+      "original_sha256": "6c3db4facb75c7fb679d46ae25cbc2ca75afec4d2416c3d4461d1b4f870f38d5",
+      "source_dimensions": [
+        1086,
+        1448
+      ],
+      "dimensions": [
+        576,
+        768
+      ],
+      "encoded_bytes": 111416,
+      "sha256": "90bfa2ef3db3d07fd81f18f4292604674ccf572d78cd05f2fd6138981204ed46",
+      "quality": 95,
+      "full_resolution_luma_ssim": 0.9850113987922668,
+      "worst_128px_luma_ssim": 0.9811264276504517,
+      "chroma_mean_absolute_error": 0.7741913972077547,
+      "chroma_95th_percentile_error": 2.0,
+      "trials": [
+        {
+          "quality": 78,
+          "bytes": 27996,
+          "full_resolution_luma_ssim": 0.9241017699241638,
+          "worst_128px_luma_ssim": 0.8688183426856995,
+          "chroma_mean_absolute_error": 0.99884033203125,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 82,
+          "bytes": 36572,
+          "full_resolution_luma_ssim": 0.9408205151557922,
+          "worst_128px_luma_ssim": 0.9034931659698486,
+          "chroma_mean_absolute_error": 0.9625323260271991,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 86,
+          "bytes": 48208,
+          "full_resolution_luma_ssim": 0.9555158019065857,
+          "worst_128px_luma_ssim": 0.9333527684211731,
+          "chroma_mean_absolute_error": 0.9131040219907407,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 90,
+          "bytes": 63194,
+          "full_resolution_luma_ssim": 0.9651012420654297,
+          "worst_128px_luma_ssim": 0.9454430341720581,
+          "chroma_mean_absolute_error": 0.8721019603587963,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 94,
+          "bytes": 101376,
+          "full_resolution_luma_ssim": 0.9814472794532776,
+          "worst_128px_luma_ssim": 0.9743872284889221,
+          "chroma_mean_absolute_error": 0.8010932074652778,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 95,
+          "bytes": 111416,
+          "full_resolution_luma_ssim": 0.9850113987922668,
+          "worst_128px_luma_ssim": 0.9811264276504517,
+          "chroma_mean_absolute_error": 0.7741913972077547,
+          "chroma_95th_percentile_error": 2.0
+        }
+      ]
+    },
+    {
+      "id": "imperial_female_2",
+      "file": "imperial_female_2.webp",
+      "original_bytes": 2279206,
+      "original_sha256": "2c39c6b74fd05de909749b048077d45b8b876033cc282359629262d84ddff378",
+      "source_dimensions": [
+        1086,
+        1448
+      ],
+      "dimensions": [
+        576,
+        768
+      ],
+      "encoded_bytes": 112248,
+      "sha256": "8058433ebba023fd5b31560f9601416d3c3372efad7b1fdf1b50e690f60307a5",
+      "quality": 97,
+      "full_resolution_luma_ssim": 0.9871174693107605,
+      "worst_128px_luma_ssim": 0.9824180603027344,
+      "chroma_mean_absolute_error": 0.6180408619068287,
+      "chroma_95th_percentile_error": 2.0,
+      "trials": [
+        {
+          "quality": 78,
+          "bytes": 23810,
+          "full_resolution_luma_ssim": 0.9269858598709106,
+          "worst_128px_luma_ssim": 0.8677273988723755,
+          "chroma_mean_absolute_error": 0.8164989330150463,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 82,
+          "bytes": 30064,
+          "full_resolution_luma_ssim": 0.9391645789146423,
+          "worst_128px_luma_ssim": 0.8901355266571045,
+          "chroma_mean_absolute_error": 0.7843221028645834,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 86,
+          "bytes": 40058,
+          "full_resolution_luma_ssim": 0.9510399699211121,
+          "worst_128px_luma_ssim": 0.9140739440917969,
+          "chroma_mean_absolute_error": 0.7436851218894676,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 90,
+          "bytes": 55732,
+          "full_resolution_luma_ssim": 0.9656754732131958,
+          "worst_128px_luma_ssim": 0.9456624984741211,
+          "chroma_mean_absolute_error": 0.6964077419704862,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 94,
+          "bytes": 92350,
+          "full_resolution_luma_ssim": 0.9809519648551941,
+          "worst_128px_luma_ssim": 0.9711030721664429,
+          "chroma_mean_absolute_error": 0.6399943033854166,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 95,
+          "bytes": 94382,
+          "full_resolution_luma_ssim": 0.9827650189399719,
+          "worst_128px_luma_ssim": 0.9746419787406921,
+          "chroma_mean_absolute_error": 0.6409087004484953,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 96,
+          "bytes": 104208,
+          "full_resolution_luma_ssim": 0.9830282926559448,
+          "worst_128px_luma_ssim": 0.9743318557739258,
+          "chroma_mean_absolute_error": 0.6379677101417824,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 97,
+          "bytes": 112248,
+          "full_resolution_luma_ssim": 0.9871174693107605,
+          "worst_128px_luma_ssim": 0.9824180603027344,
+          "chroma_mean_absolute_error": 0.6180408619068287,
+          "chroma_95th_percentile_error": 2.0
+        }
+      ]
+    },
+    {
+      "id": "imperial_female_3",
+      "file": "imperial_female_3.webp",
+      "original_bytes": 2337623,
+      "original_sha256": "40d7ab90b9d262dda9d793636f0ab0e7b04b6a7a04e083d0f10628f8608def47",
+      "source_dimensions": [
+        1086,
+        1448
+      ],
+      "dimensions": [
+        576,
+        768
+      ],
+      "encoded_bytes": 117562,
+      "sha256": "aa54c4e9185eef91120b44a8502fff9aa8c0d6352f93763a8ab463e69994941c",
+      "quality": 97,
+      "full_resolution_luma_ssim": 0.986785888671875,
+      "worst_128px_luma_ssim": 0.9839701056480408,
+      "chroma_mean_absolute_error": 0.6780983253761574,
+      "chroma_95th_percentile_error": 2.0,
+      "trials": [
+        {
+          "quality": 78,
+          "bytes": 23256,
+          "full_resolution_luma_ssim": 0.9196364879608154,
+          "worst_128px_luma_ssim": 0.8524399995803833,
+          "chroma_mean_absolute_error": 0.9081206145109953,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 82,
+          "bytes": 30052,
+          "full_resolution_luma_ssim": 0.935106098651886,
+          "worst_128px_luma_ssim": 0.893817663192749,
+          "chroma_mean_absolute_error": 0.8747140389901621,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 86,
+          "bytes": 40504,
+          "full_resolution_luma_ssim": 0.9491913914680481,
+          "worst_128px_luma_ssim": 0.9231390953063965,
+          "chroma_mean_absolute_error": 0.8344692654079862,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 90,
+          "bytes": 56652,
+          "full_resolution_luma_ssim": 0.9626684188842773,
+          "worst_128px_luma_ssim": 0.9464637041091919,
+          "chroma_mean_absolute_error": 0.7851788556134259,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 94,
+          "bytes": 93974,
+          "full_resolution_luma_ssim": 0.9812833070755005,
+          "worst_128px_luma_ssim": 0.97621750831604,
+          "chroma_mean_absolute_error": 0.723175048828125,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 95,
+          "bytes": 99808,
+          "full_resolution_luma_ssim": 0.9820663928985596,
+          "worst_128px_luma_ssim": 0.9769378304481506,
+          "chroma_mean_absolute_error": 0.7100344057436343,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 96,
+          "bytes": 109012,
+          "full_resolution_luma_ssim": 0.9845408797264099,
+          "worst_128px_luma_ssim": 0.9809232950210571,
+          "chroma_mean_absolute_error": 0.7019076877170138,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 97,
+          "bytes": 117562,
+          "full_resolution_luma_ssim": 0.986785888671875,
+          "worst_128px_luma_ssim": 0.9839701056480408,
+          "chroma_mean_absolute_error": 0.6780983253761574,
+          "chroma_95th_percentile_error": 2.0
+        }
+      ]
+    },
+    {
+      "id": "imperial_male_1",
+      "file": "imperial_male_1.webp",
+      "original_bytes": 2292782,
+      "original_sha256": "191cd1f64c2c278bfb000565d3ceffe943b6d458a37711467c8f47b5a80f2f83",
+      "source_dimensions": [
+        1086,
+        1448
+      ],
+      "dimensions": [
+        576,
+        768
+      ],
+      "encoded_bytes": 113026,
+      "sha256": "cabf269c61951544af77b374bc172f76e064d47468d5317115af1662dcf32d84",
+      "quality": 97,
+      "full_resolution_luma_ssim": 0.9864766001701355,
+      "worst_128px_luma_ssim": 0.9823674559593201,
+      "chroma_mean_absolute_error": 0.6787471064814815,
+      "chroma_95th_percentile_error": 2.0,
+      "trials": [
+        {
+          "quality": 78,
+          "bytes": 21654,
+          "full_resolution_luma_ssim": 0.9217392802238464,
+          "worst_128px_luma_ssim": 0.8606600761413574,
+          "chroma_mean_absolute_error": 0.8707569263599537,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 82,
+          "bytes": 28204,
+          "full_resolution_luma_ssim": 0.934184193611145,
+          "worst_128px_luma_ssim": 0.8899015784263611,
+          "chroma_mean_absolute_error": 0.8356085883246528,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 86,
+          "bytes": 38258,
+          "full_resolution_luma_ssim": 0.9489952325820923,
+          "worst_128px_luma_ssim": 0.919488251209259,
+          "chroma_mean_absolute_error": 0.8028112340856481,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 90,
+          "bytes": 53434,
+          "full_resolution_luma_ssim": 0.9605737328529358,
+          "worst_128px_luma_ssim": 0.9412751793861389,
+          "chroma_mean_absolute_error": 0.7593429000289352,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 94,
+          "bytes": 89224,
+          "full_resolution_luma_ssim": 0.9786209464073181,
+          "worst_128px_luma_ssim": 0.9717233180999756,
+          "chroma_mean_absolute_error": 0.7136117440682871,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 95,
+          "bytes": 93348,
+          "full_resolution_luma_ssim": 0.9781916737556458,
+          "worst_128px_luma_ssim": 0.9704268574714661,
+          "chroma_mean_absolute_error": 0.7022603352864584,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 96,
+          "bytes": 103964,
+          "full_resolution_luma_ssim": 0.9826836585998535,
+          "worst_128px_luma_ssim": 0.9774267673492432,
+          "chroma_mean_absolute_error": 0.6929230866608797,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 97,
+          "bytes": 113026,
+          "full_resolution_luma_ssim": 0.9864766001701355,
+          "worst_128px_luma_ssim": 0.9823674559593201,
+          "chroma_mean_absolute_error": 0.6787471064814815,
+          "chroma_95th_percentile_error": 2.0
+        }
+      ]
+    },
+    {
+      "id": "imperial_male_2",
+      "file": "imperial_male_2.webp",
+      "original_bytes": 2499461,
+      "original_sha256": "d1511569df0e5b7b5ddd0296d4e794b3e064e90e874b9be66125b28d14dd423c",
+      "source_dimensions": [
+        1086,
+        1448
+      ],
+      "dimensions": [
+        576,
+        768
+      ],
+      "encoded_bytes": 119134,
+      "sha256": "169979340da0ff53cc24eb174548b2676db5e003bba437f613874f8acc72c0f1",
+      "quality": 95,
+      "full_resolution_luma_ssim": 0.9858914017677307,
+      "worst_128px_luma_ssim": 0.9789232611656189,
+      "chroma_mean_absolute_error": 0.7751069245515047,
+      "chroma_95th_percentile_error": 2.0,
+      "trials": [
+        {
+          "quality": 78,
+          "bytes": 32230,
+          "full_resolution_luma_ssim": 0.9183322191238403,
+          "worst_128px_luma_ssim": 0.86197829246521,
+          "chroma_mean_absolute_error": 0.9812859429253472,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 82,
+          "bytes": 41056,
+          "full_resolution_luma_ssim": 0.9378690719604492,
+          "worst_128px_luma_ssim": 0.8994883894920349,
+          "chroma_mean_absolute_error": 0.9545514142071759,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 86,
+          "bytes": 54668,
+          "full_resolution_luma_ssim": 0.9547174572944641,
+          "worst_128px_luma_ssim": 0.927603542804718,
+          "chroma_mean_absolute_error": 0.8974598072193287,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 90,
+          "bytes": 74468,
+          "full_resolution_luma_ssim": 0.9699054956436157,
+          "worst_128px_luma_ssim": 0.9537879228591919,
+          "chroma_mean_absolute_error": 0.8605414496527778,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 94,
+          "bytes": 109474,
+          "full_resolution_luma_ssim": 0.9805611968040466,
+          "worst_128px_luma_ssim": 0.9654968976974487,
+          "chroma_mean_absolute_error": 0.7975147388599537,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 95,
+          "bytes": 119134,
+          "full_resolution_luma_ssim": 0.9858914017677307,
+          "worst_128px_luma_ssim": 0.9789232611656189,
+          "chroma_mean_absolute_error": 0.7751069245515047,
+          "chroma_95th_percentile_error": 2.0
+        }
+      ]
+    },
+    {
+      "id": "imperial_male_3",
+      "file": "imperial_male_3.webp",
+      "original_bytes": 2508895,
+      "original_sha256": "fc35e08143e38e253ec34f597fa5fa1665f8b00e39f038fae4935d8cfc6ee383",
+      "source_dimensions": [
+        1086,
+        1448
+      ],
+      "dimensions": [
+        576,
+        768
+      ],
+      "encoded_bytes": 127372,
+      "sha256": "dab6613929ff6398e181fa0a50e8397e28c2a7e4b1eddbfc7b52a6db3f047bf1",
+      "quality": 97,
+      "full_resolution_luma_ssim": 0.9868477582931519,
+      "worst_128px_luma_ssim": 0.9834433794021606,
+      "chroma_mean_absolute_error": 0.681610107421875,
+      "chroma_95th_percentile_error": 2.0,
+      "trials": [
+        {
+          "quality": 78,
+          "bytes": 28788,
+          "full_resolution_luma_ssim": 0.9155847430229187,
+          "worst_128px_luma_ssim": 0.8526062965393066,
+          "chroma_mean_absolute_error": 0.8674350314670138,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 82,
+          "bytes": 37850,
+          "full_resolution_luma_ssim": 0.9346074461936951,
+          "worst_128px_luma_ssim": 0.891463577747345,
+          "chroma_mean_absolute_error": 0.8335492169415509,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 86,
+          "bytes": 50176,
+          "full_resolution_luma_ssim": 0.9505184888839722,
+          "worst_128px_luma_ssim": 0.9174777269363403,
+          "chroma_mean_absolute_error": 0.7909365053530093,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 90,
+          "bytes": 65158,
+          "full_resolution_luma_ssim": 0.9668616652488708,
+          "worst_128px_luma_ssim": 0.9489418268203735,
+          "chroma_mean_absolute_error": 0.7593722873263888,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 94,
+          "bytes": 102372,
+          "full_resolution_luma_ssim": 0.9814836978912354,
+          "worst_128px_luma_ssim": 0.9728831052780151,
+          "chroma_mean_absolute_error": 0.7083502875434028,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 95,
+          "bytes": 113760,
+          "full_resolution_luma_ssim": 0.9843084812164307,
+          "worst_128px_luma_ssim": 0.9795545935630798,
+          "chroma_mean_absolute_error": 0.6916763870804398,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 96,
+          "bytes": 118302,
+          "full_resolution_luma_ssim": 0.9846798777580261,
+          "worst_128px_luma_ssim": 0.9794507622718811,
+          "chroma_mean_absolute_error": 0.6913836443865741,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 97,
+          "bytes": 127372,
+          "full_resolution_luma_ssim": 0.9868477582931519,
+          "worst_128px_luma_ssim": 0.9834433794021606,
+          "chroma_mean_absolute_error": 0.681610107421875,
+          "chroma_95th_percentile_error": 2.0
+        }
+      ]
+    },
+    {
+      "id": "khajiit_female_1",
+      "file": "khajiit_female_1.webp",
+      "original_bytes": 2578993,
+      "original_sha256": "b301acd566ec928adc51e9bdf00196caa8f7cdf6d414a3ff45546ec360732835",
+      "source_dimensions": [
+        1086,
+        1448
+      ],
+      "dimensions": [
+        576,
+        768
+      ],
+      "encoded_bytes": 139020,
+      "sha256": "4ee3fdd3664c80f91a27fd796c189fd8ca9ce550fd9cde331fd38a301aceb804",
+      "quality": 96,
+      "full_resolution_luma_ssim": 0.987059473991394,
+      "worst_128px_luma_ssim": 0.9832569360733032,
+      "chroma_mean_absolute_error": 0.8364551685474537,
+      "chroma_95th_percentile_error": 3.0,
+      "trials": [
+        {
+          "quality": 78,
+          "bytes": 34130,
+          "full_resolution_luma_ssim": 0.9234170317649841,
+          "worst_128px_luma_ssim": 0.8721009492874146,
+          "chroma_mean_absolute_error": 1.1601551197193287,
+          "chroma_95th_percentile_error": 4.0
+        },
+        {
+          "quality": 82,
+          "bytes": 43628,
+          "full_resolution_luma_ssim": 0.941012978553772,
+          "worst_128px_luma_ssim": 0.9097121953964233,
+          "chroma_mean_absolute_error": 1.1025164568865742,
+          "chroma_95th_percentile_error": 4.0
+        },
+        {
+          "quality": 86,
+          "bytes": 57306,
+          "full_resolution_luma_ssim": 0.9555274248123169,
+          "worst_128px_luma_ssim": 0.931719183921814,
+          "chroma_mean_absolute_error": 1.0251668294270833,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 90,
+          "bytes": 78128,
+          "full_resolution_luma_ssim": 0.9693600535392761,
+          "worst_128px_luma_ssim": 0.9537692070007324,
+          "chroma_mean_absolute_error": 0.9741391782407407,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 94,
+          "bytes": 115672,
+          "full_resolution_luma_ssim": 0.9817608594894409,
+          "worst_128px_luma_ssim": 0.9715452790260315,
+          "chroma_mean_absolute_error": 0.8838455765335648,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 95,
+          "bytes": 128616,
+          "full_resolution_luma_ssim": 0.9844596982002258,
+          "worst_128px_luma_ssim": 0.9775802493095398,
+          "chroma_mean_absolute_error": 0.8595309787326388,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 96,
+          "bytes": 139020,
+          "full_resolution_luma_ssim": 0.987059473991394,
+          "worst_128px_luma_ssim": 0.9832569360733032,
+          "chroma_mean_absolute_error": 0.8364551685474537,
+          "chroma_95th_percentile_error": 3.0
+        }
+      ]
+    },
+    {
+      "id": "khajiit_female_2",
+      "file": "khajiit_female_2.webp",
+      "original_bytes": 2597595,
+      "original_sha256": "4ac6fcf5e2090fbd097d0b8134cef79350c264852bfe286e7861380b749e2ac4",
+      "source_dimensions": [
+        1086,
+        1448
+      ],
+      "dimensions": [
+        576,
+        768
+      ],
+      "encoded_bytes": 114766,
+      "sha256": "b495fc80e6162f84add5c1b6014d6a0f7feaf69e435d32ea061e1b546e0f6d8e",
+      "quality": 94,
+      "full_resolution_luma_ssim": 0.9856635928153992,
+      "worst_128px_luma_ssim": 0.9759013652801514,
+      "chroma_mean_absolute_error": 0.7718098958333334,
+      "chroma_95th_percentile_error": 2.0,
+      "trials": [
+        {
+          "quality": 78,
+          "bytes": 38694,
+          "full_resolution_luma_ssim": 0.9326907396316528,
+          "worst_128px_luma_ssim": 0.8802307844161987,
+          "chroma_mean_absolute_error": 0.9643012152777778,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 82,
+          "bytes": 48688,
+          "full_resolution_luma_ssim": 0.9493347406387329,
+          "worst_128px_luma_ssim": 0.9138198494911194,
+          "chroma_mean_absolute_error": 0.9285798249421297,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 86,
+          "bytes": 62496,
+          "full_resolution_luma_ssim": 0.9640371203422546,
+          "worst_128px_luma_ssim": 0.9396350979804993,
+          "chroma_mean_absolute_error": 0.8822371871383102,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 90,
+          "bytes": 83246,
+          "full_resolution_luma_ssim": 0.977115273475647,
+          "worst_128px_luma_ssim": 0.9614258408546448,
+          "chroma_mean_absolute_error": 0.8299232765480324,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 94,
+          "bytes": 114766,
+          "full_resolution_luma_ssim": 0.9856635928153992,
+          "worst_128px_luma_ssim": 0.9759013652801514,
+          "chroma_mean_absolute_error": 0.7718098958333334,
+          "chroma_95th_percentile_error": 2.0
+        }
+      ]
+    },
+    {
+      "id": "khajiit_female_3",
+      "file": "khajiit_female_3.webp",
+      "original_bytes": 2497194,
+      "original_sha256": "e5c48a56a95320afc6f0de880ef79a75f87ebf0e88a7e2fdd5f9d684cde7c794",
+      "source_dimensions": [
+        1086,
+        1448
+      ],
+      "dimensions": [
+        576,
+        768
+      ],
+      "encoded_bytes": 124806,
+      "sha256": "5ebcafbc3df8114f5582249ccb6bcfa0ebed11f42d64d82ac8108002fa247b72",
+      "quality": 95,
+      "full_resolution_luma_ssim": 0.9854608774185181,
+      "worst_128px_luma_ssim": 0.9799306988716125,
+      "chroma_mean_absolute_error": 0.9085569028501157,
+      "chroma_95th_percentile_error": 3.0,
+      "trials": [
+        {
+          "quality": 78,
+          "bytes": 33128,
+          "full_resolution_luma_ssim": 0.9185600876808167,
+          "worst_128px_luma_ssim": 0.8580641746520996,
+          "chroma_mean_absolute_error": 1.1982207121672455,
+          "chroma_95th_percentile_error": 4.0
+        },
+        {
+          "quality": 82,
+          "bytes": 43032,
+          "full_resolution_luma_ssim": 0.9374383091926575,
+          "worst_128px_luma_ssim": 0.8959751129150391,
+          "chroma_mean_absolute_error": 1.1434993037471064,
+          "chroma_95th_percentile_error": 4.0
+        },
+        {
+          "quality": 86,
+          "bytes": 55912,
+          "full_resolution_luma_ssim": 0.9521563649177551,
+          "worst_128px_luma_ssim": 0.9231743812561035,
+          "chroma_mean_absolute_error": 1.0751060203269676,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 90,
+          "bytes": 77626,
+          "full_resolution_luma_ssim": 0.9696888327598572,
+          "worst_128px_luma_ssim": 0.9525396227836609,
+          "chroma_mean_absolute_error": 1.0170378508391205,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 94,
+          "bytes": 114802,
+          "full_resolution_luma_ssim": 0.979759931564331,
+          "worst_128px_luma_ssim": 0.9649823904037476,
+          "chroma_mean_absolute_error": 0.9366262930410879,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 95,
+          "bytes": 124806,
+          "full_resolution_luma_ssim": 0.9854608774185181,
+          "worst_128px_luma_ssim": 0.9799306988716125,
+          "chroma_mean_absolute_error": 0.9085569028501157,
+          "chroma_95th_percentile_error": 3.0
+        }
+      ]
+    },
+    {
+      "id": "khajiit_male_1",
+      "file": "khajiit_male_1.webp",
+      "original_bytes": 2586651,
+      "original_sha256": "edcd78c14caf2da176523e9dcd93b19f9b7a845a1737f652cf8b7c4a6e190dee",
+      "source_dimensions": [
+        1086,
+        1448
+      ],
+      "dimensions": [
+        576,
+        768
+      ],
+      "encoded_bytes": 125332,
+      "sha256": "51fefe26ba6a66349f1a059d1d56be6715ceb20b38d4dc25a3b0b5ded503b89e",
+      "quality": 95,
+      "full_resolution_luma_ssim": 0.9851500391960144,
+      "worst_128px_luma_ssim": 0.9752230644226074,
+      "chroma_mean_absolute_error": 0.8116579408998843,
+      "chroma_95th_percentile_error": 2.0,
+      "trials": [
+        {
+          "quality": 78,
+          "bytes": 34182,
+          "full_resolution_luma_ssim": 0.9195069670677185,
+          "worst_128px_luma_ssim": 0.8630945682525635,
+          "chroma_mean_absolute_error": 1.0615166558159723,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 82,
+          "bytes": 44282,
+          "full_resolution_luma_ssim": 0.9398847818374634,
+          "worst_128px_luma_ssim": 0.9074283838272095,
+          "chroma_mean_absolute_error": 1.0183275010850694,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 86,
+          "bytes": 57004,
+          "full_resolution_luma_ssim": 0.9556146860122681,
+          "worst_128px_luma_ssim": 0.9284133911132812,
+          "chroma_mean_absolute_error": 0.9561835394965278,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 90,
+          "bytes": 79226,
+          "full_resolution_luma_ssim": 0.9714823365211487,
+          "worst_128px_luma_ssim": 0.9528448581695557,
+          "chroma_mean_absolute_error": 0.9022352430555556,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 94,
+          "bytes": 112840,
+          "full_resolution_luma_ssim": 0.982365608215332,
+          "worst_128px_luma_ssim": 0.9690390825271606,
+          "chroma_mean_absolute_error": 0.8377063892505787,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 95,
+          "bytes": 125332,
+          "full_resolution_luma_ssim": 0.9851500391960144,
+          "worst_128px_luma_ssim": 0.9752230644226074,
+          "chroma_mean_absolute_error": 0.8116579408998843,
+          "chroma_95th_percentile_error": 2.0
+        }
+      ]
+    },
+    {
+      "id": "khajiit_male_2",
+      "file": "khajiit_male_2.webp",
+      "original_bytes": 2720339,
+      "original_sha256": "d2d4639cc316222dcfb4d529f8fe89e72bfd4f8379cb8158b8dc3c5c852db10e",
+      "source_dimensions": [
+        1086,
+        1448
+      ],
+      "dimensions": [
+        576,
+        768
+      ],
+      "encoded_bytes": 125598,
+      "sha256": "c370b1d68a4743931d12672c9eb0b8554596ef730f79b09920b05f9b9f53c1d6",
+      "quality": 94,
+      "full_resolution_luma_ssim": 0.9856619834899902,
+      "worst_128px_luma_ssim": 0.9789937138557434,
+      "chroma_mean_absolute_error": 0.7642596209490741,
+      "chroma_95th_percentile_error": 2.0,
+      "trials": [
+        {
+          "quality": 78,
+          "bytes": 44984,
+          "full_resolution_luma_ssim": 0.9326340556144714,
+          "worst_128px_luma_ssim": 0.8837845325469971,
+          "chroma_mean_absolute_error": 0.9448310004340278,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 82,
+          "bytes": 54910,
+          "full_resolution_luma_ssim": 0.9486608505249023,
+          "worst_128px_luma_ssim": 0.9119600653648376,
+          "chroma_mean_absolute_error": 0.9184909396701388,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 86,
+          "bytes": 70122,
+          "full_resolution_luma_ssim": 0.9641207456588745,
+          "worst_128px_luma_ssim": 0.9420102834701538,
+          "chroma_mean_absolute_error": 0.8754634150752315,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 90,
+          "bytes": 91698,
+          "full_resolution_luma_ssim": 0.9756139516830444,
+          "worst_128px_luma_ssim": 0.9613327383995056,
+          "chroma_mean_absolute_error": 0.8211681224681713,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 94,
+          "bytes": 125598,
+          "full_resolution_luma_ssim": 0.9856619834899902,
+          "worst_128px_luma_ssim": 0.9789937138557434,
+          "chroma_mean_absolute_error": 0.7642596209490741,
+          "chroma_95th_percentile_error": 2.0
+        }
+      ]
+    },
+    {
+      "id": "khajiit_male_3",
+      "file": "khajiit_male_3.webp",
+      "original_bytes": 2475499,
+      "original_sha256": "24208cbe7181bf1d104dcac71de255335e6071573f9a8f03cd1e5ecd09941c2f",
+      "source_dimensions": [
+        1086,
+        1448
+      ],
+      "dimensions": [
+        576,
+        768
+      ],
+      "encoded_bytes": 119162,
+      "sha256": "0ca68c704d189076cd801754bf9198a89f783ab759e6566be95ea5bbea3bd8b9",
+      "quality": 96,
+      "full_resolution_luma_ssim": 0.9851335883140564,
+      "worst_128px_luma_ssim": 0.980683445930481,
+      "chroma_mean_absolute_error": 0.7794924135561343,
+      "chroma_95th_percentile_error": 2.0,
+      "trials": [
+        {
+          "quality": 78,
+          "bytes": 30298,
+          "full_resolution_luma_ssim": 0.9241770505905151,
+          "worst_128px_luma_ssim": 0.8695226907730103,
+          "chroma_mean_absolute_error": 0.9838471589265047,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 82,
+          "bytes": 38680,
+          "full_resolution_luma_ssim": 0.9381811022758484,
+          "worst_128px_luma_ssim": 0.8981345891952515,
+          "chroma_mean_absolute_error": 0.9560128671151621,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 86,
+          "bytes": 51034,
+          "full_resolution_luma_ssim": 0.9538076519966125,
+          "worst_128px_luma_ssim": 0.924274206161499,
+          "chroma_mean_absolute_error": 0.9047455964265047,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 90,
+          "bytes": 66192,
+          "full_resolution_luma_ssim": 0.9666360020637512,
+          "worst_128px_luma_ssim": 0.9471951127052307,
+          "chroma_mean_absolute_error": 0.8647653085214121,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 94,
+          "bytes": 103150,
+          "full_resolution_luma_ssim": 0.9811208248138428,
+          "worst_128px_luma_ssim": 0.9736412763595581,
+          "chroma_mean_absolute_error": 0.8021952311197916,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 95,
+          "bytes": 112632,
+          "full_resolution_luma_ssim": 0.9845333695411682,
+          "worst_128px_luma_ssim": 0.9799932241439819,
+          "chroma_mean_absolute_error": 0.7826605902777778,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 96,
+          "bytes": 119162,
+          "full_resolution_luma_ssim": 0.9851335883140564,
+          "worst_128px_luma_ssim": 0.980683445930481,
+          "chroma_mean_absolute_error": 0.7794924135561343,
+          "chroma_95th_percentile_error": 2.0
+        }
+      ]
+    },
+    {
+      "id": "nord_female_1",
+      "file": "nord_female_1.webp",
+      "original_bytes": 2558428,
+      "original_sha256": "bfc03be2dc7ba971dbe562b54572a4243ec7f5a846aea425e08bab7421fe4892",
+      "source_dimensions": [
+        1086,
+        1448
+      ],
+      "dimensions": [
+        576,
+        768
+      ],
+      "encoded_bytes": 138288,
+      "sha256": "34a76b90d102c1e15720e485fc37c167feb28784942a500b3bda133df1035c91",
+      "quality": 97,
+      "full_resolution_luma_ssim": 0.9890239238739014,
+      "worst_128px_luma_ssim": 0.9853885769844055,
+      "chroma_mean_absolute_error": 0.7732080530237269,
+      "chroma_95th_percentile_error": 2.0,
+      "trials": [
+        {
+          "quality": 78,
+          "bytes": 33340,
+          "full_resolution_luma_ssim": 0.9223229289054871,
+          "worst_128px_luma_ssim": 0.8630408048629761,
+          "chroma_mean_absolute_error": 1.0247847945601851,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 82,
+          "bytes": 42436,
+          "full_resolution_luma_ssim": 0.939070463180542,
+          "worst_128px_luma_ssim": 0.9005318284034729,
+          "chroma_mean_absolute_error": 0.9885231300636574,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 86,
+          "bytes": 55886,
+          "full_resolution_luma_ssim": 0.9546012282371521,
+          "worst_128px_luma_ssim": 0.9299457669258118,
+          "chroma_mean_absolute_error": 0.9316801848234953,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 90,
+          "bytes": 78120,
+          "full_resolution_luma_ssim": 0.9730275273323059,
+          "worst_128px_luma_ssim": 0.964087963104248,
+          "chroma_mean_absolute_error": 0.8770277235243056,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 94,
+          "bytes": 111492,
+          "full_resolution_luma_ssim": 0.9842249751091003,
+          "worst_128px_luma_ssim": 0.9795206785202026,
+          "chroma_mean_absolute_error": 0.8167984573929398,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 95,
+          "bytes": 123630,
+          "full_resolution_luma_ssim": 0.9845121502876282,
+          "worst_128px_luma_ssim": 0.9806635975837708,
+          "chroma_mean_absolute_error": 0.7940413863570602,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 96,
+          "bytes": 129186,
+          "full_resolution_luma_ssim": 0.9843006134033203,
+          "worst_128px_luma_ssim": 0.9799097776412964,
+          "chroma_mean_absolute_error": 0.7936582212094907,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 97,
+          "bytes": 138288,
+          "full_resolution_luma_ssim": 0.9890239238739014,
+          "worst_128px_luma_ssim": 0.9853885769844055,
+          "chroma_mean_absolute_error": 0.7732080530237269,
+          "chroma_95th_percentile_error": 2.0
+        }
+      ]
+    },
+    {
+      "id": "nord_female_2",
+      "file": "nord_female_2.webp",
+      "original_bytes": 2487683,
+      "original_sha256": "b797bfaf8f05cf072cc01c4530963a6f594b0214c2cf49e0a8cda8976f4eb74b",
+      "source_dimensions": [
+        1086,
+        1448
+      ],
+      "dimensions": [
+        576,
+        768
+      ],
+      "encoded_bytes": 124084,
+      "sha256": "7e59a45b26b48e7c60006c5959da7241e8888d03d42959d571bd1075acf31fbc",
+      "quality": 95,
+      "full_resolution_luma_ssim": 0.985518217086792,
+      "worst_128px_luma_ssim": 0.9808275699615479,
+      "chroma_mean_absolute_error": 0.8284787778501157,
+      "chroma_95th_percentile_error": 3.0,
+      "trials": [
+        {
+          "quality": 78,
+          "bytes": 32480,
+          "full_resolution_luma_ssim": 0.9163323044776917,
+          "worst_128px_luma_ssim": 0.8446550369262695,
+          "chroma_mean_absolute_error": 1.0774366590711806,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 82,
+          "bytes": 41376,
+          "full_resolution_luma_ssim": 0.9369137287139893,
+          "worst_128px_luma_ssim": 0.8906293511390686,
+          "chroma_mean_absolute_error": 1.0320705837673612,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 86,
+          "bytes": 54764,
+          "full_resolution_luma_ssim": 0.9544538259506226,
+          "worst_128px_luma_ssim": 0.9307528138160706,
+          "chroma_mean_absolute_error": 0.9724008065682871,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 90,
+          "bytes": 75134,
+          "full_resolution_luma_ssim": 0.9707372784614563,
+          "worst_128px_luma_ssim": 0.9611076712608337,
+          "chroma_mean_absolute_error": 0.9270415129484953,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 94,
+          "bytes": 111828,
+          "full_resolution_luma_ssim": 0.9827359914779663,
+          "worst_128px_luma_ssim": 0.9767636060714722,
+          "chroma_mean_absolute_error": 0.8535902235243056,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 95,
+          "bytes": 124084,
+          "full_resolution_luma_ssim": 0.985518217086792,
+          "worst_128px_luma_ssim": 0.9808275699615479,
+          "chroma_mean_absolute_error": 0.8284787778501157,
+          "chroma_95th_percentile_error": 3.0
+        }
+      ]
+    },
+    {
+      "id": "nord_female_3",
+      "file": "nord_female_3.webp",
+      "original_bytes": 2307135,
+      "original_sha256": "fab3f59a7e9a60792d16645f3c366b4805d4984a0ab03fd80dc2f5fa8cb8585a",
+      "source_dimensions": [
+        1086,
+        1448
+      ],
+      "dimensions": [
+        576,
+        768
+      ],
+      "encoded_bytes": 110580,
+      "sha256": "1e6143e34fc53ce8e14b8a42f47657c467c5fb1164fa20f5c34758cedeb99ba8",
+      "quality": 96,
+      "full_resolution_luma_ssim": 0.9851669073104858,
+      "worst_128px_luma_ssim": 0.980080246925354,
+      "chroma_mean_absolute_error": 0.6959296332465278,
+      "chroma_95th_percentile_error": 2.0,
+      "trials": [
+        {
+          "quality": 78,
+          "bytes": 25978,
+          "full_resolution_luma_ssim": 0.9230408072471619,
+          "worst_128px_luma_ssim": 0.8544460535049438,
+          "chroma_mean_absolute_error": 0.8967104311342593,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 82,
+          "bytes": 34312,
+          "full_resolution_luma_ssim": 0.9379622340202332,
+          "worst_128px_luma_ssim": 0.8891448974609375,
+          "chroma_mean_absolute_error": 0.8602385344328703,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 86,
+          "bytes": 45430,
+          "full_resolution_luma_ssim": 0.9528868794441223,
+          "worst_128px_luma_ssim": 0.9208822250366211,
+          "chroma_mean_absolute_error": 0.8148961950231481,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 90,
+          "bytes": 60002,
+          "full_resolution_luma_ssim": 0.9661815166473389,
+          "worst_128px_luma_ssim": 0.9464094638824463,
+          "chroma_mean_absolute_error": 0.7745519567418981,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 94,
+          "bytes": 96246,
+          "full_resolution_luma_ssim": 0.9833852052688599,
+          "worst_128px_luma_ssim": 0.9785271883010864,
+          "chroma_mean_absolute_error": 0.7127504701967593,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 95,
+          "bytes": 105448,
+          "full_resolution_luma_ssim": 0.9846571087837219,
+          "worst_128px_luma_ssim": 0.979974627494812,
+          "chroma_mean_absolute_error": 0.6939674660011574,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 96,
+          "bytes": 110580,
+          "full_resolution_luma_ssim": 0.9851669073104858,
+          "worst_128px_luma_ssim": 0.980080246925354,
+          "chroma_mean_absolute_error": 0.6959296332465278,
+          "chroma_95th_percentile_error": 2.0
+        }
+      ]
+    },
+    {
+      "id": "nord_male_1",
+      "file": "nord_male_1.webp",
+      "original_bytes": 2490231,
+      "original_sha256": "923340c63c16a6535381f38a341b2cd4e3ecee5fd799322eb7dc4154868e1652",
+      "source_dimensions": [
+        1086,
+        1448
+      ],
+      "dimensions": [
+        576,
+        768
+      ],
+      "encoded_bytes": 120546,
+      "sha256": "d4e56bd6dc55408f39d3249dad4069da919d7fba6b32cc888bd0d10add37c51d",
+      "quality": 95,
+      "full_resolution_luma_ssim": 0.9856179356575012,
+      "worst_128px_luma_ssim": 0.9789144992828369,
+      "chroma_mean_absolute_error": 0.7137699833622685,
+      "chroma_95th_percentile_error": 2.0,
+      "trials": [
+        {
+          "quality": 78,
+          "bytes": 31986,
+          "full_resolution_luma_ssim": 0.9236092567443848,
+          "worst_128px_luma_ssim": 0.8698579668998718,
+          "chroma_mean_absolute_error": 0.9074526186342593,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 82,
+          "bytes": 40776,
+          "full_resolution_luma_ssim": 0.9395899772644043,
+          "worst_128px_luma_ssim": 0.8994049429893494,
+          "chroma_mean_absolute_error": 0.8776109483506944,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 86,
+          "bytes": 53424,
+          "full_resolution_luma_ssim": 0.9555126428604126,
+          "worst_128px_luma_ssim": 0.9310568571090698,
+          "chroma_mean_absolute_error": 0.8362031159577547,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 90,
+          "bytes": 76208,
+          "full_resolution_luma_ssim": 0.9707618355751038,
+          "worst_128px_luma_ssim": 0.9555712342262268,
+          "chroma_mean_absolute_error": 0.7816331651475694,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 94,
+          "bytes": 110060,
+          "full_resolution_luma_ssim": 0.9830222129821777,
+          "worst_128px_luma_ssim": 0.9749245643615723,
+          "chroma_mean_absolute_error": 0.7278091995804398,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 95,
+          "bytes": 120546,
+          "full_resolution_luma_ssim": 0.9856179356575012,
+          "worst_128px_luma_ssim": 0.9789144992828369,
+          "chroma_mean_absolute_error": 0.7137699833622685,
+          "chroma_95th_percentile_error": 2.0
+        }
+      ]
+    },
+    {
+      "id": "nord_male_2",
+      "file": "nord_male_2.webp",
+      "original_bytes": 2567069,
+      "original_sha256": "7fc2894c0f21c8371af403720f1f96c4bccd455cba898c84a77da2e940b6247b",
+      "source_dimensions": [
+        1086,
+        1448
+      ],
+      "dimensions": [
+        576,
+        768
+      ],
+      "encoded_bytes": 129316,
+      "sha256": "7c764bbcfc543d049433558876aa08bc5472b281b2dcc28762bcf8188a8b1d76",
+      "quality": 95,
+      "full_resolution_luma_ssim": 0.9863811135292053,
+      "worst_128px_luma_ssim": 0.9783395528793335,
+      "chroma_mean_absolute_error": 0.8102654351128472,
+      "chroma_95th_percentile_error": 2.0,
+      "trials": [
+        {
+          "quality": 78,
+          "bytes": 34574,
+          "full_resolution_luma_ssim": 0.9156979322433472,
+          "worst_128px_luma_ssim": 0.8620970249176025,
+          "chroma_mean_absolute_error": 1.0350477430555556,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 82,
+          "bytes": 45490,
+          "full_resolution_luma_ssim": 0.9366827607154846,
+          "worst_128px_luma_ssim": 0.9020086526870728,
+          "chroma_mean_absolute_error": 1.0002113624855324,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 86,
+          "bytes": 58200,
+          "full_resolution_luma_ssim": 0.9522149562835693,
+          "worst_128px_luma_ssim": 0.9272427558898926,
+          "chroma_mean_absolute_error": 0.9527667010271991,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 90,
+          "bytes": 82208,
+          "full_resolution_luma_ssim": 0.9726481437683105,
+          "worst_128px_luma_ssim": 0.963639497756958,
+          "chroma_mean_absolute_error": 0.9007297092013888,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 94,
+          "bytes": 116252,
+          "full_resolution_luma_ssim": 0.9840894341468811,
+          "worst_128px_luma_ssim": 0.9753793478012085,
+          "chroma_mean_absolute_error": 0.8379787868923612,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 95,
+          "bytes": 129316,
+          "full_resolution_luma_ssim": 0.9863811135292053,
+          "worst_128px_luma_ssim": 0.9783395528793335,
+          "chroma_mean_absolute_error": 0.8102654351128472,
+          "chroma_95th_percentile_error": 2.0
+        }
+      ]
+    },
+    {
+      "id": "nord_male_3",
+      "file": "nord_male_3.webp",
+      "original_bytes": 2397056,
+      "original_sha256": "1ec4f90a8f50ce6591a2fea19b1c78e7e134f9e85dfe9cb3edade3b59eba5e1f",
+      "source_dimensions": [
+        1086,
+        1448
+      ],
+      "dimensions": [
+        576,
+        768
+      ],
+      "encoded_bytes": 114154,
+      "sha256": "7bee4fd8bf05083a1936c537f71387ccbcf23f2861d8a607deddee3eb7f1c6ca",
+      "quality": 97,
+      "full_resolution_luma_ssim": 0.9869682192802429,
+      "worst_128px_luma_ssim": 0.9835683703422546,
+      "chroma_mean_absolute_error": 0.6001541702835648,
+      "chroma_95th_percentile_error": 2.0,
+      "trials": [
+        {
+          "quality": 78,
+          "bytes": 22974,
+          "full_resolution_luma_ssim": 0.9224448800086975,
+          "worst_128px_luma_ssim": 0.8651771545410156,
+          "chroma_mean_absolute_error": 0.7612813313802084,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 82,
+          "bytes": 29538,
+          "full_resolution_luma_ssim": 0.9330828189849854,
+          "worst_128px_luma_ssim": 0.8845666646957397,
+          "chroma_mean_absolute_error": 0.7316702383535879,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 86,
+          "bytes": 39888,
+          "full_resolution_luma_ssim": 0.9493884444236755,
+          "worst_128px_luma_ssim": 0.9175662994384766,
+          "chroma_mean_absolute_error": 0.7063949019820602,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 90,
+          "bytes": 56278,
+          "full_resolution_luma_ssim": 0.9630399942398071,
+          "worst_128px_luma_ssim": 0.940863311290741,
+          "chroma_mean_absolute_error": 0.6692889178240741,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 94,
+          "bytes": 93524,
+          "full_resolution_luma_ssim": 0.9812406301498413,
+          "worst_128px_luma_ssim": 0.975083589553833,
+          "chroma_mean_absolute_error": 0.6229734067563657,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 95,
+          "bytes": 95520,
+          "full_resolution_luma_ssim": 0.9817158579826355,
+          "worst_128px_luma_ssim": 0.9748654365539551,
+          "chroma_mean_absolute_error": 0.6234243887442129,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 96,
+          "bytes": 105686,
+          "full_resolution_luma_ssim": 0.9830005168914795,
+          "worst_128px_luma_ssim": 0.976238489151001,
+          "chroma_mean_absolute_error": 0.6184093334056713,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 97,
+          "bytes": 114154,
+          "full_resolution_luma_ssim": 0.9869682192802429,
+          "worst_128px_luma_ssim": 0.9835683703422546,
+          "chroma_mean_absolute_error": 0.6001541702835648,
+          "chroma_95th_percentile_error": 2.0
+        }
+      ]
+    },
+    {
+      "id": "orc_female_1",
+      "file": "orc_female_1.webp",
+      "original_bytes": 2428275,
+      "original_sha256": "7b1e16587817ef462b34c7b8339b51be3743aac0df74361fdaa7fb9ee06e22e6",
+      "source_dimensions": [
+        1086,
+        1448
+      ],
+      "dimensions": [
+        576,
+        768
+      ],
+      "encoded_bytes": 112342,
+      "sha256": "dce7d364b22a706b436ad494261a79c99f44f03124cf49f1d265e3f746cc1d74",
+      "quality": 95,
+      "full_resolution_luma_ssim": 0.9850957989692688,
+      "worst_128px_luma_ssim": 0.9803880453109741,
+      "chroma_mean_absolute_error": 0.7263353135850694,
+      "chroma_95th_percentile_error": 2.0,
+      "trials": [
+        {
+          "quality": 78,
+          "bytes": 27036,
+          "full_resolution_luma_ssim": 0.9159817099571228,
+          "worst_128px_luma_ssim": 0.8533576726913452,
+          "chroma_mean_absolute_error": 0.9004301848234953,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 82,
+          "bytes": 34390,
+          "full_resolution_luma_ssim": 0.9315125346183777,
+          "worst_128px_luma_ssim": 0.8881525993347168,
+          "chroma_mean_absolute_error": 0.8708699544270834,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 86,
+          "bytes": 46188,
+          "full_resolution_luma_ssim": 0.947436511516571,
+          "worst_128px_luma_ssim": 0.9189319610595703,
+          "chroma_mean_absolute_error": 0.8390401204427084,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 90,
+          "bytes": 66384,
+          "full_resolution_luma_ssim": 0.9654020071029663,
+          "worst_128px_luma_ssim": 0.9509252309799194,
+          "chroma_mean_absolute_error": 0.7827589246961806,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 94,
+          "bytes": 103256,
+          "full_resolution_luma_ssim": 0.9825199246406555,
+          "worst_128px_luma_ssim": 0.976784884929657,
+          "chroma_mean_absolute_error": 0.7340585214120371,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 95,
+          "bytes": 112342,
+          "full_resolution_luma_ssim": 0.9850957989692688,
+          "worst_128px_luma_ssim": 0.9803880453109741,
+          "chroma_mean_absolute_error": 0.7263353135850694,
+          "chroma_95th_percentile_error": 2.0
+        }
+      ]
+    },
+    {
+      "id": "orc_female_2",
+      "file": "orc_female_2.webp",
+      "original_bytes": 2403931,
+      "original_sha256": "6f09e41a5d74d6a61710dcaa0422218533553106d8a72e6767ed692ecd55b90c",
+      "source_dimensions": [
+        1086,
+        1448
+      ],
+      "dimensions": [
+        576,
+        768
+      ],
+      "encoded_bytes": 112450,
+      "sha256": "4381f5b4d9951b5d0079e79f9ae517c6fc584bcec2d3211b980b8ceb423fdd68",
+      "quality": 95,
+      "full_resolution_luma_ssim": 0.9861302375793457,
+      "worst_128px_luma_ssim": 0.9794866442680359,
+      "chroma_mean_absolute_error": 0.6996053059895834,
+      "chroma_95th_percentile_error": 2.0,
+      "trials": [
+        {
+          "quality": 78,
+          "bytes": 28952,
+          "full_resolution_luma_ssim": 0.9188344478607178,
+          "worst_128px_luma_ssim": 0.8633944988250732,
+          "chroma_mean_absolute_error": 0.8746450918692129,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 82,
+          "bytes": 37502,
+          "full_resolution_luma_ssim": 0.9359942674636841,
+          "worst_128px_luma_ssim": 0.8952741026878357,
+          "chroma_mean_absolute_error": 0.8468062789351852,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 86,
+          "bytes": 49676,
+          "full_resolution_luma_ssim": 0.954251766204834,
+          "worst_128px_luma_ssim": 0.9283987283706665,
+          "chroma_mean_absolute_error": 0.8052933304398148,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 90,
+          "bytes": 67186,
+          "full_resolution_luma_ssim": 0.969876766204834,
+          "worst_128px_luma_ssim": 0.9558022022247314,
+          "chroma_mean_absolute_error": 0.7631621184172453,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 94,
+          "bytes": 101178,
+          "full_resolution_luma_ssim": 0.9817907810211182,
+          "worst_128px_luma_ssim": 0.9731924533843994,
+          "chroma_mean_absolute_error": 0.7183645742910879,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 95,
+          "bytes": 112450,
+          "full_resolution_luma_ssim": 0.9861302375793457,
+          "worst_128px_luma_ssim": 0.9794866442680359,
+          "chroma_mean_absolute_error": 0.6996053059895834,
+          "chroma_95th_percentile_error": 2.0
+        }
+      ]
+    },
+    {
+      "id": "orc_female_3",
+      "file": "orc_female_3.webp",
+      "original_bytes": 2353995,
+      "original_sha256": "cf6a75b4726a26fc47484651521cb54030897562fcebbba832e96e9424113616",
+      "source_dimensions": [
+        1086,
+        1448
+      ],
+      "dimensions": [
+        576,
+        768
+      ],
+      "encoded_bytes": 113456,
+      "sha256": "23c6ae847bddaddaf89a770d9c532b7073680a59521ce8a7469a2ed12189d1ec",
+      "quality": 96,
+      "full_resolution_luma_ssim": 0.9851232767105103,
+      "worst_128px_luma_ssim": 0.9779508113861084,
+      "chroma_mean_absolute_error": 0.6770121256510416,
+      "chroma_95th_percentile_error": 2.0,
+      "trials": [
+        {
+          "quality": 78,
+          "bytes": 26424,
+          "full_resolution_luma_ssim": 0.9201433062553406,
+          "worst_128px_luma_ssim": 0.866872251033783,
+          "chroma_mean_absolute_error": 0.8477557146990741,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 82,
+          "bytes": 34070,
+          "full_resolution_luma_ssim": 0.9346264004707336,
+          "worst_128px_luma_ssim": 0.8938358426094055,
+          "chroma_mean_absolute_error": 0.8207487883391203,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 86,
+          "bytes": 46232,
+          "full_resolution_luma_ssim": 0.95280921459198,
+          "worst_128px_luma_ssim": 0.9287824630737305,
+          "chroma_mean_absolute_error": 0.7779563621238426,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 90,
+          "bytes": 61338,
+          "full_resolution_luma_ssim": 0.9647002220153809,
+          "worst_128px_luma_ssim": 0.9453107118606567,
+          "chroma_mean_absolute_error": 0.7415443702980324,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 94,
+          "bytes": 100540,
+          "full_resolution_luma_ssim": 0.9835188388824463,
+          "worst_128px_luma_ssim": 0.9769742488861084,
+          "chroma_mean_absolute_error": 0.6831111201533565,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 95,
+          "bytes": 107444,
+          "full_resolution_luma_ssim": 0.9844582080841064,
+          "worst_128px_luma_ssim": 0.9780027866363525,
+          "chroma_mean_absolute_error": 0.6793461552372685,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 96,
+          "bytes": 113456,
+          "full_resolution_luma_ssim": 0.9851232767105103,
+          "worst_128px_luma_ssim": 0.9779508113861084,
+          "chroma_mean_absolute_error": 0.6770121256510416,
+          "chroma_95th_percentile_error": 2.0
+        }
+      ]
+    },
+    {
+      "id": "orc_male_1",
+      "file": "orc_male_1.webp",
+      "original_bytes": 2458505,
+      "original_sha256": "4f5ac1db9b443b4e8f5a7f935addc05a800ef7fcdd21821c78b8fc2a4f800a93",
+      "source_dimensions": [
+        1086,
+        1448
+      ],
+      "dimensions": [
+        576,
+        768
+      ],
+      "encoded_bytes": 130276,
+      "sha256": "6f37fbd413de1dcf2269494f882cef291810f7424513e6057864f457ae4d2096",
+      "quality": 97,
+      "full_resolution_luma_ssim": 0.987242579460144,
+      "worst_128px_luma_ssim": 0.9794410467147827,
+      "chroma_mean_absolute_error": 0.7114269115306713,
+      "chroma_95th_percentile_error": 2.0,
+      "trials": [
+        {
+          "quality": 78,
+          "bytes": 31560,
+          "full_resolution_luma_ssim": 0.9142298698425293,
+          "worst_128px_luma_ssim": 0.8530200719833374,
+          "chroma_mean_absolute_error": 0.8812199345341435,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 82,
+          "bytes": 40264,
+          "full_resolution_luma_ssim": 0.9336470365524292,
+          "worst_128px_luma_ssim": 0.8988792300224304,
+          "chroma_mean_absolute_error": 0.8519739221643519,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 86,
+          "bytes": 52862,
+          "full_resolution_luma_ssim": 0.9514275789260864,
+          "worst_128px_luma_ssim": 0.9265884160995483,
+          "chroma_mean_absolute_error": 0.8103569878472222,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 90,
+          "bytes": 71464,
+          "full_resolution_luma_ssim": 0.9678835272789001,
+          "worst_128px_luma_ssim": 0.9524829387664795,
+          "chroma_mean_absolute_error": 0.7679081669560185,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 94,
+          "bytes": 108518,
+          "full_resolution_luma_ssim": 0.9819930791854858,
+          "worst_128px_luma_ssim": 0.9719684720039368,
+          "chroma_mean_absolute_error": 0.7193705240885416,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 95,
+          "bytes": 117632,
+          "full_resolution_luma_ssim": 0.984850287437439,
+          "worst_128px_luma_ssim": 0.9761762022972107,
+          "chroma_mean_absolute_error": 0.7105000813802084,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 96,
+          "bytes": 122014,
+          "full_resolution_luma_ssim": 0.9849722981452942,
+          "worst_128px_luma_ssim": 0.975822389125824,
+          "chroma_mean_absolute_error": 0.7149771231192129,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 97,
+          "bytes": 130276,
+          "full_resolution_luma_ssim": 0.987242579460144,
+          "worst_128px_luma_ssim": 0.9794410467147827,
+          "chroma_mean_absolute_error": 0.7114269115306713,
+          "chroma_95th_percentile_error": 2.0
+        }
+      ]
+    },
+    {
+      "id": "orc_male_2",
+      "file": "orc_male_2.webp",
+      "original_bytes": 2366118,
+      "original_sha256": "29d0d54a176931a9322994be9de57fa2fc4cfb4c4addb8e06a3a425de8062f99",
+      "source_dimensions": [
+        1086,
+        1448
+      ],
+      "dimensions": [
+        576,
+        768
+      ],
+      "encoded_bytes": 113904,
+      "sha256": "37a4ae651ae92ffdad72a88353ac93efa08ca701f66b5df082749ecc0247e02f",
+      "quality": 97,
+      "full_resolution_luma_ssim": 0.9884629249572754,
+      "worst_128px_luma_ssim": 0.9836288690567017,
+      "chroma_mean_absolute_error": 0.6363514087818287,
+      "chroma_95th_percentile_error": 2.0,
+      "trials": [
+        {
+          "quality": 78,
+          "bytes": 23924,
+          "full_resolution_luma_ssim": 0.9159743785858154,
+          "worst_128px_luma_ssim": 0.8572236895561218,
+          "chroma_mean_absolute_error": 0.7946065266927084,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 82,
+          "bytes": 31354,
+          "full_resolution_luma_ssim": 0.9308953881263733,
+          "worst_128px_luma_ssim": 0.8819488883018494,
+          "chroma_mean_absolute_error": 0.7721094202112269,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 86,
+          "bytes": 41684,
+          "full_resolution_luma_ssim": 0.9476891756057739,
+          "worst_128px_luma_ssim": 0.9144788384437561,
+          "chroma_mean_absolute_error": 0.7482130262586806,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 90,
+          "bytes": 59070,
+          "full_resolution_luma_ssim": 0.9647469520568848,
+          "worst_128px_luma_ssim": 0.9435437917709351,
+          "chroma_mean_absolute_error": 0.7075862178096065,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 94,
+          "bytes": 90496,
+          "full_resolution_luma_ssim": 0.983199417591095,
+          "worst_128px_luma_ssim": 0.9767613410949707,
+          "chroma_mean_absolute_error": 0.6654414424189815,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 95,
+          "bytes": 96060,
+          "full_resolution_luma_ssim": 0.9843836426734924,
+          "worst_128px_luma_ssim": 0.9781411290168762,
+          "chroma_mean_absolute_error": 0.6584246600115741,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 96,
+          "bytes": 106450,
+          "full_resolution_luma_ssim": 0.9838739633560181,
+          "worst_128px_luma_ssim": 0.9757475852966309,
+          "chroma_mean_absolute_error": 0.6552463107638888,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 97,
+          "bytes": 113904,
+          "full_resolution_luma_ssim": 0.9884629249572754,
+          "worst_128px_luma_ssim": 0.9836288690567017,
+          "chroma_mean_absolute_error": 0.6363514087818287,
+          "chroma_95th_percentile_error": 2.0
+        }
+      ]
+    },
+    {
+      "id": "orc_male_3",
+      "file": "orc_male_3.webp",
+      "original_bytes": 2435077,
+      "original_sha256": "243b736823828233df7453e013a2e11c75b05895693a9a3f9f5d7768da9ce233",
+      "source_dimensions": [
+        1086,
+        1448
+      ],
+      "dimensions": [
+        576,
+        768
+      ],
+      "encoded_bytes": 108894,
+      "sha256": "6ac9a15b13ec6fd5612630bbf65ca37ea00e274ebedd7690717a86b2ae045f91",
+      "quality": 95,
+      "full_resolution_luma_ssim": 0.9856866002082825,
+      "worst_128px_luma_ssim": 0.9822837114334106,
+      "chroma_mean_absolute_error": 0.6665672019675926,
+      "chroma_95th_percentile_error": 2.0,
+      "trials": [
+        {
+          "quality": 78,
+          "bytes": 26652,
+          "full_resolution_luma_ssim": 0.9137903451919556,
+          "worst_128px_luma_ssim": 0.8577604293823242,
+          "chroma_mean_absolute_error": 0.8125169542100694,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 82,
+          "bytes": 35924,
+          "full_resolution_luma_ssim": 0.9328239560127258,
+          "worst_128px_luma_ssim": 0.8939011096954346,
+          "chroma_mean_absolute_error": 0.7833251953125,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 86,
+          "bytes": 47992,
+          "full_resolution_luma_ssim": 0.9505643844604492,
+          "worst_128px_luma_ssim": 0.9208689332008362,
+          "chroma_mean_absolute_error": 0.747467041015625,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 90,
+          "bytes": 63340,
+          "full_resolution_luma_ssim": 0.9668424725532532,
+          "worst_128px_luma_ssim": 0.9498047232627869,
+          "chroma_mean_absolute_error": 0.7193580910011574,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 94,
+          "bytes": 101766,
+          "full_resolution_luma_ssim": 0.9817832708358765,
+          "worst_128px_luma_ssim": 0.9741219282150269,
+          "chroma_mean_absolute_error": 0.6716353804976852,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 95,
+          "bytes": 108894,
+          "full_resolution_luma_ssim": 0.9856866002082825,
+          "worst_128px_luma_ssim": 0.9822837114334106,
+          "chroma_mean_absolute_error": 0.6665672019675926,
+          "chroma_95th_percentile_error": 2.0
+        }
+      ]
+    },
+    {
+      "id": "redguard_female_1",
+      "file": "redguard_female_1.webp",
+      "original_bytes": 2383841,
+      "original_sha256": "bad064919fee9a2268b031884854d621e31dc22a16bf56fef1b997d1fca06317",
+      "source_dimensions": [
+        1086,
+        1448
+      ],
+      "dimensions": [
+        576,
+        768
+      ],
+      "encoded_bytes": 114360,
+      "sha256": "3bed5adb0d28d58c8aaf5c0c4fcbfeef3f57cade77773054af69d7286a3cda28",
+      "quality": 96,
+      "full_resolution_luma_ssim": 0.9857953190803528,
+      "worst_128px_luma_ssim": 0.9800072908401489,
+      "chroma_mean_absolute_error": 0.7188336407696759,
+      "chroma_95th_percentile_error": 2.0,
+      "trials": [
+        {
+          "quality": 78,
+          "bytes": 26486,
+          "full_resolution_luma_ssim": 0.9153557419776917,
+          "worst_128px_luma_ssim": 0.8409432172775269,
+          "chroma_mean_absolute_error": 0.9203445999710648,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 82,
+          "bytes": 35630,
+          "full_resolution_luma_ssim": 0.9346256256103516,
+          "worst_128px_luma_ssim": 0.885111927986145,
+          "chroma_mean_absolute_error": 0.8806502730758102,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 86,
+          "bytes": 47550,
+          "full_resolution_luma_ssim": 0.9522008895874023,
+          "worst_128px_luma_ssim": 0.9210837483406067,
+          "chroma_mean_absolute_error": 0.8371322066695602,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 90,
+          "bytes": 62378,
+          "full_resolution_luma_ssim": 0.965254008769989,
+          "worst_128px_luma_ssim": 0.9442922472953796,
+          "chroma_mean_absolute_error": 0.8010672110098379,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 94,
+          "bytes": 99062,
+          "full_resolution_luma_ssim": 0.9807409644126892,
+          "worst_128px_luma_ssim": 0.972892165184021,
+          "chroma_mean_absolute_error": 0.7420224790219907,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 95,
+          "bytes": 108728,
+          "full_resolution_luma_ssim": 0.9834790229797363,
+          "worst_128px_luma_ssim": 0.9774953126907349,
+          "chroma_mean_absolute_error": 0.7225760000723379,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 96,
+          "bytes": 114360,
+          "full_resolution_luma_ssim": 0.9857953190803528,
+          "worst_128px_luma_ssim": 0.9800072908401489,
+          "chroma_mean_absolute_error": 0.7188336407696759,
+          "chroma_95th_percentile_error": 2.0
+        }
+      ]
+    },
+    {
+      "id": "redguard_female_2",
+      "file": "redguard_female_2.webp",
+      "original_bytes": 2326006,
+      "original_sha256": "f38901e9035738ebe874a63b5a0c29a175c69957c29170de98eefd1b59e7c308",
+      "source_dimensions": [
+        1086,
+        1448
+      ],
+      "dimensions": [
+        576,
+        768
+      ],
+      "encoded_bytes": 107734,
+      "sha256": "3d69711df3c6ea1d73a220115718a55cb35d7608c74e6d9b6cdc2ab724c6b554",
+      "quality": 97,
+      "full_resolution_luma_ssim": 0.9851735830307007,
+      "worst_128px_luma_ssim": 0.9814155101776123,
+      "chroma_mean_absolute_error": 0.6607134783709491,
+      "chroma_95th_percentile_error": 2.0,
+      "trials": [
+        {
+          "quality": 78,
+          "bytes": 21388,
+          "full_resolution_luma_ssim": 0.9273425340652466,
+          "worst_128px_luma_ssim": 0.8576488494873047,
+          "chroma_mean_absolute_error": 0.8508221661603009,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 82,
+          "bytes": 27712,
+          "full_resolution_luma_ssim": 0.9384116530418396,
+          "worst_128px_luma_ssim": 0.8844881057739258,
+          "chroma_mean_absolute_error": 0.8173183865017362,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 86,
+          "bytes": 37104,
+          "full_resolution_luma_ssim": 0.9518227577209473,
+          "worst_128px_luma_ssim": 0.9166028499603271,
+          "chroma_mean_absolute_error": 0.7810895001446759,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 90,
+          "bytes": 52422,
+          "full_resolution_luma_ssim": 0.9651811718940735,
+          "worst_128px_luma_ssim": 0.9467253088951111,
+          "chroma_mean_absolute_error": 0.7312373408564815,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 94,
+          "bytes": 82538,
+          "full_resolution_luma_ssim": 0.9779598712921143,
+          "worst_128px_luma_ssim": 0.969197154045105,
+          "chroma_mean_absolute_error": 0.6815547236689815,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 95,
+          "bytes": 90098,
+          "full_resolution_luma_ssim": 0.9787952303886414,
+          "worst_128px_luma_ssim": 0.9691007733345032,
+          "chroma_mean_absolute_error": 0.6777366355613426,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 96,
+          "bytes": 99528,
+          "full_resolution_luma_ssim": 0.9841483235359192,
+          "worst_128px_luma_ssim": 0.9806181192398071,
+          "chroma_mean_absolute_error": 0.6670147931134259,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 97,
+          "bytes": 107734,
+          "full_resolution_luma_ssim": 0.9851735830307007,
+          "worst_128px_luma_ssim": 0.9814155101776123,
+          "chroma_mean_absolute_error": 0.6607134783709491,
+          "chroma_95th_percentile_error": 2.0
+        }
+      ]
+    },
+    {
+      "id": "redguard_female_3",
+      "file": "redguard_female_3.webp",
+      "original_bytes": 2422995,
+      "original_sha256": "d843bd3ff04543d57b94045eafcea68f14d774efb0eff667d4ca9e45e80e31bd",
+      "source_dimensions": [
+        1086,
+        1448
+      ],
+      "dimensions": [
+        576,
+        768
+      ],
+      "encoded_bytes": 120854,
+      "sha256": "59ecac44e9e5bf6e73d7777c2823b7c67e19a7b866c11e446a184605af540b51",
+      "quality": 96,
+      "full_resolution_luma_ssim": 0.9855102896690369,
+      "worst_128px_luma_ssim": 0.9815665483474731,
+      "chroma_mean_absolute_error": 0.7812816478587963,
+      "chroma_95th_percentile_error": 2.0,
+      "trials": [
+        {
+          "quality": 78,
+          "bytes": 27112,
+          "full_resolution_luma_ssim": 0.9121763110160828,
+          "worst_128px_luma_ssim": 0.8550882935523987,
+          "chroma_mean_absolute_error": 0.9960361056857638,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 82,
+          "bytes": 36592,
+          "full_resolution_luma_ssim": 0.931932270526886,
+          "worst_128px_luma_ssim": 0.8936262130737305,
+          "chroma_mean_absolute_error": 0.9585729528356481,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 86,
+          "bytes": 49542,
+          "full_resolution_luma_ssim": 0.9469804763793945,
+          "worst_128px_luma_ssim": 0.9148421883583069,
+          "chroma_mean_absolute_error": 0.9089072898582176,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 90,
+          "bytes": 65760,
+          "full_resolution_luma_ssim": 0.9610142111778259,
+          "worst_128px_luma_ssim": 0.936980128288269,
+          "chroma_mean_absolute_error": 0.8700165925202547,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 94,
+          "bytes": 105474,
+          "full_resolution_luma_ssim": 0.9821285605430603,
+          "worst_128px_luma_ssim": 0.9772377014160156,
+          "chroma_mean_absolute_error": 0.8010321723090278,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 95,
+          "bytes": 115442,
+          "full_resolution_luma_ssim": 0.9846075773239136,
+          "worst_128px_luma_ssim": 0.9809622168540955,
+          "chroma_mean_absolute_error": 0.7810522008825231,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 96,
+          "bytes": 120854,
+          "full_resolution_luma_ssim": 0.9855102896690369,
+          "worst_128px_luma_ssim": 0.9815665483474731,
+          "chroma_mean_absolute_error": 0.7812816478587963,
+          "chroma_95th_percentile_error": 2.0
+        }
+      ]
+    },
+    {
+      "id": "redguard_male_1",
+      "file": "redguard_male_1.webp",
+      "original_bytes": 2572074,
+      "original_sha256": "0d80cd7283291337b6e6f46ee4b628b88ded17f9f9213b36d085a9d5fe23dfdb",
+      "source_dimensions": [
+        1086,
+        1448
+      ],
+      "dimensions": [
+        576,
+        768
+      ],
+      "encoded_bytes": 133644,
+      "sha256": "8b0495b46cd7218794bedec34b3ad1825e51beac57cc640686aeaf5638413748",
+      "quality": 97,
+      "full_resolution_luma_ssim": 0.9872477650642395,
+      "worst_128px_luma_ssim": 0.981601357460022,
+      "chroma_mean_absolute_error": 0.6839723940248843,
+      "chroma_95th_percentile_error": 2.0,
+      "trials": [
+        {
+          "quality": 78,
+          "bytes": 30412,
+          "full_resolution_luma_ssim": 0.9052723050117493,
+          "worst_128px_luma_ssim": 0.8472104072570801,
+          "chroma_mean_absolute_error": 0.8632835105613426,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 82,
+          "bytes": 39372,
+          "full_resolution_luma_ssim": 0.9265374541282654,
+          "worst_128px_luma_ssim": 0.8818827271461487,
+          "chroma_mean_absolute_error": 0.8336305971498843,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 86,
+          "bytes": 52520,
+          "full_resolution_luma_ssim": 0.9424991607666016,
+          "worst_128px_luma_ssim": 0.909244954586029,
+          "chroma_mean_absolute_error": 0.8000081380208334,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 90,
+          "bytes": 71734,
+          "full_resolution_luma_ssim": 0.9636346697807312,
+          "worst_128px_luma_ssim": 0.9439332485198975,
+          "chroma_mean_absolute_error": 0.7604336208767362,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 94,
+          "bytes": 110142,
+          "full_resolution_luma_ssim": 0.9812906384468079,
+          "worst_128px_luma_ssim": 0.9760810136795044,
+          "chroma_mean_absolute_error": 0.7200656467013888,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 95,
+          "bytes": 117662,
+          "full_resolution_luma_ssim": 0.9837518930435181,
+          "worst_128px_luma_ssim": 0.9785069227218628,
+          "chroma_mean_absolute_error": 0.7141520182291666,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 96,
+          "bytes": 124278,
+          "full_resolution_luma_ssim": 0.9848061800003052,
+          "worst_128px_luma_ssim": 0.9785857200622559,
+          "chroma_mean_absolute_error": 0.7105215567129629,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 97,
+          "bytes": 133644,
+          "full_resolution_luma_ssim": 0.9872477650642395,
+          "worst_128px_luma_ssim": 0.981601357460022,
+          "chroma_mean_absolute_error": 0.6839723940248843,
+          "chroma_95th_percentile_error": 2.0
+        }
+      ]
+    },
+    {
+      "id": "redguard_male_2",
+      "file": "redguard_male_2.webp",
+      "original_bytes": 2336851,
+      "original_sha256": "c0a0fd950e0086334d4b7a50391f35a88bf848a3fca4b5a98121767fbc78cf42",
+      "source_dimensions": [
+        1086,
+        1448
+      ],
+      "dimensions": [
+        576,
+        768
+      ],
+      "encoded_bytes": 109128,
+      "sha256": "194f096f3f27146d5a4482e25d8b274249c611fbf15204e995b1357d52c4dc37",
+      "quality": 96,
+      "full_resolution_luma_ssim": 0.9852852821350098,
+      "worst_128px_luma_ssim": 0.9781208038330078,
+      "chroma_mean_absolute_error": 0.6924494990596065,
+      "chroma_95th_percentile_error": 2.0,
+      "trials": [
+        {
+          "quality": 78,
+          "bytes": 24484,
+          "full_resolution_luma_ssim": 0.9149783849716187,
+          "worst_128px_luma_ssim": 0.8494280576705933,
+          "chroma_mean_absolute_error": 0.8572726779513888,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 82,
+          "bytes": 33128,
+          "full_resolution_luma_ssim": 0.9342846870422363,
+          "worst_128px_luma_ssim": 0.8903977870941162,
+          "chroma_mean_absolute_error": 0.8218847204137731,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 86,
+          "bytes": 44332,
+          "full_resolution_luma_ssim": 0.952837347984314,
+          "worst_128px_luma_ssim": 0.9269241094589233,
+          "chroma_mean_absolute_error": 0.7871172869646991,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 90,
+          "bytes": 58970,
+          "full_resolution_luma_ssim": 0.9640512466430664,
+          "worst_128px_luma_ssim": 0.9412674307823181,
+          "chroma_mean_absolute_error": 0.7521407515914352,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 94,
+          "bytes": 96764,
+          "full_resolution_luma_ssim": 0.9836902618408203,
+          "worst_128px_luma_ssim": 0.9777591228485107,
+          "chroma_mean_absolute_error": 0.6989339192708334,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 95,
+          "bytes": 103186,
+          "full_resolution_luma_ssim": 0.9846395254135132,
+          "worst_128px_luma_ssim": 0.9781211614608765,
+          "chroma_mean_absolute_error": 0.69342041015625,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 96,
+          "bytes": 109128,
+          "full_resolution_luma_ssim": 0.9852852821350098,
+          "worst_128px_luma_ssim": 0.9781208038330078,
+          "chroma_mean_absolute_error": 0.6924494990596065,
+          "chroma_95th_percentile_error": 2.0
+        }
+      ]
+    },
+    {
+      "id": "redguard_male_3",
+      "file": "redguard_male_3.webp",
+      "original_bytes": 2533519,
+      "original_sha256": "9039080b6e88c18c497f7d233c41800df26e880afdcdfdde1fa034ffe526b670",
+      "source_dimensions": [
+        1086,
+        1448
+      ],
+      "dimensions": [
+        576,
+        768
+      ],
+      "encoded_bytes": 125960,
+      "sha256": "48ae21ec85229e80f067e7cb34b91ab5b07eb62be294c93f6de7dd5a7ece9464",
+      "quality": 96,
+      "full_resolution_luma_ssim": 0.9857956767082214,
+      "worst_128px_luma_ssim": 0.9806385636329651,
+      "chroma_mean_absolute_error": 0.7858898021556713,
+      "chroma_95th_percentile_error": 2.0,
+      "trials": [
+        {
+          "quality": 78,
+          "bytes": 32082,
+          "full_resolution_luma_ssim": 0.9161432981491089,
+          "worst_128px_luma_ssim": 0.8686931133270264,
+          "chroma_mean_absolute_error": 0.9756978352864584,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 82,
+          "bytes": 41650,
+          "full_resolution_luma_ssim": 0.9335749745368958,
+          "worst_128px_luma_ssim": 0.894416868686676,
+          "chroma_mean_absolute_error": 0.9487101236979166,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 86,
+          "bytes": 54156,
+          "full_resolution_luma_ssim": 0.9497960805892944,
+          "worst_128px_luma_ssim": 0.9221398830413818,
+          "chroma_mean_absolute_error": 0.9082969382957176,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 90,
+          "bytes": 73088,
+          "full_resolution_luma_ssim": 0.9667794108390808,
+          "worst_128px_luma_ssim": 0.9507973790168762,
+          "chroma_mean_absolute_error": 0.8635095666956019,
+          "chroma_95th_percentile_error": 3.0
+        },
+        {
+          "quality": 94,
+          "bytes": 109326,
+          "full_resolution_luma_ssim": 0.9827461838722229,
+          "worst_128px_luma_ssim": 0.9762985706329346,
+          "chroma_mean_absolute_error": 0.8120467574508102,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 95,
+          "bytes": 119844,
+          "full_resolution_luma_ssim": 0.9849058985710144,
+          "worst_128px_luma_ssim": 0.9800043702125549,
+          "chroma_mean_absolute_error": 0.7866177029079862,
+          "chroma_95th_percentile_error": 2.0
+        },
+        {
+          "quality": 96,
+          "bytes": 125960,
+          "full_resolution_luma_ssim": 0.9857956767082214,
+          "worst_128px_luma_ssim": 0.9806385636329651,
+          "chroma_mean_absolute_error": 0.7858898021556713,
+          "chroma_95th_percentile_error": 2.0
+        }
+      ]
+    }
+  ]
+}
