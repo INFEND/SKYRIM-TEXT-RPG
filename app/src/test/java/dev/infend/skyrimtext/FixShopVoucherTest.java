@@ -11,7 +11,8 @@ public class FixShopVoucherTest {
   int before=h.progress.quantity(o.item);assertTrue(h.fixShop.redeem(h,1));assertEquals(before+1,h.progress.quantity(o.item));assertFalse(h.fixShop.redeem(h,1));assertFalse(h.fixShop.refund(h,1));
  }
  @Test public void teleportOnlyVisited() {
-  GameEngine g=new GameEngine();g.start("Тест","Норд","Воин");g.mode="WORLD";g.fixShop.editorEnabled=true;
-  assertFalse(g.fixTeleport("Вайтран"));g.visitedVisual.add("Вайтран");assertTrue(g.fixTeleport("Вайтран"));assertEquals("Вайтран",g.progress.location);
+  GameEngine g=new GameEngine();g.start("Тест","Норд","Воин");g.mode="WORLD";
+  assertFalse(g.fastTravel("Вайтран",true));g.visitedVisual.add("Вайтран");
+  assertTrue(g.fastTravel("Вайтран",true));assertEquals("Вайтран",g.progress.location);
  }
 }
