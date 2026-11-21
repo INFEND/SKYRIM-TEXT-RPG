@@ -5151,7 +5151,8 @@ public final class MainActivity extends Activity {
     private void renderBestiary(){
         addText(content,"ᛟ  БЕСТИАРИЙ | "+BestiaryCatalog.all().size()+" ЗАПИСЕЙ",13,accent(),true,8);
         addText(content,"Skyrim и DLC: "+BestiaryCatalog.canonicalCount()+
-            " | Авторские: "+(BestiaryCatalog.all().size()-BestiaryCatalog.canonicalCount()),12,MUTED,false,7);
+            " | Авторские: "+(BestiaryCatalog.all().size()-BestiaryCatalog.canonicalCount()-BestiaryCatalog.gameCount())+
+            " | Игровые архетипы: "+BestiaryCatalog.gameCount(),12,MUTED,false,7);
         addText(content,"Угроза и добыча указаны справочно: точные награды и параметры боя определяет игровая система.",11,MUTED,false,12);
         actionButton("РАЗДЕЛ | "+bestiaryFilter,"Изменить категорию существ",false,()->{
             java.util.ArrayList<String> choices=new java.util.ArrayList<>();
