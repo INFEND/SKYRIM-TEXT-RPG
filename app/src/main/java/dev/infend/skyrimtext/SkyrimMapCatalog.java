@@ -51,6 +51,7 @@ public final class SkyrimMapCatalog {
         alias("Ферма Сарети","Sarethi Farm");
         alias("Роща Кин","Kynesgrove");
         alias("Убежище Тёмного Братства","Dark Brotherhood Sanctuary");
+        alias("Перевал Бледной тропы","Pale Pass");
     }
     private SkyrimMapCatalog(){}
     private static void alias(String name,String english){
