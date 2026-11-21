@@ -40,6 +40,9 @@ public final class BestiaryCatalogTest {
         assertEquals("Пепельное порождение",BestiaryCatalog.find("Порождения пепла").name);
         assertEquals("Пещерный охотник",BestiaryCatalog.find("Пещерный охотник").name);
         assertEquals("Ледяной призрак",BestiaryCatalog.find("Ледяной призрак").name);
+        assertEquals("Мирмулнир",BestiaryCatalog.find("Мирмулнир").name);
+        assertEquals("Инсектоиды",BestiaryCatalog.find("Кикимора").type);
+        assertEquals("Трупоеды",BestiaryCatalog.find("Гуль").type);
         assertNull(BestiaryCatalog.find("Неизвестное существо"));
     }
 

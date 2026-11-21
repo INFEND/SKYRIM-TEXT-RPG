@@ -5200,7 +5200,7 @@ public final class MainActivity extends Activity {
             tile.setPadding(dp(12),dp(11),dp(12),dp(11));
             tile.setBackground(new RuneFrameDrawable(PANEL,BORDER,false));
             addText(tile,e.name,17,TEXT,true,4);
-            addText(tile,e.category+"  |  "+e.origin,12,accent(),false,4);
+            addText(tile,e.category+(e.type.equals(e.category)?"":" · "+e.type)+"  |  "+e.origin,12,accent(),false,4);
             addText(tile,e.habitat+"  |  Угроза: "+e.threat,12,MUTED,false,0);
             LinearLayout.LayoutParams lp=lp(-1,-2);lp.bottomMargin=dp(7);
             list.addView(tile,lp);
@@ -5213,7 +5213,7 @@ public final class MainActivity extends Activity {
     private void showBestiaryEntry(BestiaryCatalog.Entry e){
         LinearLayout panel=column();
         panel.setPadding(dp(16),dp(12),dp(16),dp(12));
-        addText(panel,e.category+"  |  "+e.origin,12,accent(),true,12);
+        addText(panel,e.type+"  |  "+e.origin,12,accent(),true,12);
         addText(panel,"🌲  Среда обитания",13,accent(),true,3);
         addText(panel,e.habitat,15,TEXT,false,11);
         addText(panel,"⚔  Уровень угрозы: "+e.threat,14,ITEM_GOLD,true,12);
