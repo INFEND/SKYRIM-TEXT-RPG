@@ -1,14 +1,10 @@
 package dev.infend.skyrimtext;
 
-import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
-import android.util.Base64;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
@@ -19,15 +15,12 @@ import java.nio.charset.StandardCharsets;
  * Work/Codex OAuth: text-only Responses API.
  * Images are deliberately NOT requested through ChatGPT-plan OAuth because
  * Sign in with ChatGPT preview excludes the hosted image-generation tool.
- * The separate Images API path requires explicit user confirmation and own key.
+ * Artwork is created separately in ChatGPT Work and imported by the user.
  */
 final class ItemWorkshopAi {
     interface Result { void finished(JSONObject item,String error); }
-    interface ArtworkResult { void finished(String localFile,String error); }
     private static final Handler MAIN=new Handler(Looper.getMainLooper());
     private static final String RESPONSES="https://api.openai.com/v1/responses";
-    private static final String IMAGES="https://api.openai.com/v1/images/generations";
-    private static final int MAX_RESPONSE=30*1024*1024;
     private ItemWorkshopAi(){}
 
     static void draft(String oauthToken,String model,String idea,Result callback){
@@ -99,41 +92,6 @@ final class ItemWorkshopAi {
         },"skyrim-item-workshop-text").start();
     }
 
-    static void artwork(Context context,String prompt,ArtworkResult callback){
-        final Context app=context.getApplicationContext();
-        new Thread(()->{
-            HttpURLConnection conn=null;
-            try{
-                String idea=ItemWorkshopSpec.clip(prompt,900);
-                if(idea.isEmpty())throw new IllegalArgumentException("Опиши изображение предмета");
-                String apiKey=AiKeyVault.read(app);
-                if(apiKey.isEmpty())throw new IllegalArgumentException("Не настроен отдельный OpenAI API-ключ");
-                JSONObject body=new JSONObject();
-                body.put("model","gpt-image-2.5-flare").put("quality","high")
-                    .put("size","1024x1024").put("output_format","png")
-                    .put("n",1)
-                    .put("prompt","Single isolated Skyrim-style fantasy item artwork; "+
-                        "high-fidelity hand-crafted fantasy prop, dark neutral background, "+
-                        "one complete object centered in frame, realistic materials, "+
-                        "no text, no logo, no letters, no border. User description: "+idea);
-                conn=open(IMAGES,apiKey,"application/json");
-                conn.setReadTimeout(180000);
-                write(conn,body);check(conn);
-                byte[] response=readLimited(conn.getInputStream());
-                JSONObject json=new JSONObject(new String(response,StandardCharsets.UTF_8));
-                JSONArray results=json.optJSONArray("data");
-                String encoded=results==null||results.length()==0?"":results.getJSONObject(0).optString("b64_json","");
-                if(encoded.isEmpty())throw new IllegalStateException("Сервис не вернул изображение");
-                if(encoded.length()>MAX_RESPONSE)throw new IllegalStateException("Слишком большой ответ изображения");
-                byte[] image=Base64.decode(encoded,Base64.DEFAULT);
-                String saved=ItemArtworkStorage.install(app,image);
-                MAIN.post(()->callback.finished(saved,null));
-            }catch(Exception e){
-                String error=brief(e);MAIN.post(()->callback.finished(null,error));
-            }finally{if(conn!=null)conn.disconnect();}
-        },"skyrim-item-workshop-image").start();
-    }
-
     private static String typeList(){
         StringBuilder s=new StringBuilder();
         for(int i=0;i<ItemWorkshopSpec.TYPES.length;i++){
@@ -163,16 +121,6 @@ final class ItemWorkshopAi {
         if(code==403)message="Нет разрешения для этой функции или модели";
         if(code==429)message="Достигнут лимит запросов или средств";
         throw new IllegalStateException(message);
-    }
-    private static byte[] readLimited(InputStream stream)throws Exception{
-        try(InputStream in=stream;ByteArrayOutputStream out=new ByteArrayOutputStream()){
-            byte[] chunk=new byte[8192];int n;
-            while((n=in.read(chunk))!=-1){
-                if(out.size()+n>MAX_RESPONSE)throw new IllegalStateException("Ответ слишком большой");
-                out.write(chunk,0,n);
-            }
-            return out.toByteArray();
-        }
     }
     private static String brief(Exception error){
         String s=error.getMessage();

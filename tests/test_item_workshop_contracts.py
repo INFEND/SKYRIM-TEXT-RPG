@@ -40,13 +40,14 @@ class ExpandedItemWorkshop(unittest.TestCase):
         self.assertIn('put("store",false).put("stream",true)',AI)
         self.assertIn('response.completed',AI)
 
-    def test_work_plan_is_not_used_for_images_and_art_requires_confirmation(self):
-        self.assertIn('private static final String IMAGES="https://api.openai.com/v1/images/generations"',AI)
-        self.assertIn('AiKeyVault.read(app)',AI)
-        self.assertIn('Платная генерация изображения',MAIN)
-        self.assertIn('setPositiveButton("Генерировать"',MAIN)
-        self.assertIn('new File(context.getFilesDir(),"item_art")',ART)
-        self.assertIn('Bitmap.CompressFormat.WEBP',ART)
+    def test_images_use_work_and_manual_import_not_paid_api(self):
+        self.assertNotIn('/v1/images/generations', AI)
+        self.assertNotIn('AiKeyVault.read(app)', AI)
+        self.assertNotIn('Платная генерация изображения', MAIN)
+        self.assertNotIn('ГЕНЕРИРОВАТЬ ЧЕРЕЗ API', MAIN)
+        self.assertIn('WorkImageEditor.open(this,"item"', MAIN)
+        self.assertIn('new File(context.getFilesDir(),"item_art")', ART)
+        self.assertIn('Bitmap.CompressFormat.WEBP', ART)
 
     def test_import_and_item_card_image_are_wired(self):
         self.assertIn('Intent.ACTION_OPEN_DOCUMENT',MAIN)

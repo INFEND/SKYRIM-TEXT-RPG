@@ -6512,15 +6512,12 @@ public final class MainActivity extends Activity {
         prompt.setInputType(InputType.TYPE_CLASS_TEXT|InputType.TYPE_TEXT_FLAG_MULTI_LINE);
         prompt.setText(game.compensation.itemArtPrompts[slot]);
         addText(panel,"Создание через ChatGPT Work: изменяй описание, открой ChatGPT, "+
-                "сохрани готовое изображение и импортируй его. "+
-                "Автогенерация внутри игры требует отдельный платный Images API.",
+                "сохрани готовое изображение и импортируй его.",
                 12,MUTED,false,12);
         TextView importButton=itemAction("▣ ИМПОРТИРОВАТЬ ИЗОБРАЖЕНИЕ");
         panel.addView(importButton,lp(-1,46));space(panel,8);
         TextView workButton=itemAction("✧ СОЗДАТЬ ЧЕРЕЗ CHATGPT WORK");
         panel.addView(workButton,lp(-1,46));space(panel,8);
-        TextView generateButton=itemAction("✦ ГЕНЕРИРОВАТЬ ЧЕРЕЗ API");
-        panel.addView(generateButton,lp(-1,46));
         ScrollView scroll=new ScrollView(this);scroll.addView(panel);
         AlertDialog dialog=new RuneDialogBuilder(this,accent()).setTitle("Оформление предмета")
             .setView(scroll).setNegativeButton("Закрыть",null).create();
@@ -6536,36 +6533,6 @@ public final class MainActivity extends Activity {
             WorkImageEditor.open(this,"item",CompensationPowers.itemId(slot),
                 name,idea,accent(),this::render);
             dialog.dismiss();
-        });
-        generateButton.setOnClickListener(v->{
-            final String idea=prompt.getText().toString().trim();
-            if(idea.isEmpty()){toast("Сначала опиши изображение");return;}
-            if(!AiKeyVault.configured(this)){
-                toast("Для изображения нужен отдельный OpenAI API-ключ");
-                dialog.dismiss();aiKeyDialog();return;
-            }
-            new RuneDialogBuilder(this,accent())
-                .setTitle("Платная генерация изображения")
-                .setMessage("Запрос будет отправлен в OpenAI Images API (GPT Image Flare). "+
-                    "Он тарифицируется отдельно, лимит ChatGPT Work не используется. Продолжить?")
-                .setNegativeButton("Отмена",null)
-                .setPositiveButton("Генерировать",(d,w)->{
-                    generateButton.setEnabled(false);
-                    generateButton.setText("✦ СОЗДАЁТСЯ ИЗОБРАЖЕНИЕ…");
-                    ItemWorkshopAi.artwork(this,idea,(localFile,error)->{
-                        if(isDestroyed()||isFinishing())return;
-                        generateButton.setEnabled(true);
-                        generateButton.setText("✦ ГЕНЕРИРОВАТЬ ЧЕРЕЗ API");
-                        if(error!=null){toast(error);return;}
-                        if(!game.compensation.owned[slot]||
-                                !name.equals(game.compensation.itemNames[slot])){
-                            toast("Предмет изменился. Новый арт не назначен.");return;
-                        }
-                        game.compensation.attachArtwork(slot,localFile,idea);
-                        save();dialog.dismiss();render();
-                        toast("Изображение сжато в WebP и назначено предмету");
-                    });
-                }).show();
         });
         dialog.show();
         if(dialog.getWindow()!=null)
