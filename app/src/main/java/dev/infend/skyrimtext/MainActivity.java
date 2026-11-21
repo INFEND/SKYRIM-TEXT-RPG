@@ -3151,7 +3151,7 @@ public final class MainActivity extends Activity {
                     if(!completed.journal.isEmpty())aiMemory.add(aiSession,"event",completed.journal);
                     aiTurnStatus="";
                  }catch(Exception ex){
-                    if((!local||external)&&repairAttempt==0&&game==originalGame&&ex instanceof org.json.JSONException){
+                    if(!local&&repairAttempt==0&&game==originalGame&&ex instanceof org.json.JSONException){
                         aiTurnBusy=false;aiTurnPreview="";
                         String fix=proposalOnly?
                             "\nИсправление: верни только JSON {\"customChance\":42} либо {\"customChance\":null}; число без кавычек.":
