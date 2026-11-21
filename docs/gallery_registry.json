@@ -296,7 +296,36 @@
       "The Bannered Mare",
       "Таверна Гарцующая кобыла",
       "Гарцующая кобыла"
-    ]
+    ],
+    "artwork": {
+      "date": "2026-11-20",
+      "kind": "original_generated_illustration",
+      "format": "WebP",
+      "encoder_method": 6,
+      "frames": [
+        {
+          "frame": 1,
+          "source_sha256": "66a1f7e1c6a01df89afbbeb0005394b182296efcdec5dc446d7bb1db4a9ae271",
+          "source_bytes": 3201983,
+          "source_dimensions": [
+            1672,
+            941
+          ],
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 506836,
+          "quality": 89,
+          "sha256": "1bf17af7ff526cbb43a96881c1d33621423cd356067616ae702a7e7aac757c43",
+          "full_resolution_luma_ssim": 0.985677,
+          "worst_128px_luma_ssim": 0.973625,
+          "chroma_mean_absolute_error": 1.937648,
+          "chroma_95th_percentile_error": 6.0,
+          "scene": "Hill town inn, polished copper horseshoe suspended above a central low stone hearth, honey-colored carved pine trestles, wheat-colored late sun through open shutters, soft blue glass and horse tack in the entry."
+        }
+      ]
+    }
   },
   {
     "slug": "winking_skeever",
@@ -351,7 +380,36 @@
       "Candlehearth Hall",
       "Таверна Очаг и свеча",
       "Очаг и свеча"
-    ]
+    ],
+    "artwork": {
+      "date": "2026-11-20",
+      "kind": "original_generated_illustration",
+      "format": "WebP",
+      "encoder_method": 6,
+      "frames": [
+        {
+          "frame": 1,
+          "source_sha256": "913beae486d247cc4f43a0a7054e2546f39b5de370435fbfa8589a31ee0be41a",
+          "source_bytes": 3155996,
+          "source_dimensions": [
+            1672,
+            941
+          ],
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 507346,
+          "quality": 90,
+          "sha256": "80b66be7302a25f9edf6a05f14a554a66f6db24b7e8ed782e8573e11e006c27a",
+          "full_resolution_luma_ssim": 0.985011,
+          "worst_128px_luma_ssim": 0.977828,
+          "chroma_mean_absolute_error": 1.713377,
+          "chroma_95th_percentile_error": 5.0,
+          "scene": "Snowbound black stone city tavern with a tall copper candle lantern glowing near a broad wall hearth, charcoal-brown timber, heavy linen curtains and snowy blue air beyond back windows. Strong warm-cold contrast."
+        }
+      ]
+    }
   },
   {
     "slug": "dead_mans_drink",
@@ -364,7 +422,36 @@
       "Dead Man's Drink",
       "Таверна Мертвецкий мёд",
       "Мертвецкий мёд"
-    ]
+    ],
+    "artwork": {
+      "date": "2026-11-20",
+      "kind": "original_generated_illustration",
+      "format": "WebP",
+      "encoder_method": 6,
+      "frames": [
+        {
+          "frame": 1,
+          "source_sha256": "ad97ead77b1565d76b39be598eadb4c5498c47e86a024a75205471478234e911",
+          "source_bytes": 3181458,
+          "source_dimensions": [
+            1672,
+            941
+          ],
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 546244,
+          "quality": 91,
+          "sha256": "73aad2b1130d3abe4d169063c0721fa871a13d4f985e97cbb1688bb38b2ba8a6",
+          "full_resolution_luma_ssim": 0.987515,
+          "worst_128px_luma_ssim": 0.980174,
+          "chroma_mean_absolute_error": 1.465682,
+          "chroma_95th_percentile_error": 4.0,
+          "scene": "A welcoming forest-town inn with a tall log hall, split-stone fireplace, black spruce branches glimpsed through high leaded windows, a row of low benches with olive wool, subdued golden light and a quiet atmosphere."
+        }
+      ]
+    }
   },
   {
     "slug": "frozen_hearth",
@@ -377,7 +464,36 @@
       "The Frozen Hearth",
       "Таверна Замёрзший очаг",
       "Замёрзший очаг"
-    ]
+    ],
+    "artwork": {
+      "date": "2026-11-20",
+      "kind": "original_generated_illustration",
+      "format": "WebP",
+      "encoder_method": 6,
+      "frames": [
+        {
+          "frame": 1,
+          "source_sha256": "cd6293b267c9d245beded9c7c9ab6b674b9cb4c2c1f620a69ad8d51cc8291ef8",
+          "source_bytes": 3326801,
+          "source_dimensions": [
+            1672,
+            941
+          ],
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 516694,
+          "quality": 89,
+          "sha256": "4d723a31489e2455a2b6e6f198875d2b36363724535f280620e04d9e76cf8bc4",
+          "full_resolution_luma_ssim": 0.985675,
+          "worst_128px_luma_ssim": 0.980388,
+          "chroma_mean_absolute_error": 1.617311,
+          "chroma_95th_percentile_error": 5.0,
+          "scene": "An old wind-battered inn near a high coastal cliff, thick stone doorway rimed outside, interior brass stove and vivid rusty wool benches. The view runs from the protected hall past a snowy threshold to the blue outside."
+        }
+      ]
+    }
   },
   {
     "slug": "moorside_inn",
@@ -390,7 +506,36 @@
       "Moorside Inn",
       "Таверна Верески",
       "Верески"
-    ]
+    ],
+    "artwork": {
+      "date": "2026-11-20",
+      "kind": "original_generated_illustration",
+      "format": "WebP",
+      "encoder_method": 6,
+      "frames": [
+        {
+          "frame": 1,
+          "source_sha256": "d2ff6edfe71804f207296f47ccf383520cd4a96791ae03a8309b6dfaacea85c5",
+          "source_bytes": 3336470,
+          "source_dimensions": [
+            1672,
+            941
+          ],
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 528200,
+          "quality": 89,
+          "sha256": "2d3fe8acfeef08575350412994e6b6575e407780d7dc4c36ee798f33c3b69569",
+          "full_resolution_luma_ssim": 0.985308,
+          "worst_128px_luma_ssim": 0.976166,
+          "chroma_mean_absolute_error": 1.746262,
+          "chroma_95th_percentile_error": 5.0,
+          "scene": "Marshland inn held above reeds by dark wooden pilings. View across damp planks and a small warm dining room toward dawn fog outside, central low red iron stove, oval tables and honey lanterns."
+        }
+      ]
+    }
   },
   {
     "slug": "windpeak_inn",
@@ -403,7 +548,36 @@
       "Windpeak Inn",
       "Таверна Пик ветров",
       "Пик ветров"
-    ]
+    ],
+    "artwork": {
+      "date": "2026-11-20",
+      "kind": "original_generated_illustration",
+      "format": "WebP",
+      "encoder_method": 6,
+      "frames": [
+        {
+          "frame": 1,
+          "source_sha256": "1b2afc31194255a58a92eeac70e883192994c80194ac1f14941e54e26217355f",
+          "source_bytes": 3289230,
+          "source_dimensions": [
+            1672,
+            941
+          ],
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 490624,
+          "quality": 89,
+          "sha256": "5116ec63b9b1f8e604ac63865a99beeb0d27ac90ec1c5f9f1fb9abe4abb5839e",
+          "full_resolution_luma_ssim": 0.98542,
+          "worst_128px_luma_ssim": 0.977761,
+          "chroma_mean_absolute_error": 1.428506,
+          "chroma_95th_percentile_error": 4.0,
+          "scene": "A northern seafarers' inn with hardy low log walls and rope-guided lamp chains, welcoming large stove, dry fish and timber counter, storm-tossed gray bay framed by rear doorway. Single wide eye-level view."
+        }
+      ]
+    }
   },
   {
     "slug": "nightgate_inn",
@@ -441,7 +615,36 @@
       "Silver-Blood Inn",
       "Таверна Серебряная Кровь",
       "Серебряная Кровь"
-    ]
+    ],
+    "artwork": {
+      "date": "2026-11-20",
+      "kind": "original_generated_illustration",
+      "format": "WebP",
+      "encoder_method": 6,
+      "frames": [
+        {
+          "frame": 1,
+          "source_sha256": "42f5945f3cca0d6c0f2a88b5808ae9acaf547702bae7baacfadbe1775a210e26",
+          "source_bytes": 3356546,
+          "source_dimensions": [
+            1672,
+            941
+          ],
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 579914,
+          "quality": 91,
+          "sha256": "c3fbe6db1ed76bafd2a25791489e7f238ed31ba47b42655ea6e5d510a0d3279e",
+          "full_resolution_luma_ssim": 0.987798,
+          "worst_128px_luma_ssim": 0.978606,
+          "chroma_mean_absolute_error": 1.374572,
+          "chroma_95th_percentile_error": 4.0,
+          "scene": "An inn chamber carved into a cliff, several high sand-colored vaults with rounded uneven piers, copper fire dishes, reclaimed darkwood service counter and rows of small stone niches. Realistic flint and bronze patina."
+        }
+      ]
+    }
   },
   {
     "slug": "bee_and_barb",
@@ -454,7 +657,36 @@
       "The Bee and Barb",
       "Таверна Пчела и жало",
       "Пчела и жало"
-    ]
+    ],
+    "artwork": {
+      "date": "2026-11-20",
+      "kind": "original_generated_illustration",
+      "format": "WebP",
+      "encoder_method": 6,
+      "frames": [
+        {
+          "frame": 1,
+          "source_sha256": "55de5ed6efbd4ebcd5778f45b8ceb424ffd74ab21d42c39d266cb060b440a590",
+          "source_bytes": 3437292,
+          "source_dimensions": [
+            1672,
+            941
+          ],
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 526372,
+          "quality": 88,
+          "sha256": "a2f731702cb6ddd7b47e7c03675b3b48678b9350b51bc112732b2e21f02e01b1",
+          "full_resolution_luma_ssim": 0.985279,
+          "worst_128px_luma_ssim": 0.973464,
+          "chroma_mean_absolute_error": 1.924057,
+          "chroma_95th_percentile_error": 6.0,
+          "scene": "Canal-side dining room over a lake, rough black oak threshold, jars of honey under a row of amber glass floats, rain-blurred window and boats outside, a hearth at rear casting reflections through the varnished planks."
+        }
+      ]
+    }
   },
   {
     "slug": "new_gnisis_cornerclub",
@@ -467,7 +699,36 @@
       "New Gnisis Cornerclub",
       "Клуб Новый Гнисис",
       "Новый Гнисис"
-    ]
+    ],
+    "artwork": {
+      "date": "2026-11-20",
+      "kind": "original_generated_illustration",
+      "format": "WebP",
+      "encoder_method": 6,
+      "frames": [
+        {
+          "frame": 1,
+          "source_sha256": "acf82f85d5719260e93a4f5d5325824b7c2c1c418d5fadbf397cf85b62f54780",
+          "source_bytes": 3460223,
+          "source_dimensions": [
+            1672,
+            941
+          ],
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 572038,
+          "quality": 90,
+          "sha256": "37d0dbd474476a737db592418376f9d8f99793d24563eadebc14e49fa53609da",
+          "full_resolution_luma_ssim": 0.986857,
+          "worst_128px_luma_ssim": 0.979599,
+          "chroma_mean_absolute_error": 1.673387,
+          "chroma_95th_percentile_error": 5.0,
+          "scene": "A narrow hall built into a crowded northern stone quarter, warmly lit copper vessels, geometric brick grilles and dark red handwoven textiles, simple square tables and mended floor, soft charcoal sky visible through slits."
+        }
+      ]
+    }
   },
   {
     "slug": "ragged_flagon",
@@ -480,7 +741,36 @@
       "The Ragged Flagon",
       "Таверна Буйная фляга",
       "Буйная фляга"
-    ]
+    ],
+    "artwork": {
+      "date": "2026-11-20",
+      "kind": "original_generated_illustration",
+      "format": "WebP",
+      "encoder_method": 6,
+      "frames": [
+        {
+          "frame": 1,
+          "source_sha256": "1d7d5eaeb752a7432c4025ccaf58d1a4f2f8c16915a4c49d8d7ac140fbf4c52e",
+          "source_bytes": 3346425,
+          "source_dimensions": [
+            1672,
+            941
+          ],
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 547248,
+          "quality": 89,
+          "sha256": "b8bcc3d194a87e03955015e62e11425cad9f47e6300b6c2af949168fbd7fc645",
+          "full_resolution_luma_ssim": 0.986331,
+          "worst_128px_luma_ssim": 0.977635,
+          "chroma_mean_absolute_error": 1.96829,
+          "chroma_95th_percentile_error": 6.0,
+          "scene": "A hidden underground tavern built into an old water lock, walkable lined towpath with tables under five brick arches, amber lamps mirrored in jade water, sturdy counter on dry ground. Interior architecture is original, engineering-heavy, no sigils."
+        }
+      ]
+    }
   },
   {
     "slug": "stumbling_sabrecat",
@@ -499,36 +789,124 @@
     "name": "«Товары Белетора»",
     "parent": "Вайтран",
     "captions": [
-      "Торговый зал и прилавок"
+      "Торговый прилавок"
     ],
     "aliases": [
       "Belethor's General Goods",
       "Товары Белетора"
-    ]
+    ],
+    "artwork": {
+      "date": "2026-11-20",
+      "kind": "original_generated_illustration",
+      "format": "WebP",
+      "encoder_method": 6,
+      "frames": [
+        {
+          "frame": 1,
+          "source_sha256": "0264f9853de84f559569f00cc00efcf7b690f907e7209323bbcbac54bf40dc36",
+          "source_bytes": 3276110,
+          "source_dimensions": [
+            1672,
+            941
+          ],
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 529220,
+          "quality": 90,
+          "sha256": "79e9cae12bdf56f0d08553bb1f470403a0c1c8303d05b1676b3f13b68217fc70",
+          "full_resolution_luma_ssim": 0.985596,
+          "worst_128px_luma_ssim": 0.973255,
+          "chroma_mean_absolute_error": 1.482117,
+          "chroma_95th_percentile_error": 4.0,
+          "scene": "General goods seller in a windswept plains city, three marked measuring scoops at a split oak counter, rolled canvas, terra cotta jars and lanterns on neatly spaced shelves, late afternoon light off pale mud plaster."
+        }
+      ]
+    }
   },
   {
     "slug": "arcadias_cauldron",
     "name": "«Котелок Аркадии»",
     "parent": "Вайтран",
     "captions": [
-      "Алхимическая лавка и рабочий стол"
+      "Вход в алхимическую лавку"
     ],
     "aliases": [
       "Arcadia's Cauldron",
       "Котелок Аркадии"
-    ]
+    ],
+    "artwork": {
+      "date": "2026-11-20",
+      "kind": "original_generated_illustration",
+      "format": "WebP",
+      "encoder_method": 6,
+      "frames": [
+        {
+          "frame": 1,
+          "source_sha256": "696095017d601f5345aa2ce3defd29462c0b32a4ba9a342637e930ff2cdd76fb",
+          "source_bytes": 3376818,
+          "source_dimensions": [
+            1672,
+            941
+          ],
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 499032,
+          "quality": 88,
+          "sha256": "340be4e10e35ee2b5b20f64949ae00d586cb6c402f1fa13f2c6fd4783e2164dc",
+          "full_resolution_luma_ssim": 0.985708,
+          "worst_128px_luma_ssim": 0.975124,
+          "chroma_mean_absolute_error": 1.623311,
+          "chroma_95th_percentile_error": 5.0,
+          "scene": "An angular stucco apothecary with a high wooden bow window and potted feathery yarrow on the sill, herb-drying shelves, aged brass scale and small glass tincture bottles, warm sage and straw tones."
+        }
+      ]
+    }
   },
   {
     "slug": "warmaidens",
     "name": "«Дом воительницы»",
     "parent": "Вайтран",
     "captions": [
-      "Внутренний торговый зал оружейной"
+      "Горн и наковальня"
     ],
     "aliases": [
       "Warmaiden's",
-      "Дом воительницы"
-    ]
+      "Дом воительницы",
+      "Кузница «Дом воительницы»"
+    ],
+    "artwork": {
+      "date": "2026-11-20",
+      "kind": "original_generated_illustration",
+      "format": "WebP",
+      "encoder_method": 6,
+      "frames": [
+        {
+          "frame": 1,
+          "source_sha256": "0ac667cc50dd0c015643f280a0a5b4a1bbae6ad396fb19a01a681982a15de081",
+          "source_bytes": 3351797,
+          "source_dimensions": [
+            1672,
+            941
+          ],
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 514450,
+          "quality": 89,
+          "sha256": "9d6ef7cd6fdf84588e43608e2155ba547a4673adebccda93c69beb3158f80c5a",
+          "full_resolution_luma_ssim": 0.985186,
+          "worst_128px_luma_ssim": 0.973359,
+          "chroma_mean_absolute_error": 1.464639,
+          "chroma_95th_percentile_error": 4.0,
+          "scene": "An upright forge and metalworker's display next to a sunlit stone arch, narrow cracks of light crossing stout iron racks, ruby coals and a splash quenched in a long trough. Strong readable work station."
+        }
+      ]
+    }
   },
   {
     "slug": "drunken_huntsman",
@@ -540,7 +918,36 @@
     "aliases": [
       "The Drunken Huntsman",
       "Пьяный охотник"
-    ]
+    ],
+    "artwork": {
+      "date": "2026-11-20",
+      "kind": "original_generated_illustration",
+      "format": "WebP",
+      "encoder_method": 6,
+      "frames": [
+        {
+          "frame": 1,
+          "source_sha256": "c9fe1aa0077d67d8ef9b22c9c57925cdd171add2f5fcce719358c12ab16dd6ff",
+          "source_bytes": 3337947,
+          "source_dimensions": [
+            1672,
+            941
+          ],
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 507894,
+          "quality": 89,
+          "sha256": "55ffd8644e250acf3297b84f23ec8512e41b713d122167d6623ff7df65b43728",
+          "full_resolution_luma_ssim": 0.986443,
+          "worst_128px_luma_ssim": 0.977845,
+          "chroma_mean_absolute_error": 1.524645,
+          "chroma_95th_percentile_error": 4.0,
+          "scene": "A hunter's outfitter in a bright wattle and wood room beneath a steep roof. Wall with several simple longbows, patterned felt, waxed strings on a workbench and heather bundles beside a compact tea table."
+        }
+      ]
+    }
   },
   {
     "slug": "riverwood_trader",
@@ -768,20 +1175,79 @@
     ],
     "aliases": [
       "Arnleif and Sons Trading Company",
-      "Торговая компания Арнлейфа и сыновья"
-    ]
+      "Торговая компания Арнлейфа и сыновья",
+      "Торговая компания «Арнлейф и сыновья»"
+    ],
+    "artwork": {
+      "date": "2026-11-20",
+      "kind": "original_generated_illustration",
+      "format": "WebP",
+      "encoder_method": 6,
+      "frames": [
+        {
+          "frame": 1,
+          "source_sha256": "d7133c8673ee215543361bd460882f934dffe72277797985b98b0ccfabb3a1ef",
+          "source_bytes": 3324312,
+          "source_dimensions": [
+            1672,
+            941
+          ],
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 497280,
+          "quality": 89,
+          "sha256": "f592989ab16b042caa99aebd396f2aeb2e2170a0f106ce53294373f94abd3f19",
+          "full_resolution_luma_ssim": 0.985709,
+          "worst_128px_luma_ssim": 0.979063,
+          "chroma_mean_absolute_error": 1.351227,
+          "chroma_95th_percentile_error": 4.0,
+          "scene": "Front of a stacked limestone trading office in a quarry capital, ribbed stone ceiling, great old iron counterweight scale, timber shelves of brass and finished leather, a canted shaft of morning light."
+        }
+      ]
+    }
   },
   {
     "slug": "hags_cure",
     "name": "«Ведьмина настойка»",
     "parent": "Маркарт",
     "captions": [
-      "Алхимическая лавка в двемерских стенах"
+      "Стол с зельями и травами"
     ],
     "aliases": [
       "The Hag's Cure",
       "Ведьмина настойка"
-    ]
+    ],
+    "artwork": {
+      "date": "2026-11-20",
+      "kind": "original_generated_illustration",
+      "format": "WebP",
+      "encoder_method": 6,
+      "frames": [
+        {
+          "frame": 1,
+          "source_sha256": "6d00cc9b858fd584d1dfa37fdf58efd429107c3ec9e805220504a9e23ef8a20b",
+          "source_bytes": 3431072,
+          "source_dimensions": [
+            1672,
+            941
+          ],
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 509930,
+          "quality": 88,
+          "sha256": "ea68e411910c477c7d7081e7cbdb8624566078e4238997f310c14bb60fd5ec11",
+          "full_resolution_luma_ssim": 0.985936,
+          "worst_128px_luma_ssim": 0.97753,
+          "chroma_mean_absolute_error": 1.688921,
+          "chroma_95th_percentile_error": 5.0,
+          "scene": "An herbal remedy shop dug into layered cliff stone, slate workbench with bowls of dried roots, cool well water from a spout and curved amber glass, one low warm lantern. Wide diagonal perspective."
+        }
+      ]
+    }
   },
   {
     "slug": "pawned_prawn",
@@ -793,7 +1259,36 @@
     "aliases": [
       "The Pawned Prawn",
       "Заложенная креветка"
-    ]
+    ],
+    "artwork": {
+      "date": "2026-11-20",
+      "kind": "original_generated_illustration",
+      "format": "WebP",
+      "encoder_method": 6,
+      "frames": [
+        {
+          "frame": 1,
+          "source_sha256": "82f6cf00082dce36535cf5e3ea05771e515d302e2c6971cab382251c82fd4520",
+          "source_bytes": 3095302,
+          "source_dimensions": [
+            1672,
+            941
+          ],
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 542970,
+          "quality": 91,
+          "sha256": "b6bd4b830490df41273597d8a4e8e1a8f2cea6d35206f25f3f0ce445e9aca1e5",
+          "full_resolution_luma_ssim": 0.986869,
+          "worst_128px_luma_ssim": 0.981401,
+          "chroma_mean_absolute_error": 1.644783,
+          "chroma_95th_percentile_error": 5.0,
+          "scene": "A timber pawn counter on the low bank, mismatched baskets, folded coats, plain silver rings behind old smoky glass and a crate of fishing hardware. Narrow vertical slit with autumnal lake light. Low warm lamps and clean sightlines."
+        }
+      ]
+    }
   },
   {
     "slug": "elgrims_elixirs",
@@ -805,7 +1300,36 @@
     "aliases": [
       "Elgrim's Elixirs",
       "Эликсиры Элгрима"
-    ]
+    ],
+    "artwork": {
+      "date": "2026-11-20",
+      "kind": "original_generated_illustration",
+      "format": "WebP",
+      "encoder_method": 6,
+      "frames": [
+        {
+          "frame": 1,
+          "source_sha256": "6ab59422a0f7b31ebb1763c1a79130f87ed6b2927870c8d305abbd14070ceff4",
+          "source_bytes": 3304175,
+          "source_dimensions": [
+            1672,
+            941
+          ],
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 544180,
+          "quality": 91,
+          "sha256": "32fa37d77420189f4735964bb4ebc70b99c5048501351d8022f2b125ec102b65",
+          "full_resolution_luma_ssim": 0.987639,
+          "worst_128px_luma_ssim": 0.98034,
+          "chroma_mean_absolute_error": 1.164725,
+          "chroma_95th_percentile_error": 3.0,
+          "scene": "A half-sunken herbal lab beside canal embankments. Low black timber ceiling, botanical roots under pale brick shelves, pale blue alembics and floating white water lilies visible through a low window. Calm silver morning light."
+        }
+      ]
+    }
   },
   {
     "slug": "scorched_hammer",
@@ -817,7 +1341,36 @@
     "aliases": [
       "The Scorched Hammer",
       "Обожжённый молот"
-    ]
+    ],
+    "artwork": {
+      "date": "2026-11-20",
+      "kind": "original_generated_illustration",
+      "format": "WebP",
+      "encoder_method": 6,
+      "frames": [
+        {
+          "frame": 1,
+          "source_sha256": "7dbc34db14d4486aae36c4b1ddae4650ab7ccf4c70983d3f58fb3933746a6daa",
+          "source_bytes": 2882685,
+          "source_dimensions": [
+            1672,
+            941
+          ],
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 509826,
+          "quality": 92,
+          "sha256": "7d53a6dc30c136aa4f20274311f6bc5f2d08751ec4bcf1cb79fbaf3866e68674",
+          "full_resolution_luma_ssim": 0.985169,
+          "worst_128px_luma_ssim": 0.977655,
+          "chroma_mean_absolute_error": 1.743638,
+          "chroma_95th_percentile_error": 5.0,
+          "scene": "Forge under the eaves of a canal street, three-quarter view to a red brick furnace and worn anvil, red willow leaves beyond a window, iron hooks and hammers suspended away from foreground. Dusk, vivid but controlled orange."
+        }
+      ]
+    }
   },
   {
     "slug": "sadris_used_wares",
@@ -829,7 +1382,36 @@
     "aliases": [
       "Sadri's Used Wares",
       "Подержанные товары Садри"
-    ]
+    ],
+    "artwork": {
+      "date": "2026-11-20",
+      "kind": "original_generated_illustration",
+      "format": "WebP",
+      "encoder_method": 6,
+      "frames": [
+        {
+          "frame": 1,
+          "source_sha256": "c35daf4cc2735323229a6f2bb9716b3ad8610879b93ec6eba905c59b1c14dda3",
+          "source_bytes": 3319250,
+          "source_dimensions": [
+            1672,
+            941
+          ],
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 504712,
+          "quality": 89,
+          "sha256": "3d831d253ec5b35434dfdc3ec4306397539d3b9ead8d4f90631430dbba951ab1",
+          "full_resolution_luma_ssim": 0.985059,
+          "worst_128px_luma_ssim": 0.978442,
+          "chroma_mean_absolute_error": 1.485978,
+          "chroma_95th_percentile_error": 4.0,
+          "scene": "Secondhand housewares shop in a dense black-stone district, neatly repaired metal pots with visible rivets, worn leather boots, cloth bolts and a dusty small bay window. Smoke-blue morning color with amber light over counter."
+        }
+      ]
+    }
   },
   {
     "slug": "white_phial",
@@ -841,7 +1423,36 @@
     "aliases": [
       "The White Phial",
       "Белый флакон"
-    ]
+    ],
+    "artwork": {
+      "date": "2026-11-20",
+      "kind": "original_generated_illustration",
+      "format": "WebP",
+      "encoder_method": 6,
+      "frames": [
+        {
+          "frame": 1,
+          "source_sha256": "31c0bf6578b236ba6a2a58a7a3376918ef79ee12803fa5449a373491ca83195f",
+          "source_bytes": 3510842,
+          "source_dimensions": [
+            1672,
+            941
+          ],
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 525632,
+          "quality": 88,
+          "sha256": "913c97ceaca1778af99b57208fe3ae3a6a2d6f421e5740b9e4118c9855edd6cf",
+          "full_resolution_luma_ssim": 0.986325,
+          "worst_128px_luma_ssim": 0.975311,
+          "chroma_mean_absolute_error": 1.387877,
+          "chroma_95th_percentile_error": 4.0,
+          "scene": "A black stone apothecary in a winter city with frosted mullioned lights, a pale quartz bowl filled with fresh roots, rows of cloudy medicine jars and a navy enamel scale. Restrained blue and muted cream."
+        }
+      ]
+    }
   },
   {
     "slug": "grave_concoctions",
@@ -852,8 +1463,38 @@
     ],
     "aliases": [
       "Grave Concoctions",
-      "Мёртвые припарки"
-    ]
+      "Мёртвые припарки",
+      "Могильные настойки"
+    ],
+    "artwork": {
+      "date": "2026-11-20",
+      "kind": "original_generated_illustration",
+      "format": "WebP",
+      "encoder_method": 6,
+      "frames": [
+        {
+          "frame": 1,
+          "source_sha256": "c937821f768ece96f7b22baf2d119925cd6b4f2d7110d458912c36a0b2489e61",
+          "source_bytes": 3352138,
+          "source_dimensions": [
+            1672,
+            941
+          ],
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 525176,
+          "quality": 89,
+          "sha256": "2c7a0646d21efc49c8fb779bc8ebc7dc3a380112551faeaecb310414df34c701",
+          "full_resolution_luma_ssim": 0.986398,
+          "worst_128px_luma_ssim": 0.976483,
+          "chroma_mean_absolute_error": 1.805155,
+          "chroma_95th_percentile_error": 5.0,
+          "scene": "A forest pharmacist's timber cottage with fern fronds drying along its low rafters, amber resin pots and antler-handled tools lined beside the counter. Soft forest-green side light through a low window."
+        }
+      ]
+    }
   },
   {
     "slug": "gray_pine_goods",
@@ -865,7 +1506,36 @@
     "aliases": [
       "Gray Pine Goods",
       "Серые сосны"
-    ]
+    ],
+    "artwork": {
+      "date": "2026-11-20",
+      "kind": "original_generated_illustration",
+      "format": "WebP",
+      "encoder_method": 6,
+      "frames": [
+        {
+          "frame": 1,
+          "source_sha256": "a3daf41ad0479dffeafd6488d497f40c358c58d55756da84be452fadcc3d538b",
+          "source_bytes": 3534615,
+          "source_dimensions": [
+            1672,
+            941
+          ],
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 523394,
+          "quality": 87,
+          "sha256": "46d9a6dc29f51a174c3a2e6114b78e7fe8273663d4425cdc155697efb1cb8ff9",
+          "full_resolution_luma_ssim": 0.985293,
+          "worst_128px_luma_ssim": 0.974631,
+          "chroma_mean_absolute_error": 1.990828,
+          "chroma_95th_percentile_error": 6.0,
+          "scene": "Practical local goods shop at the edge of an evergreen forest. Knotted pine counters, braided rope, lanterns, wood pegs, pottery and flint displayed on felt. Warm but readable light in a rustic workspace."
+        }
+      ]
+    }
   },
   {
     "slug": "thaumaturgists_hut",
@@ -877,7 +1547,36 @@
     "aliases": [
       "Thaumaturgist's Hut",
       "Хижина тауматурга"
-    ]
+    ],
+    "artwork": {
+      "date": "2026-11-20",
+      "kind": "original_generated_illustration",
+      "format": "WebP",
+      "encoder_method": 6,
+      "frames": [
+        {
+          "frame": 1,
+          "source_sha256": "d5f884e5e11c0b238d44b595e26e67a91c47f59de3773680c100eef3001e455c",
+          "source_bytes": 3308138,
+          "source_dimensions": [
+            1672,
+            941
+          ],
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 517446,
+          "quality": 90,
+          "sha256": "2127ea9552f31f4624c5139e3baf196f41e2d4542ebcbf05656dd986c74101d4",
+          "full_resolution_luma_ssim": 0.985982,
+          "worst_128px_luma_ssim": 0.976533,
+          "chroma_mean_absolute_error": 1.348075,
+          "chroma_95th_percentile_error": 4.0,
+          "scene": "Working herbalist's hut with dark peat-fired kiln, hanging marsh roots, plain worn clay jars and several woven slatted shutters. Fog from an open rear window softly fills a practical workspace."
+        }
+      ]
+    }
   },
   {
     "slug": "mortar_and_pestle",
@@ -889,7 +1588,36 @@
     "aliases": [
       "The Mortar and Pestle",
       "Ступка и пестик"
-    ]
+    ],
+    "artwork": {
+      "date": "2026-11-20",
+      "kind": "original_generated_illustration",
+      "format": "WebP",
+      "encoder_method": 6,
+      "frames": [
+        {
+          "frame": 1,
+          "source_sha256": "f2e28057a41841565d260d665736fb6d38f0e10ec6fb90b20fac1c34ad9e9131",
+          "source_bytes": 3405660,
+          "source_dimensions": [
+            1672,
+            941
+          ],
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 518776,
+          "quality": 89,
+          "sha256": "18f50629692349e9a3e3fa52b1eaca90f5717a267bcf090f97d695518f798caf",
+          "full_resolution_luma_ssim": 0.985266,
+          "worst_128px_luma_ssim": 0.977373,
+          "chroma_mean_absolute_error": 1.493764,
+          "chroma_95th_percentile_error": 4.0,
+          "scene": "Windy harbor apothecary with an unusually large gray stone mortar front and center, carefully spaced blue ceramics, pale salt and brown seaweed on simple trays. Side daylight breaks through a weathered wood window."
+        }
+      ]
+    }
   },
   {
     "slug": "birnas_oddments",
@@ -900,8 +1628,38 @@
     ],
     "aliases": [
       "Birna's Oddments",
-      "Товары Бирны"
-    ]
+      "Товары Бирны",
+      "Всякая всячина Бирны"
+    ],
+    "artwork": {
+      "date": "2026-11-20",
+      "kind": "original_generated_illustration",
+      "format": "WebP",
+      "encoder_method": 6,
+      "frames": [
+        {
+          "frame": 1,
+          "source_sha256": "cd3ac3707cc3d91f73dc180b0bbed11576e964650d5f33bce65ac9df789118e9",
+          "source_bytes": 3432342,
+          "source_dimensions": [
+            1672,
+            941
+          ],
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 488304,
+          "quality": 88,
+          "sha256": "9cba8858716a81c26b65a9d0f061edfe0fa9e07cd608bcd558938a201f98c095",
+          "full_resolution_luma_ssim": 0.985388,
+          "worst_128px_luma_ssim": 0.970366,
+          "chroma_mean_absolute_error": 1.452213,
+          "chroma_95th_percentile_error": 4.0,
+          "scene": "A winter supply shop near a lonely snowbound cape, neatly stacked iron lamps, baskets, boots and wool on fir racks under steep rafters. Snow and bright sky in a high square window, neutral color and readable textures."
+        }
+      ]
+    }
   },
   {
     "slug": "tel_mithryn_apothecary",
@@ -919,12 +1677,42 @@
     "name": "Медоварня «Чёрный Вереск»",
     "parent": "Рифтен",
     "captions": [
-      "Зал медоварни и дегустационный прилавок"
+      "Бочки с мёдом у воды"
     ],
     "aliases": [
       "Black-Briar Meadery",
-      "Медоварня Чёрный Вереск"
-    ]
+      "Медоварня Чёрный Вереск",
+      "Медоварня Чёрного Вереска"
+    ],
+    "artwork": {
+      "date": "2026-11-20",
+      "kind": "original_generated_illustration",
+      "format": "WebP",
+      "encoder_method": 6,
+      "frames": [
+        {
+          "frame": 1,
+          "source_sha256": "a94db1ef8f81b18d3b385c16f39a9cf0e11f870700dfd21c59459275ca63fdcc",
+          "source_bytes": 3562266,
+          "source_dimensions": [
+            1672,
+            941
+          ],
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 557268,
+          "quality": 88,
+          "sha256": "3fcccb61761b746d54f33ead02930b3396715eedab9aaa4ec56a0b1fffba7178",
+          "full_resolution_luma_ssim": 0.986645,
+          "worst_128px_luma_ssim": 0.978329,
+          "chroma_mean_absolute_error": 1.9246,
+          "chroma_95th_percentile_error": 6.0,
+          "scene": "Lakeside mead brewery with big oaken casks on sawhorses and a row of amber trial glasses, alder beam and rack honeycomb, plain iron hoops, stone drain, a blue rippling reflection between warm lamps."
+        }
+      ]
+    }
   },
   {
     "slug": "honningbrew_meadery",
@@ -946,7 +1734,36 @@
     ],
     "aliases": [
       "Haelga's Bunkhouse"
-    ]
+    ],
+    "artwork": {
+      "date": "2026-11-20",
+      "kind": "original_generated_illustration",
+      "format": "WebP",
+      "encoder_method": 6,
+      "frames": [
+        {
+          "frame": 1,
+          "source_sha256": "1660d665f40734d58bb4661b1977774a159c071c4408ebf9bfbb03e9f58f5d69",
+          "source_bytes": 3208802,
+          "source_dimensions": [
+            1672,
+            941
+          ],
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 547556,
+          "quality": 91,
+          "sha256": "c9f9454d1bbf7a47ad9d362d39ab143fda350ebb97b9b13c0fb86400f7984ce6",
+          "full_resolution_luma_ssim": 0.98783,
+          "worst_128px_luma_ssim": 0.979433,
+          "chroma_mean_absolute_error": 1.307548,
+          "chroma_95th_percentile_error": 4.0,
+          "scene": "Old communal lodge beside a calm canal, four comfortably spaced wooden bunk alcoves and woven rust-colored patchwork, trestle supper table, mist beyond low leaded windows, dry herbs overhead. Cozy, plain, lived-in lodge."
+        }
+      ]
+    }
   },
   {
     "slug": "thirsk_mead_hall",
@@ -971,7 +1788,36 @@
       "The Retching Netch",
       "Таверна Пьяный нетч",
       "Пьяный нетч"
-    ]
+    ],
+    "artwork": {
+      "date": "2026-11-20",
+      "kind": "original_generated_illustration",
+      "format": "WebP",
+      "encoder_method": 6,
+      "frames": [
+        {
+          "frame": 1,
+          "source_sha256": "0ffdd30ab6a9bd4e24df486f454b3382aebf639bda1403a5ecbc2b7ff838969e",
+          "source_bytes": 3117644,
+          "source_dimensions": [
+            1672,
+            941
+          ],
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 534420,
+          "quality": 91,
+          "sha256": "49de1d2f43322f32ba2437ce0f313bf38b3c30d411d324b4a30f7e63384c1145",
+          "full_resolution_luma_ssim": 0.98577,
+          "worst_128px_luma_ssim": 0.976259,
+          "chroma_mean_absolute_error": 1.553494,
+          "chroma_95th_percentile_error": 5.0,
+          "scene": "Volcanic island inn in a wide, rough basalt cavity, black semicircular alcoves, undulating timber counter and red pottery, a hazy window shaft showing fine ash outside. Warm rust light against gray-black stone."
+        }
+      ]
+    }
   },
   {
     "slug": "vilemyr_inn",
@@ -1639,10 +2485,7 @@
     "name": "Ферма Катлы",
     "parent": "Солитьюд",
     "aliases": [
-      "Katla's Farm",
-      "Solitude Stables",
-      "Конюшни Солитьюда",
-      "Солитьюд - Конюшни"
+      "Katla's Farm"
     ],
     "captions": [
       "Ферма Катлы"
@@ -1689,64 +2532,33 @@
       "Каменные конюшни у ворот Маркарта"
     ],
     "artwork": {
-      "date": "2026-11-17",
-      "generator": "image_gen",
-      "kind": "generated artistic interpretation",
-      "prompt": "Use case: stylized-concept. Asset type: one landscape location illustration for the Android game SKYRIM TEXT RPG. Create a SINGLE continuous full-bleed scene, aspect ratio 16:9, around 1672 x 941 or larger. Style: consistent with a polished photorealistic Nordic fantasy environment illustration, very detailed physically grounded stone, timber and foliage, restrained natural color, atmospheric depth, believable architecture, immersive eye-level 28–35 mm view, sharp but not oversharpened. A newly generated artistic interpretation of the named Skyrim place, not a collage. Main subjects fit fully inside the frame and remain legible on a phone. No people close to the camera, no HUD, no UI, no text, no captions, no logos, no watermark, no border, no modern objects, no magical effects. Avoid malformed horse anatomy, repeated objects, extreme bloom, shallow focus and painterly brush strokes. Scene: Markarth Stables immediately outside Markarth in the rocky Reach, Skyrim. Distinctive heavy ancient DWEMER stone stable house with angular carved pale gray stone, bronze accents, a stepped geometric entry and two small squat Dwarven guard towers nearby. Beside the building a sheltered horse bay and fenced patch with a clearly visible pinto horse, a wooden trough, a little straw and a parked practical carriage. Craggy steep limestone cliffs and sparse tawny scrub; the massive Dwemer-style outer gate and walls of Markarth recede naturally behind the stable. Weathered stone textures, cool diffuse afternoon sky and restrained amber lamps. The stone stable compound, not the city interior, dominates the view. Do not replace it with a wooden farmhouse; no waterfalls across the stables.",
-      "source_sha256": "888e92211b2b8ace32087f6d160952e587c9609fcbbb8678198247cc9ae0396a",
-      "source_bytes": 3884848,
-      "source_dimensions": [
-        1672,
-        941
-      ],
-      "archive_sha256": "2cbcd883d2a5a27c26fa08f0ba1a1643c4da81bf02305b171547c541bae4c09f",
-      "archive_bytes": 593514,
-      "compression": {
-        "format": "WebP",
-        "dimensions": [
-          1672,
-          941
-        ],
-        "quality": 88,
-        "full_resolution_luma_ssim": 0.9894689321517944,
-        "worst_128px_luma_ssim": 0.9811496734619141,
-        "chroma_mean_absolute_error": 1.5803062506038064,
-        "chroma_95th_percentile_error": 5,
-        "trials": [
-          {
-            "quality": 76,
-            "bytes": 372294,
-            "full_resolution_luma_ssim": 0.966775119304657,
-            "worst_128px_luma_ssim": 0.9538506865501404,
-            "chroma_mean_absolute_error": 1.9344603114878298,
-            "chroma_95th_percentile_error": 6
-          },
-          {
-            "quality": 80,
-            "bytes": 429082,
-            "full_resolution_luma_ssim": 0.975716769695282,
-            "worst_128px_luma_ssim": 0.9661906957626343,
-            "chroma_mean_absolute_error": 1.8462124178187715,
-            "chroma_95th_percentile_error": 5
-          },
-          {
-            "quality": 84,
-            "bytes": 499056,
-            "full_resolution_luma_ssim": 0.9829246997833252,
-            "worst_128px_luma_ssim": 0.9725842475891113,
-            "chroma_mean_absolute_error": 1.7248689422328887,
-            "chroma_95th_percentile_error": 5
-          },
-          {
-            "quality": 88,
-            "bytes": 593402,
-            "full_resolution_luma_ssim": 0.9894689321517944,
-            "worst_128px_luma_ssim": 0.9811496734619141,
-            "chroma_mean_absolute_error": 1.5803062506038064,
-            "chroma_95th_percentile_error": 5
-          }
-        ]
-      }
+      "date": "2026-11-20",
+      "kind": "original_generated_illustration",
+      "format": "WebP",
+      "encoder_method": 6,
+      "frames": [
+        {
+          "frame": 1,
+          "source_sha256": "885401329da1e534e8c126126b3118c479a743c6930f3caecb11b8208dbcda19",
+          "source_bytes": 3583889,
+          "source_dimensions": [
+            1672,
+            941
+          ],
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 555392,
+          "quality": 88,
+          "sha256": "503dd9d4601df10a267c7eb4ad653656ded3191dd69ccdc8d848723d2f456652",
+          "full_resolution_luma_ssim": 0.985983,
+          "worst_128px_luma_ssim": 0.97475,
+          "chroma_mean_absolute_error": 2.025868,
+          "chroma_95th_percentile_error": 6.0,
+          "scene": "A three-stall stable dug into clay under limestone steps, steep terraced farming and a pale cascade visible in background, cut-stone trough and dry straw on a sheltered apron. Soft late summer sunset."
+        }
+      ]
     }
   },
   {
@@ -1761,64 +2573,33 @@
       "Конюшни у северных ворот Рифтена"
     ],
     "artwork": {
-      "date": "2026-11-17",
-      "generator": "image_gen",
-      "kind": "generated artistic interpretation",
-      "prompt": "Use case: stylized-concept. Asset type: one landscape location illustration for the Android game SKYRIM TEXT RPG. Create a SINGLE continuous full-bleed scene, aspect ratio 16:9, around 1672 x 941 or larger. Style: consistent with a polished photorealistic Nordic fantasy environment illustration, very detailed physically grounded stone, timber and foliage, restrained natural color, atmospheric depth, believable architecture, immersive eye-level 28–35 mm view, sharp but not oversharpened. A newly generated artistic interpretation of the named Skyrim place, not a collage. Main subjects fit fully inside the frame and remain legible on a phone. No people close to the camera, no HUD, no UI, no text, no captions, no logos, no watermark, no border, no modern objects, no magical effects. Avoid malformed horse anatomy, repeated objects, extreme bloom, shallow focus and painterly brush strokes. Scene: Riften Stables just OUTSIDE the NORTH gate of Riften, Skyrim. Rustic compact weathered Nordic timber stable house and open-front horse shelter, steep shingled timber roof, low stone footings, a split-rail paddock with a correctly proportioned dapple-gray horse, straw, trough, a modest carriage standing by the earthen approach road. The stone-and-timber city wall and northern gate of Riften are in the middle distance, golden yellow birches and a few dark pines around the road, brown and ochre fallen leaves, the unmistakably autumnal Rift. Mild cloudy late afternoon daylight, subtle amber light in the stable window. Frame the stable yard at eye height, keeping the horse and building readable. No interior canals, no snowy tundra, no generic castle dominating the view.",
-      "source_sha256": "8ca19b1e45fdd792c5ba1c7c3e941d366ab154b996c0e0ebda330a986dd44a3e",
-      "source_bytes": 3830761,
-      "source_dimensions": [
-        1672,
-        941
-      ],
-      "archive_sha256": "b139d80aa05dc88463c3f15810a1721176e1a677965c737eba05f1bb1b409d6b",
-      "archive_bytes": 621574,
-      "compression": {
-        "format": "WebP",
-        "dimensions": [
-          1672,
-          941
-        ],
-        "quality": 88,
-        "full_resolution_luma_ssim": 0.9893907904624939,
-        "worst_128px_luma_ssim": 0.9818556308746338,
-        "chroma_mean_absolute_error": 2.231631891655523,
-        "chroma_95th_percentile_error": 7,
-        "trials": [
-          {
-            "quality": 76,
-            "bytes": 388996,
-            "full_resolution_luma_ssim": 0.967182457447052,
-            "worst_128px_luma_ssim": 0.9570322632789612,
-            "chroma_mean_absolute_error": 2.716434402473191,
-            "chroma_95th_percentile_error": 8
-          },
-          {
-            "quality": 80,
-            "bytes": 456768,
-            "full_resolution_luma_ssim": 0.9768784642219543,
-            "worst_128px_luma_ssim": 0.9670846462249756,
-            "chroma_mean_absolute_error": 2.5520770304420117,
-            "chroma_95th_percentile_error": 8
-          },
-          {
-            "quality": 84,
-            "bytes": 523216,
-            "full_resolution_luma_ssim": 0.9832791686058044,
-            "worst_128px_luma_ssim": 0.9750622510910034,
-            "chroma_mean_absolute_error": 2.412109623275656,
-            "chroma_95th_percentile_error": 8
-          },
-          {
-            "quality": 88,
-            "bytes": 621462,
-            "full_resolution_luma_ssim": 0.9893907904624939,
-            "worst_128px_luma_ssim": 0.9818556308746338,
-            "chroma_mean_absolute_error": 2.231631891655523,
-            "chroma_95th_percentile_error": 7
-          }
-        ]
-      }
+      "date": "2026-11-20",
+      "kind": "original_generated_illustration",
+      "format": "WebP",
+      "encoder_method": 6,
+      "frames": [
+        {
+          "frame": 1,
+          "source_sha256": "d1f81215056211af90a0ef5a431ef72b1ea8897c8316d4b4856680fcbed819f2",
+          "source_bytes": 3672731,
+          "source_dimensions": [
+            1672,
+            941
+          ],
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 564414,
+          "quality": 87,
+          "sha256": "306cbfa6f073a008fc2c8d375b8f88b63afdb7eb58e2b045d644cd1d17e077df",
+          "full_resolution_luma_ssim": 0.987159,
+          "worst_128px_luma_ssim": 0.976069,
+          "chroma_mean_absolute_error": 2.359753,
+          "chroma_95th_percentile_error": 7.0,
+          "scene": "Low timber stable at an autumn lake road, amber alder trees, fog off the water and one horse in a roomy outdoor sand paddock, halters and clean straw beneath covered eaves."
+        }
+      ]
     }
   },
   {
@@ -1833,64 +2614,33 @@
       "Конюшни Вайтрана на краю тундры"
     ],
     "artwork": {
-      "date": "2026-11-17",
-      "generator": "image_gen",
-      "kind": "generated artistic interpretation",
-      "prompt": "Use case: stylized-concept. Asset type: one landscape location illustration for the Android game SKYRIM TEXT RPG. Create a SINGLE continuous full-bleed scene, aspect ratio 16:9, around 1672 x 941 or larger. Style: consistent with a polished photorealistic Nordic fantasy environment illustration, very detailed physically grounded stone, timber and foliage, restrained natural color, atmospheric depth, believable architecture, immersive eye-level 28–35 mm view, sharp but not oversharpened. A newly generated artistic interpretation of the named Skyrim place, not a collage. Main subjects fit fully inside the frame and remain legible on a phone. No people close to the camera, no HUD, no UI, no text, no captions, no logos, no watermark, no border, no modern objects, no magical effects. Avoid malformed horse anatomy, repeated objects, extreme bloom, shallow focus and painterly brush strokes. Scene: Whiterun Stables immediately outside Whiterun, Skyrim, on the city approach in the open golden central tundra. A recognizable compact Nordic timber-and-plaster stable building on low fieldstone footings with steep weathered thatch roof and curved wooden gable tips, an attached open wooden horse shelter, rustic paddock and an anatomically natural black horse, hay and trough. A practical wooden travel carriage rests near the road. Behind, uphill and at believable scale, the outer timber-and-stone walls of Whiterun and the long curved Nordic roof of Dragonsreach; open dry yellow grass, rocky tundra and distant gray-blue mountains. Soft clear late afternoon light with restrained warm highlights; panoramic but subject-focused. Do not show an interior city street or dense forest; the stable yard is the foreground subject.",
-      "source_sha256": "8e98f26179fc0bbf894e86c3ad7032ebceb137947dbe458adad711e8020c6d43",
-      "source_bytes": 3575655,
-      "source_dimensions": [
-        1672,
-        941
-      ],
-      "archive_sha256": "6d2752c2c9f0e5e7cc87fb370f26921d268fc25e348ee3c7ed3e59ad75bf69eb",
-      "archive_bytes": 531948,
-      "compression": {
-        "format": "WebP",
-        "dimensions": [
-          1672,
-          941
-        ],
-        "quality": 88,
-        "full_resolution_luma_ssim": 0.9874975085258484,
-        "worst_128px_luma_ssim": 0.9794964790344238,
-        "chroma_mean_absolute_error": 1.7692900253725803,
-        "chroma_95th_percentile_error": 5,
-        "trials": [
-          {
-            "quality": 76,
-            "bytes": 322200,
-            "full_resolution_luma_ssim": 0.9633077383041382,
-            "worst_128px_luma_ssim": 0.943504273891449,
-            "chroma_mean_absolute_error": 2.2431862037230066,
-            "chroma_95th_percentile_error": 7
-          },
-          {
-            "quality": 80,
-            "bytes": 377022,
-            "full_resolution_luma_ssim": 0.9724588990211487,
-            "worst_128px_luma_ssim": 0.955655574798584,
-            "chroma_mean_absolute_error": 2.111999412718832,
-            "chroma_95th_percentile_error": 6
-          },
-          {
-            "quality": 84,
-            "bytes": 445152,
-            "full_resolution_luma_ssim": 0.9809669256210327,
-            "worst_128px_luma_ssim": 0.9684131741523743,
-            "chroma_mean_absolute_error": 1.9532520376876885,
-            "chroma_95th_percentile_error": 6
-          },
-          {
-            "quality": 88,
-            "bytes": 531836,
-            "full_resolution_luma_ssim": 0.9874975085258484,
-            "worst_128px_luma_ssim": 0.9794964790344238,
-            "chroma_mean_absolute_error": 1.7692900253725803,
-            "chroma_95th_percentile_error": 5
-          }
-        ]
-      }
+      "date": "2026-11-20",
+      "kind": "original_generated_illustration",
+      "format": "WebP",
+      "encoder_method": 6,
+      "frames": [
+        {
+          "frame": 1,
+          "source_sha256": "5d8b679eff77712b874fd5ab8785f61ddad3a0c06a940d0a74c0d37931b81a57",
+          "source_bytes": 3547117,
+          "source_dimensions": [
+            1672,
+            941
+          ],
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 542594,
+          "quality": 88,
+          "sha256": "5ba8c59d03d62a4709184fca561474e8d66c3a92a3457bbed5d0106a309abd71",
+          "full_resolution_luma_ssim": 0.986225,
+          "worst_128px_luma_ssim": 0.977494,
+          "chroma_mean_absolute_error": 1.81365,
+          "chroma_95th_percentile_error": 5.0,
+          "scene": "Open-sided pine and stone horse stable beside an amber grass steppe road, saddle rack and fodder in sunshine, two correctly proportioned horses distant, snowless foreground and faint mountains."
+        }
+      ]
     }
   },
   {
@@ -1902,67 +2652,36 @@
       "Виндхельм - Конюшни"
     ],
     "captions": [
-      "Заснеженные конюшни у моста Виндхельма"
+      "Конюшни у каменного моста"
     ],
     "artwork": {
-      "date": "2026-11-17",
-      "generator": "image_gen",
-      "kind": "generated artistic interpretation",
-      "prompt": "Use case: stylized-concept. Asset type: one landscape location illustration for the Android game SKYRIM TEXT RPG. Create a SINGLE continuous full-bleed scene, aspect ratio 16:9, around 1672 x 941 or larger. Style: consistent with a polished photorealistic Nordic fantasy environment illustration, very detailed physically grounded stone, timber and foliage, restrained natural color, atmospheric depth, believable architecture, immersive eye-level 28–35 mm view, sharp but not oversharpened. A newly generated artistic interpretation of the named Skyrim place, not a collage. Main subjects fit fully inside the frame and remain legible on a phone. No people close to the camera, no HUD, no UI, no text, no captions, no logos, no watermark, no border, no modern objects, no magical effects. Avoid malformed horse anatomy, repeated objects, extreme bloom, shallow focus and painterly brush strokes. Scene: Windhelm Stables on the southern landward approach to the great stone bridge leading into Windhelm, Skyrim. A compact traditional Nordic timber stable house and open-front horse shelter on stone footings, steep thatch roof dusted with snow, a fenced stable yard with a well-proportioned bay horse with a white facial blaze and white socks, wooden trough and straw, a modest travel carriage nearby. The old broad gray stone bridge with worn parapets crosses the cold White River in the middle distance toward Windhelm's huge weathered dark Nordic stone gate and walls. Frosty rocks, sparse snow-laden conifers, scattered snow on the track, gray winter sky and soft flurries; warm lantern glow within the shelter. Clearly the stables OUTSIDE the city, with the bridge behind, not an urban market. The stable structure stays the main subject.",
-      "source_sha256": "c87557e2aff998c53b99f05fc1535bae798ca401e97cbc1dcf9f5ed0c9160ecb",
-      "source_bytes": 3727599,
-      "source_dimensions": [
-        1672,
-        941
-      ],
-      "archive_sha256": "251aaf2d80c1fcb9fd53150f037f5813ec1e4fa5e3293a1e2c3e1ae63c144e51",
-      "archive_bytes": 544654,
-      "compression": {
-        "format": "WebP",
-        "dimensions": [
-          1672,
-          941
-        ],
-        "quality": 88,
-        "full_resolution_luma_ssim": 0.9884335994720459,
-        "worst_128px_luma_ssim": 0.9772313237190247,
-        "chroma_mean_absolute_error": 1.2849060477248575,
-        "chroma_95th_percentile_error": 4,
-        "trials": [
-          {
-            "quality": 76,
-            "bytes": 335380,
-            "full_resolution_luma_ssim": 0.9658103585243225,
-            "worst_128px_luma_ssim": 0.9459468126296997,
-            "chroma_mean_absolute_error": 1.6247470368995622,
-            "chroma_95th_percentile_error": 5
-          },
-          {
-            "quality": 80,
-            "bytes": 391150,
-            "full_resolution_luma_ssim": 0.9746797680854797,
-            "worst_128px_luma_ssim": 0.9574862718582153,
-            "chroma_mean_absolute_error": 1.5311382958168294,
-            "chroma_95th_percentile_error": 5
-          },
-          {
-            "quality": 84,
-            "bytes": 457734,
-            "full_resolution_luma_ssim": 0.9822708964347839,
-            "worst_128px_luma_ssim": 0.9685236811637878,
-            "chroma_mean_absolute_error": 1.4275505417732333,
-            "chroma_95th_percentile_error": 4
-          },
-          {
-            "quality": 88,
-            "bytes": 544542,
-            "full_resolution_luma_ssim": 0.9884335994720459,
-            "worst_128px_luma_ssim": 0.9772313237190247,
-            "chroma_mean_absolute_error": 1.2849060477248575,
-            "chroma_95th_percentile_error": 4
-          }
-        ]
-      }
+      "date": "2026-11-20",
+      "kind": "original_generated_illustration",
+      "format": "WebP",
+      "encoder_method": 6,
+      "frames": [
+        {
+          "frame": 1,
+          "source_sha256": "db69a4ee6e1fe479d83c88393fc33f2385c449d6896ab4398f9b81207d0257c5",
+          "source_bytes": 3447023,
+          "source_dimensions": [
+            1672,
+            941
+          ],
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 508206,
+          "quality": 89,
+          "sha256": "5ee0520cd31d124eae42dcebb3c8a441224a657c09439870bfa765e9cf5f7ef7",
+          "full_resolution_luma_ssim": 0.985711,
+          "worst_128px_luma_ssim": 0.975605,
+          "chroma_mean_absolute_error": 1.337165,
+          "chroma_95th_percentile_error": 4.0,
+          "scene": "Stone-and-larch horse barn under an old arched winter bridge, freshly piled snow at the entrance, bale storage and small mare in a sheltered paddock. Soft overcast white snow with subtle detail, one warm window."
+        }
+      ]
     }
   },
   {
@@ -2109,7 +2828,37 @@
     "aliases": [
       "The Earth Stone",
       "Earth Stone"
-    ]
+    ],
+    "artwork": {
+      "date": "2026-11-20",
+      "kind": "original_generated_illustration",
+      "format": "WebP",
+      "encoder_method": 6,
+      "frames": [
+        {
+          "frame": 1,
+          "source_sha256": "9411bbb6d70aa452fb5b16a4323d3a7d37c5928299c8dd6e46c773e367090252",
+          "source_bytes": 3179964,
+          "source_dimensions": [
+            1672,
+            941
+          ],
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 494362,
+          "quality": 90,
+          "sha256": "e3116904ab96b34bb01cec4874083e57bb12b0bc5d15212f1b9c6308013e4faf",
+          "full_resolution_luma_ssim": 0.986345,
+          "worst_128px_luma_ssim": 0.97902,
+          "chroma_mean_absolute_error": 1.550358,
+          "chroma_95th_percentile_error": 5.0,
+          "scene": "An original cliffside shrine on a volcanic island, a waist-high volcanic stone with simple curved terraces and small unlettered incisions, dry ash dunes, orange cloth knots and light breaking horizontally through charcoal smoke. No characters."
+        }
+      ]
+    },
+    "parent": "Воронья Скала"
   },
   {
     "slug": "sun_stone",
@@ -8181,266 +8930,12 @@
     "slug": "nchuand_zel",
     "name": "Нчуанд-Зел",
     "captions": [
-      "Подземные шлюзы Нчуанд-Зела"
+      "Двемерские шлюзы и водоводы"
     ],
     "aliases": [
       "Nchuand-Zel"
     ],
     "parent": "Маркарт",
-    "artwork": {
-      "kind": "original_generated_illustration",
-      "generator": "built_in_imagegen",
-      "final_prompt": "Use case: stylized-concept. Create one original finished horizontal 16:9 environmental illustration, full bleed, for a dark Nordic fantasy location gallery. One continuous scene with a clear focal point at mobile scale. Photorealistic architectural concept art, believably weathered masonry, substantial bronze engineering with an original design, restrained natural colors, readable contrast, crisp tactile details, deep focus. Use a wholly new composition and architecture. No reference to existing screenshots or level geometry. No writing, captions, collage, UI, border, logo, watermark, or foreground figures. Scene: Beneath a city built into limestone, a monumental buried river terrace appears in a partly flooded natural cavern. Angular masonry supports a row of ancient bronze sluices at staggered heights, with a narrow stone footpath and fallen cantilevered portions over milky dark water. Side view from the footpath into the long cavern, one diagonal band of warm light from an old oil lantern and a dim green reflection off mineral stone. City-scale submerged engineering is the subject.",
-      "source_file": "exec-8be22534-c528-4234-b395-b2bf77b0d688.png",
-      "source_sha256": "66cd878cc3a7b3dd58037f53cd9b0ec8c9f7332be0449b7a39090281b000abba",
-      "source_bytes": 3255545,
-      "source_dimensions": [
-        1672,
-        941
-      ],
-      "compression": {
-        "format": "WebP",
-        "method": 6,
-        "quality": 90,
-        "dimensions": [
-          1672,
-          941
-        ],
-        "encoded_bytes": 512174,
-        "sha256": "d95bd9b0ee5beda28a484e03f0f8fdf165318f3312614e9af92d969bde245d48",
-        "archive_bytes": 512286,
-        "archive_sha256": "d9edfc3c9e93b2f84d5064db1353eaf7a6d23e3a49c636ad5c6c8640638c3ff5",
-        "full_resolution_luma_ssim": 0.9854516,
-        "worst_128px_luma_ssim": 0.9754297,
-        "chroma_mean_absolute_error": 1.3894634,
-        "chroma_95th_percentile_error": 4,
-        "trials": [
-          {
-            "quality": 68,
-            "bytes": 231744,
-            "full_resolution_luma_ssim": 0.942563,
-            "worst_128px_luma_ssim": 0.9191546,
-            "chroma_mean_absolute_error": 1.883473,
-            "chroma_95th_percentile_error": 6
-          },
-          {
-            "quality": 72,
-            "bytes": 244280,
-            "full_resolution_luma_ssim": 0.9464718,
-            "worst_128px_luma_ssim": 0.9255519,
-            "chroma_mean_absolute_error": 1.8503504,
-            "chroma_95th_percentile_error": 6
-          },
-          {
-            "quality": 76,
-            "bytes": 265918,
-            "full_resolution_luma_ssim": 0.9514824,
-            "worst_128px_luma_ssim": 0.9333035,
-            "chroma_mean_absolute_error": 1.7962099,
-            "chroma_95th_percentile_error": 6
-          },
-          {
-            "quality": 80,
-            "bytes": 314514,
-            "full_resolution_luma_ssim": 0.9638413,
-            "worst_128px_luma_ssim": 0.9506921,
-            "chroma_mean_absolute_error": 1.6875308,
-            "chroma_95th_percentile_error": 5
-          },
-          {
-            "quality": 84,
-            "bytes": 373666,
-            "full_resolution_luma_ssim": 0.9732105,
-            "worst_128px_luma_ssim": 0.9612246,
-            "chroma_mean_absolute_error": 1.5795715,
-            "chroma_95th_percentile_error": 5
-          },
-          {
-            "quality": 88,
-            "bytes": 459224,
-            "full_resolution_luma_ssim": 0.9820901,
-            "worst_128px_luma_ssim": 0.9731967,
-            "chroma_mean_absolute_error": 1.4607262,
-            "chroma_95th_percentile_error": 5
-          },
-          {
-            "quality": 92,
-            "bytes": 581780,
-            "full_resolution_luma_ssim": 0.9892685,
-            "worst_128px_luma_ssim": 0.982199,
-            "chroma_mean_absolute_error": 1.3331886,
-            "chroma_95th_percentile_error": 4
-          },
-          {
-            "quality": 89,
-            "bytes": 482368,
-            "full_resolution_luma_ssim": 0.9839537,
-            "worst_128px_luma_ssim": 0.9752173,
-            "chroma_mean_absolute_error": 1.4302229,
-            "chroma_95th_percentile_error": 4
-          },
-          {
-            "quality": 90,
-            "bytes": 512174,
-            "full_resolution_luma_ssim": 0.9854516,
-            "worst_128px_luma_ssim": 0.9754297,
-            "chroma_mean_absolute_error": 1.3894634,
-            "chroma_95th_percentile_error": 4
-          },
-          {
-            "quality": 91,
-            "bytes": 556708,
-            "full_resolution_luma_ssim": 0.9880564,
-            "worst_128px_luma_ssim": 0.9802438,
-            "chroma_mean_absolute_error": 1.3658758,
-            "chroma_95th_percentile_error": 4
-          }
-        ]
-      }
-    }
-  },
-  {
-    "slug": "nchuand_zel_excavation_site",
-    "name": "Раскопки Нчуанд-Зела",
-    "captions": [
-      "Каменная кладка в шахте раскопа"
-    ],
-    "aliases": [
-      "Nchuand-Zel Excavation Site"
-    ],
-    "parent": "Маркарт",
-    "artwork": {
-      "kind": "original_generated_illustration",
-      "generator": "built_in_imagegen",
-      "final_prompt": "Use case: stylized-concept. Create one original finished horizontal 16:9 environmental illustration, full bleed, for a dark Nordic fantasy location gallery. One continuous scene with a clear focal point at mobile scale. Photorealistic architectural concept art, believably weathered masonry, substantial bronze engineering with an original design, restrained natural colors, readable contrast, crisp tactile details, deep focus. Use a wholly new composition and architecture. No reference to existing screenshots or level geometry. No writing, captions, collage, UI, border, logo, watermark, or foreground figures. Scene: View just inside a modest archaeological excavation after the diggers have left for the night. One row of simple rough timber shoring and a rope ladder leads toward a partly exposed carved limestone wall, with bronze pipe joints protruding from the sediment at ground level. Crouching-height side view reveals stratified dirt and irregular excavation steps, a canvas-covered sifting tray near the foreground, faint golden lamplight with dark cool rock overhead. Intimate archaeological dig, no museum or monumental open hall.",
-      "source_file": "exec-ac0fab47-18fc-4d7c-9c91-3a9271471d5a.png",
-      "source_sha256": "7cc450abf9486afe7857c69fccd2ec6476e9b7effc9ebf6df7a14cf028e39709",
-      "source_bytes": 3235284,
-      "source_dimensions": [
-        1672,
-        941
-      ],
-      "compression": {
-        "format": "WebP",
-        "method": 6,
-        "quality": 91,
-        "dimensions": [
-          1672,
-          941
-        ],
-        "encoded_bytes": 530020,
-        "sha256": "06e105b360aeb210a22d7a483edd6b6b1a138821f40808d9b955f5d2b7634f17",
-        "archive_bytes": 530132,
-        "archive_sha256": "c0d436e3d0b14fb452d9da8667f860d80e744feafa717a5923f42b45e3e25573",
-        "full_resolution_luma_ssim": 0.9863772,
-        "worst_128px_luma_ssim": 0.9797116,
-        "chroma_mean_absolute_error": 1.2909244,
-        "chroma_95th_percentile_error": 4,
-        "trials": [
-          {
-            "quality": 68,
-            "bytes": 205640,
-            "full_resolution_luma_ssim": 0.9305084,
-            "worst_128px_luma_ssim": 0.9015146,
-            "chroma_mean_absolute_error": 1.8328378,
-            "chroma_95th_percentile_error": 5
-          },
-          {
-            "quality": 72,
-            "bytes": 217174,
-            "full_resolution_luma_ssim": 0.9353351,
-            "worst_128px_luma_ssim": 0.9087379,
-            "chroma_mean_absolute_error": 1.8126217,
-            "chroma_95th_percentile_error": 5
-          },
-          {
-            "quality": 76,
-            "bytes": 237980,
-            "full_resolution_luma_ssim": 0.943319,
-            "worst_128px_luma_ssim": 0.9217011,
-            "chroma_mean_absolute_error": 1.75092,
-            "chroma_95th_percentile_error": 5
-          },
-          {
-            "quality": 80,
-            "bytes": 287060,
-            "full_resolution_luma_ssim": 0.9567147,
-            "worst_128px_luma_ssim": 0.9408192,
-            "chroma_mean_absolute_error": 1.6443021,
-            "chroma_95th_percentile_error": 5
-          },
-          {
-            "quality": 84,
-            "bytes": 347992,
-            "full_resolution_luma_ssim": 0.9683505,
-            "worst_128px_luma_ssim": 0.9577483,
-            "chroma_mean_absolute_error": 1.5490898,
-            "chroma_95th_percentile_error": 4
-          },
-          {
-            "quality": 88,
-            "bytes": 430762,
-            "full_resolution_luma_ssim": 0.9788409,
-            "worst_128px_luma_ssim": 0.9699606,
-            "chroma_mean_absolute_error": 1.4128758,
-            "chroma_95th_percentile_error": 4
-          },
-          {
-            "quality": 92,
-            "bytes": 556552,
-            "full_resolution_luma_ssim": 0.9877843,
-            "worst_128px_luma_ssim": 0.9817648,
-            "chroma_mean_absolute_error": 1.2539174,
-            "chroma_95th_percentile_error": 4
-          },
-          {
-            "quality": 89,
-            "bytes": 453878,
-            "full_resolution_luma_ssim": 0.981256,
-            "worst_128px_luma_ssim": 0.9740068,
-            "chroma_mean_absolute_error": 1.3742138,
-            "chroma_95th_percentile_error": 4
-          },
-          {
-            "quality": 90,
-            "bytes": 491754,
-            "full_resolution_luma_ssim": 0.9839736,
-            "worst_128px_luma_ssim": 0.9786071,
-            "chroma_mean_absolute_error": 1.3335636,
-            "chroma_95th_percentile_error": 4
-          },
-          {
-            "quality": 91,
-            "bytes": 530020,
-            "full_resolution_luma_ssim": 0.9863772,
-            "worst_128px_luma_ssim": 0.9797116,
-            "chroma_mean_absolute_error": 1.2909244,
-            "chroma_95th_percentile_error": 4
-          }
-        ]
-      }
-    }
-  },
-  {
-    "slug": "solitude",
-    "aliases": [],
-    "name": "Солитьюд",
-    "captions": [
-      "Главные ворота",
-      "Рыночная площадь",
-      "Синий дворец",
-      "Площадь казни",
-      "Городская арка",
-      "Гавань Солитьюда"
-    ],
-    "cityPlaces": [
-      "Главные ворота",
-      "Рыночная площадь",
-      "Синий дворец",
-      "Площадь казни",
-      "Городская арка",
-      "Гавань Солитьюда"
-    ],
     "artwork": {
       "date": "2026-11-20",
       "kind": "original_generated_illustration",
@@ -8449,8 +8944,8 @@
       "frames": [
         {
           "frame": 1,
-          "source_sha256": "d2c9d629867329a0f34fcd0723ec9cbfea6be6eb2524089fca6196772f1fec10",
-          "source_bytes": 3337587,
+          "source_sha256": "06889ee14bec68edc86ca26fd3c1ebc20986f0a01ec07c9c2e994ea104e3a280",
+          "source_bytes": 3402348,
           "source_dimensions": [
             1672,
             941
@@ -8459,17 +8954,128 @@
             1672,
             941
           ],
-          "bytes": 463456,
+          "bytes": 521968,
+          "quality": 89,
+          "sha256": "3ab6f53040374317f96a244d764d103eed38096204660501246645e4edd8d18c",
+          "full_resolution_luma_ssim": 0.986076,
+          "worst_128px_luma_ssim": 0.979605,
+          "chroma_mean_absolute_error": 1.520859,
+          "chroma_95th_percentile_error": 4.0,
+          "scene": "A monumental original water-control chamber beneath a limestone cliff, three vertically staggered bronze gates, cascading mineral-blue water, dry stairwell and a warm grate. Distinct engineered forms and atmospheric foreground-to-background depth."
+        }
+      ]
+    }
+  },
+  {
+    "slug": "nchuand_zel_excavation_site",
+    "name": "Раскопки Нчуанд-Зела",
+    "captions": [
+      "Каменные террасы раскопа"
+    ],
+    "aliases": [
+      "Nchuand-Zel Excavation Site"
+    ],
+    "parent": "Маркарт",
+    "artwork": {
+      "date": "2026-11-20",
+      "kind": "original_generated_illustration",
+      "format": "WebP",
+      "encoder_method": 6,
+      "frames": [
+        {
+          "frame": 1,
+          "source_sha256": "4e051a94d630cf3321d61c126a6ea3f4ba283ded704a5667ecd7e78a0ecd186a",
+          "source_bytes": 3572813,
+          "source_dimensions": [
+            1672,
+            941
+          ],
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 539402,
           "quality": 88,
-          "sha256": "62dac0f1db8a11fe461794638f822ad7957b29f9309ead4f7a4dd487d434e720",
-          "full_resolution_luma_ssim": 0.986149,
-          "worst_128px_luma_ssim": 0.978741,
-          "chroma_mean_absolute_error": 1.554249,
-          "chroma_95th_percentile_error": 5,
-          "scene": "Low stone city gate at the top of a sweeping cliff road, two offset round towers with copper ridge tops, worn gate planks and misty sea visible in the slit to the right. Cool dawn, readable pale limestone."
+          "sha256": "20a6de68a66c17a56f5f3b7ebc2f8aed73ec141933a638bf3293c24630209a96",
+          "full_resolution_luma_ssim": 0.986338,
+          "worst_128px_luma_ssim": 0.980165,
+          "chroma_mean_absolute_error": 1.589749,
+          "chroma_95th_percentile_error": 4.0,
+          "scene": "An original excavation trench under tiered galleries of older limestone and verdigris lintels, wooden surveying gantry, rolls of rope and tiered pick marks, warm skylight reaching recently exposed blockwork."
+        }
+      ]
+    }
+  },
+  {
+    "slug": "solitude",
+    "aliases": [],
+    "name": "Солитьюд",
+    "captions": [
+      "Главные ворота",
+      "Главная улица",
+      "Рыночная площадь",
+      "Двор Мрачного замка",
+      "Синий дворец",
+      "Гавань Солитьюда"
+    ],
+    "cityPlaces": [
+      "Главные ворота",
+      "Главная улица",
+      "Рыночная площадь",
+      "Мрачный замок",
+      "Синий дворец",
+      "Гавань Солитьюда"
+    ],
+    "artwork": {
+      "date": "2026-11-21",
+      "kind": "original_generated_illustration",
+      "format": "WebP",
+      "encoder_method": 6,
+      "frames": [
+        {
+          "frame": 1,
+          "source_sha256": "abde6cf864ba66c31ff26caae76835b9f61a502d63dd0e3a6a310d76b6808aa8",
+          "source_bytes": 3476976,
+          "source_dimensions": [
+            1672,
+            941
+          ],
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 462342,
+          "quality": 87,
+          "sha256": "7d7414cb426d9d7d62a610bc8c3d0011f084e57cd26f15d6f6030c404b9d28c8",
+          "full_resolution_luma_ssim": 0.985315,
+          "worst_128px_luma_ssim": 0.97344,
+          "chroma_mean_absolute_error": 1.326107,
+          "chroma_95th_percentile_error": 4.0,
+          "scene": "Западные ворота Солитьюда со стороны подъёмной дороги."
         },
         {
           "frame": 2,
+          "source_sha256": "846578943d315aa7c1f33e36a1b9b19b6f4bd2b3fc178fa80d8ea19f4e339dc4",
+          "source_bytes": 3799299,
+          "source_dimensions": [
+            1672,
+            941
+          ],
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 523054,
+          "quality": 87,
+          "sha256": "b90312f9307323489243fa72a0f19a7987d4b4ecfc4c5c586bca7054ce5527d0",
+          "full_resolution_luma_ssim": 0.986173,
+          "worst_128px_luma_ssim": 0.97427,
+          "chroma_mean_absolute_error": 1.426147,
+          "chroma_95th_percentile_error": 4.0,
+          "scene": "Главная улица у таверны «Смеющаяся крыса», вид изнутри городских ворот."
+        },
+        {
+          "frame": 3,
           "source_sha256": "8de704eea011a4ce5367ef6f82543a2c1c90d80ff268d6f30251a3c23abaabc2",
           "source_bytes": 3432958,
           "source_dimensions": [
@@ -8490,30 +9096,9 @@
           "scene": "A medieval northern port market under salvaged red and ivory sailcloth, well-spaced stalls of herbs, bread and smoked fish, crooked pale stone shopfronts and a break in clouds. View across a cobbled square from eye level."
         },
         {
-          "frame": 3,
-          "source_sha256": "7211e1e95f02ccfb5d965d607eb28caa63c058721e76d3f757f1222af1ccaa9d",
-          "source_bytes": 3473016,
-          "source_dimensions": [
-            1672,
-            941
-          ],
-          "dimensions": [
-            1672,
-            941
-          ],
-          "bytes": 496462,
-          "quality": 87,
-          "sha256": "fdc65e3fc57b53b470895376ad1222fd2968eeb0370cbd48681fdcb9900cccc5",
-          "full_resolution_luma_ssim": 0.986442,
-          "worst_128px_luma_ssim": 0.976891,
-          "chroma_mean_absolute_error": 1.785424,
-          "chroma_95th_percentile_error": 5,
-          "scene": "Original limestone palace overlooking a cold bay, jade-blue copper roofs ranged around a crescent terrace, stairway, restrained banners with abstract patterns. Architectural three-quarter view at clear midday, human scale."
-        },
-        {
           "frame": 4,
-          "source_sha256": "a4964dc64170c847ca36a317616a073d3143785358e8121a540f1437f3572d10",
-          "source_bytes": 3265450,
+          "source_sha256": "d91614ab5b281c7f90195d92199d636e1fc4a4282c14fd40f32723ebffce0b58",
+          "source_bytes": 3769561,
           "source_dimensions": [
             1672,
             941
@@ -8522,19 +9107,19 @@
             1672,
             941
           ],
-          "bytes": 496602,
-          "quality": 89,
-          "sha256": "71654b54fd6e5e066939eb31b8b43816f3531cb965aa6e6fc030dd776b6c010f",
-          "full_resolution_luma_ssim": 0.985489,
-          "worst_128px_luma_ssim": 0.979695,
-          "chroma_mean_absolute_error": 1.735689,
-          "chroma_95th_percentile_error": 5,
-          "scene": "Broad sloped civic square paved with square gray stone, a freestanding bell frame with weathered bronze bell, raised stone speaker platform and rain channels. Warm lights in a blue after-rain evening."
+          "bytes": 525808,
+          "quality": 87,
+          "sha256": "e8a506943696774f4d3f210b2d131bba0d3fa5d36186c0905abcacf9e862c173",
+          "full_resolution_luma_ssim": 0.985527,
+          "worst_128px_luma_ssim": 0.975845,
+          "chroma_mean_absolute_error": 1.385192,
+          "chroma_95th_percentile_error": 4.0,
+          "scene": "Каменный двор Мрачного замка с имперскими знамёнами и тренировочными мишенями."
         },
         {
           "frame": 5,
-          "source_sha256": "e6155641a5f1c6e530628adc0ff0e17937a425d9e696bef9119a1ca7c1324886",
-          "source_bytes": 3231701,
+          "source_sha256": "3d03f2d4bef2465fba443d67036ef8acb352e91491d872f515b04e4ffe9446e7",
+          "source_bytes": 3638563,
           "source_dimensions": [
             1672,
             941
@@ -8543,14 +9128,14 @@
             1672,
             941
           ],
-          "bytes": 533992,
-          "quality": 91,
-          "sha256": "ab90ccb2a3ba05410be2a60e7a688af98de0fb6654ed3a0ed7040211d70a6410",
-          "full_resolution_luma_ssim": 0.987421,
-          "worst_128px_luma_ssim": 0.97893,
-          "chroma_mean_absolute_error": 1.407231,
-          "chroma_95th_percentile_error": 4,
-          "scene": "Dramatic original natural rock span low over turbulent turquoise sound, a small stone footbridge visible above on the wind-cut headland, foam and drifting sea birds. View from the opposite cliff at late afternoon, strong silhouette."
+          "bytes": 537280,
+          "quality": 88,
+          "sha256": "a9f87981e0712a18249603254fd617e500125fb365faed7f08fef44b12d127cb",
+          "full_resolution_luma_ssim": 0.986211,
+          "worst_128px_luma_ssim": 0.976066,
+          "chroma_mean_absolute_error": 1.493148,
+          "chroma_95th_percentile_error": 4.0,
+          "scene": "Фасад Синего дворца с центральной аркой, двором и куполом."
         },
         {
           "frame": 6,
@@ -8572,6 +9157,1628 @@
           "chroma_mean_absolute_error": 1.829676,
           "chroma_95th_percentile_error": 6,
           "scene": "Stone quay and two independent cargo jetties, tapering cedar masts of medieval coastal ships, capstans and rope, warm warehouse doors below terrace houses, morning fog thinning. View at quay level."
+        }
+      ]
+    }
+  },
+  {
+    "name": "Вайтран",
+    "slug": "whiterun",
+    "captions": [
+      "Главные ворота",
+      "Главная улица",
+      "Рыночная площадь",
+      "Ветреный район",
+      "Йоррваскр",
+      "Драконий Предел"
+    ],
+    "aliases": [],
+    "artwork": {
+      "date": "2026-11-20",
+      "kind": "original_generated_illustration",
+      "format": "WebP",
+      "encoder_method": 6,
+      "frames": [
+        {
+          "frame": 1,
+          "source_sha256": "f5012a0a8edda0b3dad68dec4ea052a1716e8ba5d3e1f2be04e26cd6ea3ad227",
+          "source_bytes": 3506172,
+          "source_dimensions": [
+            1672,
+            941
+          ],
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 493236,
+          "quality": 87,
+          "sha256": "8e02fc1e7a4fc9b0f3535d7d1c1f9812244bbc4cc3f8353d6e2b111f20ffbe66",
+          "full_resolution_luma_ssim": 0.986379,
+          "worst_128px_luma_ssim": 0.976618,
+          "chroma_mean_absolute_error": 1.77002,
+          "chroma_95th_percentile_error": 5.0,
+          "scene": "Northern hill town of pine beams, pale turf, wheat-colored grassy plains, soft distant snow peaks; original terrain and medieval architecture. Strong timber double gate over a dry stone base, angled windbreak and pale amber grasses in morning, low view from the approach track."
+        },
+        {
+          "frame": 2,
+          "source_sha256": "80e247159fc893bf1848f256b97049b787af711d83d5f3e7676344e9c77a4a22",
+          "source_bytes": 3648745,
+          "source_dimensions": [
+            1672,
+            941
+          ],
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 515628,
+          "quality": 86,
+          "sha256": "f9d87a243a78e1d8f696b9f8f66553ede31cadaf2c46962609e6750a238d4683",
+          "full_resolution_luma_ssim": 0.985229,
+          "worst_128px_luma_ssim": 0.969398,
+          "chroma_mean_absolute_error": 1.937779,
+          "chroma_95th_percentile_error": 6.0,
+          "scene": "Northern hill town of pine beams, pale turf, wheat-colored grassy plains, soft distant snow peaks; original terrain and medieval architecture. A long uphill cobbled main lane with plastered half-timbered houses and simple flags between posts, late afternoon dramatic side light, one handcart along the road."
+        },
+        {
+          "frame": 3,
+          "source_sha256": "569001855573810d1d6d73d8782359fa83baf69ae0af8f2bc90b7c256ddcc6cc",
+          "source_bytes": 3474394,
+          "source_dimensions": [
+            1672,
+            941
+          ],
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 526558,
+          "quality": 88,
+          "sha256": "2bd641877127059c0ce49a73d50e3bcc217936ff5e099947c1ba61bc6df9a996",
+          "full_resolution_luma_ssim": 0.986222,
+          "worst_128px_luma_ssim": 0.978288,
+          "chroma_mean_absolute_error": 1.806978,
+          "chroma_95th_percentile_error": 5.0,
+          "scene": "Northern hill town of pine beams, pale turf, wheat-colored grassy plains, soft distant snow peaks; original terrain and medieval architecture. An open-air common filled with locally woven golden shades, vegetables, pottery and a wedge of sun over the ochre marketplace, pedestrian view."
+        },
+        {
+          "frame": 4,
+          "source_sha256": "30a8394d84620655b96f21b10a6f4a3c2736d769886ab913895f6209f5a8c747",
+          "source_bytes": 3425073,
+          "source_dimensions": [
+            1672,
+            941
+          ],
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 483334,
+          "quality": 88,
+          "sha256": "15a7b2fe3aee1b75c7cc5bc4601ba14a5bcc3b953d4e81dcdf300c22f388ca17",
+          "full_resolution_luma_ssim": 0.985077,
+          "worst_128px_luma_ssim": 0.970061,
+          "chroma_mean_absolute_error": 1.554875,
+          "chroma_95th_percentile_error": 4.0,
+          "scene": "Northern hill town of pine beams, pale turf, wheat-colored grassy plains, soft distant snow peaks; original terrain and medieval architecture. Steeply pitched pine roofs braced against a cold south wind, pale cloth drying overhead, downhill lane and sunny plains seen through an opening between homes."
+        },
+        {
+          "frame": 5,
+          "source_sha256": "bb0f79b90f6ad580096f26e901394551ec4e9e627e957b5c4ed48fcf5f37dd36",
+          "source_bytes": 3274380,
+          "source_dimensions": [
+            1672,
+            941
+          ],
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 449426,
+          "quality": 88,
+          "sha256": "c5d881e75d2240943897fbede359bfd762952465996c65438d1841504769f415",
+          "full_resolution_luma_ssim": 0.985782,
+          "worst_128px_luma_ssim": 0.976706,
+          "chroma_mean_absolute_error": 1.534886,
+          "chroma_95th_percentile_error": 5.0,
+          "scene": "Northern hill town of pine beams, pale turf, wheat-colored grassy plains, soft distant snow peaks; original terrain and medieval architecture. Ancient hilltop guild hall made of stacked oak and stone, long low entrance under a ridge of visibly different engraved beams, plain round wooden shields and blue cloud shadows, medium exterior view."
+        },
+        {
+          "frame": 6,
+          "source_sha256": "c0f46f50c520604617defe27453b71c5bb10f4cc080fc007427c91128905cdf9",
+          "source_bytes": 3450381,
+          "source_dimensions": [
+            1672,
+            941
+          ],
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 487660,
+          "quality": 87,
+          "sha256": "371079147d87407b9036f3860b97334feb5d76a600f26214555200c4d8f3590e",
+          "full_resolution_luma_ssim": 0.986534,
+          "worst_128px_luma_ssim": 0.979367,
+          "chroma_mean_absolute_error": 1.897052,
+          "chroma_95th_percentile_error": 6.0,
+          "scene": "Northern hill town of pine beams, pale turf, wheat-colored grassy plains, soft distant snow peaks; original terrain and medieval architecture. High hillside timber and stone hold with a wide horn-shaped portico and two squat buttresses, pale hearth smoke leaning in the wind, stairway and steppe horizon."
+        }
+      ]
+    },
+    "cityPlaces": [
+      "Главные ворота",
+      "Главная улица",
+      "Рыночная площадь",
+      "Ветреный район",
+      "Йоррваскр",
+      "Драконий Предел"
+    ]
+  },
+  {
+    "name": "Рифтен",
+    "slug": "riften",
+    "captions": [
+      "Городские ворота",
+      "Рыночная площадь",
+      "Городские каналы",
+      "Порт",
+      "Крепость Миствейл",
+      "Нижние улицы"
+    ],
+    "aliases": [],
+    "artwork": {
+      "date": "2026-11-20",
+      "kind": "original_generated_illustration",
+      "format": "WebP",
+      "encoder_method": 6,
+      "frames": [
+        {
+          "frame": 1,
+          "source_sha256": "41d8ae50c5bd68d131f6bea1745a16255b9e0dc7c724283e566f551689c8241f",
+          "source_bytes": 3343627,
+          "source_dimensions": [
+            1672,
+            941
+          ],
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 509116,
+          "quality": 88,
+          "sha256": "35e50c7e75edda016aa9a6dcc193adf8a70bec259e10a55bc0271219666c2f54",
+          "full_resolution_luma_ssim": 0.986012,
+          "worst_128px_luma_ssim": 0.980528,
+          "chroma_mean_absolute_error": 1.840219,
+          "chroma_95th_percentile_error": 6.0,
+          "scene": "Original medieval waterside town built around an inland lake with rain-darkened alder, ochre autumn leaves and matte blue-green water. Gate in a peaked palisade above a shallow water ditch, modest stone causeway and sturdy timber doors, orange leaves catching beautifully soft gray sunrise."
+        },
+        {
+          "frame": 2,
+          "source_sha256": "75f1327b6e65ca5f5ce8a30b333e0cd8b3127a3ad1aca787aa489b69e756a1a0",
+          "source_bytes": 3196528,
+          "source_dimensions": [
+            1672,
+            941
+          ],
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 484212,
+          "quality": 89,
+          "sha256": "c0bf3219e9871a2f883152555a4d0a6d6102d2097c08cd6698975b842bed6418",
+          "full_resolution_luma_ssim": 0.985712,
+          "worst_128px_luma_ssim": 0.974271,
+          "chroma_mean_absolute_error": 1.705974,
+          "chroma_95th_percentile_error": 5.0,
+          "scene": "Original medieval waterside town built around an inland lake with rain-darkened alder, ochre autumn leaves and matte blue-green water. Quayside market in a generous plaza with wooden stall frames, honey pots, woven baskets and muted russet shades, homely low lakeshore roofs, overcast evening."
+        },
+        {
+          "frame": 3,
+          "source_sha256": "addfab2082dccef4eff893496ed4d42ba29b431b172830e7ed0515d96142768c",
+          "source_bytes": 3454692,
+          "source_dimensions": [
+            1672,
+            941
+          ],
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 555022,
+          "quality": 88,
+          "sha256": "ec40b48fe763f43d7e8e31cd0fdf3352ac06e017a1305176eddaa4956cbf7c14",
+          "full_resolution_luma_ssim": 0.986075,
+          "worst_128px_luma_ssim": 0.977969,
+          "chroma_mean_absolute_error": 2.176921,
+          "chroma_95th_percentile_error": 7.0,
+          "scene": "Original medieval waterside town built around an inland lake with rain-darkened alder, ochre autumn leaves and matte blue-green water. Amber-red alder trees drape toward a narrow canal with irregular low footbridges and piles of dark timber boathouses, emerald water reflected onto walls."
+        },
+        {
+          "frame": 4,
+          "source_sha256": "359068ae5e2174c8128ac7d4d8af56973bb5e24637bb1d0715aafc526026dd71",
+          "source_bytes": 3112901,
+          "source_dimensions": [
+            1672,
+            941
+          ],
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 483804,
+          "quality": 89,
+          "sha256": "f3d370c8cc29f4fb82fca18878add8c7593d26d3471e24890510a9a5c12a3d46",
+          "full_resolution_luma_ssim": 0.985154,
+          "worst_128px_luma_ssim": 0.973625,
+          "chroma_mean_absolute_error": 1.914789,
+          "chroma_95th_percentile_error": 6.0,
+          "scene": "Original medieval waterside town built around an inland lake with rain-darkened alder, ochre autumn leaves and matte blue-green water. Original lake docks, small broad-bottomed boats, heavily worn planked jetties with squat copper lanterns mirrored in golden-hour dark water."
+        },
+        {
+          "frame": 5,
+          "source_sha256": "3a0b765727d6a480f34b0311a33c10ec3f841e35a8215c556505b201ec349943",
+          "source_bytes": 3266367,
+          "source_dimensions": [
+            1672,
+            941
+          ],
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 544212,
+          "quality": 90,
+          "sha256": "4c25c47e690d564693b08f7e5dfbdf33816d55b3ed57746d3b689c70b3464479",
+          "full_resolution_luma_ssim": 0.987755,
+          "worst_128px_luma_ssim": 0.978432,
+          "chroma_mean_absolute_error": 1.750917,
+          "chroma_95th_percentile_error": 6.0,
+          "scene": "Original medieval waterside town built around an inland lake with rain-darkened alder, ochre autumn leaves and matte blue-green water. Walled administrative estate on a mudstone island between two narrow canals, modest stepped towers and octagonal watch lamp on a buttress, diffuse cloudy daylight."
+        },
+        {
+          "frame": 6,
+          "source_sha256": "f14ea737e26e57d7b87f402308a1b0f6ce823432196b39639e9516c87f33656d",
+          "source_bytes": 3354670,
+          "source_dimensions": [
+            1672,
+            941
+          ],
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 537370,
+          "quality": 89,
+          "sha256": "8bdb97344becb1c62ed488c62e33468d6e12fe124ff32e1ba1582dccd3d0f502",
+          "full_resolution_luma_ssim": 0.985786,
+          "worst_128px_luma_ssim": 0.976611,
+          "chroma_mean_absolute_error": 1.854355,
+          "chroma_95th_percentile_error": 6.0,
+          "scene": "Original medieval waterside town built around an inland lake with rain-darkened alder, ochre autumn leaves and matte blue-green water. A brisk, wet lower passage of stilted houses, steep irregular stairs, exposed beams and rain light reflected under a covered footway, direct perspective down the cross-lane."
+        }
+      ]
+    },
+    "cityPlaces": [
+      "Городские ворота",
+      "Рыночная площадь",
+      "Городские каналы",
+      "Порт",
+      "Крепость Миствейл",
+      "Нижние улицы"
+    ]
+  },
+  {
+    "name": "Виндхельм",
+    "slug": "windhelm",
+    "captions": [
+      "Главные ворота",
+      "Серый квартал",
+      "Рыночная площадь",
+      "Каменный квартал",
+      "Дворец королей",
+      "Набережная"
+    ],
+    "aliases": [],
+    "artwork": {
+      "date": "2026-11-20",
+      "kind": "original_generated_illustration",
+      "format": "WebP",
+      "encoder_method": 6,
+      "frames": [
+        {
+          "frame": 1,
+          "source_sha256": "5199f75e41c1650c461ab6d4acd6ffd48a0b215e8593959c2212b476ab783137",
+          "source_bytes": 3553825,
+          "source_dimensions": [
+            1672,
+            941
+          ],
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 536700,
+          "quality": 89,
+          "sha256": "4af9ca9377f7f6beaa521c7176480a2530f50c3d02c48ce8d19b0fda80b6dc9c",
+          "full_resolution_luma_ssim": 0.985134,
+          "worst_128px_luma_ssim": 0.976529,
+          "chroma_mean_absolute_error": 1.36032,
+          "chroma_95th_percentile_error": 4.0,
+          "scene": "A wholly original fortified city in frozen slate-stone mountains, dark dry-laid basalt, pale frost, weathered pine, copper hints. Massive twin stepped basalt pylons just inside snow ruts, copper corners and frozen wind-sculpted drainage on the approach, one warm torch against cold morning light."
+        },
+        {
+          "frame": 2,
+          "source_sha256": "a66802512494ffb3bf7ab19ccad1d1f831aa8725917678ce0da428a08e72569e",
+          "source_bytes": 3665858,
+          "source_dimensions": [
+            1672,
+            941
+          ],
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 523430,
+          "quality": 87,
+          "sha256": "028278187c23374974f1b8e827d174a72ee1756cdc0f00ac7ee6407feb758f70",
+          "full_resolution_luma_ssim": 0.985253,
+          "worst_128px_luma_ssim": 0.97754,
+          "chroma_mean_absolute_error": 1.650686,
+          "chroma_95th_percentile_error": 5.0,
+          "scene": "A wholly original fortified city in frozen slate-stone mountains, dark dry-laid basalt, pale frost, weathered pine, copper hints. Battered slate rowhouses with clusters of low chimneys and reddish brick repairs, snug entries and chimney vapor in textured pale blue air."
+        },
+        {
+          "frame": 3,
+          "source_sha256": "052eb66f9136b1a749fb9b231e51d4a0e7bc9e3cf31a6ae49782a54d886fe661",
+          "source_bytes": 3674996,
+          "source_dimensions": [
+            1672,
+            941
+          ],
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 523906,
+          "quality": 86,
+          "sha256": "cab7a7974a7636d99abdddb349388baa5b792de1d0bfee0010cbdbce774c95af",
+          "full_resolution_luma_ssim": 0.98533,
+          "worst_128px_luma_ssim": 0.970389,
+          "chroma_mean_absolute_error": 1.901322,
+          "chroma_95th_percentile_error": 6.0,
+          "scene": "A wholly original fortified city in frozen slate-stone mountains, dark dry-laid basalt, pale frost, weathered pine, copper hints. Snow-packed open yard where pine sleds under gray wool sails carry provisions, copper scales and russet awnings against black stone, clear afternoon."
+        },
+        {
+          "frame": 4,
+          "source_sha256": "afd2767f1ec2723f71da0126eb4fb62609c4824d69865fa9e7099b2a06e8457e",
+          "source_bytes": 3769723,
+          "source_dimensions": [
+            1672,
+            941
+          ],
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 563742,
+          "quality": 88,
+          "sha256": "5045f507243f67b5cdf2877a33dc7695df25de8c55dde71579b253a2ec77dd78",
+          "full_resolution_luma_ssim": 0.986467,
+          "worst_128px_luma_ssim": 0.978681,
+          "chroma_mean_absolute_error": 1.417782,
+          "chroma_95th_percentile_error": 4.0,
+          "scene": "A wholly original fortified city in frozen slate-stone mountains, dark dry-laid basalt, pale frost, weathered pine, copper hints. Wide uneven stairs cut into the dark slate hillside, deep-set iron-banded entrances and radial shadows, gentle flurries under real winter light."
+        },
+        {
+          "frame": 5,
+          "source_sha256": "aefa41ef97a428d640a49135ec5ca4ae191d8b9aa823a1221208455eea20fc82",
+          "source_bytes": 3408869,
+          "source_dimensions": [
+            1672,
+            941
+          ],
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 502546,
+          "quality": 88,
+          "sha256": "a56dfb35e66b1fda58d76f5e75358475210843ce988263887939abdad86a98bf",
+          "full_resolution_luma_ssim": 0.985189,
+          "worst_128px_luma_ssim": 0.979179,
+          "chroma_mean_absolute_error": 1.403178,
+          "chroma_95th_percentile_error": 4.0,
+          "scene": "A wholly original fortified city in frozen slate-stone mountains, dark dry-laid basalt, pale frost, weathered pine, copper hints. Modest monumental basalt palace with severe stepped roof, thin silver strips of snow and long gallery of original angular piers, imposing frontal wide view under low sun."
+        },
+        {
+          "frame": 6,
+          "source_sha256": "cc6ba2b10e1acad267570cc87494b2aa04e60b19d79e93ca2617ea595bf263c3",
+          "source_bytes": 3622153,
+          "source_dimensions": [
+            1672,
+            941
+          ],
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 521972,
+          "quality": 87,
+          "sha256": "f2cf034ce5c0ccceb9e12c48a28c044cf9c5e10b46635d05f4ec883abd248127",
+          "full_resolution_luma_ssim": 0.986132,
+          "worst_128px_luma_ssim": 0.976056,
+          "chroma_mean_absolute_error": 1.547677,
+          "chroma_95th_percentile_error": 4.0,
+          "scene": "A wholly original fortified city in frozen slate-stone mountains, dark dry-laid basalt, pale frost, weathered pine, copper hints. Quayside stone gangway with rope rail, rows of tall unlettered markers, frozen ships' slips and thick white ice cracked against mineral-dark water, blue midday."
+        }
+      ]
+    },
+    "cityPlaces": [
+      "Главные ворота",
+      "Серый квартал",
+      "Рыночная площадь",
+      "Каменный квартал",
+      "Королевский дворец",
+      "Набережная"
+    ]
+  },
+  {
+    "name": "Маркарт",
+    "slug": "markarth",
+    "captions": [
+      "Городские ворота",
+      "Каменные улицы",
+      "Рыночная площадь",
+      "Храм Дибеллы",
+      "Подкаменная крепость",
+      "Террасы Маркарта"
+    ],
+    "aliases": [],
+    "artwork": {
+      "date": "2026-11-20",
+      "kind": "original_generated_illustration",
+      "format": "WebP",
+      "encoder_method": 6,
+      "frames": [
+        {
+          "frame": 1,
+          "source_sha256": "26291351f365557c626b0ff848741a90318668f73f41b9ed66bc2f488bd49fba",
+          "source_bytes": 3715553,
+          "source_dimensions": [
+            1672,
+            941
+          ],
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 557270,
+          "quality": 88,
+          "sha256": "11348b5ca30253e0e9ec5c86079317fb920a8cda5174348bd1d561c1075a0b3b",
+          "full_resolution_luma_ssim": 0.986143,
+          "worst_128px_luma_ssim": 0.980012,
+          "chroma_mean_absolute_error": 1.636264,
+          "chroma_95th_percentile_error": 5.0,
+          "scene": "Original limestone quarry city cut into cliff terraces, copper drainage, falling water and golden stone, a believable medieval fantasy. Outer gate between two inclined limestone walls with a silvery mineral seam and carved stone water-tank overflow, copper doors and morning in a narrow gorge."
+        },
+        {
+          "frame": 2,
+          "source_sha256": "11bc73df8c742df87f9903492ec8d8acbaf10f0a984c0821f15c993d7b81a68e",
+          "source_bytes": 3548583,
+          "source_dimensions": [
+            1672,
+            941
+          ],
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 540242,
+          "quality": 88,
+          "sha256": "bdbcd2db6200bcb759b544f4b9eeda1bd6b70ef95e5a12d9911087e57cb54882",
+          "full_resolution_luma_ssim": 0.985394,
+          "worst_128px_luma_ssim": 0.978108,
+          "chroma_mean_absolute_error": 1.761504,
+          "chroma_95th_percentile_error": 5.0,
+          "scene": "Original limestone quarry city cut into cliff terraces, copper drainage, falling water and golden stone, a believable medieval fantasy. A stepped lane tracking a narrow stone aqueduct and doorways of multistory quarry homes, powder blue light tints one side, original arched supports."
+        },
+        {
+          "frame": 3,
+          "source_sha256": "2f0d503d41af3a355e4c82191f8baf5a7e825fd3f786e12480236aa365edb81e",
+          "source_bytes": 3778111,
+          "source_dimensions": [
+            1672,
+            941
+          ],
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 583398,
+          "quality": 87,
+          "sha256": "a82d67ba94264ba82e560d982974999994e1c7fcbafb81ba9a53e31aa1dfbe7e",
+          "full_resolution_luma_ssim": 0.986637,
+          "worst_128px_luma_ssim": 0.982072,
+          "chroma_mean_absolute_error": 2.001774,
+          "chroma_95th_percentile_error": 6.0,
+          "scene": "Original limestone quarry city cut into cliff terraces, copper drainage, falling water and golden stone, a believable medieval fantasy. Substantial stepped market under three cut rock arches, carved bowls, linen and blue-verdigris pots in stalls around a dry stone basin, warm daylight."
+        },
+        {
+          "frame": 4,
+          "source_sha256": "a6ffdce3653e82beccf00fee0a82d7f797a92f3de5a61e091fbdce1bbe0b3f08",
+          "source_bytes": 3537586,
+          "source_dimensions": [
+            1672,
+            941
+          ],
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 555280,
+          "quality": 88,
+          "sha256": "024844509064ab98cdbe9f13019f6b82404f1ce07fab464e886c080be03cae88",
+          "full_resolution_luma_ssim": 0.986005,
+          "worst_128px_luma_ssim": 0.975856,
+          "chroma_mean_absolute_error": 1.841042,
+          "chroma_95th_percentile_error": 5.0,
+          "scene": "Original limestone quarry city cut into cliff terraces, copper drainage, falling water and golden stone, a believable medieval fantasy. An original secluded temple cut into honey-colored limestone, slender pillars around gardens of porcelain flowers and a fine water curtain caught in a shaft of cool light."
+        },
+        {
+          "frame": 5,
+          "source_sha256": "ad6decd7eae8ef702c9c12ff0744f2b7015fa633b3e0e95d1195d7fba55192a7",
+          "source_bytes": 3544120,
+          "source_dimensions": [
+            1672,
+            941
+          ],
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 551988,
+          "quality": 88,
+          "sha256": "887f473d449a00598c4fdf5612c910d317e834bf1e8676ab303ce2c6706f807f",
+          "full_resolution_luma_ssim": 0.985137,
+          "worst_128px_luma_ssim": 0.976759,
+          "chroma_mean_absolute_error": 1.7844,
+          "chroma_95th_percentile_error": 5.0,
+          "scene": "Original limestone quarry city cut into cliff terraces, copper drainage, falling water and golden stone, a believable medieval fantasy. A bold layered citadel in a recess above a sandstone chasm, squat fortified entrances and a sculpted buttress, waterfall off to the far side."
+        },
+        {
+          "frame": 6,
+          "source_sha256": "6fa7fc08923f018ecc25d4753a4ed11a1605462577428e52a8fef51856736d06",
+          "source_bytes": 3463892,
+          "source_dimensions": [
+            1672,
+            941
+          ],
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 537212,
+          "quality": 88,
+          "sha256": "11e3bf551fc98e6812dc5c050c3cce8ce6721449cdc17eae2890034829d526e2",
+          "full_resolution_luma_ssim": 0.985747,
+          "worst_128px_luma_ssim": 0.976125,
+          "chroma_mean_absolute_error": 1.839309,
+          "chroma_95th_percentile_error": 5.0,
+          "scene": "Original limestone quarry city cut into cliff terraces, copper drainage, falling water and golden stone, a believable medieval fantasy. From atop green limestone terraces, terraced courtyards above the distant ravine with a dull copper conduit, bleaching limestone steps, late afternoon warmth."
+        }
+      ]
+    },
+    "cityPlaces": [
+      "Городские ворота",
+      "Каменные улицы",
+      "Рыночная площадь",
+      "Храм Дибеллы",
+      "Подкаменная крепость",
+      "Террасы Маркарта"
+    ]
+  },
+  {
+    "name": "Фолкрит",
+    "slug": "falkreath",
+    "captions": [
+      "Подход к Фолкриту",
+      "Главная улица",
+      "Торговые прилавки",
+      "Зал мёртвых",
+      "Кладбище Фолкрита",
+      "Лесная окраина"
+    ],
+    "aliases": [],
+    "artwork": {
+      "date": "2026-11-20",
+      "kind": "original_generated_illustration",
+      "format": "WebP",
+      "encoder_method": 6,
+      "frames": [
+        {
+          "frame": 1,
+          "source_sha256": "38d88a3282fe24a2b231e8d78708f6882c750cb0e2398f7f4412024c540f68ce",
+          "source_bytes": 3554298,
+          "source_dimensions": [
+            1672,
+            941
+          ],
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 544676,
+          "quality": 88,
+          "sha256": "29bec46a0b4c2afb309c363813ef3705a44b64f89189bf3d3b00a061785cc548",
+          "full_resolution_luma_ssim": 0.985281,
+          "worst_128px_luma_ssim": 0.977613,
+          "chroma_mean_absolute_error": 1.674338,
+          "chroma_95th_percentile_error": 5.0,
+          "scene": "Medieval forestry town in native spruce woodland, original timber houses, rich moss, pale stones and wet fern textures. A weathered cobbled road emerging between enormous dark spruce trunks, scattered needle beds and a little charcoal watch shelter, last shafts of sunrise and morning mist."
+        },
+        {
+          "frame": 2,
+          "source_sha256": "a1d2c2a4094ce40ee86dde4ab0bccc98010057f8f202a57a4ace8a6568644451",
+          "source_bytes": 3618724,
+          "source_dimensions": [
+            1672,
+            941
+          ],
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 553790,
+          "quality": 88,
+          "sha256": "c708b02cd2752529981353f5088c953a4630bb79b2d2bfc4ab26488f5b9f2eac",
+          "full_resolution_luma_ssim": 0.986587,
+          "worst_128px_luma_ssim": 0.977654,
+          "chroma_mean_absolute_error": 1.720458,
+          "chroma_95th_percentile_error": 5.0,
+          "scene": "Medieval forestry town in native spruce woodland, original timber houses, rich moss, pale stones and wet fern textures. Small forest town's main muddy street lined with neatly hewn cedar cottages and luminous windows, long boards set out to dry and moss along stone foundations."
+        },
+        {
+          "frame": 3,
+          "source_sha256": "75ec54d4f627d3ae917943efdedc84d8e0ff4f08ca8346962e08dc7b9950d8bd",
+          "source_bytes": 3518911,
+          "source_dimensions": [
+            1672,
+            941
+          ],
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 513584,
+          "quality": 87,
+          "sha256": "5d6af49c4dd059238cca7d0a16ee6104e046427c6c59d2ad20c3620f52171d42",
+          "full_resolution_luma_ssim": 0.985489,
+          "worst_128px_luma_ssim": 0.97773,
+          "chroma_mean_absolute_error": 1.709016,
+          "chroma_95th_percentile_error": 5.0,
+          "scene": "Medieval forestry town in native spruce woodland, original timber houses, rich moss, pale stones and wet fern textures. Quiet woodland market with beeswax, birch spiles, honey jars, coils of rope and pine pitch tubs, wedged between pitched homes and the forest. Dappled canopy light."
+        },
+        {
+          "frame": 4,
+          "source_sha256": "43d91152250740912588001e33109688dce909600cf0d3c2fd2cc5b74ff67bcf",
+          "source_bytes": 3370257,
+          "source_dimensions": [
+            1672,
+            941
+          ],
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 503686,
+          "quality": 89,
+          "sha256": "6adb31ed7f4b2780c565ab13c71f9cf9436955874ab184d905ef0e4b42be133e",
+          "full_resolution_luma_ssim": 0.985994,
+          "worst_128px_luma_ssim": 0.97766,
+          "chroma_mean_absolute_error": 1.390205,
+          "chroma_95th_percentile_error": 4.0,
+          "scene": "Medieval forestry town in native spruce woodland, original timber houses, rich moss, pale stones and wet fern textures. Plainly solemn long timber memorial hall with a runnel of rain outside its steep gable, a row of lanterns on a low stone wall, weathered beams and soft late light."
+        },
+        {
+          "frame": 5,
+          "source_sha256": "bf1d9a12611f96a556c447b932a053842c56ac7a314379b7027f0a17430fe305",
+          "source_bytes": 3455769,
+          "source_dimensions": [
+            1672,
+            941
+          ],
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 530236,
+          "quality": 89,
+          "sha256": "442b11efb1b288cc8cc4f7bffac50d81502564a5e0fafb7fe19fee38593c3620",
+          "full_resolution_luma_ssim": 0.985363,
+          "worst_128px_luma_ssim": 0.977603,
+          "chroma_mean_absolute_error": 1.422018,
+          "chroma_95th_percentile_error": 4.0,
+          "scene": "Medieval forestry town in native spruce woodland, original timber houses, rich moss, pale stones and wet fern textures. Peaceful woodland graveyard with small unmarked stone markers ringed with ivy, dripping conifers and a narrow stone bench, dignified morning fog."
+        },
+        {
+          "frame": 6,
+          "source_sha256": "706a4c31f740f8dfc1cfcc8a00ab45421b35863d58fa6fbc97bbc29b5a03177d",
+          "source_bytes": 3807756,
+          "source_dimensions": [
+            1672,
+            941
+          ],
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 570834,
+          "quality": 86,
+          "sha256": "635f0d7ba3620f3a66e6d5811f1165db6ab8256b06245e8fc039e523394159ca",
+          "full_resolution_luma_ssim": 0.986742,
+          "worst_128px_luma_ssim": 0.977854,
+          "chroma_mean_absolute_error": 2.011961,
+          "chroma_95th_percentile_error": 6.0,
+          "scene": "Medieval forestry town in native spruce woodland, original timber houses, rich moss, pale stones and wet fern textures. Forest-edge trail curving past a high split-rail fence and stacked firewood, bright green ferns, spruce trunks, softly visible village roofs behind."
+        }
+      ]
+    },
+    "cityPlaces": [
+      "Подход к Фолкриту",
+      "Главная улица",
+      "",
+      "Зал мёртвых",
+      "Кладбище Фолкрита",
+      ""
+    ]
+  },
+  {
+    "name": "Морфал",
+    "slug": "morthal",
+    "captions": [
+      "Подход к Морфалу",
+      "Деревянный мост",
+      "Главная улица",
+      "Таверна «Верески»",
+      "Болотные окраины",
+      "Рыбацкие мостки"
+    ],
+    "aliases": [],
+    "artwork": {
+      "date": "2026-11-20",
+      "kind": "original_generated_illustration",
+      "format": "WebP",
+      "encoder_method": 6,
+      "frames": [
+        {
+          "frame": 1,
+          "source_sha256": "ced54c18297fb7f5329cb19e303aa3057096b16272a65f32182a7866bbdcd66b",
+          "source_bytes": 3184222,
+          "source_dimensions": [
+            1672,
+            941
+          ],
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 476056,
+          "quality": 90,
+          "sha256": "0e77c4dee355dabed14dbed5de5e7fd32bfb7ef81b1ecf36b2b712fe9a7e35b7",
+          "full_resolution_luma_ssim": 0.986543,
+          "worst_128px_luma_ssim": 0.979672,
+          "chroma_mean_absolute_error": 1.142122,
+          "chroma_95th_percentile_error": 3.0,
+          "scene": "Original marsh settlement on low piers and boardwalks, weathered pine, peat water, reeds and cool fog, quiet medieval town. A raised causeway of split stone through dark peat ponds, reed banks, gray willows and a tiny glow in the mist ahead. Low eye-level perspective at dawn."
+        },
+        {
+          "frame": 2,
+          "source_sha256": "37d9878e49a1ce85d76ed97605b4b41a49cb61e1d8e22a180503a547110e9573",
+          "source_bytes": 3053499,
+          "source_dimensions": [
+            1672,
+            941
+          ],
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 482814,
+          "quality": 91,
+          "sha256": "4da6d932239f343a073565d65bcf87636a2f45896e15a272bc220c61a0506454",
+          "full_resolution_luma_ssim": 0.985951,
+          "worst_128px_luma_ssim": 0.980102,
+          "chroma_mean_absolute_error": 1.285291,
+          "chroma_95th_percentile_error": 4.0,
+          "scene": "Original marsh settlement on low piers and boardwalks, weathered pine, peat water, reeds and cool fog, quiet medieval town. A timber bridge with slender knees and rushes all along the tea-dark river, modest houses up on piers viewed through rain, polished handrail and believable reflections."
+        },
+        {
+          "frame": 3,
+          "source_sha256": "fbe0d2ad2f5d8465190c6a3df3a40657a3e6f9099e0a4d391dbacc7aa0645454",
+          "source_bytes": 3193711,
+          "source_dimensions": [
+            1672,
+            941
+          ],
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 489326,
+          "quality": 90,
+          "sha256": "99682261e4fc71e421c11b104f05b09058847675f80f8b6063ebe867069e8116",
+          "full_resolution_luma_ssim": 0.985264,
+          "worst_128px_luma_ssim": 0.967321,
+          "chroma_mean_absolute_error": 1.393908,
+          "chroma_95th_percentile_error": 4.0,
+          "scene": "Original marsh settlement on low piers and boardwalks, weathered pine, peat water, reeds and cool fog, quiet medieval town. Settlement boardwalk lit by lanterns and framed by shingled pine cottages on rough posts, reed-bottom crates and wet plank textures, small channel between houses."
+        },
+        {
+          "frame": 4,
+          "source_sha256": "b1705bf37dbe1acef49616a542b9338e2cfc954a68c00227267b74d643ecb92d",
+          "source_bytes": 2927122,
+          "source_dimensions": [
+            1672,
+            941
+          ],
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 414566,
+          "quality": 90,
+          "sha256": "33aa1abbd732ff5a97482d99cc1abec5ae433997ba04d5b40d04ea71cb8f03bd",
+          "full_resolution_luma_ssim": 0.985447,
+          "worst_128px_luma_ssim": 0.975062,
+          "chroma_mean_absolute_error": 1.29123,
+          "chroma_95th_percentile_error": 4.0,
+          "scene": "Original marsh settlement on low piers and boardwalks, weathered pine, peat water, reeds and cool fog, quiet medieval town. Exterior of a square low marsh inn on piled dark wood with inviting amber lantern over the door, muted fog and tufts of rose heather along the boardwalk."
+        },
+        {
+          "frame": 5,
+          "source_sha256": "13bb1476b9878fd6f3b78b0978a0e5f006c54f749cc5c1e63005243bbbebe587",
+          "source_bytes": 2742974,
+          "source_dimensions": [
+            1672,
+            941
+          ],
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 441664,
+          "quality": 92,
+          "sha256": "cd585a3bd51de922f4850783ce312a5062652b81cfbda67c18c87336ef4c5425",
+          "full_resolution_luma_ssim": 0.986568,
+          "worst_128px_luma_ssim": 0.979477,
+          "chroma_mean_absolute_error": 1.220102,
+          "chroma_95th_percentile_error": 4.0,
+          "scene": "Original marsh settlement on low piers and boardwalks, weathered pine, peat water, reeds and cool fog, quiet medieval town. Overlooking a broad still peat pool with wavering reeds and moss-covered terraces in dim sunset, floating leaves, a thin dark boat against a calm silhouette of waterfront homes."
+        },
+        {
+          "frame": 6,
+          "source_sha256": "8240ded4a57107c2e697f33822bf61b896a66e3ec5b0e5c24a4a88d732f16a8d",
+          "source_bytes": 2746428,
+          "source_dimensions": [
+            1672,
+            941
+          ],
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 376900,
+          "quality": 91,
+          "sha256": "4917549fd15258971573de34c6bfc209c3db65fc8c4c05cf48a317b59e6b0b79",
+          "full_resolution_luma_ssim": 0.985237,
+          "worst_128px_luma_ssim": 0.973226,
+          "chroma_mean_absolute_error": 1.134875,
+          "chroma_95th_percentile_error": 3.0,
+          "scene": "Original marsh settlement on low piers and boardwalks, weathered pine, peat water, reeds and cool fog, quiet medieval town. A low line of fishing cottages on pilings seen across the stream at nightfall, a trail of oil lights across rutted boards, silver shoreline fog."
+        }
+      ]
+    },
+    "cityPlaces": [
+      "Подход к Морфалу",
+      "Деревянный мост",
+      "Главная улица",
+      "Верески",
+      "Болотная окраина",
+      ""
+    ]
+  },
+  {
+    "name": "Винтерхолд",
+    "slug": "winterhold",
+    "captions": [
+      "Подход к Винтерхолду",
+      "Заснеженная улица",
+      "Площадь с колодцем",
+      "Мост к Коллегии",
+      "Двор Коллегии",
+      "Руины домов Винтерхолда"
+    ],
+    "aliases": [],
+    "artwork": {
+      "date": "2026-11-20",
+      "kind": "original_generated_illustration",
+      "format": "WebP",
+      "encoder_method": 6,
+      "frames": [
+        {
+          "frame": 1,
+          "source_sha256": "ff90c8129b914dd97d4b7b12499e29adb0ee0f38c595b5118a86c385e820a517",
+          "source_bytes": 3481189,
+          "source_dimensions": [
+            1672,
+            941
+          ],
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 482524,
+          "quality": 88,
+          "sha256": "75505544aba51fd6c7b1b942ada65af19d20f0dc8b5d69a08edf7ba9670a1e05",
+          "full_resolution_luma_ssim": 0.985988,
+          "worst_128px_luma_ssim": 0.975871,
+          "chroma_mean_absolute_error": 1.142045,
+          "chroma_95th_percentile_error": 3.0,
+          "scene": "An original winter town on a cliff over a cold gray sea, bare dark rock, snow and salt winds, battered pine-and-stone architecture. Twisting old track with buckling slate tiles and spindrift climbing from a glacial ravine toward the struggling hillside hamlet, clear cool morning like air after a storm."
+        },
+        {
+          "frame": 2,
+          "source_sha256": "3b69a5e00c61bb081c21c18277e1561102456efd1f18ab1edeeec351fa2e4bdb",
+          "source_bytes": 3126817,
+          "source_dimensions": [
+            1672,
+            941
+          ],
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 453290,
+          "quality": 91,
+          "sha256": "e101d746fda10902410ca8234e98d0212d9559cda3f34397ef2e1e03afa084b3",
+          "full_resolution_luma_ssim": 0.985993,
+          "worst_128px_luma_ssim": 0.977942,
+          "chroma_mean_absolute_error": 0.871355,
+          "chroma_95th_percentile_error": 2.0,
+          "scene": "An original winter town on a cliff over a cold gray sea, bare dark rock, snow and salt winds, battered pine-and-stone architecture. A once-busy stone lane choked with windblown snow, thick shutters partly lit by oil yellow, lean lines of tall wooden cottages on the edge of a steep drop."
+        },
+        {
+          "frame": 3,
+          "source_sha256": "af396bd9f653e4a9443a5277b8ca4f50f1bd00fecd5313d9cde001ac18cc4e8e",
+          "source_bytes": 3365136,
+          "source_dimensions": [
+            1672,
+            941
+          ],
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 464736,
+          "quality": 89,
+          "sha256": "4b335ae338f1d639ff7c1936eb9578382bc6bb8361c7a21a845d6455bf5eba2a",
+          "full_resolution_luma_ssim": 0.98646,
+          "worst_128px_luma_ssim": 0.977883,
+          "chroma_mean_absolute_error": 0.961242,
+          "chroma_95th_percentile_error": 3.0,
+          "scene": "An original winter town on a cliff over a cold gray sea, bare dark rock, snow and salt winds, battered pine-and-stone architecture. Near-empty civic square under thin snowfall, old polygonal stone well with its long wooden crossbeam, chimney smoke, small weather-beaten lodge nearby."
+        },
+        {
+          "frame": 4,
+          "source_sha256": "e889e18f41edb3ee9dae59691a451a12243854dac71f13afe501761d86f11a49",
+          "source_bytes": 3285725,
+          "source_dimensions": [
+            1672,
+            941
+          ],
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 493616,
+          "quality": 90,
+          "sha256": "536874d59f6a2a6401967d5743d2e1a7dfaa85cebe51e25b04b5ffdf9bfa038e",
+          "full_resolution_luma_ssim": 0.986178,
+          "worst_128px_luma_ssim": 0.978149,
+          "chroma_mean_absolute_error": 1.035872,
+          "chroma_95th_percentile_error": 3.0,
+          "scene": "An original winter town on a cliff over a cold gray sea, bare dark rock, snow and salt winds, battered pine-and-stone architecture. Independent long original stone bridge spanning a shear cut where seawater churns a long way below, several large buttress points, open balcony view from near the rail."
+        },
+        {
+          "frame": 5,
+          "source_sha256": "a800c676c4628acb9c6d8d99f236621a2b81d0e062436c56d84c009289ecb816",
+          "source_bytes": 3350976,
+          "source_dimensions": [
+            1672,
+            941
+          ],
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 477318,
+          "quality": 89,
+          "sha256": "c48d8ddb9be4c6bfd20878579ce4fe7427f3efd98c6c2ce49b8daac85eef2ccd",
+          "full_resolution_luma_ssim": 0.985986,
+          "worst_128px_luma_ssim": 0.977008,
+          "chroma_mean_absolute_error": 1.136166,
+          "chroma_95th_percentile_error": 3.0,
+          "scene": "An original winter town on a cliff over a cold gray sea, bare dark rock, snow and salt winds, battered pine-and-stone architecture. High fortified roadside academy yard, centered circle of understated oiled iron lamps encased in frost, leaden masonry and thin snow. Clear natural late afternoon."
+        },
+        {
+          "frame": 6,
+          "source_sha256": "4d9489ac3886f3f5e874699bc48dbfdf91ea9c161c6a738250b72f4abd142d52",
+          "source_bytes": 3396580,
+          "source_dimensions": [
+            1672,
+            941
+          ],
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 473732,
+          "quality": 89,
+          "sha256": "f0969af74030b4532e5b64391ed8646521c638b284bf18b91a133cbbbb88ac33",
+          "full_resolution_luma_ssim": 0.986041,
+          "worst_128px_luma_ssim": 0.97907,
+          "chroma_mean_absolute_error": 1.105676,
+          "chroma_95th_percentile_error": 3.0,
+          "scene": "An original winter town on a cliff over a cold gray sea, bare dark rock, snow and salt winds, battered pine-and-stone architecture. Collapsed medieval houses on an exposed snowy hillside, exploded rafters and lichen on weathered stone foundations, distant dark sea under a break in clouds."
+        }
+      ]
+    },
+    "cityPlaces": [
+      "Подход к Винтерхолду",
+      "Заснеженная улица",
+      "",
+      "Мост к Коллегии",
+      "Двор Коллегии",
+      "Руины домов"
+    ]
+  },
+  {
+    "name": "Данстар",
+    "slug": "dawnstar",
+    "captions": [
+      "Подход к Данстару",
+      "Порт",
+      "Главная улица",
+      "Таверна «Пик ветров»",
+      "У причала",
+      "Заснеженная бухта"
+    ],
+    "aliases": [],
+    "artwork": {
+      "date": "2026-11-20",
+      "kind": "original_generated_illustration",
+      "format": "WebP",
+      "encoder_method": 6,
+      "frames": [
+        {
+          "frame": 1,
+          "source_sha256": "8337a336e621254049cdcc20343a9ae1b2ac372b669d7e533e0af07281e19e12",
+          "source_bytes": 3713893,
+          "source_dimensions": [
+            1672,
+            941
+          ],
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 491354,
+          "quality": 86,
+          "sha256": "3d4f4f5db2fdd9900933167e0bbad87f83d07c068561f4065373858c4069fc75",
+          "full_resolution_luma_ssim": 0.986031,
+          "worst_128px_luma_ssim": 0.976084,
+          "chroma_mean_absolute_error": 1.56002,
+          "chroma_95th_percentile_error": 5.0,
+          "scene": "Northern medieval coastal mining and fishing town, low wood and dry stone buildings, snow and driftwood, cool marine sky. Ice-limned sandy track curving along a snowy dune into a low port settlement, fishing boats dragged above the wrack, winter sun over gray water."
+        },
+        {
+          "frame": 2,
+          "source_sha256": "29d4a11fa3f713e4b75317564912f2cff26dc76f5fb0a153b9c95181eb60becf",
+          "source_bytes": 3585569,
+          "source_dimensions": [
+            1672,
+            941
+          ],
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 473892,
+          "quality": 86,
+          "sha256": "3eb5d5d220469bb4ab5e647a6588f5a9187427c08d48358be0719164fb895f01",
+          "full_resolution_luma_ssim": 0.9851,
+          "worst_128px_luma_ssim": 0.972226,
+          "chroma_mean_absolute_error": 1.401336,
+          "chroma_95th_percentile_error": 4.0,
+          "scene": "Northern medieval coastal mining and fishing town, low wood and dry stone buildings, snow and driftwood, cool marine sky. Winter timber harbor with a stretch of gray sails under repair, stacked crates and long gaffs, salt-marked walls and waves around the studded quay."
+        },
+        {
+          "frame": 3,
+          "source_sha256": "7d4c60791c009a96e361dbb0fd08029f9dc2a1fe84ca9710cc4c5ebc933e35ae",
+          "source_bytes": 3698805,
+          "source_dimensions": [
+            1672,
+            941
+          ],
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 481442,
+          "quality": 85,
+          "sha256": "fa29a2439bf54039c95005969fa91002ab7b6d43be29a96deb6bb1e16753b1f3",
+          "full_resolution_luma_ssim": 0.986014,
+          "worst_128px_luma_ssim": 0.971542,
+          "chroma_mean_absolute_error": 1.548431,
+          "chroma_95th_percentile_error": 4.0,
+          "scene": "Northern medieval coastal mining and fishing town, low wood and dry stone buildings, snow and driftwood, cool marine sky. Street of modest stone and pine fisheries, bundles of hand-repaired nets laid on trestles, oiled boots and thin snowy ruts with muted yellow houses."
+        },
+        {
+          "frame": 4,
+          "source_sha256": "d3ae23836b88da7f25f53c1e73706f6878acdb9e2b77330acf6bed6fde0d6272",
+          "source_bytes": 3055879,
+          "source_dimensions": [
+            1672,
+            941
+          ],
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 420676,
+          "quality": 89,
+          "sha256": "b3888127bdb2f90133f688f08e429fb39560136abde570a2f39c1569a8ac4309",
+          "full_resolution_luma_ssim": 0.985573,
+          "worst_128px_luma_ssim": 0.976016,
+          "chroma_mean_absolute_error": 1.450943,
+          "chroma_95th_percentile_error": 5.0,
+          "scene": "Northern medieval coastal mining and fishing town, low wood and dry stone buildings, snow and driftwood, cool marine sky. Humble tavern exterior facing the wind on the northern waterfront, low flanking stone windbreak, dark roof with battered copper finial, warm lanterns in early blue dusk."
+        },
+        {
+          "frame": 5,
+          "source_sha256": "3526a6ec9bb915bb3841d1e28a0c7a0e80a27be3f4759ae96065ea2fbb90283d",
+          "source_bytes": 3432842,
+          "source_dimensions": [
+            1672,
+            941
+          ],
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 483842,
+          "quality": 88,
+          "sha256": "ecbe479d422c7029d072d0dbeba4906508bd55968a9692d3876a9a22798acabf",
+          "full_resolution_luma_ssim": 0.986232,
+          "worst_128px_luma_ssim": 0.979603,
+          "chroma_mean_absolute_error": 1.338842,
+          "chroma_95th_percentile_error": 4.0,
+          "scene": "Northern medieval coastal mining and fishing town, low wood and dry stone buildings, snow and driftwood, cool marine sky. Steep stepped way down to a cargo pier, block and tackle and stretched ropes, wintry wet planks bending into the distance past piled snow and quiet gray water."
+        },
+        {
+          "frame": 6,
+          "source_sha256": "7e5752477c4a15b9373392ecc2e0409e5d3dfb38c583c7c8f372049485c47dd7",
+          "source_bytes": 3566165,
+          "source_dimensions": [
+            1672,
+            941
+          ],
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 467922,
+          "quality": 86,
+          "sha256": "33a7ec3f962af426230813a386f2895f44f3e645ba9aae94c363f9835e2c8cdd",
+          "full_resolution_luma_ssim": 0.985811,
+          "worst_128px_luma_ssim": 0.977242,
+          "chroma_mean_absolute_error": 1.395749,
+          "chroma_95th_percentile_error": 4.0,
+          "scene": "Northern medieval coastal mining and fishing town, low wood and dry stone buildings, snow and driftwood, cool marine sky. Wide vista of a small cove rimmed with brittle milk-white sea ice, snow-veiled slipways and short warehouses within an arc of basalt rocks, overcast winter light."
+        }
+      ]
+    },
+    "cityPlaces": [
+      "Подход к Данстару",
+      "Порт",
+      "Главная улица",
+      "Пик Ветров",
+      "",
+      "Бухта"
+    ]
+  },
+  {
+    "name": "Воронья Скала",
+    "slug": "ravenrock",
+    "captions": [
+      "Прибытие в Воронью Скалу",
+      "Улицы Вороньей Скалы",
+      "Торговая площадь",
+      "Храм предков",
+      "Стена Бастиона",
+      "Таверна «Пьяный нетч»"
+    ],
+    "aliases": [],
+    "artwork": {
+      "date": "2026-11-20",
+      "kind": "original_generated_illustration",
+      "format": "WebP",
+      "encoder_method": 6,
+      "frames": [
+        {
+          "frame": 1,
+          "source_sha256": "1e9aaee1ed873ffc7cc456320f1f7917bb05e8e79b86d69429520a4a505ce15b",
+          "source_bytes": 3094129,
+          "source_dimensions": [
+            1672,
+            941
+          ],
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 510192,
+          "quality": 91,
+          "sha256": "8f976a9a0f10c976bc8929713f579bbe51388bd894aaae48345f8ee8d1e0a461",
+          "full_resolution_luma_ssim": 0.987039,
+          "worst_128px_luma_ssim": 0.975265,
+          "chroma_mean_absolute_error": 1.288685,
+          "chroma_95th_percentile_error": 4.0,
+          "scene": "Original medieval island port of basalt and wind-carved volcanic ash, muted terracotta and cold blue sea beyond solid stone walls. Coast-side arrival at a basalt stone quay beneath a volcanic headland, squat boats and red canvas lashings, streaks of ash on water, early light from seaward."
+        },
+        {
+          "frame": 2,
+          "source_sha256": "0b0fddbcd10b421c5abeb54a99a0b8c3aed3bc1d47f3da192ba705624dde6037",
+          "source_bytes": 3190141,
+          "source_dimensions": [
+            1672,
+            941
+          ],
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 491072,
+          "quality": 90,
+          "sha256": "0e25ed61e32290af08a0fb310a7518e687dab4d5785863b9728071869fb21d84",
+          "full_resolution_luma_ssim": 0.985015,
+          "worst_128px_luma_ssim": 0.975894,
+          "chroma_mean_absolute_error": 1.317554,
+          "chroma_95th_percentile_error": 4.0,
+          "scene": "Original medieval island port of basalt and wind-carved volcanic ash, muted terracotta and cold blue sea beyond solid stone walls. Urban street of sturdy red tuff and smooth black basalt, tilted roof pipes and rain basins, puffs of ash drifting between varied stone doorways."
+        },
+        {
+          "frame": 3,
+          "source_sha256": "25e5e4ab508e2195d6fdbccc3a652266a9f8aff54e83a06b5990a3209c390954",
+          "source_bytes": 3287921,
+          "source_dimensions": [
+            1672,
+            941
+          ],
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 523820,
+          "quality": 90,
+          "sha256": "9b0e69af72198ed28f54cc2ae951182514050a510459d983cfc71ad282fc772e",
+          "full_resolution_luma_ssim": 0.986006,
+          "worst_128px_luma_ssim": 0.977813,
+          "chroma_mean_absolute_error": 1.461351,
+          "chroma_95th_percentile_error": 4.0,
+          "scene": "Original medieval island port of basalt and wind-carved volcanic ash, muted terracotta and cold blue sea beyond solid stone walls. Close medieval market beside stacked basalt walls, arrays of hand-thrown terracotta in burnt orange and cream, taut natural canvas banners with no markings."
+        },
+        {
+          "frame": 4,
+          "source_sha256": "5ff3ebbbddfef5c5b0d3032003e67e3fa7316a66752d1dbdaf55b0c98ac95c05",
+          "source_bytes": 2783675,
+          "source_dimensions": [
+            1672,
+            941
+          ],
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 456592,
+          "quality": 93,
+          "sha256": "dab4c1a6260bffd85eb58fbcf75f37f2f849f15d3933c8aa445b5ba074639c8e",
+          "full_resolution_luma_ssim": 0.985498,
+          "worst_128px_luma_ssim": 0.978744,
+          "chroma_mean_absolute_error": 1.06989,
+          "chroma_95th_percentile_error": 3.0,
+          "scene": "Original medieval island port of basalt and wind-carved volcanic ash, muted terracotta and cold blue sea beyond solid stone walls. Solemn basalt sanctuary of originally shaped pillars over earth vents, red stone bowls and bright light from a high slot onto a floor of uneven polished rock."
+        },
+        {
+          "frame": 5,
+          "source_sha256": "6d1cfef9c9328e165262d486f3376a00c72b8ebf58e4b5b97ba560185997fea9",
+          "source_bytes": 3177521,
+          "source_dimensions": [
+            1672,
+            941
+          ],
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 522274,
+          "quality": 91,
+          "sha256": "07973e29ef7fbdad0b453679259cbd2416b5e55dcc5b2ff16bd4b0be16dec63d",
+          "full_resolution_luma_ssim": 0.986824,
+          "worst_128px_luma_ssim": 0.977299,
+          "chroma_mean_absolute_error": 1.182298,
+          "chroma_95th_percentile_error": 4.0,
+          "scene": "Original medieval island port of basalt and wind-carved volcanic ash, muted terracotta and cold blue sea beyond solid stone walls. A plain volcanic bastion to stop drifts above the harbor, high terrace of leaning black stone parapets, fabric wind baffles and an ash-mottled slope from across the valley."
+        },
+        {
+          "frame": 6,
+          "source_sha256": "269b01162707b6bf6e9e355d583beefb2349dc808b054d6238c89e441a9c2b8d",
+          "source_bytes": 3261000,
+          "source_dimensions": [
+            1672,
+            941
+          ],
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 548124,
+          "quality": 91,
+          "sha256": "0199ba3740db09bc812af98e840e521dd006377b65f1a2e89e162449ff08f62a",
+          "full_resolution_luma_ssim": 0.986789,
+          "worst_128px_luma_ssim": 0.979442,
+          "chroma_mean_absolute_error": 1.350085,
+          "chroma_95th_percentile_error": 4.0,
+          "scene": "Original medieval island port of basalt and wind-carved volcanic ash, muted terracotta and cold blue sea beyond solid stone walls. Exterior of an unnamed-looking inn recessed into a basalt arch on a normal residential street, two amber oil lanterns, rain-damp ash around the landing and pebbled black stonework."
+        }
+      ]
+    },
+    "cityPlaces": [
+      "Причал",
+      "Главная улица",
+      "Торговая площадь",
+      "Храм Вороньей Скалы",
+      "Бастион",
+      "Пьяный нетч"
+    ]
+  },
+  {
+    "name": "Коллегия Винтерхолда",
+    "slug": "collegewinterhold",
+    "captions": [
+      "Коллегия над морской бездной",
+      "Крытая галерея",
+      "Библиотека Коллегии",
+      "Кузница на каменной террасе"
+    ],
+    "aliases": [
+      "College of Winterhold"
+    ],
+    "artwork": {
+      "date": "2026-11-20",
+      "kind": "original_generated_illustration",
+      "format": "WebP",
+      "encoder_method": 6,
+      "frames": [
+        {
+          "frame": 1,
+          "source_sha256": "6d617e23ceb2a264196a23970d6e69ef9441a8c47a4c17a3c23c8e623549bd96",
+          "source_bytes": 3501859,
+          "source_dimensions": [
+            1672,
+            941
+          ],
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 509862,
+          "quality": 88,
+          "sha256": "555b6bb20a99c6a83870465e5fc5f2dcac9ed959bbc7ea872fec8824ebeaccf5",
+          "full_resolution_luma_ssim": 0.986343,
+          "worst_128px_luma_ssim": 0.980123,
+          "chroma_mean_absolute_error": 1.435661,
+          "chroma_95th_percentile_error": 4.0,
+          "scene": "Original northern academy of astronomy and ritual craft perched in pale blue coastal mountains. Medieval architecture, founded from old slate, bone-colored limewash and dark bronze, independent architectural layout. A walled academy with a steep hanging garden and two tiered observatory towers on a rocky finger over a steel blue northern sea, seen from the uphill traverse."
+        },
+        {
+          "frame": 2,
+          "source_sha256": "a421138ec9996242cb9e43da5b5542e5944ad8c2ba510c88ab06470372ebbefd",
+          "source_bytes": 3179193,
+          "source_dimensions": [
+            1672,
+            941
+          ],
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 490842,
+          "quality": 90,
+          "sha256": "3941a12354a709e60d02ba84d9e7948ef4fc7a68656a34e6589c47621fb5aeb1",
+          "full_resolution_luma_ssim": 0.98584,
+          "worst_128px_luma_ssim": 0.977421,
+          "chroma_mean_absolute_error": 1.236887,
+          "chroma_95th_percentile_error": 4.0,
+          "scene": "Original northern academy of astronomy and ritual craft perched in pale blue coastal mountains. Medieval architecture, founded from old slate, bone-colored limewash and dark bronze, independent architectural layout. A circular narrow stone ambulatory around a central open shaft, large geometric slots giving naturally cold daylight, aged brass survey tools on a long gallery ledge."
+        },
+        {
+          "frame": 3,
+          "source_sha256": "f9a95f9ad4cde3f4ece179c12598eedeb8630cce3b035c0cd3ae86af6e7e82ea",
+          "source_bytes": 3193644,
+          "source_dimensions": [
+            1672,
+            941
+          ],
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 501440,
+          "quality": 90,
+          "sha256": "64e48eed3832828647ea2298994fcf8571a58316ec42007c1ac59818cd5a9db0",
+          "full_resolution_luma_ssim": 0.986621,
+          "worst_128px_luma_ssim": 0.975665,
+          "chroma_mean_absolute_error": 1.287376,
+          "chroma_95th_percentile_error": 4.0,
+          "scene": "Original northern academy of astronomy and ritual craft perched in pale blue coastal mountains. Medieval architecture, founded from old slate, bone-colored limewash and dark bronze, independent architectural layout. An independent square meditative library built of limestone and dark oak, reading benches, brass star-measuring circles, several floors of vellum volumes by fine archive ladders."
+        },
+        {
+          "frame": 4,
+          "source_sha256": "726c861e6388d209c04128fb59d8f5739547f0f2b3290b6f39278f664fcca9c3",
+          "source_bytes": 3162496,
+          "source_dimensions": [
+            1672,
+            941
+          ],
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 494598,
+          "quality": 90,
+          "sha256": "40b85e65a3cbdf4170f24ed6a12966daa969fce91c13bd357b21fcb7eeb1d554",
+          "full_resolution_luma_ssim": 0.986721,
+          "worst_128px_luma_ssim": 0.981335,
+          "chroma_mean_absolute_error": 1.308195,
+          "chroma_95th_percentile_error": 4.0,
+          "scene": "Original northern academy of astronomy and ritual craft perched in pale blue coastal mountains. Medieval architecture, founded from old slate, bone-colored limewash and dark bronze, independent architectural layout. Stepped research furnace below an academy, heavily worn rectangular firebox and high dark bronze ventilation grates, forged rings cooling on racks and rough slate wall."
+        }
+      ]
+    },
+    "parent": "Винтерхолд"
+  },
+  {
+    "name": "Конюшни Солитьюда",
+    "slug": "solitude_stables",
+    "aliases": [
+      "Solitude Stables",
+      "Солитьюд - Конюшни"
+    ],
+    "captions": [
+      "Стойла и загон у городской стены"
+    ],
+    "artwork": {
+      "date": "2026-11-20",
+      "kind": "original_generated_illustration",
+      "format": "WebP",
+      "encoder_method": 6,
+      "frames": [
+        {
+          "frame": 1,
+          "source_sha256": "0d0f6d8335c57d25506a74a6441c3d6988f1d7d55faa47e8d732c5cb9b934b30",
+          "source_bytes": 3374691,
+          "source_dimensions": [
+            1672,
+            941
+          ],
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 514974,
+          "quality": 89,
+          "sha256": "d8c983a9595801f23cf57aa384a9a810dc078d4beec8c9c5338be01e59b9a3eb",
+          "full_resolution_luma_ssim": 0.986782,
+          "worst_128px_luma_ssim": 0.976678,
+          "chroma_mean_absolute_error": 1.525877,
+          "chroma_95th_percentile_error": 4.0,
+          "scene": "Original medieval coast clifftop town in pale limestone, fir plankwork and salt-blue daylight. A close wide exterior of a horse stable against a low limestone scarp, neatly spaced red cedar stalls, saddle towels and halters on timber, a small draft horse far in the paddock and cool morning sun."
+        }
+      ]
+    },
+    "parent": "Солитьюд"
+  },
+  {
+    "name": "Заброшенный дом Маркарта",
+    "slug": "markarth_derelict_house",
+    "aliases": [
+      "Abandoned House (Markarth)"
+    ],
+    "captions": [
+      "Вход в заброшенный дом"
+    ],
+    "artwork": {
+      "date": "2026-11-20",
+      "kind": "original_generated_illustration",
+      "format": "WebP",
+      "encoder_method": 6,
+      "frames": [
+        {
+          "frame": 1,
+          "source_sha256": "6170470a5b0d33d5414d195cab8f7aa2b4ca7e835377a5b777f49aebd17a55f0",
+          "source_bytes": 3506326,
+          "source_dimensions": [
+            1672,
+            941
+          ],
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 498272,
+          "quality": 88,
+          "sha256": "8406fc1baa03e2fefdb41a5fef16c67eb58e539c8ce39a945aa845dc8bf72959",
+          "full_resolution_luma_ssim": 0.985315,
+          "worst_128px_luma_ssim": 0.977126,
+          "chroma_mean_absolute_error": 1.287583,
+          "chroma_95th_percentile_error": 4.0,
+          "scene": "Original limestone quarry city on a waterfall escarpment, no existing level geometry. Grounded abandoned townhouse on a limestone terrace, broken timber lintel, cracked pottery and thin sheet of water running beside steps to its boarded door, cold natural light and pale slate."
+        }
+      ]
+    },
+    "parent": "Маркарт"
+  },
+  {
+    "slug": "solitude_arch",
+    "name": "Городская арка Солитьюда",
+    "parent": "Солитьюд",
+    "aliases": [
+      "Городская арка"
+    ],
+    "captions": [
+      "Каменная арка со стороны воды"
+    ],
+    "artwork": {
+      "date": "2026-11-20",
+      "kind": "original_generated_illustration",
+      "format": "WebP",
+      "encoder_method": 6,
+      "frames": [
+        {
+          "frame": 1,
+          "source_sha256": "e6155641a5f1c6e530628adc0ff0e17937a425d9e696bef9119a1ca7c1324886",
+          "source_bytes": 3231701,
+          "source_dimensions": [
+            1672,
+            941
+          ],
+          "dimensions": [
+            1672,
+            941
+          ],
+          "bytes": 533992,
+          "quality": 91,
+          "sha256": "ab90ccb2a3ba05410be2a60e7a688af98de0fb6654ed3a0ed7040211d70a6410",
+          "full_resolution_luma_ssim": 0.987421,
+          "worst_128px_luma_ssim": 0.97893,
+          "chroma_mean_absolute_error": 1.407231,
+          "chroma_95th_percentile_error": 4,
+          "scene": "Dramatic original natural rock span low over turbulent turquoise sound, a small stone footbridge visible above on the wind-cut headland, foam and drifting sea birds. View from the opposite cliff at late afternoon, strong silhouette."
         }
       ]
     }
