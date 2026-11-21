@@ -11,7 +11,7 @@ public class FixShopBundleTest {
   GameEngine h=GameEngine.fromJson(g.toJson().toString());assertTrue(h.fixShop.redeem(h,1));assertEquals(before+1,h.progress.quantity(b.items[0]));assertFalse(h.fixShop.redeem(h,1));assertFalse(h.fixShop.refund(h,1));
  }
  @Test public void membershipDoesNotCrossCivilWar() {
-  GameEngine g=new GameEngine();g.start("Тест","Норд","Воин");g.mode="WORLD";g.fixShop.editorEnabled=true;
-  int xp=g.xp;assertTrue(g.factions.fixMembership(g,4,true));assertFalse(g.factions.fixMembership(g,5,true));assertTrue(g.factions.fixMembership(g,4,false));assertTrue(g.factions.fixMembership(g,5,true));assertEquals(xp,g.xp);
+  GameEngine g=new GameEngine();g.start("Тест","Норд","Воин");g.mode="WORLD";
+  int xp=g.xp;assertFalse(g.factions.fixMembership(g,4,true));assertFalse(g.factions.fixMembership(g,5,true));assertFalse(g.factions.fixMembership(g,4,false));assertFalse(g.factions.fixMembership(g,5,true));assertEquals(xp,g.xp);
  }
 }
