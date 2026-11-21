@@ -907,6 +907,10 @@ public final class GameEngine {
         katherine.observeTravel(this);alma.observeTravel(this);
         return true;
     }
+    /** Gift and home recalls obey the same verified-visited travel rules. */
+    boolean fixTravelToVisited(String destination){
+        return fastTravel(destination,true);
+    }
     public boolean waitHours(int hours){return restHours(hours,hours>=6);}
     public boolean restHours(int hours,boolean sleep){if(solitude.custody())return false;return restHoursInternal(hours,sleep);}
     boolean restPrisonDay(){return solitude.confined()&&SolitudeJustice.CELL.equals(mode)&&restHoursInternal(24,true);}
