@@ -313,10 +313,18 @@ public final class ItemCatalog {
         put(CompensationPowers.ITEMS[1],"Броня","⬟",8,0,"Уникальная кираса компенсации.","Привязано к владельцу.",32,4);
         put(CompensationPowers.ITEMS[2],"Украшения","◈",0.2,0,"Уникальное кольцо компенсации.","Привязано к владельцу.",0,-1);
     }
-    static synchronized void clearCustom(){for(int i=3;i<CompensationPowers.SLOTS;i++)items.remove(CompensationPowers.itemId(i));}
+    static synchronized void clearCustom(){for(int i=3;i<CompensationPowers.ITEM_SLOTS;i++)items.remove(CompensationPowers.itemId(i));}
+    // Historical 3-type callers remain compatible with the new registry.
     static synchronized void registerCustom(String id,String name,int type,int stat,double weight,String description){
-        String[] categories={"Оружие","Броня","Украшения"},slots={"weapon","body","ring"},icons={"⚔","⬟","◈"};
-        items.put(id,new Item(id,name,categories[type],icons[type],weight,0,description,"Системное снаряжение.",type==2?0:stat,type==0?0:type==1?4:-1,slots[type]));
+        registerCustom(id,name,type,stat,weight,0,description,"Системное снаряжение.");
+    }
+    static synchronized void registerCustom(String id,String name,int type,int stat,double weight,
+            int value,String description,String effect){
+        int kind=ItemWorkshopSpec.normalizeType(type);
+        items.put(id,new Item(id,name,ItemWorkshopSpec.CATEGORY[kind],
+                ItemWorkshopSpec.ICON[kind],weight,value,description,effect,
+                ItemWorkshopSpec.hasStat(kind)?stat:0,ItemWorkshopSpec.SKILL[kind],
+                ItemWorkshopSpec.SLOT[kind]));
     }
     private ItemCatalog(){}
     public static synchronized void initialize(Context c){
