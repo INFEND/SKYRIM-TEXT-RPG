@@ -84,7 +84,7 @@ final class SolitudeResidents {
     static boolean present(GameEngine g,int i,int d){
         if(d<0||i<0||i>=NAMES.length||district(i,g.hour)!=d)return false;
         String status=g.sceneState.npcStatusByName(NAMES[i]);
-        return !"DEAD".equals(status)&&!"MISSING".equals(status)&&!"HOSTILE".equals(status);
+        return !"DEAD".equals(status)&&!"MISSING".equals(status);
     }
     private static JSONObject fact(GameEngine g,int i){
         JSONArray a=g.sceneState.npcFacts();
@@ -94,6 +94,11 @@ final class SolitudeResidents {
     static void choices(GameEngine g,GameEngine.Scene s,int d){
         for(int i=0;i<NAMES.length;i++)if(present(g,i,d)){
             JSONObject f=fact(g,i);
+            if(f!=null&&"HOSTILE".equals(f.optString("status"))){
+                s.add("SOLITUDE:resident:reconcile:"+i,"Попытаться примириться: "+NAMES[i],"Авторское действие | 1 час, 10 сил | один переход отношений");
+                s.add("SOLITUDE:resident:history:"+i,"История отношений: "+NAMES[i],"Только просмотр");
+                continue;
+            }
             s.add("SOLITUDE:resident:talk:"+i,"Поговорить: "+NAMES[i],f==null?"Авторский диалог | Знакомство":"Отношение: "+f.optInt("relation",50)+"/100");
             s.add("SOLITUDE:resident:topic:"+i,"Расспросить: "+NAMES[i],"Городская жизнь | авторский диалог");
             if(f!=null&&"MET".equals(f.optString("status")))s.add("SOLITUDE:resident:trust:"+i,"Поделиться впечатлениями: "+NAMES[i],"Авторский диалог | Однократное знакомство ближе");
@@ -126,13 +131,26 @@ final class SolitudeResidents {
         if(SolitudeFavors.choose(g,d,a))return true;
         if(!a.startsWith("SOLITUDE:resident:"))return false;
         for(int i=0;i<NAMES.length;i++)if(present(g,i,d)){
+            boolean reconcile=a.equals("SOLITUDE:resident:reconcile:"+i);
             boolean memory=a.equals("SOLITUDE:resident:memory:"+i);
             boolean history=a.equals("SOLITUDE:resident:history:"+i);
             boolean topic=a.equals("SOLITUDE:resident:topic:"+i);
             boolean trust=a.equals("SOLITUDE:resident:trust:"+i);
             boolean advice=a.equals("SOLITUDE:resident:advice:"+i);
-            if(!memory&&!history&&!topic&&!trust&&!advice&&!a.equals("SOLITUDE:resident:talk:"+i))continue;
+            if(!reconcile&&!memory&&!history&&!topic&&!trust&&!advice&&!a.equals("SOLITUDE:resident:talk:"+i))continue;
             JSONObject f=fact(g,i);if((memory||history)&&f==null)return true;
+            if(reconcile){
+                if(f==null||!"HOSTILE".equals(f.optString("status")))return true;
+                if(g.hour>=23||g.stamina<10){g.message="Для примирения нужны один час и 10 единиц запаса сил.";return true;}
+                try{
+                    g.sceneState.setContext(g.day,g.hour,"Солитьюд");
+                    g.sceneState.confirm("npc",f.optString("id"),NAMES[i],"INFORMED");
+                }catch(org.json.JSONException ignored){return true;}
+                g.stamina-=10;g.hour++;
+                g.message=NAMES[i]+": Конфликт улажен. Мы можем снова разговаривать.";
+                g.progress.recent=g.message;g.recordVisualEvent(g.message);g.progress.sync(g);return true;
+            }
+            if(f!=null&&"HOSTILE".equals(f.optString("status"))&&!history)return true;
             if(trust&&(f==null||!"MET".equals(f.optString("status"))))return true;
             if(advice&&(f==null||f.optInt("relation",50)<60))return true;
             try{
