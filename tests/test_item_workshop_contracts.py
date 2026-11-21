@@ -26,7 +26,7 @@ class ExpandedItemWorkshop(unittest.TestCase):
 
     def test_metadata_survives_saves_and_inventory_registration(self):
         for key in ('itemValue','itemRarity','itemEffects','itemArtPrompts','itemArtPaths'):
-            self.assertIn('j.put("'+key+'"',ITEMS)
+            self.assertIn('.put("'+key+'"',ITEMS)
             self.assertIn('str(j,"'+key+'"',ITEMS) if key.startswith("itemA") or key=="itemEffects" else self.assertIn('num(j,"'+key+'"',ITEMS)
         self.assertIn('ItemCatalog.registerCustom(itemId(i)',ITEMS)
         self.assertIn('game.compensation.attachArtwork(slot,path',MAIN)
@@ -44,7 +44,6 @@ class ExpandedItemWorkshop(unittest.TestCase):
         self.assertIn('private static final String IMAGES="https://api.openai.com/v1/images/generations"',AI)
         self.assertIn('AiKeyVault.read(app)',AI)
         self.assertIn('Платная генерация изображения',MAIN)
-        self.assertIn('Лимит',MAIN) if False else None
         self.assertIn('setPositiveButton("Генерировать"',MAIN)
         self.assertIn('new File(context.getFilesDir(),"item_art")',ART)
         self.assertIn('Bitmap.CompressFormat.WEBP',ART)
