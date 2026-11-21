@@ -12,7 +12,7 @@ class AiQuestContext(unittest.TestCase):
         self.assertIn('private static String aiQuestSummary(GameEngine game,int budget)',SOURCE)
         self.assertIn('game.progress.aiQuestRecords',SOURCE)
     def test_local_model_knows_validated_patch_fields(self):
-        self.assertIn('effects.questUpdates:[{id,title,objective,stage,status}]',SOURCE)
+        self.assertIn('effects.questUpdates:[{id,title,objective,stage,status,',SOURCE)
         self.assertIn('effects.npcRewrites:[{id,relation,resurrect}]',SOURCE)
         self.assertIn('/no_think',SOURCE)
 
