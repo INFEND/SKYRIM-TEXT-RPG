@@ -17,6 +17,8 @@ public class SolitudeReconciliationIntegrationTest {
         assertEquals(gold,g.gold);assertEquals(items,g.progress.quantity("Отмычка"));
         g=GameEngine.fromJson(g.toJson().toString());
         assertTrue(g.scene().choices.stream().anyMatch(c->c.action.equals("SOLITUDE:merchant:reconcile:2")));
+        assertTrue("Reconciliation must remain visible when the shop is closed to hostile customers",
+            g.scene().choices.stream().anyMatch(c->c.action.equals("SOLITUDE:merchant:reconcile:2")));
         int stamina=g.stamina,hour=g.hour;
         g.choose("SOLITUDE:merchant:reconcile:2");
         assertEquals(stamina-10,g.stamina);assertEquals(hour+1,g.hour);

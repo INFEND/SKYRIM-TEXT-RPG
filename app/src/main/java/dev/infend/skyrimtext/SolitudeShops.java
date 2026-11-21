@@ -122,7 +122,8 @@ final class SolitudeShops {
             tradeChoices(scene,"SOLITUDE:buy:"+s+":"+i,"Купить: "+item.name,p,maxBuy(g,s,i,item),"В наличии: "+n);
             tradeChoices(scene,"SOLITUDE:sell:"+s+":"+i,"Продать: "+item.name,g.salePrice(item),maxSell(g,s,item),"У тебя: "+g.progress.quantity(id));
         }
-        else scene=new GameEngine.Scene(scene.kicker,scene.title,scene.body+"\n\nЛавка закрыта или торговец недоступен.");
+        // Keep the existing scene: rebuilding it here discards the reconciliation action.
+        // The body already explains that the merchant is unavailable through the absence of trade choices.
         if(open(g,s))for(ItemCatalog.Item item:g.progress.owned("Все","Название"))
             if(extraAccepted(s,item))tradeChoices(scene,"SOLITUDE:extraSell:"+s+":"+item.id,"Продать: "+item.name,g.salePrice(item),maxSell(g,s,item),"У тебя: "+g.progress.quantity(item.id)+" | Скупка по специализации");
         if(open(g,s))for(java.util.Map.Entry<String,Integer> e:resale.get(s).entrySet()){
