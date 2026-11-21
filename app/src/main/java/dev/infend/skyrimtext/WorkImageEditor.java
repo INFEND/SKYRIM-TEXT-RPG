@@ -784,6 +784,68 @@ public final class WorkImageEditor {
         new AlertDialog.Builder(host).setTitle("ИЗОБРАЖЕНИЯ  |  WORK + API")
             .setView(scroll).setNegativeButton("Закрыть", null).show();
     }
+    /** User-initiated Android Sharesheet return path from ChatGPT Work. */
+    public static boolean handleSharedIntent(Activity host, Intent intent, int accent, Runnable onUpdated) {
+        if (intent == null) return false;
+        String action = intent.getAction(), type = intent.getType();
+        if (!(Intent.ACTION_SEND.equals(action) || Intent.ACTION_SEND_MULTIPLE.equals(action))
+            || type == null || !type.startsWith("image/")) return false;
+        ArrayList<Uri> files = new ArrayList<>();
+        ClipData clip = intent.getClipData();
+        if (clip != null) for (int i = 0; i < Math.min(MAX_IMPORT, clip.getItemCount()); i++) {
+            Uri uri = clip.getItemAt(i).getUri(); if (uri != null) files.add(uri);
+        }
+        if (files.isEmpty()) {
+            try {
+                if (Intent.ACTION_SEND_MULTIPLE.equals(action)) {
+                    ArrayList<Uri> batch = intent.getParcelableArrayListExtra(Intent.EXTRA_STREAM);
+                    if (batch != null) for (Uri uri : batch) {
+                        if (uri != null && files.size() < MAX_IMPORT) files.add(uri);
+                    }
+                } else {
+                    Uri uri = intent.getParcelableExtra(Intent.EXTRA_STREAM);
+                    if (uri != null) files.add(uri);
+                }
+            } catch (Exception ignored) {}
+        }
+        if (files.isEmpty() && intent.getData() != null) files.add(intent.getData());
+        if (files.isEmpty()) return true;
+        String pending = prefs(host).getString(PENDING, "");
+        if (pending.isEmpty()) {
+            new AlertDialog.Builder(host).setTitle("Изображение из ChatGPT")
+                .setMessage("Сначала открой редактор нужной локации, NPC или предмета"
+                    + " и запусти ChatGPT / Work из редактора.")
+                .setPositiveButton("Понятно", null).show();
+            return true;
+        }
+        try {
+            JSONObject target = new JSONObject(pending);
+            if (target.optString("id").isEmpty()) return true;
+            LinearLayout panel = container(host);
+            panel.addView(label(host, "Цель: " + target.optString("name")
+                + "\nИзображений: " + files.size() + "\nПроверь правильность выбранной цели.", 14, WHITE));
+            try {
+                Bitmap preview = readScaled(host, files.get(0), 1000);
+                if (preview != null) {
+                    ImageView art = new ImageView(host);
+                    art.setImageBitmap(preview); art.setAdjustViewBounds(true);
+                    panel.addView(art, new LinearLayout.LayoutParams(-1, -2));
+                }
+            } catch (Exception ignored) {}
+            final ArrayList<Uri> selected = files;
+            new AlertDialog.Builder(host).setTitle("ИМПОРТ ИЗ CHATGPT / WORK")
+                .setView(panel)
+                .setPositiveButton("Заменить основное", (d, w) ->
+                    installAsync(host, target, selected, true, onUpdated, "chatgpt-work-share"))
+                .setNeutralButton("Добавить в галерею", (d, w) ->
+                    installAsync(host, target, selected, false, onUpdated, "chatgpt-work-share"))
+                .setNegativeButton("Отмена", null).show();
+        } catch (Exception error) {
+            Toast.makeText(host, "Невозможно импортировать изображения из Work",
+                Toast.LENGTH_LONG).show();
+        }
+        return true;
+    }
     public static boolean onActivityResult(Activity host, int request, int result, Intent data,
                                            int accent, Runnable onUpdated) {
         if (request == REQUEST_API_REFERENCE) {
