@@ -405,6 +405,15 @@ public final class AiGameTurn {
         return (int)value;
     }
     private static int cap(long x,int min,int max){return (int)Math.max(min,Math.min(max,x));}
+    private static int questReward(JSONObject quest,String key,int previous,int max)throws JSONException{
+        if(!quest.has(key))return previous;
+        Object raw=quest.opt(key);
+        if(!(raw instanceof Number))throw new JSONException("Награда задания должна быть числом: "+key);
+        double value=((Number)raw).doubleValue();
+        if(!Double.isFinite(value)||value!=Math.rint(value)||value<0||value>max)
+            throw new JSONException("Награда задания вне диапазона: "+key);
+        return (int)value;
+    }
     public void apply(GameEngine g,boolean acted)throws JSONException{
         if(!acted||effects==null)return;
         // Active encounters are owned exclusively by native combat.
@@ -574,6 +583,7 @@ public final class AiGameTurn {
         // Per-quest stage and objective updates are checked on a detached ledger.
         // No result is applied if any item is malformed or rolls back a quest.
         JSONObject validatedQuests=null;
+        int questGoldReward=0,questXpReward=0;
         if(e.has("questUpdates")){
             if(!(e.opt("questUpdates") instanceof JSONArray))
                 throw new JSONException("Обновления заданий должны быть массивом");
@@ -610,9 +620,23 @@ public final class AiGameTurn {
                     if(stageNumber<prior.optInt("stage",0))
                         throw new JSONException("Нельзя откатить стадию задания");
                 }
+                int rewardGold=questReward(update,"rewardGold",
+                    prior==null?0:prior.optInt("rewardGold",0),5000);
+                int rewardXp=questReward(update,"rewardXp",
+                    prior==null?0:prior.optInt("rewardXp",0),10000);
+                if(prior!=null&&((prior.has("rewardGold")&&rewardGold!=prior.optInt("rewardGold"))
+                    ||(prior.has("rewardXp")&&rewardXp!=prior.optInt("rewardXp"))))
+                    throw new JSONException("Нельзя менять обещанную награду задания");
+                if("COMPLETED".equals(status)
+                    &&(prior==null||!"COMPLETED".equals(prior.optString("status")))){
+                    if(questGoldReward>5000-rewardGold||questXpReward>10000-rewardXp)
+                        throw new JSONException("Слишком большая суммарная награда за ход");
+                    questGoldReward+=rewardGold;questXpReward+=rewardXp;
+                }
                 validatedQuests.put(id,new JSONObject().put("title",title)
                     .put("objective",objective).put("stage",(int)stageNumber)
-                    .put("status",status));
+                    .put("status",status).put("rewardGold",rewardGold)
+                    .put("rewardXp",rewardXp));
             }
         }
         ArrayList<AiEquipmentActions.Change> equipmentChanges=
@@ -637,9 +661,10 @@ public final class AiGameTurn {
             }
         }
         g.maxHp=maxHp;g.hp=hp;g.maxStamina=maxSt;g.stamina=st;g.maxMagicka=maxMg;g.magicka=mg;
-        g.gold=gold;g.day=day;g.hour=nextHour;g.reputation=rep;g.attack=attack;g.armor=armor;g.potions=pots;g.manaPotions=manaPots;
+        g.gold=cap((long)gold+questGoldReward,0,Math.max(10000000,g.gold));
+        g.day=day;g.hour=nextHour;g.reputation=rep;g.attack=attack;g.armor=armor;g.potions=pots;g.manaPotions=manaPots;
         if(place!=null){g.region=place.region;g.progress.location=place.name;}
-        if(xp>0)g.addXp(xp);
+        if(xp+questXpReward>0)g.addXp(xp+questXpReward);
         g.questStage=Math.min(4,g.questStage+q);
         g.progress.dragonStage=Math.min(DragonArc.FINAL_STAGE,g.progress.dragonStage+d);
         if(skills!=null)for(int i=0;i<skills.length();i++){
