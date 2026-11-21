@@ -36,7 +36,9 @@ final class ImageApiClient {
 
     static boolean busy() { return RUNNING.get(); }
     static boolean modelAllowed(String model) {
-        return "gpt-image-2.5-sunburst".equals(model)
+        return "gpt-image-2.6-sunburst".equals(model)
+            || "gpt-image-2.6-flare".equals(model)
+            || "gpt-image-2.5-sunburst".equals(model)
             || "gpt-image-2.5-flare".equals(model)
             || "gpt-image-1.5".equals(model);
     }
