@@ -515,6 +515,9 @@ final class SkyrimMapPoints {
         "solstheim-2537|Храм Мирака|Temple of Miraak|Храм|1|56313.0|59653.0|9|1261.0|1111.0|anchor",
         "solstheim-2517|Переправа в Скайрим|To Skyrim|Переход|1|12404.0|20717.0|9|367.0701|1737.9514|interpolated",
         "solstheim-2525|Деревня скаалов|Skaal Village|Деревня|1|73452.0|70790.0|9|1561.0|938.0|anchor",
+        "skyrim-2493|Перевал Данмет|Dunmeth Pass|Переход|0|176127.0|38485.0|2|3423.9922|1747.3359|geographic",
+        "skyrim-2494|Бледный перевал|Pale Pass|Переход|0|27698.0|-116567.0|5|2264.3906|2958.6797|geographic",
+        "skyrim-910|Святилище Малаката|Shrine to Malacath|Святилище|0|134978.0|-111112.0|1|3102.5156|2916.0625|geographic",
     };
     private SkyrimMapPoints(){}
 }
