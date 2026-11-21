@@ -87,6 +87,7 @@ public final class MainActivity extends Activity {
     private static final String SKILL_HUD_SNAPSHOT="skill_hud_snapshot";
     private boolean animations=true, titleOpen=true;
     private int codexCategory=0;
+    private String bestiaryFilter=BestiaryCatalog.ALL, bestiaryQuery="";
     private SkyrimOtaController updater;
     private ChatGptOAuth chatGptOAuth;
     private boolean awaitingAiToken;
@@ -2126,6 +2127,10 @@ public final class MainActivity extends Activity {
             renderAiGame();return;
         }
         GameEngine.Scene s=game.scene();section(s.kicker,s.title,"");
+        if("COMBAT".equals(game.mode)){
+            BestiaryCatalog.Entry opponent=BestiaryCatalog.find(game.enemyName);
+            if(opponent!=null)actionButton("БЕСТИАРИЙ | "+opponent.name,opponent.shortLabel(),false,()->showBestiaryEntry(opponent));
+        }
         if(LiviaStory.MODE.equals(game.mode)&&game.livia.stage==4&&game.livia.survivor())actionButton("Ливия | Спутница и отношения",game.livia.life.gearLabel(),false,()->npcDetails(LiviaStory.NAME));
         if(LocationGalleryView.hasGallery(game.progress.location)){
             content.addView(sceneGallery(game.progress.location),lp(-1,-2));
@@ -2633,6 +2638,8 @@ public final class MainActivity extends Activity {
         }
         if("COMBAT".equals(game.mode)&&game.enemyHp>0){
             addText(content,"БОЙ | "+game.enemyName+" | "+game.enemyHp+"/"+game.enemyMaxHp,14,accent(),true,8);
+            BestiaryCatalog.Entry opponent=BestiaryCatalog.find(game.enemyName);
+            if(opponent!=null)actionButton("БЕСТИАРИЙ | "+opponent.name,opponent.shortLabel(),false,()->showBestiaryEntry(opponent));
             if(game.road.groupActive(game))addText(content,game.road.groupStatus(game),13,TEXT,false,8);
             actionButton("УДАР","Обычная атака",true,()->resolveNativeAiCombat("ATTACK"));
             actionButton("СИЛЬНЫЙ УДАР",game.heavyCost()+" единиц сил | "+game.progress.chance(game,"HEAVY")+"%",game.stamina>=game.heavyCost(),()->resolveNativeAiCombat("HEAVY"));
@@ -5141,16 +5148,88 @@ public final class MainActivity extends Activity {
         }).setNegativeButton("Закрыть",null).show();
     }
 
-    private static final String[][] CODEX_CREATURES={
-        {"Дракон","Древнее крылатое существо. Его появление меняет ход истории, а встреча требует подготовки, укрытий и холодной головы."},
-        {"Волк","Стайный хищник лесов и дорог. Голодные стаи особенно опасны для одиноких путников."},
-        {"Великан","Обитатель степей, пасущий мамонтов. Враждует с незваными гостями, но не всегда нападает первым."},
-        {"Морозный тролль","Живёт в заснеженных ущельях. Быстро восстанавливает силы и боится пламени."},
-        {"Драугр","Оживший страж древних нордских гробниц. Оружие и сила зависят от ранга погребённого воина."},
-        {"Двемерский центурион","Механический исполин, охраняющий подземные залы двемеров. Крайне опасен в ближнем бою."},
-        {"Ледяной призрак","Холодное существо на заснеженных перевалах. Трудно заметить во время метели."},
-        {"Фалмер","Скрытный житель глубин и старых двемерских построек. Использует яды, ловушки и боевых существ."}
-    };
+    private void renderBestiary(){
+        addText(content,"ᛟ  БЕСТИАРИЙ | "+BestiaryCatalog.all().size()+" ЗАПИСЕЙ",13,accent(),true,8);
+        addText(content,"Skyrim и DLC: "+BestiaryCatalog.canonicalCount()+
+            " | Авторские: "+(BestiaryCatalog.all().size()-BestiaryCatalog.canonicalCount()),12,MUTED,false,7);
+        addText(content,"Угроза и добыча указаны справочно: точные награды и параметры боя определяет игровая система.",11,MUTED,false,12);
+        actionButton("РАЗДЕЛ | "+bestiaryFilter,"Изменить категорию существ",false,()->{
+            java.util.ArrayList<String> choices=new java.util.ArrayList<>();
+            choices.add(BestiaryCatalog.ALL);choices.addAll(BestiaryCatalog.groups());
+            new RuneDialogBuilder(this,accent()).setTitle("Раздел бестиария")
+                .setItems(choices.toArray(new String[0]),(d,which)->{
+                    bestiaryFilter=choices.get(which);render();
+                }).setNegativeButton("Закрыть",null).show();
+        });
+        EditText search=new EditText(this);
+        search.setSingleLine(true);
+        search.setHint("Поиск: существо, место, способность, добыча…");
+        search.setTextColor(TEXT);
+        search.setHintTextColor(MUTED);
+        search.setTextSize(sp(15));
+        search.setPadding(dp(13),dp(12),dp(13),dp(12));
+        search.setBackground(new RuneFrameDrawable(PANEL,BORDER,false));
+        content.addView(search,lp(-1,-2));
+        LinearLayout list=column();
+        LinearLayout.LayoutParams p=lp(-1,-2);p.topMargin=dp(12);
+        content.addView(list,p);
+        Runnable refresh=()->{
+            bestiaryQuery=search.getText().toString();
+            populateBestiaryRows(list,bestiaryQuery);
+        };
+        search.addTextChangedListener(new android.text.TextWatcher(){
+            public void beforeTextChanged(CharSequence s,int start,int count,int after){}
+            public void onTextChanged(CharSequence s,int start,int before,int count){refresh.run();}
+            public void afterTextChanged(android.text.Editable e){}
+        });
+        search.setText(bestiaryQuery);
+        refresh.run();
+    }
+
+    private void populateBestiaryRows(LinearLayout list,String query){
+        list.removeAllViews();
+        java.util.List<BestiaryCatalog.Entry> entries=BestiaryCatalog.filter(query,bestiaryFilter);
+        addText(list,"НАЙДЕНО | "+entries.size(),11,accent(),true,10);
+        if(entries.isEmpty()){
+            addText(list,"Совпадений нет. Попробуйте другое название или выберите «Все».",14,MUTED,false,8);
+            return;
+        }
+        for(BestiaryCatalog.Entry e:entries){
+            LinearLayout tile=column();
+            tile.setPadding(dp(12),dp(11),dp(12),dp(11));
+            tile.setBackground(new RuneFrameDrawable(PANEL,BORDER,false));
+            addText(tile,e.name,17,TEXT,true,4);
+            addText(tile,e.category+"  |  "+e.origin,12,accent(),false,4);
+            addText(tile,e.habitat+"  |  Угроза: "+e.threat,12,MUTED,false,0);
+            LinearLayout.LayoutParams lp=lp(-1,-2);lp.bottomMargin=dp(7);
+            list.addView(tile,lp);
+            tile.setClickable(true);tile.setFocusable(true);
+            tile.setContentDescription(e.name+". "+e.shortLabel());
+            tile.setOnClickListener(v->showBestiaryEntry(e));
+        }
+    }
+
+    private void showBestiaryEntry(BestiaryCatalog.Entry e){
+        LinearLayout panel=column();
+        panel.setPadding(dp(16),dp(12),dp(16),dp(12));
+        addText(panel,e.category+"  |  "+e.origin,12,accent(),true,12);
+        addText(panel,"🌲  Среда обитания",13,accent(),true,3);
+        addText(panel,e.habitat,15,TEXT,false,11);
+        addText(panel,"⚔  Уровень угрозы: "+e.threat,14,ITEM_GOLD,true,12);
+        String[] titles={"ВНЕШНОСТЬ","ПОВЕДЕНИЕ","СИЛЬНЫЕ СТОРОНЫ","СЛАБОСТИ И ТАКТИКА","СПОСОБНОСТИ","ВОЗМОЖНАЯ ДОБЫЧА","ПРЕДАНИЕ"};
+        String[] values={e.appearance,e.behavior,e.strengths,e.weaknesses,e.abilities,e.loot,e.legend};
+        for(int i=0;i<titles.length;i++){
+            addText(panel,titles[i],12,accent(),true,4);
+            addText(panel,values[i],15,TEXT,false,13);
+        }
+        addText(panel,"Оценка угрозы справочная. Список добычи не гарантирует выпадение предметов.",11,MUTED,false,8);
+        ScrollView scroller=new ScrollView(this);
+        scroller.setFillViewport(false);
+        scroller.addView(panel);
+        new RuneDialogBuilder(this,accent()).setTitle(e.name)
+            .setView(scroller).setPositiveButton("Закрыть",null).show();
+    }
+
     private void renderCodex(){
         skyrimTopTabs(6);
         section("ДРЕВНИЕ ЛЕТОПИСИ","Кодекс","Бестиарий, народы, места и истории, которые открывают мир северных земель.");
@@ -5164,12 +5243,7 @@ public final class MainActivity extends Activity {
         });
         space(content,14);
         if(codexCategory==0){
-            addText(content,"ᛟ  СУЩЕСТВА И ОБИТАТЕЛИ",11,accent(),false,10);
-            for(String[] record:CODEX_CREATURES){
-                actionButton("◇  "+record[0],record[1],false,()->new RuneDialogBuilder(this,accent())
-                    .setTitle(record[0]).setMessage(record[1])
-                    .setPositiveButton("Закрыть",null).show());
-            }
+            renderBestiary();
         }else if(codexCategory==1){
             addText(content,"ᛟ  ДЕСЯТЬ НАРОДОВ",11,accent(),false,10);
             for(int i=0;i<GameEngine.RACES.length;i++){
