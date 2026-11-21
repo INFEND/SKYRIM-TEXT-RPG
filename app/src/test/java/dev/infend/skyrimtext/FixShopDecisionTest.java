@@ -11,7 +11,7 @@ public class FixShopDecisionTest {
   assertEquals(xp,g.xp);assertEquals(gold,g.gold);
  }
  @Test public void encounterRequestIsSavedAndCannotBeOverwritten() throws Exception{
-  GameEngine g=new GameEngine();g.start("Тест","Норд","Воин");g.mode="WORLD";g.fixShop.editorEnabled=true;
+  GameEngine g=new GameEngine();g.start("Тест","Норд","Воин");g.mode="WORLD";
   assertFalse(RoadEvents.fixQueue(g,"giant"));
   assertFalse(RoadEvents.fixQueue(g,"wolves"));
   assertFalse(RoadEvents.fixQueue(g,"hunter"));
