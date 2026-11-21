@@ -589,6 +589,17 @@ public final class WorkImageEditor {
         open.setOnClickListener(v -> {
             String value = editor.getText().toString().trim();
             if (value.isEmpty()) { editor.setError("Напиши описание"); return; }
+            try {
+                JSONObject pending = new JSONObject();
+                pending.put("kind", kind).put("id", id).put("name", name)
+                    .put("prompt", value).put("count", requested[0]);
+                if (!prefs(host).edit().putString(PENDING, pending.toString()).commit())
+                    throw new IllegalStateException("Не удалось сохранить цель передачи");
+            } catch (Exception e) {
+                Toast.makeText(host, "Ошибка подготовки Work: " + e.getMessage(),
+                    Toast.LENGTH_LONG).show();
+                return;
+            }
             launchChatGpt(host, "Создай " + requested[0] + (requested[0] == 1 ? " отдельное изображение. " : requested[0] == 3 ? " отдельных изображения. " : " отдельных изображений. ") + value);
         });
         panel.addView(label(host, "OPENAI IMAGES API · ПРЯМО В ИГРЕ", 15, accent));
