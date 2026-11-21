@@ -106,6 +106,21 @@ for sheet, collection in enumerate((main,island)):
         if sheet and p["name"].startswith("Shrine of "):ru += " (Солстейм)"
         points.append(dict(p,nameRu=ru,type=kind,sheet=sheet,region=district(p,sheet)))
 
+# Published coordinates for three outdoor sites are in the pinned source index,
+# but its categories are not normally treated as map locations. Include only
+# these individually reviewed exceptions; do not turn all books/items/regions
+# into travel destinations.
+extra_surface = {
+    "Dunmeth Pass": ("Перевал Данмет", "Переход"),
+    "Pale Pass": ("Бледный перевал", "Переход"),
+    "Shrine to Malacath": ("Святилище Малаката", "Святилище"),
+}
+for point in main:
+    if point["name"] in extra_surface:
+        ru, kind = extra_surface[point["name"]]
+        points.append(dict(point, nameRu=ru, type=kind, sheet=0,
+                           region=district(point, 0)))
+
 def key(name):return name.casefold().replace("’", "'")
 known={key(p["name"]):p for p in points if p["sheet"]==1}
 anchors=[]
