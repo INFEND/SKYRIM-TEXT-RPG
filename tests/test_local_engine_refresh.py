@@ -8,7 +8,7 @@ class LocalAiEngineRefresh(unittest.TestCase):
         build=(ROOT/"engine/build.gradle").read_text(encoding="utf-8")
         module=(APP/"LocalAiEngineModule.java").read_text(encoding="utf-8")
         workflow=(ROOT/".github/workflows/android-ota.yml").read_text(encoding="utf-8")
-        version=int(re.search(r"versionCode\\s+(\\d+)",build).group(1))
+        version=int(re.search(r"versionCode\s+(\d+)",build).group(1))
         self.assertGreaterEqual(version,6)
         self.assertIn(f"static final int VERSION={version};",module)
         self.assertIn('pathlib.Path("app/src/main/assets/engine_module.json").write_text',workflow)
