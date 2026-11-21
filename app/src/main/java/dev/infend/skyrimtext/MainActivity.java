@@ -6409,6 +6409,9 @@ public final class MainActivity extends Activity {
         }
         dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v->{
             if(livingBusy())return;
+            if(!editing&&game.fixSpent>Long.MAX_VALUE-50){
+                toast("Лимит компенсации исчерпан");return;
+            }
             try{
                 String title=name.getText().toString().trim();
                 int base=Integer.parseInt(stat.getText().toString().trim());
@@ -6455,7 +6458,7 @@ public final class MainActivity extends Activity {
             cover.setImageBitmap(bitmap);cover.setScaleType(android.widget.ImageView.ScaleType.FIT_CENTER);
             panel.addView(cover,lp(-1,dp(180)));space(panel,9);
         }
-        addText(panel,"ИЗОБРАЖЕНИЕ • "+name,14,accent(),true,8);
+        addText(panel,"ИЗОБРАЖЕНИЕ | "+name,14,accent(),true,8);
         EditText prompt=livingField(panel,"Опиши, что сгенерировать",
                 "Один предмет, качественная 3D-визуализация, тёмный фон",false);
         prompt.setSingleLine(false);prompt.setMinLines(3);prompt.setMaxLines(5);
