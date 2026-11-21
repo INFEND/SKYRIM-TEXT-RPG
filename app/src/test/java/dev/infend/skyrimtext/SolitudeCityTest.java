@@ -134,4 +134,18 @@ public class SolitudeCityTest {
         assertEquals("HELPED",g.sceneState.status("npc","solitude_vittoria"));
     }
 
+    @Test public void volunteerRemainsAvailableWhenPaidWagesWouldOverflowWallet() throws Exception {
+        GameEngine g=city();g.gold=Integer.MAX_VALUE;
+        g.choose("SOLITUDE:open");g.choose("SOLITUDE:visit:0");
+        assertFalse(g.scene().choices.stream().anyMatch(c->c.action.equals("SOLITUDE:job:0")));
+        assertTrue(g.scene().choices.stream().anyMatch(c->c.action.equals("SOLITUDE:volunteer:0")));
+        g.choose("SOLITUDE:job:0");assertEquals(8,g.hour);
+        g.choose("SOLITUDE:volunteer:0");
+        assertEquals(Integer.MAX_VALUE,g.gold);assertEquals(10,g.hour);
+        assertEquals("HELPED",g.sceneState.status("npc","solitude_jala"));
+        g=GameEngine.fromJson(g.toJson().toString());
+        g.choose("SOLITUDE:volunteer:0");assertEquals(10,g.hour);
+        assertEquals(Integer.MAX_VALUE,g.gold);
+    }
+
 }
