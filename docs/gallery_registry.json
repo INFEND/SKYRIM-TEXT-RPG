@@ -65,15 +65,14 @@
     ]
   },
   {
-    "name": "Лесопилка у Скального ручья",
+    "name": "Лесопилка Солитьюда",
     "slug": "solitudesawmill",
     "aliases": [
       "Solitude Sawmill",
-      "Солитьюд - Лесопилка",
-      "Лесопилка Солитьюда"
+      "Солитьюд - Лесопилка"
     ],
     "captions": [
-      "Лесопилка у Скального ручья"
+      "Лесопилка Солитьюда"
     ],
     "parent": "Солитьюд",
     "artwork": {
@@ -100,7 +99,7 @@
           "full_resolution_luma_ssim": 0.985551,
           "worst_128px_luma_ssim": 0.979114,
           "chroma_mean_absolute_error": 1.997783,
-          "chroma_95th_percentile_error": 6.0,
+          "chroma_95th_percentile_error": 6,
           "scene": "A small half-open cedar sawmill beneath pale sea cliffs, visible waterwheel rotating in a tumbling freshwater stream, squared timbers on rough carts, damp cut wood and strips of morning light, cozy grounded craft scene."
         }
       ]
@@ -301,15 +300,14 @@
   },
   {
     "slug": "winking_skeever",
-    "name": "Таверна «Соляной очаг»",
+    "name": "Смеющаяся крыса",
     "parent": "Солитьюд",
     "captions": [
-      "Зал таверны «Соляной очаг»"
+      "Смеющаяся крыса"
     ],
     "aliases": [
       "The Winking Skeever",
       "Таверна Смеющаяся крыса",
-      "Смеющаяся крыса",
       "Таверна «Смеющаяся крыса»"
     ],
     "artwork": {
@@ -336,7 +334,7 @@
           "full_resolution_luma_ssim": 0.985103,
           "worst_128px_luma_ssim": 0.975761,
           "chroma_mean_absolute_error": 2.180164,
-          "chroma_95th_percentile_error": 6.0,
+          "chroma_95th_percentile_error": 6,
           "scene": "Original medieval cliff-port inn with a barrel-vaulted limestone ceiling, hexagonal brazier, counter from an old ship beam and cool harbor light."
         }
       ]
@@ -558,14 +556,13 @@
   },
   {
     "slug": "bits_and_pieces",
-    "name": "Лавка «Медный ящик»",
+    "name": "Всякая всячина",
     "parent": "Солитьюд",
     "captions": [
-      "Лавка «Медный ящик»"
+      "Всякая всячина"
     ],
     "aliases": [
       "Bits and Pieces",
-      "Всякая всячина",
       "«Всякая всячина»"
     ],
     "artwork": {
@@ -592,7 +589,7 @@
           "full_resolution_luma_ssim": 0.985993,
           "worst_128px_luma_ssim": 0.977791,
           "chroma_mean_absolute_error": 1.647523,
-          "chroma_95th_percentile_error": 5.0,
+          "chroma_95th_percentile_error": 5,
           "scene": "Beeswax-lit general-goods shop in a coastal limestone town. Central waist-high copper-cornered chest on an oak counter, coils of rope, oil lamps, small iron tools and neatly ordered crates. A mullioned window faces the rainy port. A grounded three-quarter interior view."
         }
       ]
@@ -600,14 +597,13 @@
   },
   {
     "slug": "angelines_aromatics",
-    "name": "Аптека «Морская мята»",
+    "name": "Ароматы Анжелины",
     "parent": "Солитьюд",
     "captions": [
-      "Аптека «Морская мята»"
+      "Ароматы Анжелины"
     ],
     "aliases": [
       "Angeline's Aromatics",
-      "Ароматы Анжелины",
       "«Ароматы Анжелины»"
     ],
     "artwork": {
@@ -634,7 +630,7 @@
           "full_resolution_luma_ssim": 0.985778,
           "worst_128px_luma_ssim": 0.978014,
           "chroma_mean_absolute_error": 1.751913,
-          "chroma_95th_percentile_error": 5.0,
+          "chroma_95th_percentile_error": 5,
           "scene": "Cliff-city herbal apothecary with a moss green worktop set in the center, ceramic tincture jars, hanging sea mint and amber stills along the wall, mortar with crushed green leaves, airy stone alcove. Soft sea-green daylight and warm candles. Wide eye-level from the side of the worktable."
         }
       ]
@@ -642,14 +638,13 @@
   },
   {
     "slug": "radiant_raiment",
-    "name": "Ателье «Золотая нить»",
+    "name": "Сияющие одежды",
     "parent": "Солитьюд",
     "captions": [
-      "Ателье «Золотая нить»"
+      "Сияющие одежды"
     ],
     "aliases": [
       "Radiant Raiment",
-      "Сияющие одежды",
       "«Сияющие одежды»"
     ],
     "artwork": {
@@ -676,7 +671,7 @@
           "full_resolution_luma_ssim": 0.985022,
           "worst_128px_luma_ssim": 0.977034,
           "chroma_mean_absolute_error": 1.6474,
-          "chroma_95th_percentile_error": 5.0,
+          "chroma_95th_percentile_error": 5,
           "scene": "An elegant small medieval tailor atelier in a northern cliff capital, unwound gold thread beside scissors in the foreground, peacock-blue wool and ivory linen folded on walnut tables, decorative geometric embroidered coats displayed on wooden forms. Side lighting, wide natural perspective, no people."
         }
       ]
@@ -684,16 +679,15 @@
   },
   {
     "slug": "fletcher",
-    "name": "Лавка «Ясеневое перо»",
+    "name": "Лучник",
     "parent": "Солитьюд",
     "captions": [
-      "Лавка «Ясеневое перо»"
+      "Лучник"
     ],
     "aliases": [
       "Fletcher",
       "Флетчер",
-      "Лавка Флетчера",
-      "Лучник"
+      "Лавка Флетчера"
     ],
     "artwork": {
       "date": "2026-11-20",
@@ -719,7 +713,7 @@
           "full_resolution_luma_ssim": 0.986181,
           "worst_128px_luma_ssim": 0.977281,
           "chroma_mean_absolute_error": 1.483337,
-          "chroma_95th_percentile_error": 4.0,
+          "chroma_95th_percentile_error": 4,
           "scene": "A fletcher's workshop with uncocked simple ash bows on curved wood pegs, goose-feather fletching and shafts on a notch-cut workbench, hobnail chest and salt-latticed windows with a glimmer of harbor. Careful woodwork, side-on wide view."
         }
       ]
@@ -727,14 +721,13 @@
   },
   {
     "slug": "solitude_blacksmith",
-    "name": "Кузница «Соль и сталь»",
+    "name": "Кузница Солитьюда",
     "parent": "Солитьюд",
     "captions": [
-      "Кузница «Соль и сталь»"
+      "Кузница Солитьюда"
     ],
     "aliases": [
-      "Solitude Blacksmith",
-      "Кузница Солитьюда"
+      "Solitude Blacksmith"
     ],
     "artwork": {
       "date": "2026-11-20",
@@ -760,7 +753,7 @@
           "full_resolution_luma_ssim": 0.98648,
           "worst_128px_luma_ssim": 0.979665,
           "chroma_mean_absolute_error": 1.519135,
-          "chroma_95th_percentile_error": 5.0,
+          "chroma_95th_percentile_error": 5,
           "scene": "A sheltered working forge in original northern coastal architecture, anvil and tongs under a vaulted limewashed arcade, wet stone and naturally orange coal fire, simple iron hardware cooling by a trough. View from outside at late dusk, no people close up."
         }
       ]
@@ -1643,17 +1636,16 @@
   },
   {
     "slug": "katlas_farm",
-    "name": "Ферма и конюшни у Приливной дороги",
+    "name": "Ферма Катлы",
     "parent": "Солитьюд",
     "aliases": [
       "Katla's Farm",
       "Solitude Stables",
       "Конюшни Солитьюда",
-      "Солитьюд - Конюшни",
-      "Ферма Катлы"
+      "Солитьюд - Конюшни"
     ],
     "captions": [
-      "Ферма и конюшни у Приливной дороги"
+      "Ферма Катлы"
     ],
     "artwork": {
       "date": "2026-11-20",
@@ -1679,7 +1671,7 @@
           "full_resolution_luma_ssim": 0.986235,
           "worst_128px_luma_ssim": 0.978182,
           "chroma_mean_absolute_error": 2.015693,
-          "chroma_95th_percentile_error": 6.0,
+          "chroma_95th_percentile_error": 6,
           "scene": "A windswept seaside farm and horse stables outside a northern medieval capital, rough dry stone folds, half-timbered stable with open stall doors, grazing horse small in background, fields striped by golden hour against cold water. Clear original design; stable and pasture equally legible."
         }
       ]
@@ -6387,7 +6379,7 @@
         "full_resolution_luma_ssim": 0.9861591,
         "worst_128px_luma_ssim": 0.9746997,
         "chroma_mean_absolute_error": 1.1557922,
-        "chroma_95th_percentile_error": 3.0,
+        "chroma_95th_percentile_error": 3,
         "trials": [
           {
             "quality": 68,
@@ -6395,7 +6387,7 @@
             "full_resolution_luma_ssim": 0.9425312,
             "worst_128px_luma_ssim": 0.9120622,
             "chroma_mean_absolute_error": 1.5886153,
-            "chroma_95th_percentile_error": 5.0
+            "chroma_95th_percentile_error": 5
           },
           {
             "quality": 72,
@@ -6403,7 +6395,7 @@
             "full_resolution_luma_ssim": 0.9471747,
             "worst_128px_luma_ssim": 0.9167427,
             "chroma_mean_absolute_error": 1.5604378,
-            "chroma_95th_percentile_error": 5.0
+            "chroma_95th_percentile_error": 5
           },
           {
             "quality": 76,
@@ -6411,7 +6403,7 @@
             "full_resolution_luma_ssim": 0.9531993,
             "worst_128px_luma_ssim": 0.9277607,
             "chroma_mean_absolute_error": 1.5142524,
-            "chroma_95th_percentile_error": 4.0
+            "chroma_95th_percentile_error": 4
           },
           {
             "quality": 80,
@@ -6419,7 +6411,7 @@
             "full_resolution_luma_ssim": 0.9645755,
             "worst_128px_luma_ssim": 0.9422749,
             "chroma_mean_absolute_error": 1.422258,
-            "chroma_95th_percentile_error": 4.0
+            "chroma_95th_percentile_error": 4
           },
           {
             "quality": 84,
@@ -6427,7 +6419,7 @@
             "full_resolution_luma_ssim": 0.9738028,
             "worst_128px_luma_ssim": 0.9565333,
             "chroma_mean_absolute_error": 1.3263841,
-            "chroma_95th_percentile_error": 4.0
+            "chroma_95th_percentile_error": 4
           },
           {
             "quality": 88,
@@ -6435,7 +6427,7 @@
             "full_resolution_luma_ssim": 0.9823251,
             "worst_128px_luma_ssim": 0.9687943,
             "chroma_mean_absolute_error": 1.221181,
-            "chroma_95th_percentile_error": 3.0
+            "chroma_95th_percentile_error": 3
           },
           {
             "quality": 92,
@@ -6443,7 +6435,7 @@
             "full_resolution_luma_ssim": 0.9890275,
             "worst_128px_luma_ssim": 0.9791293,
             "chroma_mean_absolute_error": 1.0746127,
-            "chroma_95th_percentile_error": 3.0
+            "chroma_95th_percentile_error": 3
           },
           {
             "quality": 89,
@@ -6451,7 +6443,7 @@
             "full_resolution_luma_ssim": 0.9848241,
             "worst_128px_luma_ssim": 0.9735525,
             "chroma_mean_absolute_error": 1.1771114,
-            "chroma_95th_percentile_error": 3.0
+            "chroma_95th_percentile_error": 3
           },
           {
             "quality": 90,
@@ -6459,7 +6451,7 @@
             "full_resolution_luma_ssim": 0.9861591,
             "worst_128px_luma_ssim": 0.9746997,
             "chroma_mean_absolute_error": 1.1557922,
-            "chroma_95th_percentile_error": 3.0
+            "chroma_95th_percentile_error": 3
           },
           {
             "quality": 91,
@@ -6467,7 +6459,7 @@
             "full_resolution_luma_ssim": 0.9880848,
             "worst_128px_luma_ssim": 0.9780136,
             "chroma_mean_absolute_error": 1.1141436,
-            "chroma_95th_percentile_error": 3.0
+            "chroma_95th_percentile_error": 3
           }
         ]
       }
@@ -6509,7 +6501,7 @@
         "full_resolution_luma_ssim": 0.985418,
         "worst_128px_luma_ssim": 0.9786829,
         "chroma_mean_absolute_error": 1.3765909,
-        "chroma_95th_percentile_error": 4.0,
+        "chroma_95th_percentile_error": 4,
         "trials": [
           {
             "quality": 68,
@@ -6517,7 +6509,7 @@
             "full_resolution_luma_ssim": 0.9386345,
             "worst_128px_luma_ssim": 0.915468,
             "chroma_mean_absolute_error": 1.9163128,
-            "chroma_95th_percentile_error": 6.0
+            "chroma_95th_percentile_error": 6
           },
           {
             "quality": 72,
@@ -6525,7 +6517,7 @@
             "full_resolution_luma_ssim": 0.9421812,
             "worst_128px_luma_ssim": 0.922334,
             "chroma_mean_absolute_error": 1.8799785,
-            "chroma_95th_percentile_error": 6.0
+            "chroma_95th_percentile_error": 6
           },
           {
             "quality": 76,
@@ -6533,7 +6525,7 @@
             "full_resolution_luma_ssim": 0.9490843,
             "worst_128px_luma_ssim": 0.9318076,
             "chroma_mean_absolute_error": 1.8204416,
-            "chroma_95th_percentile_error": 5.0
+            "chroma_95th_percentile_error": 5
           },
           {
             "quality": 80,
@@ -6541,7 +6533,7 @@
             "full_resolution_luma_ssim": 0.9597813,
             "worst_128px_luma_ssim": 0.9445698,
             "chroma_mean_absolute_error": 1.7205584,
-            "chroma_95th_percentile_error": 5.0
+            "chroma_95th_percentile_error": 5
           },
           {
             "quality": 84,
@@ -6549,7 +6541,7 @@
             "full_resolution_luma_ssim": 0.97104,
             "worst_128px_luma_ssim": 0.9608322,
             "chroma_mean_absolute_error": 1.588484,
-            "chroma_95th_percentile_error": 5.0
+            "chroma_95th_percentile_error": 5
           },
           {
             "quality": 88,
@@ -6557,7 +6549,7 @@
             "full_resolution_luma_ssim": 0.980747,
             "worst_128px_luma_ssim": 0.9725856,
             "chroma_mean_absolute_error": 1.4524019,
-            "chroma_95th_percentile_error": 4.0
+            "chroma_95th_percentile_error": 4
           },
           {
             "quality": 92,
@@ -6565,7 +6557,7 @@
             "full_resolution_luma_ssim": 0.9884804,
             "worst_128px_luma_ssim": 0.9823401,
             "chroma_mean_absolute_error": 1.3167216,
-            "chroma_95th_percentile_error": 4.0
+            "chroma_95th_percentile_error": 4
           },
           {
             "quality": 89,
@@ -6573,7 +6565,7 @@
             "full_resolution_luma_ssim": 0.9829738,
             "worst_128px_luma_ssim": 0.9748472,
             "chroma_mean_absolute_error": 1.431127,
-            "chroma_95th_percentile_error": 4.0
+            "chroma_95th_percentile_error": 4
           },
           {
             "quality": 90,
@@ -6581,7 +6573,7 @@
             "full_resolution_luma_ssim": 0.985418,
             "worst_128px_luma_ssim": 0.9786829,
             "chroma_mean_absolute_error": 1.3765909,
-            "chroma_95th_percentile_error": 4.0
+            "chroma_95th_percentile_error": 4
           },
           {
             "quality": 91,
@@ -6589,7 +6581,7 @@
             "full_resolution_luma_ssim": 0.9871465,
             "worst_128px_luma_ssim": 0.9805543,
             "chroma_mean_absolute_error": 1.354257,
-            "chroma_95th_percentile_error": 4.0
+            "chroma_95th_percentile_error": 4
           }
         ]
       }
@@ -6630,7 +6622,7 @@
         "full_resolution_luma_ssim": 0.985778,
         "worst_128px_luma_ssim": 0.978319,
         "chroma_mean_absolute_error": 1.9301018,
-        "chroma_95th_percentile_error": 6.0,
+        "chroma_95th_percentile_error": 6,
         "trials": [
           {
             "quality": 68,
@@ -6638,7 +6630,7 @@
             "full_resolution_luma_ssim": 0.9474691,
             "worst_128px_luma_ssim": 0.9276061,
             "chroma_mean_absolute_error": 2.5602974,
-            "chroma_95th_percentile_error": 8.0
+            "chroma_95th_percentile_error": 8
           },
           {
             "quality": 72,
@@ -6646,7 +6638,7 @@
             "full_resolution_luma_ssim": 0.9501373,
             "worst_128px_luma_ssim": 0.9313972,
             "chroma_mean_absolute_error": 2.5062675,
-            "chroma_95th_percentile_error": 8.0
+            "chroma_95th_percentile_error": 8
           },
           {
             "quality": 76,
@@ -6654,7 +6646,7 @@
             "full_resolution_luma_ssim": 0.9570718,
             "worst_128px_luma_ssim": 0.9415448,
             "chroma_mean_absolute_error": 2.4289936,
-            "chroma_95th_percentile_error": 7.0
+            "chroma_95th_percentile_error": 7
           },
           {
             "quality": 80,
@@ -6662,7 +6654,7 @@
             "full_resolution_luma_ssim": 0.9662355,
             "worst_128px_luma_ssim": 0.9526093,
             "chroma_mean_absolute_error": 2.2989385,
-            "chroma_95th_percentile_error": 7.0
+            "chroma_95th_percentile_error": 7
           },
           {
             "quality": 84,
@@ -6670,7 +6662,7 @@
             "full_resolution_luma_ssim": 0.976696,
             "worst_128px_luma_ssim": 0.9667678,
             "chroma_mean_absolute_error": 2.1003669,
-            "chroma_95th_percentile_error": 6.0
+            "chroma_95th_percentile_error": 6
           },
           {
             "quality": 88,
@@ -6678,7 +6670,7 @@
             "full_resolution_luma_ssim": 0.9837821,
             "worst_128px_luma_ssim": 0.9760623,
             "chroma_mean_absolute_error": 1.9554095,
-            "chroma_95th_percentile_error": 6.0
+            "chroma_95th_percentile_error": 6
           },
           {
             "quality": 92,
@@ -6686,7 +6678,7 @@
             "full_resolution_luma_ssim": 0.9904971,
             "worst_128px_luma_ssim": 0.9846947,
             "chroma_mean_absolute_error": 1.8035656,
-            "chroma_95th_percentile_error": 6.0
+            "chroma_95th_percentile_error": 6
           },
           {
             "quality": 89,
@@ -6694,7 +6686,7 @@
             "full_resolution_luma_ssim": 0.985778,
             "worst_128px_luma_ssim": 0.978319,
             "chroma_mean_absolute_error": 1.9301018,
-            "chroma_95th_percentile_error": 6.0
+            "chroma_95th_percentile_error": 6
           },
           {
             "quality": 90,
@@ -6702,7 +6694,7 @@
             "full_resolution_luma_ssim": 0.9877282,
             "worst_128px_luma_ssim": 0.9817529,
             "chroma_mean_absolute_error": 1.8659674,
-            "chroma_95th_percentile_error": 6.0
+            "chroma_95th_percentile_error": 6
           },
           {
             "quality": 91,
@@ -6710,7 +6702,7 @@
             "full_resolution_luma_ssim": 0.9893898,
             "worst_128px_luma_ssim": 0.9828049,
             "chroma_mean_absolute_error": 1.8701139,
-            "chroma_95th_percentile_error": 6.0
+            "chroma_95th_percentile_error": 6
           }
         ]
       }
@@ -6751,7 +6743,7 @@
         "full_resolution_luma_ssim": 0.9856753,
         "worst_128px_luma_ssim": 0.973173,
         "chroma_mean_absolute_error": 2.0207541,
-        "chroma_95th_percentile_error": 6.0,
+        "chroma_95th_percentile_error": 6,
         "trials": [
           {
             "quality": 68,
@@ -6759,7 +6751,7 @@
             "full_resolution_luma_ssim": 0.9632784,
             "worst_128px_luma_ssim": 0.9404886,
             "chroma_mean_absolute_error": 2.4633172,
-            "chroma_95th_percentile_error": 8.0
+            "chroma_95th_percentile_error": 8
           },
           {
             "quality": 72,
@@ -6767,7 +6759,7 @@
             "full_resolution_luma_ssim": 0.9660811,
             "worst_128px_luma_ssim": 0.9437745,
             "chroma_mean_absolute_error": 2.4198123,
-            "chroma_95th_percentile_error": 8.0
+            "chroma_95th_percentile_error": 8
           },
           {
             "quality": 76,
@@ -6775,7 +6767,7 @@
             "full_resolution_luma_ssim": 0.9708565,
             "worst_128px_luma_ssim": 0.9506265,
             "chroma_mean_absolute_error": 2.3548923,
-            "chroma_95th_percentile_error": 8.0
+            "chroma_95th_percentile_error": 8
           },
           {
             "quality": 80,
@@ -6783,7 +6775,7 @@
             "full_resolution_luma_ssim": 0.9785063,
             "worst_128px_luma_ssim": 0.9618921,
             "chroma_mean_absolute_error": 2.1736452,
-            "chroma_95th_percentile_error": 7.0
+            "chroma_95th_percentile_error": 7
           },
           {
             "quality": 84,
@@ -6791,7 +6783,7 @@
             "full_resolution_luma_ssim": 0.984049,
             "worst_128px_luma_ssim": 0.9702797,
             "chroma_mean_absolute_error": 2.0564492,
-            "chroma_95th_percentile_error": 7.0
+            "chroma_95th_percentile_error": 7
           },
           {
             "quality": 88,
@@ -6799,7 +6791,7 @@
             "full_resolution_luma_ssim": 0.9897009,
             "worst_128px_luma_ssim": 0.9817444,
             "chroma_mean_absolute_error": 1.8851459,
-            "chroma_95th_percentile_error": 6.0
+            "chroma_95th_percentile_error": 6
           },
           {
             "quality": 85,
@@ -6807,7 +6799,7 @@
             "full_resolution_luma_ssim": 0.9856753,
             "worst_128px_luma_ssim": 0.973173,
             "chroma_mean_absolute_error": 2.0207541,
-            "chroma_95th_percentile_error": 6.0
+            "chroma_95th_percentile_error": 6
           },
           {
             "quality": 86,
@@ -6815,7 +6807,7 @@
             "full_resolution_luma_ssim": 0.9870431,
             "worst_128px_luma_ssim": 0.9744966,
             "chroma_mean_absolute_error": 1.9781587,
-            "chroma_95th_percentile_error": 6.0
+            "chroma_95th_percentile_error": 6
           },
           {
             "quality": 87,
@@ -6823,7 +6815,7 @@
             "full_resolution_luma_ssim": 0.9885792,
             "worst_128px_luma_ssim": 0.9805657,
             "chroma_mean_absolute_error": 1.933491,
-            "chroma_95th_percentile_error": 6.0
+            "chroma_95th_percentile_error": 6
           }
         ]
       }
@@ -6864,7 +6856,7 @@
         "full_resolution_luma_ssim": 0.9850549,
         "worst_128px_luma_ssim": 0.9742293,
         "chroma_mean_absolute_error": 1.1823708,
-        "chroma_95th_percentile_error": 3.0,
+        "chroma_95th_percentile_error": 3,
         "trials": [
           {
             "quality": 68,
@@ -6872,7 +6864,7 @@
             "full_resolution_luma_ssim": 0.9430486,
             "worst_128px_luma_ssim": 0.916183,
             "chroma_mean_absolute_error": 1.6751509,
-            "chroma_95th_percentile_error": 5.0
+            "chroma_95th_percentile_error": 5
           },
           {
             "quality": 72,
@@ -6880,7 +6872,7 @@
             "full_resolution_luma_ssim": 0.9460356,
             "worst_128px_luma_ssim": 0.9202358,
             "chroma_mean_absolute_error": 1.6460541,
-            "chroma_95th_percentile_error": 5.0
+            "chroma_95th_percentile_error": 5
           },
           {
             "quality": 76,
@@ -6888,7 +6880,7 @@
             "full_resolution_luma_ssim": 0.9515828,
             "worst_128px_luma_ssim": 0.9291122,
             "chroma_mean_absolute_error": 1.5819041,
-            "chroma_95th_percentile_error": 5.0
+            "chroma_95th_percentile_error": 5
           },
           {
             "quality": 80,
@@ -6896,7 +6888,7 @@
             "full_resolution_luma_ssim": 0.9626679,
             "worst_128px_luma_ssim": 0.9451573,
             "chroma_mean_absolute_error": 1.478439,
-            "chroma_95th_percentile_error": 4.0
+            "chroma_95th_percentile_error": 4
           },
           {
             "quality": 84,
@@ -6904,7 +6896,7 @@
             "full_resolution_luma_ssim": 0.9728166,
             "worst_128px_luma_ssim": 0.9609388,
             "chroma_mean_absolute_error": 1.3793067,
-            "chroma_95th_percentile_error": 4.0
+            "chroma_95th_percentile_error": 4
           },
           {
             "quality": 88,
@@ -6912,7 +6904,7 @@
             "full_resolution_luma_ssim": 0.9816213,
             "worst_128px_luma_ssim": 0.9720739,
             "chroma_mean_absolute_error": 1.2524931,
-            "chroma_95th_percentile_error": 4.0
+            "chroma_95th_percentile_error": 4
           },
           {
             "quality": 92,
@@ -6920,7 +6912,7 @@
             "full_resolution_luma_ssim": 0.9888735,
             "worst_128px_luma_ssim": 0.981084,
             "chroma_mean_absolute_error": 1.102588,
-            "chroma_95th_percentile_error": 3.0
+            "chroma_95th_percentile_error": 3
           },
           {
             "quality": 89,
@@ -6928,7 +6920,7 @@
             "full_resolution_luma_ssim": 0.9834048,
             "worst_128px_luma_ssim": 0.9737458,
             "chroma_mean_absolute_error": 1.2217625,
-            "chroma_95th_percentile_error": 4.0
+            "chroma_95th_percentile_error": 4
           },
           {
             "quality": 90,
@@ -6936,7 +6928,7 @@
             "full_resolution_luma_ssim": 0.9850549,
             "worst_128px_luma_ssim": 0.9742293,
             "chroma_mean_absolute_error": 1.1823708,
-            "chroma_95th_percentile_error": 3.0
+            "chroma_95th_percentile_error": 3
           },
           {
             "quality": 91,
@@ -6944,7 +6936,7 @@
             "full_resolution_luma_ssim": 0.9874192,
             "worst_128px_luma_ssim": 0.9784414,
             "chroma_mean_absolute_error": 1.151148,
-            "chroma_95th_percentile_error": 3.0
+            "chroma_95th_percentile_error": 3
           }
         ]
       }
@@ -6985,7 +6977,7 @@
         "full_resolution_luma_ssim": 0.985949,
         "worst_128px_luma_ssim": 0.9792589,
         "chroma_mean_absolute_error": 1.0991418,
-        "chroma_95th_percentile_error": 3.0,
+        "chroma_95th_percentile_error": 3,
         "trials": [
           {
             "quality": 68,
@@ -6993,7 +6985,7 @@
             "full_resolution_luma_ssim": 0.934302,
             "worst_128px_luma_ssim": 0.9059747,
             "chroma_mean_absolute_error": 1.6970687,
-            "chroma_95th_percentile_error": 5.0
+            "chroma_95th_percentile_error": 5
           },
           {
             "quality": 72,
@@ -7001,7 +6993,7 @@
             "full_resolution_luma_ssim": 0.940599,
             "worst_128px_luma_ssim": 0.9161265,
             "chroma_mean_absolute_error": 1.6374997,
-            "chroma_95th_percentile_error": 5.0
+            "chroma_95th_percentile_error": 5
           },
           {
             "quality": 76,
@@ -7009,7 +7001,7 @@
             "full_resolution_luma_ssim": 0.9462286,
             "worst_128px_luma_ssim": 0.9246727,
             "chroma_mean_absolute_error": 1.5804833,
-            "chroma_95th_percentile_error": 5.0
+            "chroma_95th_percentile_error": 5
           },
           {
             "quality": 80,
@@ -7017,7 +7009,7 @@
             "full_resolution_luma_ssim": 0.9575059,
             "worst_128px_luma_ssim": 0.9429086,
             "chroma_mean_absolute_error": 1.4762097,
-            "chroma_95th_percentile_error": 4.0
+            "chroma_95th_percentile_error": 4
           },
           {
             "quality": 84,
@@ -7025,7 +7017,7 @@
             "full_resolution_luma_ssim": 0.9677631,
             "worst_128px_luma_ssim": 0.9561576,
             "chroma_mean_absolute_error": 1.3600351,
-            "chroma_95th_percentile_error": 4.0
+            "chroma_95th_percentile_error": 4
           },
           {
             "quality": 88,
@@ -7033,7 +7025,7 @@
             "full_resolution_luma_ssim": 0.977735,
             "worst_128px_luma_ssim": 0.9693547,
             "chroma_mean_absolute_error": 1.2265412,
-            "chroma_95th_percentile_error": 4.0
+            "chroma_95th_percentile_error": 4
           },
           {
             "quality": 92,
@@ -7041,7 +7033,7 @@
             "full_resolution_luma_ssim": 0.985949,
             "worst_128px_luma_ssim": 0.9792589,
             "chroma_mean_absolute_error": 1.0991418,
-            "chroma_95th_percentile_error": 3.0
+            "chroma_95th_percentile_error": 3
           },
           {
             "quality": 89,
@@ -7049,7 +7041,7 @@
             "full_resolution_luma_ssim": 0.9792647,
             "worst_128px_luma_ssim": 0.969959,
             "chroma_mean_absolute_error": 1.1924617,
-            "chroma_95th_percentile_error": 3.0
+            "chroma_95th_percentile_error": 3
           },
           {
             "quality": 90,
@@ -7057,7 +7049,7 @@
             "full_resolution_luma_ssim": 0.9811231,
             "worst_128px_luma_ssim": 0.97105,
             "chroma_mean_absolute_error": 1.1819453,
-            "chroma_95th_percentile_error": 3.0
+            "chroma_95th_percentile_error": 3
           },
           {
             "quality": 91,
@@ -7065,7 +7057,7 @@
             "full_resolution_luma_ssim": 0.983874,
             "worst_128px_luma_ssim": 0.9771703,
             "chroma_mean_absolute_error": 1.1269757,
-            "chroma_95th_percentile_error": 3.0
+            "chroma_95th_percentile_error": 3
           }
         ]
       }
@@ -7106,7 +7098,7 @@
         "full_resolution_luma_ssim": 0.9855605,
         "worst_128px_luma_ssim": 0.9745429,
         "chroma_mean_absolute_error": 2.0074154,
-        "chroma_95th_percentile_error": 6.0,
+        "chroma_95th_percentile_error": 6,
         "trials": [
           {
             "quality": 68,
@@ -7114,7 +7106,7 @@
             "full_resolution_luma_ssim": 0.9529397,
             "worst_128px_luma_ssim": 0.932073,
             "chroma_mean_absolute_error": 2.6750546,
-            "chroma_95th_percentile_error": 8.0
+            "chroma_95th_percentile_error": 8
           },
           {
             "quality": 72,
@@ -7122,7 +7114,7 @@
             "full_resolution_luma_ssim": 0.9564046,
             "worst_128px_luma_ssim": 0.9366984,
             "chroma_mean_absolute_error": 2.6038461,
-            "chroma_95th_percentile_error": 8.0
+            "chroma_95th_percentile_error": 8
           },
           {
             "quality": 76,
@@ -7130,7 +7122,7 @@
             "full_resolution_luma_ssim": 0.9610162,
             "worst_128px_luma_ssim": 0.9421891,
             "chroma_mean_absolute_error": 2.5271579,
-            "chroma_95th_percentile_error": 8.0
+            "chroma_95th_percentile_error": 8
           },
           {
             "quality": 80,
@@ -7138,7 +7130,7 @@
             "full_resolution_luma_ssim": 0.9718128,
             "worst_128px_luma_ssim": 0.9570612,
             "chroma_mean_absolute_error": 2.3483404,
-            "chroma_95th_percentile_error": 7.0
+            "chroma_95th_percentile_error": 7
           },
           {
             "quality": 84,
@@ -7146,7 +7138,7 @@
             "full_resolution_luma_ssim": 0.9786037,
             "worst_128px_luma_ssim": 0.9647199,
             "chroma_mean_absolute_error": 2.1844638,
-            "chroma_95th_percentile_error": 7.0
+            "chroma_95th_percentile_error": 7
           },
           {
             "quality": 88,
@@ -7154,7 +7146,7 @@
             "full_resolution_luma_ssim": 0.9855605,
             "worst_128px_luma_ssim": 0.9745429,
             "chroma_mean_absolute_error": 2.0074154,
-            "chroma_95th_percentile_error": 6.0
+            "chroma_95th_percentile_error": 6
           },
           {
             "quality": 85,
@@ -7162,7 +7154,7 @@
             "full_resolution_luma_ssim": 0.9800014,
             "worst_128px_luma_ssim": 0.9661169,
             "chroma_mean_absolute_error": 2.1440701,
-            "chroma_95th_percentile_error": 7.0
+            "chroma_95th_percentile_error": 7
           },
           {
             "quality": 86,
@@ -7170,7 +7162,7 @@
             "full_resolution_luma_ssim": 0.9822206,
             "worst_128px_luma_ssim": 0.9702325,
             "chroma_mean_absolute_error": 2.096875,
-            "chroma_95th_percentile_error": 6.0
+            "chroma_95th_percentile_error": 6
           },
           {
             "quality": 87,
@@ -7178,7 +7170,7 @@
             "full_resolution_luma_ssim": 0.9836785,
             "worst_128px_luma_ssim": 0.9719373,
             "chroma_mean_absolute_error": 2.0549982,
-            "chroma_95th_percentile_error": 6.0
+            "chroma_95th_percentile_error": 6
           }
         ]
       }
@@ -7219,7 +7211,7 @@
         "full_resolution_luma_ssim": 0.9871768,
         "worst_128px_luma_ssim": 0.9822493,
         "chroma_mean_absolute_error": 1.2033842,
-        "chroma_95th_percentile_error": 4.0,
+        "chroma_95th_percentile_error": 4,
         "trials": [
           {
             "quality": 68,
@@ -7227,7 +7219,7 @@
             "full_resolution_luma_ssim": 0.9365556,
             "worst_128px_luma_ssim": 0.8964944,
             "chroma_mean_absolute_error": 1.778001,
-            "chroma_95th_percentile_error": 6.0
+            "chroma_95th_percentile_error": 6
           },
           {
             "quality": 72,
@@ -7235,7 +7227,7 @@
             "full_resolution_luma_ssim": 0.9406261,
             "worst_128px_luma_ssim": 0.9011406,
             "chroma_mean_absolute_error": 1.7279302,
-            "chroma_95th_percentile_error": 6.0
+            "chroma_95th_percentile_error": 6
           },
           {
             "quality": 76,
@@ -7243,7 +7235,7 @@
             "full_resolution_luma_ssim": 0.9451433,
             "worst_128px_luma_ssim": 0.90775,
             "chroma_mean_absolute_error": 1.687521,
-            "chroma_95th_percentile_error": 6.0
+            "chroma_95th_percentile_error": 6
           },
           {
             "quality": 80,
@@ -7251,7 +7243,7 @@
             "full_resolution_luma_ssim": 0.9567512,
             "worst_128px_luma_ssim": 0.9263309,
             "chroma_mean_absolute_error": 1.5937486,
-            "chroma_95th_percentile_error": 5.0
+            "chroma_95th_percentile_error": 5
           },
           {
             "quality": 84,
@@ -7259,7 +7251,7 @@
             "full_resolution_luma_ssim": 0.9661965,
             "worst_128px_luma_ssim": 0.9412506,
             "chroma_mean_absolute_error": 1.492317,
-            "chroma_95th_percentile_error": 5.0
+            "chroma_95th_percentile_error": 5
           },
           {
             "quality": 88,
@@ -7267,7 +7259,7 @@
             "full_resolution_luma_ssim": 0.9770086,
             "worst_128px_luma_ssim": 0.9638627,
             "chroma_mean_absolute_error": 1.3556416,
-            "chroma_95th_percentile_error": 4.0
+            "chroma_95th_percentile_error": 4
           },
           {
             "quality": 92,
@@ -7275,7 +7267,7 @@
             "full_resolution_luma_ssim": 0.9846767,
             "worst_128px_luma_ssim": 0.9757401,
             "chroma_mean_absolute_error": 1.2534353,
-            "chroma_95th_percentile_error": 4.0
+            "chroma_95th_percentile_error": 4
           },
           {
             "quality": 96,
@@ -7283,7 +7275,7 @@
             "full_resolution_luma_ssim": 0.9911702,
             "worst_128px_luma_ssim": 0.9858448,
             "chroma_mean_absolute_error": 1.1328654,
-            "chroma_95th_percentile_error": 4.0
+            "chroma_95th_percentile_error": 4
           },
           {
             "quality": 93,
@@ -7291,7 +7283,7 @@
             "full_resolution_luma_ssim": 0.9871768,
             "worst_128px_luma_ssim": 0.9822493,
             "chroma_mean_absolute_error": 1.2033842,
-            "chroma_95th_percentile_error": 4.0
+            "chroma_95th_percentile_error": 4
           },
           {
             "quality": 94,
@@ -7299,7 +7291,7 @@
             "full_resolution_luma_ssim": 0.9891146,
             "worst_128px_luma_ssim": 0.9844834,
             "chroma_mean_absolute_error": 1.1699156,
-            "chroma_95th_percentile_error": 4.0
+            "chroma_95th_percentile_error": 4
           },
           {
             "quality": 95,
@@ -7307,7 +7299,7 @@
             "full_resolution_luma_ssim": 0.9898811,
             "worst_128px_luma_ssim": 0.9844726,
             "chroma_mean_absolute_error": 1.1560646,
-            "chroma_95th_percentile_error": 4.0
+            "chroma_95th_percentile_error": 4
           }
         ]
       }
@@ -7348,7 +7340,7 @@
         "full_resolution_luma_ssim": 0.9851283,
         "worst_128px_luma_ssim": 0.9780591,
         "chroma_mean_absolute_error": 0.7629815,
-        "chroma_95th_percentile_error": 2.0,
+        "chroma_95th_percentile_error": 2,
         "trials": [
           {
             "quality": 68,
@@ -7356,7 +7348,7 @@
             "full_resolution_luma_ssim": 0.9355522,
             "worst_128px_luma_ssim": 0.8909911,
             "chroma_mean_absolute_error": 0.9914495,
-            "chroma_95th_percentile_error": 3.0
+            "chroma_95th_percentile_error": 3
           },
           {
             "quality": 72,
@@ -7364,7 +7356,7 @@
             "full_resolution_luma_ssim": 0.9392594,
             "worst_128px_luma_ssim": 0.8977182,
             "chroma_mean_absolute_error": 0.9842979,
-            "chroma_95th_percentile_error": 3.0
+            "chroma_95th_percentile_error": 3
           },
           {
             "quality": 76,
@@ -7372,7 +7364,7 @@
             "full_resolution_luma_ssim": 0.9450102,
             "worst_128px_luma_ssim": 0.9079487,
             "chroma_mean_absolute_error": 0.9601297,
-            "chroma_95th_percentile_error": 3.0
+            "chroma_95th_percentile_error": 3
           },
           {
             "quality": 80,
@@ -7380,7 +7372,7 @@
             "full_resolution_luma_ssim": 0.9550281,
             "worst_128px_luma_ssim": 0.9278469,
             "chroma_mean_absolute_error": 0.9173097,
-            "chroma_95th_percentile_error": 3.0
+            "chroma_95th_percentile_error": 3
           },
           {
             "quality": 84,
@@ -7388,7 +7380,7 @@
             "full_resolution_luma_ssim": 0.9644454,
             "worst_128px_luma_ssim": 0.9443917,
             "chroma_mean_absolute_error": 0.8812799,
-            "chroma_95th_percentile_error": 3.0
+            "chroma_95th_percentile_error": 3
           },
           {
             "quality": 88,
@@ -7396,7 +7388,7 @@
             "full_resolution_luma_ssim": 0.9752528,
             "worst_128px_luma_ssim": 0.9627517,
             "chroma_mean_absolute_error": 0.8226344,
-            "chroma_95th_percentile_error": 2.0
+            "chroma_95th_percentile_error": 2
           },
           {
             "quality": 92,
@@ -7404,7 +7396,7 @@
             "full_resolution_luma_ssim": 0.984364,
             "worst_128px_luma_ssim": 0.977527,
             "chroma_mean_absolute_error": 0.7699409,
-            "chroma_95th_percentile_error": 2.0
+            "chroma_95th_percentile_error": 2
           },
           {
             "quality": 96,
@@ -7412,7 +7404,7 @@
             "full_resolution_luma_ssim": 0.9901989,
             "worst_128px_luma_ssim": 0.9860698,
             "chroma_mean_absolute_error": 0.7134468,
-            "chroma_95th_percentile_error": 2.0
+            "chroma_95th_percentile_error": 2
           },
           {
             "quality": 93,
@@ -7420,7 +7412,7 @@
             "full_resolution_luma_ssim": 0.9851283,
             "worst_128px_luma_ssim": 0.9780591,
             "chroma_mean_absolute_error": 0.7629815,
-            "chroma_95th_percentile_error": 2.0
+            "chroma_95th_percentile_error": 2
           },
           {
             "quality": 94,
@@ -7428,7 +7420,7 @@
             "full_resolution_luma_ssim": 0.9874437,
             "worst_128px_luma_ssim": 0.982177,
             "chroma_mean_absolute_error": 0.7369629,
-            "chroma_95th_percentile_error": 2.0
+            "chroma_95th_percentile_error": 2
           },
           {
             "quality": 95,
@@ -7436,7 +7428,7 @@
             "full_resolution_luma_ssim": 0.9888467,
             "worst_128px_luma_ssim": 0.9841636,
             "chroma_mean_absolute_error": 0.7233337,
-            "chroma_95th_percentile_error": 2.0
+            "chroma_95th_percentile_error": 2
           }
         ]
       }
@@ -7478,7 +7470,7 @@
         "full_resolution_luma_ssim": 0.9859779,
         "worst_128px_luma_ssim": 0.9792878,
         "chroma_mean_absolute_error": 1.1529264,
-        "chroma_95th_percentile_error": 4.0,
+        "chroma_95th_percentile_error": 4,
         "trials": [
           {
             "quality": 68,
@@ -7486,7 +7478,7 @@
             "full_resolution_luma_ssim": 0.9415152,
             "worst_128px_luma_ssim": 0.9017048,
             "chroma_mean_absolute_error": 1.662075,
-            "chroma_95th_percentile_error": 5.0
+            "chroma_95th_percentile_error": 5
           },
           {
             "quality": 72,
@@ -7494,7 +7486,7 @@
             "full_resolution_luma_ssim": 0.945832,
             "worst_128px_luma_ssim": 0.9105881,
             "chroma_mean_absolute_error": 1.6370421,
-            "chroma_95th_percentile_error": 5.0
+            "chroma_95th_percentile_error": 5
           },
           {
             "quality": 76,
@@ -7502,7 +7494,7 @@
             "full_resolution_luma_ssim": 0.9494372,
             "worst_128px_luma_ssim": 0.9120819,
             "chroma_mean_absolute_error": 1.6045751,
-            "chroma_95th_percentile_error": 5.0
+            "chroma_95th_percentile_error": 5
           },
           {
             "quality": 80,
@@ -7510,7 +7502,7 @@
             "full_resolution_luma_ssim": 0.9619281,
             "worst_128px_luma_ssim": 0.9358056,
             "chroma_mean_absolute_error": 1.4630594,
-            "chroma_95th_percentile_error": 5.0
+            "chroma_95th_percentile_error": 5
           },
           {
             "quality": 84,
@@ -7518,7 +7510,7 @@
             "full_resolution_luma_ssim": 0.9727529,
             "worst_128px_luma_ssim": 0.9556152,
             "chroma_mean_absolute_error": 1.3563065,
-            "chroma_95th_percentile_error": 4.0
+            "chroma_95th_percentile_error": 4
           },
           {
             "quality": 88,
@@ -7526,7 +7518,7 @@
             "full_resolution_luma_ssim": 0.9813869,
             "worst_128px_luma_ssim": 0.9716838,
             "chroma_mean_absolute_error": 1.2318944,
-            "chroma_95th_percentile_error": 4.0
+            "chroma_95th_percentile_error": 4
           },
           {
             "quality": 92,
@@ -7534,7 +7526,7 @@
             "full_resolution_luma_ssim": 0.9887811,
             "worst_128px_luma_ssim": 0.9840246,
             "chroma_mean_absolute_error": 1.0993363,
-            "chroma_95th_percentile_error": 3.0
+            "chroma_95th_percentile_error": 3
           },
           {
             "quality": 89,
@@ -7542,7 +7534,7 @@
             "full_resolution_luma_ssim": 0.9830798,
             "worst_128px_luma_ssim": 0.9741087,
             "chroma_mean_absolute_error": 1.2035196,
-            "chroma_95th_percentile_error": 4.0
+            "chroma_95th_percentile_error": 4
           },
           {
             "quality": 90,
@@ -7550,7 +7542,7 @@
             "full_resolution_luma_ssim": 0.9859779,
             "worst_128px_luma_ssim": 0.9792878,
             "chroma_mean_absolute_error": 1.1529264,
-            "chroma_95th_percentile_error": 4.0
+            "chroma_95th_percentile_error": 4
           },
           {
             "quality": 91,
@@ -7558,7 +7550,7 @@
             "full_resolution_luma_ssim": 0.9876106,
             "worst_128px_luma_ssim": 0.9824235,
             "chroma_mean_absolute_error": 1.1369817,
-            "chroma_95th_percentile_error": 3.0
+            "chroma_95th_percentile_error": 3
           }
         ]
       }
@@ -7599,7 +7591,7 @@
         "full_resolution_luma_ssim": 0.9865782,
         "worst_128px_luma_ssim": 0.9769835,
         "chroma_mean_absolute_error": 0.9266712,
-        "chroma_95th_percentile_error": 3.0,
+        "chroma_95th_percentile_error": 3,
         "trials": [
           {
             "quality": 68,
@@ -7607,7 +7599,7 @@
             "full_resolution_luma_ssim": 0.9221202,
             "worst_128px_luma_ssim": 0.8959135,
             "chroma_mean_absolute_error": 1.4935304,
-            "chroma_95th_percentile_error": 5.0
+            "chroma_95th_percentile_error": 5
           },
           {
             "quality": 72,
@@ -7615,7 +7607,7 @@
             "full_resolution_luma_ssim": 0.9258375,
             "worst_128px_luma_ssim": 0.9017644,
             "chroma_mean_absolute_error": 1.4680764,
-            "chroma_95th_percentile_error": 5.0
+            "chroma_95th_percentile_error": 5
           },
           {
             "quality": 76,
@@ -7623,7 +7615,7 @@
             "full_resolution_luma_ssim": 0.9355315,
             "worst_128px_luma_ssim": 0.913055,
             "chroma_mean_absolute_error": 1.4119272,
-            "chroma_95th_percentile_error": 4.0
+            "chroma_95th_percentile_error": 4
           },
           {
             "quality": 80,
@@ -7631,7 +7623,7 @@
             "full_resolution_luma_ssim": 0.9485292,
             "worst_128px_luma_ssim": 0.9301189,
             "chroma_mean_absolute_error": 1.3248774,
-            "chroma_95th_percentile_error": 4.0
+            "chroma_95th_percentile_error": 4
           },
           {
             "quality": 84,
@@ -7639,7 +7631,7 @@
             "full_resolution_luma_ssim": 0.9593414,
             "worst_128px_luma_ssim": 0.9429569,
             "chroma_mean_absolute_error": 1.2413656,
-            "chroma_95th_percentile_error": 4.0
+            "chroma_95th_percentile_error": 4
           },
           {
             "quality": 88,
@@ -7647,7 +7639,7 @@
             "full_resolution_luma_ssim": 0.9721271,
             "worst_128px_luma_ssim": 0.9610276,
             "chroma_mean_absolute_error": 1.0974051,
-            "chroma_95th_percentile_error": 3.0
+            "chroma_95th_percentile_error": 3
           },
           {
             "quality": 92,
@@ -7655,7 +7647,7 @@
             "full_resolution_luma_ssim": 0.9831637,
             "worst_128px_luma_ssim": 0.974756,
             "chroma_mean_absolute_error": 0.9977551,
-            "chroma_95th_percentile_error": 3.0
+            "chroma_95th_percentile_error": 3
           },
           {
             "quality": 96,
@@ -7663,7 +7655,7 @@
             "full_resolution_luma_ssim": 0.9900552,
             "worst_128px_luma_ssim": 0.9829555,
             "chroma_mean_absolute_error": 0.8819457,
-            "chroma_95th_percentile_error": 3.0
+            "chroma_95th_percentile_error": 3
           },
           {
             "quality": 93,
@@ -7671,7 +7663,7 @@
             "full_resolution_luma_ssim": 0.984826,
             "worst_128px_luma_ssim": 0.9769416,
             "chroma_mean_absolute_error": 0.9409697,
-            "chroma_95th_percentile_error": 3.0
+            "chroma_95th_percentile_error": 3
           },
           {
             "quality": 94,
@@ -7679,7 +7671,7 @@
             "full_resolution_luma_ssim": 0.9865782,
             "worst_128px_luma_ssim": 0.9769835,
             "chroma_mean_absolute_error": 0.9266712,
-            "chroma_95th_percentile_error": 3.0
+            "chroma_95th_percentile_error": 3
           },
           {
             "quality": 95,
@@ -7687,7 +7679,7 @@
             "full_resolution_luma_ssim": 0.988404,
             "worst_128px_luma_ssim": 0.9798356,
             "chroma_mean_absolute_error": 0.9016463,
-            "chroma_95th_percentile_error": 3.0
+            "chroma_95th_percentile_error": 3
           }
         ]
       }
@@ -7728,7 +7720,7 @@
         "full_resolution_luma_ssim": 0.9866152,
         "worst_128px_luma_ssim": 0.9793147,
         "chroma_mean_absolute_error": 1.1124322,
-        "chroma_95th_percentile_error": 3.0,
+        "chroma_95th_percentile_error": 3,
         "trials": [
           {
             "quality": 68,
@@ -7736,7 +7728,7 @@
             "full_resolution_luma_ssim": 0.937896,
             "worst_128px_luma_ssim": 0.9184511,
             "chroma_mean_absolute_error": 1.5835512,
-            "chroma_95th_percentile_error": 5.0
+            "chroma_95th_percentile_error": 5
           },
           {
             "quality": 72,
@@ -7744,7 +7736,7 @@
             "full_resolution_luma_ssim": 0.9419212,
             "worst_128px_luma_ssim": 0.9252346,
             "chroma_mean_absolute_error": 1.5434416,
-            "chroma_95th_percentile_error": 5.0
+            "chroma_95th_percentile_error": 5
           },
           {
             "quality": 76,
@@ -7752,7 +7744,7 @@
             "full_resolution_luma_ssim": 0.9480678,
             "worst_128px_luma_ssim": 0.9341532,
             "chroma_mean_absolute_error": 1.4998811,
-            "chroma_95th_percentile_error": 5.0
+            "chroma_95th_percentile_error": 5
           },
           {
             "quality": 80,
@@ -7760,7 +7752,7 @@
             "full_resolution_luma_ssim": 0.9587981,
             "worst_128px_luma_ssim": 0.9485977,
             "chroma_mean_absolute_error": 1.42352,
-            "chroma_95th_percentile_error": 4.0
+            "chroma_95th_percentile_error": 4
           },
           {
             "quality": 84,
@@ -7768,7 +7760,7 @@
             "full_resolution_luma_ssim": 0.9701209,
             "worst_128px_luma_ssim": 0.9619896,
             "chroma_mean_absolute_error": 1.3182025,
-            "chroma_95th_percentile_error": 4.0
+            "chroma_95th_percentile_error": 4
           },
           {
             "quality": 88,
@@ -7776,7 +7768,7 @@
             "full_resolution_luma_ssim": 0.9788831,
             "worst_128px_luma_ssim": 0.9712958,
             "chroma_mean_absolute_error": 1.2108304,
-            "chroma_95th_percentile_error": 4.0
+            "chroma_95th_percentile_error": 4
           },
           {
             "quality": 92,
@@ -7784,7 +7776,7 @@
             "full_resolution_luma_ssim": 0.9866152,
             "worst_128px_luma_ssim": 0.9793147,
             "chroma_mean_absolute_error": 1.1124322,
-            "chroma_95th_percentile_error": 3.0
+            "chroma_95th_percentile_error": 3
           },
           {
             "quality": 89,
@@ -7792,7 +7784,7 @@
             "full_resolution_luma_ssim": 0.9802412,
             "worst_128px_luma_ssim": 0.9713587,
             "chroma_mean_absolute_error": 1.2140846,
-            "chroma_95th_percentile_error": 4.0
+            "chroma_95th_percentile_error": 4
           },
           {
             "quality": 90,
@@ -7800,7 +7792,7 @@
             "full_resolution_luma_ssim": 0.9824203,
             "worst_128px_luma_ssim": 0.9743608,
             "chroma_mean_absolute_error": 1.1585221,
-            "chroma_95th_percentile_error": 4.0
+            "chroma_95th_percentile_error": 4
           },
           {
             "quality": 91,
@@ -7808,7 +7800,7 @@
             "full_resolution_luma_ssim": 0.9848554,
             "worst_128px_luma_ssim": 0.9789101,
             "chroma_mean_absolute_error": 1.1410768,
-            "chroma_95th_percentile_error": 3.0
+            "chroma_95th_percentile_error": 3
           }
         ]
       }
@@ -7849,7 +7841,7 @@
         "full_resolution_luma_ssim": 0.9856879,
         "worst_128px_luma_ssim": 0.9808965,
         "chroma_mean_absolute_error": 1.2003503,
-        "chroma_95th_percentile_error": 4.0,
+        "chroma_95th_percentile_error": 4,
         "trials": [
           {
             "quality": 68,
@@ -7857,7 +7849,7 @@
             "full_resolution_luma_ssim": 0.9337386,
             "worst_128px_luma_ssim": 0.9068182,
             "chroma_mean_absolute_error": 1.7832697,
-            "chroma_95th_percentile_error": 5.0
+            "chroma_95th_percentile_error": 5
           },
           {
             "quality": 72,
@@ -7865,7 +7857,7 @@
             "full_resolution_luma_ssim": 0.9390674,
             "worst_128px_luma_ssim": 0.9177964,
             "chroma_mean_absolute_error": 1.7315947,
-            "chroma_95th_percentile_error": 5.0
+            "chroma_95th_percentile_error": 5
           },
           {
             "quality": 76,
@@ -7873,7 +7865,7 @@
             "full_resolution_luma_ssim": 0.944809,
             "worst_128px_luma_ssim": 0.927862,
             "chroma_mean_absolute_error": 1.6867567,
-            "chroma_95th_percentile_error": 5.0
+            "chroma_95th_percentile_error": 5
           },
           {
             "quality": 80,
@@ -7881,7 +7873,7 @@
             "full_resolution_luma_ssim": 0.957769,
             "worst_128px_luma_ssim": 0.946235,
             "chroma_mean_absolute_error": 1.5628791,
-            "chroma_95th_percentile_error": 5.0
+            "chroma_95th_percentile_error": 5
           },
           {
             "quality": 84,
@@ -7889,7 +7881,7 @@
             "full_resolution_luma_ssim": 0.9674736,
             "worst_128px_luma_ssim": 0.9589624,
             "chroma_mean_absolute_error": 1.466661,
-            "chroma_95th_percentile_error": 4.0
+            "chroma_95th_percentile_error": 4
           },
           {
             "quality": 88,
@@ -7897,7 +7889,7 @@
             "full_resolution_luma_ssim": 0.9766697,
             "worst_128px_luma_ssim": 0.9695697,
             "chroma_mean_absolute_error": 1.3379797,
-            "chroma_95th_percentile_error": 4.0
+            "chroma_95th_percentile_error": 4
           },
           {
             "quality": 92,
@@ -7905,7 +7897,7 @@
             "full_resolution_luma_ssim": 0.9856879,
             "worst_128px_luma_ssim": 0.9808965,
             "chroma_mean_absolute_error": 1.2003503,
-            "chroma_95th_percentile_error": 4.0
+            "chroma_95th_percentile_error": 4
           },
           {
             "quality": 89,
@@ -7913,7 +7905,7 @@
             "full_resolution_luma_ssim": 0.9793365,
             "worst_128px_luma_ssim": 0.973467,
             "chroma_mean_absolute_error": 1.2852474,
-            "chroma_95th_percentile_error": 4.0
+            "chroma_95th_percentile_error": 4
           },
           {
             "quality": 90,
@@ -7921,7 +7913,7 @@
             "full_resolution_luma_ssim": 0.9815649,
             "worst_128px_luma_ssim": 0.9757581,
             "chroma_mean_absolute_error": 1.2735513,
-            "chroma_95th_percentile_error": 4.0
+            "chroma_95th_percentile_error": 4
           },
           {
             "quality": 91,
@@ -7929,7 +7921,7 @@
             "full_resolution_luma_ssim": 0.9826364,
             "worst_128px_luma_ssim": 0.9759373,
             "chroma_mean_absolute_error": 1.23912,
-            "chroma_95th_percentile_error": 4.0
+            "chroma_95th_percentile_error": 4
           }
         ]
       }
@@ -7970,7 +7962,7 @@
         "full_resolution_luma_ssim": 0.9857289,
         "worst_128px_luma_ssim": 0.9775491,
         "chroma_mean_absolute_error": 1.195175,
-        "chroma_95th_percentile_error": 4.0,
+        "chroma_95th_percentile_error": 4,
         "trials": [
           {
             "quality": 68,
@@ -7978,7 +7970,7 @@
             "full_resolution_luma_ssim": 0.9264982,
             "worst_128px_luma_ssim": 0.9002551,
             "chroma_mean_absolute_error": 1.751418,
-            "chroma_95th_percentile_error": 5.0
+            "chroma_95th_percentile_error": 5
           },
           {
             "quality": 72,
@@ -7986,7 +7978,7 @@
             "full_resolution_luma_ssim": 0.9299321,
             "worst_128px_luma_ssim": 0.9054265,
             "chroma_mean_absolute_error": 1.7217025,
-            "chroma_95th_percentile_error": 5.0
+            "chroma_95th_percentile_error": 5
           },
           {
             "quality": 76,
@@ -7994,7 +7986,7 @@
             "full_resolution_luma_ssim": 0.939286,
             "worst_128px_luma_ssim": 0.919208,
             "chroma_mean_absolute_error": 1.6508178,
-            "chroma_95th_percentile_error": 5.0
+            "chroma_95th_percentile_error": 5
           },
           {
             "quality": 80,
@@ -8002,7 +7994,7 @@
             "full_resolution_luma_ssim": 0.9522603,
             "worst_128px_luma_ssim": 0.9333889,
             "chroma_mean_absolute_error": 1.5627708,
-            "chroma_95th_percentile_error": 5.0
+            "chroma_95th_percentile_error": 5
           },
           {
             "quality": 84,
@@ -8010,7 +8002,7 @@
             "full_resolution_luma_ssim": 0.9624323,
             "worst_128px_luma_ssim": 0.9433433,
             "chroma_mean_absolute_error": 1.4629415,
-            "chroma_95th_percentile_error": 4.0
+            "chroma_95th_percentile_error": 4
           },
           {
             "quality": 88,
@@ -8018,7 +8010,7 @@
             "full_resolution_luma_ssim": 0.9744216,
             "worst_128px_luma_ssim": 0.9623969,
             "chroma_mean_absolute_error": 1.3433891,
-            "chroma_95th_percentile_error": 4.0
+            "chroma_95th_percentile_error": 4
           },
           {
             "quality": 92,
@@ -8026,7 +8018,7 @@
             "full_resolution_luma_ssim": 0.9837713,
             "worst_128px_luma_ssim": 0.9748002,
             "chroma_mean_absolute_error": 1.2309534,
-            "chroma_95th_percentile_error": 4.0
+            "chroma_95th_percentile_error": 4
           },
           {
             "quality": 96,
@@ -8034,7 +8026,7 @@
             "full_resolution_luma_ssim": 0.9907543,
             "worst_128px_luma_ssim": 0.9849913,
             "chroma_mean_absolute_error": 1.1008875,
-            "chroma_95th_percentile_error": 3.0
+            "chroma_95th_percentile_error": 3
           },
           {
             "quality": 93,
@@ -8042,7 +8034,7 @@
             "full_resolution_luma_ssim": 0.9857289,
             "worst_128px_luma_ssim": 0.9775491,
             "chroma_mean_absolute_error": 1.195175,
-            "chroma_95th_percentile_error": 4.0
+            "chroma_95th_percentile_error": 4
           },
           {
             "quality": 94,
@@ -8050,7 +8042,7 @@
             "full_resolution_luma_ssim": 0.9882905,
             "worst_128px_luma_ssim": 0.9820065,
             "chroma_mean_absolute_error": 1.1468101,
-            "chroma_95th_percentile_error": 3.0
+            "chroma_95th_percentile_error": 3
           },
           {
             "quality": 95,
@@ -8058,7 +8050,7 @@
             "full_resolution_luma_ssim": 0.9892824,
             "worst_128px_luma_ssim": 0.9826447,
             "chroma_mean_absolute_error": 1.1305417,
-            "chroma_95th_percentile_error": 3.0
+            "chroma_95th_percentile_error": 3
           }
         ]
       }
@@ -8099,7 +8091,7 @@
         "full_resolution_luma_ssim": 0.9860269,
         "worst_128px_luma_ssim": 0.978506,
         "chroma_mean_absolute_error": 1.2210526,
-        "chroma_95th_percentile_error": 4.0,
+        "chroma_95th_percentile_error": 4,
         "trials": [
           {
             "quality": 68,
@@ -8107,7 +8099,7 @@
             "full_resolution_luma_ssim": 0.9502107,
             "worst_128px_luma_ssim": 0.9279928,
             "chroma_mean_absolute_error": 1.5905093,
-            "chroma_95th_percentile_error": 5.0
+            "chroma_95th_percentile_error": 5
           },
           {
             "quality": 72,
@@ -8115,7 +8107,7 @@
             "full_resolution_luma_ssim": 0.9535124,
             "worst_128px_luma_ssim": 0.9327672,
             "chroma_mean_absolute_error": 1.5685158,
-            "chroma_95th_percentile_error": 5.0
+            "chroma_95th_percentile_error": 5
           },
           {
             "quality": 76,
@@ -8123,7 +8115,7 @@
             "full_resolution_luma_ssim": 0.9590563,
             "worst_128px_luma_ssim": 0.9400318,
             "chroma_mean_absolute_error": 1.5128436,
-            "chroma_95th_percentile_error": 5.0
+            "chroma_95th_percentile_error": 5
           },
           {
             "quality": 80,
@@ -8131,7 +8123,7 @@
             "full_resolution_luma_ssim": 0.9676793,
             "worst_128px_luma_ssim": 0.9500818,
             "chroma_mean_absolute_error": 1.4364557,
-            "chroma_95th_percentile_error": 4.0
+            "chroma_95th_percentile_error": 4
           },
           {
             "quality": 84,
@@ -8139,7 +8131,7 @@
             "full_resolution_luma_ssim": 0.9764647,
             "worst_128px_luma_ssim": 0.9644014,
             "chroma_mean_absolute_error": 1.3385819,
-            "chroma_95th_percentile_error": 4.0
+            "chroma_95th_percentile_error": 4
           },
           {
             "quality": 88,
@@ -8147,7 +8139,7 @@
             "full_resolution_luma_ssim": 0.9834899,
             "worst_128px_luma_ssim": 0.9740588,
             "chroma_mean_absolute_error": 1.2476626,
-            "chroma_95th_percentile_error": 4.0
+            "chroma_95th_percentile_error": 4
           },
           {
             "quality": 92,
@@ -8155,7 +8147,7 @@
             "full_resolution_luma_ssim": 0.9897835,
             "worst_128px_luma_ssim": 0.9832147,
             "chroma_mean_absolute_error": 1.1361409,
-            "chroma_95th_percentile_error": 3.0
+            "chroma_95th_percentile_error": 3
           },
           {
             "quality": 89,
@@ -8163,7 +8155,7 @@
             "full_resolution_luma_ssim": 0.9860269,
             "worst_128px_luma_ssim": 0.978506,
             "chroma_mean_absolute_error": 1.2210526,
-            "chroma_95th_percentile_error": 4.0
+            "chroma_95th_percentile_error": 4
           },
           {
             "quality": 90,
@@ -8171,7 +8163,7 @@
             "full_resolution_luma_ssim": 0.9875091,
             "worst_128px_luma_ssim": 0.9808941,
             "chroma_mean_absolute_error": 1.1824293,
-            "chroma_95th_percentile_error": 4.0
+            "chroma_95th_percentile_error": 4
           },
           {
             "quality": 91,
@@ -8179,7 +8171,7 @@
             "full_resolution_luma_ssim": 0.9888742,
             "worst_128px_luma_ssim": 0.9824231,
             "chroma_mean_absolute_error": 1.1651144,
-            "chroma_95th_percentile_error": 3.0
+            "chroma_95th_percentile_error": 3
           }
         ]
       }
@@ -8221,7 +8213,7 @@
         "full_resolution_luma_ssim": 0.9854516,
         "worst_128px_luma_ssim": 0.9754297,
         "chroma_mean_absolute_error": 1.3894634,
-        "chroma_95th_percentile_error": 4.0,
+        "chroma_95th_percentile_error": 4,
         "trials": [
           {
             "quality": 68,
@@ -8229,7 +8221,7 @@
             "full_resolution_luma_ssim": 0.942563,
             "worst_128px_luma_ssim": 0.9191546,
             "chroma_mean_absolute_error": 1.883473,
-            "chroma_95th_percentile_error": 6.0
+            "chroma_95th_percentile_error": 6
           },
           {
             "quality": 72,
@@ -8237,7 +8229,7 @@
             "full_resolution_luma_ssim": 0.9464718,
             "worst_128px_luma_ssim": 0.9255519,
             "chroma_mean_absolute_error": 1.8503504,
-            "chroma_95th_percentile_error": 6.0
+            "chroma_95th_percentile_error": 6
           },
           {
             "quality": 76,
@@ -8245,7 +8237,7 @@
             "full_resolution_luma_ssim": 0.9514824,
             "worst_128px_luma_ssim": 0.9333035,
             "chroma_mean_absolute_error": 1.7962099,
-            "chroma_95th_percentile_error": 6.0
+            "chroma_95th_percentile_error": 6
           },
           {
             "quality": 80,
@@ -8253,7 +8245,7 @@
             "full_resolution_luma_ssim": 0.9638413,
             "worst_128px_luma_ssim": 0.9506921,
             "chroma_mean_absolute_error": 1.6875308,
-            "chroma_95th_percentile_error": 5.0
+            "chroma_95th_percentile_error": 5
           },
           {
             "quality": 84,
@@ -8261,7 +8253,7 @@
             "full_resolution_luma_ssim": 0.9732105,
             "worst_128px_luma_ssim": 0.9612246,
             "chroma_mean_absolute_error": 1.5795715,
-            "chroma_95th_percentile_error": 5.0
+            "chroma_95th_percentile_error": 5
           },
           {
             "quality": 88,
@@ -8269,7 +8261,7 @@
             "full_resolution_luma_ssim": 0.9820901,
             "worst_128px_luma_ssim": 0.9731967,
             "chroma_mean_absolute_error": 1.4607262,
-            "chroma_95th_percentile_error": 5.0
+            "chroma_95th_percentile_error": 5
           },
           {
             "quality": 92,
@@ -8277,7 +8269,7 @@
             "full_resolution_luma_ssim": 0.9892685,
             "worst_128px_luma_ssim": 0.982199,
             "chroma_mean_absolute_error": 1.3331886,
-            "chroma_95th_percentile_error": 4.0
+            "chroma_95th_percentile_error": 4
           },
           {
             "quality": 89,
@@ -8285,7 +8277,7 @@
             "full_resolution_luma_ssim": 0.9839537,
             "worst_128px_luma_ssim": 0.9752173,
             "chroma_mean_absolute_error": 1.4302229,
-            "chroma_95th_percentile_error": 4.0
+            "chroma_95th_percentile_error": 4
           },
           {
             "quality": 90,
@@ -8293,7 +8285,7 @@
             "full_resolution_luma_ssim": 0.9854516,
             "worst_128px_luma_ssim": 0.9754297,
             "chroma_mean_absolute_error": 1.3894634,
-            "chroma_95th_percentile_error": 4.0
+            "chroma_95th_percentile_error": 4
           },
           {
             "quality": 91,
@@ -8301,7 +8293,7 @@
             "full_resolution_luma_ssim": 0.9880564,
             "worst_128px_luma_ssim": 0.9802438,
             "chroma_mean_absolute_error": 1.3658758,
-            "chroma_95th_percentile_error": 4.0
+            "chroma_95th_percentile_error": 4
           }
         ]
       }
@@ -8343,7 +8335,7 @@
         "full_resolution_luma_ssim": 0.9863772,
         "worst_128px_luma_ssim": 0.9797116,
         "chroma_mean_absolute_error": 1.2909244,
-        "chroma_95th_percentile_error": 4.0,
+        "chroma_95th_percentile_error": 4,
         "trials": [
           {
             "quality": 68,
@@ -8351,7 +8343,7 @@
             "full_resolution_luma_ssim": 0.9305084,
             "worst_128px_luma_ssim": 0.9015146,
             "chroma_mean_absolute_error": 1.8328378,
-            "chroma_95th_percentile_error": 5.0
+            "chroma_95th_percentile_error": 5
           },
           {
             "quality": 72,
@@ -8359,7 +8351,7 @@
             "full_resolution_luma_ssim": 0.9353351,
             "worst_128px_luma_ssim": 0.9087379,
             "chroma_mean_absolute_error": 1.8126217,
-            "chroma_95th_percentile_error": 5.0
+            "chroma_95th_percentile_error": 5
           },
           {
             "quality": 76,
@@ -8367,7 +8359,7 @@
             "full_resolution_luma_ssim": 0.943319,
             "worst_128px_luma_ssim": 0.9217011,
             "chroma_mean_absolute_error": 1.75092,
-            "chroma_95th_percentile_error": 5.0
+            "chroma_95th_percentile_error": 5
           },
           {
             "quality": 80,
@@ -8375,7 +8367,7 @@
             "full_resolution_luma_ssim": 0.9567147,
             "worst_128px_luma_ssim": 0.9408192,
             "chroma_mean_absolute_error": 1.6443021,
-            "chroma_95th_percentile_error": 5.0
+            "chroma_95th_percentile_error": 5
           },
           {
             "quality": 84,
@@ -8383,7 +8375,7 @@
             "full_resolution_luma_ssim": 0.9683505,
             "worst_128px_luma_ssim": 0.9577483,
             "chroma_mean_absolute_error": 1.5490898,
-            "chroma_95th_percentile_error": 4.0
+            "chroma_95th_percentile_error": 4
           },
           {
             "quality": 88,
@@ -8391,7 +8383,7 @@
             "full_resolution_luma_ssim": 0.9788409,
             "worst_128px_luma_ssim": 0.9699606,
             "chroma_mean_absolute_error": 1.4128758,
-            "chroma_95th_percentile_error": 4.0
+            "chroma_95th_percentile_error": 4
           },
           {
             "quality": 92,
@@ -8399,7 +8391,7 @@
             "full_resolution_luma_ssim": 0.9877843,
             "worst_128px_luma_ssim": 0.9817648,
             "chroma_mean_absolute_error": 1.2539174,
-            "chroma_95th_percentile_error": 4.0
+            "chroma_95th_percentile_error": 4
           },
           {
             "quality": 89,
@@ -8407,7 +8399,7 @@
             "full_resolution_luma_ssim": 0.981256,
             "worst_128px_luma_ssim": 0.9740068,
             "chroma_mean_absolute_error": 1.3742138,
-            "chroma_95th_percentile_error": 4.0
+            "chroma_95th_percentile_error": 4
           },
           {
             "quality": 90,
@@ -8415,7 +8407,7 @@
             "full_resolution_luma_ssim": 0.9839736,
             "worst_128px_luma_ssim": 0.9786071,
             "chroma_mean_absolute_error": 1.3335636,
-            "chroma_95th_percentile_error": 4.0
+            "chroma_95th_percentile_error": 4
           },
           {
             "quality": 91,
@@ -8423,7 +8415,7 @@
             "full_resolution_luma_ssim": 0.9863772,
             "worst_128px_luma_ssim": 0.9797116,
             "chroma_mean_absolute_error": 1.2909244,
-            "chroma_95th_percentile_error": 4.0
+            "chroma_95th_percentile_error": 4
           }
         ]
       }
@@ -8434,12 +8426,12 @@
     "aliases": [],
     "name": "Солитьюд",
     "captions": [
-      "Ворота Ветрового гребня",
-      "Рынок под парусами",
-      "Дворец Лазурной террасы",
-      "Площадь Медного колокола",
-      "Арка над Приливным проливом",
-      "Причалы Кедровых мачт"
+      "Главные ворота",
+      "Рыночная площадь",
+      "Синий дворец",
+      "Площадь казни",
+      "Городская арка",
+      "Гавань Солитьюда"
     ],
     "cityPlaces": [
       "Главные ворота",
@@ -8473,7 +8465,7 @@
           "full_resolution_luma_ssim": 0.986149,
           "worst_128px_luma_ssim": 0.978741,
           "chroma_mean_absolute_error": 1.554249,
-          "chroma_95th_percentile_error": 5.0,
+          "chroma_95th_percentile_error": 5,
           "scene": "Low stone city gate at the top of a sweeping cliff road, two offset round towers with copper ridge tops, worn gate planks and misty sea visible in the slit to the right. Cool dawn, readable pale limestone."
         },
         {
@@ -8494,7 +8486,7 @@
           "full_resolution_luma_ssim": 0.985843,
           "worst_128px_luma_ssim": 0.971857,
           "chroma_mean_absolute_error": 1.625568,
-          "chroma_95th_percentile_error": 5.0,
+          "chroma_95th_percentile_error": 5,
           "scene": "A medieval northern port market under salvaged red and ivory sailcloth, well-spaced stalls of herbs, bread and smoked fish, crooked pale stone shopfronts and a break in clouds. View across a cobbled square from eye level."
         },
         {
@@ -8515,7 +8507,7 @@
           "full_resolution_luma_ssim": 0.986442,
           "worst_128px_luma_ssim": 0.976891,
           "chroma_mean_absolute_error": 1.785424,
-          "chroma_95th_percentile_error": 5.0,
+          "chroma_95th_percentile_error": 5,
           "scene": "Original limestone palace overlooking a cold bay, jade-blue copper roofs ranged around a crescent terrace, stairway, restrained banners with abstract patterns. Architectural three-quarter view at clear midday, human scale."
         },
         {
@@ -8536,7 +8528,7 @@
           "full_resolution_luma_ssim": 0.985489,
           "worst_128px_luma_ssim": 0.979695,
           "chroma_mean_absolute_error": 1.735689,
-          "chroma_95th_percentile_error": 5.0,
+          "chroma_95th_percentile_error": 5,
           "scene": "Broad sloped civic square paved with square gray stone, a freestanding bell frame with weathered bronze bell, raised stone speaker platform and rain channels. Warm lights in a blue after-rain evening."
         },
         {
@@ -8557,7 +8549,7 @@
           "full_resolution_luma_ssim": 0.987421,
           "worst_128px_luma_ssim": 0.97893,
           "chroma_mean_absolute_error": 1.407231,
-          "chroma_95th_percentile_error": 4.0,
+          "chroma_95th_percentile_error": 4,
           "scene": "Dramatic original natural rock span low over turbulent turquoise sound, a small stone footbridge visible above on the wind-cut headland, foam and drifting sea birds. View from the opposite cliff at late afternoon, strong silhouette."
         },
         {
@@ -8578,7 +8570,7 @@
           "full_resolution_luma_ssim": 0.985557,
           "worst_128px_luma_ssim": 0.975531,
           "chroma_mean_absolute_error": 1.829676,
-          "chroma_95th_percentile_error": 6.0,
+          "chroma_95th_percentile_error": 6,
           "scene": "Stone quay and two independent cargo jetties, tapering cedar masts of medieval coastal ships, capstans and rope, warm warehouse doors below terrace houses, morning fog thinning. View at quay level."
         }
       ]
