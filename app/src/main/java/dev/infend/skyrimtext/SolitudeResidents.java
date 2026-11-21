@@ -98,29 +98,50 @@ final class SolitudeResidents {
             s.add("SOLITUDE:resident:topic:"+i,"Расспросить: "+NAMES[i],"Городская жизнь | авторский диалог");
             if(f!=null&&"MET".equals(f.optString("status")))s.add("SOLITUDE:resident:trust:"+i,"Поделиться впечатлениями: "+NAMES[i],"Авторский диалог | Однократное знакомство ближе");
             if(f!=null&&f.optInt("relation",50)>=60)s.add("SOLITUDE:resident:advice:"+i,"Попросить совета: "+NAMES[i],"Авторский совет | Отношение от 60");
-            if(f!=null)s.add("SOLITUDE:resident:memory:"+i,"Вспомнить встречу: "+NAMES[i],"Общая память NPC");
+            if(f!=null){s.add("SOLITUDE:resident:memory:"+i,"Вспомнить встречу: "+NAMES[i],"Общая память NPC");s.add("SOLITUDE:resident:history:"+i,"История отношений: "+NAMES[i],"События и изменения отношения | только просмотр");}
             SolitudeFavors.choices(g,s,i);
         }
+    }
+    /** Read-only timeline; does not update last contact or grant relationship points. */
+    private static String relationshipHistory(JSONObject f){
+        StringBuilder out=new StringBuilder("Отношение: ").append(f.optInt("relation",50)).append("/100");
+        JSONArray events=f.optJSONArray("history");
+        if(events==null||events.length()==0)return out.append(" | Событий пока нет.").toString();
+        for(int n=Math.max(0,events.length()-8);n<events.length();n++){
+            JSONObject e=events.optJSONObject(n);
+            if(e==null)continue;
+            String status=e.optString("status");
+            String label="MET".equals(status)?"Знакомство":"INFORMED".equals(status)?"Доверительный разговор":
+                "HELPED".equals(status)?"Помощь":"HOSTILE".equals(status)?"Конфликт":
+                "MISSING".equals(status)?"Пропал":"DEAD".equals(status)?"Погиб":status;
+            int delta=e.optInt("delta",0);
+            out.append("\n• День ").append(e.optInt("day",0)).append(", ").append(e.optInt("hour",0)).append(":00: ").append(label);
+            if(delta!=0)out.append(" (").append(delta>0?"+":"").append(delta).append(")");
+            String location=e.optString("location");
+            if(!location.isEmpty())out.append(" | ").append(location);
+        }
+        return out.toString();
     }
     static boolean choose(GameEngine g,int d,String a){
         if(SolitudeFavors.choose(g,d,a))return true;
         if(!a.startsWith("SOLITUDE:resident:"))return false;
         for(int i=0;i<NAMES.length;i++)if(present(g,i,d)){
             boolean memory=a.equals("SOLITUDE:resident:memory:"+i);
+            boolean history=a.equals("SOLITUDE:resident:history:"+i);
             boolean topic=a.equals("SOLITUDE:resident:topic:"+i);
             boolean trust=a.equals("SOLITUDE:resident:trust:"+i);
             boolean advice=a.equals("SOLITUDE:resident:advice:"+i);
-            if(!memory&&!topic&&!trust&&!advice&&!a.equals("SOLITUDE:resident:talk:"+i))continue;
-            JSONObject f=fact(g,i);if(memory&&f==null)return true;
+            if(!memory&&!history&&!topic&&!trust&&!advice&&!a.equals("SOLITUDE:resident:talk:"+i))continue;
+            JSONObject f=fact(g,i);if((memory||history)&&f==null)return true;
             if(trust&&(f==null||!"MET".equals(f.optString("status"))))return true;
             if(advice&&(f==null||f.optInt("relation",50)<60))return true;
             try{
                 g.sceneState.setContext(g.day,g.hour,"Солитьюд");
                 if(f==null)g.sceneState.confirm("npc","solitude_"+IDS[i],NAMES[i],"MET");
                 else if(trust)g.sceneState.confirm("npc",f.optString("id"),NAMES[i],"INFORMED");
-                else if(!memory)g.sceneState.revisitNpc(f.optString("id"));
+                else if(!memory&&!history)g.sceneState.revisitNpc(f.optString("id"));
             }catch(org.json.JSONException ignored){return true;}
-            g.message=NAMES[i]+": "+(memory?"Отношение: "+f.optInt("relation",50)+"/100 | Последняя встреча: день "+f.optInt("lastDay")+SolitudeFavors.memory(g,i):(f==null?"":"Снова встретились. ")+(trust?"Спасибо за рассказ. Теперь мы немного лучше знакомы.":advice?ADVICE[i]:topic?TOPICS[i]:LINES[i]));
+            g.message=NAMES[i]+": "+(history?relationshipHistory(f):memory?"Отношение: "+f.optInt("relation",50)+"/100 | Последняя встреча: день "+f.optInt("lastDay")+SolitudeFavors.memory(g,i):(f==null?"":"Снова встретились. ")+(trust?"Спасибо за рассказ. Теперь мы немного лучше знакомы.":advice?ADVICE[i]:topic?TOPICS[i]:LINES[i]));
             g.progress.recent=g.message;g.recordVisualEvent(g.message);g.progress.sync(g);return true;
         }
         return true;
