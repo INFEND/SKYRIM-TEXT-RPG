@@ -55,7 +55,7 @@ final class FactionCampaign {
     }
     /** Explicit editor action: no completed chapters or earned rewards can be replayed. */
     boolean canFixMembership(GameEngine g,int f,boolean join){
-        if(!valid(f)||!g.started||!g.fixShop.editorEnabled||g.road.pending()||!("WORLD".equals(g.mode)||"RESULT".equals(g.mode)))return false;
+        if(!valid(f)||!g.started||!false||g.road.pending()||!("WORLD".equals(g.mode)||"RESULT".equals(g.mode)))return false;
         if(join)return stage[f]==0&&!"COMPLETED".equals(g.progress.questOutcome("faction_"+f))&&
             !((f==4&&(stage[5]>0||g.factionStories.started(5)))||(f==5&&(stage[4]>0||g.factionStories.started(4))));
         return stage[f]==1&&!g.factionStories.started(f)&&!"COMPLETED".equals(g.progress.questOutcome("faction_"+f));
