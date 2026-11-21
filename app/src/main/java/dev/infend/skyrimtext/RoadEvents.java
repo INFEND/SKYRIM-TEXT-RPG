@@ -335,9 +335,9 @@ final class RoadEvents {
     static boolean fixEventAllowed(String key){Event e=find(key);return e!=null&&!oneTime(e)&&!"unique".equals(e.rule)&&!"soul_cairn".equals(e.rule)&&Arrays.asList("","talk","rescue","plains","reach","forest","north","night","day","city","island","dragon","dragonplains").contains(e.rule);}
     static String fixEventName(String key){Event e=find(key);return e==null?key:e.title;}
     static java.util.List<String> fixEventIds(){ArrayList<String> ids=new ArrayList<>();for(Event e:EVENTS)if(fixEventAllowed(e.id))ids.add(e.id);return ids;}
-    static boolean fixQueue(GameEngine g,String key){if(!FixShopWorld.safe(g)||!g.fixShop.editorEnabled||!fixEventAllowed(key)||!g.fixShop.world.queuedEncounter.isEmpty())return false;g.fixShop.world.queuedEncounter=key;return true;}
+    static boolean fixQueue(GameEngine g,String key){if(!FixShopWorld.safe(g)||!false||!fixEventAllowed(key)||!g.fixShop.world.queuedEncounter.isEmpty())return false;g.fixShop.world.queuedEncounter=key;return true;}
     private boolean tryFixEncounter(GameEngine g,TravelPlanner.Route route,WorldAtlas.Place target){
-        String queued=g.fixShop.world.queuedEncounter;if(!g.fixShop.editorEnabled||queued.isEmpty())return false;
+        String queued=g.fixShop.world.queuedEncounter;if(!false||queued.isEmpty())return false;
         Event e=find(queued);if(e==null||!fixEventAllowed(queued))return false;
         for(int i=1;i<route.stops.size();i++){
             String a=route.stops.get(i-1),b=route.stops.get(i);WorldAtlas.Place p1=WorldAtlas.find(a),p2=WorldAtlas.find(b);
