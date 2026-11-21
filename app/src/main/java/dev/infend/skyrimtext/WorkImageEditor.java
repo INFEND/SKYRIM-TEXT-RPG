@@ -484,9 +484,9 @@ public final class WorkImageEditor {
         panel.addView(label(host, "OPENAI IMAGES API  |  ПРЯМАЯ ГЕНЕРАЦИЯ", 13, accent));
         panel.addView(label(host, "API оплачивается отдельно. Исходник передаётся в OpenAI "
             + "только при выборе редактирования. Результат добавляется после предпросмотра.", 12, MUTED));
-        Button key = button(host, "Настроить API-ключ", accent);
-        panel.addView(key);
-        key.setOnClickListener(v -> showApiKeyEditor(host));
+        Button apiKeyButton = button(host, "Настроить API-ключ", accent);
+        panel.addView(apiKeyButton);
+        apiKeyButton.setOnClickListener(v -> showApiKeyEditor(host));
         String[] modelIds = {"gpt-image-2.6-sunburst", "gpt-image-2.6-flare",
             "gpt-image-2.5-sunburst", "gpt-image-2.5-flare", "gpt-image-1.5"};
         String[] modelNames = {"Sunburst 2.6 · максимум качества", "Flare 2.6 · быстрее",
