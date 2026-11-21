@@ -197,8 +197,9 @@ class LocalAiInferenceService : Service() {
         val descriptor = contentResolver.openFileDescriptor(uri, "r")
             ?: error("Не удалось открыть GGUF для нативного движка.")
         val size=descriptor.statSize.takeIf{it>0} ?: modelBytes
-        // Upstream FD loader uses non-mmap. Larger files and confirmed LMK use mmap.
-        val mmap=memoryProfile || size<=0 || size>8L*1024*1024*1024
+        // Large GGUF models must use file-backed mapping from the first attempt, not only after an Android crash.
+        // This reduces the risk of duplicate resident model buffers during prompt evaluation.
+        val mmap=memoryProfile || size<=0 || size>=2L*1024*1024*1024
         contextCapacity=if(recovery)6144 else 8192
         val fd = descriptor.detachFd()
         val config = mapOf<String, Any>(
@@ -207,7 +208,7 @@ class LocalAiInferenceService : Service() {
             "embedding" to false,
             // Reserve room for prompt, ten choices and resumed output.
             "n_ctx" to contextCapacity,
-            "n_batch" to (if (recovery) 32 else 64),
+            "n_batch" to (if (recovery) 16 else 32),
             "n_threads" to (if (recovery) 2 else 4),
             "n_gpu_layers" to 0,
             "use_mmap" to mmap,
