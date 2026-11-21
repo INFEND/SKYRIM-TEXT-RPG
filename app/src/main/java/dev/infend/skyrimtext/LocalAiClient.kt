@@ -204,7 +204,7 @@ class LocalAiClient(private val context: Context) {
         Thread({
             var report:Bundle?=null
             if(pid>0&&android.os.Build.VERSION.SDK_INT>=30) {
-                repeat(4) {
+                repeat(12) {
                     if(report==null) {
                         try {
                             val candidate=context.contentResolver.call(
@@ -230,7 +230,8 @@ class LocalAiClient(private val context: Context) {
                     if(path.isNotEmpty())
                         crashProfiles.edit().putInt(profileKey(path),next).apply()
                     val hint=if(path.isNotEmpty()&&previous!=next)
-                        ". Следующий ручной запуск: "+(if(next==2) "режим сниженной нагрузки на память" else "совместимый режим") else ""
+                        ". Следующий ручной запуск: "+(if(next==2) "режим сниженной нагрузки на память" else "совместимый режим")
+                    else if(previous>=2) ". Сбой повторился в сниженном режиме; проверь совместимость GGUF с установленным движком" else ""
                     failGeneration(id,reason.trimEnd('.')+". "+detail+
                         ". Этап: "+phase+" (получено $tokens токенов)"+hint+". Повтори действие вручную")
                 }
