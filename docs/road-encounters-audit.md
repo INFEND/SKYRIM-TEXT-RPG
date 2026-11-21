@@ -1,5 +1,0 @@
-# Road encounter catalog (v1.0.150)
-
-Catalog: 188 scenarios, including user-requested extensions. No minimum character level. Enemy combat scaling remains independent from availability. Original references: https://primagames.com/eguides/elder-scrolls-v-skyrim-special-edition-eguide/world-interactions-and-encounters/world-encounters ; https://primagames.com/eguides/elder-scrolls-v-skyrim-special-edition-eguide/world-interactions-and-encounters/dawnguard-world-encounters ; https://primagames.com/eguides/elder-scrolls-v-skyrim-special-edition-eguide/world-interactions-and-encounters/dragonborn-world-encounters .
-
-Where the text RPG lacks the original prerequisites (crime/bounties, vampiric faction, various side quests, full household ownership), encounters use adapted neutral/witness/rumor scenes or regional prerequisites instead of pretending the player already performed the quest. The corresponding full quest and faction mechanics remain separate development work. Arvak is attached to the existing Soul Cairn chapter, not a mainland road event. Cities are filtered by the selected road segment's destination. No sea encounters are generated on ferry routes.

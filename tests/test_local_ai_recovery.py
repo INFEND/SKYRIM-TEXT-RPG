@@ -11,7 +11,7 @@ class LocalAiRecovery(unittest.TestCase):
         self.assertNotIn("MSG_GENERATE",recovery)
     def test_local_validation_does_not_restart_or_commit_invalid_turn(self):
         ui=(APP/"MainActivity.java").read_text()
-        self.assertIn("if(!local&&repairAttempt==0",ui)
+        self.assertIn("if(!local&&!external&&repairAttempt==0",ui)
         self.assertIn("AiGameTurn.parseLocalModel(answer,expectedChance)",ui)
         self.assertIn("НЕСОХРАНЁННЫЙ ОТВЕТ ИИ",ui)
         self.assertIn("if(!game.toJson().toString().equals(saved))",ui)
