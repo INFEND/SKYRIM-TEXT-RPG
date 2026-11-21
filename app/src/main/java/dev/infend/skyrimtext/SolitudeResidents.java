@@ -141,12 +141,12 @@ final class SolitudeResidents {
             JSONObject f=fact(g,i);if((memory||history)&&f==null)return true;
             if(reconcile){
                 if(f==null||!"HOSTILE".equals(f.optString("status")))return true;
-                if(g.hour>=23||g.stamina<10){g.message="Для примирения нужны один час и 10 единиц запаса сил.";return true;}
+                if(g.hour>=23||g.stamina<10||district(i,g.hour+1)!=d){g.message="Для примирения нужны один час, 10 единиц запаса сил и присутствие жителя до конца разговора.";return true;}
                 try{
                     g.sceneState.setContext(g.day,g.hour,"Солитьюд");
                     g.sceneState.confirm("npc",f.optString("id"),NAMES[i],"INFORMED");
                 }catch(org.json.JSONException ignored){return true;}
-                g.stamina-=10;g.hour++;
+                g.stamina-=10;g.hour++;g.syncLivingSystems();
                 g.message=NAMES[i]+": Конфликт улажен. Мы можем снова разговаривать.";
                 g.progress.recent=g.message;g.recordVisualEvent(g.message);g.progress.sync(g);return true;
             }
