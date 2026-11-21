@@ -44,4 +44,32 @@ public class AiQuestUpdatesTest {
         catch(JSONException expected){}
         assertEquals(0,game.progress.aiQuestRecords.length());
     }
+    @Test public void promisedQuestRewardsArePaidOnlyOnce()throws Exception{
+        GameEngine game=new GameEngine();game.start("Герой","Норд","Воин");game.mode="WORLD";
+        int startingGold=game.gold,startingXp=game.xp;
+        JSONObject offered=quest(1,"ACTIVE").put("rewardGold",125).put("rewardXp",2);
+        turn(new JSONArray().put(offered)).apply(game,true);
+        assertEquals(startingGold,game.gold);
+        assertEquals(startingXp,game.xp);
+        assertEquals(125,game.progress.aiQuestRecords.getJSONObject("lost_letter").getInt("rewardGold"));
+        JSONObject finished=quest(3,"COMPLETED").put("rewardGold",125).put("rewardXp",2);
+        turn(new JSONArray().put(finished)).apply(game,true);
+        assertEquals(startingGold+125,game.gold);
+        assertEquals(startingXp+2,game.xp);
+        GameEngine restored=GameEngine.fromJson(game.toJson().toString());
+        turn(new JSONArray().put(finished)).apply(restored,true);
+        assertEquals(startingGold+125,restored.gold);
+        assertEquals(startingXp+2,restored.xp);
+    }
+    @Test public void malformedRewardsNeverGrantQuestMoney()throws Exception{
+        GameEngine game=new GameEngine();game.start("Герой","Норд","Воин");game.mode="WORLD";
+        int initialGold=game.gold;
+        JSONObject invalid=quest(1,"COMPLETED").put("rewardGold","500");
+        try{
+            turn(new JSONArray().put(invalid)).apply(game,true);
+            fail("Invalid reward must be rejected");
+        }catch(JSONException expected){}
+        assertEquals(initialGold,game.gold);
+        assertEquals(0,game.progress.aiQuestRecords.length());
+    }
 }
