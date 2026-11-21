@@ -112,6 +112,7 @@ final class SolitudeCity {
             if(volunteer&&!"HELPED".equals(status)&&!"DEAD".equals(status)&&!"MISSING".equals(status)&&!"HOSTILE".equals(status))g.sceneState.confirm("npc",key,name,"HELPED");
             else if(status.isEmpty())g.sceneState.confirm("npc",key,name,"MET");
             else if("MET".equals(status))g.sceneState.confirm("npc",key,name,"INFORMED");
+            else if("INFORMED".equals(status))g.sceneState.confirm("npc",key,name,"HELPED");
             else g.sceneState.revisitNpc(key);
         }catch(org.json.JSONException ignored){/* Never undo an already completed shift. */}
     }
