@@ -103,7 +103,8 @@ public class Probe {
   pair.add(new SkyrimMapCatalog.Site("b|Б|B|Пещера|0|8192|0|0"));
   Set<String> hidden=new HashSet<>();
   ArrayList<MapPinLayout.Pin> low=MapPinLayout.build(pair,0,-1,hidden,"","",.1f,0,0,500,500,1);
-  check(low.size()==1&&low.get(0).sites.size()==1,"nearby pins are decluttered without clustering");
+  check(low.size()==1&&low.get(0).sites.size()==2,
+      "nearby places form one accessible group without dropping locations");
   ArrayList<MapPinLayout.Pin> shifted=MapPinLayout.build(pair,0,-1,hidden,"","",
       .1f,115,-72,500,500,1);
   check(shifted.size()==low.size(),"camera panning cannot change pin visibility");
@@ -124,7 +125,25 @@ public class Probe {
       "marker size grows smoothly with map zoom");
   check(MapPinLayout.hit(low,low.get(0).x,low.get(0).y,25)==low.get(0),"drawn cluster is tap target");
   ArrayList<MapPinLayout.Pin> high=MapPinLayout.build(pair,0,-1,hidden,"","",1,-1900,-1900,500,500,1);
-  check(high.size()==2,"zoom splits cluster into real positions");
+  check(high.size()==2&&high.get(0).sites.size()==1&&high.get(1).sites.size()==1,
+      "zoom separates nearby places without losing their identities");
+  for(int sheet=0;sheet<2;sheet++)for(float zoom:new float[]{1f,2.4f,5.5f,14f}){
+   float scale=zoom*(sheet==0?.09375f:.1875f);
+   ArrayList<MapPinLayout.Pin> groups=MapPinLayout.build(all,sheet,-1,
+       new HashSet<>(),"","",scale,0,0,845,384,2.8125f,zoom);
+   HashSet<String> assigned=new HashSet<>();
+   int count=0;
+   for(MapPinLayout.Pin group:groups){
+    check(!group.sites.isEmpty(),"empty map group");
+    for(SkyrimMapCatalog.Site site:group.sites){
+     check(site.sheet==sheet,"cross-sheet group membership");
+     check(assigned.add(site.id),"map location assigned to multiple groups: "+site.id);
+     count++;
+    }
+   }
+   check(count==(sheet==0?455:57),
+      "every catalog location must be tappable at zoom "+zoom+" sheet "+sheet+": "+count);
+  }
   hidden.add("Пещера");
   ArrayList<MapPinLayout.Pin> none=MapPinLayout.build(pair,0,-1,hidden,"","",.1f,0,0,500,500,1);
   check(none.isEmpty()&&MapPinLayout.hit(none,205,205,30)==null,"hidden pins cannot be tapped");
@@ -145,7 +164,7 @@ public class Probe {
   check(TravelPlanner.plan(game,WorldAtlas.find("Деревня скаалов")).stops.get(0).equals("Виндхельм"),"legacy region/location mismatch");
   game.progress.location="Камень Шора";
   check(TravelPlanner.plan(game,WorldAtlas.find("Шорский Камень")).days==0,"old name does not charge travel");
-  System.out.println("512 sites: projection, aliases, filtering, zoom, hit targets, ferry, weight and portals OK");
+  System.out.println("512 sites: projection, complete pin-group coverage, filtering, zoom, hit targets, ferry, weight and portals OK");
  }
 }''')
             compiled=subprocess.run(["javac","-encoding","UTF-8","-d",str(root),*[str(p) for p in root.glob("*.java")]],capture_output=True,text=True)
