@@ -88,7 +88,7 @@ final class SolitudeCity {
     private String commissionLedger(){
         StringBuilder out=new StringBuilder("Авторские трудовые ведомости Солитьюда.");
         for(int i=0;i<PLACES.length;i++){
-            out.append("\\n").append(PLACES[i]).append(": ");
+            out.append("\n").append(PLACES[i]).append(": ");
             if(workRewarded[i])out.append("награда получена");
             else if(workDays[i]>=3)out.append("3/3, награда у ответственного NPC");
             else out.append(workDays[i]).append("/3 смен в разные дни");
@@ -171,7 +171,7 @@ final class SolitudeCity {
         int d=district(g.mode);
         if(d<0){
             GameEngine.Scene s=new GameEngine.Scene("СОЛИТЬЮД | ДЕНЬ "+g.day,"Жизнь столицы",
-                "Над городом возвышается Синий дворец, под аркой шумит море. Выбери, куда отправиться. Местные поручения и уроки имеют свои часы работы и не требуют перехода на глобальной карте.");
+                "Над городом возвышается Синий дворец, под аркой шумит море. Выбери, куда отправиться. Местные поручения и уроки имеют свои часы работы и не требуют перехода на глобальной карте."+(g.message.isEmpty()?"":"\n\n"+g.message));
             for(int i=0;i<PLACES.length;i++)s.add(PREFIX+"visit:"+i,PLACES[i],PROSE[i]);
             s.add(SolitudeCanonical.ADDVAR,"Дом Аддвара","Жилой дом торговца рыбой");
             s.add(SolitudeCanonical.CATACOMBS,"Катакомбы Солитьюда","Место погребения жителей");
