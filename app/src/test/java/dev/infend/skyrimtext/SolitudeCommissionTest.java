@@ -65,4 +65,30 @@ public class SolitudeCommissionTest {
         assertEquals(0,saved.optJSONArray("workDays").optInt(0));
         assertFalse(saved.optJSONArray("workRewarded").optBoolean(0));
     }
+    @Test public void dayZeroShiftCountsAndDonationCannotBePaidTwice() throws Exception {
+        GameEngine g=new GameEngine();g.start("Тест","Норд","Воин");
+        g.region=3;g.progress.location="Солитьюд";g.day=0;g.hour=10;g.stamina=100;
+        g.mode="WORLD";g.choose("SOLITUDE:open");g.choose("SOLITUDE:visit:0");
+        g.choose("SOLITUDE:job:0");
+        assertEquals(1,g.solitude.save().optJSONArray("workDays").optInt(0));
+        for(int n=1;n<=2;n++){g.day=n;g.hour=10;g.stamina=100;g.choose("SOLITUDE:job:0");}
+        assertEquals(3,g.solitude.save().optJSONArray("workDays").optInt(0));
+        int gold=g.gold,rep=g.holdReputation[3];
+        g.choose("SOLITUDE:work-donate:0");
+        assertEquals(gold,g.gold);
+        assertEquals(Math.min(100,rep+4),g.holdReputation[3]);
+        assertTrue(g.solitude.save().optJSONArray("workRewarded").optBoolean(0));
+        g.choose("SOLITUDE:work-reward:0");
+        g.choose("SOLITUDE:work-donate:0");
+        assertEquals(gold,g.gold);
+        assertEquals(Math.min(100,rep+4),g.holdReputation[3]);
+        assertTrue(SolitudeCity.restore(g.solitude.save()).save().optJSONArray("workRewarded").optBoolean(0));
+    }
+    @Test public void legacyCommissionSaveStartsWithNoWorkedDay() {
+        JSONObject old=new JSONObject();
+        SolitudeCity restored=SolitudeCity.restore(old);
+        assertEquals(-1,restored.save().optJSONArray("workLastDay").optInt(0));
+        assertEquals(0,restored.save().optJSONArray("workDays").optInt(0));
+    }
+
 }
