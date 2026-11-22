@@ -91,6 +91,19 @@ final class SolitudeEncounters {
             else g.sceneState.confirm("npc",key,NAMES[d],status);
         }catch(org.json.JSONException ignored){}
     }
+    /** Apply a one-time quest consequence to the same NPC ledger used by dialogue and saves. */
+    private static void relationshipConsequence(GameEngine g,int d,int delta){
+        JSONObject npc=fact(g,d);
+        if(npc==null){
+            remember(g,d,"MET");
+            npc=fact(g,d);
+        }
+        if(npc==null||"DEAD".equals(npc.optString("status"))||"MISSING".equals(npc.optString("status")))return;
+        int old=npc.optInt("relation",50);
+        int next=Math.max(0,Math.min(100,old+delta));
+        g.sceneState.setContext(g.day,g.hour,"Солитьюд");
+        if(next!=old)g.sceneState.fixNpc(npcKey(g,d),next,false);
+    }
     private static void report(GameEngine g,String message){
         g.message=message;g.progress.recent=message;g.recordVisualEvent(message);g.progress.sync(g);
     }
@@ -146,6 +159,7 @@ final class SolitudeEncounters {
             Quest q=QUESTS[i];String prefix="SOLITUDE:quest:"+i+":",state=state(g,q);
             if(action.equals(prefix+"decline")&&d==q.giver&&"ACTIVE".equals(state)&&!worked(g,q)){
                 g.progress.setQuestOutcome(q.key(),"DECLINED");
+                relationshipConsequence(g,d,-10);
                 report(g,"Ты отказался от поручения «"+q.title+"». "+NAMES[d]+" запомнит решение. Вернуться к разговору можно позднее.");return true;
             }
             if(action.equals(prefix+"reconsider")&&d==q.giver&&"DECLINED".equals(state)){
@@ -153,6 +167,7 @@ final class SolitudeEncounters {
                 g.stamina-=10;g.hour++;g.syncLivingSystems();
                 g.progress.setQuestOutcome(q.key(),"ACTIVE");
                 remember(g,d,"INFORMED");
+                relationshipConsequence(g,d,5);
                 report(g,"Ты возвращаешься к поручению «"+q.title+"». "+objective(g,q));return true;
             }
             if(action.equals(prefix+"accept")&&d==q.giver&&state.isEmpty()){
@@ -160,14 +175,14 @@ final class SolitudeEncounters {
             }
             if(action.equals(prefix+"work")&&d==q.target&&"ACTIVE".equals(state)&&!worked(g,q)&&canWork(g,d,q)){
                 g.stamina-=q.stamina;g.hour+=q.hours;g.syncLivingSystems();
-                g.progress.setQuestOutcome(q.step(),"COMPLETED");remember(g,d,"INFORMED");report(g,q.work+"\n\n"+objective(g,q));return true;
+                g.progress.setQuestOutcome(q.step(),"COMPLETED");remember(g,d,"INFORMED");relationshipConsequence(g,d,5);report(g,q.work+"\n\n"+objective(g,q));return true;
             }
             boolean gift=action.equals(prefix+"gift");
             if((gift||action.equals(prefix+"finish"))&&d==q.giver&&"ACTIVE".equals(state)&&worked(g,q)){
                 if(!gift&&g.gold>Integer.MAX_VALUE-q.gold)return true;
                 g.progress.setQuestOutcome(q.key(),"COMPLETED");
                 if(gift)g.progress.setQuestOutcome(q.key()+"_gift","COMPLETED");else g.gold+=q.gold;
-                g.holdReputation[3]=Math.min(100,g.holdReputation[3]+q.rep+(gift?2:0));g.addXp(30);remember(g,d,"HELPED");
+                g.holdReputation[3]=Math.min(100,g.holdReputation[3]+q.rep+(gift?2:0));g.addXp(30);remember(g,d,"HELPED");relationshipConsequence(g,d,gift?10:5);
                 report(g,q.finish+(gift?" Ты оставляешь денежную награду.":" Награда: "+q.gold+" септимов.")+"\n\n"+objective(g,q));return true;
             }
         }
