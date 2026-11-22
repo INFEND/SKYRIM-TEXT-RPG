@@ -11,6 +11,9 @@ ATLAS = (SRC / "WorldAtlas.java").read_text(encoding="utf-8")
 RPG = (SRC / "RpgContent.java").read_text(encoding="utf-8")
 ITEMS = (SRC / "ItemCatalog.java").read_text(encoding="utf-8")
 AI = (SRC / "AiStoryClient.java").read_text(encoding="utf-8")
+NPC = (SRC / "NpcProfiles.java").read_text(encoding="utf-8")
+DOSSIER = (SRC / "NpcDossier.java").read_text(encoding="utf-8")
+CAMPAIGN = (SRC / "CanonicalCampaign.java").read_text(encoding="utf-8")
 GLOSSARY = (ROOT / "tools/map_names_ru.txt").read_text(encoding="utf-8")
 
 # Native game location ID never changes when a Russian display name is corrected.
@@ -69,6 +72,12 @@ class WikiRuNamesTests(unittest.TestCase):
         race_match = re.search(r'public static final String\[\] RACES=\{([^}]*)\}', RPG)
         self.assertIsNotNone(race_match)
         self.assertEqual(len(re.findall(r'"[^"]+"', race_match.group(1))), 10)
+
+    def test_named_npc_uses_wiki_spelling_and_old_alias(self):
+        self.assertIn('add("Балгруф Старший","Норд"', NPC)
+        self.assertIn('"Ярл Балгруф"', NPC)
+        self.assertIn('add("Балгруф Старший",', DOSSIER)
+        self.assertIn('"Балгруф Старший","Расскажи всё', CAMPAIGN)
 
     def test_artifacts_show_wiki_name_but_keep_save_key(self):
         self.assertIn('if("Звезда Чёрной Азуры".equals(id))return "Чёрная Звезда"', ITEMS)
