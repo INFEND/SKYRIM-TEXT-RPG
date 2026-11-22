@@ -6460,6 +6460,8 @@ public final class MainActivity extends Activity {
         idea.setInputType(InputType.TYPE_CLASS_TEXT|InputType.TYPE_TEXT_FLAG_MULTI_LINE);
         TextView work=itemAction("✦ ПРЕДЛОЖИТЬ ПАРАМЕТРЫ");
         panel.addView(work,lp(-1,46));
+        GenerationStatusView proposalProgress=new GenerationStatusView(this,accent());
+        panel.addView(proposalProgress.view(),lp(-1,-2));
         addText(panel,"Используется подключённый аккаунт ChatGPT и модель Работа/Codex. "+
                 "ИИ лишь заполняет поля, а решение сохранить предмет остаётся за игроком.",
                 11,MUTED,false,8);
@@ -6483,6 +6485,7 @@ public final class MainActivity extends Activity {
             .setTitle(editing?"Изменить предмет":"Мастерская предметов")
             .setView(scroll).setNegativeButton("Отмена",null)
             .setPositiveButton(editing?"Сохранить":"Создать за 50 F",null).create();
+        dialog.setOnDismissListener(ignored->proposalProgress.dispose());
         dialog.show();
         if(dialog.getWindow()!=null){
             dialog.getWindow().setBackgroundDrawable(new android.graphics.drawable.ColorDrawable(Color.BLACK));
@@ -6519,21 +6522,33 @@ public final class MainActivity extends Activity {
             final String request=prompt;
             work.setEnabled(false);
             work.setText("✦ ПОДКЛЮЧЕНИЕ К CHATGPT…");
+            proposalProgress.start(1,4,"Подключение к модели",
+                "Получение разрешённого доступа; текущие поля не меняются");
             status.accept("Подключение к ChatGPT Work. Текущие поля пока не меняются.");
             java.util.function.Consumer<String> generate=model->
                 chatGptOAuth.getToken((token,error)->{
                     if(!dialog.isShowing()||isDestroyed()||isFinishing())return;
                     if(error!=null||token==null||token.isEmpty()){
                         unlockWork.run();
+                        proposalProgress.finish(false,"Не удалось подключиться",
+                            error==null?"Не получен токен ChatGPT":error);
                         status.accept("Ошибка авторизации: "+(error==null?
                                 "не получен токен ChatGPT":error));
                         return;
                     }
                     work.setText("✦ ИИ ПОДБИРАЕТ ПАРАМЕТРЫ…");
-                    ItemWorkshopAi.draft(token,model,request,(result,failure)->{
+                    proposalProgress.report(2,4,"Отправка запроса",
+                        "Модель: "+model+" · ожидаем потоковый ответ");
+                    ItemWorkshopAi.draft(token,model,request,
+                        (stage,total,title,details)->{
+                            if(dialog.isShowing()&&!isDestroyed()&&!isFinishing())
+                                proposalProgress.report(stage,total,title,details);
+                        },(result,failure)->{
                         if(!dialog.isShowing()||isDestroyed()||isFinishing())return;
                         unlockWork.run();
                         if(failure!=null||result==null){
+                            proposalProgress.finish(false,"Ошибка предложения параметров",
+                                failure==null?"Модель вернула пустой ответ":failure);
                             status.accept("Не удалось предложить параметры: "+
                                     (failure==null?"пустой ответ модели":failure));
                             return;
@@ -6554,6 +6569,8 @@ public final class MainActivity extends Activity {
                         description.setText(result.optString("description",""));
                         effects.setText(result.optString("effect",""));
                         artPrompt.setText(result.optString("art_prompt",""));
+                        proposalProgress.finish(true,"Параметры получены",
+                            "Поля заполнены, но предмет ещё не сохранён");
                         status.accept("✓ Параметры предложены. Проверь их и нажми «Создать» "+
                                 "или «Сохранить». Предмет пока не добавлен.");
                     });
@@ -6562,10 +6579,14 @@ public final class MainActivity extends Activity {
             if(!model.isEmpty()){
                 generate.accept(model);
             }else{
+                proposalProgress.report(1,4,"Загрузка моделей",
+                    "Проверяем модели, разрешённые подключённому аккаунту");
                 chatGptOAuth.loadModels((models,error)->{
                     if(!dialog.isShowing()||isDestroyed()||isFinishing())return;
                     if(error!=null||models==null||models.isEmpty()){
                         unlockWork.run();
+                        proposalProgress.finish(false,"Модели недоступны",
+                            error==null?"Аккаунт не вернул список моделей":error);
                         status.accept("Не удалось выбрать модель Работа/Codex: "+
                                 (error==null?"нет доступных моделей":error));
                         return;
