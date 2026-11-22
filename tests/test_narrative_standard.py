@@ -64,7 +64,7 @@ class NarrativeContracts(unittest.TestCase):
         self.assertIn('**— Его реплика**',client)
         self.assertIn('Описания и действия пиши обычным текстом',client)
         self.assertIn('только игровым движком',client)
-        self.assertIn('SceneTypography.render(accumulated,accent(),game.name,heroColor())',ui)
+        self.assertIn('SceneTypography.render(AiNarrativeFormat.compact(accumulated),accent(),game.name,heroColor())',ui)
 
 if __name__=="__main__":
     unittest.main()

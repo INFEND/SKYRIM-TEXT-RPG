@@ -42,12 +42,13 @@ class ScreenshotNarrativeContract(unittest.TestCase):
         ui=java("MainActivity.java")
         effort=java("AiReasoningEffort.java")
         self.assertIn("response.output_text.delta",client)
-        self.assertIn("SceneTypography.render(accumulated,accent(),game.name,heroColor())",ui)
+        self.assertIn("SceneTypography.render(AiNarrativeFormat.compact(accumulated),accent(),game.name,heroColor())",ui)
         self.assertIn("storyChoice(++number,c,()->",ui)
         self.assertIn("game.choose(c.action)",ui)
         self.assertIn('case "medium":return 12000',effort)
         self.assertIn('case "max":return 32000',effort)
-        self.assertIn("reply.setLineSpacing(dp(8),1.20f)",ui)
+        self.assertIn("reply.setLineSpacing(0f,1f)",ui)
+        self.assertIn("reply.setIncludeFontPadding(false)",ui)
 
 if __name__=="__main__":
     unittest.main()

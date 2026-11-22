@@ -55,8 +55,13 @@ class PocketOrcaStoryPolish(unittest.TestCase):
         self.assertIn('Ограничение до диапазона 0–100%',PROGRESS)
         self.assertIn('return result;',PROGRESS)
 
-    def test_story_font_is_larger_for_saved_and_streamed_scenes(self):
-        self.assertIn('aiTurnText=text("",20,TEXT,false)',UI)
+    def test_story_font_follows_game_readability_setting(self):
+        self.assertEqual(UI.count('aiTurnText=text("",16,TEXT,false)'),2)
+        self.assertEqual(UI.count('aiTurnText.setLineSpacing(0f,1f)'),2)
+        self.assertIn('reply.setLineSpacing(0f,1f)',UI)
+        self.assertIn('return Math.max(10,size+fontBonus)',UI)
+        self.assertIn('AiNarrativeFormat.compact(accumulated)',UI)
+        self.assertNotIn('aiTurnText=text("",20,TEXT,false)',UI)
         self.assertIn('TextView title=text(option.title,19,TEXT,true)',UI)
         self.assertIn('addText(detail,option.detail,17,MUTED,false,8)',UI)
         self.assertIn('TextView link=text("Показать расчёт  ⌄",15,MUTED,true)',UI)
