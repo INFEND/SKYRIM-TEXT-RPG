@@ -52,6 +52,13 @@ public final class SkyrimMapCatalog {
         alias("Роща Кин","Kynesgrove");
         alias("Убежище Тёмного Братства","Dark Brotherhood Sanctuary");
         alias("Перевал Бледной тропы","Pale Pass");
+        // Legacy aliases keep pre-localization save destinations and search working.
+        alias("Золотое поместье","Goldenglow Estate");
+        alias("Камень Хранитель","The Guardian Stones");
+        alias("Шорский Камень","Shor's Stone");
+        alias("Руины Мзинчалефт","Mzinchaleft");
+        alias("Сломанное Весло","Broken Oar Grotto");
+        alias("Таверна Ночные ворота","Nightgate Inn");
     }
     private SkyrimMapCatalog(){}
     private static void alias(String name,String english){
