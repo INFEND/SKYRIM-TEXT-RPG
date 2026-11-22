@@ -35,7 +35,7 @@ final class PocketOrcaClient {
         return port>=1024&&port<=65535?port:DEFAULT_PORT;
     }
     private String baseUrl() { return "http://127.0.0.1:"+serverPort()+"/v1/"; }
-    private static final int MAX_RESPONSE = 240_000;
+    private static final int MAX_RESPONSE = 80_000;
     private final Context context;
     private final Handler main = new Handler(Looper.getMainLooper());
     private final ExecutorService worker = Executors.newSingleThreadExecutor();
@@ -149,19 +149,49 @@ final class PocketOrcaClient {
         });
     }
 
+
+    /** Only the external PocketOrca profile receives this literary direction. */
+    private static final String POCKETORCA_STYLE =
+        "ХУДОЖЕСТВЕННЫЙ СТИЛЬ: полноценная русская проза в духе атмосферного Skyrim, не сухая сводка и не игровой отчёт. "+
+        "Показывай место через конкретные звуки, свет, холод, запах, движение и мелкие наблюдения героя. "+
+        "Меняй ритм длинных и коротких абзацев, создавай живые эмоционально достоверные диалоги и подспудное напряжение. "+
+        "NPC говорят по-разному и действуют из своих мотивов. Не повторяй имя героя в каждом предложении, избегай штампов, "+
+        "не перечисляй механики или варианты действий внутри сцены. Стремись к 4–8 содержательным абзацам, "+
+        "разбивай реплики на строки. Не переписывай канонические факты, не выдавай несыгранное за событие. "+
+        "Формат JSON и ограничения эффектов из основного системного промпта обязательны. ";
     synchronized boolean generate(GameEngine game, String history, String command,
                                   boolean controlled, boolean chanceOnly,
                                   AiStoryClient.Listener listener) {
         if (running || closed) return false;
         running = true;
         final int id = ++generation;
-        // Capture the authoritative game facts on the UI thread.
-        final String system = AiStoryClient.localSystemPrompt(controlled, chanceOnly);
-        final String prompt = chanceOnly
-                ? AiStoryClient.localChancePrompt(game, command)
-                : AiStoryClient.localUserPrompt(game, history, command, controlled);
-        final int maxTokens = chanceOnly ? 128 : controlled ? 4096 : 1024;
-        worker.execute(() -> execute(id, system, prompt, maxTokens, listener));
+        // Build prompts on the worker: prompt/context exceptions must never crash the Activity.
+        try {
+            worker.execute(() -> {
+                try {
+                    if (!active(id)) return;
+                    String system = AiStoryClient.localSystemPrompt(controlled, chanceOnly);
+                    if (!chanceOnly) system += POCKETORCA_STYLE;
+                    String prompt = chanceOnly
+                        ? AiStoryClient.localChancePrompt(game, command)
+                        : AiStoryClient.localUserPrompt(game, history, command, controlled);
+                    final int maxTokens = chanceOnly ? 192 : controlled ? 6144 : 2048;
+                    execute(id, system, prompt, maxTokens, listener);
+                } catch (RuntimeException failure) {
+                    android.util.Log.e("PocketOrca", "Cannot prepare local request", failure);
+                    String message = "Не удалось подготовить запрос PocketOrca: " +
+                        failure.getClass().getSimpleName();
+                    main.post(() -> {
+                        if (!active(id)) return;
+                        synchronized (PocketOrcaClient.this) { running = false; }
+                        listener.onError(message);
+                    });
+                }
+            });
+        } catch (java.util.concurrent.RejectedExecutionException unavailable) {
+            running = false;
+            return false;
+        }
         return true;
     }
 
@@ -181,7 +211,8 @@ final class PocketOrcaClient {
             payload.put("model", loadedModel);
             payload.put("stream", true);
             payload.put("max_tokens", maxTokens);
-            payload.put("temperature", 0.65);
+            payload.put("temperature", 0.78);
+            payload.put("top_p", 0.92);
             JSONArray messages = new JSONArray();
             messages.put(new JSONObject().put("role", "system").put("content", system));
             messages.put(new JSONObject().put("role", "user").put("content", prompt));
@@ -235,9 +266,12 @@ final class PocketOrcaClient {
                                 throw new IOException("Превышен размер ответа ИИ");
                             answer.append(part);
                             long now = android.os.SystemClock.elapsedRealtime();
-                            if (now - lastUpdate >= 90L) {
+                            if (now - lastUpdate >= 300L) {
                                 String snapshot = answer.toString();
-                                main.post(() -> { if (active(id)) listener.onText(snapshot); });
+                                main.post(() -> { if (active(id)) {
+                                    try { listener.onText(snapshot); }
+                                    catch(RuntimeException uiError) { android.util.Log.e("PocketOrca","Streaming UI error",uiError); }
+                                } });
                                 lastUpdate = now;
                             }
                         }
@@ -268,10 +302,16 @@ final class PocketOrcaClient {
             main.post(() -> {
                 if (!active(id)) return;
                 synchronized (PocketOrcaClient.this) { running = false; }
-                listener.onText(full);
-                listener.onComplete(full);
+                try {
+                    listener.onText(full);
+                    listener.onComplete(full);
+                } catch(RuntimeException uiError) {
+                    android.util.Log.e("PocketOrca","Completion UI error",uiError);
+                    listener.onError("Ошибка отображения ответа PocketOrca. Состояние сохранения проверь в игре.");
+                }
             });
         } catch (Exception e) {
+            android.util.Log.e("PocketOrca","Local inference HTTP failure",e);
             String message = friendlyError(e);
             main.post(() -> {
                 if (!active(id)) return;

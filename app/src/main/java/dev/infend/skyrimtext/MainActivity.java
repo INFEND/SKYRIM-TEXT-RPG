@@ -95,7 +95,6 @@ public final class MainActivity extends Activity {
     private AiStoryMemory aiMemory;
     private AiStoryClient aiClient;
     private LocalAiClient localAiClient;
-    private AiPacaClient aipacaClient;
     private PocketOrcaClient pocketOrcaClient;
     private static final int REQUEST_LOCAL_GGUF=7107;
     private static final int REQUEST_ITEM_ARTWORK=7318;
@@ -131,6 +130,7 @@ public final class MainActivity extends Activity {
     @Override public void onCreate(Bundle bundle){
         super.onCreate(bundle);
         prefs=getSharedPreferences(PREFS,MODE_PRIVATE);
+        clearRetiredLocalServerCredentials();
         aiSession=prefs.getString("ai_session","");
         if(aiSession.isEmpty()){
             aiSession=java.util.UUID.randomUUID().toString();
@@ -139,7 +139,6 @@ public final class MainActivity extends Activity {
         aiMemory=new AiStoryMemory(this);
         aiClient=new AiStoryClient();
         localAiClient=new LocalAiClient(this);
-        aipacaClient=new AiPacaClient(this);
         pocketOrcaClient=new PocketOrcaClient(this);
         chatGptOAuth=new ChatGptOAuth(this);
         ResourceStore.start(this);
@@ -206,7 +205,6 @@ public final class MainActivity extends Activity {
         if(updater!=null)updater.onHostDestroy();
         if(aiClient!=null)aiClient.shutdown();
         if(localAiClient!=null)localAiClient.shutdown();
-        if(aipacaClient!=null)aipacaClient.shutdown();
         if(pocketOrcaClient!=null)pocketOrcaClient.shutdown();
         if(chatGptOAuth!=null)chatGptOAuth.shutdown();
         if(aiMemory!=null)aiMemory.close();
@@ -366,6 +364,24 @@ public final class MainActivity extends Activity {
             }
         });
     }
+
+    /** Remove the retired server key, encrypted preferences and unused settings after upgrade. */
+    private void clearRetiredLocalServerCredentials(){
+        if(prefs.getBoolean("legacy_aipaca_credentials_cleared",false))return;
+        try{
+            java.security.KeyStore keys=java.security.KeyStore.getInstance("AndroidKeyStore");
+            keys.load(null);
+            if(keys.containsAlias("skyrim_aipaca_api_v1"))
+                keys.deleteEntry("skyrim_aipaca_api_v1");
+            getSharedPreferences("skyrim_aipaca_vault",MODE_PRIVATE).edit().clear().apply();
+            prefs.edit().remove("ai_aipaca_fallback")
+                .remove("ai_aipaca_last_model").remove("ai_aipaca_model")
+                .putBoolean("legacy_aipaca_credentials_cleared",true).apply();
+        }catch(Exception failure){
+            android.util.Log.w("SkyrimAI","Retired credential cleanup will retry",failure);
+        }
+    }
+
     private boolean localModelReady(){return LocalAiModelStore.ready(prefs);}
     private String resolvedAiProvider(){
         String mode=aiProviderMode();
@@ -2216,7 +2232,7 @@ public final class MainActivity extends Activity {
     }
 
     private void executeStoryChoice(GameEngine.Choice c){
-                if(aiClient!=null)aiClient.cancel();if(localAiClient!=null)localAiClient.cancel();if(aipacaClient!=null)aipacaClient.cancel();if(pocketOrcaClient!=null)pocketOrcaClient.cancel();
+                if(aiClient!=null)aiClient.cancel();if(localAiClient!=null)localAiClient.cancel();if(pocketOrcaClient!=null)pocketOrcaClient.cancel();
                 int old=game.questStage;
                 java.util.Map<String,Integer> before=itemSnapshot(game);
                 VisualSnapshot visualBefore=new VisualSnapshot(game,c.action);
@@ -2383,14 +2399,14 @@ public final class MainActivity extends Activity {
             final String destination="Дом Аддвара".equals(place)?SolitudeCanonical.ADDVAR:SolitudeCanonical.CATACOMBS;
             new RuneDialogBuilder(this,accent()).setTitle(title).setView(panel).setPositiveButton("Посетить",(dialog,w)->{
                 if(!city.equals(game.progress.location)||!"WORLD".equals(game.mode)||game.road.pending())return;
-                if(aiClient!=null)aiClient.cancel();if(localAiClient!=null)localAiClient.cancel();if(aipacaClient!=null)aipacaClient.cancel();if(pocketOrcaClient!=null)pocketOrcaClient.cancel();
+                if(aiClient!=null)aiClient.cancel();if(localAiClient!=null)localAiClient.cancel();if(pocketOrcaClient!=null)pocketOrcaClient.cancel();
                 game.choose("SOLITUDE:open");game.choose(destination);save();tab=0;render();
             }).setNegativeButton("Закрыть",null).show();return;
         }
         if("Солитьюд".equals(city)&&"Высокий шпиль".equals(place)){
             new RuneDialogBuilder(this,accent()).setTitle(title).setView(panel).setPositiveButton("Посетить",(dialog,w)->{
                 if(!city.equals(game.progress.location)||!"WORLD".equals(game.mode)||game.road.pending())return;
-                if(aiClient!=null)aiClient.cancel();if(localAiClient!=null)localAiClient.cancel();if(aipacaClient!=null)aipacaClient.cancel();if(pocketOrcaClient!=null)pocketOrcaClient.cancel();
+                if(aiClient!=null)aiClient.cancel();if(localAiClient!=null)localAiClient.cancel();if(pocketOrcaClient!=null)pocketOrcaClient.cancel();
                 game.choose("SOLITUDE:open");game.choose("SOLITUDE:home");save();tab=0;render();
             }).setNegativeButton("Закрыть",null).show();return;
         }
@@ -2399,13 +2415,13 @@ public final class MainActivity extends Activity {
         final int localShop=shop;
         if(localShop>=0){new RuneDialogBuilder(this,accent()).setTitle(title).setView(panel).setPositiveButton("Посетить лавку",(dialog,w)->{
             if(!city.equals(game.progress.location)||!"WORLD".equals(game.mode)||game.road.pending())return;
-            if(aiClient!=null)aiClient.cancel();if(localAiClient!=null)localAiClient.cancel();if(aipacaClient!=null)aipacaClient.cancel();if(pocketOrcaClient!=null)pocketOrcaClient.cancel();
+            if(aiClient!=null)aiClient.cancel();if(localAiClient!=null)localAiClient.cancel();if(pocketOrcaClient!=null)pocketOrcaClient.cancel();
             game.choose("SOLITUDE:open");game.choose("SOLITUDE:visit:"+SolitudeShops.district(localShop));game.choose("SOLITUDE:store:"+localShop);save();tab=0;render();
         }).setNegativeButton("Закрыть",null).show();return;}
         if(district>=0){
             new RuneDialogBuilder(this,accent()).setTitle(title).setView(panel).setPositiveButton("Местные занятия",(dialog,w)->{
                 if(!city.equals(game.progress.location)||!"WORLD".equals(game.mode)||game.road.pending())return;
-                if(aiClient!=null)aiClient.cancel();if(localAiClient!=null)localAiClient.cancel();if(aipacaClient!=null)aipacaClient.cancel();if(pocketOrcaClient!=null)pocketOrcaClient.cancel();
+                if(aiClient!=null)aiClient.cancel();if(localAiClient!=null)localAiClient.cancel();if(pocketOrcaClient!=null)pocketOrcaClient.cancel();
                 game.choose("SOLITUDE:open");game.choose("SOLITUDE:visit:"+district);if("Подземелье Мрачного замка".equals(place))game.choose(SolitudeJustice.MODE);save();tab=0;render();
             }).setNegativeButton("Закрыть",null).show();return;
         }
@@ -2441,7 +2457,7 @@ public final class MainActivity extends Activity {
     /** Only the value is bold; the attribute label remains regular. */
     private void addChoiceStat(LinearLayout target,String label,String value,int valueColor,int bottom){
         String display=label+": "+value;
-        TextView line=text(display,13,MUTED,false);
+        TextView line=text(display,15,MUTED,false);
         android.text.SpannableString styled=new android.text.SpannableString(display);
         int start=display.length()-value.length();
         styled.setSpan(new android.text.style.StyleSpan(Typeface.BOLD),start,display.length(),
@@ -2455,9 +2471,52 @@ public final class MainActivity extends Activity {
 
     private String choiceSkillName(String action){return "HEAVY".equals(action)?RpgContent.SKILLS[game.progress.equippedWeaponSkill()]:SceneChoiceMeta.skillName(action);}
     private void livingChanceLink(LinearLayout panel,String title,String calculation){
-        TextView link=text("Показать расчёт  ⌄",12,MUTED,true);link.setPadding(0,dp(4),0,dp(4));panel.addView(link,lp(-1,-2));
-        link.setOnClickListener(v->{LinearLayout details=column();for(String line:calculation.split("\n"))addText(details,line,14,TEXT,false,6);livingDialog(title,details);});
+        TextView link=text("Показать расчёт  ⌄",15,MUTED,true);link.setPadding(0,dp(4),0,dp(4));panel.addView(link,lp(-1,-2));
+        link.setOnClickListener(v->{LinearLayout details=column();for(String line:calculation.split("\n"))addText(details,line,16,TEXT,false,8);livingDialog(title,details);});
     }
+
+    /** A model may send a legacy numeric skill index instead of the skill name. */
+    private int choiceSkillIndex(String skill){
+        if(skill==null)return -1;
+        String raw=skill.trim().toLowerCase(java.util.Locale.ROOT);
+        if(raw.matches("(?:[0-9]|1[0-7])")){
+            try{return Integer.parseInt(raw);}catch(NumberFormatException ignored){return -1;}
+        }
+        for(int i=0;i<RpgContent.SKILLS.length;i++){
+            String name=RpgContent.SKILLS[i].toLowerCase(java.util.Locale.ROOT);
+            if(raw.equals(name)||raw.startsWith(name+" |")||raw.startsWith(name+" ·"))return i;
+        }
+        return -1;
+    }
+    private void showChoiceSkillLevel(LinearLayout panel,String skill,String action){
+        int index=choiceSkillIndex(skill);
+        if(index<0 && action!=null)index=choiceSkillIndex(choiceSkillName(action));
+        if(index>=0)addChoiceStat(panel,RpgContent.SKILLS[index],
+            game.progress.skillLevel(index)+" (уровень)",accent(),4);
+    }
+    /** Never fabricate a numerical formula for a probability authored by an LLM. */
+    private String aiChoiceCalculation(AiGameTurn.Option option,int chance,boolean nativeCombat){
+        if(nativeCombat){
+            String explanation=game.progress.chanceExplanation();
+            if(!explanation.isEmpty())return explanation;
+        }
+        if(chance<0)return "Гарантированный исход: 100%. Бросок кубика не выполняется.";
+        StringBuilder details=new StringBuilder();
+        details.append("Источник шанса: оценка ИИ, а не формула движка.\n");
+        int index=choiceSkillIndex(option.skill);
+        if(index>=0)details.append("Навык: ").append(RpgContent.SKILLS[index])
+            .append(" — ").append(game.progress.skillLevel(index)).append(" (уровень).\n");
+        details.append("Вероятность: ").append(chance).append("%.\n")
+            .append("Бросок: равномерное целое от 1 до 100.\n");
+        if(chance>0)details.append("Успех: 1–").append(chance).append(" (")
+            .append(chance).append(" исходов).\n");
+        if(chance<100)details.append("Неудача: ").append(chance+1).append("–100 (")
+            .append(100-chance).append(" исходов).\n");
+        details.append("ИИ не прислал числовую разбивку по сложности и условиям. ")
+            .append("Игровой движок не выдумывает недостающие коэффициенты.");
+        return details.toString();
+    }
+
     private void storyChoice(int position,GameEngine.Choice c,Runnable onClick){
         int chance=game.progress.chance(game,c.action);String calculation=game.progress.chanceExplanation();
         LinearLayout box=row();box.setGravity(Gravity.CENTER_VERTICAL);
@@ -2478,12 +2537,12 @@ public final class MainActivity extends Activity {
         LinearLayout prose=column();
         LinearLayout.LayoutParams size=new LinearLayout.LayoutParams(0,-2,1);
         size.leftMargin=dp(13);box.addView(prose,size);
-        TextView name=text(c.title,17,TEXT,true);
+        TextView name=text(c.title,19,TEXT,true);
         name.setTypeface(SovngardeTypeface.face(this,true));
         name.setLineSpacing(dp(3),1.1f);prose.addView(name);
         if(c.detail!=null&&!c.detail.isEmpty()){
             space(prose,5);
-            TextView desc=text(c.detail,14,MUTED,false);
+            TextView desc=text(c.detail,17,MUTED,false);
             desc.setLineSpacing(dp(3),1.12f);prose.addView(desc);
         }
         space(prose,6);
@@ -2493,11 +2552,15 @@ public final class MainActivity extends Activity {
             if(target>=0&&target<TravelPlanner.HUBS.length)routePreview(prose,TravelPlanner.plan(game,WorldAtlas.find(TravelPlanner.HUBS[target])));
         }
         if(chance>=0){
-            addChoiceStat(prose,"НАВЫК",choiceSkillName(c.action),accent(),4);
+            showChoiceSkillLevel(prose,choiceSkillName(c.action),c.action);
             addChoiceStat(prose,"ШАНС УСПЕХА",chance+"%",SceneChoiceMeta.chanceColor(chance),0);
             livingBar(prose,chance,100,SceneChoiceMeta.chanceColor(chance));
             livingChanceLink(prose,c.title,calculation.isEmpty()?"Шанс движка: "+chance+"%":calculation);
-        }else addText(prose,"БЕЗ ПРОВЕРКИ",11,0xffb8c1c4,false,0);
+        }else{
+            addChoiceStat(prose,"ШАНС УСПЕХА","100%",SceneChoiceMeta.chanceColor(100),0);
+            livingBar(prose,100,100,SceneChoiceMeta.chanceColor(100));
+            livingChanceLink(prose,c.title,"Гарантированное действие: 100%.\nБросок кубика не требуется.\nПоследствия применяются по правилам игры.");
+        }
         LinearLayout.LayoutParams layout=lp(-1,-2);layout.bottomMargin=dp(5);
         content.addView(box,layout);
         box.setClickable(true);box.setFocusable(true);
@@ -2609,7 +2672,7 @@ public final class MainActivity extends Activity {
             WorkImageEditor.open(this,"location",game.progress.location,game.progress.location,
                 "Локация текущего прохождения.",accent(),this::render));
         String source=resolvedAiProvider();
-        boolean ready="pocketorca".equals(source)||"aipaca".equals(source)||("local".equals(source)?localModelReady():
+        boolean ready="pocketorca".equals(source)||("local".equals(source)?localModelReady():
             "chatgpt".equals(source)?chatGptOAuth.hasAuthorizedPlan():
             "api".equals(source)&&AiKeyVault.configured(this));
         if(LocationGalleryView.hasGallery(game.progress.location)||WorkImageEditor.hasPrimary(this,"location",game.progress.location)){
@@ -2621,7 +2684,7 @@ public final class MainActivity extends Activity {
             LinearLayout card=card();
             addText(card,"ИИ-ИГРА НЕ ПОДКЛЮЧЕНА",14,accent(),true,11);
             addText(card,"Подключи выбранный источник в настройках. Обычный текст игры скрыт, поскольку выбран режим ИИ.",14,TEXT,false,13);
-            actionButton("НАСТРОИТЬ ИИ","PocketOrca, AiPaca, GGUF или облачный ИИ",true,()->{tab=5;render();});
+            actionButton("НАСТРОИТЬ ИИ","PocketOrca, GGUF или облачный ИИ",true,()->{tab=5;render();});
             return;
         }
         if(aiTurnBusy) {
@@ -2658,9 +2721,9 @@ public final class MainActivity extends Activity {
             // A probability-only request has no story, so never create an empty panel.
             if(!aiTurnProposal){
                 LinearLayout live=card();
-                aiTurnText=text("",16,TEXT,false);
+                aiTurnText=text("",20,TEXT,false);
                 aiTurnText.setTypeface(SovngardeTypeface.face(this,false));
-                aiTurnText.setLineSpacing(dp(2),1.05f);
+                aiTurnText.setLineSpacing(dp(7),1.20f);
                 if(aiTurnPreview.isEmpty())aiTurnText.setText(aiLiveDots(android.os.SystemClock.elapsedRealtime()-aiLocalStartedAt));
                 else aiTurnText.setText(SceneTypography.render(aiTurnPreview,accent(),game.name,heroColor()));
                 live.addView(aiTurnText,lp(-1,-2));
@@ -2730,9 +2793,9 @@ public final class MainActivity extends Activity {
             });
         }
         LinearLayout narrative=card();
-        aiTurnText=text("",18,TEXT,false);
+        aiTurnText=text("",20,TEXT,false);
         aiTurnText.setTypeface(SovngardeTypeface.face(this,false));
-        aiTurnText.setLineSpacing(dp(7),1.16f);
+        aiTurnText.setLineSpacing(dp(8),1.20f);
         aiTurnText.setText(SceneTypography.render(game.aiTurn.scene,accent(),game.name,heroColor()));
         narrative.addView(aiTurnText,lp(-1,-2));
         decorateNarrative(narrative,aiTurnText,game.aiTurn.scene);
@@ -2749,7 +2812,7 @@ public final class MainActivity extends Activity {
         space(content,12);
         addText(content,"СВОЙ ВАРИАНТ ОТВЕТА",12,accent(),true,11);
         EditText own=new EditText(this);
-        own.setTextColor(TEXT);own.setHintTextColor(MUTED);own.setTextSize(sp(16));
+        own.setTextColor(TEXT);own.setHintTextColor(MUTED);own.setTextSize(sp(18));
         own.setHint("Опиши, что говоришь или делаешь...");
         if(!aiOwnDraft.isEmpty())own.setText(aiOwnDraft);
         else if(selectedAiChoices.isEmpty()){
@@ -2859,7 +2922,7 @@ public final class MainActivity extends Activity {
                 AiGameTurn.Option option=game.aiTurn.choices.get(index-1);
                 int die=option.chance<0?-1:AiGameTurn.roll();if(FixShopAiContext.mayRetry(game,option.chance,die,fateDay==game.day)){die=AiGameTurn.roll();fateDay=game.day;instruction.append("Благосклонность судьбы использована; повторный бросок окончательный.\n");}checks.add(index,option.title,option.chance,die);
                 instruction.append("Вариант ").append(index).append(": ");
-                if(option.chance<0)instruction.append("без проверки.");
+                if(option.chance<0)instruction.append("шанс 100%, бросок не требуется.");
                 else instruction.append("шанс ").append(option.chance).append("%, бросок ")
                     .append(die).append("/100, ")
                     .append(AiGameTurn.success(option.chance,die)?"УСПЕХ.":"НЕУДАЧА.");
@@ -3043,21 +3106,25 @@ public final class MainActivity extends Activity {
         LinearLayout detail=column();
         LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(0,-2,1);
         p.leftMargin=dp(13);row.addView(detail,p);
-        TextView title=text(option.title,17,TEXT,true);
+        TextView title=text(option.title,19,TEXT,true);
         title.setTypeface(SovngardeTypeface.face(this,true));
         detail.addView(title);space(detail,6);
-        addText(detail,option.detail,14,MUTED,false,7);
+        addText(detail,option.detail,17,MUTED,false,8);
         choiceExtras(detail,option.combatAction);
         boolean combat="COMBAT".equals(game.mode)&&game.enemyHp>0;
         int displayedChance=combat?("HEAVY".equals(option.combatAction)||"FLEE".equals(option.combatAction)
             ?game.progress.chance(game,option.combatAction):-1):option.chance;
         if(displayedChance>=0){
-            addChoiceStat(detail,"НАВЫК",option.skill.isEmpty()?"Способности":option.skill,accent(),3);
+            showChoiceSkillLevel(detail,option.skill,option.combatAction);
             addChoiceStat(detail,"ШАНС УСПЕХА",displayedChance+"%",
                 SceneChoiceMeta.chanceColor(displayedChance),0);
             livingBar(detail,displayedChance,100,SceneChoiceMeta.chanceColor(displayedChance));
-            livingChanceLink(detail,option.title,combat?game.progress.chanceExplanation():"Оценка ИИ: "+option.chance+"%\nФактический бросок делает игровой движок. Состав коэффициентов модели не задан.");
-        }else addText(detail,"БЕЗ ПРОВЕРКИ",12,MUTED,false,0);
+            livingChanceLink(detail,option.title,aiChoiceCalculation(option,displayedChance,combat));
+        }else{
+            addChoiceStat(detail,"ШАНС УСПЕХА","100%",SceneChoiceMeta.chanceColor(100),0);
+            livingBar(detail,100,100,SceneChoiceMeta.chanceColor(100));
+            livingChanceLink(detail,option.title,"Гарантированный исход проверки: 100%.\nБросок кубика не выполняется.\nСостояние игры всё равно изменяется только после подтверждённого действия.");
+        }
         boolean available=combat?nativeAiCombatAvailable(option.combatAction):option.companionAction.isEmpty()||AiCompanionActions.allowed(game,option.companionAction);
         if(!available){
             addText(detail,"ДЕЙСТВИЕ НЕДОСТУПНО",12,MUTED,true,0);
@@ -3100,11 +3167,11 @@ public final class MainActivity extends Activity {
     }
     private void requestAiTurn(String instruction,boolean actionResolved,
                                boolean proposalOnly,int expectedChance,String customAction,int repairAttempt){
-        if(!game.aiNarrativeMode||aiTurnBusy||aiClient.isRunning()||localAiClient.isRunning()||aipacaClient.isRunning()||pocketOrcaClient.isRunning()||!game.started||game.nativeSceneRequired())return;
+        if(!game.aiNarrativeMode||aiTurnBusy||aiClient.isRunning()||localAiClient.isRunning()||pocketOrcaClient.isRunning()||!game.started||game.nativeSceneRequired())return;
         game.setAiNarrativeMode(true);
         final String source=resolvedAiProvider();
-        final boolean orca="pocketorca".equals(source),external=orca||"aipaca".equals(source),local="local".equals(source)||external,chat="chatgpt".equals(source);
-        final String model=local?(orca?"PocketOrca-LLM":external?"AiPaca":"Qwen3.5-9B"):prefs.getString(chat?"ai_chatgpt_model":"ai_api_model",
+        final boolean orca="pocketorca".equals(source),external=orca,local="local".equals(source)||external,chat="chatgpt".equals(source);
+        final String model=local?(orca?"PocketOrca-LLM":"Qwen3.5-9B"):prefs.getString(chat?"ai_chatgpt_model":"ai_api_model",
                 chat?"":AiModelCatalog.DEFAULT_API);
         if(model.isEmpty()){aiTurnStatus="Сначала выбери модель в настройках";render();return;}
         final String effort=selectedReasoningEffort(),history=aiMemory.context(aiSession)+(local?"":"\n"+game.katherine.aiContext(game)+"\n"+game.alma.aiContext())+"\n"+game.livia.aiContext(game)+"\n"+game.itachi.aiContext(game);
@@ -3117,9 +3184,9 @@ public final class MainActivity extends Activity {
         aiTurnProposal=proposalOnly;
         aiLocalStartedAt=android.os.SystemClock.elapsedRealtime();
         aiLocalPhase=proposalOnly?"Определение вероятности действия…":
-            orca?"Подключение к PocketOrca-LLM…":external?"Подключение к AiPaca…":local?"Запуск модели…":chat?"Подключение к ChatGPT…":"Подключение к API…";
+            orca?"Подключение к PocketOrca-LLM…":local?"Запуск модели…":chat?"Подключение к ChatGPT…":"Подключение к API…";
         aiTurnStatus=proposalOnly?"Определение вероятности действия…":
-            orca?"Генерация через PocketOrca-LLM…":external?"Генерация через AiPaca…":local?"Локальная генерация без интернета…":chat?"Подключение к ChatGPT…":"Создание игровой сцены…";
+            orca?"Генерация через PocketOrca-LLM…":local?"Локальная генерация без интернета…":chat?"Подключение к ChatGPT…":"Создание игровой сцены…";
         render();
         final AiStoryClient.Listener listener=new AiStoryClient.Listener(){
             private boolean active(){return aiTurnBusy&&requestId==aiRequestSerial&&!isDestroyed()&&!isFinishing();}
@@ -3145,7 +3212,8 @@ public final class MainActivity extends Activity {
                         if(tab==0&&aiProgressInfo!=null)aiProgressInfo.setText(aiLocalPhase);
                     }
                     if(tab==0&&aiTurnText!=null&&prefs.getBoolean("ai_enabled",false)){
-                        aiTurnText.setText(SceneTypography.render(visible,accent(),game.name,heroColor()));
+                        try{aiTurnText.setText(SceneTypography.render(visible,accent(),game.name,heroColor()));}
+                        catch(RuntimeException layoutError){aiTurnText.setText(visible);}
                     }
                 }
                 // Scene may already be complete while the model is streaming choices.
@@ -3229,9 +3297,9 @@ public final class MainActivity extends Activity {
             }
         };
         if(external){
-            boolean started=generateExternalLocal(source,game,history,instruction,true,proposalOnly,listener);
+            boolean started=generatePocketOrca(game,history,instruction,true,proposalOnly,listener);
             if(!started){
-                aiTurnBusy=false;aiTurnStatus=(orca?"PocketOrca-LLM":"AiPaca")+" выполняет другой запрос";render();
+                aiTurnBusy=false;aiTurnStatus="PocketOrca-LLM"+" выполняет другой запрос";render();
             }
         }else if(local){
             if(!localModelReady()){
@@ -3275,11 +3343,10 @@ public final class MainActivity extends Activity {
      * local worker. No dice, effects, narrative memory or save are committed
      * before AiGameTurn validates the complete new answer.
      */
-    private boolean generateExternalLocal(String provider,GameEngine current,String history,String instruction,
+    private boolean generatePocketOrca(GameEngine current,String history,String instruction,
                                    boolean controlled,boolean chanceOnly,AiStoryClient.Listener listener){
-        final boolean orca="pocketorca".equals(provider);
-        final String fallbackKey=orca?"ai_pocketorca_fallback":"ai_aipaca_fallback";
-        final String providerTitle=orca?"PocketOrca-LLM":"AiPaca";
+        final String fallbackKey="ai_pocketorca_fallback";
+        final String providerTitle="PocketOrca-LLM";
         AiStoryClient.Listener bridged=new AiStoryClient.Listener(){
             @Override public void onText(String text){listener.onText(text);}
             @Override public void onReasoningSummary(String summary){listener.onReasoningSummary(summary);}
@@ -3299,38 +3366,8 @@ public final class MainActivity extends Activity {
                     ?" | Резервный локальный движок недоступен.":""));
             }
         };
-        return orca?pocketOrcaClient.generate(current,history,instruction,controlled,chanceOnly,bridged):
-            aipacaClient.generate(current,history,instruction,controlled,chanceOnly,bridged);
+        return pocketOrcaClient.generate(current,history,instruction,controlled,chanceOnly,bridged);
     }
-
-    private void testAiPacaConnection(){
-        if(aipacaClient.isRunning()){toast("Сначала останови текущую генерацию");return;}
-        TextView label=text("Проверка http://127.0.0.1:8080/v1/models…",14,TEXT,false);
-        label.setPadding(dp(16),dp(14),dp(16),dp(14));
-        AlertDialog dialog=new RuneDialogBuilder(this,accent())
-            .setTitle("ПОДКЛЮЧЕНИЕ AiPaca").setView(label)
-            .setNegativeButton("Закрыть",null).create();
-        dialog.show();
-        aipacaClient.probe((ok,message)->{
-            if(!isFinishing()&&!isDestroyed()&&dialog.isShowing())
-                label.setText(message+(ok?"\nПодключение готово, сохранения не затронуты.":"\nЗапусти сервер и загрузи GGUF в AiPaca."));
-        });
-    }
-
-    private void aiPacaKeyDialog(){
-        EditText key=new EditText(this);
-        key.setSingleLine(true);
-        key.setInputType(InputType.TYPE_CLASS_TEXT|InputType.TYPE_TEXT_VARIATION_PASSWORD);
-        key.setHint("Ключ из настроек API AiPaca");
-        new RuneDialogBuilder(this,accent()).setTitle("API-КЛЮЧ AiPaca")
-            .setView(key)
-            .setNegativeButton("Отмена",null)
-            .setPositiveButton("Сохранить",(dialog,which)->{
-                try{AiPacaKeyVault.save(this,key.getText().toString());toast("Ключ AiPaca сохранён");render();}
-                catch(Exception e){toast("Не удалось сохранить ключ AiPaca");}
-            }).show();
-    }
-
 
     private int pocketOrcaPort(){
         int p=prefs.getInt("ai_pocketorca_port",8080);
@@ -3387,7 +3424,11 @@ public final class MainActivity extends Activity {
 
     private String aiProviderMode(){
         String mode=prefs.getString("ai_provider","auto");
-        return ("chatgpt".equals(mode)||"api".equals(mode)||"local".equals(mode)||"aipaca".equals(mode)||"pocketorca".equals(mode))?mode:"auto";
+        if("aipaca".equals(mode)){
+            prefs.edit().putString("ai_provider","pocketorca").apply();
+            return "pocketorca";
+        }
+        return ("chatgpt".equals(mode)||"api".equals(mode)||"local".equals(mode)||"pocketorca".equals(mode))?mode:"auto";
     }
     private boolean usingChatGpt(){
         return "chatgpt".equals(resolvedAiProvider());
@@ -3396,13 +3437,12 @@ public final class MainActivity extends Activity {
         String[] labels={"Автоматически | Работа/Codex → API → офлайн",
                 "ChatGPT | расход лимитов Работа/Codex","OpenAI API | отдельная оплата",
                 "Локальная модель | GGUF | без интернета",
-                "AiPaca | внешний локальный API | 127.0.0.1",
                 "PocketOrca-LLM | локальный сервер Snapdragon"};
         String mode=aiProviderMode();
-        int selected="chatgpt".equals(mode)?1:"api".equals(mode)?2:"local".equals(mode)?3:"aipaca".equals(mode)?4:"pocketorca".equals(mode)?5:0;
+        int selected="chatgpt".equals(mode)?1:"api".equals(mode)?2:"local".equals(mode)?3:"pocketorca".equals(mode)?4:0;
         new RuneDialogBuilder(this,accent()).setTitle("Источник ИИ")
             .setSingleChoiceItems(labels,selected,(dialog,which)->{
-                prefs.edit().putString("ai_provider",which==1?"chatgpt":which==2?"api":which==3?"local":which==4?"aipaca":which==5?"pocketorca":"auto").apply();
+                prefs.edit().putString("ai_provider",which==1?"chatgpt":which==2?"api":which==3?"local":which==4?"pocketorca":"auto").apply();
                 cancelAiForSourceChange();
                 dialog.dismiss();render();
             }).setNegativeButton("Закрыть",null).show();
@@ -3417,7 +3457,7 @@ public final class MainActivity extends Activity {
         aiReasoningPreview="";
         aiPreviewSelected.clear();
         if(aiClient!=null)aiClient.cancel();
-        if(localAiClient!=null)localAiClient.cancel();if(aipacaClient!=null)aipacaClient.cancel();if(pocketOrcaClient!=null)pocketOrcaClient.cancel();
+        if(localAiClient!=null)localAiClient.cancel();if(pocketOrcaClient!=null)pocketOrcaClient.cancel();
     }
     private String selectedReasoningEffort(){
         return AiReasoningEffort.normalize(prefs.getString("ai_reasoning_effort",AiReasoningEffort.DEFAULT));
@@ -3429,7 +3469,7 @@ public final class MainActivity extends Activity {
             .setSingleChoiceItems(choices,selected,(dialog,which)->{
                 String effort=AiReasoningEffort.VALUES[which];
                 prefs.edit().putString("ai_reasoning_effort",effort).apply();
-                if(aiClient!=null)aiClient.cancel();if(localAiClient!=null)localAiClient.cancel();if(aipacaClient!=null)aipacaClient.cancel();if(pocketOrcaClient!=null)pocketOrcaClient.cancel();
+                if(aiClient!=null)aiClient.cancel();if(localAiClient!=null)localAiClient.cancel();if(pocketOrcaClient!=null)pocketOrcaClient.cancel();
                 awaitingAiToken=false;
                 dialog.dismiss();
                 render();
@@ -3441,7 +3481,7 @@ public final class MainActivity extends Activity {
         new RuneDialogBuilder(this,accent()).setTitle("Модель OpenAI API")
             .setSingleChoiceItems(AiModelCatalog.LABELS,current,(dialog,which)->{
                 prefs.edit().putString("ai_api_model",AiModelCatalog.IDS[which]).apply();
-                if(aiClient!=null)aiClient.cancel();if(localAiClient!=null)localAiClient.cancel();if(aipacaClient!=null)aipacaClient.cancel();if(pocketOrcaClient!=null)pocketOrcaClient.cancel();
+                if(aiClient!=null)aiClient.cancel();if(localAiClient!=null)localAiClient.cancel();if(pocketOrcaClient!=null)pocketOrcaClient.cancel();
                 dialog.dismiss();render();
             }).setNegativeButton("Закрыть",null).show();
     }
@@ -3503,7 +3543,7 @@ public final class MainActivity extends Activity {
             new RuneDialogBuilder(this,accent()).setTitle("Модели | Работа/Codex")
                 .setSingleChoiceItems(labels,selected,(dialog,which)->{
                     prefs.edit().putString("ai_chatgpt_model",models.get(which).slug).apply();
-                    if(aiClient!=null)aiClient.cancel();if(localAiClient!=null)localAiClient.cancel();if(aipacaClient!=null)aipacaClient.cancel();if(pocketOrcaClient!=null)pocketOrcaClient.cancel();
+                    if(aiClient!=null)aiClient.cancel();if(localAiClient!=null)localAiClient.cancel();if(pocketOrcaClient!=null)pocketOrcaClient.cancel();
                     dialog.dismiss();render();
                 }).setNegativeButton("Закрыть",null).show();
         });
@@ -3512,14 +3552,14 @@ public final class MainActivity extends Activity {
     private void renderAiStoryPanel(){
         LinearLayout panel=card();
         String source=resolvedAiProvider();
-        addText(panel,"ᚱ  ИИ-МАСТЕР | "+("pocketorca".equals(source)?"PocketOrca | ОФЛАЙН":"aipaca".equals(source)?"AiPaca | ОФЛАЙН":"local".equals(source)?"ОФЛАЙН GGUF":usingChatGpt()?"РАБОТА / CODEX":"OPENAI API"),11,accent(),true,8);
+        addText(panel,"ᚱ  ИИ-МАСТЕР | "+("pocketorca".equals(source)?"PocketOrca | ОФЛАЙН":"local".equals(source)?"ОФЛАЙН GGUF":usingChatGpt()?"РАБОТА / CODEX":"OPENAI API"),11,accent(),true,8);
         addText(panel,"Свободный диалог и повествование. Инвентарь, бой, награды и перемещения изменяются только игровыми действиями.",12,MUTED,false,12);
         boolean chatgpt=usingChatGpt();
-        boolean local="local".equals(source),orca="pocketorca".equals(source),external=orca||"aipaca".equals(source);
+        boolean local="local".equals(source),orca="pocketorca".equals(source),external=orca;
         boolean ready=external||local&&localModelReady()||chatgpt&&chatGptOAuth.hasAuthorizedPlan()||"api".equals(source)&&AiKeyVault.configured(this);
         if(!ready){
             addText(panel,chatgpt?"Войди через ChatGPT и разреши использование лимитов в настройках.":
-                "Выбери GGUF, AiPaca или добавь OpenAI API-ключ в настройках.",13,TEXT,false,8);
+                "Выбери GGUF, PocketOrca или добавь OpenAI API-ключ в настройках.",13,TEXT,false,8);
             TextView setup=text("НАСТРОИТЬ ИИ",14,accent(),true);
             setup.setPadding(dp(10),dp(12),dp(10),dp(12));
             setup.setBackground(new RuneFrameDrawable(PANEL_2,accent(),false));
@@ -3527,8 +3567,8 @@ public final class MainActivity extends Activity {
             return;
         }
         String previous=aiMemory.latestAnswer(aiSession);
-        TextView reply=text(previous.isEmpty()?"ИИ помнит историю беседы. Опиши действие или заговори с персонажем.":previous,17,TEXT,false);
-        reply.setLineSpacing(dp(6),1.16f);
+        TextView reply=text(previous.isEmpty()?"ИИ помнит историю беседы. Опиши действие или заговори с персонажем.":previous,20,TEXT,false);
+        reply.setLineSpacing(dp(8),1.20f);
         reply.setText(SceneTypography.render(previous.isEmpty()?
             "ИИ помнит историю беседы. Опиши действие или заговори с персонажем.":previous,
             accent(),game.name,heroColor()));
@@ -3537,16 +3577,16 @@ public final class MainActivity extends Activity {
         EditText prompt=new EditText(this);
         prompt.setTextColor(TEXT);prompt.setHintTextColor(MUTED);
         prompt.setHint("Что ты хочешь сказать или сделать?");
-        prompt.setTextSize(sp(14));
+        prompt.setTextSize(sp(18));
         prompt.setMinLines(2);prompt.setMaxLines(4);
         prompt.setInputType(InputType.TYPE_CLASS_TEXT|InputType.TYPE_TEXT_FLAG_MULTI_LINE|InputType.TYPE_TEXT_FLAG_CAP_SENTENCES);
         prompt.setBackground(new RuneFrameDrawable(PANEL_2,BORDER,false));
         prompt.setPadding(dp(12),dp(10),dp(12),dp(10));
         panel.addView(prompt,lp(-1,-2));
         space(panel,9);
-        String selectedModel=orca?prefs.getString("ai_pocketorca_last_model","Автоматически"):external?prefs.getString("ai_aipaca_last_model","Автоматически"):local?"Qwen3.5-9B":prefs.getString(chatgpt?"ai_chatgpt_model":"ai_api_model",chatgpt?"":AiModelCatalog.DEFAULT_API);
+        String selectedModel=orca?prefs.getString("ai_pocketorca_last_model","Автоматически"):local?"Qwen3.5-9B":prefs.getString(chatgpt?"ai_chatgpt_model":"ai_api_model",chatgpt?"":AiModelCatalog.DEFAULT_API);
         String modelLabel=selectedModel.isEmpty()?"не выбрана":external?selectedModel:local?"Qwen3.5-9B | GGUF":chatgpt?selectedModel:AiModelCatalog.label(selectedModel);
-        String providerLabel=orca?"Источник: PocketOrca-LLM | локальный API | без интернета":external?"Источник: AiPaca | локальный API | без интернета":local?"Источник: локальная модель | без интернета":chatgpt?"Источник: ChatGPT | лимиты Работа/Codex":
+        String providerLabel=orca?"Источник: PocketOrca-LLM | локальный API | без интернета":local?"Источник: локальная модель | без интернета":chatgpt?"Источник: ChatGPT | лимиты Работа/Codex":
                 "Источник: OpenAI API | отдельная оплата";
         TextView status=text(providerLabel+"\nМодель (выбрана в игре): "+modelLabel+
                 "\nРазмышление (настройка игры): "+AiReasoningEffort.label(selectedReasoningEffort()),11,MUTED,false);
@@ -3558,9 +3598,9 @@ public final class MainActivity extends Activity {
         send.setBackground(new RuneFrameDrawable(PANEL_2,accent(),false));
         panel.addView(send);
         send.setOnClickListener(v->{
-            if(aiClient.isRunning()||localAiClient.isRunning()||aipacaClient.isRunning()||pocketOrcaClient.isRunning()||awaitingAiToken){
+            if(aiClient.isRunning()||localAiClient.isRunning()||pocketOrcaClient.isRunning()||awaitingAiToken){
                 awaitingAiToken=false;
-                aiClient.cancel();if(localAiClient!=null)localAiClient.cancel();if(aipacaClient!=null)aipacaClient.cancel();if(pocketOrcaClient!=null)pocketOrcaClient.cancel();
+                aiClient.cancel();if(localAiClient!=null)localAiClient.cancel();if(pocketOrcaClient!=null)pocketOrcaClient.cancel();
                 status.setText("Генерация остановлена. Игровой прогресс не изменён.");
                 send.setText("СОЗДАТЬ ПРОДОЛЖЕНИЕ");
                 return;
@@ -3573,7 +3613,7 @@ public final class MainActivity extends Activity {
             if(chatgpt&&selectedModel.isEmpty()){
                 status.setText("Сначала выбери модель ChatGPT в настройках.");return;
             }
-            status.setText(orca?"Генерация через PocketOrca-LLM…":external?"Генерация через AiPaca…":local?"Генерация локальной моделью…":chatgpt?"Проверка сессии ChatGPT…":"ИИ создаёт сцену…");
+            status.setText(orca?"Генерация через PocketOrca-LLM…":local?"Генерация локальной моделью…":chatgpt?"Проверка сессии ChatGPT…":"ИИ создаёт сцену…");
             reply.setText("");
             send.setText("ОСТАНОВИТЬ");
             AiStoryClient.Listener responseListener=new AiStoryClient.Listener(){
@@ -3584,7 +3624,8 @@ public final class MainActivity extends Activity {
                     prefs.edit().putFloat("ai_local_last_tps",speed).putInt("ai_local_last_tokens",tokens).apply();
                 }
                 @Override public void onText(String accumulated){
-                    reply.setText(SceneTypography.render(accumulated,accent(),game.name,heroColor()));
+                    try{reply.setText(SceneTypography.render(accumulated,accent(),game.name,heroColor()));}
+                    catch(RuntimeException layoutError){reply.setText(accumulated.length()>12000?accumulated.substring(accumulated.length()-12000):accumulated);}
                 }
                 @Override public void onComplete(String answer){
                     aiMemory.add(aiSession,"user",request);
@@ -3599,8 +3640,8 @@ public final class MainActivity extends Activity {
                 }
             };
             if(external){
-                boolean started=generateExternalLocal(source,game,history,request,false,false,responseListener);
-                if(!started){status.setText((orca?"PocketOrca-LLM":"AiPaca")+" уже генерирует ответ");send.setText("ПОВТОРИТЬ");}
+                boolean started=generatePocketOrca(game,history,request,false,false,responseListener);
+                if(!started){status.setText("PocketOrca-LLM"+" уже генерирует ответ");send.setText("ПОВТОРИТЬ");}
             }else if(local){
                 boolean started=localAiClient.generate(LocalAiModelStore.path(prefs),game,history,
                     request,false,false,responseListener);
@@ -6937,7 +6978,6 @@ public final class MainActivity extends Activity {
             "chatgpt".equals(provider)?"ChatGPT | Работа/Codex":
             "api".equals(provider)?"OpenAI API | отдельная оплата":
             "local".equals(provider)?"Локальная GGUF | офлайн":
-            "aipaca".equals(provider)?"AiPaca | API на устройстве":
             "pocketorca".equals(provider)?"PocketOrca-LLM | API на устройстве":
                 "Автоматически | Работа/Codex → API → GGUF",
             true,this::aiProviderDialog);
@@ -6947,7 +6987,6 @@ public final class MainActivity extends Activity {
             String chosen="chatgpt".equals(effectiveProvider)?"ChatGPT | Работа/Codex":
                 "api".equals(effectiveProvider)?"OpenAI API":
                 "local".equals(effectiveProvider)?"Локальная GGUF":
-                "aipaca".equals(effectiveProvider)?"AiPaca":
                 "pocketorca".equals(effectiveProvider)?"PocketOrca-LLM":"не найден";
             addText(content,"Автоматический выбор: "+chosen+
                 ". Приоритет: ChatGPT → API → GGUF. Платный API "+
@@ -6984,7 +7023,7 @@ public final class MainActivity extends Activity {
                 false,this::pocketOrcaKeyDialog);
             if(PocketOrcaKeyVault.configured(this))
                 actionButton("Удалить ключ PocketOrca-LLM",
-                    "Не затрагивает AiPaca и OpenAI",false,()->{
+                    "Не затрагивает OpenAI API",false,()->{
                         PocketOrcaKeyVault.clear(this);render();toast("Ключ PocketOrca удалён");
                     });
             Switch pocketOrcaFallback=new Switch(this);
@@ -6996,27 +7035,7 @@ public final class MainActivity extends Activity {
             pocketOrcaFallback.setOnCheckedChangeListener((v,on)->
                 prefs.edit().putBoolean("ai_pocketorca_fallback",on).apply());
             content.addView(pocketOrcaFallback,lp(-1,48));
-            addText(content,"Потоковая генерация включена. AiPaca и PocketOrca-LLM не могут одновременно занимать один и тот же порт 8080. Для двух активных серверов измени порт одного из них. Облачный ИИ автоматически не вызывается.",12,MUTED,false,9);
-        }else if("aipaca".equals(effectiveProvider)){
-            addText(content,"AiPaca запускается отдельным приложением. Skyrim использует его API на 127.0.0.1:8080, без импорта модели или дополнительных библиотек.",12,MUTED,false,9);
-            actionButton("ПРОВЕРИТЬ ПОДКЛЮЧЕНИЕ AiPaca",
-                "GET /v1/models | проверить сервер и загруженную модель",false,this::testAiPacaConnection);
-            actionButton("API-ключ AiPaca",
-                AiPacaKeyVault.configured(this)?"Сохранён отдельно в Android Keystore":"Не задан | сервер может разрешать доступ без ключа",
-                false,this::aiPacaKeyDialog);
-            if(AiPacaKeyVault.configured(this))
-                actionButton("Удалить API-ключ AiPaca","Не влияет на ключ OpenAI",false,()->{
-                    AiPacaKeyVault.clear(this);render();toast("Ключ AiPaca удалён");
-                });
-            Switch aipacaFallback=new Switch(this);
-            aipacaFallback.setText("Резервное подключение | Local AI Engine");
-            aipacaFallback.setTextSize(sp(14));aipacaFallback.setTextColor(TEXT);
-            aipacaFallback.setThumbTintList(ColorStateList.valueOf(accent()));
-            aipacaFallback.setChecked(prefs.getBoolean("ai_aipaca_fallback",true));
-            aipacaFallback.setOnCheckedChangeListener((v,on)->
-                prefs.edit().putBoolean("ai_aipaca_fallback",on).apply());
-            content.addView(aipacaFallback,lp(-1,48));
-            addText(content,"Потоковая генерация включена. При сбое AiPaca резерв работает только при установленном отдельном движке и импортированной GGUF; облачные источники автоматически не вызываются.",12,MUTED,false,9);
+            addText(content,"Потоковая генерация включена. Укажи тот же порт, на котором работает сервер PocketOrca-LLM. Облачный ИИ автоматически не вызывается.",12,MUTED,false,9);
         }else if("chatgpt".equals(effectiveProvider)){
             boolean signedIn=chatGptOAuth.hasSignedInAccount();
             boolean authorized=chatGptOAuth.hasAuthorizedPlan();
@@ -7062,7 +7081,7 @@ public final class MainActivity extends Activity {
                         new RuneDialogBuilder(this,accent()).setTitle("Удалить ключ API?")
                             .setNegativeButton("Отмена",null).setPositiveButton("Удалить",(d,w)->{
                                 if(aiClient!=null)aiClient.cancel();
-                                if(localAiClient!=null)localAiClient.cancel();if(aipacaClient!=null)aipacaClient.cancel();if(pocketOrcaClient!=null)pocketOrcaClient.cancel();
+                                if(localAiClient!=null)localAiClient.cancel();if(pocketOrcaClient!=null)pocketOrcaClient.cancel();
                                 AiKeyVault.clear(this);render();
                             }).show();
                     });
