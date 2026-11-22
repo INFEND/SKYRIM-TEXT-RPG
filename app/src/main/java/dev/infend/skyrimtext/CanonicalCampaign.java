@@ -58,11 +58,11 @@ public final class CanonicalCampaign {
     };
     static void installOriginal(StoryDialoguePack pack){original=pack;}
     public static void loadLocal(Context context){
-        // A private build can bundle the V7 file; existing private data is also reused.
+        // User-imported verified pack takes priority; private bundled V7 is fallback.
         // Nothing is downloaded, and no import screen is required.
         for(int i=0;i<2;i++){
-            try(java.io.InputStream in=i==0?context.getAssets().open("story_core_v7.json"):
-                new java.io.FileInputStream(new java.io.File(context.getFilesDir(),"imported_story_v7.json"));
+            try(java.io.InputStream in=i==0?new java.io.FileInputStream(new java.io.File(context.getFilesDir(),"imported_story_v7.json")):
+                context.getAssets().open("story_core_v7.json");
                 java.io.ByteArrayOutputStream out=new java.io.ByteArrayOutputStream()){
                 byte[] buffer=new byte[16384];int n;
                 while((n=in.read(buffer))!=-1){
