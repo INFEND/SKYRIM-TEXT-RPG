@@ -9,8 +9,11 @@ class AuthorNpcCardTests(unittest.TestCase):
         card = UI.split("private void npcDetails(String name)", 1)[1].split("private void npcGallerySection", 1)[0]
         self.assertIn("refreshNpcPortrait()", card)
         frame = UI.split("private void refreshNpcPortrait()", 1)[1].split("private void closeNpcDialog()", 1)[0]
-        self.assertIn("ScaleType.FIT_CENTER", frame)
-        self.assertNotIn("ScaleType.CENTER_CROP", frame)
+        # Adaptive portrait frames may center-crop overflow but must never distort.
+        self.assertIn("npcFillPhoto((android.widget.ImageView)portrait)", frame)
+        self.assertIn("npcPhotoHeight(portrait,holder.getWidth(),180,520)", frame)
+        self.assertIn("image.setScaleType(android.widget.ImageView.ScaleType.CENTER_CROP)", UI)
+        self.assertIn("drawable.getIntrinsicWidth()/(float)drawable.getIntrinsicHeight()", UI)
         self.assertIn('role.setTag("npc_no_self_link")', card)
 
     def test_author_sections_and_progress(self):
@@ -22,7 +25,7 @@ class AuthorNpcCardTests(unittest.TestCase):
         self.assertIn("setCustomTitle(title)", UI)
 
     def test_primary_gallery_and_terminal_state(self):
-        for token in ('npcGalleryPrimary("alma",7,AlmaGallery.COUNT)', 'npcGalleryPrimary("katherine",1,KatherineGallery.COUNT)', 'npcGalleryChoice(panel,dialog,"alma"', 'npcGalleryChoice(panel,dialog,"katherine"', 'activeNpcPortrait.removeAllViews()', 'interact.setEnabled(!blocked)'):
+        for token in ('npcGalleryPrimary("alma",7,AlmaGallery.COUNT)', 'npcGalleryPrimary("katherine",1,KatherineGallery.COUNT)', 'npcGalleryChoice(panel,dialog,"alma"', 'npcGalleryChoice(panel,dialog,"katherine"', 'holder.removeAllViews()', 'interact.setEnabled(!blocked)'):
             self.assertIn(token, UI)
 
 if __name__ == "__main__":
