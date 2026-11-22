@@ -18,7 +18,7 @@ public class SolitudeLifeStage28Test {
         for(int i=4;i<40;i++)days.put(i+1);
         org.json.JSONArray restored=SolitudeCity.restore(new org.json.JSONObject().put("lastDay",days)).save().getJSONArray("lastDay");
         assertEquals(32,restored.length());
-        assertEquals(0,restored.getInt(0));assertEquals(0,restored.getInt(1));assertEquals(0,restored.getInt(2));
+        assertEquals(-1,restored.getInt(0));assertEquals(-1,restored.getInt(1));assertEquals(-1,restored.getInt(2));
         for(int i=3;i<32;i++)assertEquals(i+1,restored.getInt(i));
     }
     @Test public void oldSaveKeepsOriginalJobHistoryAndNewJobsStartUnused() throws Exception {
@@ -28,7 +28,7 @@ public class SolitudeLifeStage28Test {
             org.json.JSONArray restored=city.save().getJSONArray("lastDay");
             assertEquals(32,restored.length());
             for(int i=0;i<oldSize;i++)assertEquals(i+1,restored.getInt(i));
-            for(int i=oldSize;i<32;i++)assertEquals(0,restored.getInt(i));
+            for(int i=oldSize;i<32;i++)assertEquals(-1,restored.getInt(i));
         }
     }
 }
