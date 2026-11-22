@@ -29,8 +29,11 @@ public final class CharacterPortraitView extends ImageView {
     @Override protected void onMeasure(int widthSpec,int heightSpec){
         int width=MeasureSpec.getSize(widthSpec);
         if(width==0)width=Math.round(144*getResources().getDisplayMetrics().density);
+        // Honor an exact parent height so the portrait can fill adaptive NPC cards.
+        int height=MeasureSpec.getMode(heightSpec)==MeasureSpec.EXACTLY
+            ? MeasureSpec.getSize(heightSpec) : Math.round(width*4f/3f);
         super.onMeasure(MeasureSpec.makeMeasureSpec(width,MeasureSpec.EXACTLY),
-            MeasureSpec.makeMeasureSpec(Math.round(width*4f/3f),MeasureSpec.EXACTLY));
+            MeasureSpec.makeMeasureSpec(height,MeasureSpec.EXACTLY));
     }
     @Override protected void onAttachedToWindow(){
         super.onAttachedToWindow();
