@@ -152,7 +152,8 @@ public final class AiGameTurn {
         java.util.regex.Matcher m=java.util.regex.Pattern.compile(
             "(?iu)(?:^|\\s)[\"']?(?:effects|customChance|choices|journal)[\"']?\\s*(?:=|:)\\s*(?=\\{|\\[|[0-9]|null|\"|$)"
         ).matcher(text);
-        return m.find()?text.substring(0,m.start()).trim():text;
+        String prose=m.find()?text.substring(0,m.start()):text;
+        return AiNarrativeFormat.compact(prose);
     }
 
     /** Recover only a missing final root brace; all choices and effects still

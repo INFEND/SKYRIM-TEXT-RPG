@@ -2768,9 +2768,10 @@ public final class MainActivity extends Activity {
             // A probability-only request has no story, so never create an empty panel.
             if(!aiTurnProposal){
                 LinearLayout live=card();
-                aiTurnText=text("",20,TEXT,false);
+                aiTurnText=text("",16,TEXT,false);
                 aiTurnText.setTypeface(SovngardeTypeface.face(this,false));
-                aiTurnText.setLineSpacing(dp(7),1.20f);
+                aiTurnText.setLineSpacing(0f,1f);
+                aiTurnText.setIncludeFontPadding(false);
                 if(aiTurnPreview.isEmpty())aiTurnText.setText(aiLiveDots(android.os.SystemClock.elapsedRealtime()-aiLocalStartedAt));
                 else aiTurnText.setText(SceneTypography.render(aiTurnPreview,accent(),game.name,heroColor()));
                 live.addView(aiTurnText,lp(-1,-2));
@@ -2840,9 +2841,10 @@ public final class MainActivity extends Activity {
             });
         }
         LinearLayout narrative=card();
-        aiTurnText=text("",20,TEXT,false);
+        aiTurnText=text("",16,TEXT,false);
         aiTurnText.setTypeface(SovngardeTypeface.face(this,false));
-        aiTurnText.setLineSpacing(dp(8),1.20f);
+        aiTurnText.setLineSpacing(0f,1f);
+        aiTurnText.setIncludeFontPadding(false);
         aiTurnText.setText(SceneTypography.render(game.aiTurn.scene,accent(),game.name,heroColor()));
         narrative.addView(aiTurnText,lp(-1,-2));
         decorateNarrative(narrative,aiTurnText,game.aiTurn.scene);
@@ -3622,10 +3624,11 @@ public final class MainActivity extends Activity {
             return;
         }
         String previous=aiMemory.latestAnswer(aiSession);
-        TextView reply=text(previous.isEmpty()?"ИИ помнит историю беседы. Опиши действие или заговори с персонажем.":previous,20,TEXT,false);
-        reply.setLineSpacing(dp(8),1.20f);
+        TextView reply=text(previous.isEmpty()?"ИИ помнит историю беседы. Опиши действие или заговори с персонажем.":AiNarrativeFormat.compact(previous),16,TEXT,false);
+        reply.setLineSpacing(0f,1f);
+        reply.setIncludeFontPadding(false);
         reply.setText(SceneTypography.render(previous.isEmpty()?
-            "ИИ помнит историю беседы. Опиши действие или заговори с персонажем.":previous,
+            "ИИ помнит историю беседы. Опиши действие или заговори с персонажем.":AiNarrativeFormat.compact(previous),
             accent(),game.name,heroColor()));
         panel.addView(reply);
         space(panel,9);
@@ -3679,12 +3682,12 @@ public final class MainActivity extends Activity {
                     prefs.edit().putFloat("ai_local_last_tps",speed).putInt("ai_local_last_tokens",tokens).apply();
                 }
                 @Override public void onText(String accumulated){
-                    try{reply.setText(SceneTypography.render(accumulated,accent(),game.name,heroColor()));}
-                    catch(RuntimeException layoutError){reply.setText(accumulated.length()>12000?accumulated.substring(accumulated.length()-12000):accumulated);}
+                    try{reply.setText(SceneTypography.render(AiNarrativeFormat.compact(accumulated),accent(),game.name,heroColor()));}
+                    catch(RuntimeException layoutError){reply.setText(AiNarrativeFormat.compact(accumulated.length()>12000?accumulated.substring(accumulated.length()-12000):accumulated));}
                 }
                 @Override public void onComplete(String answer){
                     aiMemory.add(aiSession,"user",request);
-                    aiMemory.add(aiSession,"master",answer);
+                    aiMemory.add(aiSession,"master",AiNarrativeFormat.compact(answer));
                     status.setText("Ответ сохранён в памяти приключения");
                     prompt.setText("");
                     send.setText("СОЗДАТЬ ПРОДОЛЖЕНИЕ");
