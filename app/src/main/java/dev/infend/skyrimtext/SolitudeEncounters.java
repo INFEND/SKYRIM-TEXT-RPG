@@ -117,7 +117,7 @@ final class SolitudeEncounters {
     static boolean choose(GameEngine g,int d,String action){
         if(action.equals("SOLITUDE:supervisor:reconcile:"+d)){
             if(!onDuty(g,d)||!"HOSTILE".equals(g.sceneState.npcStatusByName(NAMES[d])))return true;
-            if(g.hour>=23||g.stamina<10){report(g,"Для примирения нужны один час и 10 единиц запаса сил.");return true;}
+            if(g.hour>=23||g.hour+1>CLOSE[d]||g.stamina<10){report(g,"Для примирения нужны один час в пределах смены и 10 единиц запаса сил.");return true;}
             try{
                 g.sceneState.setContext(g.day,g.hour,"Солитьюд");
                 g.sceneState.confirm("npc",npcKey(g,d),NAMES[d],"INFORMED");
@@ -136,7 +136,7 @@ final class SolitudeEncounters {
         }
         if(action.equals("SOLITUDE:memory:"+d)){
             if(fact(g,d)==null)return true;
-            String remembered=memory(g,d);remember(g,d,"MET");report(g,NAMES[d]+"\n"+remembered);return true;
+            String remembered=memory(g,d);report(g,NAMES[d]+"\n"+remembered);return true;
         }
         for(int i=0;i<QUESTS.length;i++){
             Quest q=QUESTS[i];String prefix="SOLITUDE:quest:"+i+":",state=state(g,q);
