@@ -97,6 +97,7 @@ public final class MainActivity extends Activity {
     private LocalAiClient localAiClient;
     private PocketOrcaClient pocketOrcaClient;
     private static final int REQUEST_LOCAL_GGUF=7107;
+    private static final int REQUEST_OFFICIAL_RU_PACK=7522;
     private static final int REQUEST_ITEM_ARTWORK=7318;
     private int pendingArtworkSlot=-1;
     private String aiSession;
@@ -222,6 +223,28 @@ public final class MainActivity extends Activity {
     }
     @Override protected void onActivityResult(int requestCode,int resultCode,Intent data){
         super.onActivityResult(requestCode,resultCode,data);
+        if(requestCode==REQUEST_OFFICIAL_RU_PACK){
+            if(resultCode==RESULT_OK&&data!=null&&data.getData()!=null){
+                final android.net.Uri chosen=data.getData();
+                new Thread(()->{
+                    try{
+                        final int imported=OfficialRuDialogueImport.install(this,chosen);
+                        runOnUiThread(()->{
+                            if(!isFinishing()&&!isDestroyed()){
+                                toast("Русский пакет установлен: "+imported+" записей");
+                                render();
+                            }
+                        });
+                    }catch(Exception error){
+                        runOnUiThread(()->{
+                            if(!isFinishing()&&!isDestroyed())
+                                toast("Ошибка русского пакета: "+error.getMessage());
+                        });
+                    }
+                },"official-ru-import").start();
+            }
+            return;
+        }
         if(WorkImageEditor.onActivityResult(this,requestCode,resultCode,data,accent(),this::render))return;
         if(requestCode==REQUEST_ITACHI_REPLACE_ART){
             String target=itachiReplaceTarget;itachiReplaceTarget="";
@@ -6882,9 +6905,27 @@ public final class MainActivity extends Activity {
         addText(host,"Отключённые потребности не расходуются и не накладывают штрафы. Значения сохраняются до повторного включения. При отключении всех раздел героя скрывается.",12,MUTED,false,8);
         refresh.run();
     }
+    private void chooseOfficialRuDialogue(){
+        Intent picker=new Intent(Intent.ACTION_OPEN_DOCUMENT);
+        picker.addCategory(Intent.CATEGORY_OPENABLE);
+        picker.setType("application/json");
+        try{startActivityForResult(picker,REQUEST_OFFICIAL_RU_PACK);}
+        catch(Exception error){toast("Не удалось открыть выбор русского пакета");}
+    }
     private void renderSettings(){
         section("ПАРАМЕТРЫ","Настройки","Твоя история, твои правила.");
         int additionsStart=content.getChildCount();
+        int ruStart=content.getChildCount();
+        LinearLayout ruLocalization=column();
+        content.addView(ruLocalization,lp(-1,-2));
+        addText(ruLocalization,
+                CanonicalCampaign.hasOriginal()
+                    ?"Локальный пакет реплик загружен."
+                    :"Официальный пакет реплик пока не импортирован.",
+                13,TEXT,false,8);
+        livingLink(ruLocalization,"Импортировать русские диалоги","JSON","book",this::chooseOfficialRuDialogue);
+        addText(ruLocalization,"Выберите приватный imported_story_v7.json, созданный из официальных файлов Skyrim. Непроверенные записи не заменяются автоматически.",12,MUTED,false,8);
+        foldAddonSection("addon_official_ru","Русская локализация",ruStart,false);
         int addonStart=content.getChildCount();
         LinearLayout workshopSettings=column();
         content.addView(workshopSettings,lp(-1,-2));
