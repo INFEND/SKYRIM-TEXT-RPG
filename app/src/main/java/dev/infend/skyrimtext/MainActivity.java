@@ -2643,6 +2643,16 @@ public final class MainActivity extends Activity {
             ", опиши только этот установленный результат, effects и 10 новых вариантов.";
     }
 
+    /** Never let Android regex-class initialization terminate a manually entered game turn. */
+    private boolean safeRoutineAiAction(String value){
+        try{return AiRoutineAction.requiresNoCheck(value);}
+        catch(java.util.regex.PatternSyntaxException | LinkageError failure){
+            android.util.Log.e("SkyrimAI","Android failed to initialize routine-action parser",failure);
+            // A risky action takes the existing probability check; no automatic success or save mutation.
+            return false;
+        }
+    }
+
     private void clearAiLiveViews(){
         if(aiElapsedText!=null&&aiDotsTicker!=null)aiElapsedText.removeCallbacks(aiDotsTicker);
         aiDotsTicker=null;
@@ -2898,7 +2908,7 @@ public final class MainActivity extends Activity {
                 // Uncontested conversations and movement are not dice checks.
                 // A completed AI reply still passes the normal effects validator.
                 if(indexes.isEmpty()&&!"COMBAT".equals(game.mode)
-                    &&!game.nativeSceneRequired()&&AiRoutineAction.requiresNoCheck(value)){
+                    &&!game.nativeSceneRequired()&&safeRoutineAiAction(value)){
                     if(!storeAiPending(compound,-1,-1,-1)){
                         toast("Не удалось сохранить действие");return;
                     }
