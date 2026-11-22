@@ -46,13 +46,12 @@ types = {
     "wheat-mill":"Ферма", "wood-mill":"Лесопилка", "region":"Озеро"}
 # Existing save/story keys keep their spelling, even when a reference differs.
 legacy = {
-    "Shor's Stone":"Шорский Камень", "The Guardian Stones":"Камень Хранитель",
-    "Mzinchaleft":"Руины Мзинчалефт", "Dark Brotherhood Sanctuary":"Святилище Тёмного Братства",
-    "Kynesgrove":"Кинсгроув", "Shrine of Azura":"Святилище Азуры",
+    "Dark Brotherhood Sanctuary":"Святилище Тёмного Братства",
+    "Shrine of Azura":"Святилище Азуры",
     "Shrine of Mehrunes Dagon":"Святилище Мерунеса Дагона",
     "Sacellum of Boethiah":"Святилище Боэтии", "Solitude Lighthouse":"Маяк Солитьюда",
-    "Fort Dunstad":"Форт Данстад", "Sarethi Farm":"Саретийская ферма",
-    "Hob's Fall Cave":"Пещера Хоба", "Broken Oar Grotto":"Сломанное Весло",
+    "Fort Dunstad":"Форт Данстад",
+    "Hob's Fall Cave":"Пещера Хоба",
     "Kolbjorn Barrow":"Колбьорн", "Frostmoon Crag":"Ущелье Фростмуна"}
 
 def translate(en):
