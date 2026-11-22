@@ -126,7 +126,8 @@ def build_story(strings_dir: Path, java_file: Path, manifest: Path, output: Path
             raise ImportErrorDetail(
                 f"Segment {position}: missing/invalid {source}_Russian.DLSTRINGS ID {string_id}"
             )
-        seen_chapters.add(chapter)
+        if row.get("exclude_from_reading", False) is not True:
+            seen_chapters.add(chapter)
         segments.append({
             "id": position,
             "scene_id": chapter,
