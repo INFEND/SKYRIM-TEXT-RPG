@@ -47,7 +47,7 @@ class WikiRuItemsTests(unittest.TestCase):
         for old in ALIASES:
             with self.subTest(item=old):
                 self.assertIn(f'"{old}"', source)
-        self.assertIn('put("Повреждённая Звезда Азуры"', CATALOG)
+        self.assertIn('registerMissing("Повреждённая Звезда Азуры"', CATALOG)
 
     def test_language_and_ai_rules_follow_skyrim_wiki(self):
         self.assertIn('ATTRIBUTES={"Здоровье","Магия","Запас сил"}', RPG)
@@ -56,7 +56,7 @@ class WikiRuItemsTests(unittest.TestCase):
             self.assertIn(name, AI)
         self.assertIn("Ресурс выносливости называется Запас сил", AI)
         # Skill indices are save keys: never rearrange the 18 skills.
-        match = re.search(r'public static final String\\[\\] SKILLS=\\{(.*?)\\};',
+        match = re.search(r'public static final String\[\] SKILLS=\{(.*?)\};',
                           RPG, re.S)
         self.assertIsNotNone(match)
         self.assertEqual(len(re.findall(r'"[^"]+"', match.group(1))), 18)
