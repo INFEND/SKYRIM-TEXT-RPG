@@ -22,3 +22,20 @@ jobs:
           python-version: '3.12'
       - name: Verify importer against synthetic fixtures
         run: python3 -m unittest discover -s tests -p 'test_official_ru_localization.py' -v
+  android-compile:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.11.1'
+      - name: Android SDK 36
+        shell: bash
+        run: "${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager" --install 'platforms;android-36' 'build-tools;35.0.0'
+      - name: Compile debug APK without publishing
+        run: gradle --no-daemon :app:assembleDebug
