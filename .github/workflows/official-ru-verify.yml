@@ -1,0 +1,24 @@
+name: Verify official Russian localization importer
+on:
+  push:
+    branches:
+      - 'feat/official-ru-localization-*'
+  pull_request:
+    paths:
+      - 'tools/official_ru_localization.py'
+      - 'tests/test_official_ru_localization.py'
+      - '.github/workflows/official-ru-verify.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  validate-localization:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify importer against synthetic fixtures
+        run: python3 -m unittest discover -s tests -p 'test_official_ru_localization.py' -v
