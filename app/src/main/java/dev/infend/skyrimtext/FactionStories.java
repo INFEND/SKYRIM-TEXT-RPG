@@ -110,13 +110,20 @@ final class FactionStories {
     }
     int skill(int f){return approach[f]==2?12:chapter(f).skill;}
     int cost(int f){return approach[f]==1?12:8;}
-    boolean canChooseApproach(GameEngine g,int f){return !completed(f)&&phase[f]==1&&g.started&&("WORLD".equals(g.mode)||"RESULT".equals(g.mode))&&chapter(f).place.equalsIgnoreCase(g.progress.location)&&attemptDay[f]!=g.day;}
+    // Atlas labels may be renamed while faction chapters retain legacy save-compatible place keys.
+    private boolean atChapterPlace(GameEngine g,int f){
+        String destination=chapter(f).place;
+        if(destination.equalsIgnoreCase(g.progress.location))return true;
+        WorldAtlas.Place place=WorldAtlas.find(destination);
+        return place!=null&&place.name.equalsIgnoreCase(g.progress.location);
+    }
+    boolean canChooseApproach(GameEngine g,int f){return !completed(f)&&phase[f]==1&&g.started&&("WORLD".equals(g.mode)||"RESULT".equals(g.mode))&&atChapterPlace(g,f)&&attemptDay[f]!=g.day;}
     boolean setApproach(GameEngine g,int f,int choice){if(!canChooseApproach(g,f)||choice<0||choice>2||(choice==2&&!chapter(f).enemy.isEmpty()))return false;approach[f]=choice;return true;}
     String block(GameEngine g,int f){
         if(!g.started||g.road.pending()||!("WORLD".equals(g.mode)||"RESULT".equals(g.mode)))return "Сначала заверши текущую сцену.";
         if(completed(f))return "Кампания завершена.";
         if(f==4&&(started(5)||g.factions.stage(5)>0)||f==5&&(started(4)||g.factions.stage(4)>0))return "Ты выбрал другую сторону гражданской войны.";
-        if(!chapter(f).place.equalsIgnoreCase(g.progress.location))return "Прибудь: "+chapter(f).place;
+        if(!atChapterPlace(g,f))return "Прибудь: "+chapter(f).place;
         if(phase[f]==1&&attemptDay[f]==g.day)return "Следующая попытка в другой игровой день.";
         if(phase[f]==1&&g.stamina<cost(f))return "Нужно "+cost(f)+" выносливости.";
         return "";
