@@ -21,6 +21,27 @@ public class SolitudeCommissionTest {
         assertEquals(paid,g.gold);
         assertTrue(g.solitude.save().optJSONArray("workRewarded").optBoolean(0));
     }
+    @Test public void commissionCountsServiceNotLeisureOrTraining(){
+        int[] service={0,3,4,7,9,10,12,14,16,18,20,22,23,24,25,26,27,28,29,30,31};
+        for(int job:service)assertTrue("service job "+job,SolitudeCity.commissionEligible(job));
+        int[] excluded={1,2,5,6,8,11,13,17,19};
+        for(int job:excluded)assertFalse("non-service job "+job,SolitudeCity.commissionEligible(job));
+        assertFalse(SolitudeCity.commissionEligible(-1));
+        assertFalse(SolitudeCity.commissionEligible(32));
+    }
+    @Test public void trainingAndMealsDoNotAdvanceMultiDayCommission(){
+        GameEngine g=new GameEngine();g.start("Тест","Норд","Воин");
+        g.region=3;g.progress.location="Солитьюд";g.hour=10;g.stamina=100;g.gold=1000;
+        g.mode="WORLD";g.choose("SOLITUDE:open");g.choose("SOLITUDE:visit:6");
+        g.choose("SOLITUDE:job:13");
+        assertEquals(0,g.solitude.save().optJSONArray("workDays").optInt(6));
+        g.day++;g.hour=10;g.stamina=100;
+        g.choose("SOLITUDE:job:13");
+        assertEquals(0,g.solitude.save().optJSONArray("workDays").optInt(6));
+        g.choose("SOLITUDE:job:12");
+        assertEquals(1,g.solitude.save().optJSONArray("workDays").optInt(6));
+        assertEquals(1,SolitudeCity.restore(g.solitude.save()).save().optJSONArray("workDays").optInt(6));
+    }
     @Test public void oldSavesHaveNoEarnedCommission(){
         JSONObject saved=SolitudeCity.restore(new JSONObject()).save();
         assertEquals(0,saved.optJSONArray("workDays").optInt(0));

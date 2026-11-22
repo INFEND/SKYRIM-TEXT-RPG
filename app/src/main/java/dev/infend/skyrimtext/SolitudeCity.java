@@ -65,6 +65,19 @@ final class SolitudeCity {
     // Authored multi-day city work commission, distinct from canonical Skyrim quests.
     private final int[] workDays=new int[8], workLastDay=new int[8];
     private final boolean[] workRewarded=new boolean[8];
+    // Only actual civic service counts towards a three-day commission.
+    // Lessons, meals, paid training and observation cannot earn a work bonus.
+    // Existing job IDs are stable across saves and OTA updates.
+    static boolean commissionEligible(int job){
+        switch(job){
+            case 0: case 3: case 4: case 7: case 9: case 10:
+            case 12: case 14: case 15: case 16: case 18: case 20:
+            case 21: case 22: case 23: case 24: case 25: case 26:
+            case 27: case 28: case 29: case 30: case 31:
+                return true;
+            default: return false;
+        }
+    }
     private void recordWorkDay(int d,int day){
         if(!workRewarded[d]&&workDays[d]<3&&workLastDay[d]!=day){
             workDays[d]++;workLastDay[d]=day;
@@ -243,7 +256,7 @@ final class SolitudeCity {
             boolean residentPresent=resident>=0&&SolitudeResidents.present(g,resident,d);
             boolean supervisorPresent=SolitudeEncounters.present(g,d);
             lastDay[i]=g.day;
-            recordWorkDay(d,g.day);
+            if(commissionEligible(i))recordWorkDay(d,g.day);
             g.stamina-=j.stamina;g.gold=GameEngine.nonnegativeAdd(g.gold,volunteer?0:j.gold);
             g.hour+=j.hours; // opening hours prevent a midnight rollover
             g.syncLivingSystems();
