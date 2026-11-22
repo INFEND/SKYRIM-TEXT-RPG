@@ -16,6 +16,21 @@ class AuthorNpcCardTests(unittest.TestCase):
         self.assertIn("drawable.getIntrinsicWidth()/(float)drawable.getIntrinsicHeight()", UI)
         self.assertIn('role.setTag("npc_no_self_link")', card)
 
+    def test_gallery_photo_restored_to_full_frame(self):
+        gallery = UI.split("private void npcGalleryPhoto(", 1)[1].split("private void refreshNpcPortrait()", 1)[0]
+        self.assertIn("ScaleType.FIT_CENTER", gallery)
+        self.assertNotIn("npcFillPhoto(image)", gallery)
+        self.assertIn("panel.addView(image,lp(-1,heightDp))", gallery)
+        for token in (
+            "npcGalleryPhoto(panel,KatherineGallery.photo(this,index),440)",
+            "npcGalleryPhoto(panel,SeranaGallery.photo(this,index),440)",
+            "npcGalleryPhoto(panel,AlmaGallery.photo(this,index),400)",
+            "npcGalleryPhoto(panel,ElisifGallery.photo(this,index),440)",
+            "npcGalleryPhoto(panel,LiviaPortrait.photo(this),440)",
+            "npcGalleryPhoto(panel,LocalCharacterGallery.photo(files[index]),380)",
+        ):
+            self.assertIn(token, UI)
+
     def test_author_sections_and_progress(self):
         self.assertIn("record.author){npcAuthorSection(name,index)", UI)
         section = UI.split("private void npcAuthorSection", 1)[1].split("private void npcLegacyDetails", 1)[0]
