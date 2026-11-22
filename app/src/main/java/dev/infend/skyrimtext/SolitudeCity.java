@@ -62,6 +62,7 @@ final class SolitudeCity {
     // Preserve the original 0–15 save/action IDs; new jobs are appended.
     private static int jobDistrict(int i){return i<16?i/2:(i-16)%8;}
     private final int[] lastDay=new int[JOBS.length];
+    {java.util.Arrays.fill(lastDay,-1);} // Day zero must allow the first shift.
     // Authored multi-day city work commission, distinct from canonical Skyrim quests.
     private final int[] workDays=new int[8], workLastDay=new int[8];
     {java.util.Arrays.fill(workLastDay,-1);} // Day zero is a valid first working day.
@@ -307,7 +308,7 @@ final class SolitudeCity {
     JSONObject save(){JSONObject o=new JSONObject();try{o.put("lastDay",new JSONArray(lastDay)).put("workDays",new JSONArray(workDays)).put("workLastDay",new JSONArray(workLastDay)).put("workRewarded",new JSONArray(workRewarded)).put("shops",shops.save()).put("home",home.save()).put("justice",justice.save()).put("fenceDay",fence.save());}catch(Exception ignored){}return o;}
     static SolitudeCity restore(JSONObject o){
         SolitudeCity s=new SolitudeCity();JSONArray a=o==null?null:o.optJSONArray("lastDay");
-        if(a!=null)for(int i=0;i<Math.min(a.length(),s.lastDay.length);i++)s.lastDay[i]=Math.max(0,a.optInt(i,0));
+        if(a!=null)for(int i=0;i<Math.min(a.length(),s.lastDay.length);i++)s.lastDay[i]=Math.max(-1,a.optInt(i,-1));
         JSONArray wd=o==null?null:o.optJSONArray("workDays");
         JSONArray wl=o==null?null:o.optJSONArray("workLastDay");
         JSONArray wr=o==null?null:o.optJSONArray("workRewarded");
