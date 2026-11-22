@@ -8,18 +8,17 @@ UI = (APP / "MainActivity.java").read_text(encoding="utf-8")
 EDITOR = (APP / "WorkImageEditor.java").read_text(encoding="utf-8")
 
 class WorkImageEditorContracts(unittest.TestCase):
-    def test_editor_is_manual_and_uses_no_secret_api(self):
-        self.assertIn('getLaunchIntentForPackage("com.openai.chatgpt")', EDITOR)
+    def test_editor_uses_explicit_api_and_safe_local_import(self):
         self.assertIn('ClipboardManager', EDITOR)
         self.assertIn('Intent.ACTION_OPEN_DOCUMENT', EDITOR)
-        self.assertNotIn('api.openai.com', EDITOR)
-        self.assertNotIn('Authorization', EDITOR)
+        self.assertIn('REQUEST_API_EDIT', EDITOR)
+        self.assertNotIn('getLaunchIntentForPackage("com.openai.chatgpt")', EDITOR)
+        self.assertNotIn('Intent.ACTION_SEND', EDITOR)
 
     def test_editable_prompt_and_location_city_series(self):
         self.assertIn('editor.addTextChangedListener', EDITOR)
-        self.assertIn('Восстановить автоматическое описание', EDITOR)
-        self.assertIn('Пять отдельных каноничных ракурсов города', EDITOR)
-        self.assertIn('new int[]{1, 3, 5}', EDITOR)
+        self.assertIn('editor.setText(prompt(kind, name, facts, requested[0]))', EDITOR)
+        self.assertIn('for (int n : new int[]{1, 3, 5})', EDITOR)
 
     def test_safe_local_webp_import_with_gallery_and_restore(self):
         self.assertIn('Bitmap.CompressFormat.WEBP', EDITOR)
