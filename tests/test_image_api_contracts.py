@@ -1,4 +1,4 @@
-"""Regression contracts for SKYRIM's opt-in OpenAI Images API + manual Work flow."""
+"""Regression contracts for SKYRIM's opt-in Images API and local image imports."""
 import pathlib
 import unittest
 
@@ -6,7 +6,6 @@ ROOT = pathlib.Path(__file__).resolve().parents[1]
 JAVA = ROOT / "app/src/main/java/dev/infend/skyrimtext"
 EDITOR = (JAVA / "WorkImageEditor.java").read_text(encoding="utf-8")
 CLIENT = (JAVA / "ImageApiClient.java").read_text(encoding="utf-8")
-PROVIDER = (JAVA / "ImageShareProvider.java").read_text(encoding="utf-8")
 MAIN = (JAVA / "MainActivity.java").read_text(encoding="utf-8")
 MANIFEST = (ROOT / "app/src/main/AndroidManifest.xml").read_text(encoding="utf-8")
 
@@ -21,14 +20,14 @@ class ImagesIntegration(unittest.TestCase):
         self.assertIn('setNeutralButton("Добавить в галерею"', EDITOR)
         self.assertIn('setNegativeButton("Не сохранять"', EDITOR)
 
-    def test_work_session_does_not_become_api_credential(self):
+    def test_image_generation_uses_only_explicit_images_api_credentials(self):
         self.assertNotIn('chatGptOAuth', CLIENT)
         self.assertNotIn('ChatGptOAuth', CLIENT)
         self.assertNotIn('getToken(', CLIENT)
-        self.assertIn('launchChatGpt(host', EDITOR)
-        self.assertIn('Intent.ACTION_SEND', EDITOR)
-        self.assertIn('FLAG_GRANT_READ_URI_PERMISSION', EDITOR)
-        self.assertIn('EXTRA_STREAM', EDITOR)
+        self.assertIn('AiKeyVault.read(app)', CLIENT)
+        self.assertIn('Intent.ACTION_OPEN_DOCUMENT', EDITOR)
+        self.assertNotIn('launchChatGpt(host', EDITOR)
+        self.assertNotIn('Intent.ACTION_SEND', EDITOR)
 
     def test_api_results_are_bounded_and_saved_atomically_after_review(self):
         self.assertIn('MAX_IMAGE = 24 * 1024 * 1024', CLIENT)
@@ -49,16 +48,14 @@ class ImagesIntegration(unittest.TestCase):
         self.assertIn('WorkImageEditor.primaryView(this,"item"', MAIN)
         self.assertIn('WorkImageEditor.onActivityResult(this,requestCode', MAIN)
         self.assertIn('public static final int REQUEST_API_EDIT', EDITOR)
-        self.assertIn('public static final int REQUEST_WORK_SHARE', EDITOR)
+        self.assertNotIn('public static final int REQUEST_WORK_SHARE', EDITOR)
 
-    def test_shared_artwork_is_private_and_read_only(self):
-        self.assertIn('android:exported="false"', MANIFEST)
-        self.assertIn('android:grantUriPermissions="true"', MANIFEST)
-        self.assertIn('android:name=".ImageShareProvider"', MANIFEST)
-        self.assertIn('ParcelFileDescriptor.MODE_READ_ONLY', PROVIDER)
-        self.assertIn('if (!"r".equals(mode))', PROVIDER)
-        self.assertIn('getPathSegments().size() != 2', PROVIDER)
-        self.assertIn('matches("[0-9a-f]{64}")', PROVIDER)
+    def test_images_are_imported_locally_without_obsolete_share_provider(self):
+        self.assertNotIn('android:name=".ImageShareProvider"', MANIFEST)
+        self.assertFalse((JAVA / "ImageShareProvider.java").exists())
+        self.assertIn('Intent.ACTION_OPEN_DOCUMENT', EDITOR)
+        self.assertIn('getFilesDir()', EDITOR)
+        self.assertIn('writeMetadata(host, kind, id, meta)', EDITOR)
 
 if __name__ == "__main__":
     unittest.main()
