@@ -14,7 +14,7 @@ public final class RpgProgress {
     public final JSONObject aiQuestRecords=new JSONObject();
     public void setQuestOutcome(String id,String state){
         if(id==null||!id.matches("[a-z0-9_]{1,48}"))return;
-        if(!("ACTIVE".equals(state)||"COMPLETED".equals(state)||"FAILED".equals(state)))return;
+        if(!("ACTIVE".equals(state)||"COMPLETED".equals(state)||"FAILED".equals(state)||"DECLINED".equals(state)))return;
         String old=questOutcomes.get(id);
         if("COMPLETED".equals(old)||"FAILED".equals(old))return; // terminal outcomes cannot be farmed
         questOutcomes.put(id,state);
