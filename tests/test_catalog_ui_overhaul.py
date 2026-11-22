@@ -13,9 +13,9 @@ class CatalogUiOverhaul(unittest.TestCase):
         self.assertIn('String display=label+": "+value;',UI)
         self.assertIn('int start=display.length()-value.length()',UI)
         self.assertIn("new android.text.style.StyleSpan(Typeface.BOLD),start,display.length()",UI)
-        self.assertIn('addChoiceStat(prose,"НАВЫК",choiceSkillName(c.action)',UI)
+        self.assertIn('showChoiceSkillLevel(prose,choiceSkillName(c.action),c.action)',UI)
         self.assertIn('addChoiceStat(prose,"ШАНС УСПЕХА",chance+"%"',UI)
-        self.assertIn('addChoiceStat(detail,"НАВЫК",option.skill.isEmpty()',UI)
+        self.assertIn('showChoiceSkillLevel(detail,option.skill,option.combatAction)',UI)
         choice=UI.split("private void renderAiChoice(",1)[1].split("private void requestAiTurn(",1)[0]
         self.assertIn('addChoiceStat(detail,"ШАНС УСПЕХА",displayedChance+"%"',choice)
         self.assertIn('SceneChoiceMeta.chanceColor(displayedChance)',choice)
