@@ -117,7 +117,7 @@ final class SolitudeCity {
                 boolean unavailable="DEAD".equals(status)||"MISSING".equals(status)||"HOSTILE".equals(status);
                 boolean present=group==0?SolitudeEncounters.present(g,i):
                     SolitudeResidents.present(g,i,SolitudeResidents.district(i,g.hour));
-                out.append("\\n• ").append(name).append(": ");
+                out.append("\n• ").append(name).append(": ");
                 out.append(fact==null?"ещё не знакомы":"отношение "+fact.optInt("relation",50)+"/100");
                 out.append(" | ");
                 if("DEAD".equals(status))out.append("погиб");
