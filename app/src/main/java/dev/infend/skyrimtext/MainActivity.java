@@ -5093,6 +5093,7 @@ public final class MainActivity extends Activity {
             int matches=0;
             for(ItemCatalog.Item item:allItems){
                 if(searching&&!item.name.toLowerCase(java.util.Locale.ROOT).contains(query)
+                    &&!item.id.toLowerCase(java.util.Locale.ROOT).contains(query)
                     &&!item.category.toLowerCase(java.util.Locale.ROOT).contains(query))continue;
                 java.util.ArrayList<ItemCatalog.Item> group=groups.get(item.category);
                 if(group==null){group=new java.util.ArrayList<>();groups.put(item.category,group);}
