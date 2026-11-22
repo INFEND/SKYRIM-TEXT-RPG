@@ -38,7 +38,7 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * Local image-asset editor for user-created ChatGPT Work images.
+ * Local image-asset editor using Images API and text-only Work prompts.
  *
  * ChatGPT/Work has no supported third-party image-generation endpoint under a
  * signed-in ChatGPT session. This editor copies an editable prompt and opens
@@ -48,11 +48,9 @@ import java.util.UUID;
 public final class WorkImageEditor {
     public static final int REQUEST_IMPORT = 8319;
     public static final int REQUEST_API_EDIT = 8320;
-    public static final int REQUEST_WORK_SHARE = 8321;
     private static final String PREF = "work_image_editor";
     private static final String PENDING = "pending_target";
     private static final String PENDING_API = "pending_api_edit";
-    private static final String PENDING_WORK = "pending_work_reference";
     private static final int MAX_IMPORT = 5;
     private static final int MAX_IMAGES = 60;
     private static final int WHITE = 0xfff2f2f2, MUTED = 0xffa0a8ac, BG = 0xff080808;
@@ -126,14 +124,32 @@ public final class WorkImageEditor {
         t.setText(value);
         t.setTextColor(tint);
         t.setTextSize(size);
-        t.setPadding(0, 9, 0, 9);
+        t.setPadding(0, 5, 0, 5);
         return t;
+    }
+    private static int dp(Activity host, int amount) {
+        return Math.round(amount * host.getResources().getDisplayMetrics().density);
+    }
+    private static android.graphics.drawable.GradientDrawable bg(Activity host, int color, int border) {
+        android.graphics.drawable.GradientDrawable shape = new android.graphics.drawable.GradientDrawable();
+        shape.setColor(color);
+        shape.setCornerRadius(dp(host, 9));
+        if (border != 0) shape.setStroke(dp(host, 1), border);
+        return shape;
     }
     private static Button button(Activity host, String title, int accent) {
         Button b = new Button(host);
-        b.setText(title);
-        b.setAllCaps(false);
-        b.setTextColor(accent);
+        b.setText(title); b.setAllCaps(false); b.setTextSize(13);
+        b.setTextColor(WHITE); b.setMinHeight(0); b.setMinimumHeight(0);
+        b.setMinWidth(0); b.setMinimumWidth(0);
+        b.setPadding(dp(host, 9), dp(host, 9), dp(host, 9), dp(host, 9));
+        b.setBackground(bg(host, 0xff1b1b1b, 0xff464646));
+        return b;
+    }
+    private static Button primary(Activity host, String label, int accent) {
+        Button b = button(host, label, accent);
+        b.setTextColor(0xff080808);
+        b.setBackground(bg(host, accent, 0));
         return b;
     }
     private static LinearLayout container(Activity host) {
@@ -144,72 +160,30 @@ public final class WorkImageEditor {
         l.setBackgroundColor(BG);
         return l;
     }
+
+    /** Visual description only; WebP, file count and import live in the editor settings. */
     private static String prompt(String kind, String name, String facts, int count) {
-        String core;
+        String visual = facts == null ? "" : facts.trim();
+        if ("Локация текущего прохождения.".equals(visual)) visual = "";
+        if ("item".equals(kind)) visual = visual.replaceAll("Вес: [^.]+\\.", "").trim();
+        String text;
         if ("npc".equals(kind))
-            core = "Создай каноничный высокодетализированный портрет персонажа " + name +
-                " из The Elder Scrolls V: Skyrim. " + facts +
-                " Реалистичная анатомия, характерная одежда, ракурс от волос до живота.";
+            text = "Фотореалистичный портрет «" + name + "» из The Elder Scrolls V: Skyrim. "
+                + visual + " Каноничная внешность и одежда, естественные пропорции, портрет по пояс, мягкое освещение.";
         else if ("item".equals(kind))
-            core = "Создай предметную иллюстрацию " + name + " из Skyrim. " + facts +
-                " Сохрани узнаваемую форму, материалы и пропорции. Предмет целиком, без обрезания.";
+            text = "Предмет «" + name + "» из The Elder Scrolls V: Skyrim. "
+                + visual + " Узнаваемая форма и материалы, предмет целиком, чёткие детали, выразительный свет.";
         else
-            core = "Создай фотореалистичное изображение локации " + name +
-                " из The Elder Scrolls V: Skyrim. " + facts +
-                " Сохрани каноничную географию, архитектуру и узнаваемые ориентиры.";
-        if ("location".equals(kind) && count == 5 &&
-            ("Солитьюд".equals(name) || "Вайтран".equals(name) || "Рифтен".equals(name) ||
-             "Маркарт".equals(name) || "Виндхельм".equals(name) || "Фолкрит".equals(name) ||
-             "Ривервуд".equals(name) || "Винтерхолд".equals(name) ||
-             "Данстар".equals(name) || "Морфал".equals(name)))
-            core += "\nПять отдельных каноничных ракурсов города: 1) главный вход, " +
-                "2) сразу после входа, 3) рынок или главная улица, 4) центр, " +
-                "5) узнаваемая уникальная достопримечательность. Без коллажей.";
-        return core + "\nВысочайшая детализация, современная next-gen графика, естественное освещение, " +
-            "единый художественный стиль, без текста и элементов интерфейса." +
-            (count > 1 ? "\nПодготовь " + count + " отдельных разных вариантов, не коллаж." : "") +
-            "\nИзображение будет импортировано в игру и оптимизировано в WebP.";
+            text = "Фотореалистичная локация «" + name + "» из The Elder Scrolls V: Skyrim. "
+                + visual + " Каноничная архитектура и узнаваемые ориентиры, кинематографичная композиция, естественное освещение.";
+        return text.replaceAll("\\s+", " ").trim();
     }
     private static void copyPrompt(Activity host, String value) {
         ClipboardManager clip = (ClipboardManager) host.getSystemService(Context.CLIPBOARD_SERVICE);
         if (clip != null) clip.setPrimaryClip(ClipData.newPlainText("SKYRIM · Work", value));
     }
-    private static void launchChatGpt(Activity host, String value) {
-        copyPrompt(host, value);
-        Intent launch = host.getPackageManager().getLaunchIntentForPackage("com.openai.chatgpt");
-        if (launch == null) launch = new Intent(Intent.ACTION_VIEW, Uri.parse("https://chatgpt.com/"));
-        try {
-            host.startActivity(launch);
-            Toast.makeText(host, "Описание скопировано. Выбери Work и вставь текст.", Toast.LENGTH_LONG).show();
-        } catch (Exception e) {
-            Toast.makeText(host, "Текст скопирован. Открой ChatGPT вручную.", Toast.LENGTH_LONG).show();
-        }
-    }
     private static String promptKey(String kind, String id) {
         return "draft_" + stableKey(kind, id);
-    }
-
-    /** An explicit share is the only supported way to pass a picture to ChatGPT. */
-    private static void shareWithChatGpt(Activity host, Uri source, String description) {
-        copyPrompt(host, description);
-        if (source == null) { launchChatGpt(host, description); return; }
-        Intent share = new Intent(Intent.ACTION_SEND);
-        String type = host.getContentResolver().getType(source);
-        share.setType(type != null && type.startsWith("image/") ? type : "image/*");
-        share.putExtra(Intent.EXTRA_STREAM, source);
-        share.putExtra(Intent.EXTRA_TEXT, description);
-        share.setClipData(ClipData.newUri(host.getContentResolver(), "SKYRIM", source));
-        share.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-        Intent direct = new Intent(share);
-        direct.setPackage("com.openai.chatgpt");
-        try {
-            if (direct.resolveActivity(host.getPackageManager()) != null) host.startActivity(direct);
-            else host.startActivity(Intent.createChooser(share, "Отправить исходник в ChatGPT"));
-            Toast.makeText(host, "Описание скопировано. Выбери Work и при необходимости вставь текст.",
-                Toast.LENGTH_LONG).show();
-        } catch (Exception failure) {
-            launchChatGpt(host, description);
-        }
     }
 
     private static void selectReference(Activity host, String pendingKey, int request,
@@ -240,7 +214,7 @@ public final class WorkImageEditor {
             | android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD);
         LinearLayout panel = container(host);
         panel.addView(label(host, "Используется тот же API-ключ, что и для текстового OpenAI API. "
-            + "Он шифруется через Android Keystore и никогда не передаётся в ChatGPT Work.", 13, MUTED));
+            + "Он шифруется через Android Keystore и никогда не передаётся в Images API.", 13, MUTED));
         panel.addView(entry);
         new AlertDialog.Builder(host).setTitle("OPENAI API-КЛЮЧ")
             .setView(panel).setPositiveButton("Сохранить", (dialog, which) -> {
@@ -407,18 +381,18 @@ public final class WorkImageEditor {
         String key = promptKey(kind, id);
         LinearLayout panel = container(host);
         panel.addView(label(host, name, 18, accent));
-        panel.addView(label(host,
-            "Описание можно изменить полностью. ChatGPT Work откроется отдельно; после генерации сохрани файл и импортируй его.",
-            12, MUTED));
+        panel.addView(label(host, "Work создаёт только промпт. Изображения создаются через Images API.", 12, MUTED));
         EditText editor = new EditText(host);
         editor.setTextColor(WHITE);
         editor.setHintTextColor(MUTED);
         editor.setTextSize(15);
-        editor.setMinLines(5);
-        editor.setMaxLines(12);
+        editor.setMinLines(4);
+        editor.setMaxLines(8);
         editor.setGravity(Gravity.TOP | Gravity.START);
         editor.setSingleLine(false);
-        editor.setHint("Описание изображения");
+        editor.setHint("Опиши желаемое изображение");
+        editor.setPadding(dp(host, 12), dp(host, 12), dp(host, 12), dp(host, 12));
+        editor.setBackground(bg(host, 0xff111111, 0xff535353));
         editor.setText(prefs(host).getString(key, prompt(kind, name, facts, count)));
         panel.addView(editor, new LinearLayout.LayoutParams(-1, -2));
         editor.addTextChangedListener(new TextWatcher() {
@@ -428,7 +402,7 @@ public final class WorkImageEditor {
             }
             public void afterTextChanged(Editable s) {}
         });
-        panel.addView(label(host, "Вариантов: 1 / 3 / 5", 12, MUTED));
+        panel.addView(label(host, "ВАРИАНТЫ", 12, accent));
         LinearLayout counts = new LinearLayout(host);
         counts.setOrientation(LinearLayout.HORIZONTAL);
         final int[] requested = {count};
@@ -444,72 +418,61 @@ public final class WorkImageEditor {
             });
         }
         panel.addView(counts);
-        Button reset = button(host, "Восстановить автоматическое описание", accent);
-        panel.addView(reset);
+        LinearLayout promptActions = new LinearLayout(host);
+        promptActions.setOrientation(LinearLayout.HORIZONTAL);
+        Button reset = button(host, "↺ Сбросить", accent);
+        promptActions.addView(reset, new LinearLayout.LayoutParams(0, -2, 1));
         reset.setOnClickListener(v -> editor.setText(prompt(kind, name, facts, requested[0])));
-        Button copy = button(host, "Копировать описание", accent);
-        panel.addView(copy);
+        Button copy = button(host, "⧉ Копировать", accent);
+        promptActions.addView(copy, new LinearLayout.LayoutParams(0, -2, 1));
+        panel.addView(promptActions);
         copy.setOnClickListener(v -> {
             String value = editor.getText().toString().trim();
             if (value.isEmpty()) { editor.setError("Напиши описание"); return; }
-            copyPrompt(host, "Создай " + requested[0] + (requested[0] == 1 ? " изображение. " : requested[0] == 3 ? " изображения. " : " изображений. ") + value);
+            copyPrompt(host, value);
             Toast.makeText(host, "Описание скопировано", Toast.LENGTH_SHORT).show();
         });
-        Button open = button(host, "Открыть ChatGPT / Work", accent);
-        panel.addView(open);
-        open.setOnClickListener(v -> {
-            String value = editor.getText().toString().trim();
-            if (value.isEmpty()) { editor.setError("Напиши описание"); return; }
-            try {
-                JSONObject pending = new JSONObject();
-                pending.put("kind", kind).put("id", id).put("name", name)
-                    .put("prompt", value).put("count", requested[0]);
-                if (!prefs(host).edit().putString(PENDING, pending.toString()).commit())
-                    throw new IllegalStateException("Не удалось сохранить цель передачи");
-            } catch (Exception e) {
-                Toast.makeText(host, "Ошибка подготовки Work: " + e.getMessage(),
-                    Toast.LENGTH_LONG).show();
-                return;
-            }
-            launchChatGpt(host, "Создай " + requested[0] + (requested[0] == 1 ? " отдельное изображение. " : requested[0] == 3 ? " отдельных изображения. " : " отдельных изображений. ") + value);
+        Button autoPrompt = primary(host, "✦ Автопромпт · Work", accent);
+        panel.addView(autoPrompt);
+        TextView promptStatus = label(host, "Подготовка текстового описания через подключённый ChatGPT.", 12, MUTED);
+        panel.addView(promptStatus);
+        autoPrompt.setOnClickListener(v -> {
+            autoPrompt.setEnabled(false);
+            autoPrompt.setText("✦ Создание промпта…");
+            promptStatus.setText("ChatGPT · текстовая генерация");
+            WorkImagePromptClient.generate(host, kind, name, facts, editor.getText().toString(),
+                (result, error) -> {
+                    autoPrompt.setEnabled(true);
+                    autoPrompt.setText("✦ Автопромпт · Work");
+                    if (error != null) {
+                        promptStatus.setText(error);
+                        Toast.makeText(host, error, Toast.LENGTH_LONG).show();
+                    } else {
+                        editor.setText(result);
+                        editor.setSelection(editor.length());
+                        promptStatus.setText("Готово. Промпт можно изменить перед отправкой в API.");
+                    }
+                });
         });
-        panel.addView(label(host, "CHATGPT WORK  |  ИСХОДНАЯ КАРТИНКА", 13, accent));
-        Button shareReference = button(host, "Отправить картинку в ChatGPT / Work", accent);
-        panel.addView(shareReference);
-        shareReference.setOnClickListener(v -> {
-            String description = editor.getText().toString().trim();
-            if (description.isEmpty()) { editor.setError("Напиши описание"); return; }
-            JSONObject meta = metadata(host, kind, id);
-            File primary = safeFile(host, kind, id, meta.optString("primary", ""));
-            String workText = "Отредактируй приложенное изображение для Skyrim. " + description;
-            try {
-                JSONObject pending = new JSONObject().put("kind", kind).put("id", id)
-                    .put("name", name).put("prompt", workText).put("count", 1);
-                if (!prefs(host).edit().putString(PENDING, pending.toString()).commit())
-                    throw new IllegalStateException("Не удалось сохранить цель изображения");
-            } catch (Exception error) {
-                Toast.makeText(host, "Ошибка подготовки Work: " + error.getMessage(),
-                    Toast.LENGTH_LONG).show();
-                return;
-            }
-            if (primary != null && primary.isFile()) {
-                new AlertDialog.Builder(host).setTitle("ИСХОДНОЕ ИЗОБРАЖЕНИЕ")
-                    .setItems(new String[]{"Использовать текущее основное",
-                        "Выбрать другое изображение"}, (d, choice) -> {
-                        if (choice == 0)
-                            shareWithChatGpt(host, ImageShareProvider.uriFor(host, primary), workText);
-                        else selectReference(host, PENDING_WORK, REQUEST_WORK_SHARE,
-                            kind, id, name, workText, "", "", "", 1);
-                    }).show();
-            } else selectReference(host, PENDING_WORK, REQUEST_WORK_SHARE,
-                kind, id, name, workText, "", "", "", 1);
-        });
-
-        panel.addView(label(host, "OPENAI IMAGES API  |  ПРЯМАЯ ГЕНЕРАЦИЯ", 13, accent));
+        panel.addView(label(host, "◇ OPENAI IMAGES API", 13, accent));
         panel.addView(label(host, "API оплачивается отдельно. Исходник передаётся в OpenAI "
             + "только при выборе редактирования. Результат добавляется после предпросмотра.", 12, MUTED));
-        Button apiKeyButton = button(host, "Настроить API-ключ", accent);
-        panel.addView(apiKeyButton);
+
+        Button settingsToggle = button(host, "⚙ Модель, качество, API-ключ ▾", accent);
+        panel.addView(settingsToggle);
+        LinearLayout apiSettings = new LinearLayout(host);
+        apiSettings.setOrientation(LinearLayout.VERTICAL);
+        apiSettings.setPadding(dp(host, 7), dp(host, 5), dp(host, 7), dp(host, 7));
+        apiSettings.setBackground(bg(host, 0xff111111, 0xff373737));
+        apiSettings.setVisibility(View.GONE);
+        panel.addView(apiSettings);
+        settingsToggle.setOnClickListener(v -> {
+            boolean expand = apiSettings.getVisibility() == View.GONE;
+            apiSettings.setVisibility(expand ? View.VISIBLE : View.GONE);
+            settingsToggle.setText(expand ? "⚙ Модель, качество, API-ключ ▴" : "⚙ Модель, качество, API-ключ ▾");
+        });
+        Button apiKeyButton = button(host, "API-ключ  ›", accent);
+        apiSettings.addView(apiKeyButton);
         apiKeyButton.setOnClickListener(v -> showApiKeyEditor(host));
         String[] modelIds = {"gpt-image-2.6-sunburst", "gpt-image-2.6-flare",
             "gpt-image-2.5-sunburst", "gpt-image-2.5-flare", "gpt-image-1.5"};
@@ -521,7 +484,7 @@ public final class WorkImageEditor {
         for (int i = 0; i < modelIds.length; i++)
             if (modelIds[i].equals(savedModel)) selectedModel[0] = i;
         Button modelButton = button(host, "Модель: " + modelNames[selectedModel[0]], accent);
-        panel.addView(modelButton);
+        apiSettings.addView(modelButton);
         modelButton.setOnClickListener(v -> new AlertDialog.Builder(host)
             .setTitle("Модель изображений").setSingleChoiceItems(modelNames, selectedModel[0],
                 (dialog, index) -> {
@@ -534,7 +497,7 @@ public final class WorkImageEditor {
         String[] qualityNames = {"Максимальное", "Среднее", "Экономное"};
         final int[] selectedQuality = {0};
         Button qualityButton = button(host, "Качество: " + qualityNames[0], accent);
-        panel.addView(qualityButton);
+        apiSettings.addView(qualityButton);
         qualityButton.setOnClickListener(v -> new AlertDialog.Builder(host)
             .setTitle("Качество API").setSingleChoiceItems(qualityNames, selectedQuality[0],
                 (dialog, index) -> {
@@ -544,9 +507,9 @@ public final class WorkImageEditor {
                 }).setNegativeButton("Отмена", null).show());
         String resolution = "npc".equals(kind) ? "1024x1536"
             : "item".equals(kind) ? "1024x1024" : "1536x1024";
-        panel.addView(label(host, "Разрешение: " + resolution
+        apiSettings.addView(label(host, "Разрешение: " + resolution
             + " · выход WebP, сжатие 90%", 12, MUTED));
-        Button generate = button(host, "API · Создать новое", accent);
+        Button generate = primary(host, "✦ Создать через API", accent);
         panel.addView(generate);
         generate.setOnClickListener(v -> {
             String description = editor.getText().toString().trim();
@@ -559,7 +522,7 @@ public final class WorkImageEditor {
                 Toast.makeText(host, "Ошибка подготовки запроса", Toast.LENGTH_LONG).show();
             }
         });
-        Button editApi = button(host, "API · Изменить по исходнику", accent);
+        Button editApi = button(host, "◈ Редактировать через API", accent);
         panel.addView(editApi);
         editApi.setOnClickListener(v -> {
             String description = editor.getText().toString().trim();
@@ -588,8 +551,11 @@ public final class WorkImageEditor {
             }
         });
 
-        Button importButton = button(host, "Импортировать изображение", accent);
-        panel.addView(importButton);
+        panel.addView(label(host, "▣ МОИ ИЗОБРАЖЕНИЯ", 12, accent));
+        LinearLayout assetActions = new LinearLayout(host);
+        assetActions.setOrientation(LinearLayout.HORIZONTAL);
+        Button importButton = button(host, "＋ Импорт", accent);
+        assetActions.addView(importButton, new LinearLayout.LayoutParams(0, -2, 1));
         importButton.setOnClickListener(v -> {
             try {
                 JSONObject pending = new JSONObject();
@@ -606,89 +572,30 @@ public final class WorkImageEditor {
                 Toast.makeText(host, "Не удалось открыть импорт: " + e.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
-        Button gallery = button(host, "Мои изображения / выбрать основное", accent);
-        panel.addView(gallery);
+        Button gallery = button(host, "▤ Галерея", accent);
+        assetActions.addView(gallery, new LinearLayout.LayoutParams(0, -2, 1));
+        panel.addView(assetActions);
         gallery.setOnClickListener(v -> showGallery(host, kind, id, accent, onUpdated));
         ScrollView scroll = new ScrollView(host);
         scroll.addView(panel);
-        new AlertDialog.Builder(host).setTitle("ИЗОБРАЖЕНИЯ  |  WORK + API")
-            .setView(scroll).setNegativeButton("Закрыть", null).show();
-    }
-    /** User-initiated Android Sharesheet return path from ChatGPT Work. */
-    public static boolean handleSharedIntent(Activity host, Intent intent, int accent, Runnable onUpdated) {
-        if (intent == null) return false;
-        String action = intent.getAction(), type = intent.getType();
-        if (!(Intent.ACTION_SEND.equals(action) || Intent.ACTION_SEND_MULTIPLE.equals(action))
-            || type == null || !type.startsWith("image/")) return false;
-        ArrayList<Uri> files = new ArrayList<>();
-        ClipData clip = intent.getClipData();
-        if (clip != null) for (int i = 0; i < Math.min(MAX_IMPORT, clip.getItemCount()); i++) {
-            Uri uri = clip.getItemAt(i).getUri(); if (uri != null) files.add(uri);
-        }
-        if (files.isEmpty()) {
-            try {
-                if (Intent.ACTION_SEND_MULTIPLE.equals(action)) {
-                    ArrayList<Uri> batch = intent.getParcelableArrayListExtra(Intent.EXTRA_STREAM);
-                    if (batch != null) for (Uri uri : batch) {
-                        if (uri != null && files.size() < MAX_IMPORT) files.add(uri);
-                    }
-                } else {
-                    Uri uri = intent.getParcelableExtra(Intent.EXTRA_STREAM);
-                    if (uri != null) files.add(uri);
-                }
-            } catch (Exception ignored) {}
-        }
-        if (files.isEmpty() && intent.getData() != null) files.add(intent.getData());
-        if (files.isEmpty()) return true;
-        String pending = prefs(host).getString(PENDING, "");
-        if (pending.isEmpty()) {
-            new AlertDialog.Builder(host).setTitle("Изображение из ChatGPT")
-                .setMessage("Сначала открой редактор нужной локации, NPC или предмета"
-                    + " и запусти ChatGPT / Work из редактора.")
-                .setPositiveButton("Понятно", null).show();
-            return true;
-        }
-        try {
-            JSONObject target = new JSONObject(pending);
-            if (target.optString("id").isEmpty()) return true;
-            LinearLayout panel = container(host);
-            panel.addView(label(host, "Цель: " + target.optString("name")
-                + "\nИзображений: " + files.size() + "\nПроверь правильность выбранной цели.", 14, WHITE));
-            try {
-                Bitmap preview = readScaled(host, files.get(0), 1000);
-                if (preview != null) {
-                    ImageView art = new ImageView(host);
-                    art.setImageBitmap(preview); art.setAdjustViewBounds(true);
-                    panel.addView(art, new LinearLayout.LayoutParams(-1, -2));
-                }
-            } catch (Exception ignored) {}
-            final ArrayList<Uri> selected = files;
-            new AlertDialog.Builder(host).setTitle("ИМПОРТ ИЗ CHATGPT / WORK")
-                .setView(panel)
-                .setPositiveButton("Заменить основное", (d, w) ->
-                    installAsync(host, target, selected, true, onUpdated, "chatgpt-work-share"))
-                .setNeutralButton("Добавить в галерею", (d, w) ->
-                    installAsync(host, target, selected, false, onUpdated, "chatgpt-work-share"))
-                .setNegativeButton("Отмена", null).show();
-        } catch (Exception error) {
-            Toast.makeText(host, "Невозможно импортировать изображения из Work",
-                Toast.LENGTH_LONG).show();
-        }
-        return true;
+        AlertDialog dialog = new AlertDialog.Builder(host).setTitle("ИЗОБРАЖЕНИЯ")
+            .setView(scroll).setNegativeButton("Закрыть", null).create();
+        dialog.setOnShowListener(ignored -> {
+            if (dialog.getWindow() != null)
+                dialog.getWindow().setBackgroundDrawable(bg(host, 0xff080808, 0xff64696d));
+            Button close = dialog.getButton(AlertDialog.BUTTON_NEGATIVE);
+            if (close != null) close.setTextColor(accent);
+        });
+        dialog.show();
     }
     public static boolean onActivityResult(Activity host, int request, int result, Intent data,
                                            int accent, Runnable onUpdated) {
-        if (request == REQUEST_WORK_SHARE || request == REQUEST_API_EDIT) {
-            final String pendingKey = request == REQUEST_WORK_SHARE ? PENDING_WORK : PENDING_API;
-            String saved = prefs(host).getString(pendingKey, "");
-            prefs(host).edit().remove(pendingKey).apply();
+        if (request == REQUEST_API_EDIT) {
+            String saved = prefs(host).getString(PENDING_API, "");
+            prefs(host).edit().remove(PENDING_API).apply();
             if (result == Activity.RESULT_OK && data != null && data.getData() != null && !saved.isEmpty()) {
-                try {
-                    JSONObject target = new JSONObject(saved);
-                    if (request == REQUEST_WORK_SHARE)
-                        shareWithChatGpt(host, data.getData(), target.optString("prompt"));
-                    else confirmApi(host, target, data.getData(), accent, onUpdated);
-                } catch (Exception error) {
+                try { confirmApi(host, new JSONObject(saved), data.getData(), accent, onUpdated); }
+                catch (Exception error) {
                     Toast.makeText(host, "Не удалось обработать исходник", Toast.LENGTH_LONG).show();
                 }
             }
@@ -721,9 +628,9 @@ public final class WorkImageEditor {
                 .setTitle("Импорт: " + target.optString("name"))
                 .setView(panel)
                 .setPositiveButton("Заменить основное", (d, w) ->
-                    installAsync(host, target, files, true, onUpdated, "chatgpt-work-manual"))
+                    installAsync(host, target, files, true, onUpdated, "manual-import"))
                 .setNeutralButton("Добавить в галерею", (d, w) ->
-                    installAsync(host, target, files, false, onUpdated, "chatgpt-work-manual"))
+                    installAsync(host, target, files, false, onUpdated, "manual-import"))
                 .setNegativeButton("Отмена", null).show();
         } catch (Exception e) {
             Toast.makeText(host, "Ошибка подготовки импорта", Toast.LENGTH_LONG).show();
@@ -878,7 +785,7 @@ public final class WorkImageEditor {
                 }
                 panel.addView(label(host, "Размер: " + Math.round(imageFile.length() / 1024f) +
                     " КБ · источник: " + (record.optString("source").startsWith("openai-images-api")
-                    ? "OpenAI API" : "ChatGPT Work"), 12, MUTED));
+                    ? "OpenAI API" : "Импорт"), 12, MUTED));
                 new AlertDialog.Builder(host).setTitle("Изображение " + (index + 1))
                     .setView(panel)
                     .setPositiveButton("Сделать основным", (x, y) -> {
