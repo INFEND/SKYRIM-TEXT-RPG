@@ -100,6 +100,12 @@ public final class ItemCatalog {
         if("Пурпурный горноцвет".equals(id))return "Лиловый горноцвет";
         if("Грибы имп".equals(id))return "Бесовский гриб";
         if("Крыло голубой бабочки".equals(id))return "Крыло синей бабочки";
+        if("Голубой стрекозник".equals(id))return "Синяя стрекоза";
+        if("Оранжевый стрекозник".equals(id))return "Оранжевая стрекоза";
+        if("Усики коруса-охотника".equals(id))return "Усик коруса-охотника";
+        if("Ястребиное яйцо".equals(id))return "Яйцо ястреба";
+        if("Яйцо рыбы-убийцы".equals(id))return "Икра рыбы-убийцы";
+        if("Яйцо паука".equals(id))return "Паучье яйцо";
         if("Повреждённая Звезда Азуры".equals(id))return "Сломанная Звезда Азуры";
         if("Малый камень душ (заполненный)".equals(id))
             return "Маленький камень душ (заполненный)";
@@ -375,6 +381,12 @@ public final class ItemCatalog {
         if("Лиловый горноцвет".equals(id))return items.get("Пурпурный горноцвет");
         if("Бесовский гриб".equals(id))return items.get("Грибы имп");
         if("Крыло синей бабочки".equals(id))return items.get("Крыло голубой бабочки");
+        if("Синяя стрекоза".equals(id))return items.get("Голубой стрекозник");
+        if("Оранжевая стрекоза".equals(id))return items.get("Оранжевый стрекозник");
+        if("Усик коруса-охотника".equals(id))return items.get("Усики коруса-охотника");
+        if("Яйцо ястреба".equals(id))return items.get("Ястребиное яйцо");
+        if("Икра рыбы-убийцы".equals(id))return items.get("Яйцо рыбы-убийцы");
+        if("Паучье яйцо".equals(id))return items.get("Яйцо паука");
         if("Маленький камень душ (заполненный)".equals(id))
             return items.get("Малый камень душ (заполненный)");
         if("Серебряное кольцо".equals(id))return items.get("Кольцо серебряное");
