@@ -30,4 +30,45 @@ public class SolitudeEncountersTest {
         g.hour=9;g.sceneState.confirm("npc","solitude_vittoria","Виттория Вичи","DEAD");g.choose("SOLITUDE:quest:0:accept");assertNull(g.progress.questOutcome("solitude_cargo"));
         visit(g,0);g.choose("SOLITUDE:quest:0:accept");assertNull(g.progress.questOutcome("solitude_cargo"));
     }
+    private int relation(GameEngine g,String name){
+        org.json.JSONArray a=g.sceneState.npcFacts();
+        for(int i=0;i<a.length();i++){
+            org.json.JSONObject n=a.optJSONObject(i);
+            if(n!=null&&name.equals(n.optString("title")))return n.optInt("relation",50);
+        }
+        return 50;
+    }
+    @Test public void refusalRecoveryWorkAndGiftHavePersistentNonRepeatableRelations() throws Exception{
+        GameEngine g=city();
+        visit(g,7);
+        g.choose("SOLITUDE:quest:0:accept");
+        int before=relation(g,"Виттория Вичи");
+        g.choose("SOLITUDE:quest:0:decline");
+        assertEquals("DECLINED",g.progress.questOutcome("solitude_cargo"));
+        assertEquals(before-10,relation(g,"Виттория Вичи"));
+        g.choose("SOLITUDE:quest:0:decline");
+        assertEquals(before-10,relation(g,"Виттория Вичи"));
+        g=GameEngine.fromJson(g.toJson().toString());
+        assertEquals(before-10,relation(g,"Виттория Вичи"));
+        visit(g,7);
+        g.choose("SOLITUDE:quest:0:reconsider");
+        assertEquals("ACTIVE",g.progress.questOutcome("solitude_cargo"));
+        int restored=relation(g,"Виттория Вичи");
+        g.choose("SOLITUDE:quest:0:reconsider");
+        assertEquals(restored,relation(g,"Виттория Вичи"));
+        visit(g,0);
+        g.choose("SOLITUDE:quest:0:work");
+        int target=relation(g,"Яла");
+        g.choose("SOLITUDE:quest:0:work");
+        assertEquals(target,relation(g,"Яла"));
+        visit(g,7);
+        g.choose("SOLITUDE:quest:0:gift");
+        int finished=relation(g,"Виттория Вичи");
+        g.choose("SOLITUDE:quest:0:gift");
+        assertEquals(finished,relation(g,"Виттория Вичи"));
+        g=GameEngine.fromJson(g.toJson().toString());
+        assertEquals(finished,relation(g,"Виттория Вичи"));
+        assertEquals(target,relation(g,"Яла"));
+    }
 }
+
