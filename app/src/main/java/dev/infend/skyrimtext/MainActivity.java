@@ -2438,7 +2438,7 @@ public final class MainActivity extends Activity {
     /** Only the value is bold; the attribute label remains regular. */
     private void addChoiceStat(LinearLayout target,String label,String value,int valueColor,int bottom){
         String display=label+": "+value;
-        TextView line=text(display,13,MUTED,false);
+        TextView line=text(display,15,MUTED,false);
         android.text.SpannableString styled=new android.text.SpannableString(display);
         int start=display.length()-value.length();
         styled.setSpan(new android.text.style.StyleSpan(Typeface.BOLD),start,display.length(),
@@ -2452,9 +2452,52 @@ public final class MainActivity extends Activity {
 
     private String choiceSkillName(String action){return "HEAVY".equals(action)?RpgContent.SKILLS[game.progress.equippedWeaponSkill()]:SceneChoiceMeta.skillName(action);}
     private void livingChanceLink(LinearLayout panel,String title,String calculation){
-        TextView link=text("Показать расчёт  ⌄",12,MUTED,true);link.setPadding(0,dp(4),0,dp(4));panel.addView(link,lp(-1,-2));
-        link.setOnClickListener(v->{LinearLayout details=column();for(String line:calculation.split("\n"))addText(details,line,14,TEXT,false,6);livingDialog(title,details);});
+        TextView link=text("Показать расчёт  ⌄",15,MUTED,true);link.setPadding(0,dp(4),0,dp(4));panel.addView(link,lp(-1,-2));
+        link.setOnClickListener(v->{LinearLayout details=column();for(String line:calculation.split("\n"))addText(details,line,16,TEXT,false,8);livingDialog(title,details);});
     }
+
+    /** A model may send a legacy numeric skill index instead of the skill name. */
+    private int choiceSkillIndex(String skill){
+        if(skill==null)return -1;
+        String raw=skill.trim().toLowerCase(java.util.Locale.ROOT);
+        if(raw.matches("(?:[0-9]|1[0-7])")){
+            try{return Integer.parseInt(raw);}catch(NumberFormatException ignored){return -1;}
+        }
+        for(int i=0;i<RpgContent.SKILLS.length;i++){
+            String name=RpgContent.SKILLS[i].toLowerCase(java.util.Locale.ROOT);
+            if(raw.equals(name)||raw.startsWith(name+" |")||raw.startsWith(name+" ·"))return i;
+        }
+        return -1;
+    }
+    private void showChoiceSkillLevel(LinearLayout panel,String skill,String action){
+        int index=choiceSkillIndex(skill);
+        if(index<0 && action!=null)index=choiceSkillIndex(choiceSkillName(action));
+        if(index>=0)addChoiceStat(panel,RpgContent.SKILLS[index],
+            game.progress.skillLevel(index)+" (уровень)",accent(),4);
+    }
+    /** Never fabricate a numerical formula for a probability authored by an LLM. */
+    private String aiChoiceCalculation(AiGameTurn.Option option,int chance,boolean nativeCombat){
+        if(nativeCombat){
+            String explanation=game.progress.chanceExplanation();
+            if(!explanation.isEmpty())return explanation;
+        }
+        if(chance<0)return "Гарантированный исход: 100%. Бросок кубика не выполняется.";
+        StringBuilder details=new StringBuilder();
+        details.append("Источник шанса: оценка ИИ, а не формула движка.\n");
+        int index=choiceSkillIndex(option.skill);
+        if(index>=0)details.append("Навык: ").append(RpgContent.SKILLS[index])
+            .append(" — ").append(game.progress.skillLevel(index)).append(" (уровень).\n");
+        details.append("Вероятность: ").append(chance).append("%.\n")
+            .append("Бросок: равномерное целое от 1 до 100.\n");
+        if(chance>0)details.append("Успех: 1–").append(chance).append(" (")
+            .append(chance).append(" исходов).\n");
+        if(chance<100)details.append("Неудача: ").append(chance+1).append("–100 (")
+            .append(100-chance).append(" исходов).\n");
+        details.append("ИИ не прислал числовую разбивку по сложности и условиям. ")
+            .append("Игровой движок не выдумывает недостающие коэффициенты.");
+        return details.toString();
+    }
+
     private void storyChoice(int position,GameEngine.Choice c,Runnable onClick){
         int chance=game.progress.chance(game,c.action);String calculation=game.progress.chanceExplanation();
         LinearLayout box=row();box.setGravity(Gravity.CENTER_VERTICAL);
@@ -2475,12 +2518,12 @@ public final class MainActivity extends Activity {
         LinearLayout prose=column();
         LinearLayout.LayoutParams size=new LinearLayout.LayoutParams(0,-2,1);
         size.leftMargin=dp(13);box.addView(prose,size);
-        TextView name=text(c.title,17,TEXT,true);
+        TextView name=text(c.title,19,TEXT,true);
         name.setTypeface(SovngardeTypeface.face(this,true));
         name.setLineSpacing(dp(3),1.1f);prose.addView(name);
         if(c.detail!=null&&!c.detail.isEmpty()){
             space(prose,5);
-            TextView desc=text(c.detail,14,MUTED,false);
+            TextView desc=text(c.detail,17,MUTED,false);
             desc.setLineSpacing(dp(3),1.12f);prose.addView(desc);
         }
         space(prose,6);
@@ -2490,11 +2533,15 @@ public final class MainActivity extends Activity {
             if(target>=0&&target<TravelPlanner.HUBS.length)routePreview(prose,TravelPlanner.plan(game,WorldAtlas.find(TravelPlanner.HUBS[target])));
         }
         if(chance>=0){
-            addChoiceStat(prose,"НАВЫК",choiceSkillName(c.action),accent(),4);
+            showChoiceSkillLevel(prose,choiceSkillName(c.action),c.action);
             addChoiceStat(prose,"ШАНС УСПЕХА",chance+"%",SceneChoiceMeta.chanceColor(chance),0);
             livingBar(prose,chance,100,SceneChoiceMeta.chanceColor(chance));
             livingChanceLink(prose,c.title,calculation.isEmpty()?"Шанс движка: "+chance+"%":calculation);
-        }else addText(prose,"БЕЗ ПРОВЕРКИ",11,0xffb8c1c4,false,0);
+        }else{
+            addChoiceStat(prose,"ШАНС УСПЕХА","100%",SceneChoiceMeta.chanceColor(100),0);
+            livingBar(prose,100,100,SceneChoiceMeta.chanceColor(100));
+            livingChanceLink(prose,c.title,"Гарантированное действие: 100%.\nБросок кубика не требуется.\nПоследствия применяются по правилам игры.");
+        }
         LinearLayout.LayoutParams layout=lp(-1,-2);layout.bottomMargin=dp(5);
         content.addView(box,layout);
         box.setClickable(true);box.setFocusable(true);
@@ -2655,9 +2702,9 @@ public final class MainActivity extends Activity {
             // A probability-only request has no story, so never create an empty panel.
             if(!aiTurnProposal){
                 LinearLayout live=card();
-                aiTurnText=text("",16,TEXT,false);
+                aiTurnText=text("",20,TEXT,false);
                 aiTurnText.setTypeface(SovngardeTypeface.face(this,false));
-                aiTurnText.setLineSpacing(dp(2),1.05f);
+                aiTurnText.setLineSpacing(dp(7),1.20f);
                 if(aiTurnPreview.isEmpty())aiTurnText.setText(aiLiveDots(android.os.SystemClock.elapsedRealtime()-aiLocalStartedAt));
                 else aiTurnText.setText(SceneTypography.render(aiTurnPreview,accent(),game.name,heroColor()));
                 live.addView(aiTurnText,lp(-1,-2));
@@ -2727,9 +2774,9 @@ public final class MainActivity extends Activity {
             });
         }
         LinearLayout narrative=card();
-        aiTurnText=text("",18,TEXT,false);
+        aiTurnText=text("",20,TEXT,false);
         aiTurnText.setTypeface(SovngardeTypeface.face(this,false));
-        aiTurnText.setLineSpacing(dp(7),1.16f);
+        aiTurnText.setLineSpacing(dp(8),1.20f);
         aiTurnText.setText(SceneTypography.render(game.aiTurn.scene,accent(),game.name,heroColor()));
         narrative.addView(aiTurnText,lp(-1,-2));
         decorateNarrative(narrative,aiTurnText,game.aiTurn.scene);
@@ -2746,7 +2793,7 @@ public final class MainActivity extends Activity {
         space(content,12);
         addText(content,"СВОЙ ВАРИАНТ ОТВЕТА",12,accent(),true,11);
         EditText own=new EditText(this);
-        own.setTextColor(TEXT);own.setHintTextColor(MUTED);own.setTextSize(sp(16));
+        own.setTextColor(TEXT);own.setHintTextColor(MUTED);own.setTextSize(sp(18));
         own.setHint("Опиши, что говоришь или делаешь...");
         if(!aiOwnDraft.isEmpty())own.setText(aiOwnDraft);
         else if(selectedAiChoices.isEmpty()){
@@ -2856,7 +2903,7 @@ public final class MainActivity extends Activity {
                 AiGameTurn.Option option=game.aiTurn.choices.get(index-1);
                 int die=option.chance<0?-1:AiGameTurn.roll();if(FixShopAiContext.mayRetry(game,option.chance,die,fateDay==game.day)){die=AiGameTurn.roll();fateDay=game.day;instruction.append("Благосклонность судьбы использована; повторный бросок окончательный.\n");}checks.add(index,option.title,option.chance,die);
                 instruction.append("Вариант ").append(index).append(": ");
-                if(option.chance<0)instruction.append("без проверки.");
+                if(option.chance<0)instruction.append("шанс 100%, бросок не требуется.");
                 else instruction.append("шанс ").append(option.chance).append("%, бросок ")
                     .append(die).append("/100, ")
                     .append(AiGameTurn.success(option.chance,die)?"УСПЕХ.":"НЕУДАЧА.");
@@ -3040,21 +3087,25 @@ public final class MainActivity extends Activity {
         LinearLayout detail=column();
         LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(0,-2,1);
         p.leftMargin=dp(13);row.addView(detail,p);
-        TextView title=text(option.title,17,TEXT,true);
+        TextView title=text(option.title,19,TEXT,true);
         title.setTypeface(SovngardeTypeface.face(this,true));
         detail.addView(title);space(detail,6);
-        addText(detail,option.detail,14,MUTED,false,7);
+        addText(detail,option.detail,17,MUTED,false,8);
         choiceExtras(detail,option.combatAction);
         boolean combat="COMBAT".equals(game.mode)&&game.enemyHp>0;
         int displayedChance=combat?("HEAVY".equals(option.combatAction)||"FLEE".equals(option.combatAction)
             ?game.progress.chance(game,option.combatAction):-1):option.chance;
         if(displayedChance>=0){
-            addChoiceStat(detail,"НАВЫК",option.skill.isEmpty()?"Способности":option.skill,accent(),3);
+            showChoiceSkillLevel(detail,option.skill,option.combatAction);
             addChoiceStat(detail,"ШАНС УСПЕХА",displayedChance+"%",
                 SceneChoiceMeta.chanceColor(displayedChance),0);
             livingBar(detail,displayedChance,100,SceneChoiceMeta.chanceColor(displayedChance));
-            livingChanceLink(detail,option.title,combat?game.progress.chanceExplanation():"Оценка ИИ: "+option.chance+"%\nФактический бросок делает игровой движок. Состав коэффициентов модели не задан.");
-        }else addText(detail,"БЕЗ ПРОВЕРКИ",12,MUTED,false,0);
+            livingChanceLink(detail,option.title,aiChoiceCalculation(option,displayedChance,combat));
+        }else{
+            addChoiceStat(detail,"ШАНС УСПЕХА","100%",SceneChoiceMeta.chanceColor(100),0);
+            livingBar(detail,100,100,SceneChoiceMeta.chanceColor(100));
+            livingChanceLink(detail,option.title,"Гарантированный исход проверки: 100%.\nБросок кубика не выполняется.\nСостояние игры всё равно изменяется только после подтверждённого действия.");
+        }
         boolean available=combat?nativeAiCombatAvailable(option.combatAction):option.companionAction.isEmpty()||AiCompanionActions.allowed(game,option.companionAction);
         if(!available){
             addText(detail,"ДЕЙСТВИЕ НЕДОСТУПНО",12,MUTED,true,0);
@@ -3142,7 +3193,8 @@ public final class MainActivity extends Activity {
                         if(tab==0&&aiProgressInfo!=null)aiProgressInfo.setText(aiLocalPhase);
                     }
                     if(tab==0&&aiTurnText!=null&&prefs.getBoolean("ai_enabled",false)){
-                        aiTurnText.setText(SceneTypography.render(visible,accent(),game.name,heroColor()));
+                        try{aiTurnText.setText(SceneTypography.render(visible,accent(),game.name,heroColor()));}
+                        catch(RuntimeException layoutError){aiTurnText.setText(visible);}
                     }
                 }
                 // Scene may already be complete while the model is streaming choices.
@@ -3496,8 +3548,8 @@ public final class MainActivity extends Activity {
             return;
         }
         String previous=aiMemory.latestAnswer(aiSession);
-        TextView reply=text(previous.isEmpty()?"ИИ помнит историю беседы. Опиши действие или заговори с персонажем.":previous,17,TEXT,false);
-        reply.setLineSpacing(dp(6),1.16f);
+        TextView reply=text(previous.isEmpty()?"ИИ помнит историю беседы. Опиши действие или заговори с персонажем.":previous,20,TEXT,false);
+        reply.setLineSpacing(dp(8),1.20f);
         reply.setText(SceneTypography.render(previous.isEmpty()?
             "ИИ помнит историю беседы. Опиши действие или заговори с персонажем.":previous,
             accent(),game.name,heroColor()));
@@ -3506,7 +3558,7 @@ public final class MainActivity extends Activity {
         EditText prompt=new EditText(this);
         prompt.setTextColor(TEXT);prompt.setHintTextColor(MUTED);
         prompt.setHint("Что ты хочешь сказать или сделать?");
-        prompt.setTextSize(sp(14));
+        prompt.setTextSize(sp(18));
         prompt.setMinLines(2);prompt.setMaxLines(4);
         prompt.setInputType(InputType.TYPE_CLASS_TEXT|InputType.TYPE_TEXT_FLAG_MULTI_LINE|InputType.TYPE_TEXT_FLAG_CAP_SENTENCES);
         prompt.setBackground(new RuneFrameDrawable(PANEL_2,BORDER,false));
@@ -3553,7 +3605,8 @@ public final class MainActivity extends Activity {
                     prefs.edit().putFloat("ai_local_last_tps",speed).putInt("ai_local_last_tokens",tokens).apply();
                 }
                 @Override public void onText(String accumulated){
-                    reply.setText(SceneTypography.render(accumulated,accent(),game.name,heroColor()));
+                    try{reply.setText(SceneTypography.render(accumulated,accent(),game.name,heroColor()));}
+                    catch(RuntimeException layoutError){reply.setText(accumulated.length()>12000?accumulated.substring(accumulated.length()-12000):accumulated);}
                 }
                 @Override public void onComplete(String answer){
                     aiMemory.add(aiSession,"user",request);
