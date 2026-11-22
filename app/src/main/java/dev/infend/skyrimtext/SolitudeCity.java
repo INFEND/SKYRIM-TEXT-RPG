@@ -83,6 +83,18 @@ final class SolitudeCity {
             workDays[d]++;workLastDay[d]=day;
         }
     }
+    // One city-wide register shows every district's commission without moving the
+    // player or granting remote rewards. The actual supervisor still pays in person.
+    private String commissionLedger(){
+        StringBuilder out=new StringBuilder("Авторские трудовые ведомости Солитьюда.");
+        for(int i=0;i<PLACES.length;i++){
+            out.append("\\n").append(PLACES[i]).append(": ");
+            if(workRewarded[i])out.append("награда получена");
+            else if(workDays[i]>=3)out.append("3/3, награда у ответственного NPC");
+            else out.append(workDays[i]).append("/3 смен в разные дни");
+        }
+        return out.toString();
+    }
     private void commissionChoices(GameEngine g,GameEngine.Scene s,int d){
         if(workRewarded[d])return;
         if(workDays[d]<3)s.add(PREFIX+"work-progress:"+d,"Трудовая ведомость",
@@ -164,6 +176,7 @@ final class SolitudeCity {
             s.add(SolitudeCanonical.ADDVAR,"Дом Аддвара","Жилой дом торговца рыбой");
             s.add(SolitudeCanonical.CATACOMBS,"Катакомбы Солитьюда","Место погребения жителей");
             s.add("SOLITUDE:home","Высокий шпиль",SolitudeHome.owns(g)?"Собственный дом":"Поместье | покупка в Синем дворце");
+            s.add(PREFIX+"work-ledger","Трудовые ведомости","Все восемь районов | учёт смен, выполненные поручения и невыплаченные награды");
             return s.add("GO_WORLD","Вернуться к приключению","Открыть обычные действия города");
         }
         GameEngine.Scene s=new GameEngine.Scene("СОЛИТЬЮД | "+g.hour+":00",PLACES[d],PROSE[d]+
@@ -219,6 +232,9 @@ final class SolitudeCity {
         int store=SolitudeShops.index(g.mode);if(store>=0){shops.choose(g,store,action);return;}
         int d=district(g.mode);
         if(MODE.equals(g.mode)){
+            if((PREFIX+"work-ledger").equals(action)){
+                g.message=commissionLedger();g.progress.recent=g.message;g.progress.sync(g);return;
+            }
             if(SolitudeCanonical.graceMode(action)){g.mode=action;g.message="";return;}
             if(SolitudeHome.MODE.equals(action)){g.mode=SolitudeHome.MODE;g.message="";return;}
             for(int i=0;i<PLACES.length;i++)if((PREFIX+"visit:"+i).equals(action)){g.mode=PREFIX+i;g.message="";return;}
@@ -238,6 +254,17 @@ final class SolitudeCity {
             if(workRewarded[d]||workDays[d]<3||!SolitudeEncounters.present(g,d))return;
             if(g.gold>Integer.MAX_VALUE-40){g.message="Кошелёк переполнен.";return;}
             workRewarded[d]=true;g.gold+=40;
+            // Record the completed contract in the same persistent NPC ledger
+            // used by dialogue and civic work; never create a parallel reputation.
+            try{
+                String key="solitude_"+new String[]{"jala","tullius","falk","viarmo","rorlund","beirand","corpulus","vittoria"}[d];
+                g.sceneState.setContext(g.day,g.hour,"Солитьюд");
+                String old=g.sceneState.status("npc",key);
+                if(!"DEAD".equals(old)&&!"MISSING".equals(old)&&!"HOSTILE".equals(old)){
+                    if(!"HELPED".equals(old))g.sceneState.confirm("npc",key,SolitudeEncounters.NAMES[d],"HELPED");
+                    else g.sceneState.revisitNpc(key);
+                }
+            }catch(org.json.JSONException ignored){/* Payment remains one-time and persistent. */}
             g.holdReputation[3]=Math.min(100,g.holdReputation[3]+2);
             g.addXp(40);
             g.message="Авторская трудовая ведомость закрыта: +40 септимов, +2 репутации, +40 опыта.";
