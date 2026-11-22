@@ -2835,6 +2835,7 @@ public final class MainActivity extends Activity {
         content.addView(own,lp(-1,-2));
         space(content,10);
         actionButton("ОТПРАВИТЬ","Отправить выбранные ответы и свой текст одним действием",true,()->{
+            try{
             String value=own.getText().toString().trim();
             if(value.equalsIgnoreCase("/фк")||value.equalsIgnoreCase("/фикскоин")||value.equalsIgnoreCase("/этернис")||value.equalsIgnoreCase("/eternis")){livingFixShop();return;}
             if(value.equalsIgnoreCase("/отношения")){journalRelations=true;tab=4;render();return;}
@@ -2931,6 +2932,13 @@ public final class MainActivity extends Activity {
             instruction.append("Продолжи историю, применив effects только за совершённые действия.");
             if(!storeSelectedChecks(compound,instruction.toString(),checks,fateDay)){toast("Не удалось сохранить броски");return;}
             requestAiTurn(instruction.toString(),true);
+            }catch(RuntimeException manualInputError){
+                android.util.Log.e("SkyrimAI","Manual action submission failed",manualInputError);
+                aiTurnStatus="Ошибка ручного ввода: "+manualInputError.getClass().getSimpleName()+
+                    ". Сохранение не подтверждено, проверь текущую сцену.";
+                toast(aiTurnStatus);
+                if(tab==0)render();
+            }
         });
     }
 
