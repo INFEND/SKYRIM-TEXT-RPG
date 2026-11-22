@@ -679,12 +679,45 @@ public final class MainActivity extends Activity {
     private android.widget.FrameLayout activeNpcPortrait;
     private int npcGalleryPrimary(String key,int fallback,int count){int value=prefs.getInt("npc_primary_"+key,fallback);return value>=1&&value<=count?value:fallback;}
     private void setNpcGalleryPrimary(String key,int value){prefs.edit().putInt("npc_primary_"+key,value).apply();refreshNpcPortrait();}
+    /** Fill without distortion. Any overflow is cropped, never squeezed or letterboxed. */
+    private void npcFillPhoto(android.widget.ImageView image){
+        image.setAdjustViewBounds(false);
+        image.setScaleType(android.widget.ImageView.ScaleType.CENTER_CROP);
+    }
+    /** Match the visible photo's aspect ratio before resorting to CENTER_CROP. */
+    private int npcPhotoHeight(View portrait,int widthPx,int minHeightDp,int maxHeightDp){
+        if(!(portrait instanceof android.widget.ImageView))return dp(150);
+        android.graphics.drawable.Drawable drawable=((android.widget.ImageView)portrait).getDrawable();
+        float ratio=3f/4f; // Portraits decoded asynchronously use this until their pixels arrive.
+        if(drawable!=null&&drawable.getIntrinsicWidth()>0&&drawable.getIntrinsicHeight()>0)
+            ratio=drawable.getIntrinsicWidth()/(float)drawable.getIntrinsicHeight();
+        int natural=Math.round(Math.max(1,widthPx)/Math.max(.05f,ratio));
+        return Math.max(dp(minHeightDp),Math.min(dp(maxHeightDp),natural));
+    }
+    /** The same rule applies to portrait, landscape and user-imported gallery photos. */
+    private void npcGalleryPhoto(LinearLayout panel,android.graphics.Bitmap bitmap){
+        android.widget.ImageView image=new android.widget.ImageView(this);
+        image.setImageBitmap(bitmap);npcFillPhoto(image);
+        image.setBackground(npcShape(0xff111111,0,12));image.setClipToOutline(true);
+        int width=Math.max(dp(160),getResources().getDisplayMetrics().widthPixels-dp(72));
+        panel.addView(image,lp(-1,npcPhotoHeight(image,width,170,440)));
+    }
     private void refreshNpcPortrait(){
         if(activeNpcDialog==null||!activeNpcDialog.isShowing()||activeNpcPortrait==null||activeNpcName.isEmpty())return;
         String name=activeNpcName;View portrait=npcPortrait(name);portrait.setBackground(npcShape(0xff111111,0,16));portrait.setClipToOutline(true);
-        if(portrait instanceof android.widget.ImageView){android.widget.ImageView image=(android.widget.ImageView)portrait;image.setScaleType(android.widget.ImageView.ScaleType.FIT_CENTER);image.setAdjustViewBounds(true);}
-        activeNpcPortrait.removeAllViews();activeNpcPortrait.addView(portrait,new android.widget.FrameLayout.LayoutParams(-1,-1));
-        activeNpcPortrait.getLayoutParams().height=dp(portrait instanceof android.widget.ImageView?280:150);activeNpcPortrait.requestLayout();portrait.setOnClickListener(v->npcGallerySection(name));
+        if(portrait instanceof android.widget.ImageView)npcFillPhoto((android.widget.ImageView)portrait);
+        final android.widget.FrameLayout holder=activeNpcPortrait;
+        holder.removeAllViews();holder.addView(portrait,new android.widget.FrameLayout.LayoutParams(-1,-1));
+        int approximateWidth=Math.max(dp(180),getResources().getDisplayMetrics().widthPixels-dp(28));
+        holder.getLayoutParams().height=npcPhotoHeight(portrait,approximateWidth,180,520);
+        holder.requestLayout();
+        // The first layout gives the actual dialog width: avoid small scaling/crop errors.
+        holder.post(()->{
+            if(activeNpcPortrait!=holder||activeNpcDialog==null||!activeNpcDialog.isShowing()||holder.getWidth()<=0)return;
+            int exactHeight=npcPhotoHeight(portrait,holder.getWidth(),180,520);
+            if(holder.getLayoutParams().height!=exactHeight){holder.getLayoutParams().height=exactHeight;holder.requestLayout();}
+        });
+        portrait.setOnClickListener(v->npcGallerySection(name));
     }
     private void closeNpcDialog(){
         android.app.Dialog old=activeNpcDialog;activeNpcDialog=null;activeNpcName="";activeNpcPortrait=null;
@@ -773,7 +806,10 @@ public final class MainActivity extends Activity {
         if("Серана".equalsIgnoreCase(name)){seranaGallery(1);return;}
         if(KatherineStory.NAME.equals(name)){katherineGallery(npcGalleryPrimary("katherine",1,KatherineGallery.COUNT));return;}
         if(AlmaStory.NAME.equals(name)){almaGallery(npcGalleryPrimary("alma",7,AlmaGallery.COUNT));return;}
-        LinearLayout p=column();View portrait=npcPortrait(name);p.addView(portrait,lp(-1,300));
+        LinearLayout p=column();View portrait=npcPortrait(name);
+        if(portrait instanceof android.widget.ImageView)npcFillPhoto((android.widget.ImageView)portrait);
+        int galleryWidth=Math.max(dp(160),getResources().getDisplayMetrics().widthPixels-dp(72));
+        p.addView(portrait,lp(-1,npcPhotoHeight(portrait,galleryWidth,170,440)));
         if(!NpcAppearance.has(this,name))addText(p,"Иллюстративный образ или эмблема, не индивидуальный портрет.",12,MUTED,false,8);
         if(!NpcAppearance.id(name).isEmpty()){
             livingLink(p,"Индивидуальные портреты","","hero",()->new ResourceManagerDialog(this,accent(),this::render,NpcAppearance.GROUP).show());
@@ -1090,7 +1126,7 @@ public final class MainActivity extends Activity {
         java.io.File[] files=LocalCharacterGallery.files(this);LinearLayout panel=column();panel.setPadding(dp(12),dp(8),dp(12),dp(8));
         if(files.length==0){new RuneDialogBuilder(this,accent()).setTitle("Итачи | Личная галерея").setMessage("Добавь подходящие иллюстрации персонажа. Файлы хранятся локально, без изменения оригиналов.").setPositiveButton("Добавить",(d,w)->chooseItachiLocalArt()).setNegativeButton("Закрыть",null).show();return;}
         final int index=Math.floorMod(requested,files.length);
-        try{android.widget.ImageView image=new android.widget.ImageView(this);image.setImageBitmap(LocalCharacterGallery.photo(files[index]));image.setAdjustViewBounds(true);image.setScaleType(android.widget.ImageView.ScaleType.FIT_CENTER);panel.addView(image,lp(-1,380));}catch(java.io.IOException e){addText(panel,"Не удалось открыть изображение",14,MUTED,false,8);}
+        try{npcGalleryPhoto(panel,LocalCharacterGallery.photo(files[index]));}catch(java.io.IOException e){addText(panel,"Не удалось открыть изображение",14,MUTED,false,8);}
         TextView count=text((index+1)+" / "+files.length,14,accent(),true);count.setGravity(Gravity.CENTER);panel.addView(count,lp(-1,34));
         TextView add=text("Добавить изображения",14,accent(),true);add.setPadding(dp(12),dp(12),dp(12),dp(12));panel.addView(add,lp(-1,-2));
         TextView replace=text("Заменить это изображение",14,accent(),true);replace.setPadding(dp(12),dp(12),dp(12),dp(12));panel.addView(replace,lp(-1,-2));
@@ -1106,7 +1142,7 @@ public final class MainActivity extends Activity {
     private void chooseLiviaPortrait(){Intent picker=new Intent(Intent.ACTION_OPEN_DOCUMENT);picker.addCategory(Intent.CATEGORY_OPENABLE);picker.setType("image/*");picker.putExtra(Intent.EXTRA_MIME_TYPES,new String[]{"image/webp","image/jpeg","image/png"});try{startActivityForResult(picker,REQUEST_LIVIA_PORTRAIT);}catch(Exception e){toast("Не удалось открыть выбор файла");}}
     private void liviaPortrait(){
         LinearLayout panel=column();
-        try{android.widget.ImageView image=new android.widget.ImageView(this);image.setImageBitmap(LiviaPortrait.photo(this));image.setAdjustViewBounds(true);image.setScaleType(android.widget.ImageView.ScaleType.FIT_CENTER);panel.addView(image,lp(-1,440));}
+        try{npcGalleryPhoto(panel,LiviaPortrait.photo(this));}
         catch(java.io.IOException e){addText(panel,"Портрет не загружен. Импортируй исходное фото или скачай пакет Ливии в управлении ресурсами.",14,TEXT,false,8);}
         addText(panel,LiviaPortrait.overridden(this)?"Используется личный портрет. Обновления ресурсов его не заменяют.":"Используется серверный портрет, если он загружен.",12,MUTED,false,8);
         if(LiviaPortrait.overridden(this)){TextView reset=text("Вернуть серверный портрет",14,accent(),true);reset.setPadding(dp(12),dp(12),dp(12),dp(12));panel.addView(reset,lp(-1,-2));reset.setOnClickListener(v->new RuneDialogBuilder(this,accent()).setTitle("Удалить личную замену?").setMessage("Исходный файл в памяти телефона не будет удалён.").setPositiveButton("Вернуть",(d,w)->{if(LiviaPortrait.reset(this)){toast("Серверный портрет восстановлен");render();}else toast("Не удалось удалить замену");}).setNegativeButton("Отмена",null).show());}
@@ -1123,7 +1159,7 @@ public final class MainActivity extends Activity {
     private void almaGallery(int index){
         LinearLayout panel=column();panel.setPadding(dp(12),dp(8),dp(12),dp(8));
         if(!AlmaGallery.available(this)){addText(panel,"Оригинальная галерея: 7 фотографий. Скачай подписанный пакет Альмы из управления ресурсами. Ручной импорт также доступен.",14,TEXT,false,8);new RuneDialogBuilder(this,accent()).setTitle("Альма | Галерея").setView(panel).setPositiveButton("Скачать",(d,w)->new ResourceManagerDialog(this,accent(),this::render,"media:alma").show()).setNeutralButton("Импорт ZIP",(d,w)->chooseAlmaGallery()).setNegativeButton("Закрыть",null).show();return;}
-        try{android.widget.ImageView image=new android.widget.ImageView(this);image.setImageBitmap(AlmaGallery.photo(this,index));image.setAdjustViewBounds(true);image.setScaleType(android.widget.ImageView.ScaleType.FIT_CENTER);panel.addView(image,lp(-1,400));TextView count=text(index+" / "+AlmaGallery.COUNT,14,accent(),true);count.setGravity(Gravity.CENTER);panel.addView(count,lp(-1,34));
+        try{npcGalleryPhoto(panel,AlmaGallery.photo(this,index));TextView count=text(index+" / "+AlmaGallery.COUNT,14,accent(),true);count.setGravity(Gravity.CENTER);panel.addView(count,lp(-1,34));
             AlertDialog dialog=new RuneDialogBuilder(this,accent()).setTitle("Альма | Галерея").setView(panel).setNegativeButton("Закрыть",null).setNeutralButton("Назад",(d,w)->almaGallery(index==1?AlmaGallery.COUNT:index-1)).setPositiveButton("Вперёд",(d,w)->almaGallery(index==AlmaGallery.COUNT?1:index+1)).create();npcGalleryChoice(panel,dialog,"alma",index,7,AlmaGallery.COUNT,()->almaGallery(index));dialog.show();}catch(Exception e){new RuneDialogBuilder(this,accent()).setTitle("Альма | Галерея").setMessage("Не удалось прочитать фото. Восстанови пакет в управлении ресурсами или повтори импорт оригинального архива.").setPositiveButton("Восстановить",(d,w)->new ResourceManagerDialog(this,accent(),this::render,"media:alma").show()).setNeutralButton("Импорт ZIP",(d,w)->chooseAlmaGallery()).setNegativeButton("Закрыть",null).show();}
     }
     private static final int REQUEST_KATHERINE_GALLERY=7218;
@@ -1135,7 +1171,7 @@ public final class MainActivity extends Activity {
             new RuneDialogBuilder(this,accent()).setTitle("Кэтрин | Галерея").setView(panel).setPositiveButton("Скачать",(d,w)->new ResourceManagerDialog(this,accent(),this::render,"media:katherine").show()).setNeutralButton("Импорт ZIP",(d,w)->chooseKatherineGallery()).setNegativeButton("Закрыть",null).show();return;
         }
         try{
-            android.widget.ImageView image=new android.widget.ImageView(this);image.setImageBitmap(KatherineGallery.photo(this,index));image.setAdjustViewBounds(true);image.setScaleType(android.widget.ImageView.ScaleType.FIT_CENTER);panel.addView(image,lp(-1,440));
+            npcGalleryPhoto(panel,KatherineGallery.photo(this,index));
             TextView count=text(index+" / "+KatherineGallery.COUNT,14,accent(),true);count.setGravity(Gravity.CENTER);panel.addView(count,lp(-1,34));
             AlertDialog dialog=new RuneDialogBuilder(this,accent()).setTitle("Кэтрин | Галерея").setView(panel).setNegativeButton("Закрыть",null).setNeutralButton("Назад",(d,w)->katherineGallery(index==1?KatherineGallery.COUNT:index-1)).setPositiveButton("Вперёд",(d,w)->katherineGallery(index==KatherineGallery.COUNT?1:index+1)).create();npcGalleryChoice(panel,dialog,"katherine",index,1,KatherineGallery.COUNT,()->katherineGallery(index));dialog.show();
         }catch(Exception e){new RuneDialogBuilder(this,accent()).setTitle("Кэтрин | Галерея").setMessage("Не удалось прочитать фото. Восстанови пакет в управлении ресурсами или повтори импорт оригинального архива.").setPositiveButton("Восстановить",(d,w)->new ResourceManagerDialog(this,accent(),this::render,"media:katherine").show()).setNeutralButton("Импорт ZIP",(d,w)->chooseKatherineGallery()).setNegativeButton("Закрыть",null).show();}
@@ -1146,7 +1182,7 @@ public final class MainActivity extends Activity {
         LinearLayout panel=column();panel.setPadding(dp(12),dp(8),dp(12),dp(8));
         if(!ElisifGallery.available(this)){new RuneDialogBuilder(this,accent()).setTitle("Элисиф Прекрасная | Галерея").setMessage("Скачай галерею Элисиф: 10 оригинальных фотографий и новый основной портрет. Основное фото можно выбрать вручную.").setPositiveButton("Скачать",(d,w)->new ResourceManagerDialog(this,accent(),this::render,"media:elisif").show()).setNeutralButton("Импорт ZIP",(d,w)->chooseElisifGallery()).setNegativeButton("Закрыть",null).show();return;}
         int index=ElisifGallery.hasPhoto(this,requested)?requested:ElisifGallery.primary(this);
-        try{android.widget.ImageView image=new android.widget.ImageView(this);image.setImageBitmap(ElisifGallery.photo(this,index));image.setAdjustViewBounds(true);image.setScaleType(android.widget.ImageView.ScaleType.FIT_CENTER);panel.addView(image,lp(-1,440));
+        try{npcGalleryPhoto(panel,ElisifGallery.photo(this,index));
             TextView count=text(ElisifGallery.position(this,index)+" / "+ElisifGallery.count(this)+(index==ElisifGallery.primary(this)?"  |  Основной портрет":""),14,accent(),true);count.setGravity(Gravity.CENTER);panel.addView(count,lp(-1,34));
             TextView makePrimary=text(index==ElisifGallery.primary(this)?"✓ Основной портрет":"★ Сделать основным",15,accent(),true);makePrimary.setPadding(dp(12),dp(12),dp(12),dp(12));panel.addView(makePrimary,lp(-1,-2));
             TextView resetPrimary=text("Вернуть портрет по умолчанию",14,accent(),true);resetPrimary.setPadding(dp(12),dp(12),dp(12),dp(12));panel.addView(resetPrimary,lp(-1,-2));
@@ -1164,7 +1200,7 @@ public final class MainActivity extends Activity {
             new RuneDialogBuilder(this,accent()).setTitle("Серана | Галерея").setView(panel).setPositiveButton("Скачать",(d,w)->new ResourceManagerDialog(this,accent(),this::render,"media:serana").show()).setNeutralButton("Импорт ZIP",(d,w)->chooseSeranaGallery()).setNegativeButton("Закрыть",null).show();return;
         }
         try{
-            android.widget.ImageView image=new android.widget.ImageView(this);image.setImageBitmap(SeranaGallery.photo(this,index));image.setAdjustViewBounds(true);image.setScaleType(android.widget.ImageView.ScaleType.FIT_CENTER);panel.addView(image,lp(-1,440));
+            npcGalleryPhoto(panel,SeranaGallery.photo(this,index));
             TextView count=text(index+" / "+SeranaGallery.COUNT,14,accent(),true);count.setGravity(Gravity.CENTER);panel.addView(count,lp(-1,34));
             AlertDialog dialog=new RuneDialogBuilder(this,accent()).setTitle("Серана | Галерея").setView(panel).setNegativeButton("Закрыть",null).setNeutralButton("Назад",(d,w)->seranaGallery(index==1?SeranaGallery.COUNT:index-1)).setPositiveButton("Вперёд",(d,w)->seranaGallery(index==SeranaGallery.COUNT?1:index+1)).create();dialog.show();
         }catch(Exception e){new RuneDialogBuilder(this,accent()).setTitle("Серана | Галерея").setMessage("Не удалось прочитать фото. Восстанови пакет в управлении ресурсами или повтори импорт оригинального архива.").setPositiveButton("Восстановить",(d,w)->new ResourceManagerDialog(this,accent(),this::render,"media:serana").show()).setNeutralButton("Импорт ZIP",(d,w)->chooseSeranaGallery()).setNegativeButton("Закрыть",null).show();}
