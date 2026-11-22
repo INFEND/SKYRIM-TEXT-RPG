@@ -62,6 +62,21 @@ final class SolitudeCity {
     // Preserve the original 0–15 save/action IDs; new jobs are appended.
     private static int jobDistrict(int i){return i<16?i/2:(i-16)%8;}
     private final int[] lastDay=new int[JOBS.length];
+    // Authored multi-day city work commission, distinct from canonical Skyrim quests.
+    private final int[] workDays=new int[8], workLastDay=new int[8];
+    private final boolean[] workRewarded=new boolean[8];
+    private void recordWorkDay(int d,int day){
+        if(!workRewarded[d]&&workDays[d]<3&&workLastDay[d]!=day){
+            workDays[d]++;workLastDay[d]=day;
+        }
+    }
+    private void commissionChoices(GameEngine g,GameEngine.Scene s,int d){
+        if(workRewarded[d])return;
+        if(workDays[d]<3)s.add(PREFIX+"work-progress:"+d,"Трудовая ведомость",
+            "Авторская цепочка | "+workDays[d]+"/3 смен в разные дни");
+        else s.add(PREFIX+"work-reward:"+d,"Получить награду за три смены",
+            "Авторская цепочка | 40 септимов, +2 репутации | требуется присутствие ответственного");
+    }
     private SolitudeShops shops=new SolitudeShops();
     private SolitudeHome home=new SolitudeHome();
     boolean homeEnchanting(GameEngine g){return SolitudeHome.MODE.equals(g.mode)&&SolitudeHome.owns(g)&&home.room(4);}
@@ -166,6 +181,7 @@ final class SolitudeCity {
         SolitudeCanonical.districtChoices(g,s,d);
         SolitudeEncounters.choices(g,s,d);
         SolitudeResidents.choices(g,s,d);
+        commissionChoices(g,s,d);
         if(d==5)SolitudeCraft.choices(g,s);
         return s.add(PREFIX+"back","На улицы Солитьюда","Вернуться к выбору районов").add("GO_WORLD","Завершить прогулку","Вернуться к приключению");
     }
@@ -201,6 +217,19 @@ final class SolitudeCity {
         if((d==0||d==1)&&justice.theft(g,action))return;
         if(SolitudeEncounters.choose(g,d,action))return;
         if(SolitudeResidents.choose(g,d,action))return;
+        if(d>=0&&action.equals(PREFIX+"work-progress:"+d)){
+            g.message="Трудовая ведомость: "+workDays[d]+"/3 смен в разные дни.";
+            g.progress.recent=g.message;g.progress.sync(g);return;
+        }
+        if(d>=0&&action.equals(PREFIX+"work-reward:"+d)){
+            if(workRewarded[d]||workDays[d]<3||!SolitudeEncounters.present(g,d))return;
+            if(g.gold>Integer.MAX_VALUE-40){g.message="Кошелёк переполнен.";return;}
+            workRewarded[d]=true;g.gold+=40;
+            g.holdReputation[3]=Math.min(100,g.holdReputation[3]+2);
+            g.addXp(40);
+            g.message="Авторская трудовая ведомость закрыта: +40 септимов, +2 репутации, +40 опыта.";
+            g.progress.recent=g.message;g.recordVisualEvent(g.message);g.progress.sync(g);return;
+        }
         if((PREFIX+"shop").equals(action)&&(d==0||d==5)){g.mode="WORLD";g.choose("SHOP");return;}
         if((PREFIX+"rest").equals(action)&&d==6){g.mode="WORLD";g.choose("REST");return;}
         if((PREFIX+"livia").equals(action)&&d==1){g.mode="WORLD";if(g.livia.available(g)){g.choose("LIVIA:open");g.livia.castleReturn=LiviaStory.MODE.equals(g.mode);}else g.mode=PREFIX+d;return;}
@@ -214,6 +243,7 @@ final class SolitudeCity {
             boolean residentPresent=resident>=0&&SolitudeResidents.present(g,resident,d);
             boolean supervisorPresent=SolitudeEncounters.present(g,d);
             lastDay[i]=g.day;
+            recordWorkDay(d,g.day);
             g.stamina-=j.stamina;g.gold=GameEngine.nonnegativeAdd(g.gold,volunteer?0:j.gold);
             g.hour+=j.hours; // opening hours prevent a midnight rollover
             g.syncLivingSystems();
@@ -227,10 +257,18 @@ final class SolitudeCity {
             g.progress.sync(g);return;
         }
     }
-    JSONObject save(){JSONObject o=new JSONObject();try{o.put("lastDay",new JSONArray(lastDay)).put("shops",shops.save()).put("home",home.save()).put("justice",justice.save()).put("fenceDay",fence.save());}catch(Exception ignored){}return o;}
+    JSONObject save(){JSONObject o=new JSONObject();try{o.put("lastDay",new JSONArray(lastDay)).put("workDays",new JSONArray(workDays)).put("workLastDay",new JSONArray(workLastDay)).put("workRewarded",new JSONArray(workRewarded)).put("shops",shops.save()).put("home",home.save()).put("justice",justice.save()).put("fenceDay",fence.save());}catch(Exception ignored){}return o;}
     static SolitudeCity restore(JSONObject o){
         SolitudeCity s=new SolitudeCity();JSONArray a=o==null?null:o.optJSONArray("lastDay");
         if(a!=null)for(int i=0;i<Math.min(a.length(),s.lastDay.length);i++)s.lastDay[i]=Math.max(0,a.optInt(i,0));
+        JSONArray wd=o==null?null:o.optJSONArray("workDays");
+        JSONArray wl=o==null?null:o.optJSONArray("workLastDay");
+        JSONArray wr=o==null?null:o.optJSONArray("workRewarded");
+        for(int i=0;i<8;i++){
+            if(wd!=null)s.workDays[i]=Math.min(3,Math.max(0,wd.optInt(i)));
+            if(wl!=null)s.workLastDay[i]=Math.max(0,wl.optInt(i));
+            if(wr!=null)s.workRewarded[i]=wr.optBoolean(i);
+        }
         s.shops=SolitudeShops.restore(o==null?null:o.optJSONObject("shops"));
         s.home=SolitudeHome.restore(o==null?null:o.optJSONObject("home"));
         s.justice=SolitudeJustice.restore(o==null?null:o.optJSONObject("justice"));
