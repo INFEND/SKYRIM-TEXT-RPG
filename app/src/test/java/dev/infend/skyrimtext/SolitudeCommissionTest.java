@@ -20,6 +20,7 @@ public class SolitudeCommissionTest {
         g.choose("SOLITUDE:work-reward:0");
         assertEquals(paid,g.gold);
         assertTrue(g.solitude.save().optJSONArray("workRewarded").optBoolean(0));
+        assertEquals("HELPED",g.sceneState.status("npc","solitude_jala"));
     }
     @Test public void commissionCountsServiceNotLeisureOrTraining(){
         int[] service={0,3,4,7,9,10,12,14,16,18,20,22,23,24,25,26,27,28,29,30,31};
@@ -41,6 +42,23 @@ public class SolitudeCommissionTest {
         g.choose("SOLITUDE:job:12");
         assertEquals(1,g.solitude.save().optJSONArray("workDays").optInt(6));
         assertEquals(1,SolitudeCity.restore(g.solitude.save()).save().optJSONArray("workDays").optInt(6));
+    }
+    @Test public void cityLedgerReportsAllDistrictsWithoutPayingRemotely(){
+        GameEngine g=new GameEngine();g.start("Тест","Норд","Воин");
+        g.region=3;g.progress.location="Солитьюд";g.hour=10;g.stamina=100;
+        g.mode="WORLD";g.choose("SOLITUDE:open");
+        int before=g.gold;
+        g.choose("SOLITUDE:work-ledger");
+        assertTrue(g.message.contains("Главные ворота"));
+        assertTrue(g.message.contains("Гавань Солитьюда"));
+        assertTrue(g.message.contains("0/3"));
+        assertEquals(before,g.gold);
+        g.choose("SOLITUDE:visit:0");
+        g.choose("SOLITUDE:job:0");
+        g.choose("SOLITUDE:back");
+        g.choose("SOLITUDE:work-ledger");
+        assertTrue(g.message.contains("1/3 смен"));
+        assertEquals(before+18,g.gold);
     }
     @Test public void oldSavesHaveNoEarnedCommission(){
         JSONObject saved=SolitudeCity.restore(new JSONObject()).save();
