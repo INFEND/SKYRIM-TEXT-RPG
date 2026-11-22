@@ -95,6 +95,16 @@ public final class ItemCatalog {
     private static String canonicalItemDisplayName(String id){
         if("Звезда Чёрной Азуры".equals(id))return "Чёрная Звезда";
         if("Молот Волендранг".equals(id))return "Волендранг";
+        // Russian The Elder Scrolls Wiki, Skyrim item / ingredient pages.
+        // Keep each legacy ID stable: inventory and quests are keyed by ID.
+        if("Пурпурный горноцвет".equals(id))return "Лиловый горноцвет";
+        if("Грибы имп".equals(id))return "Бесовский гриб";
+        if("Крыло голубой бабочки".equals(id))return "Крыло синей бабочки";
+        if("Повреждённая Звезда Азуры".equals(id))return "Сломанная Звезда Азуры";
+        if("Малый камень душ (заполненный)".equals(id))
+            return "Маленький камень душ (заполненный)";
+        if("Кольцо серебряное".equals(id))return "Серебряное кольцо";
+        if("Кольцо золотое".equals(id))return "Золотое кольцо";
         return id;
     }
     private static void put(String name,String category,String icon,double weight,int cost,String desc,String effect,double stat,int skill){
@@ -361,6 +371,14 @@ public final class ItemCatalog {
         if(existing!=null)return existing;
         if("Чёрная Звезда".equals(id))return items.get("Звезда Чёрной Азуры");
         if("Волендранг".equals(id))return items.get("Молот Волендранг");
+        // Resolve displayed names as well as historical saved IDs.
+        if("Лиловый горноцвет".equals(id))return items.get("Пурпурный горноцвет");
+        if("Бесовский гриб".equals(id))return items.get("Грибы имп");
+        if("Крыло синей бабочки".equals(id))return items.get("Крыло голубой бабочки");
+        if("Маленький камень душ (заполненный)".equals(id))
+            return items.get("Малый камень душ (заполненный)");
+        if("Серебряное кольцо".equals(id))return items.get("Кольцо серебряное");
+        if("Золотое кольцо".equals(id))return items.get("Кольцо золотое");
         return null;
     }
     public static int count(){return items.size();}
