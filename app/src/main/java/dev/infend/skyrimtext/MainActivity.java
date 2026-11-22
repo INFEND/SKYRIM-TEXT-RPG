@@ -709,8 +709,7 @@ public final class MainActivity extends Activity {
         header.addView(npcHeaderName,new LinearLayout.LayoutParams(0,dp(42),1));
         header.addView(new View(this),lp(42,42));
         panel.addView(header,lp(-1,-2));space(panel,8);
-        livingLink(panel,"СОЗДАТЬ / ЗАМЕНИТЬ ИЗОБРАЖЕНИЕ",
-            "ChatGPT Work · описание можно изменить","hero",()->{
+        workshopAction(panel,"npc",()->{
                 dialog.dismiss();
                 String facts=profile==null?"":("Раса: "+profile.race+". Пол: "+profile.gender+". Роль: "+profile.role+".");
                 WorkImageEditor.open(this,"npc",display,display,facts,accent(),this::render);
@@ -2199,7 +2198,7 @@ public final class MainActivity extends Activity {
         }else{
             content.addView(new NordicArtView(this,NordicArtView.STORY),lp(-1,188));
         }
-        actionButton("ИЗОБРАЖЕНИЕ ЛОКАЦИИ","Создать / заменить через Work",false,()->
+        workshopAction(content,"location",()->
             WorkImageEditor.open(this,"location",game.progress.location,game.progress.location,
                 "Локация текущего прохождения.",accent(),this::render));
         space(content,16);
@@ -2384,8 +2383,7 @@ public final class MainActivity extends Activity {
         android.widget.ImageView local=WorkImageEditor.primaryView(this,"location",assetId,accent(),this::render);
         if(local!=null)panel.addView(local,lp(-1,-2));
         else if(gallery!=null)panel.addView(gallery,lp(-1,-2));
-        livingLink(panel,"СОЗДАТЬ / ЗАМЕНИТЬ ИЗОБРАЖЕНИЕ",
-            "Через ChatGPT Work · редактируемое описание","hero",()->
+        workshopAction(panel,"city",()->
                 WorkImageEditor.open(this,"location",assetId,title,
                     "Город: "+city+". Район: "+CityArchitecture.CATEGORIES[category]+".",accent(),this::render));
         int d=-1;
@@ -2668,7 +2666,7 @@ public final class MainActivity extends Activity {
 
     /** AI mode replaces the entire offline story, not just its dialogue panel. */
     private void renderAiGame(){
-        actionButton("ИЗОБРАЖЕНИЕ ЛОКАЦИИ","Создать / заменить через Work",false,()->
+        workshopAction(content,"location",()->
             WorkImageEditor.open(this,"location",game.progress.location,game.progress.location,
                 "Локация текущего прохождения.",accent(),this::render));
         String source=resolvedAiProvider();
@@ -3939,7 +3937,7 @@ public final class MainActivity extends Activity {
             overview.addView(sceneGallery(game.progress.location),lp(-1,-2));
             renderLocationWeather(overview);
         }
-        actionButton("РЕДАКТОР ИЗОБРАЖЕНИЯ ЛОКАЦИИ","Создать / заменить через Work",false,()->
+        workshopAction(content,"location",()->
             WorkImageEditor.open(this,"location",game.progress.location,game.progress.location,
                 "Текущая локация на карте Скайрима.",accent(),this::render));
         addText(content,"МЕСТА И ПЕРЕХОДЫ",11,accent(),true,10);
@@ -4260,8 +4258,7 @@ public final class MainActivity extends Activity {
             addText(details,"Положение метки на рельефе ориентировочное.",12,MUTED,false,0);
         }
         wrapper.addView(details,lp(-1,-2));
-        livingLink(wrapper,"СОЗДАТЬ / ЗАМЕНИТЬ ИЗОБРАЖЕНИЕ",
-            "ChatGPT Work · можно изменить описание","hero",()->
+        workshopAction(wrapper,"location",()->
                 WorkImageEditor.open(this,"location",place.name,place.name,
                     place.description,accent(),this::render));
 
@@ -4835,7 +4832,7 @@ public final class MainActivity extends Activity {
             t.setOnClickListener(clicked->{selectedSort=field;render();});
         }
         content.addView(new SkyrimRuleView(this,0xff92999b),lp(-1,18));
-        actionButton("✦ Мастерская предметов","Ручное создание | ChatGPT Work | изображения",true,()->showItemWorkshop(-1));
+        workshopAction(content,"item","✦  Мастерская предметов  ›",()->showItemWorkshop(-1));
         actionButton("Полный справочник предметов","Каталог, поиск и характеристики всех вещей",false,this::showItemCatalog);
         actionButton("Кодекс и бестиарий","Народы, существа, история и древние места",false,()->{tab=6;render();});
         actionButton("Личная библиотека","Твои документы, легенды и записи",false,this::showLibrary);
@@ -4853,8 +4850,7 @@ public final class MainActivity extends Activity {
         view.setBackground(itemBackground(0xff000000,0,16));
         LinearLayout heading=row();heading.setGravity(Gravity.CENTER_VERTICAL);
         view.addView(heading,lp(-1,-2));
-        livingLink(view,"СОЗДАТЬ / ЗАМЕНИТЬ ИЗОБРАЖЕНИЕ",
-            "Через ChatGPT Work · редактируемое описание","hero",()->{
+        workshopAction(view,"item",()->{
                 WorkImageEditor.open(this,"item",item.id,item.name,
                     "Тип: "+item.category+". Вес: "+item.weight+".",accent(),this::render);
             });
@@ -5197,6 +5193,42 @@ public final class MainActivity extends Activity {
         ProgressBar bar=new ProgressBar(this,null,android.R.attr.progressBarStyleHorizontal);
         bar.setMax(Math.max(1,max));bar.setProgress(Math.max(0,Math.min(value,max)));bar.setProgressTintList(ColorStateList.valueOf(color));bar.setProgressBackgroundTintList(ColorStateList.valueOf(0xff303030));
         host.addView(bar,lp(-1,5));space(host,7);
+    }
+    /** All artwork and item workshop entry points share one visibility policy. */
+    private boolean workshopVisible(String category){
+        return prefs.getBoolean("workshop_buttons_visible",true)
+            &&prefs.getBoolean("workshop_visible_"+category,true);
+    }
+    /** Fixed compact Skyrim action, not a full-width/fill-height tile. */
+    private void workshopAction(LinearLayout host,String category,Runnable onClick){
+        workshopAction(host,category,"✧  Изображение  ›",onClick);
+    }
+    private void workshopAction(LinearLayout host,String category,String label,Runnable onClick){
+        if(!workshopVisible(category))return;
+        LinearLayout line=row();line.setGravity(Gravity.END|Gravity.CENTER_VERTICAL);
+        TextView button=text(label,13,accent(),true);
+        button.setGravity(Gravity.CENTER);
+        button.setSingleLine(true);
+        button.setPadding(dp(15),0,dp(15),0);
+        button.setBackground(new RuneFrameDrawable(0xff141414,0xff69615a,false));
+        button.setContentDescription("Открыть мастерскую: "+label);
+        button.setOnClickListener(v->onClick.run());
+        line.addView(button,lp(-2,38));
+        LinearLayout.LayoutParams params=lp(-1,44);
+        params.bottomMargin=dp(5);
+        host.addView(line,params);
+    }
+    private void workshopVisibilityToggle(LinearLayout host,String key,String title){
+        Switch toggle=new Switch(this);
+        toggle.setText(title);
+        toggle.setTextColor(TEXT);
+        toggle.setTextSize(sp(14));
+        toggle.setThumbTintList(ColorStateList.valueOf(accent()));
+        toggle.setChecked(prefs.getBoolean(key,true));
+        toggle.setMinHeight(dp(48));
+        host.addView(toggle,lp(-1,-2));
+        toggle.setOnCheckedChangeListener((v,on)->
+            prefs.edit().putBoolean(key,on).apply());
     }
     private void livingLink(LinearLayout host,String label,String value,String glyph,Runnable action){
         LinearLayout tile=livingTile(host);LinearLayout line=row();line.setGravity(Gravity.CENTER_VERTICAL);
@@ -6794,6 +6826,7 @@ public final class MainActivity extends Activity {
             try{startActivityForResult(picker,REQUEST_ITEM_ARTWORK);dialog.dismiss();}
             catch(Exception e){pendingArtworkSlot=-1;toast("Не удалось открыть выбор изображений");}
         });
+        workButton.setVisibility(workshopVisible("item")?View.VISIBLE:View.GONE);
         workButton.setOnClickListener(v->{
             final String idea=prompt.getText().toString().trim();
             WorkImageEditor.open(this,"item",CompensationPowers.itemId(slot),
@@ -6853,6 +6886,16 @@ public final class MainActivity extends Activity {
         section("ПАРАМЕТРЫ","Настройки","Твоя история, твои правила.");
         int additionsStart=content.getChildCount();
         int addonStart=content.getChildCount();
+        LinearLayout workshopSettings=column();
+        content.addView(workshopSettings,lp(-1,-2));
+        workshopVisibilityToggle(workshopSettings,"workshop_buttons_visible","Показывать мастерскую");
+        workshopVisibilityToggle(workshopSettings,"workshop_visible_location","Изображения локаций");
+        workshopVisibilityToggle(workshopSettings,"workshop_visible_city","Городские локации и галереи");
+        workshopVisibilityToggle(workshopSettings,"workshop_visible_npc","Портреты и изображения персонажей");
+        workshopVisibilityToggle(workshopSettings,"workshop_visible_item","Предметы и их изображения");
+        addText(workshopSettings,"Переключатели скрывают только кнопки. Существующие изображения и сохранения остаются доступны.",12,MUTED,false,6);
+        foldAddonSection("addon_workshop","Мастерская изображений и предметов",addonStart,false);
+        addonStart=content.getChildCount();
         LinearLayout expansion=column();content.addView(expansion,lp(-1,-2));
         Switch katherineToggle=new Switch(this);katherineToggle.setText("Кэтрин | Нулевой Предел");
         katherineToggle.setTextColor(TEXT);katherineToggle.setThumbTintList(ColorStateList.valueOf(accent()));
