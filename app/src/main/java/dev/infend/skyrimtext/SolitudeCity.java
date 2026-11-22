@@ -97,6 +97,40 @@ final class SolitudeCity {
         }
         return out.toString();
     }
+    // Read-only overview of all established city contacts, including off-duty NPCs.
+    // Uses the shared SceneState facts rather than inventing a second reputation ledger.
+    private static String relationshipLedger(GameEngine g){
+        StringBuilder out=new StringBuilder("Жители Солитьюда | отношения и доступность");
+        java.util.HashSet<String> seen=new java.util.HashSet<>();
+        org.json.JSONArray facts=g.sceneState.npcFacts();
+        for(int group=0;group<2;group++){
+            String[] names=group==0?SolitudeEncounters.NAMES:SolitudeResidents.NAMES;
+            for(int i=0;i<names.length;i++){
+                String name=names[i];
+                if(!seen.add(name.toLowerCase(java.util.Locale.ROOT)))continue;
+                org.json.JSONObject fact=null;
+                for(int k=0;k<facts.length();k++){
+                    org.json.JSONObject candidate=facts.optJSONObject(k);
+                    if(candidate!=null&&name.equalsIgnoreCase(candidate.optString("title"))){fact=candidate;break;}
+                }
+                String status=g.sceneState.npcStatusByName(name);
+                boolean unavailable="DEAD".equals(status)||"MISSING".equals(status)||"HOSTILE".equals(status);
+                boolean present=group==0?SolitudeEncounters.present(g,i):
+                    SolitudeResidents.present(g,i,SolitudeResidents.district(i,g.hour));
+                out.append("\\n• ").append(name).append(": ");
+                out.append(fact==null?"ещё не знакомы":"отношение "+fact.optInt("relation",50)+"/100");
+                out.append(" | ");
+                if("DEAD".equals(status))out.append("погиб");
+                else if("MISSING".equals(status))out.append("пропал");
+                else if("HOSTILE".equals(status))out.append("конфликт");
+                else if(present)out.append("доступен сейчас");
+                else if(!unavailable)out.append("сейчас отсутствует");
+                if(fact!=null&&fact.optInt("lastDay",-1)>=0)
+                    out.append(" | встреча: день ").append(fact.optInt("lastDay"));
+            }
+        }
+        return out.toString();
+    }
     private void commissionChoices(GameEngine g,GameEngine.Scene s,int d){
         if(workRewarded[d])return;
         if(workDays[d]<3)s.add(PREFIX+"work-progress:"+d,"Трудовая ведомость",
@@ -183,6 +217,7 @@ final class SolitudeCity {
             s.add(SolitudeCanonical.CATACOMBS,"Катакомбы Солитьюда","Место погребения жителей");
             s.add("SOLITUDE:home","Высокий шпиль",SolitudeHome.owns(g)?"Собственный дом":"Поместье | покупка в Синем дворце");
             s.add(PREFIX+"work-ledger","Трудовые ведомости","Все восемь районов | учёт смен, выполненные поручения и невыплаченные награды");
+            s.add(PREFIX+"relations-ledger","Отношения с жителями","Общий реестр знакомых, отношений и доступности | только просмотр");
             return s.add("GO_WORLD","Вернуться к приключению","Открыть обычные действия города");
         }
         GameEngine.Scene s=new GameEngine.Scene("СОЛИТЬЮД | "+g.hour+":00",PLACES[d],PROSE[d]+
@@ -238,6 +273,9 @@ final class SolitudeCity {
         int store=SolitudeShops.index(g.mode);if(store>=0){shops.choose(g,store,action);return;}
         int d=district(g.mode);
         if(MODE.equals(g.mode)){
+            if((PREFIX+"relations-ledger").equals(action)){
+                g.message=relationshipLedger(g);g.progress.recent=g.message;g.progress.sync(g);return;
+            }
             if((PREFIX+"work-ledger").equals(action)){
                 g.message=commissionLedger();g.progress.recent=g.message;g.progress.sync(g);return;
             }
