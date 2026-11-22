@@ -6478,8 +6478,11 @@ public final class MainActivity extends Activity {
             workshopStatus.setText(message);
             workshopStatus.setTextColor(message.startsWith("✓")?ITEM_UP:
                     message.startsWith("Подключение")?MUTED:ITEM_DOWN);
-            scroll.post(()->{if(scroll.isAttachedToWindow())
-                scroll.smoothScrollTo(0,Math.max(0,workshopStatus.getTop()-dp(35)));});
+            scroll.post(()->{if(scroll.isAttachedToWindow()){
+                View focus=proposalProgress.view().getVisibility()==View.VISIBLE
+                        ?proposalProgress.view():workshopStatus;
+                scroll.smoothScrollTo(0,Math.max(0,focus.getTop()-dp(35)));
+            }});
         };
         AlertDialog dialog=new RuneDialogBuilder(this,accent())
             .setTitle(editing?"Изменить предмет":"Мастерская предметов")
