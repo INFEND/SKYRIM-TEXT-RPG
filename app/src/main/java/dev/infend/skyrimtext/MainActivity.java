@@ -4484,7 +4484,8 @@ public final class MainActivity extends Activity {
             }
         }
         String file=null;
-        String n=item.name.toLowerCase(java.util.Locale.ROOT);
+        // Artwork uses stable IDs: translated display labels must not hide existing images.
+        String n=item.id.toLowerCase(java.util.Locale.ROOT);
         if(n.equals("эбонитовый меч"))file="ebony_sword";
         else if(n.equals("эбонитовая кираса"))file="ebony_armor";
         else if(n.equals("стальной кинжал"))file="steel_dagger";
