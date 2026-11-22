@@ -51,6 +51,7 @@ final class SolitudeEncounters {
         String state=state(g,q);
         if("COMPLETED".equals(state))return "Завершено"+("COMPLETED".equals(g.progress.questOutcome(q.key()+"_gift"))?" | Без оплаты":" | Награда получена");
         if("ACTIVE".equals(state))return worked(g,q)?"Вернуться к "+NAMES[q.giver]:q.task;
+        if("DECLINED".equals(state))return "Поручение отклонено | можно вернуться к заказчику и пересмотреть решение";
         return q.offer;
     }
     static boolean availableForWork(GameEngine g,int d,int hours){return present(g,d)&&g.hour+hours<=CLOSE[d];}
@@ -78,6 +79,7 @@ final class SolitudeEncounters {
         for(Quest q:QUESTS)if(q.giver==d||q.target==d){
             if("COMPLETED".equals(state(g,q)))b.append("\nПомнит: ").append(q.title).append(" — завершено.").append("COMPLETED".equals(g.progress.questOutcome(q.key()+"_gift"))?" Ты отказался от платы.":"");
             else if("ACTIVE".equals(state(g,q)))b.append("\nПомнит поручение: ").append(q.title).append(". ").append(objective(g,q));
+            else if("DECLINED".equals(state(g,q)))b.append("\nПомнит отказ от поручения: ").append(q.title).append(". Можно вернуться к разговору.");
         }
         return b.toString();
     }
@@ -105,6 +107,8 @@ final class SolitudeEncounters {
         for(int i=0;i<QUESTS.length;i++){
             Quest q=QUESTS[i];String state=state(g,q);
             if(d==q.giver&&state.isEmpty())s.add("SOLITUDE:quest:"+i+":accept",q.title,"Авторское поручение | "+q.offer);
+            if(d==q.giver&&"ACTIVE".equals(state)&&!worked(g,q))s.add("SOLITUDE:quest:"+i+":decline","Отказаться от поручения: "+q.title,"Авторское поручение | отказ сохраняется, награда не выдаётся");
+            if(d==q.giver&&"DECLINED".equals(state))s.add("SOLITUDE:quest:"+i+":reconsider","Пересмотреть отказ: "+q.title,"Авторское поручение | 1 час и 10 запаса сил | восстановить прежнюю цель");
             if(d==q.target&&"ACTIVE".equals(state)&&!worked(g,q)&&canWork(g,d,q))
                 s.add("SOLITUDE:quest:"+i+":work",q.task,q.hours+" ч. | −"+q.stamina+" запаса сил");
             if(d==q.giver&&"ACTIVE".equals(state)&&worked(g,q)){
@@ -140,6 +144,17 @@ final class SolitudeEncounters {
         }
         for(int i=0;i<QUESTS.length;i++){
             Quest q=QUESTS[i];String prefix="SOLITUDE:quest:"+i+":",state=state(g,q);
+            if(action.equals(prefix+"decline")&&d==q.giver&&"ACTIVE".equals(state)&&!worked(g,q)){
+                g.progress.setQuestOutcome(q.key(),"DECLINED");
+                report(g,"Ты отказался от поручения «"+q.title+"». "+NAMES[d]+" запомнит решение. Вернуться к разговору можно позднее.");return true;
+            }
+            if(action.equals(prefix+"reconsider")&&d==q.giver&&"DECLINED".equals(state)){
+                if(g.hour+1>CLOSE[d]||g.stamina<10){report(g,"Чтобы пересмотреть отказ, нужны один час до конца приёма и 10 единиц запаса сил.");return true;}
+                g.stamina-=10;g.hour++;g.syncLivingSystems();
+                g.progress.setQuestOutcome(q.key(),"ACTIVE");
+                remember(g,d,"INFORMED");
+                report(g,"Ты возвращаешься к поручению «"+q.title+"». "+objective(g,q));return true;
+            }
             if(action.equals(prefix+"accept")&&d==q.giver&&state.isEmpty()){
                 g.progress.setQuestOutcome(q.key(),"ACTIVE");remember(g,d,"INFORMED");report(g,q.offer+"\n\nЦель: "+q.task);return true;
             }
