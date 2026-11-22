@@ -64,6 +64,7 @@ final class SolitudeCity {
     private final int[] lastDay=new int[JOBS.length];
     // Authored multi-day city work commission, distinct from canonical Skyrim quests.
     private final int[] workDays=new int[8], workLastDay=new int[8];
+    {java.util.Arrays.fill(workLastDay,-1);} // Day zero is a valid first working day.
     private final boolean[] workRewarded=new boolean[8];
     // Only actual civic service counts towards a three-day commission.
     // Lessons, meals, paid training and observation cannot earn a work bonus.
@@ -99,8 +100,12 @@ final class SolitudeCity {
         if(workRewarded[d])return;
         if(workDays[d]<3)s.add(PREFIX+"work-progress:"+d,"Трудовая ведомость",
             "Авторская цепочка | "+workDays[d]+"/3 смен в разные дни");
-        else s.add(PREFIX+"work-reward:"+d,"Получить награду за три смены",
-            "Авторская цепочка | 40 септимов, +2 репутации | требуется присутствие ответственного");
+        else {
+            s.add(PREFIX+"work-reward:"+d,"Получить награду за три смены",
+                "Авторская цепочка | 40 септимов, +2 репутации | требуется присутствие ответственного");
+            s.add(PREFIX+"work-donate:"+d,"Передать награду на нужды города",
+                "Авторская цепочка | без септимов, +4 репутации | та же однократная награда");
+        }
     }
     private SolitudeShops shops=new SolitudeShops();
     private SolitudeHome home=new SolitudeHome();
@@ -250,10 +255,11 @@ final class SolitudeCity {
             g.message="Трудовая ведомость: "+workDays[d]+"/3 смен в разные дни.";
             g.progress.recent=g.message;g.progress.sync(g);return;
         }
-        if(d>=0&&action.equals(PREFIX+"work-reward:"+d)){
+        if(d>=0&&(action.equals(PREFIX+"work-reward:"+d)||action.equals(PREFIX+"work-donate:"+d))){
+            boolean donate=action.equals(PREFIX+"work-donate:"+d);
             if(workRewarded[d]||workDays[d]<3||!SolitudeEncounters.present(g,d))return;
-            if(g.gold>Integer.MAX_VALUE-40){g.message="Кошелёк переполнен.";return;}
-            workRewarded[d]=true;g.gold+=40;
+            if(!donate&&g.gold>Integer.MAX_VALUE-40){g.message="Кошелёк переполнен.";return;}
+            workRewarded[d]=true;if(!donate)g.gold+=40;
             // Record the completed contract in the same persistent NPC ledger
             // used by dialogue and civic work; never create a parallel reputation.
             try{
@@ -265,9 +271,10 @@ final class SolitudeCity {
                     else g.sceneState.revisitNpc(key);
                 }
             }catch(org.json.JSONException ignored){/* Payment remains one-time and persistent. */}
-            g.holdReputation[3]=Math.min(100,g.holdReputation[3]+2);
+            g.holdReputation[3]=Math.min(100,g.holdReputation[3]+(donate?4:2));
             g.addXp(40);
-            g.message="Авторская трудовая ведомость закрыта: +40 септимов, +2 репутации, +40 опыта.";
+            g.message=donate?"Авторская трудовая ведомость закрыта: награда передана городу, +4 репутации, +40 опыта.":
+                "Авторская трудовая ведомость закрыта: +40 септимов, +2 репутации, +40 опыта.";
             g.progress.recent=g.message;g.recordVisualEvent(g.message);g.progress.sync(g);return;
         }
         if((PREFIX+"shop").equals(action)&&(d==0||d==5)){g.mode="WORLD";g.choose("SHOP");return;}
@@ -306,7 +313,7 @@ final class SolitudeCity {
         JSONArray wr=o==null?null:o.optJSONArray("workRewarded");
         for(int i=0;i<8;i++){
             if(wd!=null)s.workDays[i]=Math.min(3,Math.max(0,wd.optInt(i)));
-            if(wl!=null)s.workLastDay[i]=Math.max(0,wl.optInt(i));
+            if(wl!=null)s.workLastDay[i]=Math.max(-1,wl.optInt(i,-1));
             if(wr!=null)s.workRewarded[i]=wr.optBoolean(i);
         }
         s.shops=SolitudeShops.restore(o==null?null:o.optJSONObject("shops"));
