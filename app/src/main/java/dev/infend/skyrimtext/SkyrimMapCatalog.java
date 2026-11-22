@@ -59,6 +59,7 @@ public final class SkyrimMapCatalog {
         alias("Руины Мзинчалефт","Mzinchaleft");
         alias("Сломанное Весло","Broken Oar Grotto");
         alias("Таверна Ночные ворота","Nightgate Inn");
+        alias("Лесопилка Пирожок","Mixwater Mill");
     }
     private SkyrimMapCatalog(){}
     private static void alias(String name,String english){

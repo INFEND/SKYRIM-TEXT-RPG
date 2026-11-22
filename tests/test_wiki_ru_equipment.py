@@ -47,10 +47,23 @@ INGREDIENTS = {
 }
 
 
+DRAGONBONE = {
+    "Драконий меч": "Драконий костяной меч",
+    "Драконий боевой топор": "Драконий костяной боевой топор",
+    "Драконий кинжал": "Драконий костяной кинжал",
+    "Драконья булава": "Драконья костяная булава",
+    "Драконий двуручный меч": "Драконий костяной двуручный меч",
+    "Драконья секира": "Драконья костяная секира",
+    "Драконий боевой молот": "Драконий костяной боевой молот",
+    "Драконий лук": "Драконий костяной лук",
+    "Драконья стрела": "Драконья костяная стрела",
+}
+
+
 class WikiRuEquipmentTest(unittest.TestCase):
     def test_exact_lookup_has_all_armor_and_ingredient_names(self):
         actual = dict(re.findall(r'case "([^"]+)": return "([^"]+)";', CATALOG))
-        for old, new in {**ARMOR, **INGREDIENTS}.items():
+        for old, new in {**ARMOR, **INGREDIENTS, **DRAGONBONE}.items():
             with self.subTest(old=old):
                 self.assertEqual(actual.get(old), new)
 
@@ -72,9 +85,16 @@ class WikiRuEquipmentTest(unittest.TestCase):
                 self.assertIn('"' + old + '"', WORLD)
 
     def test_visible_new_names_are_one_to_one(self):
-        names = [*ARMOR.values(), *INGREDIENTS.values()]
+        names = [*ARMOR.values(), *INGREDIENTS.values(), *DRAGONBONE.values()]
         self.assertEqual(len(names), len(set(names)),
                          "Two different historical item IDs must not share a new display name")
+
+    def test_dragonbone_family_stays_generated_under_historic_ids(self):
+        self.assertIn('"Драконий"', CATALOG)
+        self.assertIn('"Драконья"', CATALOG)
+        self.assertIn('String name=metals[i]+" "+kinds[k]', CATALOG)
+        self.assertIn('put(arrows[i]+" стрела"', CATALOG)
+        self.assertIn('return legacyId==null?null:items.get(legacyId)', CATALOG)
 
     def test_armor_generator_keeps_actual_stats_and_skill(self):
         self.assertIn('put(feminine[i]+" кираса"', CATALOG)

@@ -145,3 +145,4 @@ Shor's Stone|Камень Шора
 Kynesgrove|Роща Кин
 Sarethi Farm|Ферма Сарети
 Nightgate Inn|Таверна «Ночные ворота»
+Mixwater Mill|Лесопилка «Пирожок»

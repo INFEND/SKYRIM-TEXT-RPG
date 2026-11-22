@@ -2,16 +2,21 @@ name: Verify canonical Russian Skyrim names
 on:
   push:
     branches:
-      - 'fix/wiki-canonical-russian-names-*'
+      - 'fix/wiki-*'
+      - 'feat/wiki-*'
   pull_request:
     paths:
       - 'app/src/main/java/dev/infend/skyrimtext/RpgContent.java'
+      - 'app/src/main/java/dev/infend/skyrimtext/CanonicalCampaign.java'
+      - 'app/src/main/java/dev/infend/skyrimtext/MainActivity.java'
       - 'app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java'
       - 'app/src/main/java/dev/infend/skyrimtext/SkyrimMapCatalog.java'
       - 'app/src/main/java/dev/infend/skyrimtext/WorldAtlas.java'
       - 'app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java'
       - 'app/src/main/java/dev/infend/skyrimtext/AiStoryClient.java'
       - 'tests/test_wiki_ru_names.py'
+      - 'tests/test_wiki_ru_equipment.py'
+      - 'tests/test_wiki_ru_quests.py'
       - 'tools/map_names_ru.txt'
 permissions:
   contents: read
