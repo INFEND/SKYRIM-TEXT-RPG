@@ -15,8 +15,11 @@ final class AiRoutineAction {
     private static final Pattern REMAINS=Pattern.compile(
         "^(?:я\\s+)?обыскать\\s+(?:труп|тело|останки)(?:\\s+[^.!?;:]{1,60})?[.!?]?$",
         Pattern.CASE_INSENSITIVE|Pattern.UNICODE_CASE);
+    // Android may reject Java's inline Unicode-character-class flag on the first typed action.
+    // Unicode letter boundaries and explicit flags preserve Russian risk detection.
     private static final Pattern RISK=Pattern.compile(
-        "(?iuU)\\b(?:враг|вражд|бой|боя|бою|драк|драугр|дракон|опасн|заперт|закрыт|замк|страж|охран|скрыт|скрытн|тайн|незамет|воров|краст|украст|ограб|обман|угроз|шантаж|насил|убий|убить|напад|побег|заклин|магич|взлом|ловушк|секрет)\\p{L}*\\b");
+        "(?<!\\p{L})(?:враг|вражд|бой|боя|бою|драк|драугр|дракон|опасн|заперт|закрыт|замк|страж|охран|скрыт|скрытн|тайн|незамет|воров|краст|украст|ограб|обман|угроз|шантаж|насил|убий|убить|напад|побег|заклин|магич|взлом|ловушк|секрет)\\p{L}*(?!\\p{L})",
+        Pattern.CASE_INSENSITIVE|Pattern.UNICODE_CASE);
     private AiRoutineAction(){}
 
     static boolean requiresNoCheck(String request){

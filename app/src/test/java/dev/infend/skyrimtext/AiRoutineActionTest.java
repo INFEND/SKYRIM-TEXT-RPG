@@ -13,6 +13,15 @@ public final class AiRoutineActionTest {
         assertTrue(AiRoutineAction.requiresNoCheck("Обыскать труп"));
         assertTrue(AiRoutineAction.requiresNoCheck("Осмотреться"));
     }
+    @Test public void russianRiskWordsAndCaseNeverBecomeGuaranteedActions(){
+        // First access to AiRoutineAction also initializes its regex patterns.
+        // On Android, a Java-only inline (?U) flag can throw ExceptionInInitializerError here.
+        assertFalse(AiRoutineAction.requiresNoCheck("Поговорить с ДРАКОНОМ"));
+        assertFalse(AiRoutineAction.requiresNoCheck("Спросить стражника о тайне"));
+        assertFalse(AiRoutineAction.requiresNoCheck("Я подхожу к врагу незаметно"));
+        assertFalse(AiRoutineAction.requiresNoCheck("Осмотреться возле ловушки"));
+        assertTrue(AiRoutineAction.requiresNoCheck("Я спрашиваю о дороге"));
+    }
     @Test public void contestedActionsStillNeedChecks(){
         assertFalse(AiRoutineAction.requiresNoCheck("Уйти из боя"));
         assertFalse(AiRoutineAction.requiresNoCheck("Подойти к врагу незаметно"));
