@@ -72,6 +72,9 @@ class WikiRuNamesTests(unittest.TestCase):
         race_match = re.search(r'public static final String\[\] RACES=\{([^}]*)\}', RPG)
         self.assertIsNotNone(race_match)
         self.assertEqual(len(re.findall(r'"[^"]+"', race_match.group(1))), 10)
+        self.assertIn("Постоянной расовой способности нет. Особый талант орков", RPG)
+        self.assertIn("Ночное зрение — отдельная малая способность", RPG)
+        self.assertNotIn("Природная стойкость и привычка носить тяжёлые доспехи", RPG)
 
     def test_named_npc_uses_wiki_spelling_and_old_alias(self):
         self.assertIn('add("Балгруф Старший","Норд"', NPC)
