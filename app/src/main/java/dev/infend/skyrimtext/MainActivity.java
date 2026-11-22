@@ -130,6 +130,7 @@ public final class MainActivity extends Activity {
     @Override public void onCreate(Bundle bundle){
         super.onCreate(bundle);
         prefs=getSharedPreferences(PREFS,MODE_PRIVATE);
+        clearRetiredLocalServerCredentials();
         aiSession=prefs.getString("ai_session","");
         if(aiSession.isEmpty()){
             aiSession=java.util.UUID.randomUUID().toString();
@@ -363,6 +364,24 @@ public final class MainActivity extends Activity {
             }
         });
     }
+
+    /** Remove the retired server key, encrypted preferences and unused settings after upgrade. */
+    private void clearRetiredLocalServerCredentials(){
+        if(prefs.getBoolean("legacy_aipaca_credentials_cleared",false))return;
+        try{
+            java.security.KeyStore keys=java.security.KeyStore.getInstance("AndroidKeyStore");
+            keys.load(null);
+            if(keys.containsAlias("skyrim_aipaca_api_v1"))
+                keys.deleteEntry("skyrim_aipaca_api_v1");
+            getSharedPreferences("skyrim_aipaca_vault",MODE_PRIVATE).edit().clear().apply();
+            prefs.edit().remove("ai_aipaca_fallback")
+                .remove("ai_aipaca_last_model").remove("ai_aipaca_model")
+                .putBoolean("legacy_aipaca_credentials_cleared",true).apply();
+        }catch(Exception failure){
+            android.util.Log.w("SkyrimAI","Retired credential cleanup will retry",failure);
+        }
+    }
+
     private boolean localModelReady(){return LocalAiModelStore.ready(prefs);}
     private String resolvedAiProvider(){
         String mode=aiProviderMode();
