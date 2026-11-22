@@ -47,7 +47,7 @@ class ScreenshotNarrativeContract(unittest.TestCase):
         self.assertIn("game.choose(c.action)",ui)
         self.assertIn('case "medium":return 12000',effort)
         self.assertIn('case "max":return 32000',effort)
-        self.assertIn("reply.setLineSpacing(dp(6),1.16f)",ui)
+        self.assertIn("reply.setLineSpacing(dp(8),1.20f)",ui)
 
 if __name__=="__main__":
     unittest.main()
