@@ -46,4 +46,18 @@ public class SolitudeReconciliationIntegrationTest {
         g.choose("SOLITUDE:merchant:reconcile:2");
         assertEquals(stamina,g.stamina);assertEquals("DEAD",g.sceneState.npcStatusByName("Сайма"));
     }
+    @Test public void inspectingSupervisorMemoryDoesNotChangeNpcHistory() throws Exception {
+        GameEngine g=city();
+        g.sceneState.setContext(g.day,g.hour,"Солитьюд");
+        g.sceneState.confirm("npc","solitude_vittoria","Виттория Вичи","HELPED");
+        g.choose("SOLITUDE:open");g.choose("SOLITUDE:visit:7");
+        String before=g.sceneState.npcFacts().toString();
+        g.choose("SOLITUDE:memory:7");
+        assertEquals("Memory inspection must be read-only",before,g.sceneState.npcFacts().toString());
+        g=GameEngine.fromJson(g.toJson().toString());
+        String reloaded=g.sceneState.npcFacts().toString();
+        g.choose("SOLITUDE:memory:7");
+        assertEquals("Read-only inspection must survive save/load",reloaded,g.sceneState.npcFacts().toString());
+    }
+
 }
