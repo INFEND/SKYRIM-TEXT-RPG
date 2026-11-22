@@ -296,7 +296,43 @@ public final class RpgProgress {
         int attribute=stat==0?g.maxHp:stat==1?g.maxMagicka:g.maxStamina;
         int charisma=Math.max(-10,Math.min(10,g.reputation/5));
         int raw=50+(attribute-100)/7+g.level*2-difficulty-danger*3-exhaustion/5+context+charisma;
-        chanceExplanation="Базовый шанс: 50%\nХарактеристика ("+(stat==0?"здоровье":stat==1?"магия":"выносливость")+"): "+signed((attribute-100)/7)+"\nУровень: "+signed(g.level*2)+"\nСложность: "+signed(-difficulty)+"\nОпасность: "+signed(-danger*3)+"\nУсталость: "+signed(-exhaustion/5)+"\nНавык: "+signed(skill)+"\nАртефакты: "+signed((skillIndex==9&&equipped("Эбонитовая кольчуга")?15:0)+artifacts.towerBonus(g,skillIndex))+"\nТаланты: "+signed(branches.chanceBonus(skillIndex)+advanced.checkBonus(skillIndex)+(skillIndex==12&&advanced.has(AdvancedPerks.PERSUASION)?5:0))+"\nРепутация: "+signed(Math.min(18,g.reputation/3)+charisma)+"\nВес рюкзака: "+signed(carryWeight()>carryLimit()*0.9?-8:0)+"\nОграничение 0–100: "+raw+" → "+base+(g.needs.anyEnabled()?"\nПотребности: −"+g.needs.penalty():"")+"\nИтог: "+result+"%";
+        int gear=skillIndex==12?gearSpeech():skillIndex==14?gearAlchemy():0;
+        int skillLevelValue=skillIndex<0?0:skillLevel(skillIndex);
+        int armorBonus=skillIndex==9&&equipped("Эбонитовая кольчуга")?15:0;
+        int artifactBonus=artifacts.towerBonus(g,skillIndex);
+        int perkBonus=branches.chanceBonus(skillIndex)+advanced.checkBonus(skillIndex)
+            +(skillIndex==12&&advanced.has(AdvancedPerks.PERSUASION)?5:0);
+        int bagPenalty=carryWeight()>carryLimit()*0.9?-8:0;
+        int reputationBonus=Math.min(18,g.reputation/3);
+        int healthModifier=(attribute-100)/7;
+        int fatigueModifier=-exhaustion/5;
+        int levelModifier=g.level*2;
+        String skillName=skillIndex>=0&&skillIndex<RpgContent.SKILLS.length?
+            RpgContent.SKILLS[skillIndex]:"Не задействован";
+        chanceExplanation="ИГРОВОЙ РАСЧЁТ ШАНСА\n"+
+            "База: 50%\n"+
+            "Характеристика ("+(stat==0?"здоровье":stat==1?"магия":"выносливость")+
+                " "+attribute+"): "+signed(healthModifier)+"\n"+
+            "Уровень героя ("+g.level+"): "+signed(levelModifier)+"\n"+
+            "Сложность ("+difficulty+"): "+signed(-difficulty)+"\n"+
+            "Опасность ("+danger+" × 3): "+signed(-danger*3)+"\n"+
+            "Истощение ("+exhaustion+" ÷ 5): "+signed(fatigueModifier)+"\n"+
+            skillName+" ("+skillLevelValue+" уровень"+
+                (gear==0?"":", снаряжение "+signed(gear))+"): "+signed(skill)+"\n"+
+            "Экипировка: "+signed(armorBonus)+"\n"+
+            "Артефакты: "+signed(artifactBonus)+"\n"+
+            "Таланты: "+signed(perkBonus)+"\n"+
+            "Репутация: "+signed(reputationBonus)+"\n"+
+            "Влияние репутации на общение: "+signed(charisma)+"\n"+
+            "Перегрузка: "+signed(bagPenalty)+"\n"+
+            "---------------------------\n"+
+            "Сумма: 50 + все модификаторы = "+raw+"%\n"+
+            "Ограничение до диапазона 0–100%: "+base+"%\n"+
+            "Штраф потребностей: −"+g.needs.penalty()+" п.п.\n"+
+            "ИТОГ: "+result+"%\n"+
+            "Бросок d100: успех, если выпало от 1 до "+result+
+                (result<100?"; неудача от "+(result+1)+" до 100.":".") ;
+
         return result;
     }
     public int chance(GameEngine g,String action){
