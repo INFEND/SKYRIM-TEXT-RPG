@@ -28,16 +28,6 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.SEND" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <data android:mimeType="image/*" />
-            </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.SEND_MULTIPLE" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <data android:mimeType="image/*" />
-            </intent-filter>
         </activity>
         <service android:name=".OtaDownloadService" android:exported="false" android:foregroundServiceType="dataSync" />
         <provider android:name=".LocalAiModelProvider" android:authorities="${applicationId}.models"
@@ -51,11 +41,6 @@
                 <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
             </intent-filter>
         </receiver>
-        <provider
-            android:name=".ImageShareProvider"
-            android:authorities="${applicationId}.workimages"
-            android:exported="false"
-            android:grantUriPermissions="true" />
         <provider
             android:name=".OtaFileProvider"
             android:authorities="${applicationId}.updates"
