@@ -40,10 +40,9 @@ import java.util.UUID;
 /**
  * Local image-asset editor using Images API and text-only Work prompts.
  *
- * ChatGPT/Work has no supported third-party image-generation endpoint under a
- * signed-in ChatGPT session. This editor copies an editable prompt and opens
- * the ChatGPT app, then imports the user-selected image through Android SAF.
- * It never reads cookies, access tokens or ChatGPT's private app storage.
+ * Work/Codex only refines text through the authorized ChatGPT connection.
+ * Image creation and editing use Images API; import remains a local SAF action.
+ * Existing user images and drafts remain in their original storage.
  */
 public final class WorkImageEditor {
     public static final int REQUEST_IMPORT = 8319;
@@ -180,7 +179,7 @@ public final class WorkImageEditor {
     }
     private static void copyPrompt(Activity host, String value) {
         ClipboardManager clip = (ClipboardManager) host.getSystemService(Context.CLIPBOARD_SERVICE);
-        if (clip != null) clip.setPrimaryClip(ClipData.newPlainText("SKYRIM · Work", value));
+        if (clip != null) clip.setPrimaryClip(ClipData.newPlainText("SKYRIM · промпт", value));
     }
     private static String promptKey(String kind, String id) {
         return "draft_" + stableKey(kind, id);
@@ -393,7 +392,13 @@ public final class WorkImageEditor {
         editor.setHint("Опиши желаемое изображение");
         editor.setPadding(dp(host, 12), dp(host, 12), dp(host, 12), dp(host, 12));
         editor.setBackground(bg(host, 0xff111111, 0xff535353));
-        editor.setText(prefs(host).getString(key, prompt(kind, name, facts, count)));
+        String storedDraft = prefs(host).getString(key, "");
+        if (storedDraft.isEmpty() || (storedDraft.startsWith("Создай ")
+                && storedDraft.contains("Изображение будет импортировано в игру и оптимизировано в WebP."))) {
+            storedDraft = prompt(kind, name, facts, count);
+            prefs(host).edit().putString(key, storedDraft).apply();
+        }
+        editor.setText(storedDraft);
         panel.addView(editor, new LinearLayout.LayoutParams(-1, -2));
         editor.addTextChangedListener(new TextWatcher() {
             public void beforeTextChanged(CharSequence s, int st, int c, int a) {}
@@ -731,7 +736,7 @@ public final class WorkImageEditor {
                     }
                 }
             }
-        }, "work-image-import").start();
+        }, "skyrim-image-import").start();
     }
     public static void showGallery(Activity host, String kind, String id, int accent,
                                    Runnable onUpdated) {
