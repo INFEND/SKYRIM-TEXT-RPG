@@ -283,10 +283,29 @@ public final class WorkImageEditor {
                 + "Изображения заменятся только после отдельного подтверждения.")
             .setNegativeButton("Отмена", null)
             .setPositiveButton("Запустить платный запрос", (dialog, which) -> {
-                Toast.makeText(host, "OpenAI API: выполняется запрос…", Toast.LENGTH_LONG).show();
+                GenerationStatusView progress = new GenerationStatusView(host, accent);
+                LinearLayout info = container(host);
+                info.addView(label(host, target.optString("name", "Изображение") +
+                    " · " + model + " · " + count + " шт.", 13, WHITE));
+                info.addView(progress.view(), new LinearLayout.LayoutParams(-1, -2));
+                info.addView(label(host, "«Скрыть» только закрывает это окно. "+
+                    "Запрос продолжится, повторное списание не запускается.", 12, MUTED));
+                AlertDialog running = new AlertDialog.Builder(host)
+                    .setTitle(reference == null ? "ГЕНЕРАЦИЯ ИЗОБРАЖЕНИЙ" :
+                        "РЕДАКТИРОВАНИЕ ИЗОБРАЖЕНИЙ")
+                    .setView(info).setNegativeButton("Скрыть", null).create();
+                progress.start(1, 5, "Подготовка запроса",
+                    "Проверяем данные перед отправкой в OpenAI API");
+                running.setOnDismissListener(ignored -> progress.dispose());
+                running.show();
+                long requestedAt = android.os.SystemClock.elapsedRealtime();
                 ImageApiClient.request(host, target.optString("prompt"), model, quality,
-                    target.optString("size"), count, reference,
+                    target.optString("size"), count, reference, progress::report,
                     (images, error) -> {
+                        progress.finish(error == null && images != null && !images.isEmpty(),
+                            error == null ? "Запрос завершён" : "Ошибка генерации",
+                            error == null ? "Получен ответ API. Готовим предпросмотр." : error);
+                        if (running.isShowing()) running.dismiss();
                         if (host.isDestroyed() || host.isFinishing()) return;
                         if (error != null) {
                             new AlertDialog.Builder(host).setTitle("Ошибка OpenAI API")
@@ -294,11 +313,16 @@ public final class WorkImageEditor {
                             return;
                         }
                         if (images == null || images.isEmpty()) {
-                            Toast.makeText(host, "Пустой ответ API", Toast.LENGTH_LONG).show();
+                            new AlertDialog.Builder(host).setTitle("Пустой ответ OpenAI API")
+                                .setMessage("Запрос завершился без изображений.")
+                                .setPositiveButton("Закрыть", null).show();
                             return;
                         }
                         LinearLayout review = container(host);
+                        long elapsed = (android.os.SystemClock.elapsedRealtime() - requestedAt) / 1000;
                         review.addView(label(host, "Получено: " + images.size()
+                            + " · время: " + String.format(Locale.ROOT, "%02d:%02d",
+                                elapsed / 60, elapsed % 60)
                             + ". Изображения ещё не установлены в игру.", 13, WHITE));
                         Bitmap picture = BitmapFactory.decodeByteArray(images.get(0), 0, images.get(0).length);
                         if (picture != null) {
