@@ -19,14 +19,23 @@ import java.nio.charset.StandardCharsets;
  */
 final class ItemWorkshopAi {
     interface Result { void finished(JSONObject item,String error); }
+    interface Progress { void stage(int current,int total,String title,String details); }
+    private static void report(Progress progress,int current,String title,String details){
+        if(progress!=null)MAIN.post(()->progress.stage(current,4,title,details));
+    }
     private static final Handler MAIN=new Handler(Looper.getMainLooper());
     private static final String RESPONSES="https://api.openai.com/v1/responses";
     private ItemWorkshopAi(){}
 
     static void draft(String oauthToken,String model,String idea,Result callback){
+        draft(oauthToken,model,idea,null,callback);
+    }
+    static void draft(String oauthToken,String model,String idea,Progress progress,Result callback){
         new Thread(()->{
             HttpURLConnection conn=null;
             try{
+                report(progress,1,"Подготовка параметров",
+                    "Проверяем модель и описание предмета");
                 if(oauthToken==null||oauthToken.isEmpty()||model==null||
                     !model.matches("[a-zA-Z0-9._-]{2,100}"))
                     throw new IllegalArgumentException("Войди в ChatGPT и выбери модель Работа/Codex");
@@ -45,10 +54,15 @@ final class ItemWorkshopAi {
                      "art_prompt описывает ОДИН предмет, изолированный на тёмном фоне, без букв и рамки. "+
                      "Не выдумывай состоявшиеся игровые награды или изменения инвентаря.")
                   .put("input",new JSONArray().put(new JSONObject().put("role","user").put("content",prompt)));
+                report(progress,2,"Отправка запроса",
+                    "Передаём описание модели "+model);
                 conn=open(RESPONSES,oauthToken,"text/event-stream");
                 write(conn,request);
+                report(progress,3,"Ожидание ответа",
+                    "Запрос отправлен, ожидаем поток ответа ИИ");
                 check(conn);
                 StringBuilder result=new StringBuilder();boolean finished=false;
+                int lastReported=0;
                 try(BufferedReader reader=new BufferedReader(new InputStreamReader(conn.getInputStream(),StandardCharsets.UTF_8))){
                     String line;
                     while((line=reader.readLine())!=null){
@@ -62,11 +76,18 @@ final class ItemWorkshopAi {
                         if("response.output_text.delta".equals(type)){
                             result.append(event.optString("delta",""));
                             if(result.length()>8000)throw new IllegalStateException("Слишком длинный ответ ИИ");
+                            if(lastReported==0||result.length()-lastReported>=96){
+                                lastReported=result.length();
+                                report(progress,3,"Получение параметров",
+                                    "Получено "+result.length()+" символов от ИИ");
+                            }
                         }
                         if("response.completed".equals(type))finished=true;
                     }
                 }
                 if(!finished)throw new IllegalStateException("Ответ прерван до завершения");
+                report(progress,4,"Проверка ответа",
+                    "Принято "+result.length()+" символов. Проверяем JSON и ограничения.");
                 String s=result.toString().trim();
                 if(s.startsWith("```"))s=s.replaceFirst("(?s)^\\`\\`\\`(?:json)?\\s*","")
                     .replaceFirst("(?s)\\s*\\`\\`\\`$","");
