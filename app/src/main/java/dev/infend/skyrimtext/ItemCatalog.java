@@ -37,7 +37,7 @@ public final class ItemCatalog {
         public String temperMaterial(){
             if(CompensationPowers.itemIndex(id)>=0)return "";
             if(baseStat<=0||statSkill<0||"Артефакты".equals(category)||"Боеприпасы".equals(category))return "";
-            String n=name.toLowerCase(Locale.ROOT).replace('ё','е');
+            String n=id.toLowerCase(Locale.ROOT).replace('ё','е');
             if(n.contains("чешуйчат"))return "Драконья чешуя";
             if(n.startsWith("дракон"))return "Драконья кость";
             if(n.startsWith("даэдр")||n.startsWith("эбонит"))return "Эбонитовый слиток";
@@ -64,7 +64,7 @@ public final class ItemCatalog {
             if("Роза Сангвина".equals(name)||"Этериевый посох".equals(name))return "weapon";
             if(weapon())return "Боеприпасы".equals(category)?"ammo":"weapon";
             if(!wearable())return "";
-            String n=name.toLowerCase(Locale.ROOT).replace('ё','е');
+            String n=id.toLowerCase(Locale.ROOT).replace('ё','е');
             if(n.contains("щит"))return "shield";
             if(n.contains("кольц"))return "ring";
             if(n.contains("ожерел")||n.contains("амулет")||n.contains("медальон"))return "neck";
