@@ -80,11 +80,11 @@ class WikiRuNamesTests(unittest.TestCase):
         self.assertIn('"Балгруф Старший","Расскажи всё', CAMPAIGN)
 
     def test_artifacts_show_wiki_name_but_keep_save_key(self):
-        self.assertIn('if("Звезда Чёрной Азуры".equals(id))return "Чёрная Звезда"', ITEMS)
-        self.assertIn('if("Молот Волендранг".equals(id))return "Волендранг"', ITEMS)
-        self.assertIn('items.put(name,new Item(name,canonicalItemDisplayName(name)', ITEMS)
-        self.assertIn('items.get("Звезда Чёрной Азуры")', ITEMS)
-        self.assertIn('items.get("Молот Волендранг")', ITEMS)
+        self.assertIn('case "Звезда Чёрной Азуры": return "Чёрная Звезда"', ITEMS)
+        self.assertIn('case "Молот Волендранг": return "Волендранг"', ITEMS)
+        self.assertIn('items.put(name,new Item(name,visibleName', ITEMS)
+        self.assertIn('DISPLAY_ALIASES.putIfAbsent(visibleName,name)', ITEMS)
+        self.assertIn('return legacyId==null?null:items.get(legacyId)', ITEMS)
 
     def test_ai_sources_are_told_to_preserve_canonical_names(self):
         self.assertIn("private static final String CANONICAL_RU_NAMES", AI)

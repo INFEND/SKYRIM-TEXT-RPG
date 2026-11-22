@@ -37,7 +37,7 @@ public final class ItemCatalog {
         public String temperMaterial(){
             if(CompensationPowers.itemIndex(id)>=0)return "";
             if(baseStat<=0||statSkill<0||"Артефакты".equals(category)||"Боеприпасы".equals(category))return "";
-            String n=name.toLowerCase(Locale.ROOT).replace('ё','е');
+            String n=id.toLowerCase(Locale.ROOT).replace('ё','е');
             if(n.contains("чешуйчат"))return "Драконья чешуя";
             if(n.startsWith("дракон"))return "Драконья кость";
             if(n.startsWith("даэдр")||n.startsWith("эбонит"))return "Эбонитовый слиток";
@@ -64,7 +64,7 @@ public final class ItemCatalog {
             if("Роза Сангвина".equals(name)||"Этериевый посох".equals(name))return "weapon";
             if(weapon())return "Боеприпасы".equals(category)?"ammo":"weapon";
             if(!wearable())return "";
-            String n=name.toLowerCase(Locale.ROOT).replace('ё','е');
+            String n=id.toLowerCase(Locale.ROOT).replace('ё','е');
             if(n.contains("щит"))return "shield";
             if(n.contains("кольц"))return "ring";
             if(n.contains("ожерел")||n.contains("амулет")||n.contains("медальон"))return "neck";
@@ -86,19 +86,59 @@ public final class ItemCatalog {
         }
     }
     private static final LinkedHashMap<String,Item> items=new LinkedHashMap<>();
+    // Maps visible canonical names to historic item IDs, for search and model-generated actions.
+    private static final HashMap<String,String> DISPLAY_ALIASES=new HashMap<>();
     private static boolean loaded=false;
     private static void put(String name,String category,String icon,double weight,int cost,String desc,String effect){
         double stat=("Одежда".equals(category)||"Украшения".equals(category))?0:-1;
         put(name,category,icon,weight,cost,desc,effect,stat,-1);
     }
-    // The original item identifier is retained for old saves and quest references.
+    // Display names follow the Russian Skyrim Wiki; original inventory/save IDs remain unchanged.
+    // Exact mappings only: do not mutate custom item names or unrelated word forms.
     private static String canonicalItemDisplayName(String id){
-        if("Звезда Чёрной Азуры".equals(id))return "Чёрная Звезда";
-        if("Молот Волендранг".equals(id))return "Волендранг";
-        return id;
+        if(id==null)return "";
+        switch(id){
+            case "Звезда Чёрной Азуры": return "Чёрная Звезда";
+            case "Молот Волендранг": return "Волендранг";
+            case "Железная кираса": return "Железная броня";
+            case "Стальная кираса": return "Стальная броня";
+            case "Орочья кираса": return "Орочья броня";
+            case "Двемерская кираса": return "Двемерская броня";
+            case "Эльфийская кираса": return "Эльфийская броня";
+            case "Стеклянная кираса": return "Стеклянная броня";
+            case "Эбонитовая кираса": return "Эбонитовая броня";
+            case "Даэдрическая кираса": return "Даэдрическая броня";
+            case "Драконья кираса": return "Драконья панцирная броня";
+            case "Нордская резная кираса": return "Нордская резная броня";
+            case "Сталгримовая кираса": return "Сталгримовая броня";
+            case "Кожаная кираса": return "Кожаная броня";
+            case "Кираса из шкур": return "Сыромятная броня";
+            case "Сапоги из шкур": return "Сыромятные сапоги";
+            case "Наручи из шкур": return "Сыромятные наручи";
+            case "Шлем из шкур": return "Сыромятный шлем";
+            case "Щит из шкур": return "Сыромятный щит";
+            case "Стальная пластинчатая кираса": return "Стальная пластинчатая броня";
+            case "Костяная кираса": return "Костяная броня";
+            case "Тяжёлая хитиновая кираса": return "Тяжёлая хитиновая броня";
+            case "Драконья чешуйчатая кираса": return "Драконья чешуйчатая броня";
+            case "Драконий шлем": return "Драконий панцирный шлем";
+            case "Драконьи перчатки": return "Драконьи панцирные перчатки";
+            case "Драконьи сапоги": return "Драконьи панцирные сапоги";
+            case "Драконий щит": return "Драконий панцирный щит";
+            case "Грибы имп": return "Бесовский гриб";
+            case "Голубой стрекозник": return "Синяя стрекоза";
+            case "Корень каниса": return "Собачий корень";
+            case "Драконий язык": return "Язык дракона";
+            case "Крыло голубой бабочки": return "Крыло синей бабочки";
+            case "Пурпурный горноцвет": return "Лиловый горноцвет";
+            case "Усики коруса-охотника": return "Усик коруса-охотника";
+            default: return id;
+        }
     }
     private static void put(String name,String category,String icon,double weight,int cost,String desc,String effect,double stat,int skill){
-        items.put(name,new Item(name,canonicalItemDisplayName(name),category,icon,weight,cost,desc,effect,stat,skill,""));
+        String visibleName=canonicalItemDisplayName(name);
+        items.put(name,new Item(name,visibleName,category,icon,weight,cost,desc,effect,stat,skill,""));
+        if(!visibleName.equals(name))DISPLAY_ALIASES.putIfAbsent(visibleName,name);
     }
     private static void weapon(String name,double[] row,int skill){
         put(name,"Оружие","⚔",row[1],(int)row[2],"Оружие Скайрима.",
@@ -359,9 +399,8 @@ public final class ItemCatalog {
     public static Item find(String id){
         Item existing=items.get(id);
         if(existing!=null)return existing;
-        if("Чёрная Звезда".equals(id))return items.get("Звезда Чёрной Азуры");
-        if("Волендранг".equals(id))return items.get("Молот Волендранг");
-        return null;
+        String legacyId=DISPLAY_ALIASES.get(id);
+        return legacyId==null?null:items.get(legacyId);
     }
     public static int count(){return items.size();}
     public static int countCategory(String category){return sorted(category,"Название").size();}
