@@ -10,3 +10,13 @@ signing.properties
 *.apk
 *.aab
 .DS_Store
+
+# Private imports from user's own official Skyrim installation
+**/Skyrim_Russian.*STRINGS
+**/Dawnguard_Russian.*STRINGS
+**/Dragonborn_Russian.*STRINGS
+**/HearthFires_Russian.*STRINGS
+**/Skyrim_English.*STRINGS
+**/story_core_v7.json
+**/imported_story_v7.json
+private_skyrim_ru/
