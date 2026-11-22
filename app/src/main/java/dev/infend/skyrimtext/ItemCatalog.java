@@ -91,8 +91,14 @@ public final class ItemCatalog {
         double stat=("Одежда".equals(category)||"Украшения".equals(category))?0:-1;
         put(name,category,icon,weight,cost,desc,effect,stat,-1);
     }
+    // The original item identifier is retained for old saves and quest references.
+    private static String canonicalItemDisplayName(String id){
+        if("Звезда Чёрной Азуры".equals(id))return "Чёрная Звезда";
+        if("Молот Волендранг".equals(id))return "Волендранг";
+        return id;
+    }
     private static void put(String name,String category,String icon,double weight,int cost,String desc,String effect,double stat,int skill){
-        items.put(name,new Item(name,category,icon,weight,cost,desc,effect,stat,skill));
+        items.put(name,new Item(name,canonicalItemDisplayName(name),category,icon,weight,cost,desc,effect,stat,skill,""));
     }
     private static void weapon(String name,double[] row,int skill){
         put(name,"Оружие","⚔",row[1],(int)row[2],"Оружие Скайрима.",
@@ -350,7 +356,13 @@ public final class ItemCatalog {
         for(Item item:items.values())if(!item.category.isEmpty())list.add(item);
         return list;
     }
-    public static Item find(String id){return items.get(id);}
+    public static Item find(String id){
+        Item existing=items.get(id);
+        if(existing!=null)return existing;
+        if("Чёрная Звезда".equals(id))return items.get("Звезда Чёрной Азуры");
+        if("Волендранг".equals(id))return items.get("Молот Волендранг");
+        return null;
+    }
     public static int count(){return items.size();}
     public static int countCategory(String category){return sorted(category,"Название").size();}
     public static ArrayList<Item> sorted(String category,String by){
