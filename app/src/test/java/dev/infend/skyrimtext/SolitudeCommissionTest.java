@@ -3,7 +3,7 @@ import org.json.JSONObject;
 import org.junit.Test;
 import static org.junit.Assert.*;
 public class SolitudeCommissionTest {
-    @Test public void workDaysPersistAndCannotDoubleCount(){
+    @Test public void workDaysPersistAndCannotDoubleCount() throws Exception {
         GameEngine g=new GameEngine();g.start("Тест","Норд","Воин");
         g.region=3;g.progress.location="Солитьюд";g.hour=10;g.stamina=100;
         g.mode="WORLD";g.choose("SOLITUDE:open");g.choose("SOLITUDE:visit:0");
