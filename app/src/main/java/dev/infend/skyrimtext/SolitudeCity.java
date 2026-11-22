@@ -194,6 +194,20 @@ final class SolitudeCity {
             else if("MET".equals(status))g.sceneState.confirm("npc",key,name,"INFORMED");
             else if("INFORMED".equals(status))g.sceneState.confirm("npc",key,name,"HELPED");
             else g.sceneState.revisitNpc(key);
+            // Every completed shift affects the actual supervisor's persistent
+            // relationship, not only the province-wide reputation counter.
+            // The daily job guard prevents farming the same action repeatedly.
+            org.json.JSONArray facts=g.sceneState.npcFacts();
+            for(int i=0;i<facts.length();i++){
+                org.json.JSONObject fact=facts.optJSONObject(i);
+                if(fact==null||!key.equals(fact.optString("id")))continue;
+                String current=fact.optString("status");
+                if("DEAD".equals(current)||"MISSING".equals(current)||"HOSTILE".equals(current))break;
+                int relation=fact.optInt("relation",50);
+                int increase=volunteer?3:1;
+                g.sceneState.fixNpc(key,Math.min(100,Math.max(0,relation)+increase),false);
+                break;
+            }
         }catch(org.json.JSONException ignored){/* Never undo an already completed shift. */}
     }
     private String detail(GameEngine g,int i){
