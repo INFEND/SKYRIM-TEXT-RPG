@@ -6,6 +6,7 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.SystemClock;
 import android.util.Base64;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -27,6 +28,10 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 final class ImageApiClient {
     interface Callback { void complete(List<byte[]> images, String error); }
+    interface Progress { void stage(int current, int total, String title, String detail); }
+    private static void notifyProgress(Progress callback, int step, String title, String detail) {
+        if (callback != null) MAIN.post(() -> callback.stage(step, 5, title, detail));
+    }
     private static final Handler MAIN = new Handler(Looper.getMainLooper());
     private static final AtomicBoolean RUNNING = new AtomicBoolean(false);
     private static final int MAX_IMAGE = 24 * 1024 * 1024;
@@ -45,6 +50,11 @@ final class ImageApiClient {
 
     static void request(Context context, String prompt, String model, String quality,
                         String size, int count, Uri reference, Callback callback) {
+        request(context, prompt, model, quality, size, count, reference, null, callback);
+    }
+
+    static void request(Context context, String prompt, String model, String quality,
+                        String size, int count, Uri reference, Progress progress, Callback callback) {
         if (!RUNNING.compareAndSet(false, true)) {
             MAIN.post(() -> callback.complete(null, "Дождись завершения предыдущего запроса"));
             return;
@@ -54,6 +64,8 @@ final class ImageApiClient {
             List<byte[]> images = null;
             String error = null;
             try {
+                notifyProgress(progress, 1, "Проверка запроса",
+                    "Проверяем модель, разрешение, ключ и количество изображений");
                 if (prompt == null || prompt.trim().isEmpty() || prompt.length() > 32000)
                     throw new IllegalArgumentException("Описание должно содержать от 1 до 32000 символов");
                 if (!modelAllowed(model)) throw new IllegalArgumentException("Модель изображений не поддерживается");
@@ -68,6 +80,9 @@ final class ImageApiClient {
                 HttpURLConnection conn = null;
                 try {
                     boolean editing = reference != null;
+                    notifyProgress(progress, 2, editing ? "Подготовка исходника" : "Отправка описания",
+                        editing ? "Подготавливаем WebP-образец и отправляем запрос" :
+                            "Передаём параметры генерации в OpenAI");
                     conn = (HttpURLConnection) new URL(ROOT + (editing ? "edits" : "generations")).openConnection();
                     conn.setInstanceFollowRedirects(false);
                     conn.setRequestMethod("POST");
@@ -106,6 +121,8 @@ final class ImageApiClient {
                         conn.setFixedLengthStreamingMode(body.length);
                         try (OutputStream out = conn.getOutputStream()) { out.write(body); }
                     }
+                    notifyProgress(progress, 3, "Генерация на сервере",
+                        "Запрос отправлен. Ожидаем ответ OpenAI; сервер не сообщает процент готовности");
                     int status = conn.getResponseCode();
                     if (status < 200 || status >= 300) {
                         String details = "";
@@ -121,13 +138,18 @@ final class ImageApiClient {
                         throw new IllegalStateException("OpenAI API: HTTP " + status
                             + (details.isEmpty() ? "" : " · " + details.substring(0, Math.min(250, details.length()))));
                     }
-                    byte[] reply = readLimited(conn.getInputStream(), MAX_RESPONSE);
+                    notifyProgress(progress, 4, "Загрузка ответа",
+                        "OpenAI ответил. Получаем данные изображения");
+                    byte[] reply = readLimitedResponse(conn.getInputStream(), MAX_RESPONSE,
+                        conn.getContentLengthLong(), progress);
                     JSONArray data = new JSONObject(new String(reply, StandardCharsets.UTF_8)).optJSONArray("data");
                     if (data == null || data.length() == 0)
                         throw new IllegalStateException("OpenAI API не вернул изображений");
                     if (data.length() > count)
                         throw new IllegalStateException("API вернул неожиданное количество изображений");
                     images = new ArrayList<>();
+                    notifyProgress(progress, 5, "Проверка изображений",
+                        "Проверено: 0 из " + data.length());
                     for (int i = 0; i < data.length(); i++) {
                         String encoded = data.getJSONObject(i).optString("b64_json", "");
                         if (encoded.isEmpty() || encoded.length() > MAX_IMAGE * 2)
@@ -142,6 +164,8 @@ final class ImageApiClient {
                                 || (long) bounds.outWidth * bounds.outHeight > 120000000L)
                             throw new IllegalStateException("API вернул повреждённое изображение");
                         images.add(decoded);
+                        notifyProgress(progress, 5, "Проверка изображений",
+                            "Проверено: " + images.size() + " из " + data.length());
                     }
                 } finally { if (conn != null) conn.disconnect(); }
             } catch (Exception | OutOfMemoryError failure) {
@@ -196,6 +220,32 @@ final class ImageApiClient {
             if (bytes.size() > MAX_IMAGE) throw new IllegalArgumentException("Исходник превышает 24 МБ");
             return bytes.toByteArray();
         } finally { bitmap.recycle(); }
+    }
+
+    /** Report actual downloaded bytes; no fake percentage of model processing. */
+    private static byte[] readLimitedResponse(InputStream input, int limit, long expected,
+                                              Progress progress) throws Exception {
+        try (InputStream stream = new BufferedInputStream(input);
+             ByteArrayOutputStream output = new ByteArrayOutputStream()) {
+            byte[] buffer = new byte[8192];
+            int n;
+            long lastUpdate = 0;
+            while ((n = stream.read(buffer)) != -1) {
+                if (output.size() + n > limit)
+                    throw new IllegalStateException("Ответ API слишком большой");
+                output.write(buffer, 0, n);
+                long now = SystemClock.elapsedRealtime();
+                if (lastUpdate == 0 || now - lastUpdate >= 750) {
+                    lastUpdate = now;
+                    String size = String.format(java.util.Locale.ROOT, "%.2f",
+                        output.size() / 1048576.0) + " МБ";
+                    String total = expected > 0 ? String.format(java.util.Locale.ROOT,
+                        " / %.2f МБ", expected / 1048576.0) : "";
+                    notifyProgress(progress, 4, "Загрузка ответа", "Получено " + size + total);
+                }
+            }
+            return output.toByteArray();
+        }
     }
 
     private static byte[] readLimited(InputStream input, int limit) throws Exception {
