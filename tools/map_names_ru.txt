@@ -146,3 +146,9 @@ Kynesgrove|Роща Кин
 Sarethi Farm|Ферма Сарети
 Nightgate Inn|Таверна «Ночные ворота»
 Mixwater Mill|Лесопилка «Пирожок»
+Darkwater Pass|Чёрный проход
+Duskglow Crevice|Закатная расселина
+Brinewater Grotto|Грот Солёная Вода
+Reachwater Rock|Озёрный утёс
+Shadowgreen Cavern|Пещера Зелёная Тень
+Knifepoint Ridge|Хребет Остриё Ножа
