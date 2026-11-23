@@ -42,10 +42,33 @@ jobs:
           java-version: '17'
       - name: Check the live registry and export unresolved identities
         run: python3 tools/audit_localization.py --live --json "$RUNNER_TEMP/registry.json"
+      - name: Export up-to-date localization coverage and remaining identities
+        env:
+          REGISTRY_JSON: ${{ runner.temp }}/registry.json
+          CURRENT_STATUS: ${{ runner.temp }}/localization-status.md
+          CURRENT_PENDING: ${{ runner.temp }}/localization-pending.tsv
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import json, os, sys
+          from pathlib import Path
+          sys.path.insert(0, 'tools')
+          import audit_localization
+          report = json.loads(Path(os.environ['REGISTRY_JSON']).read_text(encoding='utf-8'))
+          header = '# Актуальный аудит русификации Skyrim\n\n' + 'Коммит: `' + os.environ['GITHUB_SHA'] + '`\n\n'
+          Path(os.environ['CURRENT_STATUS']).write_text(
+              header + audit_localization.markdown_table(report['counts']) + '\n',
+              encoding='utf-8')
+          Path(os.environ['CURRENT_PENDING']).write_text(
+              audit_localization.pending_table(report['entities']), encoding='utf-8')
+          PY
       - uses: actions/upload-artifact@v4
         with:
           name: russian-localization-registry
-          path: ${{ runner.temp }}/registry.json
+          path: |
+            ${{ runner.temp }}/registry.json
+            ${{ runner.temp }}/localization-status.md
+            ${{ runner.temp }}/localization-pending.tsv
       - name: Run Python localization and regression checks
         run: python3 -m unittest discover -s tests -p 'test_*.py' -q
       - uses: gradle/actions/setup-gradle@v4
