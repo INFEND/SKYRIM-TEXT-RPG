@@ -49,6 +49,7 @@ final class NpcProfiles {
             case "Бандит-мародёр": return "Мародёр";
             case "Ученик некроманта": return "Некромант-ученик";
             case "Адепт некромантии": return "Некромант-адепт";
+            case "Стражник Вороньей Скалы": return "Редоранская стража";
             default: return id;
         }
     }
