@@ -6,22 +6,22 @@ BESTIARY=(ROOT/"app/src/main/java/dev/infend/skyrimtext/BestiaryCatalog.java").r
 with (ROOT/"tools/localization/catalog.tsv").open(encoding="utf-8") as f: CATALOG={(r["kind"],r["id"]):r for r in csv.DictReader(f,delimiter="\t")}
 with (ROOT/"tools/localization/evidence.tsv").open(encoding="utf-8") as f: EVIDENCE={(r["kind"],r["id"]):r for r in csv.DictReader(f,delimiter="\t")}
 CASES=[
-    ("Фалмер-воитель","Фалмер-мастер теней","Falmer Shadowmaster","Фалмер (Skyrim)",true),
-    ("Фалмер-военачальник","Фалмер-наёмник","Falmer Warmonger","Фалмер (Skyrim)",true),
-    ("Фалмер-скрытень","Фалмер-мастер укрытий","Falmer Skulker","Фалмер (Skyrim)",false),
-    ("Фалмер-мракобес","Фалмер-сумрачный страж","Falmer Gloomlurker","Фалмер (Skyrim)",false),
-    ("Фалмер-сумеречный","Фалмер-ночной охотник","Falmer Nightprowler","Фалмер (Skyrim)",false),
-    ("Гневный человек","Яростный человек","Wrathman","Яростный человек (Dawnguard)",true),
-    ("Скрытень","Луркер","Lurker","Луркер (Dragonborn)",true),
-    ("Волк (существо)","Волк","Wolf","Волк (Skyrim)",true),
-    ("Ледяной волк","Снежный волк","Ice Wolf","Снежный волк",true),
-    ("Мать дымков","Мать-дымок","Wispmother","Мать-дымок (Skyrim)",true),
-    ("Огонёк","Дымок","Wisp","Дымок (Skyrim)",true),
-    ("Кор","Корус","Chaurus","Корус (Skyrim)",true),
-    ("Кор-жнец","Корус-жнец","Chaurus Reaper","Корус (Skyrim)",false),
-    ("Кор-охотник","Корус-охотник","Chaurus Hunter","Корус (Skyrim)",true),
-    ("Горящий спригган","Горелый спригган","Burnt Spriggan","Неотмеченные локации (Skyrim)",true),
-    ("Спригган-земная мать","Спригган-мать земли","Spriggan Earth Mother","Существа (Skyrim)",false),
+    ("Фалмер-воитель","Фалмер-мастер теней","Falmer Shadowmaster","Фалмер (Skyrim)",True),
+    ("Фалмер-военачальник","Фалмер-наёмник","Falmer Warmonger","Фалмер (Skyrim)",True),
+    ("Фалмер-скрытень","Фалмер-мастер укрытий","Falmer Skulker","Фалмер (Skyrim)",False),
+    ("Фалмер-мракобес","Фалмер-сумрачный страж","Falmer Gloomlurker","Фалмер (Skyrim)",False),
+    ("Фалмер-сумеречный","Фалмер-ночной охотник","Falmer Nightprowler","Фалмер (Skyrim)",False),
+    ("Гневный человек","Яростный человек","Wrathman","Яростный человек (Dawnguard)",True),
+    ("Скрытень","Луркер","Lurker","Луркер (Dragonborn)",True),
+    ("Волк (существо)","Волк","Wolf","Волк (Skyrim)",True),
+    ("Ледяной волк","Снежный волк","Ice Wolf","Снежный волк",True),
+    ("Мать дымков","Мать-дымок","Wispmother","Мать-дымок (Skyrim)",True),
+    ("Огонёк","Дымок","Wisp","Дымок (Skyrim)",True),
+    ("Кор","Корус","Chaurus","Корус (Skyrim)",True),
+    ("Кор-жнец","Корус-жнец","Chaurus Reaper","Корус (Skyrim)",False),
+    ("Кор-охотник","Корус-охотник","Chaurus Hunter","Корус (Skyrim)",True),
+    ("Горящий спригган","Горелый спригган","Burnt Spriggan","Неотмеченные локации (Skyrim)",True),
+    ("Спригган-земная мать","Спригган-мать земли","Spriggan Earth Mother","Существа (Skyrim)",False),
 ]
 class CanonicalNpcTemplates(unittest.TestCase):
     def test_sixteen_display_names_keep_all_legacy_ids(self):
