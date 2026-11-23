@@ -423,11 +423,11 @@
     },
     {
       "slug": "telmithryn",
-      "name": "Тел-Митрин",
+      "name": "Тель-Митрин",
       "photos": [
         {
           "number": 1,
-          "caption": "Подход к Тел-Митрину",
+          "caption": "Подход к Тель-Митрину",
           "scene": "approach to Tel Mithryn in southeast Solstheim: one enormous living orange-brown Telvanni mushroom tower and three smaller mushroom dwellings rising from grey ash ground and dark rock, sparse alien fungi, calm pale sky. No conventional castle.",
           "final_prompt": "Use case: stylized-concept. Asset type: single offline SKYRIM TEXT RPG location artwork. Scene: approach to Tel Mithryn in southeast Solstheim: one enormous living orange-brown Telvanni mushroom tower and three smaller mushroom dwellings rising from grey ash ground and dark rock, sparse alien fungi, calm pale sky. No conventional castle. Detailed cinematic realistic fantasy environment matching the established richly detailed gallery. Authentic Solstheim materials appropriate to this location, nuanced readable natural light. Wide horizontal 16:9 full-bleed landscape, one scene only. No text, captions, UI, logos, watermark, frame or collage. Preserve distinct Redoran and Telvanni organic architecture where specified; no generic European castle."
         },

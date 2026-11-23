@@ -23,11 +23,29 @@ def record_id(row):
     return form
 
 
+def shout_words():
+    with (DATA / "shout_words.tsv").open(encoding="utf-8") as stream:
+        return list(csv.DictReader(stream, delimiter="\t"))
+
+
+def actor_references():
+    with (DATA / "actor_references.tsv").open(encoding="utf-8") as stream:
+        return list(csv.DictReader(stream, delimiter="\t"))
+
+
 def java_source():
-    accepted = [r for r in evidence() if not r["review"]]
+    all_rows = evidence()
+    accepted = [r for r in all_rows if not r["review"]]
+    word_evidence = {row["id"]: row["english"] for row in all_rows if row["kind"] == "word"}
     groups = {
+        "SHOUTS": [(r["id"], r["canonical"], r["english"]) for r in accepted if r["kind"] == "shout-reference"],
+        "WORDS": [(r["shout"], r["position"], r["word"], word_evidence[r["word"]], r["transcription"], r["meaning"])
+                  for r in shout_words()],
         "NPC": [(r["id"], r["canonical"], record_id(r), r["english"]) for r in accepted
                 if r["kind"] == "npc" and (r["original_id"] or r["prior"])],
+        "ACTOR_REFERENCES": [(record_id(dict(edition=r["edition"], original_id=r["base_id"])),
+                              record_id(dict(edition=r["edition"], original_id=r["reference_id"])))
+                             for r in actor_references()],
         "RACES": [(r["canonical"], r["english"], r["original_id"]) for r in
                   sorted((r for r in accepted if r["kind"] == "race"), key=lambda r: int(r["id"]))],
         "CREATURES": [(r["id"], r["canonical"], r["english"]) for r in accepted

@@ -30,6 +30,60 @@ public class CanonicalRussianRuntimeTest {
         assertTrue(CanonicalRussian.speakerContext(game).contains("Фаренгар Тайный Огонь [NPC:00013BBB]"));
     }
 
+    @Test public void sharedDragonBaseRequiresTheIndividualReferenceOrSavedName() throws Exception {
+        String base = "DRAGONBORN_03D5B5";
+        assertNull(NpcProfiles.findOriginal(base));
+        assertEquals("[NPC:" + base + "]:", CanonicalRussian.speakerLine("[NPC:" + base + "]:"));
+        assertEquals("Крузикрел:", CanonicalRussian.speakerLine("[NPC:DRAGONBORN_01D573]:"));
+        assertEquals("Релоникив:", CanonicalRussian.speakerLine("[NPC:DRAGONBORN_01D572]:"));
+        assertSame(NpcProfiles.findOriginal("Релоникрив"), NpcProfiles.findOriginal("DRAGONBORN_01D572"));
+        assertNotSame(NpcProfiles.findOriginal("Крузикрел"), NpcProfiles.findOriginal("Релоникив"));
+        for (String title : new String[]{"Крузикрел", "Релоникрив", "Мой дракон"}) {
+            GameEngine game = new GameEngine();
+            game.sceneState.confirm("npc", base, title, "MET");
+            game.sceneState = SceneState.fromJson(game.sceneState.toJson());
+            String expected = title.equals("Крузикрел") ? "Крузикрел [NPC:DRAGONBORN_01D573]" :
+                title.equals("Релоникрив") ? "Релоникив [NPC:DRAGONBORN_01D572]" : "";
+            assertEquals(expected, CanonicalRussian.speakerContext(game));
+            assertTrue(game.sceneState.contains("npc", base));
+        }
+    }
+
+    @Test public void aConfirmedNamedCombatantCanSpeakUnderItsOriginalId() {
+        GameEngine game = new GameEngine();
+        game.mode = "COMBAT";
+        game.enemyHp = 25;
+        game.enemyName = "Мирмулнир";
+        assertEquals("Мирмулнир [NPC:0001CA05]", CanonicalRussian.speakerContext(game));
+        game.enemyName = "Мирмулнир-младший";
+        assertEquals("", CanonicalRussian.speakerContext(game));
+        game.name = game.enemyName = "Мирмулнир";
+        assertEquals("", CanonicalRussian.speakerContext(game));
+    }
+
+    @Test public void telMithrynOldSaveAndNewMapUseTheSameQuestAndGallery() {
+        RoadQuests.Task task = RoadQuests.find("steward_intro");
+        assertEquals("Тел-Митрин", task.place);
+        GameEngine game = new GameEngine();
+        game.progress.location = task.place;
+        game.progress = RpgProgress.fromJson(game.progress.toJson());
+        assertTrue(RoadQuests.here(game, task));
+        WorldAtlas.Place old = WorldAtlas.find(task.place);
+        assertEquals("Тель-Митрин", old.name);
+        assertSame(old, WorldAtlas.find("Тель-Митрин"));
+        assertEquals(1041, old.x);
+        assertEquals(457, old.y);
+        assertEquals("solstheim-2519", SkyrimMapCatalog.find(task.place).id);
+        game.progress.location = old.name;
+        assertTrue(RoadQuests.here(game, task));
+        assertEquals(old.name, CanonicalRussian.mapName(task.place));
+        assertTrue(LocationGalleryView.hasGallery(task.place));
+        assertEquals(6, LocationGalleryView.imageCount(old.name));
+        assertEquals(6, LocationGalleryView.imageCount(task.place));
+        game.progress.location = "Воронья Скала";
+        assertFalse(RoadQuests.here(game, task));
+    }
+
     @Test public void bothDiamondsKeepTheirValueWeightAndOriginalSaveKey() throws Exception {
         RpgProgress state = RpgProgress.fromJson(new JSONObject().put("inventory",
             new JSONObject().put("Алмаз", 2).put("Безупречный алмаз", 3)));

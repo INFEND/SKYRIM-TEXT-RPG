@@ -34,6 +34,36 @@ def table(path, value):
 
 
 class OfficialGameNames(unittest.TestCase):
+    def test_individual_dragons_are_never_verified_by_their_shared_base(self):
+        actor = dict(identity="dragon", category="NPC", original_id="XX01D572", edition="Dragonborn",
+                     actor_reference={"base_id": "XX03D5B5"}, project=[{"name": "Релоникив"}])
+        inventory = {"dragonborn.esm:03D5B5": {"type": "NPC_", "editor_id": "", "name": "Дракон"}}
+        result = official.compare({"entities": [actor]}, inventory)[0]
+        self.assertEqual("dragonborn.esm:01D572", result["original_identity"])
+        self.assertEqual("reference-name-requires-review", result["status"])
+
+    def test_words_use_separate_localized_strings_for_name_and_meaning(self):
+        with TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            master, strings = root / "Skyrim.esm", root / "Skyrim_Russian.STRINGS"
+            name, meaning = "Фус".encode("cp1251") + b"\0", "Сила".encode("cp1251") + b"\0"
+            strings.write_bytes(struct.pack("<IIIIII", 2, len(name + meaning), 9, 0, 10, len(name)) + name + meaning)
+            word = field(b"FULL", struct.pack("<I", 9)) + field(b"TNAM", struct.pack("<I", 10))
+            master.write_bytes(record(b"TES4", 0x80, 0, b"") + record(b"WOOP", 0, 0x13E22, word))
+            inv = {}
+            official.read_plugin(master, strings, inv)
+            self.assertEqual(10, inv["skyrim.esm:013E22"]["translation_id"])
+            row = dict(identity="fus", category="Слова силы", original_id="00013E22",
+                       project=[{"name": "Фус"}], word_of_power={"meaning": "Сила"})
+            result = official.compare({"entities": [row]}, inv)[0]
+            self.assertEqual("matches-official", result["status"])
+            row["word_of_power"]["meaning"] = "Иное слово"
+            result = official.compare({"entities": [row]}, inv)[0]
+            self.assertEqual("matches-official", result["word_name_status"])
+            self.assertEqual("different", result["status"])
+            row["word_of_power"]["meaning"] = ""
+            self.assertEqual("needs-review", official.compare({"entities": [row]}, inv)[0]["meaning_status"])
+
     def test_overrides_keep_form_origin_and_use_the_winning_plugins_string(self):
         with TemporaryDirectory() as tmp:
             root = Path(tmp)

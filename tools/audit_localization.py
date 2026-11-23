@@ -11,13 +11,13 @@ from collections import Counter, defaultdict
 from pathlib import Path
 from urllib.parse import quote
 
-from localization.build_names import DATA, JAVA, ROOT, evidence, java_source
+from localization.build_names import DATA, JAVA, ROOT, actor_references, evidence, java_source, shout_words
 
 REGISTRY = DATA / "registry.json.gz"
 TEXT = {".java", ".kt", ".json", ".xml", ".txt", ".py", ".md", ".yml", ".yaml", ".gradle", ".properties", ".csv", ".tsv", ".sh", ".kts", ".toml", ".pro", ".html", ".js", ".jsonl"}
 GROUPS = {"map": "Локации", "atlas": "Локации", "npc": "NPC", "npc-template": "NPC", "mention": "NPC",
           "weapon": "Оружие", "armor": "Броня", "item": "Предметы", "book": "Книги", "tome": "Книги",
-          "scroll": "Предметы", "spell": "Заклинания", "shout": "Крики и расовые таланты",
+          "scroll": "Предметы", "spell": "Заклинания", "shout": "Крики и расовые таланты", "shout-reference": "Крики и расовые таланты", "word": "Слова силы",
           "racial-power": "Крики и расовые таланты", "magic-school": "Навыки и перки", "author-power": "Крики и расовые таланты", "skill": "Навыки и перки", "perk": "Навыки и перки",
           "talent-branch": "Навыки и перки", "creature": "Бестиарий", "main-quest": "Задания",
           "faction-quest": "Задания", "faction": "Фракции", "race": "Расы"}
@@ -211,7 +211,15 @@ def audit():
             rec["status"] = "corrected"
         rec["project"].append(dict(kind=kind, id=key, name=row["name"], canonical_ru=ev.get("canonical", "") if not ev.get("review") else "",
                                    english=en, source=ref, corroboration=ev.get("corroboration", ""), aliases=sorted(set(alias)-{row["name"]}), declaration=loc))
+    for actor in actor_references():
+        key = "record:" + actor["edition"] + ":" + actor["reference_id"]
+        records[key]["actor_reference"] = {"base_id": actor["base_id"], "reference_id": actor["reference_id"]}
+    words = {word["word"]: word for word in shout_words()}
     for record in records.values():
+        if record["project"][0]["kind"] == "word":
+            word = words[record["project"][0]["id"]]
+            record["word_of_power"] = dict(shout=word["shout"], position=int(word["position"]),
+                                           transcription=word["transcription"], meaning=word["meaning"])
         record["multiple_project_entries"] = len(record["project"]) > 1
         record["conflict"] = record["status"] == "conflict"
         titles = sorted({slot["canonical_ru"] for slot in record["project"] if slot["canonical_ru"]})

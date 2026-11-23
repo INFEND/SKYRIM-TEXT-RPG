@@ -36,7 +36,7 @@ final class RoadQuests {
         new Task("mistwatch_return","Судьба освобождённых","Виндхельм","Поговори с караульными о людях, спасённых из Туманной заставы. Их принимают в безопасном месте.","","",40,""),
         new Task("wolf_escape_report","Доклад о бойцовых зверях","Рифтен","Сообщи страже о незаконных боях и оставшихся следах дрессировщиков.","","",35,""),
         new Task("frossel_report","След разбойничьей банды","Воронья Скала","Передай сведения о Фросселе местным стражникам. У них появилось основание проверить северные тропы.","","",30,""),
-        new Task("blackbook_research","Исследование Чёрной книги","Тел-Митрин","Покажи запись исследователям Тел-Митрина. Они объясняют, почему обращаться с книгами Апокрифа нужно осторожно.","","Сведения о Чёрной книге",35,""),
+        new Task("blackbook_research","Исследование Чёрной книги","Тел-Митрин","Покажи запись исследователям Тель-Митрина. Они объясняют, почему обращаться с книгами Апокрифа нужно осторожно.","","Сведения о Чёрной книге",35,""),
         new Task("hakar_report","Доклад Хакара","Форт Стражи Рассвета","Доставь припасы и сведения о засаде. Дозорные благодарят за помощь и проверяют маршрут новобранца.","","Припасы Стражи Рассвета",45,""),
         new Task("saliah_report","Донесение Салии","Форт Стражи Рассвета","Передай сведения о северном тайнике. Дозорные отмечают, что запас найден.","","Припасы Стражи Рассвета",45,""),
         new Task("lynoit_report","Последний дозор Линоита","Форт Стражи Рассвета","Доложи о судьбе Линоита и найденном тайнике. Его товарищи чтут память погибшего.","","Припасы Стражи Рассвета",45,""),
@@ -110,7 +110,11 @@ final class RoadQuests {
     static Task find(String id){for(Task t:TASKS)if(t.id.equals(id))return t;return null;}
     static String title(String key){for(Task t:TASKS)if(t.key().equals(key))return t.title;return key;}
     static boolean active(GameEngine g,Task t){return "ACTIVE".equals(g.progress.questOutcome(t.key()));}
-    static boolean here(GameEngine g,Task t){return t.place.equalsIgnoreCase(g.progress.location);}
+    static boolean here(GameEngine g,Task t){
+        if(t.place.equalsIgnoreCase(g.progress.location))return true;
+        SkyrimMapCatalog.Site destination=SkyrimMapCatalog.find(t.place);
+        return destination!=null && destination==SkyrimMapCatalog.find(g.progress.location);
+    }
     static List<Task> visible(GameEngine g){ArrayList<Task> out=new ArrayList<>();for(Task t:TASKS)if(g.progress.questOutcome(t.key())!=null||(!branchGroup(t.id).isEmpty()&&availableStart(g,t)))out.add(t);return out;}
     private static String next(String id){switch(id){
         case "afflicted":return "afflicted_ruins";
@@ -258,6 +262,6 @@ final class RoadQuests {
         Task existing=find(id);if(existing!=null&&done(g,id))return "Это поручение уже завершено.";
         String name=evidenceFor(id);
         if(!name.isEmpty()&&!item(g,name))return "Не хватает места для "+name+".";
-        offer(g,id);Task t=find(id);return (name.isEmpty()?"":"Получено: "+name+". ")+(t==null?"":"Цель в журнале: "+t.place+".");
+        offer(g,id);Task t=find(id);return (name.isEmpty()?"":"Получено: "+name+". ")+(t==null?"":"Цель в журнале: "+CanonicalRussian.mapName(t.place)+".");
     }
 }

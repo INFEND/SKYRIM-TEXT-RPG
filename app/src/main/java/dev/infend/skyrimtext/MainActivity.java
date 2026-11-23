@@ -5486,9 +5486,38 @@ public final class MainActivity extends Activity {
         addText(content,"ШКОЛЫ МАГИИ И КРИКИ",11,accent(),true,12);
         for(String record:RpgContent.SHOUTS){
             String[] parts=record.split("\\|",2);
-            actionButton("ᚱ  "+parts[0],parts.length>1?parts[1]:"",false,()->new RuneDialogBuilder(this,accent())
-                .setTitle(parts[0]).setMessage(parts.length>1?parts[1]:"").setPositiveButton("Закрыть",null).show());
+            String description=parts.length>1?parts[1]:"";
+            actionButton("ᚱ  "+parts[0],description,false,()->{
+                ShoutLexicon.Entry entry=ShoutLexicon.find(parts[0]);
+                String details=entry==null?description:description+"\n\n"+entry.detail();
+                new RuneDialogBuilder(this,accent()).setTitle(parts[0]).setMessage(details)
+                    .setPositiveButton("Закрыть",null).show();
+            });
         }
+        actionButton("Справочник криков","Поиск по крику или слову силы",false,()->showShoutLexicon(""));
+    }
+
+    private void showShoutLexicon(String query){
+        java.util.List<ShoutLexicon.Entry> results=ShoutLexicon.search(query);
+        String[] titles=new String[results.size()];
+        for(int i=0;i<titles.length;i++)titles[i]=results.get(i).name;
+        RuneDialogBuilder dialog=new RuneDialogBuilder(this,accent());
+        dialog.setTitle("Крики и слова силы");
+        if(results.isEmpty())dialog.setMessage("По запросу «"+query+"» крики не найдены.");
+        else dialog.setItems(titles,(d,index)->{
+            ShoutLexicon.Entry entry=results.get(index);
+            new RuneDialogBuilder(this,accent()).setTitle(entry.name).setMessage(entry.detail())
+                .setNegativeButton("Назад",(back,button)->showShoutLexicon(query))
+                .setPositiveButton("Закрыть",null).show();
+        });
+        dialog.setNeutralButton("Поиск",(d,button)->{
+            LinearLayout panel=column();
+            EditText input=livingField(panel,"Крик или слово силы","Название, перевод или FormID",false);
+            input.setText(query);
+            new RuneDialogBuilder(this,accent()).setTitle("Поиск крика").setView(panel)
+                .setNegativeButton("Назад",(back,i)->showShoutLexicon(query))
+                .setPositiveButton("Найти",(ok,i)->showShoutLexicon(input.getText().toString())).show();
+        }).setNegativeButton("Закрыть",null).show();
     }
     private void findCanonicalPerk(){
         LinearLayout panel=column();
@@ -5798,7 +5827,7 @@ public final class MainActivity extends Activity {
         if(game.road.hasDog(game))addText(panel,"Спутник: бродячий пёс | помощь в бою",13,TEXT,false,6);
         if(game.road.hasMount(game))addText(panel,"Верховая лошадь / Арвак | меньший расход сил в пути",13,TEXT,false,6);
         for(int i=0;i<10;i++)if(game.road.bounty(i)>0)addText(panel,"Дорожный штраф | "+GameEngine.REGIONS[i]+": "+game.road.bounty(i)+" септимов",13,ITEM_DOWN,false,6);
-        for(RoadQuests.Task task:tasks){boolean active=RoadQuests.active(game,task),choice=RoadQuests.availableStart(game,task);addText(panel,task.title+" | "+(active?"Активно":choice?"Выбор":"Завершено"),14,TEXT,true,5);addText(panel,task.place,12,MUTED,false,6);if(!active&&!choice)continue;final RoadQuests.Task t=task;
+        for(RoadQuests.Task task:tasks){boolean active=RoadQuests.active(game,task),choice=RoadQuests.availableStart(game,task);addText(panel,task.title+" | "+(active?"Активно":choice?"Выбор":"Завершено"),14,TEXT,true,5);addText(panel,CanonicalRussian.mapName(task.place),12,MUTED,false,6);if(!active&&!choice)continue;final RoadQuests.Task t=task;
             if(RoadQuests.here(game,t))visualSummaryLink(panel,choice?"ВЫБРАТЬ":"ПРОДОЛЖИТЬ",()->{if(livingBusy())return;VisualSnapshot before=new VisualSnapshot(game);game.choose((choice?"ROADSTART:":"ROADQUEST:")+t.id);game.progress.sync(game);recordVisual(before,game,t.title);save();tab=0;render();});
             else{WorldAtlas.Place p=WorldAtlas.find(t.place);if(p!=null)visualSummaryLink(panel,"МАРШРУТ К ЦЕЛИ",()->locationDialog(p));}space(panel,5);
         }

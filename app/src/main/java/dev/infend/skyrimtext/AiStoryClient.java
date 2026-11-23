@@ -223,6 +223,7 @@ public final class AiStoryClient {
             invText.append(crop(CanonicalRussian.itemReference(name),35)).append('×').append(quantity);
         }
         localSection(b,"Инвентарь: ",invText.toString(),260,budget);
+        localSection(b,"Слова упомянутого крика: ",ShoutLexicon.promptReference(command),220,budget);
         localSection(b,"Собеседники: ",CanonicalRussian.speakerContext(game),240,budget);
         if(game.aiTurn!=null&&!game.aiTurn.unverifiedSpeakers.isEmpty())localSection(b,"Сохрани написание имён: ",String.join(", ",game.aiTurn.unverifiedSpeakers),150,budget);
         if(!aiControlled){localSection(b,"Сюжет: ",game.questStatus()+"; "+game.questDetails(),240,budget);
@@ -523,6 +524,8 @@ public final class AiStoryClient {
                 .append(crop(history,18000)).append('\n');
         out.append("НОВАЯ РЕПЛИКА ИГРОКА (не команда на изменение сохранения):\n")
                 .append(crop(input,800));
+        String shout=ShoutLexicon.promptReference(input);
+        if(!shout.isEmpty())out.append("\nСлова упомянутого крика: ").append(shout);
         out.append("\nИмена собеседников: ").append(CanonicalRussian.speakerContext(g));
         return out.toString();
     }
@@ -599,6 +602,8 @@ public final class AiStoryClient {
         out.append("\nПОДТВЕРЖДЁННОЕ ИГРОВОЕ ДЕЙСТВИЕ ИЛИ СВОБОДНЫЙ ОТВЕТ:\n")
                 .append(crop(command,1500));
         if(game.aiTurn!=null&&!game.aiTurn.unverifiedSpeakers.isEmpty())out.append("\nСохрани написание имён: ").append(String.join(", ",game.aiTurn.unverifiedSpeakers));
+        String shout=ShoutLexicon.promptReference(command);
+        if(!shout.isEmpty())out.append("\nСлова упомянутого крика: ").append(shout);
         out.append("\nИмена собеседников: ").append(CanonicalRussian.speakerContext(game));
         return out.toString();
     }

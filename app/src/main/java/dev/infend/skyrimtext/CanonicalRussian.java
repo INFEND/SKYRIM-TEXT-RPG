@@ -73,16 +73,35 @@ final class CanonicalRussian {
             String id = profile == null ? null : NPC_IDS.get(profile.name);
             if (id != null) out.append(profile.displayName).append(" [NPC:").append(id).append(']');
         }
+        if ("COMBAT".equals(game.mode) && game.enemyHp > 0 &&
+                !NpcNameMatcher.key(game.enemyName).equals(NpcNameMatcher.key(game.name))) {
+            BestiaryCatalog.Entry creature = BestiaryCatalog.find(game.enemyName);
+            NpcProfiles.Profile npc = creature == null ? null : NpcProfiles.findOriginal(creature.id);
+            String id = npc == null ? null : NPC_IDS.get(npc.name);
+            if (id != null && creature.id.equals(npc.name)) {
+                out.append(npc.displayName).append(" [NPC:").append(id).append(']');
+            }
+        }
         if (game.sceneState == null) return out.toString();
         org.json.JSONArray facts = game.sceneState.npcFacts();
         for (int i = 0; i < facts.length(); i++) {
             org.json.JSONObject fact = facts.optJSONObject(i);
             if (fact == null) continue;
             String id = fact.optString("id").toUpperCase(Locale.ROOT);
-            String name = NPC_BY_ID.get(id);
-            if (name == null || NpcNameMatcher.key(fact.optString("title")).equals(NpcNameMatcher.key(game.name))) continue;
-            NpcProfiles.Profile npc = NpcProfiles.findOriginal(fact.optString("title"));
-            if (npc == null || !id.equals(NPC_IDS.get(npc.name)) || out.indexOf("[NPC:" + id + "]") >= 0) continue;
+            String title = fact.optString("title");
+            if (NpcNameMatcher.key(title).equals(NpcNameMatcher.key(game.name))) continue;
+            NpcProfiles.Profile npc = NpcProfiles.findOriginal(title);
+            String actorId = npc == null ? null : NPC_IDS.get(npc.name);
+            if (actorId == null) continue;
+            if (!id.equals(actorId)) {
+                boolean legacyMatch = false;
+                for (String[] pair : RussianNameData.ACTOR_REFERENCES) {
+                    if (pair[0].equals(id) && pair[1].equals(actorId)) legacyMatch = true;
+                }
+                if (!legacyMatch) continue;
+                id = actorId;
+            }
+            if (out.indexOf("[NPC:" + id + "]") >= 0) continue;
             if (out.length() > 0) out.append(", ");
             out.append(npc.displayName).append(" [NPC:").append(id).append(']');
             if (out.length() >= 180) break;

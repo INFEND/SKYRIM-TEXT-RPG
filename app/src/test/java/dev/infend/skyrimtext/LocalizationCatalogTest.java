@@ -84,6 +84,12 @@ public class LocalizationCatalogTest {
         }
         array("race", RpgContent.raceNames(), "", "RpgContent");
         array("racial-power", RpgContent.POWERS, ":", "RpgContent");
+        for (ShoutLexicon.Entry shout : ShoutLexicon.all()) {
+            row("shout-reference", shout.id, shout.name, "candidate", "ShoutLexicon");
+            for (ShoutLexicon.Word word : shout.words) {
+                row("word", word.id, word.label(), "candidate", "ShoutLexicon");
+            }
+        }
         array("shout", RpgContent.SHOUTS, "\\|", "RpgContent");
         Collections.sort(rows);
         rows.add(0, "kind\tid\tname\tscope\tdeclaration");

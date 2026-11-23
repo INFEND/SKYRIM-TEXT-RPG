@@ -511,7 +511,7 @@ final class SkyrimMapPoints {
         "solstheim-2555|Дом Хродульфа|Hrodulf's House|Дом|1|43976.0|19472.0|9|975.5|1760.0|anchor",
         "solstheim-2509|Старый торговый пост|Ramshackle Trading Post|Дом|1|57695.0|43972.0|9|1347.0|1296.0|anchor",
         "solstheim-2533|Обломки «Стремительного шквала»|Wreck of the Strident Squall|Кораблекрушение|1|36220.0|11292.0|9|754.0|1930.0|anchor",
-        "solstheim-2519|Тел-Митрин|Tel Mithryn|Башня|1|75484.0|23835.0|9|1699.0|1644.0|anchor",
+        "solstheim-2519|Тель-Митрин|Tel Mithryn|Башня|1|75484.0|23835.0|9|1699.0|1644.0|anchor",
         "solstheim-2537|Храм Мирака|Temple of Miraak|Храм|1|56313.0|59653.0|9|1261.0|1111.0|anchor",
         "solstheim-2517|Переправа в Скайрим|To Skyrim|Переход|1|12404.0|20717.0|9|367.0701|1737.9514|interpolated",
         "solstheim-2525|Деревня скаалов|Skaal Village|Деревня|1|73452.0|70790.0|9|1561.0|938.0|anchor",

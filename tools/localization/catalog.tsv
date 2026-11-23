@@ -2053,7 +2053,7 @@ map	solstheim-2515	Пещеры замка Карстааг	candidate	SkyrimMapP
 map	solstheim-2516	Заброшенный дом	candidate	SkyrimMapPoints
 map	solstheim-2517	Переправа в Скайрим	candidate	SkyrimMapPoints
 map	solstheim-2518	Медовый зал Тирска	candidate	SkyrimMapPoints
-map	solstheim-2519	Тел-Митрин	candidate	SkyrimMapPoints
+map	solstheim-2519	Тель-Митрин	candidate	SkyrimMapPoints
 map	solstheim-2520	Камень Ветра	candidate	SkyrimMapPoints
 map	solstheim-2521	Камень Воды	candidate	SkyrimMapPoints
 map	solstheim-2522	Камень Солнца	candidate	SkyrimMapPoints
@@ -2208,7 +2208,7 @@ npc	Баркнар	Баркнар	candidate	NpcProfiles
 npc	Бассиан Аксий	Бассиан Аксий	candidate	NpcProfiles
 npc	Батум гра-Бар	Батум гра-Бар	candidate	NpcProfiles
 npc	Башнаг	Башнаг	candidate	NpcProfiles
-npc	Бдительный	Бдительный	candidate	NpcProfiles
+npc	Бдительный	Зоркий	candidate	NpcProfiles
 npc	Бейранд	Бейранд	candidate	NpcProfiles
 npc	Бейтильд	Бейтильд	candidate	NpcProfiles
 npc	Белевал	Белевал	candidate	NpcProfiles
@@ -2280,8 +2280,8 @@ npc	Варона Нелас	Варона Нелас	candidate	NpcProfiles
 npc	Вейлин	Вейлин	candidate	NpcProfiles
 npc	Векел Воин	Векел Воин	candidate	NpcProfiles
 npc	Векс	Векс	candidate	NpcProfiles
-npc	Велех Сейн	Велех Сейн	candidate	NpcProfiles
-npc	Венарус Вульпин	Венарус Вульпин	candidate	NpcProfiles
+npc	Велех Сейн	Велек Сейн	candidate	NpcProfiles
+npc	Венарус Вульпин	Венар Вульпин	candidate	NpcProfiles
 npc	Вендил Северин	Вендил Северин	candidate	NpcProfiles
 npc	Верен Дулери	Верен Дулери	candidate	NpcProfiles
 npc	Вермина	Вермина	candidate	NpcProfiles
@@ -2549,7 +2549,7 @@ npc	Красный Орёл	Красный Орёл	candidate	NpcProfiles
 npc	Кресций Кареллий	Кресций Кареллий	candidate	NpcProfiles
 npc	Кристер	Кристер	candidate	NpcProfiles
 npc	Кросис	Кросис	candidate	NpcProfiles
-npc	Кросулха	Кросулха	candidate	NpcProfiles
+npc	Кросулха	Кросулах	candidate	NpcProfiles
 npc	Крузикрел	Крузикрел	candidate	NpcProfiles
 npc	Ку Сит	Ку Сит	candidate	NpcProfiles
 npc	Куаранир	Куаранир	candidate	NpcProfiles
@@ -2663,7 +2663,7 @@ npc	Мирели	Мирели	candidate	NpcProfiles
 npc	Мирмулнир	Мирмулнир	candidate	NpcProfiles
 npc	Мирри Северин	Мирри Северин	candidate	NpcProfiles
 npc	Мишель Лилвив	Мишель Лилвив	candidate	NpcProfiles
-npc	Моварт Пикин	Моварт Пикин	candidate	NpcProfiles
+npc	Моварт Пикин	Моварт Пикуин	candidate	NpcProfiles
 npc	Могдурз	Могдурз	candidate	NpcProfiles
 npc	Могрул	Могрул	candidate	NpcProfiles
 npc	Модна	Модна	candidate	NpcProfiles
@@ -2751,7 +2751,7 @@ npc	Палевий Лекс	Палевий Лекс	candidate	NpcProfiles
 npc	Пантея Атейя	Пантея Атейя	candidate	NpcProfiles
 npc	Партурнакс	Партурнакс	candidate	NpcProfiles
 npc	Пелагий Безумный	Пелагий Безумный	candidate	NpcProfiles
-npc	Пень	Пень	candidate	NpcProfiles
+npc	Пень	Пенёк	candidate	NpcProfiles
 npc	Периайт	Периайт	candidate	NpcProfiles
 npc	Перт	Перт	candidate	NpcProfiles
 npc	Петра	Петра	candidate	NpcProfiles
@@ -2785,7 +2785,7 @@ npc	Ревин Садри	Ревин Садри	candidate	NpcProfiles
 npc	Ревус Сарвани	Ревус Сарвани	candidate	NpcProfiles
 npc	Рейвин Имиан	Рейвин Имиан	candidate	NpcProfiles
 npc	Релдит	Релдит	candidate	NpcProfiles
-npc	Релоникрив	Релоникрив	candidate	NpcProfiles
+npc	Релоникрив	Релоникив	candidate	NpcProfiles
 npc	Ри'сад	Ри'сад	candidate	NpcProfiles
 npc	Риада	Риада	candidate	NpcProfiles
 npc	Ригель Сильная Рука	Ригель Сильная Рука	candidate	NpcProfiles
@@ -2867,7 +2867,7 @@ npc	Сифнар Железный Котёл	Сифнар Железный Ко�
 npc	Скагги Меченый	Скагги Меченый	candidate	NpcProfiles
 npc	Скали	Скали	candidate	NpcProfiles
 npc	Скальд Старший	Скальд Старший	candidate	NpcProfiles
-npc	Скеоланг	Скеоланг	candidate	NpcProfiles
+npc	Скеоланг	Скеолан	candidate	NpcProfiles
 npc	Скульвар Чёрная Рукоять	Скульвар Чёрная Рукоять	candidate	NpcProfiles
 npc	Скьор	Скьор	candidate	NpcProfiles
 npc	Слиттер	Слиттер	candidate	NpcProfiles
@@ -3020,7 +3020,7 @@ npc	Хакнир Печать Смерти	Хакнир Печать Смерт�
 npc	Хакон Одноглазый	Хакон Одноглазый	candidate	NpcProfiles
 npc	Халбарн Железная Шкура	Хальбарн Железный Мех	candidate	NpcProfiles
 npc	Халдин	Халдин	candidate	NpcProfiles
-npc	Халдир	Халдир	candidate	NpcProfiles
+npc	Халдир	Холдир	candidate	NpcProfiles
 npc	Хамал	Хамал	candidate	NpcProfiles
 npc	Хамелин	Хеймлин	candidate	NpcProfiles
 npc	Хаминг	Хаминг	candidate	NpcProfiles
@@ -3457,6 +3457,33 @@ shout	6	Замедление времени	candidate	RpgContent
 shout	7	Драконобой	candidate	RpgContent
 shout	8	Зов дракона	candidate	RpgContent
 shout	9	Подчинение воли	candidate	RpgContent
+shout-reference	00013E07	Безжалостная сила	candidate	ShoutLexicon
+shout-reference	0002395A	Испуг	candidate	ShoutLexicon
+shout-reference	0002F7BA	Стремительный рывок	candidate	ShoutLexicon
+shout-reference	00032920	Бесплотность	candidate	ShoutLexicon
+shout-reference	00032921	Элементная ярость	candidate	ShoutLexicon
+shout-reference	0003CD34	Чистое небо	candidate	ShoutLexicon
+shout-reference	0003F9EA	Огненное дыхание	candidate	ShoutLexicon
+shout-reference	00044250	Драконобой	candidate	ShoutLexicon
+shout-reference	00046B8C	Зов дракона	candidate	ShoutLexicon
+shout-reference	00048AC9	Замедление времени	candidate	ShoutLexicon
+shout-reference	0005196A	Зов доблести	candidate	ShoutLexicon
+shout-reference	0005D16B	Морозное дыхание	candidate	ShoutLexicon
+shout-reference	0005FC77	Дружба со зверями	candidate	ShoutLexicon
+shout-reference	0007097B	Шёпот ауры	candidate	ShoutLexicon
+shout-reference	0007097C	Смертный приговор	candidate	ShoutLexicon
+shout-reference	0007097D	Грозовой зов	candidate	ShoutLexicon
+shout-reference	0007097E	Гармония Кин	candidate	ShoutLexicon
+shout-reference	0007097F	Голосовой бросок	candidate	ShoutLexicon
+shout-reference	00070980	Ледяная форма	candidate	ShoutLexicon
+shout-reference	00070981	Разоружение	candidate	ShoutLexicon
+shout-reference	DAWNGUARD_0030D2	Вызов Дюрневира	candidate	ShoutLexicon
+shout-reference	DAWNGUARD_007CB6	Разрыв души	candidate	ShoutLexicon
+shout-reference	DAWNGUARD_008A62	Высасывание жизненной энергии	candidate	ShoutLexicon
+shout-reference	DRAGONBORN_0179D8	Подчинение воли	candidate	ShoutLexicon
+shout-reference	DRAGONBORN_01DF92	Воплощение дракона	candidate	ShoutLexicon
+shout-reference	DRAGONBORN_0200C0	Циклон	candidate	ShoutLexicon
+shout-reference	DRAGONBORN_02AD09	Ярость боя	candidate	ShoutLexicon
 skill	0	Одноручное оружие	candidate	RpgContent
 skill	1	Двуручное оружие	candidate	RpgContent
 skill	10	Взлом	candidate	RpgContent
@@ -3900,3 +3927,84 @@ weapon	Эльфийский кинжал	Эльфийский кинжал	candi
 weapon	Эльфийский лук	Эльфийский лук	candidate	ItemCatalog
 weapon	Эльфийский меч	Эльфийский меч	candidate	ItemCatalog
 weapon	Этериевый посох	Этериевый посох	candidate	ItemCatalog
+word	00013E22	Фус	candidate	ShoutLexicon
+word	00013E23	Ро	candidate	ShoutLexicon
+word	00013E24	Да	candidate	ShoutLexicon
+word	00020E17	Йол	candidate	ShoutLexicon
+word	00020E18	Тор	candidate	ShoutLexicon
+word	00020E19	Шул	candidate	ShoutLexicon
+word	0002F7BB	WULD	candidate	ShoutLexicon
+word	0002F7BC	На	candidate	ShoutLexicon
+word	0002F7BD	Кест	candidate	ShoutLexicon
+word	00032917	Файм	candidate	ShoutLexicon
+word	00032918	Зи	candidate	ShoutLexicon
+word	00032919	Грон	candidate	ShoutLexicon
+word	0003291A	Фас	candidate	ShoutLexicon
+word	0003291B	Ру	candidate	ShoutLexicon
+word	0003291C	Мар	candidate	ShoutLexicon
+word	0003291D	Су	candidate	ShoutLexicon
+word	0003291E	Гра	candidate	ShoutLexicon
+word	0003291F	Дун	candidate	ShoutLexicon
+word	0003CD31	Лок	candidate	ShoutLexicon
+word	0003CD32	Ва	candidate	ShoutLexicon
+word	0003CD33	Кор	candidate	ShoutLexicon
+word	00044251	Джор	candidate	ShoutLexicon
+word	00044252	За	candidate	ShoutLexicon
+word	00044253	Фруль	candidate	ShoutLexicon
+word	00046B89	Од	candidate	ShoutLexicon
+word	00046B8A	А	candidate	ShoutLexicon
+word	00046B8B	Винг	candidate	ShoutLexicon
+word	00048ACA	Тид	candidate	ShoutLexicon
+word	00048ACB	Кло	candidate	ShoutLexicon
+word	00048ACC	Уль	candidate	ShoutLexicon
+word	00051960	Хун	candidate	ShoutLexicon
+word	00051961	Каль	candidate	ShoutLexicon
+word	00051962	Зор	candidate	ShoutLexicon
+word	0005D16C	Фо	candidate	ShoutLexicon
+word	0005D16D	Кра	candidate	ShoutLexicon
+word	0005D16E	Дин	candidate	ShoutLexicon
+word	0005FB95	Зун	candidate	ShoutLexicon
+word	0005FB96	Халь	candidate	ShoutLexicon
+word	0005FB97	Вик	candidate	ShoutLexicon
+word	00060291	Ран	candidate	ShoutLexicon
+word	00060292	Мир	candidate	ShoutLexicon
+word	00060293	Та	candidate	ShoutLexicon
+word	00060294	Лас	candidate	ShoutLexicon
+word	00060295	Йа	candidate	ShoutLexicon
+word	00060296	Нир	candidate	ShoutLexicon
+word	00060297	Кри	candidate	ShoutLexicon
+word	00060298	Лун	candidate	ShoutLexicon
+word	00060299	Аус	candidate	ShoutLexicon
+word	0006029A	Струн	candidate	ShoutLexicon
+word	0006029B	Ба	candidate	ShoutLexicon
+word	0006029C	Кво	candidate	ShoutLexicon
+word	0006029D	Кан	candidate	ShoutLexicon
+word	0006029E	Дрем	candidate	ShoutLexicon
+word	0006029F	Ов	candidate	ShoutLexicon
+word	000602A0	Зуль	candidate	ShoutLexicon
+word	000602A1	Мей	candidate	ShoutLexicon
+word	000602A2	Гут	candidate	ShoutLexicon
+word	000602A3	Из	candidate	ShoutLexicon
+word	000602A4	Слен	candidate	ShoutLexicon
+word	000602A5	Нус	candidate	ShoutLexicon
+word	DAWNGUARD_0030D4	DUR	candidate	ShoutLexicon
+word	DAWNGUARD_0030D6	Не	candidate	ShoutLexicon
+word	DAWNGUARD_0030D7	Вир	candidate	ShoutLexicon
+word	DAWNGUARD_007CB7	Ри	candidate	ShoutLexicon
+word	DAWNGUARD_007CB8	Ваз	candidate	ShoutLexicon
+word	DAWNGUARD_007CB9	Зол	candidate	ShoutLexicon
+word	DAWNGUARD_008A63	Хас	candidate	ShoutLexicon
+word	DAWNGUARD_008A64	Ла	candidate	ShoutLexicon
+word	DAWNGUARD_008A65	Ган	candidate	ShoutLexicon
+word	DRAGONBORN_0179D9	Гол	candidate	ShoutLexicon
+word	DRAGONBORN_0179DA	Ха	candidate	ShoutLexicon
+word	DRAGONBORN_0179DB	Дов	candidate	ShoutLexicon
+word	DRAGONBORN_01DF93	MUL	candidate	ShoutLexicon
+word	DRAGONBORN_01DF94	Ква	candidate	ShoutLexicon
+word	DRAGONBORN_01DF95	Див	candidate	ShoutLexicon
+word	DRAGONBORN_0200C2	Вен	candidate	ShoutLexicon
+word	DRAGONBORN_0200C3	Гар	candidate	ShoutLexicon
+word	DRAGONBORN_0200C4	Нос	candidate	ShoutLexicon
+word	DRAGONBORN_0200E4	Мид	candidate	ShoutLexicon
+word	DRAGONBORN_0200E5	Вур	candidate	ShoutLexicon
+word	DRAGONBORN_0200E6	Шан	candidate	ShoutLexicon

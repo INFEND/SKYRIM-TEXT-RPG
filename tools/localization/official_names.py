@@ -118,7 +118,7 @@ def read_plugin(path, strings_path, inventory):
                 continue
             sub = {}
             for key, value in fields(payload):
-                if key in (b"EDID", b"FULL", b"XMRK"):
+                if key in (b"EDID", b"FULL", b"XMRK") or (kind == "WOOP" and key == b"TNAM"):
                     sub.setdefault(key, value)
             full = sub.get(b"FULL", b"")
             if not full or (kind == "REFR" and b"XMRK" not in sub):
@@ -131,6 +131,13 @@ def read_plugin(path, strings_path, inventory):
                     editor_id=sub.get(b"EDID", b"").rstrip(b"\0").decode("ascii"),
                     name=strings.get(string_id), string_id=string_id,
                     master=path.name, strings=strings_path.name)
+                if kind == "WOOP":
+                    translation = sub.get(b"TNAM", b"")
+                    if translation and len(translation) != 4:
+                        raise ValueError(f"Invalid WOOP translation in {path.name} for {identity}")
+                    translation_id = u32(translation, 0) if translation else 0
+                    inventory[identity].update(translation_id=translation_id, translation=strings.get(translation_id))
+
 
 
 def compare(registry, inventory):
@@ -154,7 +161,11 @@ def compare(registry, inventory):
         else:
             match = None
         original = inventory.get(match)
-        if ambiguous:
+        if row.get("actor_reference"):
+            # Named actors can share one NPC_ base. The reference or quest alias
+            # supplies the individual name. A base record's FULL cannot confirm it.
+            state = "reference-name-requires-review"
+        elif ambiguous:
             state = "ambiguous-editor-id"
         elif original is None:
             state = "unmapped"
@@ -166,7 +177,18 @@ def compare(registry, inventory):
             state = "matches-official"
         else:
             state = "different"
-        results.append(dict(project_identity=row["identity"], original_identity=match, status=state))
+        result = dict(project_identity=row["identity"], original_identity=match, status=state)
+        if row.get("word_of_power") and original and original["type"] == "WOOP":
+            # FULL stores the word name. TNAM stores its localized meaning. Compare
+            # them independently, including a missing or unresolved Russian gloss.
+            gloss = row["word_of_power"]["meaning"]
+            translation = original.get("translation")
+            result["word_name_status"] = state
+            result["meaning_status"] = ("missing-string" if not translation else "needs-review" if not gloss
+                                        else "matches-official" if gloss == translation else "different")
+            if state == "matches-official":
+                result["status"] = result["meaning_status"]
+        results.append(result)
     return results
 
 
