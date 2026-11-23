@@ -172,11 +172,12 @@ final class SolitudeShops {
         if(!open(g,s))return;
         if(action.equals("SOLITUDE:merchant:talk:"+s)){conversation(g,s,false);return;}
         if(action.equals("SOLITUDE:merchant:memory:"+s)){conversation(g,s,true);return;}
-        for(java.util.Map.Entry<String,Integer> e:resale.get(s).entrySet()){
+        for(java.util.Iterator<java.util.Map.Entry<String,Integer>> it=resale.get(s).entrySet().iterator();it.hasNext();){
+            java.util.Map.Entry<String,Integer> e=it.next();
             ItemCatalog.Item item=ItemCatalog.find(e.getKey());if(item==null)continue;
             int n=amount(action,"SOLITUDE:rebuy:"+s+":"+item.id,maxPurchase(g,s,item,e.getValue()));if(n<=0)continue;
             int total=purchasePrice(g,s,item)*n;if(!g.progress.addItem(item.id,n))return;
-            if(n==e.getValue())resale.get(s).remove(item.id);else e.setValue(e.getValue()-n);
+            if(n==e.getValue())it.remove();else e.setValue(e.getValue()-n);
             g.gold-=total;budget[s]+=total;g.message="Выкуплено: "+item.name+" ×"+n+" | −"+total+" септимов.";
             g.progress.recent=g.message;g.recordVisualEvent(NAMES[s]+": "+g.message);g.progress.sync(g);return;
         }
