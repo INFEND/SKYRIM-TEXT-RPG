@@ -63,22 +63,43 @@ final class SolitudeShops {
     static int price(GameEngine g,ItemCatalog.Item item){
         return (int)Math.max(1,Math.min(Integer.MAX_VALUE,((long)item.value*Math.max(100,130-g.progress.skillLevel(12)/5)+99)/100));
     }
+    // Personal merchant terms use the same persistent NPC memory as dialogue and jobs.
+    // Unmet merchants retain the historical price, preserving old saves and economy.
+    private static int relation(GameEngine g,int s){
+        JSONArray facts=g.sceneState.npcFacts();
+        for(int i=0;i<facts.length();i++){
+            JSONObject f=facts.optJSONObject(i);
+            if(f!=null&&OWNERS[s].equalsIgnoreCase(f.optString("title")))
+                return Math.max(0,Math.min(100,f.optInt("relation",50)));
+        }
+        return 50;
+    }
+    private static int purchasePrice(GameEngine g,int s,ItemCatalog.Item item){
+        int r=relation(g,s);
+        int percent=r>=75?90:r<=25?115:100;
+        return (int)Math.max(1,Math.min(Integer.MAX_VALUE,((long)price(g,item)*percent+99)/100));
+    }
+    private static int salePrice(GameEngine g,int s,ItemCatalog.Item item){
+        int r=relation(g,s);
+        int percent=r>=75?110:r<=25?85:100;
+        return (int)Math.max(1,Math.min(Integer.MAX_VALUE,((long)g.salePrice(item)*percent)/100));
+    }
     static int capacity(String id){return id.endsWith("стрела")?20:id.endsWith("слиток")||id.equals("Отмычка")?8:3;}
     int stock(GameEngine g,int s,int i){refresh(g,s);return Math.max(0,capacity(ITEMS[s][i])-sold[s][i]);}
     private boolean canSell(GameEngine g,ItemCatalog.Item item,int s){
         return g.canTradeItem(item)
-            &&budget[s]>=g.salePrice(item)&&g.gold<=Integer.MAX_VALUE-g.salePrice(item);
+            &&budget[s]>=salePrice(g,s,item)&&g.gold<=Integer.MAX_VALUE-salePrice(g,s,item);
     }
     private int maxBuy(GameEngine g,int s,int i,ItemCatalog.Item item){return maxPurchase(g,s,item,stock(g,s,i));}
     private int maxPurchase(GameEngine g,int s,ItemCatalog.Item item,int available){
         if(g.progress.temperQuality(item.id)>0||g.progress.artifacts.filled(item.id)||(g.swordUpgraded&&"Стальной меч".equals(item.id))||(g.armorUpgraded&&"Стальная кираса".equals(item.id)))return 0;
-        int p=price(g,item);
+        int p=purchasePrice(g,s,item);
         int weight=item.weight<=0?99:(int)Math.max(0,Math.floor((g.progress.carryLimit()-g.progress.carryWeight()+0.00001)/item.weight));
         return Math.max(0,Math.min(99,Math.min(available,Math.min(weight,Math.min(g.gold/p,Math.min((Integer.MAX_VALUE-budget[s])/p,Integer.MAX_VALUE-g.progress.quantity(item.id)))))));
     }
     private int maxSell(GameEngine g,int s,ItemCatalog.Item item){
         if(!canSell(g,item,s))return 0;
-        int p=g.salePrice(item);if(p<=0)return 0;
+        int p=salePrice(g,s,item);if(p<=0)return 0;
         return Math.max(0,Math.min(99,Math.min(g.progress.quantity(item.id),Math.min(budget[s]/p,(Integer.MAX_VALUE-g.gold)/p))));
     }
     private static boolean extraAccepted(int s,ItemCatalog.Item item){
@@ -120,15 +141,15 @@ final class SolitudeShops {
             String id=ITEMS[s][i];ItemCatalog.Item item=ItemCatalog.find(id);if(item==null)continue;
             int n=stock(g,s,i),p=price(g,item);
             tradeChoices(scene,"SOLITUDE:buy:"+s+":"+i,"Купить: "+item.name,p,maxBuy(g,s,i,item),"В наличии: "+n);
-            tradeChoices(scene,"SOLITUDE:sell:"+s+":"+i,"Продать: "+item.name,g.salePrice(item),maxSell(g,s,item),"У тебя: "+g.progress.quantity(id));
+            tradeChoices(scene,"SOLITUDE:sell:"+s+":"+i,"Продать: "+item.name,salePrice(g,s,item),maxSell(g,s,item),"У тебя: "+g.progress.quantity(id));
         }
         // Keep the existing scene: rebuilding it here discards the reconciliation action.
         // The body already explains that the merchant is unavailable through the absence of trade choices.
         if(open(g,s))for(ItemCatalog.Item item:g.progress.owned("Все","Название"))
-            if(extraAccepted(s,item))tradeChoices(scene,"SOLITUDE:extraSell:"+s+":"+item.id,"Продать: "+item.name,g.salePrice(item),maxSell(g,s,item),"У тебя: "+g.progress.quantity(item.id)+" | Скупка по специализации");
+            if(extraAccepted(s,item))tradeChoices(scene,"SOLITUDE:extraSell:"+s+":"+item.id,"Продать: "+item.name,salePrice(g,s,item),maxSell(g,s,item),"У тебя: "+g.progress.quantity(item.id)+" | Скупка по специализации");
         if(open(g,s))for(java.util.Map.Entry<String,Integer> e:resale.get(s).entrySet()){
             ItemCatalog.Item item=ItemCatalog.find(e.getKey());if(item==null)continue;
-            tradeChoices(scene,"SOLITUDE:rebuy:"+s+":"+item.id,"Выкупить: "+item.name,price(g,item),maxPurchase(g,s,item,e.getValue()),"В наличии: "+e.getValue());
+            tradeChoices(scene,"SOLITUDE:rebuy:"+s+":"+item.id,"Выкупить: "+item.name,purchasePrice(g,s,item),maxPurchase(g,s,item,e.getValue()),"В наличии: "+e.getValue());
         }
         if(s==1||s==4)SolitudeCraft.choices(g,scene);
         if(s==0)SolitudeCanonical.attireChoices(g,scene);
@@ -154,7 +175,7 @@ final class SolitudeShops {
         for(java.util.Map.Entry<String,Integer> e:resale.get(s).entrySet()){
             ItemCatalog.Item item=ItemCatalog.find(e.getKey());if(item==null)continue;
             int n=amount(action,"SOLITUDE:rebuy:"+s+":"+item.id,maxPurchase(g,s,item,e.getValue()));if(n<=0)continue;
-            int total=price(g,item)*n;if(!g.progress.addItem(item.id,n))return;
+            int total=purchasePrice(g,s,item)*n;if(!g.progress.addItem(item.id,n))return;
             if(n==e.getValue())resale.get(s).remove(item.id);else e.setValue(e.getValue()-n);
             g.gold-=total;budget[s]+=total;g.message="Выкуплено: "+item.name+" ×"+n+" | −"+total+" септимов.";
             g.progress.recent=g.message;g.recordVisualEvent(NAMES[s]+": "+g.message);g.progress.sync(g);return;
@@ -163,7 +184,7 @@ final class SolitudeShops {
             if(!extraAccepted(s,item))continue;
             int n=amount(action,"SOLITUDE:extraSell:"+s+":"+item.id,maxSell(g,s,item));
             if(n<=0)continue;
-            int total=g.salePrice(item)*n;
+            int total=salePrice(g,s,item)*n;
             if(!g.progress.removeItem(item.id,n))return;
             resale.get(s).merge(item.id,n,(a,b)->GameEngine.nonnegativeAdd(a,b));
             budget[s]-=total;g.gold+=total;g.message="Продано: "+item.name+" ×"+n+" | +"+total+" септимов.";
@@ -174,11 +195,11 @@ final class SolitudeShops {
             int buy=amount(action,"SOLITUDE:buy:"+s+":"+i,maxBuy(g,s,i,item));
             int sell=amount(action,"SOLITUDE:sell:"+s+":"+i,maxSell(g,s,item));
             if(buy>0){
-                int total=price(g,item)*buy;
+                int total=purchasePrice(g,s,item)*buy;
                 if(!g.progress.addItem(id,buy))return;
                 sold[s][i]+=buy;g.gold-=total;budget[s]+=total;g.message="Куплено: "+item.name+" ×"+buy+" | −"+total+" септимов.";
             }else if(sell>0){
-                int total=g.salePrice(item)*sell;
+                int total=salePrice(g,s,item)*sell;
                 if(!g.progress.removeItem(id,sell))return;
                 budget[s]-=total;g.gold+=total;int returned=Math.min(sold[s][i],sell);sold[s][i]-=returned;int surplus=sell-returned;if(surplus>0)resale.get(s).merge(id,surplus,(x,y)->GameEngine.nonnegativeAdd(x,y));g.message="Продано: "+item.name+" ×"+sell+" | +"+total+" септимов.";
             }else continue;
