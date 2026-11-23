@@ -46,6 +46,29 @@ WHITERUN_VERIFIED = (
     "Утгерд Несломленная","Даника Свет Весны","Морис Жондрель",
     "Аколит Йенссен","Андурс","Лидия",
 )
+# Exact named residents, city and immediate suburb, from Russian Skyrim Wiki.
+SOLITUDE_VERIFIED = (
+    "Элисиф Прекрасная","Фолк Огнебород","Сибилла Стентор",
+    "Болгейр Медвежий Коготь","Одар","Уна","Эрди",
+    "Генерал Туллий","Рикке","Легат Адвент Цезенний",
+    "Капитан Алдис","Капитан Метиллий","Джианна",
+    "Рорлунд","Силана Петрия","Фрейра","Стирр",
+    "Виармо","Жиро Жиман","Инге Шесть Пальцев","Пантея Атейя",
+    "Бендт","Айа Аррия","Ильди","Йорн","Атаф",
+    "Анжелина Моррар","Вивьен Онис","Бейранд","Сэйма",
+    "Кейд","Хеймвар","Фиада","Джаванан","Эндари",
+    "Тари","Корпул Виний","Сорекс Виний","Минеция Виния",
+    "Лизетта","Гулум-Ай","Белранд","Йордис Дева Меча",
+    "Аддвар","Грета","Сварри","Брюлин",
+    "Ирнскар Железная Рука","Эрикур","Гисли","Меларан",
+    "Иветта Сан","Октав Сан","Атар","Джейла",
+    "Виттория Вичи","Алексия Вичи","Аквилий Эресий",
+    "Дервенин","Джари-Ра","Ностер Орлиный Глаз","Роггвир",
+    "Йольф","Диджа","Дориан","Эрис","Сабина Нитт",
+    "Сафия","Зандер","Хьорунн","Хараг гро-Шуркул",
+    "Катла","Кнут","Снилин","Фридрика",
+    "Геймунд","Тир","Хорм","Блез","Ма'зака",
+)
 BESTIARY_VERIFIED = (
     "Ледяной тролль","Ледяное привидение","Дракон-скелет",
     "Тролль в броне","Гаргулья","Гончая смерти","Туманный человек",
@@ -112,6 +135,7 @@ def counts() -> dict[str, dict[str, int | float]]:
     for english, canonical in MAP_VERIFIED.items():
         assert map_entries.get(english) == canonical, (english, canonical)
     assert set(WHITERUN_VERIFIED).issubset(npc_entries), "NPC Wiki registry drift"
+    assert set(SOLITUDE_VERIFIED).issubset(npc_entries), "Solitude NPC Wiki registry drift"
     assert set(BESTIARY_VERIFIED).issubset(beast_entries), "Bestiary Wiki registry drift"
     assert set(MAIN_QUEST_VERIFIED).issubset(quest_titles), "Quest labels drift"
     assert len(races) == 10 and len(skills) == 18
@@ -119,7 +143,7 @@ def counts() -> dict[str, dict[str, int | float]]:
 
     raw = {
         "Карта": (len(map_entries), len(MAP_VERIFIED)),
-        "Именные NPC": (len(npc_entries), len(WHITERUN_VERIFIED)),
+        "Именные NPC": (len(npc_entries), len(set(WHITERUN_VERIFIED) | set(SOLITUDE_VERIFIED))),
         "Бестиарий": (len(beast_entries), len(BESTIARY_VERIFIED)),
         "Предметы (прямые регистрации)": (len(other_items), len(item_verified)),
         "Тома и свитки": (len(magic), len(magic_verified)),
