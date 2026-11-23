@@ -344,6 +344,14 @@ public final class ItemCatalog {
     }
     // Supplement uses existing name as save key, so replacements preserve quantities.
     static void registerSupplement(String name,String category,String icon,double weight,int cost,String desc,String effect,double stat,int skill){
+        // Lore spell tomes preserve their original save keys but teach the visible canonical spell name.
+        String visibleName=canonicalItemDisplayName(name);
+        String prefix="Том заклинаний: ";
+        if(name.startsWith(prefix)&&visibleName.startsWith(prefix)&&!visibleName.equals(name)){
+            String oldSpell=name.substring(prefix.length());
+            String canonicalSpell=visibleName.substring(prefix.length());
+            effect=effect.replace("«"+oldSpell+"»","«"+canonicalSpell+"»");
+        }
         put(name,category,icon,weight,cost,desc,effect,stat,skill);
     }
     static void registerMissing(String name,String category,String icon,double weight,int cost,String desc,String effect,double stat,int skill){
