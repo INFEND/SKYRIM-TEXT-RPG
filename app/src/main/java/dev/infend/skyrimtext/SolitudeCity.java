@@ -163,13 +163,29 @@ final class SolitudeCity {
         return -1;
     }
     static boolean validMode(String mode){return MODE.equals(mode)||district(mode)>=0||SolitudeShops.index(mode)>=0||SolitudeHome.MODE.equals(mode)||SolitudeJustice.MODE.equals(mode)||SolitudeJustice.CELL.equals(mode)||SolitudeCanonical.graceMode(mode);}
+    // A shift may be supervised by the scheduled local resident when the usual
+    // supervisor is absent. Never let a hostile or departed resident bypass the
+    // same restrictions that apply to the named supervisor.
+    private static boolean workContactAvailable(GameEngine g,int d,int hours){
+        if(SolitudeEncounters.availableForWork(g,d,hours))return true;
+        int resident=WORK_CONTACT[d];
+        if(resident<0||!SolitudeResidents.present(g,resident,d))return false;
+        String status=g.sceneState.npcStatusByName(SolitudeResidents.NAMES[resident]);
+        if("HOSTILE".equals(status)||"DEAD".equals(status)||"MISSING".equals(status))return false;
+        // Recheck attendance at the end of the shift, not only at its start.
+        int original=g.hour;
+        try{
+            g.hour=original+hours-1;
+            return SolitudeResidents.present(g,resident,d);
+        }finally{g.hour=original;}
+    }
     private String blocked(GameEngine g,int i){return blocked(g,i,false);}
     private String blocked(GameEngine g,int i,boolean volunteer){
         Job j=JOBS[i];
         if(lastDay[i]>=g.day)return "Уже выполнено сегодня";
         int d=jobDistrict(i);int start=d==6?6:8, end=d==6?23:20;
         if(g.hour<start||g.hour+j.hours>end)return "Доступно "+start+":00–"+end+":00";
-        if(!SolitudeEncounters.availableForWork(g,d,j.hours))return "Ответственный житель недоступен | "+SolitudeEncounters.workHours(d);
+        if(!workContactAvailable(g,d,j.hours))return "Ответственный житель недоступен | "+SolitudeEncounters.workHours(d);
         if(g.stamina<j.stamina)return "Не хватает запаса сил";
         if(j.gold<0&&g.gold< -j.gold)return "Не хватает септимов";
         if(j.gold>0&&!volunteer&&g.gold>Integer.MAX_VALUE-j.gold)return "Кошелёк переполнен";
