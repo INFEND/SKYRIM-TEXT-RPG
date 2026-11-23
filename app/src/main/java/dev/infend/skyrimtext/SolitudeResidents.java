@@ -145,6 +145,11 @@ final class SolitudeResidents {
                 try{
                     g.sceneState.setContext(g.day,g.hour,"Солитьюд");
                     g.sceneState.confirm("npc",f.optString("id"),NAMES[i],"INFORMED");
+                    // Reconciliation restores neutral standing, as for city merchants.
+                    // Status alone can leave the NPC at hostile-level relation.
+                    JSONObject reconciled=fact(g,i);
+                    if(reconciled!=null&&reconciled.optInt("relation",50)<50)
+                        g.sceneState.fixNpc(f.optString("id"),50,false);
                 }catch(org.json.JSONException ignored){return true;}
                 g.stamina-=10;g.hour++;g.syncLivingSystems();
                 g.message=NAMES[i]+": Конфликт улажен. Мы можем снова разговаривать.";

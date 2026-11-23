@@ -130,7 +130,7 @@ final class SolitudeShops {
     GameEngine.Scene scene(GameEngine g,int s){
         refresh(g,s);
         GameEngine.Scene scene=new GameEngine.Scene("СОЛИТЬЮД | ТОРГОВЛЯ",NAMES[s],OWNERS[s]+" | Кошелёк: "+budget[s]+" септимов.\nПополнение через каждые два игровых дня.\n\n"+g.message);
-        if(onDuty(g,s)&&"HOSTILE".equals(g.sceneState.npcStatusByName(OWNERS[s])))
+        if(onDuty(g,s)&&g.hour+1<20&&"HOSTILE".equals(g.sceneState.npcStatusByName(OWNERS[s])))
             scene.add("SOLITUDE:merchant:reconcile:"+s,"Примириться: "+OWNERS[s],"Авторское действие | 1 час | 10 сил | без награды");
         if(open(g,s)){
             JSONObject f=fact(g,s);
@@ -160,7 +160,7 @@ final class SolitudeShops {
         refresh(g,s);
         if(action.equals("SOLITUDE:merchant:reconcile:"+s)){
             if(!onDuty(g,s)||!"HOSTILE".equals(g.sceneState.npcStatusByName(OWNERS[s])))return;
-            if(g.hour>=23||g.stamina<10){g.message="Для примирения нужны один час и 10 единиц запаса сил.";return;}
+            if(g.hour+1>=20||g.stamina<10){g.message="Для примирения нужны один час до закрытия лавки и 10 единиц запаса сил.";return;}
             try{
                 g.sceneState.setContext(g.day,g.hour,"Солитьюд");
                 g.sceneState.confirm("npc",npcKey(g,s),OWNERS[s],"INFORMED");
