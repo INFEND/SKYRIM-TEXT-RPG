@@ -249,6 +249,18 @@ public final class BestiaryCatalog {
         alias("Оборотень-медведь","Медведь-оборотень");
         alias("Сожжённый спригган","Горелый спригган");
         alias("Корусов","Корус");
+        // Historical NPC-template spellings also resolve in the existing bestiary.
+        alias("Фалмер-воитель","Фалмер-мастер теней");
+        alias("Фалмер-военачальник","Фалмер-наёмник");
+        alias("Гневный человек","Яростный человек");
+        alias("Скрытень","Луркер");
+        alias("Волк (существо)","Волк");
+        alias("Ледяной волк","Снежный волк");
+        alias("Мать дымков","Мать-дымок");
+        alias("Огонёк","Дымок");
+        alias("Кор","Корус");
+        alias("Кор-охотник","Корус-охотник");
+        alias("Горящий спригган","Горелый спригган");
     }
 
     public static List<Entry> all(){return Collections.unmodifiableList(ENTRIES);}

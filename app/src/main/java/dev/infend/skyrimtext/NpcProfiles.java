@@ -6,7 +6,7 @@ import java.util.LinkedHashMap;
 final class NpcProfiles {
     static final class Profile {
         final String name,displayName,race,gender,role;final int variant;final boolean dragon,child,author,mentioned,template;
-        Profile(String n,String r,String g,String role,int v,boolean d,boolean a,boolean m,boolean t){name=n;displayName=(a||m||t)?n:RussianNameData.npcName(n);race=r;gender=g;this.role=role;variant=v;dragon=d;author=a;mentioned=m;template=t;child=role.startsWith("Ребёнок |")||n.equals("Бабетта");}
+        Profile(String n,String r,String g,String role,int v,boolean d,boolean a,boolean m,boolean t){name=n;displayName=t?canonicalTemplateName(n):(a||m)?n:RussianNameData.npcName(n);race=r;gender=g;this.role=role;variant=v;dragon=d;author=a;mentioned=m;template=t;child=role.startsWith("Ребёнок |")||n.equals("Бабетта");}
     }
     private static final LinkedHashMap<String,Profile> INDEX=new LinkedHashMap<>();
     private static final LinkedHashMap<String,Profile> TEMPLATES=new LinkedHashMap<>();
@@ -21,7 +21,29 @@ final class NpcProfiles {
     private static void register(LinkedHashMap<String,Profile> target,String n,String r,String g,String role,int v,boolean author,boolean mentioned,String... aliases){
         Profile p=new Profile(n,r,g,role,v,"Дракон".equals(r),author,mentioned,target==TEMPLATES);
         target.put(key(n),p);for(String alias:aliases)target.put(key(alias),p);
-        if(target==INDEX&&!p.displayName.equals(n))target.putIfAbsent(key(p.displayName),p);
+        if((target==INDEX||target==TEMPLATES)&&!p.displayName.equals(n))target.putIfAbsent(key(p.displayName),p);
+    }
+    // Keep Profile.name as the original save key; only presentation changes.
+    private static String canonicalTemplateName(String id) {
+        switch(id) {
+            case "Фалмер-воитель": return "Фалмер-мастер теней";
+            case "Фалмер-военачальник": return "Фалмер-наёмник";
+            case "Фалмер-скрытень": return "Фалмер-мастер укрытий";
+            case "Фалмер-мракобес": return "Фалмер-сумрачный страж";
+            case "Фалмер-сумеречный": return "Фалмер-ночной охотник";
+            case "Гневный человек": return "Яростный человек";
+            case "Скрытень": return "Луркер";
+            case "Волк (существо)": return "Волк";
+            case "Ледяной волк": return "Снежный волк";
+            case "Мать дымков": return "Мать-дымок";
+            case "Огонёк": return "Дымок";
+            case "Кор": return "Корус";
+            case "Кор-жнец": return "Корус-жнец";
+            case "Кор-охотник": return "Корус-охотник";
+            case "Горящий спригган": return "Горелый спригган";
+            case "Спригган-земная мать": return "Спригган-мать земли";
+            default: return id;
+        }
     }
     private static void addTemplate(String n,String r,String g,String role,int v,String... aliases){register(TEMPLATES,n,r,g,role,v,false,false,aliases);}
     private static void registerTemplates(){

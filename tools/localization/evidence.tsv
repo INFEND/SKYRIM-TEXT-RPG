@@ -3276,3 +3276,8 @@
 "word"	"DRAGONBORN_0200E4"	"MID"	"XX0200E4"	"Мид"	""	"Ярость боя"	"1016584"	"Dragonborn"	"https://skyrimcommands.com/spells"	""
 "word"	"DRAGONBORN_0200E5"	"VUR"	"XX0200E5"	"Вур"	""	"Ярость боя"	"1016584"	"Dragonborn"	"https://skyrimcommands.com/spells"	""
 "word"	"DRAGONBORN_0200E6"	"SHAAN"	"XX0200E6"	"Шан"	""	"Ярость боя"	"1016584"	"Dragonborn"	"https://skyrimcommands.com/spells"	""
+"npc-template"	"Фалмер-скрытень"	"Falmer Skulker"	""	"Фалмер-мастер укрытий"	"Фалмер-скрытень"	"Фалмер (Skyrim)"	""	"Skyrim"	""	""
+"npc-template"	"Фалмер-мракобес"	"Falmer Gloomlurker"	""	"Фалмер-сумрачный страж"	"Фалмер-мракобес"	"Фалмер (Skyrim)"	""	"Skyrim"	""	""
+"npc-template"	"Фалмер-сумеречный"	"Falmer Nightprowler"	""	"Фалмер-ночной охотник"	"Фалмер-сумеречный"	"Фалмер (Skyrim)"	""	"Skyrim"	""	""
+"npc-template"	"Кор-жнец"	"Chaurus Reaper"	""	"Корус-жнец"	"Кор-жнец"	"Корус (Skyrim)"	""	"Skyrim"	""	""
+"npc-template"	"Спригган-земная мать"	"Spriggan Earth Mother"	""	"Спригган-мать земли"	"Спригган-земная мать"	"Существа (Skyrim)"	""	"Dawnguard"	""	""

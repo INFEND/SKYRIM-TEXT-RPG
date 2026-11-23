@@ -3165,7 +3165,7 @@ npc-template	Вампир-туманный	Вампир-туманный	candida
 npc-template	Ведьма	Ведьма	candidate	NpcProfiles
 npc-template	Великан	Великан	candidate	NpcProfiles
 npc-template	Воин Алик'ра	Воин Алик'ра	candidate	NpcProfiles
-npc-template	Волк (существо)	Волк (существо)	candidate	NpcProfiles
+npc-template	Волк (существо)	Волк	candidate	NpcProfiles
 npc-template	Вор	Вор	candidate	NpcProfiles
 npc-template	Гаргулья	Гаргулья	candidate	NpcProfiles
 npc-template	Гаргулья-громила	Гаргулья-громила	candidate	NpcProfiles
@@ -3173,10 +3173,10 @@ npc-template	Гаргулья-страж	Гаргулья-страж	candidate	N
 npc-template	Гигантский морозный паук	Гигантский морозный паук	candidate	NpcProfiles
 npc-template	Главарь бандитов	Главарь бандитов	candidate	NpcProfiles
 npc-template	Главарь пиратов Солстейма	Главарь пиратов Солстейма	candidate	NpcProfiles
-npc-template	Гневный человек	Гневный человек	candidate	NpcProfiles
+npc-template	Гневный человек	Яростный человек	candidate	NpcProfiles
 npc-template	Гонец	Гонец	candidate	NpcProfiles
 npc-template	Гончая смерти	Гончая смерти	candidate	NpcProfiles
-npc-template	Горящий спригган	Горящий спригган	candidate	NpcProfiles
+npc-template	Горящий спригган	Горелый спригган	candidate	NpcProfiles
 npc-template	Грозовой атронах	Грозовой атронах	candidate	NpcProfiles
 npc-template	Грязевой краб	Грязевой краб	candidate	NpcProfiles
 npc-template	Двемерская сфера	Двемерская сфера	candidate	NpcProfiles
@@ -3225,9 +3225,9 @@ npc-template	Квартирмейстер Братьев Бури	Квартир
 npc-template	Колдун	Колдун	candidate	NpcProfiles
 npc-template	Колдун-мастер	Колдун-мастер	candidate	NpcProfiles
 npc-template	Командир Братьев Бури	Командир Братьев Бури	candidate	NpcProfiles
-npc-template	Кор	Кор	candidate	NpcProfiles
-npc-template	Кор-жнец	Кор-жнец	candidate	NpcProfiles
-npc-template	Кор-охотник	Кор-охотник	candidate	NpcProfiles
+npc-template	Кор	Корус	candidate	NpcProfiles
+npc-template	Кор-жнец	Корус-жнец	candidate	NpcProfiles
+npc-template	Кор-охотник	Корус-охотник	candidate	NpcProfiles
 npc-template	Костяной человек	Костяной человек	candidate	NpcProfiles
 npc-template	Криомант	Криомант	candidate	NpcProfiles
 npc-template	Кровавый дракон	Кровавый дракон	candidate	NpcProfiles
@@ -3236,12 +3236,12 @@ npc-template	Культист Мирака	Культист Мирака	candida
 npc-template	Курьер	Курьер	candidate	NpcProfiles
 npc-template	Легендарный дракон	Легендарный дракон	candidate	NpcProfiles
 npc-template	Ледяной атронах	Ледяной атронах	candidate	NpcProfiles
-npc-template	Ледяной волк	Ледяной волк	candidate	NpcProfiles
+npc-template	Ледяной волк	Снежный волк	candidate	NpcProfiles
 npc-template	Ледяной маг	Ледяной маг	candidate	NpcProfiles
 npc-template	Ледяной тролль	Ледяной тролль	candidate	NpcProfiles
 npc-template	Лесоруб	Лесоруб	candidate	NpcProfiles
 npc-template	Маг молний	Маг молний	candidate	NpcProfiles
-npc-template	Мать дымков	Мать дымков	candidate	NpcProfiles
+npc-template	Мать дымков	Мать-дымок	candidate	NpcProfiles
 npc-template	Медведь	Медведь	candidate	NpcProfiles
 npc-template	Медведь-оборотень	Медведь-оборотень	candidate	NpcProfiles
 npc-template	Морозный великан	Морозный великан	candidate	NpcProfiles
@@ -3260,7 +3260,7 @@ npc-template	Нищий	Нищий	candidate	NpcProfiles
 npc-template	Оборотень	Оборотень	candidate	NpcProfiles
 npc-template	Огненный атронах	Огненный атронах	candidate	NpcProfiles
 npc-template	Огненный маг	Огненный маг	candidate	NpcProfiles
-npc-template	Огонёк	Огонёк	candidate	NpcProfiles
+npc-template	Огонёк	Дымок	candidate	NpcProfiles
 npc-template	Офицер Братьев Бури	Офицер Братьев Бури	candidate	NpcProfiles
 npc-template	Охотник	Охотник	candidate	NpcProfiles
 npc-template	Охотник Серебряной Руки	Охотник Серебряной Руки	candidate	NpcProfiles
@@ -3285,13 +3285,13 @@ npc-template	Саблезуб	Саблезуб	candidate	NpcProfiles
 npc-template	Скелет	Скелет	candidate	NpcProfiles
 npc-template	Скелет-лучник	Скелет-лучник	candidate	NpcProfiles
 npc-template	Скелет-маг	Скелет-маг	candidate	NpcProfiles
-npc-template	Скрытень	Скрытень	candidate	NpcProfiles
+npc-template	Скрытень	Луркер	candidate	NpcProfiles
 npc-template	Слуга	Слуга	candidate	NpcProfiles
 npc-template	Снежный саблезуб	Снежный саблезуб	candidate	NpcProfiles
 npc-template	Солдат Братьев Бури	Солдат Братьев Бури	candidate	NpcProfiles
 npc-template	Солдат Талмора	Солдат Талмора	candidate	NpcProfiles
 npc-template	Спригган	Спригган	candidate	NpcProfiles
-npc-template	Спригган-земная мать	Спригган-земная мать	candidate	NpcProfiles
+npc-template	Спригган-земная мать	Спригган-мать земли	candidate	NpcProfiles
 npc-template	Спригган-матрона	Спригган-матрона	candidate	NpcProfiles
 npc-template	Старейший дракон	Старейший дракон	candidate	NpcProfiles
 npc-template	Стражник	Стражник	candidate	NpcProfiles
@@ -3324,12 +3324,12 @@ npc-template	Убийца Тёмного Братства	Убийца Тёмн�
 npc-template	Ученик колдуна	Ученик колдуна	candidate	NpcProfiles
 npc-template	Ученик некроманта	Ученик некроманта	candidate	NpcProfiles
 npc-template	Фалмер	Фалмер	candidate	NpcProfiles
-npc-template	Фалмер-военачальник	Фалмер-военачальник	candidate	NpcProfiles
-npc-template	Фалмер-воитель	Фалмер-воитель	candidate	NpcProfiles
+npc-template	Фалмер-военачальник	Фалмер-наёмник	candidate	NpcProfiles
+npc-template	Фалмер-воитель	Фалмер-мастер теней	candidate	NpcProfiles
 npc-template	Фалмер-лучник	Фалмер-лучник	candidate	NpcProfiles
-npc-template	Фалмер-мракобес	Фалмер-мракобес	candidate	NpcProfiles
-npc-template	Фалмер-скрытень	Фалмер-скрытень	candidate	NpcProfiles
-npc-template	Фалмер-сумеречный	Фалмер-сумеречный	candidate	NpcProfiles
+npc-template	Фалмер-мракобес	Фалмер-сумрачный страж	candidate	NpcProfiles
+npc-template	Фалмер-скрытень	Фалмер-мастер укрытий	candidate	NpcProfiles
+npc-template	Фалмер-сумеречный	Фалмер-ночной охотник	candidate	NpcProfiles
 npc-template	Фалмер-шаман	Фалмер-шаман	candidate	NpcProfiles
 npc-template	Фермер	Фермер	candidate	NpcProfiles
 npc-template	Хоркер	Хоркер	candidate	NpcProfiles
