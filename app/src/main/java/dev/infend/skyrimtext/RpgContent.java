@@ -4,7 +4,7 @@ import java.util.Random;
 
 public final class RpgContent {
     private RpgContent(){}
-    public static final String[] ATTRIBUTES={"Здоровье","Магия","Выносливость"};
+    public static final String[] ATTRIBUTES={"Здоровье","Магия","Запас сил"};
     public static final String[] RACES={"Норд","Бретон","Данмер","Каджит","Имперец","Орк","Редгард","Альтмер","Босмер","Аргонианин"};
     public static final String[] PASSIVES={
         "Сопротивление холоду 50%. Суровый климат меньше истощает героя.",
