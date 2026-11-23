@@ -5,7 +5,7 @@ import org.json.JSONObject;
 final class FactionStories {
     static final class Chapter {
         final String title,place,story,enemy;final int skill;
-        Chapter(String[] x){title=x[0];place=x[1];story=x[2];enemy="-".equals(x[3])?"":x[3];skill=Integer.parseInt(x[4]);}
+        Chapter(String[] x,int faction,int stage){title=CanonicalRussian.questTitle(faction,stage,x[0]);place=x[1];story=x[2];enemy="-".equals(x[3])?"":x[3];skill=Integer.parseInt(x[4]);}
     }
     private static final String[][][] DATA={{{"К оружию","Вайтран","Кодлак принимает претендента, Вилкас проверяет его выучку.","-","0"},
 {"Испытание доблести","Вайтран","Фаркас ведёт героя за обломком Вутрада в древний курган.","Драугр","0"},
@@ -81,7 +81,7 @@ final class FactionStories {
     int done(int f){return index[f];}
     boolean started(int f){return index[f]>0||phase[f]>0;}
     boolean completed(int f){return index[f]>=count(f);}
-    Chapter chapter(int f){return completed(f)?null:new Chapter(DATA[f][index[f]]);}
+    Chapter chapter(int f){return completed(f)?null:new Chapter(DATA[f][index[f]],f,index[f]);}
     int phase(int f){return phase[f];}
     int preparation(int f){return preparation[f];}
     int approach(int f){return approach[f];}

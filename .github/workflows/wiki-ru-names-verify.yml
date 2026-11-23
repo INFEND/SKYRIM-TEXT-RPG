@@ -1,54 +1,106 @@
 name: Verify canonical Russian Skyrim names
 on:
   push:
-    branches:
-      - 'fix/wiki-*'
-      - 'feat/wiki-*'
+    branches: [main, 'fix/wiki-*', 'feat/wiki-*']
+    paths:
+      - 'app/src/**'
+      - 'tests/test_wiki_ru*'
+      - 'tools/**'
+      - '.github/workflows/wiki-ru-names-verify.yml'
+  workflow_run:
+    workflows: ["Android APK and OTA"]
+    types: [completed]
+    branches: [main]
   pull_request:
     paths:
-      - 'app/src/main/java/dev/infend/skyrimtext/RpgContent.java'
-      - 'app/src/main/java/dev/infend/skyrimtext/CanonicalCampaign.java'
-      - 'app/src/main/java/dev/infend/skyrimtext/MainActivity.java'
-      - 'app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java'
-      - 'app/src/main/java/dev/infend/skyrimtext/SkyrimMapCatalog.java'
-      - 'app/src/main/java/dev/infend/skyrimtext/WorldAtlas.java'
-      - 'app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java'
-      - 'app/src/main/java/dev/infend/skyrimtext/AiStoryClient.java'
-      - 'tests/test_wiki_ru_names.py'
-      - 'tests/test_wiki_ru_equipment.py'
-      - 'tests/test_wiki_ru_quests.py'
-      - 'tools/map_names_ru.txt'
+      - 'app/src/**'
+      - 'tests/test_wiki_ru*'
+      - 'tools/**'
+      - '.github/workflows/wiki-ru-names-verify.yml'
 permissions:
   contents: read
 
 jobs:
-  python-regression:
+  localization:
+    if: github.event_name != 'workflow_run'
     runs-on: ubuntu-latest
+    timeout-minutes: 35
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Validate localized names and compatibility
-        run: python3 -m unittest discover -s tests -p 'test_wiki_ru_names.py' -v
-      - name: Run full Python regression
-        run: python3 -m unittest discover -s tests -p 'test_*.py' -q
-
-  android-compile:
-    runs-on: ubuntu-latest
-    timeout-minutes: 35
-    steps:
-      - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '17'
+      - name: Check the live registry and export unresolved identities
+        run: python3 tools/audit_localization.py --live --json "$RUNNER_TEMP/registry.json"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: russian-localization-registry
+          path: ${{ runner.temp }}/registry.json
+      - name: Run Python localization and regression checks
+        run: python3 -m unittest discover -s tests -p 'test_*.py' -q
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.11.1'
-      - name: Android SDK 36
+      - name: Install Android SDK 36
+        run: '"${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager" --install "platforms;android-36" "build-tools;35.0.0"'
+      - name: Run Android unit tests and assemble the debug APK
+        run: gradle --no-daemon :app:testDebugUnitTest :app:assembleDebug
+
+  ota-device:
+    if: github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+          fetch-depth: 1
+          persist-credentials: false
+      - name: Select the signed release and its predecessor
+        id: versions
+        env:
+          GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
-          "${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager" --install 'platforms;android-36' 'build-tools;35.0.0'
-      - name: Compile debug APK (no release)
-        run: gradle --no-daemon :app:assembleDebug
+          set -euo pipefail
+          version=$(sed -n "s/.*versionName '\([^']*\)'.*/\1/p" app/build.gradle | head -1)
+          tag="v$version"
+          if ! git fetch -q --depth=1 origin "refs/tags/$tag:refs/tags/$tag"; then exit 0; fi
+          if [[ "$(git rev-parse "$tag^{commit}")" != "$(git rev-parse HEAD)" ]]; then exit 0; fi
+          predecessor=$(gh api "repos/$GITHUB_REPOSITORY/releases?per_page=100" | python3 -c '
+          import json, sys
+          def version(s): return tuple(int(part) for part in s.split("."))
+          current = version(sys.argv[1])
+          choices = [(version(r["tag_name"][1:]), r["tag_name"]) for r in json.load(sys.stdin)
+                     if not r["draft"] and not r["prerelease"] and r["tag_name"].startswith("v") and all(p.isdigit() for p in r["tag_name"][1:].split("."))
+                     and any(a["name"] == "SKYRIM-TEXT-RPG.apk" for a in r["assets"])]
+          print(max(tag for tag in choices if tag[0] < current)[1])' "$version")
+          gh release download "$predecessor" --pattern SKYRIM-TEXT-RPG.apk --dir "$RUNNER_TEMP"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+      - name: Enable Android hardware acceleration
+        if: steps.versions.outputs.version != ''
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-android-kvm.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: Open the preceding signed game and inspect its update dialog
+        if: steps.versions.outputs.version != ''
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          target: default
+          arch: x86_64
+          disable-animations: true
+          script: bash scripts/test_published_ota_ui.sh "${{ steps.versions.outputs.version }}"
+      - uses: actions/upload-artifact@v4
+        if: always() && steps.versions.outputs.version != ''
+        with:
+          name: published-update-dialog
+          path: |
+            ${{ runner.temp }}/update-screen.png
+            ${{ runner.temp }}/update-window.xml
+          if-no-files-found: ignore

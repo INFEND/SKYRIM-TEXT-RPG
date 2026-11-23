@@ -22,8 +22,8 @@ class WikiRuQuests(unittest.TestCase):
         self.assertIn('public static final int COUNT=33;', CAMPAIGN)
 
     def test_legacy_and_canonical_items_both_appear_in_inventory_search(self):
-        self.assertIn('!item.name.toLowerCase(java.util.Locale.ROOT).contains(query)', UI)
-        self.assertIn('!item.id.toLowerCase(java.util.Locale.ROOT).contains(query)', UI)
+        self.assertIn('!item.matches(query)', UI)
+        self.assertIn('id.toLowerCase(Locale.ROOT).contains(needle)', ITEMS)
         self.assertIn('DISPLAY_ALIASES.putIfAbsent(visibleName,name)', ITEMS)
         self.assertIn('return legacyId==null?null:items.get(legacyId)', ITEMS)
 

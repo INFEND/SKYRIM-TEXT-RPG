@@ -62,7 +62,7 @@ class GeographicSource(unittest.TestCase):
         if shutil.which("javac") is None:self.skipTest("Java model checks run on JDK-equipped CI")
         with tempfile.TemporaryDirectory() as directory:
             root=Path(directory)
-            for name in ("SkyrimMapCatalog.java","SkyrimMapPoints.java","MapPinLayout.java","TravelPlanner.java"):
+            for name in ("SkyrimMapCatalog.java","SkyrimMapPoints.java","RussianNameData.java","MapPinLayout.java","TravelPlanner.java"):
                 (root/name).write_bytes((JAVA/name).read_bytes())
             # Keep the exact WorldAtlas model and travel integration; remove only
             # the unused legacy Android drawing class and its Android imports.

@@ -48,6 +48,7 @@ public final class SkyrimMapCatalog {
             INDEX.putIfAbsent(normalize(site.name.replace(": "," - ")),site);
             INDEX.putIfAbsent(normalize(site.english),site);
         }
+        for(String[] row:RussianNameData.MAP_ALIASES) alias(row[0],row[1]);
         alias("Камень Шора","Shor's Stone");
         alias("Камни-хранители","The Guardian Stones");
         alias("Кинсгроув","Kynesgrove");

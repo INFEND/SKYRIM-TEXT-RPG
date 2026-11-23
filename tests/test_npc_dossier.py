@@ -23,7 +23,7 @@ public class DossierProbe {
 '''
         with tempfile.TemporaryDirectory() as f:
             src=pathlib.Path(f)/"DossierProbe.java";src.write_text(probe,encoding="utf-8")
-            files=["NpcDossier.java","NpcProfiles.java","NpcNameMatcher.java","AuthorNpcProfiles.java","LoreNpcProfiles.java"]
+            files=["RussianNameData.java","NpcDossier.java","NpcProfiles.java","NpcNameMatcher.java","AuthorNpcProfiles.java","LoreNpcProfiles.java"]
             subprocess.run(["javac","-encoding","UTF-8","-d",f,*[str(JAVA/x) for x in files],str(src)],check=True,capture_output=True,text=True,timeout=45)
             subprocess.run(["java","-cp",f,"dev.infend.skyrimtext.DossierProbe"],check=True,capture_output=True,text=True,timeout=20)
     def test_reference_and_save_history_separated(self):

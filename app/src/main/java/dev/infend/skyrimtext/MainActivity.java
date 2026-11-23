@@ -744,7 +744,7 @@ public final class MainActivity extends Activity {
         dialog.requestWindowFeature(android.view.Window.FEATURE_NO_TITLE);
         LinearLayout panel=column();panel.setPadding(dp(14),dp(10),dp(14),dp(14));panel.setBackgroundColor(Color.BLACK);
         LinearLayout header=row();TextView back=npcCentered("‹",30,TEXT,true);header.addView(back,lp(42,42));back.setContentDescription("Назад");back.setOnClickListener(v->dialog.dismiss());
-        TextView npcHeaderName=npcCentered(display,23,accent(),true);
+        TextView npcHeaderName=npcCentered(profile==null?display:profile.displayName,23,accent(),true);
         npcHeaderName.setTag("npc_no_self_link");
         header.addView(npcHeaderName,new LinearLayout.LayoutParams(0,dp(42),1));
         header.addView(new View(this),lp(42,42));
@@ -752,7 +752,7 @@ public final class MainActivity extends Activity {
         workshopAction(panel,"npc",()->{
                 dialog.dismiss();
                 String facts=profile==null?"":("Раса: "+profile.race+". Пол: "+profile.gender+". Роль: "+profile.role+".");
-                WorkImageEditor.open(this,"npc",display,display,facts,accent(),this::render);
+                WorkImageEditor.open(this,"npc",display,profile==null?display:profile.displayName,facts,accent(),this::render);
             });
         space(panel,7);
         activeNpcPortrait=new android.widget.FrameLayout(this);panel.addView(activeNpcPortrait,lp(-1,280));space(panel,14);
@@ -5119,9 +5119,7 @@ public final class MainActivity extends Activity {
                 new java.util.LinkedHashMap<>();
             int matches=0;
             for(ItemCatalog.Item item:allItems){
-                if(searching&&!item.name.toLowerCase(java.util.Locale.ROOT).contains(query)
-                    &&!item.id.toLowerCase(java.util.Locale.ROOT).contains(query)
-                    &&!item.category.toLowerCase(java.util.Locale.ROOT).contains(query))continue;
+                if(searching&&!item.matches(query))continue;
                 java.util.ArrayList<ItemCatalog.Item> group=groups.get(item.category);
                 if(group==null){group=new java.util.ArrayList<>();groups.put(item.category,group);}
                 group.add(item);matches++;
@@ -5463,6 +5461,7 @@ public final class MainActivity extends Activity {
         addText(stats,"Стартовые очки: +"+game.progress.spent[0]+" / +"+game.progress.spent[1]+" / +"+game.progress.spent[2],12,MUTED,false,0);
         addText(content,"НАВЫКИ И ДРЕВА РАЗВИТИЯ",11,accent(),true,12);
         addText(content,"Свободных очков талантов: "+game.progress.perkPoints,13,MUTED,false,13);
+        actionButton("Найти способность","По названию или игровому ID",false,this::findCanonicalPerk);
         starSkills();
         for(int i=0;i<RpgContent.SKILLS.length;i++){
             final int index=i;int lvl=game.progress.skillLevel(i);
@@ -5489,6 +5488,22 @@ public final class MainActivity extends Activity {
             actionButton("ᚱ  "+parts[0],parts.length>1?parts[1]:"",false,()->new RuneDialogBuilder(this,accent())
                 .setTitle(parts[0]).setMessage(parts.length>1?parts[1]:"").setPositiveButton("Закрыть",null).show());
         }
+    }
+    private void findCanonicalPerk(){
+        LinearLayout panel=column();
+        EditText input=livingField(panel,"Название способности","Название, прежнее имя или FormID",false);
+        new RuneDialogBuilder(this,accent()).setTitle("Поиск способности").setView(panel)
+            .setNegativeButton("Закрыть",null).setPositiveButton("Найти",(dialog,which)->{
+                java.util.List<Integer> ids=CanonicalRussian.findPerks(input.getText().toString());
+                if(ids.isEmpty()){toast("Способность не найдена");return;}
+                String[] labels=new String[ids.size()];
+                for(int i=0;i<ids.size();i++){
+                    int id=ids.get(i);
+                    labels[i]=AdvancedPerks.NAMES[id]+"  |  "+RpgContent.SKILLS[AdvancedPerks.SKILL[id]];
+                }
+                new RuneDialogBuilder(this,accent()).setTitle("Найденные способности").setItems(labels,
+                    (list,index)->showSkill(AdvancedPerks.SKILL[ids.get(index)])).setNegativeButton("Закрыть",null).show();
+            }).show();
     }
     private void showSkill(int index){
         int lvl=game.progress.skillLevel(index),rank=game.progress.talentRank(index);boolean combat=RpgProgress.isCombatPerk(index);
@@ -5690,7 +5705,7 @@ public final class MainActivity extends Activity {
                 View v=super.getView(pos,convert,parent);
                 if(v instanceof TextView){TextView row=(TextView)v;row.setTextColor(TEXT);row.setTag("npc_no_self_link");
                     if(pos>=0&&pos<filtered.size()&&npcLinkSetting(NPC_LINKS)){
-                        String label=labels.get(pos);int end=filtered.get(pos).name.length();
+                        String label=labels.get(pos);int end=filtered.get(pos).displayName.length();
                         android.text.SpannableString styled=new android.text.SpannableString(label);
                         if(npcLinkSetting(NPC_LINK_COLORED))styled.setSpan(new android.text.style.ForegroundColorSpan(npcLinkColor()),0,end,33);
                         if(npcLinkSetting(NPC_LINK_BOLD))styled.setSpan(new android.text.style.StyleSpan(android.graphics.Typeface.BOLD),0,end,33);
@@ -5702,7 +5717,7 @@ public final class MainActivity extends Activity {
         };
         list.setAdapter(adapter);
         Runnable refresh=()->{String q=NpcNameMatcher.key(search.getText().toString());filtered.clear();labels.clear();NpcProfiles.Profile exact=NpcProfiles.find(q);
-            for(NpcProfiles.Profile p:profiles)if(q.isEmpty()||p==exact||NpcNameMatcher.key(p.name+" "+p.race+" "+p.role).contains(q)){filtered.add(p);labels.add(p.name+"  |  "+(p.template?"Типовой NPC":p.race));}
+            for(NpcProfiles.Profile p:profiles)if(q.isEmpty()||p==exact||NpcNameMatcher.key(p.name+" "+p.displayName+" "+p.race+" "+p.role).contains(q)){filtered.add(p);labels.add(p.displayName+"  |  "+(p.template?"Типовой NPC":p.race));}
             adapter.notifyDataSetChanged();
         };
         search.addTextChangedListener(new android.text.TextWatcher(){public void beforeTextChanged(CharSequence x,int st,int c,int a){}public void onTextChanged(CharSequence x,int st,int before,int c){refresh.run();}public void afterTextChanged(android.text.Editable e){}});

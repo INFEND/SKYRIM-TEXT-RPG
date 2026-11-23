@@ -10,7 +10,7 @@ Bloodchill Cavern (CC)|Пещера Кровавый Холод
 Darkfall Cave (DG)|Вечерняя пещера
 Dayspring Canyon (DG)|Ущелье Утренней Зари
 Dimhollow Crypt (DG)|Крипта Ночной Пустоты
-Forebears' Holdout (DG)|Убежище Предков
+Forebears' Holdout (DG)|Укрытие Старейшин
 Frostroot Cave (CC)|Пещера Морозного Корня
 Giant's Tooth (CC)|Зуб Великана
 Gromm's Pass (CC)|Перевал Громма
@@ -57,7 +57,7 @@ Sky Haven Temple|Храм Небесной Гавани
 Thieves Guild|Гильдия воров
 Stonehills|Каменные Холмы
 Journeyman's Nook|Приют Подмастерья
-Moldering Ruins (DG)|Обветшалые руины
+Moldering Ruins (DG)|Развалины
 Bleak Falls Barrow|Ветреный пик
 Champion's Rest (CC)|Приют Чемпиона
 Labyrinthian|Лабиринтиан
@@ -83,20 +83,20 @@ Earth Stone|Камень Земли
 Sun Stone|Камень Солнца
 Water Stone|Камень Воды
 Wind Stone|Камень Ветра
-Bujold's Retreat|Убежище Буйольд
+Bujold's Retreat|Пристанище Буйольд
 Haknir's Shoal|Отмель Хакнира
 Ashfall's Tear (CC)|Слеза Пепла
-Benkongerike|Бенконгерике
+Benkongerike|Бенконгерик
 Bristleback Cave|Пещера Щетиноспин
 Castle Karstaag Caverns|Пещеры замка Карстааг
 Castle Karstaag Ruins|Руины замка Карстааг
 Frossel|Фроссель
 Frostmoon Crag|Утёс Морозной Луны
-Glacial Cave|Ледниковая пещера
+Glacial Cave|Ледяная пещера
 Hrothmund's Barrow|Курган Хротмунда
 Raven Rock|Воронья Скала
-Headwaters of Harstrad|Верховья Харстрада
-Northshore Landing|Пристань на северном берегу
+Headwaters of Harstrad|Верховье Харстрада
+Northshore Landing|Северная пристань
 Saering's Watch|Застава Сиринга
 Fahlbtharz|Фалбтарз
 Kagrumez|Кагрумез
@@ -104,28 +104,28 @@ Nchardak|Нчардак
 Old Attius Farm|Старая ферма Аттия
 Ashfallow Citadel|Пепельная крепость
 Fort Frostmoth|Форт Морозного Мотылька
-Highpoint Tower|Башня Высокая Точка
+Highpoint Tower|Вершинная башня
 Altar of Thrond|Алтарь Тронда
-Brodir Grove|Роща Бродир
+Brodir Grove|Роща Бродира
 Frykte Peak|Пик Фрикте
-Horker Island|Остров хоркеров
+Horker Island|Остров Хоркеров
 Hvitkald Peak|Пик Хвиткальд
 Mortrag Peak|Пик Мортраг
 Mount Moesring|Гора Моэсринг
 Stalhrim Source|Источник сталгрима
-Broken Tusk Mine|Шахта Сломанный Бивень
-Damphall Mine|Дамфолл
+Broken Tusk Mine|Шахта Сломанный Клык
+Damphall Mine|Душная шахта
 Snowclad Ruins|Заснеженные руины
 Bloodskal Barrow|Курган Бладскал
 Gyldenhul Barrow|Курган Гильденхул
 Kolbjorn Barrow|Колбьорн
 Vahlok's Tomb|Гробница Валока
 White Ridge Barrow|Курган Белого Хребта
-Moesring Pass|Перевал Моэсринг
-Thirsk Mead Hall|Медовый зал Тирск
+Moesring Pass|Проход Моэсринг
+Thirsk Mead Hall|Медовый зал Тирска
 Abandoned Lodge|Заброшенный дом
 Hrodulf's House|Дом Хродульфа
-Ramshackle Trading Post|Полуразрушенный торговый пост
+Ramshackle Trading Post|Старый торговый пост
 Wreck of the Strident Squall|Обломки «Стремительного шквала»
 Tel Mithryn|Тел-Митрин
 Temple of Miraak|Храм Мирака
@@ -171,3 +171,15 @@ Stonehill Bluff|Утёс Каменный Холм
 Wreck Of The Brinehammer|Место крушения «Солёного молота»
 Wreck of the Winter War|Место крушения «Зимней войны»
 Wreck of the Icerunner|Место крушения «Бегущего по льду»
+Hollyfrost Farm|Ферма «Остролист»
+Greenspring Hollow|Нора Зелёный Ручей
+Bronze Water Cave|Пещера Бронзовая вода
+Skytemple Ruins|Руины Небесного храма
+Four Skull Lookout|Наблюдательный пост «Четыре Черепа»
+Swindler's Den|Логово плута
+Brandy-Mug Farm|Ферма «Кружка Бренди»
+Duskglow Crevice|Закатная расселина
+Blind Cliff Cave|Пещера Отвесный Утёс
+Clearpine Pond|Пруд Чистых Сосен
+East Empire Company Warehouse|Склад Восточной имперской компании
+Skyborn Altar|Алтарь Рождённого Небом

@@ -79,7 +79,7 @@ public class NpcLinkProbe {
             folder = pathlib.Path(folder)
             src = folder / "NpcLinkProbe.java"
             src.write_text(probe, encoding="utf-8")
-            subprocess.run([javac, "-encoding", "UTF-8", "-d", str(folder), str(JAVA/"NpcProfiles.java"), str(JAVA/"NpcNameMatcher.java"), str(JAVA/"AuthorNpcProfiles.java"), str(JAVA/"LoreNpcProfiles.java"), str(src)], check=True, capture_output=True, text=True, timeout=45)
+            subprocess.run([javac, "-encoding", "UTF-8", "-d", str(folder), str(JAVA/"RussianNameData.java"), str(JAVA/"NpcProfiles.java"), str(JAVA/"NpcNameMatcher.java"), str(JAVA/"AuthorNpcProfiles.java"), str(JAVA/"LoreNpcProfiles.java"), str(src)], check=True, capture_output=True, text=True, timeout=45)
             subprocess.run([java, "-cp", str(folder), "dev.infend.skyrimtext.NpcLinkProbe"], check=True, capture_output=True, text=True, timeout=20)
 
     def test_card_and_link_guards(self):

@@ -26,7 +26,7 @@ final class AiNarrativeFormat {
                 .replaceAll("^[>\\p{So}\\s]+", "").trim();
             if (LOCATION_TIME.matcher(header).matches() || LABEL.matcher(header).matches()) continue;
             if (cleaned.length() > 0) cleaned.append('\n');
-            cleaned.append(current);
+            cleaned.append(CanonicalRussian.speakerLine(current));
         }
         return cleaned.toString();
     }

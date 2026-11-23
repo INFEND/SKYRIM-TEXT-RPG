@@ -122,8 +122,9 @@ public final class RpgProgress {
         ItemCatalog.Item weapon=ItemCatalog.find(equipped.get("weapon"));
         if(weapon!=null&&weapon.twoHanded())equipped.remove("shield");
     }
-    public boolean equipped(String id){return id!=null&&equipped.containsValue(id)&&quantity(id)>0;}
+    public boolean equipped(String id){return id!=null&&equipped.containsValue(ItemCatalog.inventoryKey(id))&&quantity(id)>0;}
     public boolean equip(String id){
+        id=ItemCatalog.inventoryKey(id);
         ItemCatalog.Item item=ItemCatalog.find(id);
         if(item==null||item.slot().isEmpty()||quantity(id)<1)return false;
         if("shield".equals(item.slot())){
@@ -133,7 +134,7 @@ public final class RpgProgress {
         equipmentInitialized=true;
         equipped.put(item.slot(),id);cleanEquipment();return true;
     }
-    public void unequip(String id){if(id==null)return;equipmentInitialized=true;equipped.values().removeIf(id::equals);}
+    public void unequip(String id){if(id==null)return;equipmentInitialized=true;equipped.values().removeIf(ItemCatalog.inventoryKey(id)::equals);}
     public String equippedName(String slot){String id=equipped.get(slot);return id==null||quantity(id)<1?"Не надето":id;}
     public String equippedDisplayName(String slot){String id=equippedName(slot);ItemCatalog.Item item=ItemCatalog.find(id);return item==null?id:item.name;}
     public double equippedDamage(){
@@ -227,18 +228,21 @@ public final class RpgProgress {
         cleanEquipment();if(g.progress==this)g.syncGearAttributes();
     }
     public void quantity(String id,int n){
+        id=ItemCatalog.inventoryKey(id);
         try{inventory.put(id,Math.max(0,n));if(n<=0)tempered.remove(id);if(n<=0)weaponPoisons.remove(id);}catch(Exception ignored){}
     }
-    public int quantity(String id){return inventory.optInt(id,0);}
+    public int quantity(String id){return inventory.optInt(ItemCatalog.inventoryKey(id),0);}
     public int fixCarryBonus=0;
     public double carryLimit(){return 50+(equipped("Зачарованное ожерелье")?25:0)+(equipped("Очарованное ожерелье")?25:0)+(equipped("Серебряное кольцо грузоподъёмности")?10:0)+artifacts.carryBonus(this)+fixCarryBonus;}
     public boolean addItem(String id,int quantity){
+        id=ItemCatalog.inventoryKey(id);
         if(quantity<=0||ItemCatalog.find(id)==null||CompensationPowers.itemIndex(id)>=0||quantity(id)>Integer.MAX_VALUE-quantity)return false;
         ItemCatalog.Item item=ItemCatalog.find(id);
         if(item.weight>0&&carryWeight()+item.weight*quantity>carryLimit()+0.00001)return false;
         quantity(id,quantity(id)+quantity);return true;
     }
     public boolean removeItem(String id,int amount){
+        id=ItemCatalog.inventoryKey(id);
         if(amount<1||quantity(id)<amount||CompensationPowers.itemIndex(id)>=0)return false;
         if(SolitudeCourt.protect(this,id))return false;
         if(SolitudeCanonical.GRACE_ITEM.equals(id)&&"ACTIVE".equals(questOutcome(SolitudeCanonical.GRACE)))return false;
@@ -515,7 +519,14 @@ public final class RpgProgress {
         }
         for(int i=0;i<3;i++)if(pts!=null)p.spent[i]=Math.max(0,Math.min(5,pts.optInt(i,0)));
         JSONObject inv=obj.optJSONObject("inventory");
-        if(inv!=null){Iterator<String> keys=inv.keys();while(keys.hasNext()){String k=keys.next();p.quantity(k,inv.optInt(k,0));}}
+        if(inv!=null){
+            Iterator<String> keys=inv.keys();
+            while(keys.hasNext()){
+                String raw=keys.next();
+                String key=ItemCatalog.inventoryKey(raw);
+                p.quantity(key,GameEngine.nonnegativeAdd(p.quantity(key),Math.max(0,inv.optInt(raw,0))));
+            }
+        }
         // Older saves contained an invalid armor key; convert without duplicating weight.
         int legacyArmor=p.quantity("Стальной кираса");
         if(legacyArmor>0){
@@ -529,19 +540,19 @@ public final class RpgProgress {
         p.equipmentInitialized=obj.optBoolean("equipmentInitialized",false);
         JSONObject gear=obj.optJSONObject("equipped");
         if(gear!=null)for(String slot:SLOTS){
-            String id=gear.optString(slot,"");if(!id.isEmpty())p.equipped.put(slot,id);
+            String id=gear.optString(slot,"");if(!id.isEmpty())p.equipped.put(slot,ItemCatalog.inventoryKey(id));
         }
         JSONObject temper=obj.optJSONObject("tempered");
         if(temper!=null){Iterator<String> keys=temper.keys();while(keys.hasNext()){
             String id=keys.next();ItemCatalog.Item item=ItemCatalog.find(id);int quality=temper.optInt(id,0);
             if(item!=null&&p.quantity(id)>0&&!item.temperMaterial().isEmpty()&&quality>0&&quality<=6)
-                p.tempered.put(id,quality);
+                p.tempered.merge(item.id,quality,Math::max);
         }}
         // Legacy wear data is intentionally ignored; old equipment regains its full stats.
         JSONObject poisons=obj.optJSONObject("weaponPoisons");
         if(poisons!=null){Iterator<String> keys=poisons.keys();while(keys.hasNext()){
             String id=keys.next(),value=poisons.optString(id,"");ItemCatalog.Item item=ItemCatalog.find(id);
-            if(item!=null&&item.weapon()&&p.quantity(id)>0&&GearEffects.supportedPoison(value))p.weaponPoisons.put(id,value);
+            if(item!=null&&item.weapon()&&p.quantity(id)>0&&GearEffects.supportedPoison(value))p.weaponPoisons.putIfAbsent(item.id,value);
         }}
         p.cleanEquipment();
         JSONArray done=obj.optJSONArray("completed"),bad=obj.optJSONArray("failed");

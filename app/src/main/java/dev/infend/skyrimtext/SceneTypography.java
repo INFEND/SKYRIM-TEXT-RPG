@@ -69,6 +69,7 @@ public final class SceneTypography {
             String line=lines[i].trim();
             boolean quoted=line.startsWith(">");
             if(quoted)line=line.substring(1).trim(); // Old saves, no QuoteSpan.
+            line=CanonicalRussian.speakerLine(line);
             String plain=line.replace("**","").trim();
             boolean thought=plain.startsWith("[Мысли]"),event=plain.startsWith("[Событие]"),action=plain.startsWith("[Действие]");
             boolean spoken=quoted||plain.startsWith("— ")||plain.startsWith("- ");

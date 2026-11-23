@@ -77,6 +77,7 @@ public final class CanonicalCampaign {
         }
     }
     static boolean hasOriginal(){return original!=null;}
+    static String speakerKey(int id){return id>=1 && id<=COUNT ? stage(id).speaker : "";}
     private static Stage stage(int id){return STAGES[Math.max(0,Math.min(COUNT-1,id-1))];}
     public static String title(int id){return stage(id).title;}
     public static String objective(GameEngine g){
@@ -105,7 +106,7 @@ public final class CanonicalCampaign {
         return list;
     }
     private static int lastPage(List<StoryDialoguePack.Line> list){return Math.max(0,(list.size()-1)/PAGE);}
-    private static String dialogue(String speaker,String text){return "**"+speaker+":**\n**— "+text+"**";}
+    private static String dialogue(String speaker,String text){return "**"+CanonicalRussian.npcName(speaker)+":**\n**— "+text+"**";}
     public static GameEngine.Scene scene(GameEngine g){
         if(g.canonicalStage<1||g.canonicalStage>COUNT)
             return new GameEngine.Scene("ГЛАВНАЯ ИСТОРИЯ","Путь Довакина завершён",objective(g))

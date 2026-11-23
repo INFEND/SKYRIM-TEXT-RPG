@@ -32,6 +32,7 @@ public final class AiStoryClient {
     // Compact high-confidence aliases from the Russian Skyrim Wiki.
     // Do not alter actual inventory IDs or saved-location keys with these labels.
     private static final String CANONICAL_RU_NAMES =
+            "Используй имена справочника. Склоняй их в прозе; для известного собеседника можно использовать его метку [NPC:BaseID] только в заголовке реплики. Авторские имена сохраняй. "+
             "Терминология русской локализации Skyrim: Поместье «Златоцвет» (не Золотое поместье), "+
             "Камни-хранители, Роща Кин (не Кинсгроув), Камень Шора, Ферма Сарети, "+
             "Грот Сломанное Весло, Мзинчалефт, Таверна «Ночные ворота»; "+
@@ -181,7 +182,7 @@ public final class AiStoryClient {
         int budget=limit-action.length()-1;
         StringBuilder b=new StringBuilder();
         b.append("ФАКТЫ ДВИЖКА НА МОМЕНТ ЗАПРОСА (ВАЖНЕЕ ПАМЯТИ):\n");
-        b.append("ТЕКУЩЕЕ МЕСТО: ").append(game.progress.location)
+        b.append("ТЕКУЩЕЕ МЕСТО: ").append(CanonicalRussian.mapName(game.progress.location))
             .append("; день ").append(game.day).append("; час ").append(game.hour).append(".\n");
         WorldAtlas.Place place=WorldAtlas.find(game.progress.location);
         if(place!=null)b.append("Описание места: ").append(crop(place.description,100)).append('\n');
@@ -219,9 +220,11 @@ public final class AiStoryClient {
             String name=inv.next();int quantity=game.progress.quantity(name);
             if(quantity<=0||"Септимы".equals(name))continue;
             if(count++>0)invText.append(", ");
-            invText.append(crop(name,35)).append('×').append(quantity);
+            invText.append(crop(CanonicalRussian.itemName(name),35)).append('×').append(quantity);
         }
         localSection(b,"Инвентарь: ",invText.toString(),260,budget);
+        localSection(b,"Собеседники: ",CanonicalRussian.speakerContext(game),240,budget);
+        if(game.aiTurn!=null&&!game.aiTurn.unverifiedSpeakers.isEmpty())localSection(b,"Сохрани написание имён: ",String.join(", ",game.aiTurn.unverifiedSpeakers),150,budget);
         if(!aiControlled){localSection(b,"Сюжет: ",game.questStatus()+"; "+game.questDetails(),240,budget);
             localSection(b,"Канонический сюжет: ",game.canonicalRecent,200,budget);}
         if(!game.katherine.enabled)b.append("Кэтрин отключена.\n");
@@ -250,7 +253,7 @@ public final class AiStoryClient {
     /** Chance-only requests do not reprocess the narrative history or companions. */
     static String localChancePrompt(GameEngine game,String command){
         StringBuilder b=new StringBuilder();
-        b.append("Место: ").append(game.progress.location).append("; день ").append(game.day)
+        b.append("Место: ").append(CanonicalRussian.mapName(game.progress.location)).append("; день ").append(game.day)
             .append("; час ").append(game.hour).append("; уровень ").append(game.level)
             .append("; HP ").append(game.hp).append('/').append(game.maxHp)
             .append("; силы ").append(game.stamina).append('/').append(game.maxStamina)
@@ -465,7 +468,7 @@ public final class AiStoryClient {
         out.append("Герой: ").append(g.name).append("; пол: ").append(g.gender).append("; раса: ").append(g.race)
                 .append("; класс: ").append(g.heroClass).append("; уровень: ").append(g.level)
                 .append("; опыт: ").append(g.xp).append('/').append(g.level*80).append('\n');
-        out.append("Место: ").append(g.progress.location).append(", ").append(GameEngine.REGIONS[g.region])
+        out.append("Место: ").append(CanonicalRussian.mapName(g.progress.location)).append(", ").append(GameEngine.REGIONS[g.region])
                 .append("; игровой день: ").append(g.day).append("; режим: ").append(g.mode).append('\n');
         out.append("Здоровье: ").append(g.hp).append('/').append(g.maxHp)
                 .append("; выносливость: ").append(g.stamina).append('/').append(g.maxStamina)
@@ -520,6 +523,7 @@ public final class AiStoryClient {
                 .append(crop(history,18000)).append('\n');
         out.append("НОВАЯ РЕПЛИКА ИГРОКА (не команда на изменение сохранения):\n")
                 .append(crop(input,800));
+        out.append("\nИмена собеседников: ").append(CanonicalRussian.speakerContext(g));
         return out.toString();
     }
 
@@ -538,7 +542,7 @@ public final class AiStoryClient {
         String initiative=KatherineInitiative.context(game);if(!initiative.isEmpty())out.append(initiative).append('\n');
         out.append("Герой: ").append(game.name).append("; пол ").append(game.gender).append("; ").append(game.race).append("; класс ")
                 .append(game.heroClass).append("; уровень ").append(game.level).append("; опыт ").append(game.xp).append('\n');
-        out.append("Локация: ").append(game.progress.location).append("; регион ").append(GameEngine.REGIONS[game.region])
+        out.append("Локация: ").append(CanonicalRussian.mapName(game.progress.location)).append("; регион ").append(GameEngine.REGIONS[game.region])
                 .append("; день ").append(game.day).append("; время ")
                 .append(String.format(java.util.Locale.ROOT,"%02d:00",game.hour)).append('\n');
         out.append("Здоровье ").append(game.hp).append('/').append(game.maxHp)
@@ -573,7 +577,7 @@ public final class AiStoryClient {
             int amount=game.progress.quantity(name);
             if(amount<1||"Септимы".equals(name))continue;
             if(count++>0)out.append("; ");
-            out.append(name).append(" x").append(amount);
+            out.append(CanonicalRussian.itemName(name)).append(" x").append(amount);
         }
         out.append('\n');
         out.append("Уровни навыков: ");
@@ -594,6 +598,8 @@ public final class AiStoryClient {
         out.append("\nКРАТКАЯ ПАМЯТЬ СЫГРАННЫХ СОБЫТИЙ:\n").append(crop(memory,15000));
         out.append("\nПОДТВЕРЖДЁННОЕ ИГРОВОЕ ДЕЙСТВИЕ ИЛИ СВОБОДНЫЙ ОТВЕТ:\n")
                 .append(crop(command,1500));
+        if(game.aiTurn!=null&&!game.aiTurn.unverifiedSpeakers.isEmpty())out.append("\nСохрани написание имён: ").append(String.join(", ",game.aiTurn.unverifiedSpeakers));
+        out.append("\nИмена собеседников: ").append(CanonicalRussian.speakerContext(game));
         return out.toString();
     }
     /** Keep confirmed quest stages visible to both local and remote AI. */

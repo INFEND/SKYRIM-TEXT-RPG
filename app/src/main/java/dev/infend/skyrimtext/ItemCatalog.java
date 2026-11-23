@@ -26,6 +26,12 @@ public final class ItemCatalog {
             id=key;name=n;fixedSlot=slot;category=cat;icon=ic;weight=kg;value=septims;description=desc;effect=eff;
             baseStat=stat;statSkill=skill;
         }
+        public boolean matches(String query) {
+            String needle = query.trim().toLowerCase(Locale.ROOT);
+            return name.toLowerCase(Locale.ROOT).contains(needle)
+                || id.toLowerCase(Locale.ROOT).contains(needle)
+                || category.toLowerCase(Locale.ROOT).contains(needle);
+        }
         public boolean weapon(){return "Роза Сангвина".equals(name)||"Оружие".equals(category)||"Боеприпасы".equals(category)||statSkill>=0&&statSkill<=2;}
         public boolean wearable(){return "Разрушитель Заклинаний".equals(name)||"Броня".equals(category)||"Одежда".equals(category)||"Украшения".equals(category)||statSkill>=4;}
         public double currentStat(RpgProgress progress){
@@ -173,7 +179,9 @@ public final class ItemCatalog {
             case "Яйцо паука": return "Паучье яйцо";
             case "Кольцо серебряное": return "Серебряное кольцо";
             case "Кольцо золотое": return "Золотое кольцо";
-            default: return id;
+            default:
+                for(String[] row:RussianNameData.ITEMS)if(row[0].equals(id))return row[1];
+                return id;
         }
     }
     private static void put(String name,String category,String icon,double weight,int cost,String desc,String effect,double stat,int skill){
@@ -450,6 +458,10 @@ public final class ItemCatalog {
         if(existing!=null)return existing;
         String legacyId=DISPLAY_ALIASES.get(id);
         return legacyId==null?null:items.get(legacyId);
+    }
+    static String inventoryKey(String value) {
+        Item item = find(value);
+        return item == null ? value : item.id;
     }
     public static int count(){return items.size();}
     public static int countCategory(String category){return sorted(category,"Название").size();}

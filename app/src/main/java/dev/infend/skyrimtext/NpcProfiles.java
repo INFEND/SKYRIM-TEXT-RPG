@@ -5,8 +5,8 @@ import java.util.LinkedHashMap;
 /** Named characters use curated identities rather than guesses based on their name. */
 final class NpcProfiles {
     static final class Profile {
-        final String name,race,gender,role;final int variant;final boolean dragon,child,author,mentioned,template;
-        Profile(String n,String r,String g,String role,int v,boolean d,boolean a,boolean m,boolean t){name=n;race=r;gender=g;this.role=role;variant=v;dragon=d;author=a;mentioned=m;template=t;child=role.startsWith("Ребёнок |")||n.equals("Бабетта");}
+        final String name,displayName,race,gender,role;final int variant;final boolean dragon,child,author,mentioned,template;
+        Profile(String n,String r,String g,String role,int v,boolean d,boolean a,boolean m,boolean t){name=n;displayName=(a||m||t)?n:RussianNameData.npcName(n);race=r;gender=g;this.role=role;variant=v;dragon=d;author=a;mentioned=m;template=t;child=role.startsWith("Ребёнок |")||n.equals("Бабетта");}
     }
     private static final LinkedHashMap<String,Profile> INDEX=new LinkedHashMap<>();
     private static final LinkedHashMap<String,Profile> TEMPLATES=new LinkedHashMap<>();
@@ -21,6 +21,7 @@ final class NpcProfiles {
     private static void register(LinkedHashMap<String,Profile> target,String n,String r,String g,String role,int v,boolean author,boolean mentioned,String... aliases){
         Profile p=new Profile(n,r,g,role,v,"Дракон".equals(r),author,mentioned,target==TEMPLATES);
         target.put(key(n),p);for(String alias:aliases)target.put(key(alias),p);
+        if(target==INDEX&&!p.displayName.equals(n))target.putIfAbsent(key(p.displayName),p);
     }
     private static void addTemplate(String n,String r,String g,String role,int v,String... aliases){register(TEMPLATES,n,r,g,role,v,false,false,aliases);}
     private static void registerTemplates(){
@@ -1296,6 +1297,19 @@ final class NpcProfiles {
         registerTemplates();
         AuthorNpcProfiles.register(NpcProfiles::addAuthor);
         LoreNpcProfiles.register(NpcProfiles::addMention);
+        java.util.HashMap<String,Profile> english=new java.util.HashMap<>();
+        java.util.HashSet<String> ambiguous=new java.util.HashSet<>();
+        for(String[] row:RussianNameData.NPC){
+            Profile original=INDEX.get(key(row[0]));
+            if(original==null)continue;
+            if(!row[2].isEmpty())INDEX.putIfAbsent(key(row[2]),original);
+            if(!row[3].isEmpty()){
+                String label=key(row[3]);
+                Profile prior=english.putIfAbsent(label,original);
+                if(prior!=null && prior!=original)ambiguous.add(label);
+            }
+        }
+        english.forEach((label,p)->{if(!ambiguous.contains(label))INDEX.putIfAbsent(label,p);});
     }
     private static Profile exact(String name){
         String k=key(name);Profile p=INDEX.get(k);if(p==null)p=AUTHORS.get(k);if(p==null)p=MENTIONS.get(k);if(p==null)p=TEMPLATES.get(k);return p;
@@ -1303,7 +1317,7 @@ final class NpcProfiles {
     static Profile find(String name){Profile p=exact(name);return p!=null?p:exact(canonicalName(name));}
     static Profile findOriginal(String name){Profile p=find(name);return p!=null&&!p.author&&!p.mentioned?p:null;}
     static Profile findAuthor(String name){Profile p=find(name);return p!=null&&p.author?p:null;}
-    static java.util.List<Profile> originalProfiles(){java.util.ArrayList<Profile> all=new java.util.ArrayList<>(profiles(INDEX));all.addAll(profiles(TEMPLATES));all.sort((a,b)->a.name.compareToIgnoreCase(b.name));return java.util.Collections.unmodifiableList(all);}
+    static java.util.List<Profile> originalProfiles(){java.util.ArrayList<Profile> all=new java.util.ArrayList<>(profiles(INDEX));all.addAll(profiles(TEMPLATES));all.sort((a,b)->a.displayName.compareToIgnoreCase(b.displayName));return java.util.Collections.unmodifiableList(all);}
     static int namedOriginalCount(){return profiles(INDEX).size();}
     static int templateCount(){return profiles(TEMPLATES).size();}
     static boolean isTemplate(String name){Profile p=find(name);return p!=null&&p.template;}

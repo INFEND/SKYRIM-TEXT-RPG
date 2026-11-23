@@ -23,10 +23,11 @@ public final class AiGameTurn {
     }
     private static final SecureRandom DICE=new SecureRandom();
     public final String scene,journal;
+    public final java.util.List<String> unverifiedSpeakers;
     public final int customChance;
     public final ArrayList<Option> choices=new ArrayList<>();
     private final JSONObject effects;
-    private AiGameTurn(String s,String j,int c,JSONObject e){scene=s;journal=j;customChance=c;effects=e;}
+    private AiGameTurn(String s,String j,int c,JSONObject e){scene=s;journal=j;customChance=c;effects=e;unverifiedSpeakers=CanonicalRussian.unverifiedSpeakers(s);}
     private static String limited(String s,int n){
         if(s==null)return "";
         s=s.trim();return s.substring(0,Math.min(n,s.length()));
@@ -459,7 +460,9 @@ public final class AiGameTurn {
                 String name=limited(item.optString("name",""),80);
                 if("Септимы".equals(name)||"Лечебное зелье".equals(name)||"Зелье магии".equals(name))
                     throw new JSONException("Валюту и зелья меняют отдельные поля");
-                if(ItemCatalog.find(name)==null)throw new JSONException("Предмет неизвестен: "+name);
+                ItemCatalog.Item resolved=ItemCatalog.find(name);
+                if(resolved==null)throw new JSONException("Предмет неизвестен: "+name);
+                name=resolved.id;
                 if(CompensationPowers.itemIndex(name)>=0)throw new JSONException("Системный предмет не изменяется ИИ");
                 changes.put(name,changes.getOrDefault(name,0)+change(item,"delta",50));
             }

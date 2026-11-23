@@ -1,0 +1,111 @@
+package dev.infend.skyrimtext;
+
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+
+/** Display labels use the project's original inventory keys, NPC keys and numeric indices. */
+final class CanonicalRussian {
+    private static final Map<String, String> NPC_IDS = new HashMap<>();
+    private static final Map<String, String> NPC_BY_ID = new HashMap<>();
+
+    static {
+        for (String[] row : RussianNameData.NPC) {
+            if (!row[2].isEmpty()) {
+                NPC_IDS.put(row[0], row[2]);
+                NPC_BY_ID.put(row[2], row[1]);
+            }
+        }
+    }
+
+    private CanonicalRussian() {}
+
+    static String npcName(String key) {
+        return RussianNameData.npcName(key);
+    }
+
+    static String mapName(String key) {
+        SkyrimMapCatalog.Site site = SkyrimMapCatalog.find(key);
+        return site == null ? key : site.name;
+    }
+
+    static String itemName(String key) {
+        ItemCatalog.Item item = ItemCatalog.find(key);
+        return item == null ? key : item.name;
+    }
+
+    // An explicit identifier in a dialogue heading is nominative. Prose, inflected
+    // names, free-form NPCs and user-created items have no identifier to substitute.
+    static String speakerLine(String raw) {
+        String line = raw.trim();
+        boolean bold = line.startsWith("**") && line.endsWith("**") && line.length() > 4;
+        String heading = bold ? line.substring(2, line.length() - 2) : line;
+        if (heading.length() < 8 || heading.length() > 40 || !heading.startsWith("[NPC:") || !heading.endsWith("]:")) return raw;
+        String name = NPC_BY_ID.get(heading.substring(5, heading.length() - 2).toUpperCase(Locale.ROOT));
+        if (name == null) return raw;
+        return bold ? "**" + name + ":**" : name + ":";
+    }
+
+    static java.util.List<String> unverifiedSpeakers(String scene) {
+        java.util.List<String> result = new java.util.ArrayList<>();
+        for (String title : NpcProfiles.speakers(scene, "")) {
+            NpcProfiles.Profile actor = NpcProfiles.findOriginal(title);
+            if (NpcProfiles.findAuthor(title) == null && (actor == null || !NPC_IDS.containsKey(actor.name))) {
+                result.add(title);
+                if (result.size() == 12) break;
+            }
+        }
+        return java.util.Collections.unmodifiableList(result);
+    }
+
+    static String speakerContext(GameEngine game) {
+        StringBuilder out = new StringBuilder();
+        if ("CANON".equals(game.mode)) {
+            String speaker = CanonicalCampaign.speakerKey(game.canonicalStage);
+            NpcProfiles.Profile profile = NpcProfiles.findOriginal(speaker);
+            String id = profile == null ? null : NPC_IDS.get(profile.name);
+            if (id != null) out.append(profile.displayName).append(" [NPC:").append(id).append(']');
+        }
+        if (game.sceneState == null) return out.toString();
+        org.json.JSONArray facts = game.sceneState.npcFacts();
+        for (int i = 0; i < facts.length(); i++) {
+            org.json.JSONObject fact = facts.optJSONObject(i);
+            if (fact == null) continue;
+            String id = fact.optString("id").toUpperCase(Locale.ROOT);
+            String name = NPC_BY_ID.get(id);
+            if (name == null || NpcNameMatcher.key(fact.optString("title")).equals(NpcNameMatcher.key(game.name))) continue;
+            NpcProfiles.Profile npc = NpcProfiles.findOriginal(fact.optString("title"));
+            if (npc == null || !id.equals(NPC_IDS.get(npc.name)) || out.indexOf("[NPC:" + id + "]") >= 0) continue;
+            if (out.length() > 0) out.append(", ");
+            out.append(npc.displayName).append(" [NPC:").append(id).append(']');
+            if (out.length() >= 180) break;
+        }
+        return out.toString();
+    }
+
+    static String questTitle(int faction, int stage, String fallback) {
+        String entry = faction + "/" + stage;
+        for (String[] row : RussianNameData.QUESTS) if (row[0].equals(entry)) return row[1];
+        return fallback;
+    }
+
+    static java.util.List<Integer> findPerks(String label) {
+        java.util.List<Integer> matches = new java.util.ArrayList<>();
+        for (int i = 0; i < AdvancedPerks.NAMES.length; i++) {
+            if (matchesPerk(i, label)) matches.add(i);
+        }
+        return matches;
+    }
+
+    static boolean matchesPerk(int index, String label) {
+        String key = SkyrimMapCatalog.normalize(label);
+        if (key.isEmpty()) return false;
+        for (String[] row : RussianNameData.PERKS) {
+            if (Integer.parseInt(row[0]) == index) {
+                return key.equals(SkyrimMapCatalog.normalize(row[1])) ||
+                       key.equals(SkyrimMapCatalog.normalize(row[2])) || key.equalsIgnoreCase(row[3]);
+            }
+        }
+        return false;
+    }
+}

@@ -55,7 +55,7 @@ class CatalogUiOverhaul(unittest.TestCase):
         self.assertNotIn('item.icon',catalog)
         self.assertNotIn('item.weight',catalog)
         self.assertNotIn('simple_list_item_1',catalog)
-        self.assertIn('if(searching&&!item.name.toLowerCase',catalog)
+        self.assertIn('if(searching&&!item.matches(query)',catalog)
 
 
 if __name__=="__main__":

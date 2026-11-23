@@ -5,6 +5,7 @@ Run locally after reviewing tools/map_source and map_names_ru.txt. The APK does
 not download map data. Positions remain in the source game's world coordinates.
 """
 import json
+import csv
 import math
 import pathlib
 import re
@@ -84,6 +85,10 @@ def district(p, sheet):
     if n in {"High Hrothgar","Throat of the World","Riverwood","Bleak Falls Barrow","Rorikstead"}:return 0
     return min(range(9),key=lambda i:math.hypot(p["x"]-hubs[i]["x"],p["y"]-hubs[i]["y"]))
 
+with (ROOT / "tools/localization/evidence.tsv").open(encoding="utf-8") as source:
+    reviewed_by_id = {r["id"]: r["canonical"] for r in csv.DictReader(source, delimiter="\t")
+                      if r["kind"] == "map" and not r["review"]}
+
 points=[]
 seen=set()
 for sheet, collection in enumerate((main,island)):
@@ -103,7 +108,7 @@ for sheet, collection in enumerate((main,island)):
         if p["name"].endswith(" Military Camp"):
             ru += " — " + ("Империя" if category=="imperial-camp" else "Братья Бури")
         if sheet and p["name"].startswith("Shrine of "):ru += " (Солстейм)"
-        points.append(dict(p,nameRu=ru,type=kind,sheet=sheet,region=district(p,sheet)))
+        points.append(dict(p,nameRu=reviewed_by_id.get(p["id"],ru),type=kind,sheet=sheet,region=district(p,sheet)))
 
 # Published coordinates for three outdoor sites are in the pinned source index,
 # but its categories are not normally treated as map locations. Include only

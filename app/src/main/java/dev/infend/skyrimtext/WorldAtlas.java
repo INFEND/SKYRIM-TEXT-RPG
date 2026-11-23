@@ -114,7 +114,7 @@ public final class WorldAtlas {
         geographyAdded=true;
         for(SkyrimMapCatalog.Site site:SkyrimMapCatalog.all()){
             int existing=-1;
-            for(int i=0;i<places.size();i++)if(places.get(i).name.equals(site.name)){existing=i;break;}
+            for(int i=0;i<places.size();i++)if(places.get(i).name.equals(site.name)||SkyrimMapCatalog.find(places.get(i).name)==site){existing=i;break;}
             Place old=existing<0?null:places.get(existing);
             String description=old==null?site.type+" | "+site.grid+". "+
                 "Переход ведёт к этому месту; доступ к отдельным сюжетным областям зависит от событий истории.":old.description;
