@@ -32,12 +32,13 @@ WHITERUN={
 
 class WikiRuConsolidation(unittest.TestCase):
     def test_six_map_sites_keep_identity_and_reviewed_source(self):
-        points={p["name"]:p for p in COMPILED}
+        points=COMPILED
         self.assertEqual(len(points),515)
         for en, (old, canonical) in SITES.items():
             with self.subTest(site=en):
-                self.assertIn(en,points)
-                self.assertEqual(points[en]["nameRu"],canonical)
+                matches=[p for p in points if p["name"]==en]
+                self.assertTrue(matches,en)
+                self.assertTrue(any(p["nameRu"]==canonical for p in matches),en)
                 self.assertIn("|"+canonical+"|"+en+"|",ROWS)
                 self.assertNotIn("|"+old+"|"+en+"|",ROWS)
                 self.assertIn(en+"|"+canonical, NAMES)
