@@ -102,7 +102,7 @@ final class NpcProfiles {
         addTemplate("Гаргулья","Разная","Не указан","Стража Рассвета | Dawnguard",1,"Gargoyle");
         addTemplate("Гаргулья-страж","Разная","Не указан","Стража Рассвета | Dawnguard",1,"Gargoyle Sentinel");
         addTemplate("Гаргулья-громила","Разная","Не указан","Стража Рассвета | Dawnguard",1,"Gargoyle Brute");
-        addTemplate("Бронированный тролль","Разная","Не указан","Стража Рассвета | Dawnguard",1,"Armored Troll");
+        addTemplate("Тролль в броне","Разная","Не указан","Стража Рассвета | Dawnguard",1,"Armored Troll","Бронированный тролль");
         addTemplate("Бронированный морозный тролль","Разная","Не указан","Стража Рассвета | Dawnguard",1,"Armored Frost Troll");
         addTemplate("Дозорный Стендарра","Разная","Не указан","Фракции | Skyrim",1,"Vigilant of Stendarr","Дозорная Стендарра");
         addTemplate("Охотник Серебряной Руки","Разная","Не указан","Фракции | Skyrim",1,"Silver Hand");
@@ -182,7 +182,7 @@ final class NpcProfiles {
         addTemplate("Риклинг","Разная","Не указан","Солстейм | Dragonborn",1,"Riekling");
         addTemplate("Риклинг-воин","Разная","Не указан","Солстейм | Dragonborn",1,"Riekling Warrior");
         addTemplate("Риклинг-всадник","Разная","Не указан","Солстейм | Dragonborn",1,"Riekling Rider");
-        addTemplate("Пепельное порождение","Разная","Не указан","Солстейм | Dragonborn",1,"Ash Spawn");
+        addTemplate("Порождение пепла","Разная","Не указан","Солстейм | Dragonborn",1,"Ash Spawn","Пепельное порождение");
         addTemplate("Пепельный страж","Разная","Не указан","Солстейм | Dragonborn",1,"Ash Guardian");
         addTemplate("Искатель","Разная","Не указан","Солстейм | Dragonborn",1,"Seeker");
         addTemplate("Скрытень","Разная","Не указан","Солстейм | Dragonborn",1,"Lurker");
@@ -196,7 +196,7 @@ final class NpcProfiles {
         addTemplate("Легендарный дракон","Дракон","Не указан","Драконы | Dawnguard",1,"Legendary Dragon");
         addTemplate("Великан","Разная","Не указан","Существа | Skyrim",1,"Giant");
         addTemplate("Тролль","Разная","Не указан","Существа | Skyrim",1,"Troll");
-        addTemplate("Морозный тролль","Разная","Не указан","Существа | Skyrim",1,"Frost Troll");
+        addTemplate("Ледяной тролль","Разная","Не указан","Существа | Skyrim",1,"Frost Troll","Морозный тролль");
         addTemplate("Спригган","Разная","Не указан","Существа | Skyrim",1,"Spriggan");
         addTemplate("Спригган-матрона","Разная","Не указан","Существа | Skyrim",1,"Spriggan Matron");
         addTemplate("Оборотень","Разная","Не указан","Существа | Skyrim",1,"Werewolf");

@@ -37,12 +37,31 @@ public final class BestiaryCatalogTest {
         assertEquals("Волк",BestiaryCatalog.find("Волки").name);
         assertEquals("Скелет",BestiaryCatalog.find("Скелеты").name);
         assertEquals("Корус",BestiaryCatalog.find("Корусов").name);
-        assertEquals("Пепельное порождение",BestiaryCatalog.find("Порождения пепла").name);
+        assertEquals("Порождение пепла",BestiaryCatalog.find("Порождения пепла").name);
         assertEquals("Пещерный охотник",BestiaryCatalog.find("Пещерный охотник").name);
-        assertEquals("Ледяной призрак",BestiaryCatalog.find("Ледяной призрак").name);
+        assertEquals("Ледяное привидение",BestiaryCatalog.find("Ледяной призрак").name);
         assertEquals("Мирмулнир",BestiaryCatalog.find("Мирмулнир").name);
         assertEquals("Инсектоиды",BestiaryCatalog.find("Кикимора").type);
         assertEquals("Трупоеды",BestiaryCatalog.find("Гуль").type);
+        // Russian Wiki names resolve to the same entries as legacy saved references.
+        for(String[] pair:new String[][]{
+            {"Морозный тролль","Ледяной тролль"},
+            {"Ледяной призрак","Ледяное привидение"},
+            {"Скелетный дракон","Дракон-скелет"},
+            {"Бронированный тролль","Тролль в броне"},
+            {"Горгулья","Гаргулья"},
+            {"Адская гончая","Гончая смерти"},
+            {"Туманник Каирна","Туманный человек"},
+            {"Гневный страж","Яростный человек"},
+            {"Оборотень-медведь","Медведь-оборотень"},
+            {"Сожжённый спригган","Горелый спригган"},
+            {"Пепельное порождение","Порождение пепла"}
+        }){
+            assertEquals(pair[1],BestiaryCatalog.find(pair[0]).name);
+            assertEquals(pair[1],BestiaryCatalog.find(pair[1]).name);
+            assertTrue(BestiaryCatalog.filter(pair[0],BestiaryCatalog.ALL).stream()
+                .anyMatch(e->e.name.equals(pair[1])));
+        }
         assertNull(BestiaryCatalog.find("Неизвестное существо"));
     }
 
