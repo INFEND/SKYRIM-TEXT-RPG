@@ -42,6 +42,13 @@ final class NpcProfiles {
             case "Кор-охотник": return "Корус-охотник";
             case "Горящий спригган": return "Горелый спригган";
             case "Спригган-земная мать": return "Спригган-мать земли";
+            case "Бандит-изгой": return "Разбойник";
+            case "Бандит-головорез": return "Громила";
+            case "Бандит-разбойник": return "Грабитель";
+            case "Бандит-грабитель": return "Головорез";
+            case "Бандит-мародёр": return "Мародёр";
+            case "Ученик некроманта": return "Некромант-ученик";
+            case "Адепт некромантии": return "Некромант-адепт";
             default: return id;
         }
     }
@@ -69,7 +76,7 @@ final class NpcProfiles {
         addTemplate("Бандит","Разная","Не указан","Бандиты | Skyrim",1,"Bandit","Бандитка");
         addTemplate("Бандит-изгой","Разная","Не указан","Бандиты | Skyrim",1,"Bandit Outlaw");
         addTemplate("Бандит-головорез","Разная","Не указан","Бандиты | Skyrim",1,"Bandit Thug");
-        addTemplate("Бандит-разбойник","Разная","Не указан","Бандиты | Skyrim",1,"Bandit Highwayman","Разбойник");
+        addTemplate("Бандит-разбойник","Разная","Не указан","Бандиты | Skyrim",1,"Bandit Highwayman");
         addTemplate("Бандит-грабитель","Разная","Не указан","Бандиты | Skyrim",1,"Bandit Plunderer");
         addTemplate("Бандит-мародёр","Разная","Не указан","Бандиты | Skyrim",1,"Bandit Marauder");
         addTemplate("Главарь бандитов","Разная","Не указан","Бандиты | Skyrim",1,"Bandit Chief","Предводитель бандитов");

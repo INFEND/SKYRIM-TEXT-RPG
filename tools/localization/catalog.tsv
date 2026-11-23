@@ -3133,7 +3133,7 @@ npc	Юрик Голдурсон	Юрик Голдурсон	candidate	NpcProfile
 npc	Ямарз	Ямарз	candidate	NpcProfiles
 npc	Яр гро-Гатук	Яр гро-Гатук	candidate	NpcProfiles
 npc-template	Адепт колдовства	Адепт колдовства	candidate	NpcProfiles
-npc-template	Адепт некромантии	Адепт некромантии	candidate	NpcProfiles
+npc-template	Адепт некромантии	Некромант-адепт	candidate	NpcProfiles
 npc-template	Алхимик	Алхимик	candidate	NpcProfiles
 npc-template	Архиколдун	Архиколдун	candidate	NpcProfiles
 npc-template	Архикриомант	Архикриомант	candidate	NpcProfiles
@@ -3141,13 +3141,13 @@ npc-template	Архинекромант	Архинекромант	candidate	Npc
 npc-template	Архипиромант	Архипиромант	candidate	NpcProfiles
 npc-template	Архиэлектромант	Архиэлектромант	candidate	NpcProfiles
 npc-template	Бандит	Бандит	candidate	NpcProfiles
-npc-template	Бандит-головорез	Бандит-головорез	candidate	NpcProfiles
-npc-template	Бандит-грабитель	Бандит-грабитель	candidate	NpcProfiles
-npc-template	Бандит-изгой	Бандит-изгой	candidate	NpcProfiles
+npc-template	Бандит-головорез	Громила	candidate	NpcProfiles
+npc-template	Бандит-грабитель	Головорез	candidate	NpcProfiles
+npc-template	Бандит-изгой	Разбойник	candidate	NpcProfiles
 npc-template	Бандит-лучник	Бандит-лучник	candidate	NpcProfiles
 npc-template	Бандит-маг	Бандит-маг	candidate	NpcProfiles
-npc-template	Бандит-мародёр	Бандит-мародёр	candidate	NpcProfiles
-npc-template	Бандит-разбойник	Бандит-разбойник	candidate	NpcProfiles
+npc-template	Бандит-мародёр	Мародёр	candidate	NpcProfiles
+npc-template	Бандит-разбойник	Грабитель	candidate	NpcProfiles
 npc-template	Бард	Бард	candidate	NpcProfiles
 npc-template	Беглец	Беглец	candidate	NpcProfiles
 npc-template	Беженец	Беженец	candidate	NpcProfiles
@@ -3322,7 +3322,7 @@ npc-template	Туманный человек	Туманный человек	can
 npc-template	Убийца Мораг Тонг	Убийца Мораг Тонг	candidate	NpcProfiles
 npc-template	Убийца Тёмного Братства	Убийца Тёмного Братства	candidate	NpcProfiles
 npc-template	Ученик колдуна	Ученик колдуна	candidate	NpcProfiles
-npc-template	Ученик некроманта	Ученик некроманта	candidate	NpcProfiles
+npc-template	Ученик некроманта	Некромант-ученик	candidate	NpcProfiles
 npc-template	Фалмер	Фалмер	candidate	NpcProfiles
 npc-template	Фалмер-военачальник	Фалмер-наёмник	candidate	NpcProfiles
 npc-template	Фалмер-воитель	Фалмер-мастер теней	candidate	NpcProfiles
