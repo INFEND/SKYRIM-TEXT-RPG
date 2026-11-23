@@ -308,7 +308,7 @@
           "full_resolution_luma_ssim": 0.985677,
           "worst_128px_luma_ssim": 0.973625,
           "chroma_mean_absolute_error": 1.937648,
-          "chroma_95th_percentile_error": 6.0,
+          "chroma_95th_percentile_error": 6,
           "scene": "Hill town inn, polished copper horseshoe suspended above a central low stone hearth, honey-colored carved pine trestles, wheat-colored late sun through open shutters, soft blue glass and horse tack in the entry."
         }
       ]
@@ -392,7 +392,7 @@
           "full_resolution_luma_ssim": 0.985011,
           "worst_128px_luma_ssim": 0.977828,
           "chroma_mean_absolute_error": 1.713377,
-          "chroma_95th_percentile_error": 5.0,
+          "chroma_95th_percentile_error": 5,
           "scene": "Snowbound black stone city tavern with a tall copper candle lantern glowing near a broad wall hearth, charcoal-brown timber, heavy linen curtains and snowy blue air beyond back windows. Strong warm-cold contrast."
         }
       ]
@@ -434,7 +434,7 @@
           "full_resolution_luma_ssim": 0.987515,
           "worst_128px_luma_ssim": 0.980174,
           "chroma_mean_absolute_error": 1.465682,
-          "chroma_95th_percentile_error": 4.0,
+          "chroma_95th_percentile_error": 4,
           "scene": "A welcoming forest-town inn with a tall log hall, split-stone fireplace, black spruce branches glimpsed through high leaded windows, a row of low benches with olive wool, subdued golden light and a quiet atmosphere."
         }
       ]
@@ -476,7 +476,7 @@
           "full_resolution_luma_ssim": 0.985675,
           "worst_128px_luma_ssim": 0.980388,
           "chroma_mean_absolute_error": 1.617311,
-          "chroma_95th_percentile_error": 5.0,
+          "chroma_95th_percentile_error": 5,
           "scene": "An old wind-battered inn near a high coastal cliff, thick stone doorway rimed outside, interior brass stove and vivid rusty wool benches. The view runs from the protected hall past a snowy threshold to the blue outside."
         }
       ]
@@ -518,7 +518,7 @@
           "full_resolution_luma_ssim": 0.985308,
           "worst_128px_luma_ssim": 0.976166,
           "chroma_mean_absolute_error": 1.746262,
-          "chroma_95th_percentile_error": 5.0,
+          "chroma_95th_percentile_error": 5,
           "scene": "Marshland inn held above reeds by dark wooden pilings. View across damp planks and a small warm dining room toward dawn fog outside, central low red iron stove, oval tables and honey lanterns."
         }
       ]
@@ -560,7 +560,7 @@
           "full_resolution_luma_ssim": 0.98542,
           "worst_128px_luma_ssim": 0.977761,
           "chroma_mean_absolute_error": 1.428506,
-          "chroma_95th_percentile_error": 4.0,
+          "chroma_95th_percentile_error": 4,
           "scene": "A northern seafarers' inn with hardy low log walls and rope-guided lamp chains, welcoming large stove, dry fish and timber counter, storm-tossed gray bay framed by rear doorway. Single wide eye-level view."
         }
       ]
@@ -627,7 +627,7 @@
           "full_resolution_luma_ssim": 0.987798,
           "worst_128px_luma_ssim": 0.978606,
           "chroma_mean_absolute_error": 1.374572,
-          "chroma_95th_percentile_error": 4.0,
+          "chroma_95th_percentile_error": 4,
           "scene": "An inn chamber carved into a cliff, several high sand-colored vaults with rounded uneven piers, copper fire dishes, reclaimed darkwood service counter and rows of small stone niches. Realistic flint and bronze patina."
         }
       ]
@@ -669,7 +669,7 @@
           "full_resolution_luma_ssim": 0.985279,
           "worst_128px_luma_ssim": 0.973464,
           "chroma_mean_absolute_error": 1.924057,
-          "chroma_95th_percentile_error": 6.0,
+          "chroma_95th_percentile_error": 6,
           "scene": "Canal-side dining room over a lake, rough black oak threshold, jars of honey under a row of amber glass floats, rain-blurred window and boats outside, a hearth at rear casting reflections through the varnished planks."
         }
       ]
@@ -711,7 +711,7 @@
           "full_resolution_luma_ssim": 0.986857,
           "worst_128px_luma_ssim": 0.979599,
           "chroma_mean_absolute_error": 1.673387,
-          "chroma_95th_percentile_error": 5.0,
+          "chroma_95th_percentile_error": 5,
           "scene": "A narrow hall built into a crowded northern stone quarter, warmly lit copper vessels, geometric brick grilles and dark red handwoven textiles, simple square tables and mended floor, soft charcoal sky visible through slits."
         }
       ]
@@ -753,7 +753,7 @@
           "full_resolution_luma_ssim": 0.986331,
           "worst_128px_luma_ssim": 0.977635,
           "chroma_mean_absolute_error": 1.96829,
-          "chroma_95th_percentile_error": 6.0,
+          "chroma_95th_percentile_error": 6,
           "scene": "A hidden underground tavern built into an old water lock, walkable lined towpath with tables under five brick arches, amber lamps mirrored in jade water, sturdy counter on dry ground. Interior architecture is original, engineering-heavy, no sigils."
         }
       ]
@@ -806,7 +806,7 @@
           "full_resolution_luma_ssim": 0.985596,
           "worst_128px_luma_ssim": 0.973255,
           "chroma_mean_absolute_error": 1.482117,
-          "chroma_95th_percentile_error": 4.0,
+          "chroma_95th_percentile_error": 4,
           "scene": "General goods seller in a windswept plains city, three marked measuring scoops at a split oak counter, rolled canvas, terra cotta jars and lanterns on neatly spaced shelves, late afternoon light off pale mud plaster."
         }
       ]
@@ -847,7 +847,7 @@
           "full_resolution_luma_ssim": 0.985708,
           "worst_128px_luma_ssim": 0.975124,
           "chroma_mean_absolute_error": 1.623311,
-          "chroma_95th_percentile_error": 5.0,
+          "chroma_95th_percentile_error": 5,
           "scene": "An angular stucco apothecary with a high wooden bow window and potted feathery yarrow on the sill, herb-drying shelves, aged brass scale and small glass tincture bottles, warm sage and straw tones."
         }
       ]
@@ -889,7 +889,7 @@
           "full_resolution_luma_ssim": 0.985186,
           "worst_128px_luma_ssim": 0.973359,
           "chroma_mean_absolute_error": 1.464639,
-          "chroma_95th_percentile_error": 4.0,
+          "chroma_95th_percentile_error": 4,
           "scene": "An upright forge and metalworker's display next to a sunlit stone arch, narrow cracks of light crossing stout iron racks, ruby coals and a splash quenched in a long trough. Strong readable work station."
         }
       ]
@@ -930,7 +930,7 @@
           "full_resolution_luma_ssim": 0.986443,
           "worst_128px_luma_ssim": 0.977845,
           "chroma_mean_absolute_error": 1.524645,
-          "chroma_95th_percentile_error": 4.0,
+          "chroma_95th_percentile_error": 4,
           "scene": "A hunter's outfitter in a bright wattle and wood room beneath a steep roof. Wall with several simple longbows, patterned felt, waxed strings on a workbench and heather bundles beside a compact tea table."
         }
       ]
@@ -1189,7 +1189,7 @@
           "full_resolution_luma_ssim": 0.985709,
           "worst_128px_luma_ssim": 0.979063,
           "chroma_mean_absolute_error": 1.351227,
-          "chroma_95th_percentile_error": 4.0,
+          "chroma_95th_percentile_error": 4,
           "scene": "Front of a stacked limestone trading office in a quarry capital, ribbed stone ceiling, great old iron counterweight scale, timber shelves of brass and finished leather, a canted shaft of morning light."
         }
       ]
@@ -1230,7 +1230,7 @@
           "full_resolution_luma_ssim": 0.985936,
           "worst_128px_luma_ssim": 0.97753,
           "chroma_mean_absolute_error": 1.688921,
-          "chroma_95th_percentile_error": 5.0,
+          "chroma_95th_percentile_error": 5,
           "scene": "An herbal remedy shop dug into layered cliff stone, slate workbench with bowls of dried roots, cool well water from a spout and curved amber glass, one low warm lantern. Wide diagonal perspective."
         }
       ]
@@ -1271,7 +1271,7 @@
           "full_resolution_luma_ssim": 0.986869,
           "worst_128px_luma_ssim": 0.981401,
           "chroma_mean_absolute_error": 1.644783,
-          "chroma_95th_percentile_error": 5.0,
+          "chroma_95th_percentile_error": 5,
           "scene": "A timber pawn counter on the low bank, mismatched baskets, folded coats, plain silver rings behind old smoky glass and a crate of fishing hardware. Narrow vertical slit with autumnal lake light. Low warm lamps and clean sightlines."
         }
       ]
@@ -1312,7 +1312,7 @@
           "full_resolution_luma_ssim": 0.987639,
           "worst_128px_luma_ssim": 0.98034,
           "chroma_mean_absolute_error": 1.164725,
-          "chroma_95th_percentile_error": 3.0,
+          "chroma_95th_percentile_error": 3,
           "scene": "A half-sunken herbal lab beside canal embankments. Low black timber ceiling, botanical roots under pale brick shelves, pale blue alembics and floating white water lilies visible through a low window. Calm silver morning light."
         }
       ]
@@ -1353,7 +1353,7 @@
           "full_resolution_luma_ssim": 0.985169,
           "worst_128px_luma_ssim": 0.977655,
           "chroma_mean_absolute_error": 1.743638,
-          "chroma_95th_percentile_error": 5.0,
+          "chroma_95th_percentile_error": 5,
           "scene": "Forge under the eaves of a canal street, three-quarter view to a red brick furnace and worn anvil, red willow leaves beyond a window, iron hooks and hammers suspended away from foreground. Dusk, vivid but controlled orange."
         }
       ]
@@ -1394,7 +1394,7 @@
           "full_resolution_luma_ssim": 0.985059,
           "worst_128px_luma_ssim": 0.978442,
           "chroma_mean_absolute_error": 1.485978,
-          "chroma_95th_percentile_error": 4.0,
+          "chroma_95th_percentile_error": 4,
           "scene": "Secondhand housewares shop in a dense black-stone district, neatly repaired metal pots with visible rivets, worn leather boots, cloth bolts and a dusty small bay window. Smoke-blue morning color with amber light over counter."
         }
       ]
@@ -1435,7 +1435,7 @@
           "full_resolution_luma_ssim": 0.986325,
           "worst_128px_luma_ssim": 0.975311,
           "chroma_mean_absolute_error": 1.387877,
-          "chroma_95th_percentile_error": 4.0,
+          "chroma_95th_percentile_error": 4,
           "scene": "A black stone apothecary in a winter city with frosted mullioned lights, a pale quartz bowl filled with fresh roots, rows of cloudy medicine jars and a navy enamel scale. Restrained blue and muted cream."
         }
       ]
@@ -1477,7 +1477,7 @@
           "full_resolution_luma_ssim": 0.986398,
           "worst_128px_luma_ssim": 0.976483,
           "chroma_mean_absolute_error": 1.805155,
-          "chroma_95th_percentile_error": 5.0,
+          "chroma_95th_percentile_error": 5,
           "scene": "A forest pharmacist's timber cottage with fern fronds drying along its low rafters, amber resin pots and antler-handled tools lined beside the counter. Soft forest-green side light through a low window."
         }
       ]
@@ -1518,7 +1518,7 @@
           "full_resolution_luma_ssim": 0.985293,
           "worst_128px_luma_ssim": 0.974631,
           "chroma_mean_absolute_error": 1.990828,
-          "chroma_95th_percentile_error": 6.0,
+          "chroma_95th_percentile_error": 6,
           "scene": "Practical local goods shop at the edge of an evergreen forest. Knotted pine counters, braided rope, lanterns, wood pegs, pottery and flint displayed on felt. Warm but readable light in a rustic workspace."
         }
       ]
@@ -1559,7 +1559,7 @@
           "full_resolution_luma_ssim": 0.985982,
           "worst_128px_luma_ssim": 0.976533,
           "chroma_mean_absolute_error": 1.348075,
-          "chroma_95th_percentile_error": 4.0,
+          "chroma_95th_percentile_error": 4,
           "scene": "Working herbalist's hut with dark peat-fired kiln, hanging marsh roots, plain worn clay jars and several woven slatted shutters. Fog from an open rear window softly fills a practical workspace."
         }
       ]
@@ -1600,7 +1600,7 @@
           "full_resolution_luma_ssim": 0.985266,
           "worst_128px_luma_ssim": 0.977373,
           "chroma_mean_absolute_error": 1.493764,
-          "chroma_95th_percentile_error": 4.0,
+          "chroma_95th_percentile_error": 4,
           "scene": "Windy harbor apothecary with an unusually large gray stone mortar front and center, carefully spaced blue ceramics, pale salt and brown seaweed on simple trays. Side daylight breaks through a weathered wood window."
         }
       ]
@@ -1642,7 +1642,7 @@
           "full_resolution_luma_ssim": 0.985388,
           "worst_128px_luma_ssim": 0.970366,
           "chroma_mean_absolute_error": 1.452213,
-          "chroma_95th_percentile_error": 4.0,
+          "chroma_95th_percentile_error": 4,
           "scene": "A winter supply shop near a lonely snowbound cape, neatly stacked iron lamps, baskets, boots and wool on fir racks under steep rafters. Snow and bright sky in a high square window, neutral color and readable textures."
         }
       ]
@@ -1695,7 +1695,7 @@
           "full_resolution_luma_ssim": 0.986645,
           "worst_128px_luma_ssim": 0.978329,
           "chroma_mean_absolute_error": 1.9246,
-          "chroma_95th_percentile_error": 6.0,
+          "chroma_95th_percentile_error": 6,
           "scene": "Lakeside mead brewery with big oaken casks on sawhorses and a row of amber trial glasses, alder beam and rack honeycomb, plain iron hoops, stone drain, a blue rippling reflection between warm lamps."
         }
       ]
@@ -1746,7 +1746,7 @@
           "full_resolution_luma_ssim": 0.98783,
           "worst_128px_luma_ssim": 0.979433,
           "chroma_mean_absolute_error": 1.307548,
-          "chroma_95th_percentile_error": 4.0,
+          "chroma_95th_percentile_error": 4,
           "scene": "Old communal lodge beside a calm canal, four comfortably spaced wooden bunk alcoves and woven rust-colored patchwork, trestle supper table, mist beyond low leaded windows, dry herbs overhead. Cozy, plain, lived-in lodge."
         }
       ]
@@ -1800,7 +1800,7 @@
           "full_resolution_luma_ssim": 0.98577,
           "worst_128px_luma_ssim": 0.976259,
           "chroma_mean_absolute_error": 1.553494,
-          "chroma_95th_percentile_error": 5.0,
+          "chroma_95th_percentile_error": 5,
           "scene": "Volcanic island inn in a wide, rough basalt cavity, black semicircular alcoves, undulating timber counter and red pottery, a hazy window shaft showing fine ash outside. Warm rust light against gray-black stone."
         }
       ]
@@ -2542,7 +2542,7 @@
           "full_resolution_luma_ssim": 0.985983,
           "worst_128px_luma_ssim": 0.97475,
           "chroma_mean_absolute_error": 2.025868,
-          "chroma_95th_percentile_error": 6.0,
+          "chroma_95th_percentile_error": 6,
           "scene": "A three-stall stable dug into clay under limestone steps, steep terraced farming and a pale cascade visible in background, cut-stone trough and dry straw on a sheltered apron. Soft late summer sunset."
         }
       ]
@@ -2583,7 +2583,7 @@
           "full_resolution_luma_ssim": 0.987159,
           "worst_128px_luma_ssim": 0.976069,
           "chroma_mean_absolute_error": 2.359753,
-          "chroma_95th_percentile_error": 7.0,
+          "chroma_95th_percentile_error": 7,
           "scene": "Low timber stable at an autumn lake road, amber alder trees, fog off the water and one horse in a roomy outdoor sand paddock, halters and clean straw beneath covered eaves."
         }
       ]
@@ -2624,7 +2624,7 @@
           "full_resolution_luma_ssim": 0.986225,
           "worst_128px_luma_ssim": 0.977494,
           "chroma_mean_absolute_error": 1.81365,
-          "chroma_95th_percentile_error": 5.0,
+          "chroma_95th_percentile_error": 5,
           "scene": "Open-sided pine and stone horse stable beside an amber grass steppe road, saddle rack and fodder in sunshine, two correctly proportioned horses distant, snowless foreground and faint mountains."
         }
       ]
@@ -2665,7 +2665,7 @@
           "full_resolution_luma_ssim": 0.985711,
           "worst_128px_luma_ssim": 0.975605,
           "chroma_mean_absolute_error": 1.337165,
-          "chroma_95th_percentile_error": 4.0,
+          "chroma_95th_percentile_error": 4,
           "scene": "Stone-and-larch horse barn under an old arched winter bridge, freshly piled snow at the entrance, bale storage and small mare in a sheltered paddock. Soft overcast white snow with subtle detail, one warm window."
         }
       ]
@@ -2840,7 +2840,7 @@
           "full_resolution_luma_ssim": 0.986345,
           "worst_128px_luma_ssim": 0.97902,
           "chroma_mean_absolute_error": 1.550358,
-          "chroma_95th_percentile_error": 5.0,
+          "chroma_95th_percentile_error": 5,
           "scene": "An original cliffside shrine on a volcanic island, a waist-high volcanic stone with simple curved terraces and small unlettered incisions, dry ash dunes, orange cloth knots and light breaking horizontally through charcoal smoke. No characters."
         }
       ]
@@ -8947,7 +8947,7 @@
           "full_resolution_luma_ssim": 0.986076,
           "worst_128px_luma_ssim": 0.979605,
           "chroma_mean_absolute_error": 1.520859,
-          "chroma_95th_percentile_error": 4.0,
+          "chroma_95th_percentile_error": 4,
           "scene": "A monumental original water-control chamber beneath a limestone cliff, three vertically staggered bronze gates, cascading mineral-blue water, dry stairwell and a warm grate. Distinct engineered forms and atmospheric foreground-to-background depth."
         }
       ]
@@ -8987,7 +8987,7 @@
           "full_resolution_luma_ssim": 0.986338,
           "worst_128px_luma_ssim": 0.980165,
           "chroma_mean_absolute_error": 1.589749,
-          "chroma_95th_percentile_error": 4.0,
+          "chroma_95th_percentile_error": 4,
           "scene": "An original excavation trench under tiered galleries of older limestone and verdigris lintels, wooden surveying gantry, rolls of rope and tiered pick marks, warm skylight reaching recently exposed blockwork."
         }
       ]
@@ -9037,7 +9037,7 @@
           "full_resolution_luma_ssim": 0.985315,
           "worst_128px_luma_ssim": 0.97344,
           "chroma_mean_absolute_error": 1.326107,
-          "chroma_95th_percentile_error": 4.0,
+          "chroma_95th_percentile_error": 4,
           "scene": "Западные ворота Солитьюда со стороны подъёмной дороги."
         },
         {
@@ -9058,7 +9058,7 @@
           "full_resolution_luma_ssim": 0.986173,
           "worst_128px_luma_ssim": 0.97427,
           "chroma_mean_absolute_error": 1.426147,
-          "chroma_95th_percentile_error": 4.0,
+          "chroma_95th_percentile_error": 4,
           "scene": "Главная улица у таверны «Смеющаяся крыса», вид изнутри городских ворот."
         },
         {
@@ -9100,7 +9100,7 @@
           "full_resolution_luma_ssim": 0.985527,
           "worst_128px_luma_ssim": 0.975845,
           "chroma_mean_absolute_error": 1.385192,
-          "chroma_95th_percentile_error": 4.0,
+          "chroma_95th_percentile_error": 4,
           "scene": "Каменный двор Мрачного замка с имперскими знамёнами и тренировочными мишенями."
         },
         {
@@ -9121,7 +9121,7 @@
           "full_resolution_luma_ssim": 0.986211,
           "worst_128px_luma_ssim": 0.976066,
           "chroma_mean_absolute_error": 1.493148,
-          "chroma_95th_percentile_error": 4.0,
+          "chroma_95th_percentile_error": 4,
           "scene": "Фасад Синего дворца с центральной аркой, двором и куполом."
         },
         {
@@ -9161,15 +9161,15 @@
     ],
     "aliases": [],
     "artwork": {
-      "date": "2026-11-20",
-      "kind": "original_generated_illustration",
+      "date": "2026-11-24",
+      "kind": "user_supplied_generated_illustration",
       "format": "WebP",
       "encoder_method": 6,
       "frames": [
         {
           "frame": 1,
-          "source_sha256": "f5012a0a8edda0b3dad68dec4ea052a1716e8ba5d3e1f2be04e26cd6ea3ad227",
-          "source_bytes": 3506172,
+          "source_sha256": "535aab929c76c51182e8ec65c03800dde32303ec77d86764695efe35c2c07a48",
+          "source_bytes": 3470913,
           "source_dimensions": [
             1672,
             941
@@ -9178,19 +9178,20 @@
             1672,
             941
           ],
-          "bytes": 493236,
-          "quality": 87,
-          "sha256": "8e02fc1e7a4fc9b0f3535d7d1c1f9812244bbc4cc3f8353d6e2b111f20ffbe66",
-          "full_resolution_luma_ssim": 0.986379,
-          "worst_128px_luma_ssim": 0.976618,
-          "chroma_mean_absolute_error": 1.77002,
-          "chroma_95th_percentile_error": 5.0,
-          "scene": "Northern hill town of pine beams, pale turf, wheat-colored grassy plains, soft distant snow peaks; original terrain and medieval architecture. Strong timber double gate over a dry stone base, angled windbreak and pale amber grasses in morning, low view from the approach track."
+          "bytes": 507726,
+          "quality": 88,
+          "sha256": "6d38483a87313f111f346e247161b629f9f1a2ea41d14a36b566081436382883",
+          "full_resolution_luma_ssim": 0.986472,
+          "worst_128px_luma_ssim": 0.969083,
+          "chroma_mean_absolute_error": 2.856763,
+          "chroma_95th_percentile_error": 8,
+          "scene": "Главные ворота Вайтрана: массивные деревянные створки в каменной крепостной стене, два стражника, жаровня, каменная дорога, горы на заднем плане.",
+          "source": "uploaded_user_image_2026-11-24"
         },
         {
           "frame": 2,
-          "source_sha256": "80e247159fc893bf1848f256b97049b787af711d83d5f3e7676344e9c77a4a22",
-          "source_bytes": 3648745,
+          "source_sha256": "e07dc37aaea97460a9bcfc4bffcf1d76ec245a699f56dd52a94d67d9a64117f6",
+          "source_bytes": 3706883,
           "source_dimensions": [
             1672,
             941
@@ -9199,14 +9200,15 @@
             1672,
             941
           ],
-          "bytes": 515628,
-          "quality": 86,
-          "sha256": "f9d87a243a78e1d8f696b9f8f66553ede31cadaf2c46962609e6750a238d4683",
-          "full_resolution_luma_ssim": 0.985229,
-          "worst_128px_luma_ssim": 0.969398,
-          "chroma_mean_absolute_error": 1.937779,
-          "chroma_95th_percentile_error": 6.0,
-          "scene": "Northern hill town of pine beams, pale turf, wheat-colored grassy plains, soft distant snow peaks; original terrain and medieval architecture. A long uphill cobbled main lane with plastered half-timbered houses and simple flags between posts, late afternoon dramatic side light, one handcart along the road."
+          "bytes": 566922,
+          "quality": 88,
+          "sha256": "6d178b48f3a613a9bc42c283fcd5949a17dba3325c3eea76e025e7501d70e051",
+          "full_resolution_luma_ssim": 0.990548,
+          "worst_128px_luma_ssim": 0.975678,
+          "chroma_mean_absolute_error": 3.050357,
+          "chroma_95th_percentile_error": 9,
+          "scene": "Главная улица Вайтрана: мощёная улица с северной деревянной архитектурой, таверной со знаком коня, NPC и горными вершинами на горизонте.",
+          "source": "uploaded_user_image_2026-11-24"
         },
         {
           "frame": 3,
@@ -9226,7 +9228,7 @@
           "full_resolution_luma_ssim": 0.986222,
           "worst_128px_luma_ssim": 0.978288,
           "chroma_mean_absolute_error": 1.806978,
-          "chroma_95th_percentile_error": 5.0,
+          "chroma_95th_percentile_error": 5,
           "scene": "Northern hill town of pine beams, pale turf, wheat-colored grassy plains, soft distant snow peaks; original terrain and medieval architecture. An open-air common filled with locally woven golden shades, vegetables, pottery and a wedge of sun over the ochre marketplace, pedestrian view."
         },
         {
@@ -9247,7 +9249,7 @@
           "full_resolution_luma_ssim": 0.985077,
           "worst_128px_luma_ssim": 0.970061,
           "chroma_mean_absolute_error": 1.554875,
-          "chroma_95th_percentile_error": 4.0,
+          "chroma_95th_percentile_error": 4,
           "scene": "Northern hill town of pine beams, pale turf, wheat-colored grassy plains, soft distant snow peaks; original terrain and medieval architecture. Steeply pitched pine roofs braced against a cold south wind, pale cloth drying overhead, downhill lane and sunny plains seen through an opening between homes."
         },
         {
@@ -9268,7 +9270,7 @@
           "full_resolution_luma_ssim": 0.985782,
           "worst_128px_luma_ssim": 0.976706,
           "chroma_mean_absolute_error": 1.534886,
-          "chroma_95th_percentile_error": 5.0,
+          "chroma_95th_percentile_error": 5,
           "scene": "Northern hill town of pine beams, pale turf, wheat-colored grassy plains, soft distant snow peaks; original terrain and medieval architecture. Ancient hilltop guild hall made of stacked oak and stone, long low entrance under a ridge of visibly different engraved beams, plain round wooden shields and blue cloud shadows, medium exterior view."
         },
         {
@@ -9289,7 +9291,7 @@
           "full_resolution_luma_ssim": 0.986534,
           "worst_128px_luma_ssim": 0.979367,
           "chroma_mean_absolute_error": 1.897052,
-          "chroma_95th_percentile_error": 6.0,
+          "chroma_95th_percentile_error": 6,
           "scene": "Northern hill town of pine beams, pale turf, wheat-colored grassy plains, soft distant snow peaks; original terrain and medieval architecture. High hillside timber and stone hold with a wide horn-shaped portico and two squat buttresses, pale hearth smoke leaning in the wind, stairway and steppe horizon."
         }
       ]
@@ -9339,7 +9341,7 @@
           "full_resolution_luma_ssim": 0.986012,
           "worst_128px_luma_ssim": 0.980528,
           "chroma_mean_absolute_error": 1.840219,
-          "chroma_95th_percentile_error": 6.0,
+          "chroma_95th_percentile_error": 6,
           "scene": "Original medieval waterside town built around an inland lake with rain-darkened alder, ochre autumn leaves and matte blue-green water. Gate in a peaked palisade above a shallow water ditch, modest stone causeway and sturdy timber doors, orange leaves catching beautifully soft gray sunrise."
         },
         {
@@ -9360,7 +9362,7 @@
           "full_resolution_luma_ssim": 0.985712,
           "worst_128px_luma_ssim": 0.974271,
           "chroma_mean_absolute_error": 1.705974,
-          "chroma_95th_percentile_error": 5.0,
+          "chroma_95th_percentile_error": 5,
           "scene": "Original medieval waterside town built around an inland lake with rain-darkened alder, ochre autumn leaves and matte blue-green water. Quayside market in a generous plaza with wooden stall frames, honey pots, woven baskets and muted russet shades, homely low lakeshore roofs, overcast evening."
         },
         {
@@ -9381,7 +9383,7 @@
           "full_resolution_luma_ssim": 0.986075,
           "worst_128px_luma_ssim": 0.977969,
           "chroma_mean_absolute_error": 2.176921,
-          "chroma_95th_percentile_error": 7.0,
+          "chroma_95th_percentile_error": 7,
           "scene": "Original medieval waterside town built around an inland lake with rain-darkened alder, ochre autumn leaves and matte blue-green water. Amber-red alder trees drape toward a narrow canal with irregular low footbridges and piles of dark timber boathouses, emerald water reflected onto walls."
         },
         {
@@ -9402,7 +9404,7 @@
           "full_resolution_luma_ssim": 0.985154,
           "worst_128px_luma_ssim": 0.973625,
           "chroma_mean_absolute_error": 1.914789,
-          "chroma_95th_percentile_error": 6.0,
+          "chroma_95th_percentile_error": 6,
           "scene": "Original medieval waterside town built around an inland lake with rain-darkened alder, ochre autumn leaves and matte blue-green water. Original lake docks, small broad-bottomed boats, heavily worn planked jetties with squat copper lanterns mirrored in golden-hour dark water."
         },
         {
@@ -9423,7 +9425,7 @@
           "full_resolution_luma_ssim": 0.987755,
           "worst_128px_luma_ssim": 0.978432,
           "chroma_mean_absolute_error": 1.750917,
-          "chroma_95th_percentile_error": 6.0,
+          "chroma_95th_percentile_error": 6,
           "scene": "Original medieval waterside town built around an inland lake with rain-darkened alder, ochre autumn leaves and matte blue-green water. Walled administrative estate on a mudstone island between two narrow canals, modest stepped towers and octagonal watch lamp on a buttress, diffuse cloudy daylight."
         },
         {
@@ -9444,7 +9446,7 @@
           "full_resolution_luma_ssim": 0.985786,
           "worst_128px_luma_ssim": 0.976611,
           "chroma_mean_absolute_error": 1.854355,
-          "chroma_95th_percentile_error": 6.0,
+          "chroma_95th_percentile_error": 6,
           "scene": "Original medieval waterside town built around an inland lake with rain-darkened alder, ochre autumn leaves and matte blue-green water. A brisk, wet lower passage of stilted houses, steep irregular stairs, exposed beams and rain light reflected under a covered footway, direct perspective down the cross-lane."
         }
       ]
@@ -9494,7 +9496,7 @@
           "full_resolution_luma_ssim": 0.985134,
           "worst_128px_luma_ssim": 0.976529,
           "chroma_mean_absolute_error": 1.36032,
-          "chroma_95th_percentile_error": 4.0,
+          "chroma_95th_percentile_error": 4,
           "scene": "A wholly original fortified city in frozen slate-stone mountains, dark dry-laid basalt, pale frost, weathered pine, copper hints. Massive twin stepped basalt pylons just inside snow ruts, copper corners and frozen wind-sculpted drainage on the approach, one warm torch against cold morning light."
         },
         {
@@ -9515,7 +9517,7 @@
           "full_resolution_luma_ssim": 0.985253,
           "worst_128px_luma_ssim": 0.97754,
           "chroma_mean_absolute_error": 1.650686,
-          "chroma_95th_percentile_error": 5.0,
+          "chroma_95th_percentile_error": 5,
           "scene": "A wholly original fortified city in frozen slate-stone mountains, dark dry-laid basalt, pale frost, weathered pine, copper hints. Battered slate rowhouses with clusters of low chimneys and reddish brick repairs, snug entries and chimney vapor in textured pale blue air."
         },
         {
@@ -9536,7 +9538,7 @@
           "full_resolution_luma_ssim": 0.98533,
           "worst_128px_luma_ssim": 0.970389,
           "chroma_mean_absolute_error": 1.901322,
-          "chroma_95th_percentile_error": 6.0,
+          "chroma_95th_percentile_error": 6,
           "scene": "A wholly original fortified city in frozen slate-stone mountains, dark dry-laid basalt, pale frost, weathered pine, copper hints. Snow-packed open yard where pine sleds under gray wool sails carry provisions, copper scales and russet awnings against black stone, clear afternoon."
         },
         {
@@ -9557,7 +9559,7 @@
           "full_resolution_luma_ssim": 0.986467,
           "worst_128px_luma_ssim": 0.978681,
           "chroma_mean_absolute_error": 1.417782,
-          "chroma_95th_percentile_error": 4.0,
+          "chroma_95th_percentile_error": 4,
           "scene": "A wholly original fortified city in frozen slate-stone mountains, dark dry-laid basalt, pale frost, weathered pine, copper hints. Wide uneven stairs cut into the dark slate hillside, deep-set iron-banded entrances and radial shadows, gentle flurries under real winter light."
         },
         {
@@ -9578,7 +9580,7 @@
           "full_resolution_luma_ssim": 0.985189,
           "worst_128px_luma_ssim": 0.979179,
           "chroma_mean_absolute_error": 1.403178,
-          "chroma_95th_percentile_error": 4.0,
+          "chroma_95th_percentile_error": 4,
           "scene": "A wholly original fortified city in frozen slate-stone mountains, dark dry-laid basalt, pale frost, weathered pine, copper hints. Modest monumental basalt palace with severe stepped roof, thin silver strips of snow and long gallery of original angular piers, imposing frontal wide view under low sun."
         },
         {
@@ -9599,7 +9601,7 @@
           "full_resolution_luma_ssim": 0.986132,
           "worst_128px_luma_ssim": 0.976056,
           "chroma_mean_absolute_error": 1.547677,
-          "chroma_95th_percentile_error": 4.0,
+          "chroma_95th_percentile_error": 4,
           "scene": "A wholly original fortified city in frozen slate-stone mountains, dark dry-laid basalt, pale frost, weathered pine, copper hints. Quayside stone gangway with rope rail, rows of tall unlettered markers, frozen ships' slips and thick white ice cracked against mineral-dark water, blue midday."
         }
       ]
@@ -9649,7 +9651,7 @@
           "full_resolution_luma_ssim": 0.986143,
           "worst_128px_luma_ssim": 0.980012,
           "chroma_mean_absolute_error": 1.636264,
-          "chroma_95th_percentile_error": 5.0,
+          "chroma_95th_percentile_error": 5,
           "scene": "Original limestone quarry city cut into cliff terraces, copper drainage, falling water and golden stone, a believable medieval fantasy. Outer gate between two inclined limestone walls with a silvery mineral seam and carved stone water-tank overflow, copper doors and morning in a narrow gorge."
         },
         {
@@ -9670,7 +9672,7 @@
           "full_resolution_luma_ssim": 0.985394,
           "worst_128px_luma_ssim": 0.978108,
           "chroma_mean_absolute_error": 1.761504,
-          "chroma_95th_percentile_error": 5.0,
+          "chroma_95th_percentile_error": 5,
           "scene": "Original limestone quarry city cut into cliff terraces, copper drainage, falling water and golden stone, a believable medieval fantasy. A stepped lane tracking a narrow stone aqueduct and doorways of multistory quarry homes, powder blue light tints one side, original arched supports."
         },
         {
@@ -9691,7 +9693,7 @@
           "full_resolution_luma_ssim": 0.986637,
           "worst_128px_luma_ssim": 0.982072,
           "chroma_mean_absolute_error": 2.001774,
-          "chroma_95th_percentile_error": 6.0,
+          "chroma_95th_percentile_error": 6,
           "scene": "Original limestone quarry city cut into cliff terraces, copper drainage, falling water and golden stone, a believable medieval fantasy. Substantial stepped market under three cut rock arches, carved bowls, linen and blue-verdigris pots in stalls around a dry stone basin, warm daylight."
         },
         {
@@ -9712,7 +9714,7 @@
           "full_resolution_luma_ssim": 0.986005,
           "worst_128px_luma_ssim": 0.975856,
           "chroma_mean_absolute_error": 1.841042,
-          "chroma_95th_percentile_error": 5.0,
+          "chroma_95th_percentile_error": 5,
           "scene": "Original limestone quarry city cut into cliff terraces, copper drainage, falling water and golden stone, a believable medieval fantasy. An original secluded temple cut into honey-colored limestone, slender pillars around gardens of porcelain flowers and a fine water curtain caught in a shaft of cool light."
         },
         {
@@ -9733,7 +9735,7 @@
           "full_resolution_luma_ssim": 0.985137,
           "worst_128px_luma_ssim": 0.976759,
           "chroma_mean_absolute_error": 1.7844,
-          "chroma_95th_percentile_error": 5.0,
+          "chroma_95th_percentile_error": 5,
           "scene": "Original limestone quarry city cut into cliff terraces, copper drainage, falling water and golden stone, a believable medieval fantasy. A bold layered citadel in a recess above a sandstone chasm, squat fortified entrances and a sculpted buttress, waterfall off to the far side."
         },
         {
@@ -9754,7 +9756,7 @@
           "full_resolution_luma_ssim": 0.985747,
           "worst_128px_luma_ssim": 0.976125,
           "chroma_mean_absolute_error": 1.839309,
-          "chroma_95th_percentile_error": 5.0,
+          "chroma_95th_percentile_error": 5,
           "scene": "Original limestone quarry city cut into cliff terraces, copper drainage, falling water and golden stone, a believable medieval fantasy. From atop green limestone terraces, terraced courtyards above the distant ravine with a dull copper conduit, bleaching limestone steps, late afternoon warmth."
         }
       ]
@@ -9804,7 +9806,7 @@
           "full_resolution_luma_ssim": 0.985281,
           "worst_128px_luma_ssim": 0.977613,
           "chroma_mean_absolute_error": 1.674338,
-          "chroma_95th_percentile_error": 5.0,
+          "chroma_95th_percentile_error": 5,
           "scene": "Medieval forestry town in native spruce woodland, original timber houses, rich moss, pale stones and wet fern textures. A weathered cobbled road emerging between enormous dark spruce trunks, scattered needle beds and a little charcoal watch shelter, last shafts of sunrise and morning mist."
         },
         {
@@ -9825,7 +9827,7 @@
           "full_resolution_luma_ssim": 0.986587,
           "worst_128px_luma_ssim": 0.977654,
           "chroma_mean_absolute_error": 1.720458,
-          "chroma_95th_percentile_error": 5.0,
+          "chroma_95th_percentile_error": 5,
           "scene": "Medieval forestry town in native spruce woodland, original timber houses, rich moss, pale stones and wet fern textures. Small forest town's main muddy street lined with neatly hewn cedar cottages and luminous windows, long boards set out to dry and moss along stone foundations."
         },
         {
@@ -9846,7 +9848,7 @@
           "full_resolution_luma_ssim": 0.985489,
           "worst_128px_luma_ssim": 0.97773,
           "chroma_mean_absolute_error": 1.709016,
-          "chroma_95th_percentile_error": 5.0,
+          "chroma_95th_percentile_error": 5,
           "scene": "Medieval forestry town in native spruce woodland, original timber houses, rich moss, pale stones and wet fern textures. Quiet woodland market with beeswax, birch spiles, honey jars, coils of rope and pine pitch tubs, wedged between pitched homes and the forest. Dappled canopy light."
         },
         {
@@ -9867,7 +9869,7 @@
           "full_resolution_luma_ssim": 0.985994,
           "worst_128px_luma_ssim": 0.97766,
           "chroma_mean_absolute_error": 1.390205,
-          "chroma_95th_percentile_error": 4.0,
+          "chroma_95th_percentile_error": 4,
           "scene": "Medieval forestry town in native spruce woodland, original timber houses, rich moss, pale stones and wet fern textures. Plainly solemn long timber memorial hall with a runnel of rain outside its steep gable, a row of lanterns on a low stone wall, weathered beams and soft late light."
         },
         {
@@ -9888,7 +9890,7 @@
           "full_resolution_luma_ssim": 0.985363,
           "worst_128px_luma_ssim": 0.977603,
           "chroma_mean_absolute_error": 1.422018,
-          "chroma_95th_percentile_error": 4.0,
+          "chroma_95th_percentile_error": 4,
           "scene": "Medieval forestry town in native spruce woodland, original timber houses, rich moss, pale stones and wet fern textures. Peaceful woodland graveyard with small unmarked stone markers ringed with ivy, dripping conifers and a narrow stone bench, dignified morning fog."
         },
         {
@@ -9909,7 +9911,7 @@
           "full_resolution_luma_ssim": 0.986742,
           "worst_128px_luma_ssim": 0.977854,
           "chroma_mean_absolute_error": 2.011961,
-          "chroma_95th_percentile_error": 6.0,
+          "chroma_95th_percentile_error": 6,
           "scene": "Medieval forestry town in native spruce woodland, original timber houses, rich moss, pale stones and wet fern textures. Forest-edge trail curving past a high split-rail fence and stacked firewood, bright green ferns, spruce trunks, softly visible village roofs behind."
         }
       ]
@@ -9959,7 +9961,7 @@
           "full_resolution_luma_ssim": 0.986543,
           "worst_128px_luma_ssim": 0.979672,
           "chroma_mean_absolute_error": 1.142122,
-          "chroma_95th_percentile_error": 3.0,
+          "chroma_95th_percentile_error": 3,
           "scene": "Original marsh settlement on low piers and boardwalks, weathered pine, peat water, reeds and cool fog, quiet medieval town. A raised causeway of split stone through dark peat ponds, reed banks, gray willows and a tiny glow in the mist ahead. Low eye-level perspective at dawn."
         },
         {
@@ -9980,7 +9982,7 @@
           "full_resolution_luma_ssim": 0.985951,
           "worst_128px_luma_ssim": 0.980102,
           "chroma_mean_absolute_error": 1.285291,
-          "chroma_95th_percentile_error": 4.0,
+          "chroma_95th_percentile_error": 4,
           "scene": "Original marsh settlement on low piers and boardwalks, weathered pine, peat water, reeds and cool fog, quiet medieval town. A timber bridge with slender knees and rushes all along the tea-dark river, modest houses up on piers viewed through rain, polished handrail and believable reflections."
         },
         {
@@ -10001,7 +10003,7 @@
           "full_resolution_luma_ssim": 0.985264,
           "worst_128px_luma_ssim": 0.967321,
           "chroma_mean_absolute_error": 1.393908,
-          "chroma_95th_percentile_error": 4.0,
+          "chroma_95th_percentile_error": 4,
           "scene": "Original marsh settlement on low piers and boardwalks, weathered pine, peat water, reeds and cool fog, quiet medieval town. Settlement boardwalk lit by lanterns and framed by shingled pine cottages on rough posts, reed-bottom crates and wet plank textures, small channel between houses."
         },
         {
@@ -10022,7 +10024,7 @@
           "full_resolution_luma_ssim": 0.985447,
           "worst_128px_luma_ssim": 0.975062,
           "chroma_mean_absolute_error": 1.29123,
-          "chroma_95th_percentile_error": 4.0,
+          "chroma_95th_percentile_error": 4,
           "scene": "Original marsh settlement on low piers and boardwalks, weathered pine, peat water, reeds and cool fog, quiet medieval town. Exterior of a square low marsh inn on piled dark wood with inviting amber lantern over the door, muted fog and tufts of rose heather along the boardwalk."
         },
         {
@@ -10043,7 +10045,7 @@
           "full_resolution_luma_ssim": 0.986568,
           "worst_128px_luma_ssim": 0.979477,
           "chroma_mean_absolute_error": 1.220102,
-          "chroma_95th_percentile_error": 4.0,
+          "chroma_95th_percentile_error": 4,
           "scene": "Original marsh settlement on low piers and boardwalks, weathered pine, peat water, reeds and cool fog, quiet medieval town. Overlooking a broad still peat pool with wavering reeds and moss-covered terraces in dim sunset, floating leaves, a thin dark boat against a calm silhouette of waterfront homes."
         },
         {
@@ -10064,7 +10066,7 @@
           "full_resolution_luma_ssim": 0.985237,
           "worst_128px_luma_ssim": 0.973226,
           "chroma_mean_absolute_error": 1.134875,
-          "chroma_95th_percentile_error": 3.0,
+          "chroma_95th_percentile_error": 3,
           "scene": "Original marsh settlement on low piers and boardwalks, weathered pine, peat water, reeds and cool fog, quiet medieval town. A low line of fishing cottages on pilings seen across the stream at nightfall, a trail of oil lights across rutted boards, silver shoreline fog."
         }
       ]
@@ -10114,7 +10116,7 @@
           "full_resolution_luma_ssim": 0.985988,
           "worst_128px_luma_ssim": 0.975871,
           "chroma_mean_absolute_error": 1.142045,
-          "chroma_95th_percentile_error": 3.0,
+          "chroma_95th_percentile_error": 3,
           "scene": "An original winter town on a cliff over a cold gray sea, bare dark rock, snow and salt winds, battered pine-and-stone architecture. Twisting old track with buckling slate tiles and spindrift climbing from a glacial ravine toward the struggling hillside hamlet, clear cool morning like air after a storm."
         },
         {
@@ -10135,7 +10137,7 @@
           "full_resolution_luma_ssim": 0.985993,
           "worst_128px_luma_ssim": 0.977942,
           "chroma_mean_absolute_error": 0.871355,
-          "chroma_95th_percentile_error": 2.0,
+          "chroma_95th_percentile_error": 2,
           "scene": "An original winter town on a cliff over a cold gray sea, bare dark rock, snow and salt winds, battered pine-and-stone architecture. A once-busy stone lane choked with windblown snow, thick shutters partly lit by oil yellow, lean lines of tall wooden cottages on the edge of a steep drop."
         },
         {
@@ -10156,7 +10158,7 @@
           "full_resolution_luma_ssim": 0.98646,
           "worst_128px_luma_ssim": 0.977883,
           "chroma_mean_absolute_error": 0.961242,
-          "chroma_95th_percentile_error": 3.0,
+          "chroma_95th_percentile_error": 3,
           "scene": "An original winter town on a cliff over a cold gray sea, bare dark rock, snow and salt winds, battered pine-and-stone architecture. Near-empty civic square under thin snowfall, old polygonal stone well with its long wooden crossbeam, chimney smoke, small weather-beaten lodge nearby."
         },
         {
@@ -10177,7 +10179,7 @@
           "full_resolution_luma_ssim": 0.986178,
           "worst_128px_luma_ssim": 0.978149,
           "chroma_mean_absolute_error": 1.035872,
-          "chroma_95th_percentile_error": 3.0,
+          "chroma_95th_percentile_error": 3,
           "scene": "An original winter town on a cliff over a cold gray sea, bare dark rock, snow and salt winds, battered pine-and-stone architecture. Independent long original stone bridge spanning a shear cut where seawater churns a long way below, several large buttress points, open balcony view from near the rail."
         },
         {
@@ -10198,7 +10200,7 @@
           "full_resolution_luma_ssim": 0.985986,
           "worst_128px_luma_ssim": 0.977008,
           "chroma_mean_absolute_error": 1.136166,
-          "chroma_95th_percentile_error": 3.0,
+          "chroma_95th_percentile_error": 3,
           "scene": "An original winter town on a cliff over a cold gray sea, bare dark rock, snow and salt winds, battered pine-and-stone architecture. High fortified roadside academy yard, centered circle of understated oiled iron lamps encased in frost, leaden masonry and thin snow. Clear natural late afternoon."
         },
         {
@@ -10219,7 +10221,7 @@
           "full_resolution_luma_ssim": 0.986041,
           "worst_128px_luma_ssim": 0.97907,
           "chroma_mean_absolute_error": 1.105676,
-          "chroma_95th_percentile_error": 3.0,
+          "chroma_95th_percentile_error": 3,
           "scene": "An original winter town on a cliff over a cold gray sea, bare dark rock, snow and salt winds, battered pine-and-stone architecture. Collapsed medieval houses on an exposed snowy hillside, exploded rafters and lichen on weathered stone foundations, distant dark sea under a break in clouds."
         }
       ]
@@ -10269,7 +10271,7 @@
           "full_resolution_luma_ssim": 0.986031,
           "worst_128px_luma_ssim": 0.976084,
           "chroma_mean_absolute_error": 1.56002,
-          "chroma_95th_percentile_error": 5.0,
+          "chroma_95th_percentile_error": 5,
           "scene": "Northern medieval coastal mining and fishing town, low wood and dry stone buildings, snow and driftwood, cool marine sky. Ice-limned sandy track curving along a snowy dune into a low port settlement, fishing boats dragged above the wrack, winter sun over gray water."
         },
         {
@@ -10290,7 +10292,7 @@
           "full_resolution_luma_ssim": 0.9851,
           "worst_128px_luma_ssim": 0.972226,
           "chroma_mean_absolute_error": 1.401336,
-          "chroma_95th_percentile_error": 4.0,
+          "chroma_95th_percentile_error": 4,
           "scene": "Northern medieval coastal mining and fishing town, low wood and dry stone buildings, snow and driftwood, cool marine sky. Winter timber harbor with a stretch of gray sails under repair, stacked crates and long gaffs, salt-marked walls and waves around the studded quay."
         },
         {
@@ -10311,7 +10313,7 @@
           "full_resolution_luma_ssim": 0.986014,
           "worst_128px_luma_ssim": 0.971542,
           "chroma_mean_absolute_error": 1.548431,
-          "chroma_95th_percentile_error": 4.0,
+          "chroma_95th_percentile_error": 4,
           "scene": "Northern medieval coastal mining and fishing town, low wood and dry stone buildings, snow and driftwood, cool marine sky. Street of modest stone and pine fisheries, bundles of hand-repaired nets laid on trestles, oiled boots and thin snowy ruts with muted yellow houses."
         },
         {
@@ -10332,7 +10334,7 @@
           "full_resolution_luma_ssim": 0.985573,
           "worst_128px_luma_ssim": 0.976016,
           "chroma_mean_absolute_error": 1.450943,
-          "chroma_95th_percentile_error": 5.0,
+          "chroma_95th_percentile_error": 5,
           "scene": "Northern medieval coastal mining and fishing town, low wood and dry stone buildings, snow and driftwood, cool marine sky. Humble tavern exterior facing the wind on the northern waterfront, low flanking stone windbreak, dark roof with battered copper finial, warm lanterns in early blue dusk."
         },
         {
@@ -10353,7 +10355,7 @@
           "full_resolution_luma_ssim": 0.986232,
           "worst_128px_luma_ssim": 0.979603,
           "chroma_mean_absolute_error": 1.338842,
-          "chroma_95th_percentile_error": 4.0,
+          "chroma_95th_percentile_error": 4,
           "scene": "Northern medieval coastal mining and fishing town, low wood and dry stone buildings, snow and driftwood, cool marine sky. Steep stepped way down to a cargo pier, block and tackle and stretched ropes, wintry wet planks bending into the distance past piled snow and quiet gray water."
         },
         {
@@ -10374,7 +10376,7 @@
           "full_resolution_luma_ssim": 0.985811,
           "worst_128px_luma_ssim": 0.977242,
           "chroma_mean_absolute_error": 1.395749,
-          "chroma_95th_percentile_error": 4.0,
+          "chroma_95th_percentile_error": 4,
           "scene": "Northern medieval coastal mining and fishing town, low wood and dry stone buildings, snow and driftwood, cool marine sky. Wide vista of a small cove rimmed with brittle milk-white sea ice, snow-veiled slipways and short warehouses within an arc of basalt rocks, overcast winter light."
         }
       ]
@@ -10424,7 +10426,7 @@
           "full_resolution_luma_ssim": 0.987039,
           "worst_128px_luma_ssim": 0.975265,
           "chroma_mean_absolute_error": 1.288685,
-          "chroma_95th_percentile_error": 4.0,
+          "chroma_95th_percentile_error": 4,
           "scene": "Original medieval island port of basalt and wind-carved volcanic ash, muted terracotta and cold blue sea beyond solid stone walls. Coast-side arrival at a basalt stone quay beneath a volcanic headland, squat boats and red canvas lashings, streaks of ash on water, early light from seaward."
         },
         {
@@ -10445,7 +10447,7 @@
           "full_resolution_luma_ssim": 0.985015,
           "worst_128px_luma_ssim": 0.975894,
           "chroma_mean_absolute_error": 1.317554,
-          "chroma_95th_percentile_error": 4.0,
+          "chroma_95th_percentile_error": 4,
           "scene": "Original medieval island port of basalt and wind-carved volcanic ash, muted terracotta and cold blue sea beyond solid stone walls. Urban street of sturdy red tuff and smooth black basalt, tilted roof pipes and rain basins, puffs of ash drifting between varied stone doorways."
         },
         {
@@ -10466,7 +10468,7 @@
           "full_resolution_luma_ssim": 0.986006,
           "worst_128px_luma_ssim": 0.977813,
           "chroma_mean_absolute_error": 1.461351,
-          "chroma_95th_percentile_error": 4.0,
+          "chroma_95th_percentile_error": 4,
           "scene": "Original medieval island port of basalt and wind-carved volcanic ash, muted terracotta and cold blue sea beyond solid stone walls. Close medieval market beside stacked basalt walls, arrays of hand-thrown terracotta in burnt orange and cream, taut natural canvas banners with no markings."
         },
         {
@@ -10487,7 +10489,7 @@
           "full_resolution_luma_ssim": 0.985498,
           "worst_128px_luma_ssim": 0.978744,
           "chroma_mean_absolute_error": 1.06989,
-          "chroma_95th_percentile_error": 3.0,
+          "chroma_95th_percentile_error": 3,
           "scene": "Original medieval island port of basalt and wind-carved volcanic ash, muted terracotta and cold blue sea beyond solid stone walls. Solemn basalt sanctuary of originally shaped pillars over earth vents, red stone bowls and bright light from a high slot onto a floor of uneven polished rock."
         },
         {
@@ -10508,7 +10510,7 @@
           "full_resolution_luma_ssim": 0.986824,
           "worst_128px_luma_ssim": 0.977299,
           "chroma_mean_absolute_error": 1.182298,
-          "chroma_95th_percentile_error": 4.0,
+          "chroma_95th_percentile_error": 4,
           "scene": "Original medieval island port of basalt and wind-carved volcanic ash, muted terracotta and cold blue sea beyond solid stone walls. A plain volcanic bastion to stop drifts above the harbor, high terrace of leaning black stone parapets, fabric wind baffles and an ash-mottled slope from across the valley."
         },
         {
@@ -10529,7 +10531,7 @@
           "full_resolution_luma_ssim": 0.986789,
           "worst_128px_luma_ssim": 0.979442,
           "chroma_mean_absolute_error": 1.350085,
-          "chroma_95th_percentile_error": 4.0,
+          "chroma_95th_percentile_error": 4,
           "scene": "Original medieval island port of basalt and wind-carved volcanic ash, muted terracotta and cold blue sea beyond solid stone walls. Exterior of an unnamed-looking inn recessed into a basalt arch on a normal residential street, two amber oil lanterns, rain-damp ash around the landing and pebbled black stonework."
         }
       ]
@@ -10579,7 +10581,7 @@
           "full_resolution_luma_ssim": 0.986343,
           "worst_128px_luma_ssim": 0.980123,
           "chroma_mean_absolute_error": 1.435661,
-          "chroma_95th_percentile_error": 4.0,
+          "chroma_95th_percentile_error": 4,
           "scene": "Original northern academy of astronomy and ritual craft perched in pale blue coastal mountains. Medieval architecture, founded from old slate, bone-colored limewash and dark bronze, independent architectural layout. A walled academy with a steep hanging garden and two tiered observatory towers on a rocky finger over a steel blue northern sea, seen from the uphill traverse."
         },
         {
@@ -10600,7 +10602,7 @@
           "full_resolution_luma_ssim": 0.98584,
           "worst_128px_luma_ssim": 0.977421,
           "chroma_mean_absolute_error": 1.236887,
-          "chroma_95th_percentile_error": 4.0,
+          "chroma_95th_percentile_error": 4,
           "scene": "Original northern academy of astronomy and ritual craft perched in pale blue coastal mountains. Medieval architecture, founded from old slate, bone-colored limewash and dark bronze, independent architectural layout. A circular narrow stone ambulatory around a central open shaft, large geometric slots giving naturally cold daylight, aged brass survey tools on a long gallery ledge."
         },
         {
@@ -10621,7 +10623,7 @@
           "full_resolution_luma_ssim": 0.986621,
           "worst_128px_luma_ssim": 0.975665,
           "chroma_mean_absolute_error": 1.287376,
-          "chroma_95th_percentile_error": 4.0,
+          "chroma_95th_percentile_error": 4,
           "scene": "Original northern academy of astronomy and ritual craft perched in pale blue coastal mountains. Medieval architecture, founded from old slate, bone-colored limewash and dark bronze, independent architectural layout. An independent square meditative library built of limestone and dark oak, reading benches, brass star-measuring circles, several floors of vellum volumes by fine archive ladders."
         },
         {
@@ -10642,7 +10644,7 @@
           "full_resolution_luma_ssim": 0.986721,
           "worst_128px_luma_ssim": 0.981335,
           "chroma_mean_absolute_error": 1.308195,
-          "chroma_95th_percentile_error": 4.0,
+          "chroma_95th_percentile_error": 4,
           "scene": "Original northern academy of astronomy and ritual craft perched in pale blue coastal mountains. Medieval architecture, founded from old slate, bone-colored limewash and dark bronze, independent architectural layout. Stepped research furnace below an academy, heavily worn rectangular firebox and high dark bronze ventilation grates, forged rings cooling on racks and rough slate wall."
         }
       ]
@@ -10683,7 +10685,7 @@
           "full_resolution_luma_ssim": 0.986782,
           "worst_128px_luma_ssim": 0.976678,
           "chroma_mean_absolute_error": 1.525877,
-          "chroma_95th_percentile_error": 4.0,
+          "chroma_95th_percentile_error": 4,
           "scene": "Original medieval coast clifftop town in pale limestone, fir plankwork and salt-blue daylight. A close wide exterior of a horse stable against a low limestone scarp, neatly spaced red cedar stalls, saddle towels and halters on timber, a small draft horse far in the paddock and cool morning sun."
         }
       ]
@@ -10723,7 +10725,7 @@
           "full_resolution_luma_ssim": 0.985315,
           "worst_128px_luma_ssim": 0.977126,
           "chroma_mean_absolute_error": 1.287583,
-          "chroma_95th_percentile_error": 4.0,
+          "chroma_95th_percentile_error": 4,
           "scene": "Original limestone quarry city on a waterfall escarpment, no existing level geometry. Grounded abandoned townhouse on a limestone terrace, broken timber lintel, cracked pottery and thin sheet of water running beside steps to its boarded door, cold natural light and pale slate."
         }
       ]

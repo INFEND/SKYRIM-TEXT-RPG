@@ -49,7 +49,7 @@ public final class LocationGalleryView extends LinearLayout {
     private static final Map<String,Integer> PHOTO_INDEX_BY_CITY=new HashMap<>();
     /** Labels follow location/sub-location names, not gallery image numbers. */
     private static final String[][] PHOTO_LABELS={
-        {"Главные ворота","Вход в город","Рынок","Ветреный район","Йоррваскр","Драконий Предел"},
+        {"Главные ворота","Главная улица","Рынок","Ветреный район","Йоррваскр","Драконий Предел"},
         {"Главные ворота","Серый квартал","Рынок","Каменный квартал","Дворец королей","Набережная"},
         {"Подход к Винтерхолду","Заснеженная улица","Главная площадь","Врата Коллегии","Двор Коллегии","Зимний двор"},
         {"Подход к Данстару","Порт","Главная улица","Таверна","У причала","Заснеженная бухта"},
@@ -114,7 +114,9 @@ public final class LocationGalleryView extends LinearLayout {
             captions=new String[c.length()];archives=new String[c.length()];
             for(int i=0;i<c.length();i++){
                 captions[i]=c.getString(i);archives[i]=a.getString(i);
-                if(captions[i].trim().isEmpty()||!(archives[i].equals(slug+".zip")||archives[i].equals(slug+"_extra.zip")))throw new IllegalArgumentException("Неверный кадр галереи");
+                boolean standardArchive=archives[i].equals(slug+".zip")||archives[i].equals(slug+"_extra.zip");
+                boolean whiterunOverride="whiterun".equals(slug)&&i<2&&"media/whiterun/replacement.zip".equals(archives[i]);
+                if(captions[i].trim().isEmpty()||!(standardArchive||whiterunOverride))throw new IllegalArgumentException("Неверный кадр галереи");
             }
             org.json.JSONArray places=entry.optJSONArray("cityPlaces");
             if(places==null)return;
@@ -135,7 +137,7 @@ public final class LocationGalleryView extends LinearLayout {
                 locations.add(d.name);
                 org.json.JSONArray aliases=entry.optJSONArray("aliases");
                 if(aliases!=null)for(int j=0;j<aliases.length();j++)if(names.put(locationKey(aliases.getString(j)),d)!=null)throw new IllegalArgumentException("Повтор названия");
-                if(files!=null)for(String archive:d.archives)if(!files.containsKey("gallery/"+archive))throw new IllegalArgumentException("Нет архива "+archive);
+                if(files!=null)for(String archive:d.archives)if(!files.containsKey(archive.startsWith("media/")?archive:"gallery/"+archive))throw new IllegalArgumentException("Нет архива "+archive);
             }
             if(locations.isEmpty())throw new IllegalArgumentException("Пустой реестр галерей");
             for(GalleryDefinition d:slugs.values()){
@@ -232,6 +234,10 @@ public final class LocationGalleryView extends LinearLayout {
         if("riften".equals(slug))return number<=3?"riften.zip":"riften_extra.zip";
         if("highhrothgar".equals(slug)&&number>6)return "highhrothgar_extra.zip";
         return slug+".zip";
+    }
+    private static String archivePath(String slug,int number){
+        String archive=archive(slug,number);
+        return archive.startsWith("media/")?archive:"gallery/"+archive;
     }
     private static String captionFor(String location,int index){
         GalleryDefinition d=definition(location);
@@ -364,7 +370,7 @@ public final class LocationGalleryView extends LinearLayout {
             }
         });
         photo.setOnClickListener(v->{
-            if(!ResourceStore.has(getContext(),"gallery/"+archive(slug,archiveFrame(current)+1))){
+            if(!ResourceStore.has(getContext(),archivePath(slug,archiveFrame(current)+1))){
                 openResourceManager();
             }else if(!fullscreen)openFullscreen();
         });
@@ -493,7 +499,7 @@ public final class LocationGalleryView extends LinearLayout {
         int frame=archiveFrame(index);
         page.setText(captionFor(location,frame));
         updateIndicators();
-        String resourcePath="gallery/"+archive(slug,frame+1);
+        String resourcePath=archivePath(slug,frame+1);
         if(!ResourceStore.has(getContext(),resourcePath)){
             photo.setImageDrawable(null);
             missingPhoto.setVisibility(View.VISIBLE);
@@ -536,7 +542,7 @@ public final class LocationGalleryView extends LinearLayout {
     }
     private static Bitmap decode(Context context,String slug,int index,boolean full){
         String file=String.format(Locale.ROOT,"%02d.webp",index);
-        try(InputStream raw=ResourceStore.open(context,"gallery/"+archive(slug,index));
+        try(InputStream raw=ResourceStore.open(context,archivePath(slug,index));
             ZipInputStream zip=new ZipInputStream(new BufferedInputStream(raw,65536))){
             ZipEntry entry;byte[] buf=new byte[32768];
             while((entry=zip.getNextEntry())!=null){
@@ -573,7 +579,7 @@ public final class LocationGalleryView extends LinearLayout {
         render[0]=()->{
             int number=archiveFrame(selected[0])+1;
             int ticket=++generation[0];
-            if(!ResourceStore.has(context,"gallery/"+archive(slug,number))){image.setImageDrawable(null);return;}
+            if(!ResourceStore.has(context,archivePath(slug,number))){image.setImageDrawable(null);return;}
             String fullKey=cacheKey(slug,number,true);
             Bitmap full=CACHE.get(fullKey);
             if(full!=null&&!full.isRecycled()){

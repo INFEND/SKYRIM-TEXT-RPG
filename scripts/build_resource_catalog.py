@@ -162,6 +162,18 @@ def gallery_registry():
             keys=[p.strip().lower().replace("ё","е") for p in places if p.strip()]
             if len(keys)!=len(set(keys)):raise ValueError("Duplicate city place "+slug)
         entry["archives"]=[photos[i] for i in range(1,len(labels)+1)]
+        if slug=="whiterun":
+            # User-supplied Whiterun gate and street replace only frames 1/2.
+            # Keep the six original archive frames untouched for compatibility.
+            replacement="media/whiterun/replacement.zip"
+            with zipfile.ZipFile(ASSETS/replacement) as z:
+                if z.testzip() or set(z.namelist())!={"01.webp","02.webp"}:
+                    raise ValueError("Invalid Whiterun replacement archive")
+                for number in (1,2):
+                    data=z.read(f"{number:02d}.webp")
+                    if not 16000<len(data)<2_000_000 or data[:4]!=b"RIFF" or data[8:12]!=b"WEBP":
+                        raise ValueError("Invalid Whiterun replacement frame")
+            entry["archives"][:2]=[replacement,replacement]
     for entry in result:
         parent=entry.get("parent","")
         if parent:
