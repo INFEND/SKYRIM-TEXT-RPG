@@ -398,6 +398,14 @@ public final class MainActivity extends Activity {
         return HERO_NAME_COLORS[index];
     }
     private boolean showChoiceNumbers(){return prefs.getBoolean("show_choice_numbers",true);}
+    /** Choice cards scale with the game's text-size preference. */
+    private int choicePadX(){return Math.max(8,10+fontBonus/2);}
+    private int choicePadY(){return Math.max(6,8+fontBonus/2);}
+    private int choiceIconSize(){return Math.max(20,24+fontBonus);}
+    private void compactChoiceText(TextView view){
+        view.setIncludeFontPadding(false);
+        view.setLineSpacing(0f,1f);
+    }
     private String skillGlyph(String skill){
         if(skill==null||skill.trim().isEmpty())return "skills";
         String clean=skill.split(" [·|] ",2)[0].trim();
@@ -2493,7 +2501,8 @@ public final class MainActivity extends Activity {
     /** Only the value is bold; the attribute label remains regular. */
     private void addChoiceStat(LinearLayout target,String label,String value,int valueColor,int bottom){
         String display=label+": "+value;
-        TextView line=text(display,15,MUTED,false);
+        TextView line=text(display,12,MUTED,false);
+        compactChoiceText(line);
         android.text.SpannableString styled=new android.text.SpannableString(display);
         int start=display.length()-value.length();
         styled.setSpan(new android.text.style.StyleSpan(Typeface.BOLD),start,display.length(),
@@ -2507,7 +2516,10 @@ public final class MainActivity extends Activity {
 
     private String choiceSkillName(String action){return "HEAVY".equals(action)?RpgContent.SKILLS[game.progress.equippedWeaponSkill()]:SceneChoiceMeta.skillName(action);}
     private void livingChanceLink(LinearLayout panel,String title,String calculation){
-        TextView link=text("Показать расчёт  ⌄",15,MUTED,true);link.setPadding(0,dp(4),0,dp(4));panel.addView(link,lp(-1,-2));
+        TextView link=text("Показать расчёт  ⌄",12,MUTED,true);
+        compactChoiceText(link);link.setPadding(0,dp(2),0,dp(2));
+        link.setMinimumHeight(dp(28));link.setGravity(Gravity.CENTER_VERTICAL);
+        panel.addView(link,lp(-1,-2));
         link.setOnClickListener(v->{LinearLayout details=column();for(String line:calculation.split("\n"))addText(details,line,16,TEXT,false,8);livingDialog(title,details);});
     }
 
@@ -2528,7 +2540,7 @@ public final class MainActivity extends Activity {
         int index=choiceSkillIndex(skill);
         if(index<0 && action!=null)index=choiceSkillIndex(choiceSkillName(action));
         if(index>=0)addChoiceStat(panel,RpgContent.SKILLS[index],
-            game.progress.skillLevel(index)+" (уровень)",accent(),4);
+            game.progress.skillLevel(index)+" (уровень)",accent(),2);
     }
     /** Never fabricate a numerical formula for a probability authored by an LLM. */
     private String aiChoiceCalculation(AiGameTurn.Option option,int chance,boolean nativeCombat){
@@ -2553,35 +2565,44 @@ public final class MainActivity extends Activity {
         return details.toString();
     }
 
+    private void choiceChanceBar(LinearLayout host,int chance,int color){
+        ProgressBar bar=new ProgressBar(this,null,android.R.attr.progressBarStyleHorizontal);
+        bar.setMax(100);bar.setProgress(Math.max(0,Math.min(100,chance)));
+        bar.setProgressTintList(ColorStateList.valueOf(color));
+        bar.setProgressBackgroundTintList(ColorStateList.valueOf(0xff303030));
+        host.addView(bar,lp(-1,3));space(host,3);
+    }
+
     private void storyChoice(int position,GameEngine.Choice c,Runnable onClick){
         int chance=game.progress.chance(game,c.action);String calculation=game.progress.chanceExplanation();
         LinearLayout box=row();box.setGravity(Gravity.CENTER_VERTICAL);
-        box.setPadding(dp(14),dp(14),dp(14),dp(14));
+        box.setPadding(dp(choicePadX()),dp(choicePadY()),dp(choicePadX()),dp(choicePadY()));
+        box.setMinimumHeight(dp(48));
         int actionTint=AmoledAppearance.storyTint(c.action,c.title,c.special?accent():BORDER);
         box.setBackground(new RuneFrameDrawable(PANEL,actionTint,c.special||AmoledAppearance.buttons()==5));
         box.setBackground(bg(0xff141414,Color.TRANSPARENT,18));
         if(showChoiceNumbers()){
-            TextView ordinal=text(String.valueOf(position),17,c.special?accent():MUTED,true);
-            ordinal.setGravity(Gravity.CENTER);
-            LinearLayout.LayoutParams ordinalSize=lp(32,36);
-            ordinalSize.rightMargin=dp(8);
+            TextView ordinal=text(String.valueOf(position),14,c.special?accent():MUTED,true);
+            compactChoiceText(ordinal);ordinal.setGravity(Gravity.CENTER);
+            LinearLayout.LayoutParams ordinalSize=lp(24,28);
+            ordinalSize.rightMargin=dp(5);
             box.addView(ordinal,ordinalSize);
         }
         SkyrimIconView glyph=new SkyrimIconView(this,
             chance>=0?skillGlyph(choiceSkillName(c.action)):"skills",accent());
-        if(visual("choices"))box.addView(glyph,lp(31,34));
+        if(visual("choices"))box.addView(glyph,lp(choiceIconSize(),choiceIconSize()));
         LinearLayout prose=column();
         LinearLayout.LayoutParams size=new LinearLayout.LayoutParams(0,-2,1);
-        size.leftMargin=dp(13);box.addView(prose,size);
-        TextView name=text(c.title,19,TEXT,true);
+        size.leftMargin=dp(8);box.addView(prose,size);
+        TextView name=text(c.title,16,TEXT,true);
         name.setTypeface(SovngardeTypeface.face(this,true));
-        name.setLineSpacing(dp(3),1.1f);prose.addView(name);
+        compactChoiceText(name);prose.addView(name);
         if(c.detail!=null&&!c.detail.isEmpty()){
-            space(prose,5);
-            TextView desc=text(c.detail,17,MUTED,false);
-            desc.setLineSpacing(dp(3),1.12f);prose.addView(desc);
+            space(prose,3);
+            TextView desc=text(c.detail,14,MUTED,false);
+            compactChoiceText(desc);prose.addView(desc);
         }
-        space(prose,6);
+        space(prose,3);
         choiceExtras(prose,c.action);
         if(visual("travel")&&c.action.startsWith("REGION:")){
             int target=Integer.parseInt(c.action.substring(7));
@@ -2590,14 +2611,14 @@ public final class MainActivity extends Activity {
         if(chance>=0){
             showChoiceSkillLevel(prose,choiceSkillName(c.action),c.action);
             addChoiceStat(prose,"ШАНС УСПЕХА",chance+"%",SceneChoiceMeta.chanceColor(chance),0);
-            livingBar(prose,chance,100,SceneChoiceMeta.chanceColor(chance));
+            choiceChanceBar(prose,chance,SceneChoiceMeta.chanceColor(chance));
             livingChanceLink(prose,c.title,calculation.isEmpty()?"Шанс движка: "+chance+"%":calculation);
         }else{
             addChoiceStat(prose,"ШАНС УСПЕХА","100%",SceneChoiceMeta.chanceColor(100),0);
-            livingBar(prose,100,100,SceneChoiceMeta.chanceColor(100));
+            choiceChanceBar(prose,100,SceneChoiceMeta.chanceColor(100));
             livingChanceLink(prose,c.title,"Гарантированное действие: 100%.\nБросок кубика не требуется.\nПоследствия применяются по правилам игры.");
         }
-        LinearLayout.LayoutParams layout=lp(-1,-2);layout.bottomMargin=dp(5);
+        LinearLayout.LayoutParams layout=lp(-1,-2);layout.bottomMargin=dp(4);
         content.addView(box,layout);
         box.setClickable(true);box.setFocusable(true);
         box.setOnClickListener(view->onClick.run());
@@ -3089,19 +3110,23 @@ public final class MainActivity extends Activity {
             AiGameTurn.Option option=aiChoicePreview.get(i);
             if(i==aiChoiceLiveRows.size()){
                 LinearLayout row=column();
-                row.setPadding(dp(15),dp(12),dp(15),dp(12));
+                row.setPadding(dp(choicePadX()),dp(choicePadY()),dp(choicePadX()),dp(choicePadY()));
+                row.setMinimumHeight(dp(48));
                 row.setBackground(bg(0xff141414,Color.TRANSPARENT,18));
-                TextView title=text("",17,TEXT,true);
+                TextView title=text("",16,TEXT,true);
                 title.setTypeface(SovngardeTypeface.face(this,true));
                 TextView detail=text("",14,MUTED,false);
                 TextView meta=text("",12,MUTED,false);
+                compactChoiceText(title);compactChoiceText(detail);compactChoiceText(meta);
                 LinearLayout titleRow=row();titleRow.setGravity(Gravity.CENTER_VERTICAL);
                 android.widget.FrameLayout iconHost=new android.widget.FrameLayout(this);
-                titleRow.addView(iconHost,lp(26,26));
+                titleRow.addView(iconHost,lp(choiceIconSize(),choiceIconSize()));
                 aiChoiceLiveIconHosts.add(iconHost);
-                titleRow.addView(title,new LinearLayout.LayoutParams(0,-2,1));row.addView(titleRow,lp(-1,-2));space(row,5);
+                LinearLayout.LayoutParams titleSize=new LinearLayout.LayoutParams(0,-2,1);
+                titleSize.leftMargin=dp(7);
+                titleRow.addView(title,titleSize);row.addView(titleRow,lp(-1,-2));space(row,3);
                 row.addView(detail,lp(-1,-2));row.addView(meta,lp(-1,-2));
-                LinearLayout.LayoutParams p=lp(-1,-2);p.topMargin=dp(6);
+                LinearLayout.LayoutParams p=lp(-1,-2);p.topMargin=dp(4);
                 aiChoiceLive.addView(row,p);
                 aiChoiceLiveRows.add(new TextView[]{title,detail,meta});
                 aiChoiceLiveCards.add(row);
@@ -3144,28 +3169,30 @@ public final class MainActivity extends Activity {
 
     private void renderAiChoice(int number,AiGameTurn.Option option){
         LinearLayout row=row();row.setGravity(Gravity.CENTER_VERTICAL);
-        row.setPadding(dp(14),dp(14),dp(14),dp(14));
+        row.setPadding(dp(choicePadX()),dp(choicePadY()),dp(choicePadX()),dp(choicePadY()));
+        row.setMinimumHeight(dp(48));
         boolean selected=selectedAiChoices.contains(number);
         int actionTint=AmoledAppearance.storyTint(option.combatAction,option.title,selected?accent():BORDER);
         row.setBackground(new RuneFrameDrawable(PANEL,actionTint,selected||AmoledAppearance.buttons()==5));
         row.setBackground(bg(selected?0xff252525:0xff141414,Color.TRANSPARENT,18));
-        TextView ordinal=showChoiceNumbers()?text(String.valueOf(number),17,
+        TextView ordinal=showChoiceNumbers()?text(String.valueOf(number),14,
             selected?accent():MUTED,true):null;
         if(ordinal!=null){
-            ordinal.setGravity(Gravity.CENTER);
-            LinearLayout.LayoutParams ordinalSize=lp(32,36);
-            ordinalSize.rightMargin=dp(8);
+            compactChoiceText(ordinal);ordinal.setGravity(Gravity.CENTER);
+            LinearLayout.LayoutParams ordinalSize=lp(24,28);
+            ordinalSize.rightMargin=dp(5);
             row.addView(ordinal,ordinalSize);
         }
         SkyrimIconView glyph=new SkyrimIconView(this,skillGlyph(option.skill),accent());
-        if(visual("choices"))row.addView(glyph,lp(31,34));
+        if(visual("choices"))row.addView(glyph,lp(choiceIconSize(),choiceIconSize()));
         LinearLayout detail=column();
         LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(0,-2,1);
-        p.leftMargin=dp(13);row.addView(detail,p);
-        TextView title=text(option.title,19,TEXT,true);
+        p.leftMargin=dp(8);row.addView(detail,p);
+        TextView title=text(option.title,16,TEXT,true);
         title.setTypeface(SovngardeTypeface.face(this,true));
-        detail.addView(title);space(detail,6);
-        addText(detail,option.detail,17,MUTED,false,8);
+        compactChoiceText(title);detail.addView(title);space(detail,3);
+        TextView description=text(option.detail,14,MUTED,false);
+        compactChoiceText(description);detail.addView(description);space(detail,4);
         choiceExtras(detail,option.combatAction);
         boolean combat="COMBAT".equals(game.mode)&&game.enemyHp>0;
         int displayedChance=combat?("HEAVY".equals(option.combatAction)||"FLEE".equals(option.combatAction)
@@ -3174,11 +3201,11 @@ public final class MainActivity extends Activity {
             showChoiceSkillLevel(detail,option.skill,option.combatAction);
             addChoiceStat(detail,"ШАНС УСПЕХА",displayedChance+"%",
                 SceneChoiceMeta.chanceColor(displayedChance),0);
-            livingBar(detail,displayedChance,100,SceneChoiceMeta.chanceColor(displayedChance));
+            choiceChanceBar(detail,displayedChance,SceneChoiceMeta.chanceColor(displayedChance));
             livingChanceLink(detail,option.title,aiChoiceCalculation(option,displayedChance,combat));
         }else{
             addChoiceStat(detail,"ШАНС УСПЕХА","100%",SceneChoiceMeta.chanceColor(100),0);
-            livingBar(detail,100,100,SceneChoiceMeta.chanceColor(100));
+            choiceChanceBar(detail,100,SceneChoiceMeta.chanceColor(100));
             livingChanceLink(detail,option.title,"Гарантированный исход проверки: 100%.\nБросок кубика не выполняется.\nСостояние игры всё равно изменяется только после подтверждённого действия.");
         }
         boolean available=combat?nativeAiCombatAvailable(option.combatAction):option.companionAction.isEmpty()||AiCompanionActions.allowed(game,option.companionAction);
@@ -3203,7 +3230,7 @@ public final class MainActivity extends Activity {
             if(ordinal!=null)ordinal.setTextColor(active?accent():MUTED);
             row.setContentDescription("Вариант "+number+". "+option.title+". "+(active?"Выбран":"Не выбран"));
         });
-        LinearLayout.LayoutParams wrap=lp(-1,-2);wrap.bottomMargin=dp(6);
+        LinearLayout.LayoutParams wrap=lp(-1,-2);wrap.bottomMargin=dp(4);
         content.addView(row,wrap);
     }
 

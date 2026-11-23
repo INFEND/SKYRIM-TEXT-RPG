@@ -62,9 +62,9 @@ class PocketOrcaStoryPolish(unittest.TestCase):
         self.assertIn('return Math.max(10,size+fontBonus)',UI)
         self.assertIn('AiNarrativeFormat.compact(accumulated)',UI)
         self.assertNotIn('aiTurnText=text("",20,TEXT,false)',UI)
-        self.assertIn('TextView title=text(option.title,19,TEXT,true)',UI)
-        self.assertIn('addText(detail,option.detail,17,MUTED,false,8)',UI)
-        self.assertIn('TextView link=text("Показать расчёт  ⌄",15,MUTED,true)',UI)
+        self.assertIn('TextView title=text(option.title,16,TEXT,true)',UI)
+        self.assertIn('TextView description=text(option.detail,14,MUTED,false)',UI)
+        self.assertIn('TextView link=text("Показать расчёт  ⌄",12,MUTED,true)',UI)
         self.assertIn('prompt.setTextSize(sp(18))',UI)
 
 
