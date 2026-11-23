@@ -10,8 +10,8 @@ class AtlasColonLabels(unittest.TestCase):
                       "Солитьюд: Лесопилка","Вайтран: Лагерь Братьев Бури"):
             self.assertIn(label,ROWS)
             self.assertNotIn(label.replace(": "," - "),ROWS)
-        self.assertIn("Дрифтшейд - Приют",ROWS)
-        self.assertIn("Снежная Завеса - Святилище",ROWS)
+        self.assertIn("Дрифтшейд — Приют",ROWS)
+        self.assertIn("Снежная Завеса — Святилище",ROWS)
         self.assertIn('INDEX.putIfAbsent(normalize(site.name.replace(": "," - ")),site)',CATALOG)
 
 if __name__=="__main__":unittest.main()

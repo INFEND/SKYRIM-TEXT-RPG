@@ -52,7 +52,7 @@ legacy = {
     "Sacellum of Boethiah":"Святилище Боэтии", "Solitude Lighthouse":"Маяк Солитьюда",
     "Fort Dunstad":"Форт Данстад",
     "Hob's Fall Cave":"Пещера Хоба",
-    "Kolbjorn Barrow":"Колбьорн", "Frostmoon Crag":"Ущелье Фростмуна"}
+    "Kolbjorn Barrow":"Колбьорн", }
 
 def translate(en):
     if en.startswith("Shrine of "):

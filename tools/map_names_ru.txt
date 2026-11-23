@@ -19,7 +19,7 @@ Red Scar Cavern (CC)|Пещера Красный Шрам
 Rielle (CC)|Риэль
 Rimerock Burrow|Морозная пещера
 Runoff Caverns (CC)|Сточные пещеры
-Ruunvald Excavation (DG)|Раскопки Рунвальда
+Ruunvald Excavation (DG)|Рунвальд — Раскопки
 Wolfskull Cave|Волчий Череп
 Fallowstone Cave|Пещера Жёлтый Камень
 Giant's Grove|Роща Великанов
@@ -56,7 +56,7 @@ Windhelm Military Camp|Военный лагерь Виндхельма
 Sky Haven Temple|Храм Небесной Гавани
 Thieves Guild|Гильдия воров
 Stonehills|Каменные Холмы
-Journeyman's Nook|Уголок подмастерья
+Journeyman's Nook|Приют Подмастерья
 Moldering Ruins (DG)|Обветшалые руины
 Bleak Falls Barrow|Ветреный пик
 Champion's Rest (CC)|Приют Чемпиона
@@ -67,7 +67,7 @@ Myrwatch (CC)|Мирвотч
 Forgotten Vale (DG)|Забытая долина
 Wayward Pass|Перевал Странника
 Goldenglow Estate|Поместье «Златоцвет»
-Redwater Den (DG)|Логово Красная Вода
+Redwater Den (DG)|Красноводное логово
 Japhet's Folly|Каприз Яфета
 Hammerfell Gate|Врата в Хаммерфелл
 To Solstheim (DB)|Переправа на Солстейм
@@ -91,7 +91,7 @@ Bristleback Cave|Пещера Щетиноспин
 Castle Karstaag Caverns|Пещеры замка Карстааг
 Castle Karstaag Ruins|Руины замка Карстааг
 Frossel|Фроссель
-Frostmoon Crag|Ущелье Фростмуна
+Frostmoon Crag|Утёс Морозной Луны
 Glacial Cave|Ледниковая пещера
 Hrothmund's Barrow|Курган Хротмунда
 Raven Rock|Воронья Скала
@@ -156,3 +156,18 @@ Reachcliff Cave|Утёсная пещера
 Reachwater Rock|Озёрный утёс
 Red Eagle Redoubt|Оплот Красный Орёл
 Knifepoint Ridge|Хребет Остриё Ножа
+Merryfair Farm|Весёлая ферма
+Driftshade Refuge|Дрифтшейд — Приют
+Evergreen Grove|Вечнозелёная роща
+Black-Briar Lodge|Резиденция «Чёрный Вереск»
+Chillfurrow Farm|Ферма «Холодная Борозда»
+Snow Veil Sanctum|Снежная Завеса — Святилище
+Sundered Towers|Разделённые башни
+Bleakwind Basin|Водоём Холодный Ветер
+Bleakwind Bluff|Утёс Холодный Ветер
+Serpent's Bluff Redoubt|Оплот Змеиный Утёс
+Darkwater Crossing|Чёрный Брод
+Stonehill Bluff|Утёс Каменный Холм
+Wreck Of The Brinehammer|Место крушения «Солёного молота»
+Wreck of the Winter War|Место крушения «Зимней войны»
+Wreck of the Icerunner|Место крушения «Бегущего по льду»

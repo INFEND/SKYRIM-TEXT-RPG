@@ -26,11 +26,16 @@ public final class SkyrimMapCatalog {
             registered=v.length<=10||!v[10].equals("interpolated");
             search=normalize(name+" "+name.replace(": "," - ")+" "+english+" "+type);
         }
-        public boolean matches(String query){return search.contains(normalize(query));}
+        public boolean matches(String query){
+            String term=normalize(query);
+            String history=SEARCH_ALIASES.get(id);
+            return search.contains(term)||(history!=null&&history.contains(term));
+        }
         public boolean capital(){return type.equals("Столица");}
     }
     private static final ArrayList<Site> SITES=new ArrayList<>();
     private static final HashMap<String,Site> INDEX=new HashMap<>();
+    private static final HashMap<String,String> SEARCH_ALIASES=new HashMap<>();
     static {
         HashSet<String> ids=new HashSet<>();
         for(String row:SkyrimMapPoints.ROWS){
@@ -63,11 +68,34 @@ public final class SkyrimMapCatalog {
         alias("Каньон Дневной Зари","Dayspring Canyon (DG)");
         alias("Пещера Вечерняя Пустота","Darkfall Cave (DG)");
         alias("Хребет Острие Ножа","Knifepoint Ridge");
+        alias("Веселая ферма","Merryfair Farm");
+        alias("Дрифтшейд - Приют","Driftshade Refuge");
+        alias("Вечнозеленая роща","Evergreen Grove");
+        alias("Резиденция Черный Вереск","Black-Briar Lodge");
+        alias("Ферма Холодная борозда","Chillfurrow Farm");
+        alias("Снежная Завеса - Святилище","Snow Veil Sanctum");
+        alias("Разделенные башни","Sundered Towers");
+        alias("Водоем Холодный Ветер","Bleakwind Basin");
+        alias("Утес Холодный Ветер","Bleakwind Bluff");
+        alias("Оплот Змеиный Утес","Serpent's Bluff Redoubt");
+        alias("Уголок подмастерья","Journeyman's Nook");
+        alias("Раскопки Рунвальда","Ruunvald Excavation (DG)");
+        alias("Черный Брод","Darkwater Crossing");
+        alias("Утес Каменный Холм","Stonehill Bluff");
+        alias("Место крушения Соленого молота","Wreck Of The Brinehammer");
+        alias("Место крушения Зимней Войны","Wreck of the Winter War");
+        alias("Место крушения Бегущего по льду","Wreck of the Icerunner");
+        alias("Логово Красная Вода","Redwater Den (DG)");
+        alias("Ущелье Фростмуна","Frostmoon Crag");
     }
     private SkyrimMapCatalog(){}
     private static void alias(String name,String english){
         Site site=INDEX.get(normalize(english));
-        if(site!=null)INDEX.put(normalize(name),site);
+        if(site!=null){
+            String key=normalize(name);
+            INDEX.put(key,site);
+            SEARCH_ALIASES.merge(site.id," "+key,(left,right)->left+right);
+        }
     }
     public static String normalize(String text){
         return text==null?"":text.trim().toLowerCase(Locale.ROOT).replace('ё','е');
