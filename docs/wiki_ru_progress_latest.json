@@ -1,0 +1,65 @@
+{
+  "Карта": {
+    "total": 515,
+    "wiki_verified": 15,
+    "not_individually_checked": 500,
+    "verified_percent": 2.9,
+    "unchecked_percent": 97.1
+  },
+  "Именные NPC": {
+    "total": 1032,
+    "wiki_verified": 125,
+    "not_individually_checked": 907,
+    "verified_percent": 12.1,
+    "unchecked_percent": 87.9
+  },
+  "Бестиарий": {
+    "total": 131,
+    "wiki_verified": 11,
+    "not_individually_checked": 120,
+    "verified_percent": 8.4,
+    "unchecked_percent": 91.6
+  },
+  "Предметы (прямые регистрации)": {
+    "total": 1282,
+    "wiki_verified": 21,
+    "not_individually_checked": 1261,
+    "verified_percent": 1.6,
+    "unchecked_percent": 98.4
+  },
+  "Тома и свитки": {
+    "total": 134,
+    "wiki_verified": 24,
+    "not_individually_checked": 110,
+    "verified_percent": 17.9,
+    "unchecked_percent": 82.1
+  },
+  "Расы и навыки": {
+    "total": 28,
+    "wiki_verified": 28,
+    "not_individually_checked": 0,
+    "verified_percent": 100,
+    "unchecked_percent": 0
+  },
+  "Сюжетные этапы": {
+    "total": 33,
+    "wiki_verified": 18,
+    "not_individually_checked": 15,
+    "verified_percent": 54.5,
+    "unchecked_percent": 45.5
+  },
+  "ИТОГО (учитываемый набор)": {
+    "total": 3155,
+    "wiki_verified": 242,
+    "not_individually_checked": 2913,
+    "verified_percent": 7.7,
+    "unchecked_percent": 92.3
+  },
+  "Шаблоны NPC (вне итога)": {
+    "total": 206,
+    "wiki_verified": 0,
+    "not_individually_checked": 206,
+    "verified_percent": 0,
+    "unchecked_percent": 100
+  }
+}
