@@ -60,6 +60,9 @@ public final class SkyrimMapCatalog {
         alias("Сломанное Весло","Broken Oar Grotto");
         alias("Таверна Ночные ворота","Nightgate Inn");
         alias("Лесопилка Пирожок","Mixwater Mill");
+        alias("Каньон Дневной Зари","Dayspring Canyon (DG)");
+        alias("Пещера Вечерняя Пустота","Darkfall Cave (DG)");
+        alias("Хребет Острие Ножа","Knifepoint Ridge");
     }
     private SkyrimMapCatalog(){}
     private static void alias(String name,String english){

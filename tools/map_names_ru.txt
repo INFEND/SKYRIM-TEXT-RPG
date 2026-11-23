@@ -7,8 +7,8 @@ Palace of the Kings|Королевский дворец
 Understone Keep|Подкаменная крепость
 Blackbone Isle (CC)|Остров Чёрной Кости
 Bloodchill Cavern (CC)|Пещера Кровавый Холод
-Darkfall Cave (DG)|Пещера Вечерняя Пустота
-Dayspring Canyon (DG)|Каньон Дневной Зари
+Darkfall Cave (DG)|Вечерняя пещера
+Dayspring Canyon (DG)|Ущелье Утренней Зари
 Dimhollow Crypt (DG)|Крипта Ночной Пустоты
 Forebears' Holdout (DG)|Убежище Предков
 Frostroot Cave (CC)|Пещера Морозного Корня
@@ -155,3 +155,4 @@ Sunderstone Gorge|Разделённое ущелье
 Reachcliff Cave|Утёсная пещера
 Reachwater Rock|Озёрный утёс
 Red Eagle Redoubt|Оплот Красный Орёл
+Knifepoint Ridge|Хребет Остриё Ножа

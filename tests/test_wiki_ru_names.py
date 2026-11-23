@@ -130,5 +130,32 @@ class WikiRuMapDiacriticsTests(unittest.TestCase):
         # normalize() maps historical е-spellings onto the new ё-spellings.
         self.assertIn(".replace('ё','е')", CATALOG)
 
+
+# Rechecked against Russian Wiki: two substantive location names and one spelling.
+ADDITIONAL_WIKI_SITE_NAMES = {
+    "Dayspring Canyon (DG)": ("Каньон Дневной Зари", "Ущелье Утренней Зари"),
+    "Darkfall Cave (DG)": ("Пещера Вечерняя Пустота", "Вечерняя пещера"),
+    "Knifepoint Ridge": ("Хребет Острие Ножа", "Хребет Остриё Ножа"),
+}
+
+
+class WikiRuAdditionalSiteTests(unittest.TestCase):
+    def test_wiki_location_names_and_old_save_destinations(self):
+        rows = [line.strip().strip('",') for line in MAP.splitlines()
+                if line.strip().startswith('"skyrim-')]
+        translations = dict(line.split("|", 1) for line in GLOSSARY.splitlines()
+                            if "|" in line and not line.lstrip().startswith("#"))
+        compiled = (ROOT / "tools/map_source/compiled.json").read_text(encoding="utf-8")
+        for english, (old, new) in ADDITIONAL_WIKI_SITE_NAMES.items():
+            with self.subTest(location=english):
+                matches = [row for row in rows if len(row.split("|")) > 2
+                           and row.split("|")[2] == english]
+                self.assertEqual(len(matches), 1)
+                self.assertEqual(matches[0].split("|")[1], new)
+                self.assertEqual(translations.get(english), new)
+                self.assertIn('"nameRu": "' + new + '"', compiled)
+                self.assertIn('alias("' + old + '","' + english + '")', CATALOG)
+        self.assertIn(".replace('ё','е')", CATALOG)
+
 if __name__ == "__main__":
     unittest.main()
