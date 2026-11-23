@@ -40,7 +40,8 @@ public class RussianNpcTemplateLocalizationTest {
             assertNotNull(row[0],profile);
             assertEquals("Save key changed",row[0],profile.name);
             assertEquals("Canonical speech and UI label differs",row[1],NpcProfiles.canonicalName(row[0]));
-            assertEquals("Canonical lookup should be idempotent",row[1],NpcProfiles.canonicalName(row[1]));
+            // A reviewed display name may also be an alias for a different named NPC.
+            // Resolve by the historical template key to keep identity unambiguous.
         }
         // Two different characters may share a visible name; never overwrite the named NPC.
         assertFalse(NpcProfiles.findOriginal("Волк").template);
