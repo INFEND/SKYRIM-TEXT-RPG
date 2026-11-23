@@ -40,7 +40,7 @@ class CompactHud(unittest.TestCase):
                       'if(imageCount(location)==1)indicators.setVisibility',
                       'Панорама Вайтрана'):
             self.assertNotIn(token,GALLERY)
-        self.assertIn('{"Главные ворота","Вход в город","Рынок"',GALLERY)
+        self.assertIn('{"Главные ворота","Главная улица","Рынок"',GALLERY)
     def test_gallery_weather_is_current_location_and_offline(self):
         self.assertEqual(UI.count('renderLocationWeather(content);'),2)
         self.assertIn('renderLocationWeather(overview);',UI)
