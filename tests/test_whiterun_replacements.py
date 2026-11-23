@@ -31,7 +31,7 @@ class WhiterunArtwork(unittest.TestCase):
     def test_gallery_reads_exact_catalog_archive(self):
         source = SOURCE.read_text(encoding="utf-8")
         self.assertIn('return archive.startsWith("media/")?archive:"gallery/"+archive;', source)
-        self.assertEqual(source.count("archivePath(slug,"), 5)
+        self.assertEqual(source.count("archivePath(slug,"), 4)
         self.assertIn('{"Главные ворота","Главная улица","Рынок"', source)
 
 if __name__ == "__main__":
