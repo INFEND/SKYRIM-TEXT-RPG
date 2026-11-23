@@ -164,6 +164,11 @@ final class SolitudeShops {
             try{
                 g.sceneState.setContext(g.day,g.hour,"Солитьюд");
                 g.sceneState.confirm("npc",npcKey(g,s),OWNERS[s],"INFORMED");
+                // Reconciliation must restore neutral trading terms as well as access.
+                // A former HOSTILE status starts at 10 relation; INFORMED alone only adds 10.
+                JSONObject reconciled=fact(g,s);
+                if(reconciled!=null&&reconciled.optInt("relation",50)<50)
+                    g.sceneState.fixNpc(npcKey(g,s),50,false);
             }catch(org.json.JSONException ignored){return;}
             g.stamina-=10;g.hour++;g.syncLivingSystems();
             g.message=OWNERS[s]+": Конфликт улажен. Торговля снова доступна.";
