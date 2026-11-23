@@ -166,6 +166,13 @@ public final class ItemCatalog {
             case "Свиток: Круг стража": return "Свиток: Защитный круг";
             case "Том заклинаний: Солнечный огонь": return "Том заклинаний: Огонь солнца";
             case "Том заклинаний: Проклятие вампиров": return "Том заклинаний: Бич вампиров";
+            // Verified ingredients and ordinary rings; legacy item keys stay intact.
+            case "Оранжевый стрекозник": return "Оранжевая стрекоза";
+            case "Ястребиное яйцо": return "Яйцо ястреба";
+            case "Яйцо рыбы-убийцы": return "Икра рыбы-убийцы";
+            case "Яйцо паука": return "Паучье яйцо";
+            case "Кольцо серебряное": return "Серебряное кольцо";
+            case "Кольцо золотое": return "Золотое кольцо";
             default: return id;
         }
     }
