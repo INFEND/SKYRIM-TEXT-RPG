@@ -150,7 +150,7 @@ public final class MainActivity extends Activity {
         if(bundle!=null){
             itachiReplaceTarget=bundle.getString("itachi_replace_target","");
             draftName=bundle.getString("hero_name","");
-            selectedRace=bundle.getString("hero_race","Норд");
+            selectedRace=RpgContent.raceKey(bundle.getString("hero_race","Норд"));
             selectedClass=bundle.getString("hero_class","Без класса");
             selectedGender=CharacterIdentity.normalizeGender(bundle.getString("hero_gender"));
             selectedPortrait=CharacterIdentity.normalizePortrait(bundle.getInt("hero_portrait",1));
@@ -751,7 +751,7 @@ public final class MainActivity extends Activity {
         panel.addView(header,lp(-1,-2));space(panel,8);
         workshopAction(panel,"npc",()->{
                 dialog.dismiss();
-                String facts=profile==null?"":("Раса: "+profile.race+". Пол: "+profile.gender+". Роль: "+profile.role+".");
+                String facts=profile==null?"":("Раса: "+RpgContent.raceName(profile.race)+". Пол: "+profile.gender+". Роль: "+profile.role+".");
                 WorkImageEditor.open(this,"npc",display,profile==null?display:profile.displayName,facts,accent(),this::render);
             });
         space(panel,7);
@@ -986,7 +986,7 @@ public final class MainActivity extends Activity {
         });
     }
     private String npcRaceLabel(NpcProfiles.Profile p){
-        if("Женский".equals(p.gender)){if("Имперец".equals(p.race))return "Имперка";if("Бретон".equals(p.race))return "Бретонка";}return p.race;
+        return RpgContent.raceName(p.race);
     }
     private boolean npcAuthorKnown(String name){
         if(!game.started||!npcAddonEnabled(name))return false;
@@ -1064,7 +1064,7 @@ public final class MainActivity extends Activity {
         NpcProfiles.Profile entry=NpcProfiles.find(name);if(entry!=null&&entry.author){npcAuthorSection(entry.name,0);return;}
         LinearLayout panel=column();panel.setGravity(Gravity.CENTER);panel.setPadding(dp(12),dp(12),dp(12),dp(12));
         NpcProfiles.Profile profile=NpcProfiles.find(name);
-        if(profile!=null){livingLine(panel,"Имя",profile.name,accent());livingLine(panel,"Раса",profile.race,TEXT);livingLine(panel,"Пол",profile.gender,TEXT);livingLine(panel,"Роль",profile.role,TEXT);if(profile.child)addText(panel,"Ребёнок",13,MUTED,false,8);}
+        if(profile!=null){livingLine(panel,"Имя",profile.displayName,accent());livingLine(panel,"Раса",npcRaceLabel(profile),TEXT);livingLine(panel,"Пол",profile.gender,TEXT);livingLine(panel,"Роль",profile.role,TEXT);if(profile.child)addText(panel,"Ребёнок",13,MUTED,false,8);}
         if(ItachiProfile.matches(name)){
             if(!ResourceStore.has(this,"media/itachi/portrait.webp")){TextView load=text("Загрузить портрет Итачи",14,accent(),true);load.setPadding(dp(12),dp(12),dp(12),dp(12));load.setOnClickListener(v->new ResourceManagerDialog(this,accent(),this::render,"media:itachi").show());panel.addView(load,lp(-1,-2));}
             if(game.itachi.enabled&&game.itachi.stage>0){addText(panel,game.itachi.relation()+" | "+game.itachi.objective(game),14,TEXT,true,8);addText(panel,"Доверие "+game.itachi.trust+"/100 | Уважение "+game.itachi.respect+"/100 | Симпатия "+game.itachi.affection+"/100 | Энергия "+game.itachi.energy+"/100",13,TEXT,false,8);}
@@ -1229,7 +1229,7 @@ public final class MainActivity extends Activity {
                     LinearLayout person=column();person.setGravity(Gravity.CENTER);
                     person.setPadding(dp(5),dp(4),dp(5),dp(8));person.addView(npcPortrait(name),lp(68,-2));
                     NpcProfiles.Profile profile=NpcProfiles.find(name);
-                    TextView label=text(profile==null?name:profile.name,10,MUTED,false);label.setGravity(Gravity.CENTER);label.setMaxLines(2);
+                    TextView label=text(profile==null?name:profile.displayName,10,MUTED,false);label.setGravity(Gravity.CENTER);label.setMaxLines(2);
                     person.addView(label,lp(-1,-2));TextView relation=text(LiviaStory.matches(name)&&game.livia.enabled?game.livia.relation():npcStatusLabel(game.sceneState.npcStatusByName(name)),10,accent(),false);relation.setGravity(Gravity.CENTER);person.addView(relation,lp(-1,-2));
                     avatars.addView(person,lp(94,-2));person.setOnClickListener(view->npcDetails(name));
                 }
@@ -1548,11 +1548,11 @@ public final class MainActivity extends Activity {
         else{
             addText(panel,c.title,20,ITEM_GOLD,true,8);addText(panel,c.story,16,TEXT,false,10);
             TextView lines=text("",16,TEXT,false);lines.setText(SceneTypography.render(stories.dialogue(f),accent(),game.name,heroColor()));lines.setLineSpacing(dp(4),1.12f);panel.addView(lines,lp(-1,-2));space(panel,10);
-            addText(panel,"Точка входа на карте: "+c.place,12,MUTED,false,8);
+            addText(panel,"Точка входа на карте: "+CanonicalRussian.mapName(c.place),12,MUTED,false,8);
             if(stories.phase(f)==1){addText(panel,"Подход: "+(stories.approach(f)==1?"Подготовка":stories.approach(f)==2?"Переговоры":"Прямое действие"),13,accent(),true,5);addText(panel,(c.enemy.isEmpty()?RpgContent.SKILLS[stories.skill(f)]:"Противник: "+c.enemy)+" | −"+stories.cost(f)+" выносливости",14,TEXT,true,8);int chance=stories.chance(game,f);if(chance>=0){addText(panel,"Шанс успеха: "+chance+"%",13,SceneChoiceMeta.chanceColor(chance),true,8);if(stories.preparation(f)>0)addText(panel,"Подготовка: +"+stories.preparation(f)+" к шансу",12,MUTED,false,8);}}
             String block=stories.block(game,f);if(!block.isEmpty())addText(panel,block,12,ITEM_DOWN,false,8);
             WorldAtlas.Place destination=WorldAtlas.find(c.place);
-            if(destination!=null&&!c.place.equals(game.progress.location)&&!"COMBAT".equals(game.mode))visualSummaryLink(panel,"МАРШРУТ",()->locationDialog(destination));
+            if(destination!=null&&destination!=WorldAtlas.find(game.progress.location)&&!"COMBAT".equals(game.mode))visualSummaryLink(panel,"МАРШРУТ",()->locationDialog(destination));
         }
         if(f==0&&stories.beast()>0)addText(panel,stories.beast()==1?"Дар зверя: −1 к расходу сил на мощный удар (адаптация).":"Ликантропия исцелена.",12,accent(),true,8);
         if(f==3&&stories.cicero()>0)addText(panel,stories.cicero()==1?"Цицерон пощажён.":"Цицерон погиб.",12,accent(),true,8);
@@ -2086,8 +2086,8 @@ public final class MainActivity extends Activity {
         addText(details,"Нажми ⟳, чтобы получить случайное имя.",12,MUTED,false,0);
 
         addText(content,"РАСА",11,accent(),true,9);
-        chips(GameEngine.RACES,selectedRace,value->{
-            draftName=nameField.getText().toString();selectedRace=value;selectedPortrait=1;render();
+        chips(RpgContent.raceNames(),RpgContent.raceName(selectedRace),value->{
+            draftName=nameField.getText().toString();selectedRace=RpgContent.raceKey(value);selectedPortrait=1;render();
         });
         renderPortraitChoices();
         int race=RpgContent.raceIndex(selectedRace);
@@ -2180,7 +2180,7 @@ public final class MainActivity extends Activity {
             int portrait=(Integer)tile.getTag();boolean active=portrait==selectedPortrait;
             tile.setSelected(active);
             tile.setBackground(new RuneFrameDrawable(PANEL_2,active?accent():BORDER,active));
-            tile.setContentDescription(selectedRace+", "+selectedGender+", образ "+portrait+
+            tile.setContentDescription(RpgContent.raceName(selectedRace)+", "+selectedGender+", образ "+portrait+
                 (active?", выбран":""));
             TextView label=(TextView)tile.getChildAt(1);
             label.setText(active?"ВЫБРАН":"ОБРАЗ "+portrait);label.setTextColor(active?accent():MUTED);
@@ -5329,7 +5329,7 @@ public final class MainActivity extends Activity {
         skyrimTopTabs(3);game.syncLivingSystems();
         LinearLayout head=row();head.setGravity(Gravity.CENTER_VERTICAL);head.addView(fixHeroPortrait(),lp(92,-2));
         LinearLayout identity=column();identity.setPadding(dp(13),0,0,0);head.addView(identity,new LinearLayout.LayoutParams(0,-2,1));
-        addText(identity,game.name,24,heroColor(),true,4);if(!game.fixShop.cosmetics.title().isEmpty())addText(identity,game.fixShop.cosmetics.title(),13,accent(),true,4);addText(identity,game.race+" · "+game.heroClass,13,MUTED,false,8);
+        addText(identity,game.name,24,heroColor(),true,4);if(!game.fixShop.cosmetics.title().isEmpty())addText(identity,game.fixShop.cosmetics.title(),13,accent(),true,4);addText(identity,RpgContent.raceName(game.race)+" · "+game.heroClass,13,MUTED,false,8);
         livingLine(identity,"Уровень "+game.level,game.level>=100?"MAX":game.xp+" / "+game.experienceRequired(),accent());livingBar(identity,game.level>=100?1:game.xp,game.level>=100?1:game.experienceRequired(),accent());
         content.addView(head,lp(-1,-2));space(content,12);
         String portraitPath=CharacterIdentity.portraitPath(game.race,game.gender,game.portrait);
@@ -5413,7 +5413,7 @@ public final class MainActivity extends Activity {
     private void renderHeroLegacy(){
         skyrimTopTabs(3);
         livingLink(content,"К обзору героя","","hero",()->{heroDetailed=false;render();});
-        section("ЛИЧНОЕ ДЕЛО",""+game.name,game.race+" | "+game.heroClass+" | уровень "+game.level);if(!game.fixShop.cosmetics.title().isEmpty())addText(content,game.fixShop.cosmetics.title(),15,accent(),true,8);
+        section("ЛИЧНОЕ ДЕЛО",""+game.name,RpgContent.raceName(game.race)+" | "+game.heroClass+" | уровень "+game.level);if(!game.fixShop.cosmetics.title().isEmpty())addText(content,game.fixShop.cosmetics.title(),15,accent(),true,8);
         View portrait=fixHeroPortrait();
         LinearLayout.LayoutParams portraitParams=lp(150,-2);portraitParams.gravity=Gravity.CENTER_HORIZONTAL;
         content.addView(portrait,portraitParams);space(content,12);
@@ -5446,7 +5446,7 @@ public final class MainActivity extends Activity {
             toast(game.drinkMana()?"Магия восстановлена":"Зелье не требуется или закончилось");game.progress.sync(game);save();render();});
         if(game.progress.quantity("Зелье запаса сил")>0)actionButton("Выпить зелье запаса сил","+"+game.staminaPotionAmount()+" выносливости | без боя",false,()->{toast(game.drinkStamina()?"Выносливость восстановлена":"Зелье недоступно");save();render();});
         LinearLayout race=card();addText(race,"НАСЛЕДИЕ РАСЫ",11,accent(),true,12);
-        addText(race,game.race+" | пассивно",16,TEXT,true,7);
+        addText(race,RpgContent.raceName(game.race)+" | пассивно",16,TEXT,true,7);
         addText(race,game.progress.racePassive(game),14,MUTED,false,13);
         addText(race,"Талант",13,accent(),true,5);
         addText(race,game.progress.racePower(game),14,TEXT,false,7);
@@ -5663,8 +5663,8 @@ public final class MainActivity extends Activity {
             addText(content,"ᛟ  ДЕСЯТЬ НАРОДОВ",11,accent(),false,10);
             for(int i=0;i<GameEngine.RACES.length;i++){
                 final int idx=i;
-                actionButton("ᚱ  "+GameEngine.RACES[i],RpgContent.PASSIVES[i],false,()->new RuneDialogBuilder(this,accent())
-                    .setTitle(GameEngine.RACES[idx]).setMessage("Наследие: "+RpgContent.PASSIVES[idx]+
+                actionButton("ᚱ  "+RpgContent.raceName(GameEngine.RACES[i]),RpgContent.PASSIVES[i],false,()->new RuneDialogBuilder(this,accent())
+                    .setTitle(RpgContent.raceName(GameEngine.RACES[idx])).setMessage("Наследие: "+RpgContent.PASSIVES[idx]+
                     "\n\nРасовая способность: "+RpgContent.POWERS[idx])
                     .setPositiveButton("Закрыть",null).show());
             }
@@ -5717,7 +5717,7 @@ public final class MainActivity extends Activity {
         };
         list.setAdapter(adapter);
         Runnable refresh=()->{String q=NpcNameMatcher.key(search.getText().toString());filtered.clear();labels.clear();NpcProfiles.Profile exact=NpcProfiles.find(q);
-            for(NpcProfiles.Profile p:profiles)if(q.isEmpty()||p==exact||NpcNameMatcher.key(p.name+" "+p.displayName+" "+p.race+" "+p.role).contains(q)){filtered.add(p);labels.add(p.displayName+"  |  "+(p.template?"Типовой NPC":p.race));}
+            for(NpcProfiles.Profile p:profiles)if(q.isEmpty()||p==exact||NpcNameMatcher.key(p.name+" "+p.displayName+" "+p.race+" "+npcRaceLabel(p)+" "+p.role).contains(q)){filtered.add(p);labels.add(p.displayName+"  |  "+(p.template?"Типовой NPC":npcRaceLabel(p)));}
             adapter.notifyDataSetChanged();
         };
         search.addTextChangedListener(new android.text.TextWatcher(){public void beforeTextChanged(CharSequence x,int st,int c,int a){}public void onTextChanged(CharSequence x,int st,int before,int c){refresh.run();}public void afterTextChanged(android.text.Editable e){}});
@@ -5802,6 +5802,22 @@ public final class MainActivity extends Activity {
             else{WorldAtlas.Place p=WorldAtlas.find(t.place);if(p!=null)visualSummaryLink(panel,"МАРШРУТ К ЦЕЛИ",()->locationDialog(p));}space(panel,5);
         }
     }
+    private void searchQuestTitles(){
+        LinearLayout panel=column();
+        EditText input=livingField(panel,"Название задания","Название, прежнее имя или ID",false);
+        new RuneDialogBuilder(this,accent()).setTitle("Поиск заданий").setView(panel)
+            .setNegativeButton("Закрыть",null).setPositiveButton("Найти",(d,w)->{
+                java.util.List<CanonicalRussian.QuestMatch> hits=CanonicalRussian.findQuests(input.getText().toString());
+                if(hits.isEmpty()){toast("Задание не найдено");return;}
+                String[] labels=new String[hits.size()];
+                for(int i=0;i<labels.length;i++)labels[i]=hits.get(i).line;
+                new RuneDialogBuilder(this,accent()).setTitle("Задания").setItems(labels,(list,index)->{
+                    CanonicalRussian.QuestMatch match=hits.get(index);
+                    new RuneDialogBuilder(this,accent()).setTitle(match.title).setMessage(match.description())
+                        .setPositiveButton("Закрыть",null).show();
+                }).setNegativeButton("Закрыть",null).show();
+            }).show();
+    }
     private void renderJournal(){
         skyrimTopTabs(4);
         LinearLayout switcher=row();switcher.setGravity(Gravity.TOP);switcher.setBaselineAligned(false);
@@ -5818,6 +5834,7 @@ public final class MainActivity extends Activity {
         }
         space(content,8);
         if(journalRelations){renderLivingRelations();return;}
+        visualSummaryLink(content,"ПОИСК ЗАДАНИЯ",this::searchQuestTitles);
         section("ЛЕТОПИСЬ СЕВЕРА","Журнал","Выбирай задание, чтобы увидеть описание и текущую цель.");
         renderFactionJournal();
         renderRoadQuestJournal();
@@ -6397,13 +6414,13 @@ public final class MainActivity extends Activity {
         d.show();d.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v->{String n=input.getText().toString().trim();if(n.isEmpty()||n.length()>60||n.equals(game.name)){toast("Укажи новое имя до 60 символов");return;}if(fixApply("Новое имя",n,25,()->{game.name=n;return true;})){d.dismiss();livingFixShop();}});
     }
     private void fixRace(){
-        new RuneDialogBuilder(this,accent()).setTitle("Новое наследие | 150 F").setItems(GameEngine.RACES,(d,i)->{
+        new RuneDialogBuilder(this,accent()).setTitle("Новое наследие | 150 F").setItems(RpgContent.raceNames(),(d,i)->{
             String race=GameEngine.RACES[i];if(race.equals(game.race)){toast("Эта раса уже выбрана");return;}
-            fixConfirm("Новое наследие",race,150,()->{game.race=race;game.portrait=1;return true;},this::livingFixShop);
+            fixConfirm("Новое наследие",RpgContent.raceName(race),150,()->{game.race=race;game.portrait=1;return true;},this::livingFixShop);
         }).setNegativeButton("Отмена",null).show();
     }
     private void fixPortrait(){
-        LinearLayout panel=column();addText(panel,"Текущий герой | "+game.race,14,MUTED,false,8);
+        LinearLayout panel=column();addText(panel,"Текущий герой | "+RpgContent.raceName(game.race),14,MUTED,false,8);
         LinearLayout images=row();panel.addView(images,lp(-1,-2));
         for(int i=1;i<=CharacterIdentity.PORTRAITS_PER_GENDER;i++){final int n=i;LinearLayout cell=column();images.addView(cell,new LinearLayout.LayoutParams(0,-2,1));
             cell.addView(new CharacterPortraitView(this,game.race,game.gender,n),lp(-1,-2));addText(cell,n==game.portrait?"Выбран":"Облик "+n,12,TEXT,true,8);

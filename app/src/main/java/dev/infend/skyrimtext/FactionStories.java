@@ -81,7 +81,8 @@ final class FactionStories {
     int done(int f){return index[f];}
     boolean started(int f){return index[f]>0||phase[f]>0;}
     boolean completed(int f){return index[f]>=count(f);}
-    Chapter chapter(int f){return completed(f)?null:new Chapter(DATA[f][index[f]],f,index[f]);}
+    static Chapter at(int faction,int stage){return new Chapter(DATA[faction][stage],faction,stage);}
+    Chapter chapter(int f){return completed(f)?null:at(f,index[f]);}
     int phase(int f){return phase[f];}
     int preparation(int f){return preparation[f];}
     int approach(int f){return approach[f];}
@@ -123,7 +124,7 @@ final class FactionStories {
         if(!g.started||g.road.pending()||!("WORLD".equals(g.mode)||"RESULT".equals(g.mode)))return "Сначала заверши текущую сцену.";
         if(completed(f))return "Кампания завершена.";
         if(f==4&&(started(5)||g.factions.stage(5)>0)||f==5&&(started(4)||g.factions.stage(4)>0))return "Ты выбрал другую сторону гражданской войны.";
-        if(!atChapterPlace(g,f))return "Прибудь: "+chapter(f).place;
+        if(!atChapterPlace(g,f))return "Прибудь: "+CanonicalRussian.mapName(chapter(f).place);
         if(phase[f]==1&&attemptDay[f]==g.day)return "Следующая попытка в другой игровой день.";
         if(phase[f]==1&&g.stamina<cost(f))return "Нужно "+cost(f)+" выносливости.";
         return "";

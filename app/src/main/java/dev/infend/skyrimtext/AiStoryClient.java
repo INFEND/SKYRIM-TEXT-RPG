@@ -187,14 +187,14 @@ public final class AiStoryClient {
         WorldAtlas.Place place=WorldAtlas.find(game.progress.location);
         if(place!=null)b.append("Описание места: ").append(crop(place.description,100)).append('\n');
         b.append("Герой: ").append(crop(game.name,55)).append("; ").append(game.gender)
-            .append("; ").append(game.race).append("; ").append(game.heroClass)
+            .append("; ").append(RpgContent.raceName(game.race)).append("; ").append(game.heroClass)
             .append("; ур. ").append(game.level).append(".\n");
         b.append("HP ").append(game.hp).append('/').append(game.maxHp)
             .append("; силы ").append(game.stamina).append('/').append(game.maxStamina)
             .append("; магия ").append(game.magicka).append('/').append(game.maxMagicka)
             .append("; септимы ").append(game.gold).append("; зелья HP ").append(game.potions)
             .append("; зелья магии ").append(game.manaPotions).append(".\n");
-        if(game.enemyHp>0)b.append("АКТИВНЫЙ ВРАГ: ").append(crop(game.enemyName,60))
+        if(game.enemyHp>0)b.append("АКТИВНЫЙ ВРАГ: ").append(crop(BestiaryCatalog.displayName(game.enemyName),60))
             .append(" HP ").append(game.enemyHp).append('/').append(game.enemyMaxHp)
             .append("; тип боя ").append(game.battleKind).append(".\n");
         else b.append("Активного боя нет.\n");
@@ -259,7 +259,7 @@ public final class AiStoryClient {
             .append("; силы ").append(game.stamina).append('/').append(game.maxStamina)
             .append("; магия ").append(game.magicka).append('/').append(game.maxMagicka)
             .append("; золото ").append(game.gold).append('\n');
-        if(game.enemyHp>0)b.append("Враг: ").append(game.enemyName).append("; HP ").append(game.enemyHp).append('\n');
+        if(game.enemyHp>0)b.append("Враг: ").append(BestiaryCatalog.displayName(game.enemyName)).append("; HP ").append(game.enemyHp).append('\n');
         b.append("Навыки: ");
         for(int i=0;i<RpgContent.SKILLS.length;i++)
             b.append(RpgContent.SKILLS[i]).append('=').append(game.progress.skillLevel(i)).append("; ");
@@ -465,7 +465,7 @@ public final class AiStoryClient {
         out.append(genderInstruction(g));
         if(g.katherine.enabled&&g.katherine.stage>0)out.append(g.katherine.aiContext(g)).append('\n');
         out.append("ПРОВЕРЕННЫЕ ФАКТЫ ИГРОВОГО ДВИЖКА:\n").append(FixShopAiContext.context(g,false)).append("\n");
-        out.append("Герой: ").append(g.name).append("; пол: ").append(g.gender).append("; раса: ").append(g.race)
+        out.append("Герой: ").append(g.name).append("; пол: ").append(g.gender).append("; раса: ").append(RpgContent.raceName(g.race))
                 .append("; класс: ").append(g.heroClass).append("; уровень: ").append(g.level)
                 .append("; опыт: ").append(g.xp).append('/').append(g.level*80).append('\n');
         out.append("Место: ").append(CanonicalRussian.mapName(g.progress.location)).append(", ").append(GameEngine.REGIONS[g.region])
@@ -483,7 +483,7 @@ public final class AiStoryClient {
         out.append("Драконий сюжет: ").append(DragonArc.status(g)).append('\n');
         if(g.sideQuest==1)out.append("Заказ «Опасные дороги»: ").append(g.sideKills).append("/3 побед.\n");
         if("COMBAT".equals(g.mode))
-            out.append("ПОДТВЕРЖДЁННЫЙ ПРОТИВНИК: ").append(g.enemyName)
+            out.append("ПОДТВЕРЖДЁННЫЙ ПРОТИВНИК: ").append(BestiaryCatalog.displayName(g.enemyName))
                 .append("; здоровье ").append(g.enemyHp).append('/').append(g.enemyMaxHp)
                 .append("; тип боя ").append(g.battleKind).append(".\n");
         out.append("ИНВЕНТАРЬ (до 16 позиций): ");
@@ -540,7 +540,7 @@ public final class AiStoryClient {
         out.append("Состояние Ливии: ").append(game.livia.aiContext(game)).append('\n');
         out.append("Не переносить отсутствующих NPC в сцену. Отключённые дополнения не использовать, даже если они есть в старой памяти.\n");
         String initiative=KatherineInitiative.context(game);if(!initiative.isEmpty())out.append(initiative).append('\n');
-        out.append("Герой: ").append(game.name).append("; пол ").append(game.gender).append("; ").append(game.race).append("; класс ")
+        out.append("Герой: ").append(game.name).append("; пол ").append(game.gender).append("; ").append(RpgContent.raceName(game.race)).append("; класс ")
                 .append(game.heroClass).append("; уровень ").append(game.level).append("; опыт ").append(game.xp).append('\n');
         out.append("Локация: ").append(CanonicalRussian.mapName(game.progress.location)).append("; регион ").append(GameEngine.REGIONS[game.region])
                 .append("; день ").append(game.day).append("; время ")
@@ -560,7 +560,7 @@ public final class AiStoryClient {
         out.append("Собственное снаряжение (ID слотов для equipmentChanges): ")
             .append(authoredEquipment(game)).append('\n');
         if(game.enemyHp>0)
-            out.append("ПРОТИВНИК: ").append(game.enemyName).append(", HP ").append(game.enemyHp)
+            out.append("ПРОТИВНИК: ").append(BestiaryCatalog.displayName(game.enemyName)).append(", HP ").append(game.enemyHp)
                     .append('/').append(game.enemyMaxHp).append(", урон ").append(game.enemyDamage).append('\n');
         out.append('\n').append(FixShopAiContext.context(game,false)).append('\n').append(game.fixShop.world.context()).append('\n');
         String confirmedFacts=game.sceneState==null?"":game.sceneState.confirmedContext();

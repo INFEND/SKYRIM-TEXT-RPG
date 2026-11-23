@@ -70,7 +70,32 @@ public final class RpgContent {
         "Бывший имперский легионер|Солитьюд|3|Война оставила шрамы и сухой приказ об увольнении. Мирную жизнь придётся искать самому."
     };
     public static String[] startParts(int idx){return STARTS[Math.max(0,Math.min(idx,STARTS.length-1))].split("\\|",4);}
-    public static int raceIndex(String name){for(int i=0;i<RACES.length;i++)if(RACES[i].equals(name))return i;return 0;}
+    private static String raceLookup(String name){
+        return name==null ? "" : name.trim().toLowerCase(java.util.Locale.ROOT).replace('ё','е');
+    }
+    private static int findRace(String name){
+        String query=raceLookup(name);
+        for(int i=0;i<RACES.length;i++){
+            String[] row=RussianNameData.RACES[i];
+            if(raceLookup(RACES[i]).equals(query) || raceLookup(row[0]).equals(query)
+                    || row[1].equalsIgnoreCase(query) || row[2].equalsIgnoreCase(query))return i;
+        }
+        return -1;
+    }
+    public static int raceIndex(String name){return Math.max(0,findRace(name));}
+    static String raceKey(String name){
+        int index=findRace(name);
+        return index<0 ? name : RACES[index];
+    }
+    static String raceName(String name){
+        int index=findRace(name);
+        return index<0 ? name : RussianNameData.RACES[index][0];
+    }
+    static String[] raceNames(){
+        String[] labels=new String[RACES.length];
+        for(int i=0;i<labels.length;i++)labels[i]=RussianNameData.RACES[i][0];
+        return labels;
+    }
     public static String randomName(){return randomName(CharacterIdentity.MALE);}
     public static String randomName(String gender){
         String[] first=CharacterIdentity.FEMALE.equals(gender)?

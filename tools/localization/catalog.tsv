@@ -88,7 +88,7 @@ armor	Капюшон мага	Капюшон мага	candidate	ItemCatalog
 armor	Капюшон палача	Капюшон палача	candidate	ItemCatalog
 armor	Капюшон храмового жреца	Капюшон храмового жреца	candidate	ItemCatalog
 armor	Кираса из шкур	Сыромятная броня	candidate	ItemCatalog
-armor	Кираса сумеречного стража	Кираса сумеречного стража	candidate	ItemCatalog
+armor	Кираса сумеречного стража	Кираса сумеречного стража	author	ItemCatalog
 armor	Клёпаная броня	Клёпаная броня	candidate	ItemCatalog
 armor	Кожаная кираса	Кожаная броня	candidate	ItemCatalog
 armor	Кожаные наручи	Кожаные наручи	candidate	ItemCatalog
@@ -98,7 +98,7 @@ armor	Кожаный капюшон	Кожаный капюшон	candidate	Item
 armor	Кожаный шлем	Кожаный шлем	candidate	ItemCatalog
 armor	Кольцо Илас-Тей	Кольцо Илас-Тей	candidate	ItemCatalog
 armor	Кольцо Калсельмо	Кольцо Калсельмо	candidate	ItemCatalog
-armor	Кольцо зимнего пламени	Кольцо зимнего пламени	candidate	ItemCatalog
+armor	Кольцо зимнего пламени	Кольцо зимнего пламени	author	ItemCatalog
 armor	Кольцо золотое	Золотое кольцо	candidate	ItemCatalog
 armor	Кольцо серебряное	Серебряное кольцо	candidate	ItemCatalog
 armor	Кольцо чистейших смесей	Кольцо чистейших смесей	candidate	ItemCatalog
@@ -623,7 +623,7 @@ creature	Медведь	Медведь	candidate	BestiaryCatalog
 creature	Медведь-оборотень	Медведь-оборотень	candidate	BestiaryCatalog
 creature	Мирмулнир	Мирмулнир	candidate	BestiaryCatalog
 creature	Могильная баба	Могильная баба	author	BestiaryCatalog
-creature	Молодой нетч	Молодой нетч	candidate	BestiaryCatalog
+creature	Молодой нетч	Нетч-детёныш	candidate	BestiaryCatalog
 creature	Морозный дракон	Морозный дракон	candidate	BestiaryCatalog
 creature	Морозный паук	Морозный паук	candidate	BestiaryCatalog
 creature	Мёртвый утопленник	Мёртвый утопленник	author	BestiaryCatalog
@@ -655,8 +655,8 @@ creature	Риклинг-вождь	Риклинг-вождь	candidate	BestiaryC
 creature	Рыба-убийца	Рыба-убийца	candidate	BestiaryCatalog
 creature	Саблезуб	Саблезуб	candidate	BestiaryCatalog
 creature	Салокнир	Салокнир	candidate	BestiaryCatalog
-creature	Самец нетча	Самец нетча	candidate	BestiaryCatalog
-creature	Самка нетча	Самка нетча	candidate	BestiaryCatalog
+creature	Самец нетча	Нетч-самец	candidate	BestiaryCatalog
+creature	Самка нетча	Нетч-самка	candidate	BestiaryCatalog
 creature	Скелет	Скелет	candidate	BestiaryCatalog
 creature	Снежная лисица	Снежная лисица	candidate	BestiaryCatalog
 creature	Снежный волк	Снежный волк	candidate	BestiaryCatalog
@@ -674,8 +674,8 @@ creature	Туманный человек	Туманный человек	candida
 creature	Утопец	Утопец	author	BestiaryCatalog
 creature	Фалмер	Фалмер	candidate	BestiaryCatalog
 creature	Фалмер-воин	Фалмер-воин	candidate	BestiaryCatalog
-creature	Фалмер-повелитель теней	Фалмер-повелитель теней	candidate	BestiaryCatalog
-creature	Фалмер-разжигатель войны	Фалмер-разжигатель войны	candidate	BestiaryCatalog
+creature	Фалмер-повелитель теней	Фалмер-мастер теней	candidate	BestiaryCatalog
+creature	Фалмер-разжигатель войны	Фалмер-наёмник	candidate	BestiaryCatalog
 creature	Хаски	Хаски	candidate	BestiaryCatalog
 creature	Хоркер	Хоркер	candidate	BestiaryCatalog
 creature	Щетиноспин	Щетиноспин	candidate	BestiaryCatalog
@@ -693,7 +693,7 @@ faction-quest	0/0	К оружию	candidate	FactionStories
 faction-quest	0/1	Испытание доблести	candidate	FactionStories
 faction-quest	0/2	Серебряная рука	candidate	FactionStories
 faction-quest	0/3	Кровь и честь	candidate	FactionStories
-faction-quest	0/4	Чистота мести	candidate	FactionStories
+faction-quest	0/4	Очистительная месть	candidate	FactionStories
 faction-quest	0/5	Последний долг	candidate	FactionStories
 faction-quest	1/0	Первые уроки	candidate	FactionStories
 faction-quest	1/1	В глубинах Саартала	candidate	FactionStories
@@ -716,40 +716,40 @@ faction-quest	2/8	Возрождённая триада	candidate	FactionStories
 faction-quest	2/9	Ослепление	candidate	FactionStories
 faction-quest	3/0	Потерянная невинность	candidate	FactionStories
 faction-quest	3/1	С такими друзьями…	candidate	FactionStories
-faction-quest	3/10	Убить империю	candidate	FactionStories
+faction-quest	3/10	Смерть Империи	candidate	FactionStories
 faction-quest	3/11	Смерть воплощённая	candidate	FactionStories
 faction-quest	3/12	Слава Ситису!	candidate	FactionStories
 faction-quest	3/2	Убежище	candidate	FactionStories
 faction-quest	3/3	Прощай, любовь	candidate	FactionStories
-faction-quest	3/4	Шёпот во тьме	candidate	FactionStories
-faction-quest	3/5	Нарушенная тишина	candidate	FactionStories
+faction-quest	3/4	Шепотки во тьме	candidate	FactionStories
+faction-quest	3/5	Со смертью тишины	candidate	FactionStories
 faction-quest	3/6	Пока смерть не разлучит нас	candidate	FactionStories
 faction-quest	3/7	Уязвимое место	candidate	FactionStories
 faction-quest	3/8	Лекарство от безумия	candidate	FactionStories
-faction-quest	3/9	Рецепт катастрофы	candidate	FactionStories
+faction-quest	3/9	Убийственный рецепт	candidate	FactionStories
 faction-quest	4/0	Вступление в Легион	candidate	FactionStories
 faction-quest	4/1	Зубчатая корона	candidate	FactionStories
-faction-quest	4/2	Послание для Вайтрана	candidate	FactionStories
-faction-quest	4/3	Защита Вайтрана	candidate	FactionStories
-faction-quest	4/4	Воссоединение Скайрима	candidate	FactionStories
-faction-quest	4/5	Битва за форт Данстад	candidate	FactionStories
-faction-quest	4/6	Принуждение к дани	candidate	FactionStories
+faction-quest	4/2	Сообщение для Вайтрана	candidate	FactionStories
+faction-quest	4/3	Битва при Вайтране	candidate	FactionStories
+faction-quest	4/4	Объединение Скайрима	candidate	FactionStories
+faction-quest	4/5	Битва за форт Дунстад	candidate	FactionStories
+faction-quest	4/6	Военная добыча	candidate	FactionStories
 faction-quest	4/7	Битва за форт Амол	candidate	FactionStories
-faction-quest	4/8	Битва за Виндхельм	candidate	FactionStories
-faction-quest	5/0	Вступление к Братьям Бури	candidate	FactionStories
+faction-quest	4/8	Битва при Виндхельме	candidate	FactionStories
+faction-quest	5/0	Вступление в ряды Братьев Бури	candidate	FactionStories
 faction-quest	5/1	Зубчатая корона	candidate	FactionStories
-faction-quest	5/2	Послание для Вайтрана	candidate	FactionStories
-faction-quest	5/3	Битва за Вайтран	candidate	FactionStories
+faction-quest	5/2	Сообщение для Вайтрана	candidate	FactionStories
+faction-quest	5/3	Битва при Вайтране	candidate	FactionStories
 faction-quest	5/4	Освобождение Скайрима	candidate	FactionStories
-faction-quest	5/5	Принуждение к дани	candidate	FactionStories
+faction-quest	5/5	Военная добыча	candidate	FactionStories
 faction-quest	5/6	Битва за форт Сноухок	candidate	FactionStories
 faction-quest	5/7	Битва за форт Храгстад	candidate	FactionStories
-faction-quest	5/8	Битва за Солитьюд	candidate	FactionStories
+faction-quest	5/8	Битва при Солитьюде	candidate	FactionStories
 faction-quest	6/0	Страж Рассвета	candidate	FactionStories
 faction-quest	6/1	Пробуждение	candidate	FactionStories
 faction-quest	6/10	Семейный суд	candidate	FactionStories
-faction-quest	6/2	Кровные узы	candidate	FactionStories
-faction-quest	6/3	Новый порядок	candidate	FactionStories
+faction-quest	6/2	Линия крови	candidate	FactionStories
+faction-quest	6/3	Новый орден	candidate	FactionStories
 faction-quest	6/4	Пророк	candidate	FactionStories
 faction-quest	6/5	В поисках истины	candidate	FactionStories
 faction-quest	6/6	В погоне за прошлым	candidate	FactionStories
@@ -1499,7 +1499,7 @@ item	Экстракт лотоса	Экстракт лотоса	candidate	ItemC
 item	Экстракт стручков душ	Экстракт стручков душ	candidate	ItemCatalog
 item	Экстрактор эссенции	Экстрактор эссенции	candidate	ItemCatalog
 item	Эктоплазма	Эктоплазма	candidate	ItemCatalog
-item	Эликсир Жизни	Эликсир Жизни	candidate	ItemCatalog
+item	Эликсир Жизни	Эликсир Жизни	author	ItemCatalog
 item	Эликсир бодрости	Эликсир бодрости	candidate	ItemCatalog
 item	Эликсир водного дыхания	Эликсир водного дыхания	candidate	ItemCatalog
 item	Эликсир добавочной магии	Эликсир добавочной магии	candidate	ItemCatalog
@@ -1542,6 +1542,11 @@ item	Яйцо паука	Паучье яйцо	candidate	ItemCatalog
 item	Яйцо рыбы-убийцы	Икра рыбы-убийцы	candidate	ItemCatalog
 item	Яйцо соснового дрозда	Яйцо соснового дрозда	candidate	ItemCatalog
 item	Ястребиное яйцо	Яйцо ястреба	candidate	ItemCatalog
+magic-school	0	Разрушение	candidate	RpgContent
+magic-school	1	Восстановление	candidate	RpgContent
+magic-school	2	Изменение	candidate	RpgContent
+magic-school	3	Иллюзия	candidate	RpgContent
+magic-school	4	Колдовство	candidate	RpgContent
 main-quest	1	На свободу!	candidate	CanonicalCampaign
 main-quest	10	Клинок во тьме	candidate	CanonicalCampaign
 main-quest	11	Дипломатическая неприкосновенность	candidate	CanonicalCampaign
@@ -1593,9 +1598,9 @@ map	skyrim-1045	Драконий курган 7	candidate	SkyrimMapPoints
 map	skyrim-1046	Драконий курган 8	candidate	SkyrimMapPoints
 map	skyrim-1047	Драконий курган 9	candidate	SkyrimMapPoints
 map	skyrim-1048	Драконий курган 10	candidate	SkyrimMapPoints
-map	skyrim-105	Великий подъёмник — Альфтанд	candidate	SkyrimMapPoints
-map	skyrim-106	Великий подъёмник — Мзинчалефт	candidate	SkyrimMapPoints
-map	skyrim-107	Великий подъёмник — Ральдбтхар	candidate	SkyrimMapPoints
+map	skyrim-105	Главный подъёмник Альфтанда	candidate	SkyrimMapPoints
+map	skyrim-106	Главный подъёмник Мзинчалефта	candidate	SkyrimMapPoints
+map	skyrim-107	Главный подъёмник Ральдбтхара	candidate	SkyrimMapPoints
 map	skyrim-108	Ральдбтхар	candidate	SkyrimMapPoints
 map	skyrim-109	Кагрензел	candidate	SkyrimMapPoints
 map	skyrim-11	Разделённое ущелье	candidate	SkyrimMapPoints
@@ -1632,7 +1637,7 @@ map	skyrim-137	Форт Кастав	candidate	SkyrimMapPoints
 map	skyrim-138	Форт Гринвол	candidate	SkyrimMapPoints
 map	skyrim-139	Форт Феллхаммер	candidate	SkyrimMapPoints
 map	skyrim-14	Южный Ноголомный проход	candidate	SkyrimMapPoints
-map	skyrim-140	Форт Данстад	candidate	SkyrimMapPoints
+map	skyrim-140	Форт Дунстад	candidate	SkyrimMapPoints
 map	skyrim-141	Форт Греймур	candidate	SkyrimMapPoints
 map	skyrim-142	Форт Амол	candidate	SkyrimMapPoints
 map	skyrim-143	Крепость Феллглоу	candidate	SkyrimMapPoints
@@ -2092,7 +2097,7 @@ map	solstheim-2725	Драконий курган Подножие храма	can
 map	solstheim-2726	Драконий курган Замёрзшие отмели	candidate	SkyrimMapPoints
 mention	Лилия Снегоход	Лилия Снегоход	candidate	LoreNpcProfiles
 mention	Фура Моррар	Фура Моррар	candidate	LoreNpcProfiles
-npc	Абелона	Абелона	candidate	NpcProfiles
+npc	Абелона	Абелон	candidate	NpcProfiles
 npc	Авал Атерон	Авал Атерон	candidate	NpcProfiles
 npc	Авгур Данлейнский	Авгур Данлейнский	candidate	NpcProfiles
 npc	Авентус Аретино	Авентус Аретино	candidate	NpcProfiles
@@ -2126,7 +2131,7 @@ npc	Аквилий Эресий	Аквилий Эресий	candidate	NpcProfile
 npc	Аколит Йенссен	Аколит Йенссен	candidate	NpcProfiles
 npc	Алвор	Алвор	candidate	NpcProfiles
 npc	Алдуин	Алдуин	candidate	NpcProfiles
-npc	Алеа Квинт	Алеа Квинт	candidate	NpcProfiles
+npc	Алеа Квинт	Алея Квинт	candidate	NpcProfiles
 npc	Алексия Вичи	Алексия Вичи	candidate	NpcProfiles
 npc	Ален Дюфон	Ален Дюфон	candidate	NpcProfiles
 npc	Алессандра	Алессандра	candidate	NpcProfiles
@@ -2180,7 +2185,7 @@ npc	Атаф	Атаф	candidate	NpcProfiles
 npc	Атис	Атис	candidate	NpcProfiles
 npc	Атуб	Атуб	candidate	NpcProfiles
 npc	Афия Велоти	Афия Велоти	candidate	NpcProfiles
-npc	Ахджиси	Ахджиси	candidate	NpcProfiles
+npc	Ахджиси	Ахиси	candidate	NpcProfiles
 npc	Ахкари	Ахкари	candidate	NpcProfiles
 npc	Ахлам	Ахлам	candidate	NpcProfiles
 npc	Ахтар	Ахтар	candidate	NpcProfiles
@@ -2266,10 +2271,10 @@ npc	Валок Тюремщик	Валок Тюремщик	candidate	NpcProfile
 npc	Валс Веран	Валс Веран	candidate	NpcProfiles
 npc	Вальд	Вальд	candidate	NpcProfiles
 npc	Вальдар	Вальдар	candidate	NpcProfiles
-npc	Вальдимар	Вальдимар	candidate	NpcProfiles
+npc	Вальдимар	Валдимар	candidate	NpcProfiles
 npc	Ваник	Ваник	candidate	NpcProfiles
 npc	Ванрит Гатариан	Ванрит Гатариан	candidate	NpcProfiles
-npc	Вантус Лорей	Вантус Лорей	candidate	NpcProfiles
+npc	Вантус Лорей	Ванций Лорей	candidate	NpcProfiles
 npc	Варний Юний	Варний Юний	candidate	NpcProfiles
 npc	Варона Нелас	Варона Нелас	candidate	NpcProfiles
 npc	Вейлин	Вейлин	candidate	NpcProfiles
@@ -2385,7 +2390,7 @@ npc	Гутрум	Гутрум	candidate	NpcProfiles
 npc	Гхак	Гхак	candidate	NpcProfiles
 npc	Гьюк	Гьюк	candidate	NpcProfiles
 npc	Гьяк	Гьяк	candidate	NpcProfiles
-npc	Гьялунд Морской Волк	Гьялунд Морской Волк	candidate	NpcProfiles
+npc	Гьялунд Морской Волк	Гьялунд Пуд Соли	candidate	NpcProfiles
 npc	Дагни	Дагни	candidate	NpcProfiles
 npc	Дагур	Дагур	candidate	NpcProfiles
 npc	Далан Меркад	Далан Меркад	candidate	NpcProfiles
@@ -2401,10 +2406,10 @@ npc	Дервенин	Дервенин	candidate	NpcProfiles
 npc	Деркитус	Деркитус	candidate	NpcProfiles
 npc	Дж'дарр	Дж'дарр	candidate	NpcProfiles
 npc	Дж'зарго	Дж'зарго	candidate	NpcProfiles
-npc	Дж'кир	Дж'кир	candidate	NpcProfiles
+npc	Дж'кир	Дж'киер	candidate	NpcProfiles
 npc	Джаван	Джаванан	candidate	NpcProfiles
 npc	Джала	Джала	candidate	NpcProfiles
-npc	Джан Кулак	Джан Кулак	candidate	NpcProfiles
+npc	Джан Кулак	Джиан Кулак	candidate	NpcProfiles
 npc	Джари-Ра	Джари-Ра	candidate	NpcProfiles
 npc	Джейри	Джейри	candidate	NpcProfiles
 npc	Дженасса	Дженасса	candidate	NpcProfiles
@@ -2462,7 +2467,7 @@ npc	Ингол	Ингол	candidate	NpcProfiles
 npc	Ингрид	Ингрид	candidate	NpcProfiles
 npc	Ингун Чёрный Вереск	Ингун Чёрный Вереск	candidate	NpcProfiles
 npc	Ингьярд	Ингьярд	candidate	NpcProfiles
-npc	Индара Каэреллия	Индара Каэреллия	candidate	NpcProfiles
+npc	Индара Каэреллия	Индара Киреллия	candidate	NpcProfiles
 npc	Индарин	Индарин	candidate	NpcProfiles
 npc	Иона	Иона	candidate	NpcProfiles
 npc	Иргнир	Иргнир	candidate	NpcProfiles
@@ -2493,14 +2498,14 @@ npc	Йофтор	Йофтор	candidate	NpcProfiles
 npc	Каирин	Каирин	candidate	NpcProfiles
 npc	Кай Мокрая Рукоять	Кай Мокрая Рукоять	candidate	NpcProfiles
 npc	Кайе	Кайе	candidate	NpcProfiles
-npc	Кайла	Кайла	candidate	NpcProfiles
+npc	Кайла	Кейла	candidate	NpcProfiles
 npc	Каликсто Корриум	Каликсто Корриум	candidate	NpcProfiles
 npc	Кальдер	Колдер	candidate	NpcProfiles
 npc	Камилла Валерия	Камилла Валерия	candidate	NpcProfiles
 npc	Капитан Авидий	Капитан Авидий	candidate	NpcProfiles
 npc	Капитан Алдис	Капитан Алдис	candidate	NpcProfiles
 npc	Капитан Валмир	Капитан Валмир	candidate	NpcProfiles
-npc	Капитан Вейфайндер	Капитан Вейфайндер	candidate	NpcProfiles
+npc	Капитан Вейфайндер	Капитан Чёрный Шторм	candidate	NpcProfiles
 npc	Капитан Велет	Капитан Велет	candidate	NpcProfiles
 npc	Капитан Метиллий	Капитан Метиллий	candidate	NpcProfiles
 npc	Капитан Одинокий Шквал	Капитан Одинокий Шквал	candidate	NpcProfiles
@@ -2525,7 +2530,7 @@ npc	Клавикус Вайл	Клавикус Вайл	candidate	NpcProfiles
 npc	Клепп	Клепп	candidate	NpcProfiles
 npc	Климмек	Климмек	candidate	NpcProfiles
 npc	Клинтон Лилвив	Клинтон Лилвив	candidate	NpcProfiles
-npc	Кнаджкр	Кнаджкр	candidate	NpcProfiles
+npc	Кнаджкр	Кньякр	candidate	NpcProfiles
 npc	Кнут	Кнут	candidate	NpcProfiles
 npc	Кодлак Белая Грива	Кодлак Белая Грива	candidate	NpcProfiles
 npc	Кодрир	Кодрир	candidate	NpcProfiles
@@ -2587,7 +2592,7 @@ npc	Линли Звёздная Песня	Линли Звёздная Песн�
 npc	Лисбет	Лисбет	candidate	NpcProfiles
 npc	Лисетта	Лизетта	candidate	NpcProfiles
 npc	Лисл	Лисл	candidate	NpcProfiles
-npc	Ллевелин Соловей	Ллевелин Соловей	candidate	NpcProfiles
+npc	Ллевелин Соловей	Луэллин Соловей	candidate	NpcProfiles
 npc	Ллерил Морвейн	Ллерил Морвейн	candidate	NpcProfiles
 npc	Лоб	Лоб	candidate	NpcProfiles
 npc	Лод	Лод	candidate	NpcProfiles
@@ -2618,7 +2623,7 @@ npc	Малакат	Малакат	candidate	NpcProfiles
 npc	Малборн	Малборн	candidate	NpcProfiles
 npc	Маленький Пелагий	Маленький Пелагий	candidate	NpcProfiles
 npc	Малкоран	Малкоран	candidate	NpcProfiles
-npc	Малкус	Малкус	candidate	NpcProfiles
+npc	Малкус	Малк	candidate	NpcProfiles
 npc	Маллий Макий	Маллий Макий	candidate	NpcProfiles
 npc	Малтир Эленил	Малтир Эленил	candidate	NpcProfiles
 npc	Малур Селот	Мейлур Селот	candidate	NpcProfiles
@@ -2627,7 +2632,7 @@ npc	Марамал	Марамал	candidate	NpcProfiles
 npc	Маргрет	Маргрет	candidate	NpcProfiles
 npc	Мариса Аравел	Мариса Аравел	candidate	NpcProfiles
 npc	Маркурио	Маркурио	candidate	NpcProfiles
-npc	Маркус	Маркус	candidate	NpcProfiles
+npc	Маркус	Марк	candidate	NpcProfiles
 npc	Матлара	Матлара	candidate	NpcProfiles
 npc	Мать Ночи	Мать Ночи	candidate	NpcProfiles
 npc	Матьес	Матьес	candidate	NpcProfiles
@@ -2667,7 +2672,7 @@ npc	Молгром Дважды Убитый	Молгром Дважды Уби�
 npc	Молл	Молл	candidate	NpcProfiles
 npc	Морвен	Морвен	candidate	NpcProfiles
 npc	Морвен Страуд	Морвен Страуд	candidate	NpcProfiles
-npc	Морвена	Морвена	candidate	NpcProfiles
+npc	Морвена	Моруэн	candidate	NpcProfiles
 npc	Морик Сидрей	Морик Сидрей	candidate	NpcProfiles
 npc	Морис Жондрель	Морис Жондрель	candidate	NpcProfiles
 npc	Мороз	Мороз	candidate	NpcProfiles
@@ -2735,13 +2740,13 @@ npc	Ориэлла	Ориэлла	candidate	NpcProfiles
 npc	Оркендор	Оркендор	candidate	NpcProfiles
 npc	Орла	Орла	candidate	NpcProfiles
 npc	Оррини Драл	Оррини Драл	candidate	NpcProfiles
-npc	Ортус Эндарио	Ортус Эндарио	candidate	NpcProfiles
+npc	Ортус Эндарио	Орт Эндарио	candidate	NpcProfiles
 npc	Ортьольф	Ортьольф	candidate	NpcProfiles
 npc	Ослаф	Ослаф	candidate	NpcProfiles
 npc	Отар Безумный	Отар Безумный	candidate	NpcProfiles
 npc	Оэнгул Наковальня	Онгул Наковальня	candidate	NpcProfiles
 npc	Павон Аттий	Павон Аттий	candidate	NpcProfiles
-npc	Пактюр	Пактюр	candidate	NpcProfiles
+npc	Пактюр	Пактур	candidate	NpcProfiles
 npc	Палевий Лекс	Палевий Лекс	candidate	NpcProfiles
 npc	Пантея Атейя	Пантея Атейя	candidate	NpcProfiles
 npc	Партурнакс	Партурнакс	candidate	NpcProfiles
@@ -2811,7 +2816,7 @@ npc	Сайма	Сэйма	candidate	NpcProfiles
 npc	Салма	Салма	candidate	NpcProfiles
 npc	Салокнир	Салокнир	candidate	NpcProfiles
 npc	Салония Карван	Салония Карван	candidate	NpcProfiles
-npc	Салония Целия	Салония Целия	candidate	NpcProfiles
+npc	Салония Целия	Салония Кейлия	candidate	NpcProfiles
 npc	Сальвиан	Сальвиан	candidate	NpcProfiles
 npc	Самуил	Самуил	candidate	NpcProfiles
 npc	Сангвин	Сангвин	candidate	NpcProfiles
@@ -2867,7 +2872,7 @@ npc	Скульвар Чёрная Рукоять	Скульвар Чёрная �
 npc	Скьор	Скьор	candidate	NpcProfiles
 npc	Слиттер	Слиттер	candidate	NpcProfiles
 npc	Снилин	Снилин	candidate	NpcProfiles
-npc	Снилф	Снилф	candidate	NpcProfiles
+npc	Снилф	Снильф	candidate	NpcProfiles
 npc	Сноррейд	Сноррейд	candidate	NpcProfiles
 npc	Согрлаф	Согрлаф	candidate	NpcProfiles
 npc	Созия Тремеллия	Созия Тремеллия	candidate	NpcProfiles
@@ -2881,7 +2886,7 @@ npc	Сорин Журар	Сорин Журар	candidate	NpcProfiles
 npc	Сорли Строительница	Сорли Строительница	candidate	NpcProfiles
 npc	Софи	Софи	candidate	NpcProfiles
 npc	Сталлео	Сталлео	candidate	NpcProfiles
-npc	Сталф	Сталф	candidate	NpcProfiles
+npc	Сталф	Стальф	candidate	NpcProfiles
 npc	Старейшина Отрелот	Старейшина Отрелот	candidate	NpcProfiles
 npc	Стенвар	Стенвар	candidate	NpcProfiles
 npc	Стиг Солёная Доска	Стиг Солёная Доска	candidate	NpcProfiles
@@ -2896,7 +2901,7 @@ npc	Таари	Тари	candidate	NpcProfiles
 npc	Таддгейр	Таддгейр	candidate	NpcProfiles
 npc	Талвас Фатрион	Талвас Фатрион	candidate	NpcProfiles
 npc	Тален-Джей	Тален-Джей	candidate	NpcProfiles
-npc	Талсгар Странник	Талсгар Странник	candidate	NpcProfiles
+npc	Талсгар Странник	Тальсгар Странник	candidate	NpcProfiles
 npc	Тандил	Тандил	candidate	NpcProfiles
 npc	Тарон Дрет	Тарон Дрет	candidate	NpcProfiles
 npc	Тарстан	Тарстан	candidate	NpcProfiles
@@ -2905,10 +2910,10 @@ npc	Таэр	Тир	candidate	NpcProfiles
 npc	Тейна	Тейна	candidate	NpcProfiles
 npc	Текла	Текла	candidate	NpcProfiles
 npc	Телрав	Телрав	candidate	NpcProfiles
-npc	Тельдрин Серо	Тельдрин Серо	candidate	NpcProfiles
+npc	Тельдрин Серо	Телдрин Серо	candidate	NpcProfiles
 npc	Темба Широкая Рука	Темба Широкая Рука	candidate	NpcProfiles
 npc	Тенегрив	Тенегрив	candidate	NpcProfiles
-npc	Тиба-Эй	Тиба-Эй	candidate	NpcProfiles
+npc	Тиба-Эй	Тиба-Ай	candidate	NpcProfiles
 npc	Тибер	Тибер	candidate	NpcProfiles
 npc	Тилису Северин	Тилису Северин	candidate	NpcProfiles
 npc	Тильда	Тильда	candidate	NpcProfiles
@@ -2930,10 +2935,10 @@ npc	Торбьорн Расколотый Щит	Торбьорн Расколо
 npc	Торвар	Торвар	candidate	NpcProfiles
 npc	Торвьор Жестокое Море	Торвьор Жестокое Море	candidate	NpcProfiles
 npc	Торгар	Торгар	candidate	NpcProfiles
-npc	Торигг Убийца Солнца	Торигг Убийца Солнца	candidate	NpcProfiles
+npc	Торигг Убийца Солнца	Торуг Солнцененавистник	candidate	NpcProfiles
 npc	Торинг	Торинг	candidate	NpcProfiles
 npc	Торкильд	Торкильд	candidate	NpcProfiles
-npc	Торкильд Грозный	Торкильд Грозный	candidate	NpcProfiles
+npc	Торкильд Грозный	Торкильд Страшный	candidate	NpcProfiles
 npc	Тормир	Тормир	candidate	NpcProfiles
 npc	Торольф	Торольф	candidate	NpcProfiles
 npc	Тором	Тором	candidate	NpcProfiles
@@ -3002,7 +3007,7 @@ npc	Фротар	Фротар	candidate	NpcProfiles
 npc	Фруки	Фруки	candidate	NpcProfiles
 npc	Фультхейм	Фультхейм	candidate	NpcProfiles
 npc	Фультхейм Бесстрашный	Фультхейм Бесстрашный	candidate	NpcProfiles
-npc	Фура Кровавая Пасть	Фура Кровавая Пасть	candidate	NpcProfiles
+npc	Фура Кровавая Пасть	Фьюра Кровопийца	candidate	NpcProfiles
 npc	Фьола	Фьола	candidate	NpcProfiles
 npc	Фьори	Фьори	candidate	NpcProfiles
 npc	Фьотра	Фьотра	candidate	NpcProfiles
@@ -3010,14 +3015,14 @@ npc	Хабд	Хабд	candidate	NpcProfiles
 npc	Хадвар	Хадвар	candidate	NpcProfiles
 npc	Хадринг	Хадринг	candidate	NpcProfiles
 npc	Хайварр Железная Рука	Хайварр Железная Рука	candidate	NpcProfiles
-npc	Хакар	Хакар	candidate	NpcProfiles
+npc	Хакар	Страж Рассвета — рекрут Хакар	candidate	NpcProfiles
 npc	Хакнир Печать Смерти	Хакнир Печать Смерти	candidate	NpcProfiles
 npc	Хакон Одноглазый	Хакон Одноглазый	candidate	NpcProfiles
-npc	Халбарн Железная Шкура	Халбарн Железная Шкура	candidate	NpcProfiles
+npc	Халбарн Железная Шкура	Хальбарн Железный Мех	candidate	NpcProfiles
 npc	Халдин	Халдин	candidate	NpcProfiles
 npc	Халдир	Халдир	candidate	NpcProfiles
 npc	Хамал	Хамал	candidate	NpcProfiles
-npc	Хамелин	Хамелин	candidate	NpcProfiles
+npc	Хамелин	Хеймлин	candidate	NpcProfiles
 npc	Хаминг	Хаминг	candidate	NpcProfiles
 npc	Хараг гро-Шуркул	Хараг гро-Шуркул	candidate	NpcProfiles
 npc	Харан	Харан	candidate	NpcProfiles
@@ -3043,14 +3048,14 @@ npc	Хестла	Хестла	candidate	NpcProfiles
 npc	Хефид Глухая	Хефид Глухая	candidate	NpcProfiles
 npc	Хиллеви Жестокое Море	Хиллеви Жестокое Море	candidate	NpcProfiles
 npc	Хильде	Хильде	candidate	NpcProfiles
-npc	Хильунд	Хильунд	candidate	NpcProfiles
+npc	Хильунд	Хилунд	candidate	NpcProfiles
 npc	Хирсин	Хирсин	candidate	NpcProfiles
 npc	Хогни Красная Рука	Хогни Красная Рука	candidate	NpcProfiles
 npc	Ход	Ход	candidate	NpcProfiles
 npc	Ходдрид	Ходдрид	candidate	NpcProfiles
 npc	Хольгейр	Хольгейр	candidate	NpcProfiles
 npc	Хоргеир	Хоргеир	candidate	NpcProfiles
-npc	Хорик Полурукий	Хорик Полурукий	candidate	NpcProfiles
+npc	Хорик Полурукий	Хорик Полруки	candidate	NpcProfiles
 npc	Хорм	Хорм	candidate	NpcProfiles
 npc	Хорошо-Знает-Болота	Хорошо-Знает-Болота	candidate	NpcProfiles
 npc	Хофгир Гроза Лошадей	Хофгир Гроза Лошадей	candidate	NpcProfiles
@@ -3389,14 +3394,14 @@ perk	7	Торговец	candidate	AdvancedPerks
 perk	8	Новичок школы разрушения	candidate	AdvancedPerks
 perk	9	Восполнение	candidate	AdvancedPerks
 race	0	Норд	candidate	RpgContent
-race	1	Бретон	candidate	RpgContent
-race	2	Данмер	candidate	RpgContent
+race	1	Бретонец	candidate	RpgContent
+race	2	Темный эльф	candidate	RpgContent
 race	3	Каджит	candidate	RpgContent
 race	4	Имперец	candidate	RpgContent
 race	5	Орк	candidate	RpgContent
 race	6	Редгард	candidate	RpgContent
-race	7	Альтмер	candidate	RpgContent
-race	8	Босмер	candidate	RpgContent
+race	7	Высокий эльф	candidate	RpgContent
+race	8	Лесной эльф	candidate	RpgContent
 race	9	Аргонианин	candidate	RpgContent
 racial-power	0	Боевой клич	candidate	RpgContent
 racial-power	1	Драконья кожа	candidate	RpgContent
@@ -3739,7 +3744,7 @@ tome	Том заклинаний: Ядовитая руна	Том заклин�
 tome	Том заклинаний: Ярость	Том заклинаний: Ярость	candidate	ItemCatalog
 tome	Том заклинаний: Ясновидение	Том заклинаний: Ясновидение	candidate	ItemCatalog
 weapon	Арбалет	Арбалет	candidate	ItemCatalog
-weapon	Арбалет «Рик»	Арбалет «Рик»	candidate	ItemCatalog
+weapon	Арбалет «Рик»	Арбалет «Рик»	author	ItemCatalog
 weapon	Боевой молот Стражи Рассвета	Боевой молот Стражи Рассвета	candidate	ItemCatalog
 weapon	Боевой молот Шагрола	Боевой молот Шагрола	candidate	ItemCatalog
 weapon	Боевой топор Стражи Рассвета	Боевой топор Стражи Рассвета	candidate	ItemCatalog
@@ -3795,10 +3800,10 @@ weapon	Зачарованный железный меч силы	Зачаров�
 weapon	Имперский меч	Имперский меч	candidate	ItemCatalog
 weapon	Кинжал Алессандры	Кинжал Алессандры	candidate	ItemCatalog
 weapon	Кинжал драконьего жреца	Кинжал драконьего жреца	candidate	ItemCatalog
-weapon	Клинок «Кай»	Клинок «Кай»	candidate	ItemCatalog
+weapon	Клинок «Кай»	Клинок «Кай»	author	ItemCatalog
 weapon	Клинок Хаафингара	Клинок Хаафингара	candidate	ItemCatalog
 weapon	Клинок жертвоприношения	Клинок жертвоприношения	candidate	ItemCatalog
-weapon	Клинок северной зари	Клинок северной зари	candidate	ItemCatalog
+weapon	Клинок северной зари	Клинок северной зари	author	ItemCatalog
 weapon	Клык Кавозеина	Клык Кавозеина	candidate	ItemCatalog
 weapon	Крапивник	Крапивник	candidate	ItemCatalog
 weapon	Лук Дравина	Лук Дравина	candidate	ItemCatalog

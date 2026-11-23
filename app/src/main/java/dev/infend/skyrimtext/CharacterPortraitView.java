@@ -22,7 +22,7 @@ public final class CharacterPortraitView extends ImageView {
         assetPath=CharacterIdentity.portraitPath(race,gender,portrait);
         setScaleType(ScaleType.CENTER_CROP);
         setBackgroundColor(0xff141516);
-        setContentDescription(race+", "+CharacterIdentity.normalizeGender(gender)+", образ "+
+        setContentDescription(RpgContent.raceName(race)+", "+CharacterIdentity.normalizeGender(gender)+", образ "+
             CharacterIdentity.normalizePortrait(portrait));
         setImportantForAccessibility(IMPORTANT_FOR_ACCESSIBILITY_NO);
     }

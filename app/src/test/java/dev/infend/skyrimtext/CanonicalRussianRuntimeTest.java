@@ -89,6 +89,58 @@ public class CanonicalRussianRuntimeTest {
         assertEquals(2, p.quantity("Эбонитовая кираса"));
     }
 
+    @Test public void raceLabelsLoadAndSaveWithHistoricKeysAndPortraits() throws Exception {
+        for(int i=0;i<RpgContent.RACES.length;i++){
+            String key=RpgContent.RACES[i];
+            String[] race=RussianNameData.RACES[i];
+            assertEquals(i,RpgContent.raceIndex(key));
+            assertEquals(i,RpgContent.raceIndex(race[0]));
+            assertEquals(i,RpgContent.raceIndex(race[2]));
+            assertEquals(race[0],RpgContent.raceName(race[1]));
+            assertEquals(key,RpgContent.raceKey(race[0]));
+            assertEquals(CharacterIdentity.portraitPath(key,"Женский",2),
+                CharacterIdentity.portraitPath(race[0],"Женский",2));
+            GameEngine g=new GameEngine();
+            g.start("Герой",race[0],"Воин");
+            assertEquals(key,g.race);
+            assertEquals(key,g.toJson().getString("race"));
+            assertEquals(key,GameEngine.fromJson(g.toJson().put("race",race[0]).toString()).race);
+        }
+        assertEquals("Данмер",RpgContent.raceKey("Тёмный эльф"));
+        assertEquals("Авторский народ",RpgContent.raceName("Авторский народ"));
+    }
+
+    @Test public void oldAndNewQuestTitlesResolveToTheSamePlayableChapter() {
+        for(String[] row:RussianNameData.QUESTS){
+            CanonicalRussian.QuestMatch q=new CanonicalRussian.QuestMatch(row);
+            String actual=q.faction<0 ? CanonicalCampaign.title(q.stage) : FactionStories.at(q.faction,q.stage).title;
+            assertEquals(actual,q.title);
+            assertFalse(q.description().isEmpty());
+            for(String alias:new String[]{row[1],row[2],row[3]}){
+                if(alias.isEmpty())continue;
+                assertTrue(q.line,CanonicalRussian.findQuests(alias).stream()
+                    .anyMatch(hit->hit.stage==q.stage && hit.faction==q.faction && hit.title.equals(actual)));
+            }
+        }
+        assertEquals(2,CanonicalRussian.findQuests("Послание для Вайтрана").size());
+        assertEquals(4,CanonicalRussian.findQuests("CWSiegeObj").size());
+        assertEquals("Линия крови",FactionStories.at(6,2).title);
+        assertEquals("Новый орден",FactionStories.at(6,3).title);
+    }
+
+    @Test public void creatureAliasesMatchCombatLabelsAndTheSearchResult() {
+        for(String[] row:RussianNameData.CREATURES){
+            BestiaryCatalog.Entry e=BestiaryCatalog.find(row[0]);
+            assertNotNull(e);
+            assertSame(e,BestiaryCatalog.find(row[1]));
+            assertEquals(row[0],e.id);
+            assertEquals(row[1],e.name);
+            assertTrue(BestiaryCatalog.filter(row[0],BestiaryCatalog.ALL).contains(e));
+            assertTrue(BestiaryCatalog.filter(row[1],BestiaryCatalog.ALL).contains(e));
+            assertEquals(e.name,BestiaryCatalog.displayName(row[0]));
+        }
+        assertEquals("Мой нетч",BestiaryCatalog.displayName("Мой нетч"));
+    }
     @Test public void providerAliasesAreGroupedBeforeInventoryValidation() throws Exception {
         GameEngine g = new GameEngine();
         g.start("Герой", "Норд", "Воин");

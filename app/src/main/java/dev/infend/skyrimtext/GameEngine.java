@@ -215,7 +215,7 @@ public final class GameEngine {
         portrait=CharacterIdentity.normalizePortrait(desiredPortrait);
         name=desiredName==null||desiredName.trim().isEmpty()?RpgContent.randomName(gender):desiredName.trim();
         if(name.length()>28)name=name.substring(0,28);
-        race=contains(RACES,desiredRace)?desiredRace:"Норд";
+        race=RACES[RpgContent.raceIndex(desiredRace)];
         heroClass=contains(CLASSES,desiredClass)?desiredClass:"Без класса";
         started=true;solitude=new SolitudeCity();compensation=new CompensationPowers();compensation.installCatalog();lastLivingResult=new JSONObject();lastCheckChance=lastCheckRoll=-1;needs=new LivingNeeds();economy=new LivingEconomy();java.util.Arrays.fill(regenBonus,0);regenIgnorePenalty=false;fixSpent=0;fixShop=new FixShopState();aiTurn=null;sceneState=new SceneState();road=new RoadEvents();katherine=new KatherineStory();alma=new AlmaStory();livia=new LiviaStory();itachi=new ItachiStory();aiJournal="";day=1;hour=8;level=1;xp=0;gold=85;potions=3;manaPotions=1;
         questStage=0;sideQuest=0;sideKills=0;boardCompleted=0;explored=0;victories=0;reputation=0;
@@ -368,7 +368,7 @@ public final class GameEngine {
             .add("EVENT_LEAVE","Пройти мимо","Не рисковать");
     }
     private Scene battleScene() {
-        Scene s=new Scene("БОЙ | " + REGIONS[region], enemyName, enemyIntro + "\n\n" + battleLog +
+        Scene s=new Scene("БОЙ | " + REGIONS[region], BestiaryCatalog.displayName(enemyName), enemyIntro + "\n\n" + battleLog +
             "\n\nПротивник: " + enemyHp + "/" + enemyMaxHp + " здоровья."+road.groupStatus(this)+"\nТы: " + hp + "/" + maxHp + " здоровья.")
             .primary("ATTACK","Обычный удар","Стабильный урон, без затрат")
             .add("HEAVY","Сильный удар","−"+heavyCost()+" выносливости | риск промаха")
@@ -866,7 +866,7 @@ public final class GameEngine {
         }
         addXp(gain);mode="RESULT";
         katherine.victory(this);alma.victory(this);livia.victory(this);itachi.victory();
-        message=lastHit+"\n\nПобеда над «"+enemyName+"»! +"+reward+" септимов, +"+gain+" опыта.";
+        message=lastHit+"\n\nПобеда над «"+BestiaryCatalog.displayName(enemyName)+"»! +"+reward+" септимов, +"+gain+" опыта.";
         if("QUEST".equals(battleKind))message+="\n\nЗа стражем ты находишь журнал хранителя. Следующая цель: Солитьюд.";
         if("DRAGON".equals(battleKind))message+="\n\n"+progress.dragonRecent;
         if(sideQuest==1)message+="\nЗаказ доски: "+sideKills+"/3.";
@@ -976,7 +976,7 @@ public final class GameEngine {
             JSONObject j=new JSONObject(json);
             if(j.optInt("schema")!=1)return g;
             g.started=j.optBoolean("started",false);g.name=j.optString("name",g.name);
-            g.race=j.optString("race",g.race);g.heroClass=j.optString("heroClass",g.heroClass);
+            g.race=RpgContent.raceKey(j.optString("race",g.race));g.heroClass=j.optString("heroClass",g.heroClass);
             g.gender=CharacterIdentity.normalizeGender(j.optString("gender",CharacterIdentity.MALE));
             g.portrait=CharacterIdentity.normalizePortrait(j.optInt("portrait",1));
             g.region=Math.max(0,Math.min(REGIONS.length-1,j.optInt("region",0)));

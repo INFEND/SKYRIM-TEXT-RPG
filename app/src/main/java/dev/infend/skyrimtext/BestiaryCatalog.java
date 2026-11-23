@@ -24,10 +24,10 @@ public final class BestiaryCatalog {
     public static final String GAME = "Игровой архетип";
 
     public static final class Entry {
-        public final String name, category, origin, type, habitat, appearance, behavior;
+        public final String id, name, category, origin, type, habitat, appearance, behavior;
         public final String strengths, weaknesses, abilities, threat, loot, legend;
         private Entry(String category, String origin, String[] fields) {
-            this.name=fields[0]; this.category=category; this.origin=origin;
+            this.id=fields[0]; this.name=displayName(id); this.category=category; this.origin=origin;
             this.type=originalType(fields[0],category);
             this.habitat=fields[1]; this.appearance=fields[2]; this.behavior=fields[3];
             this.strengths=fields[4]; this.weaknesses=fields[5]; this.abilities=fields[6];
@@ -67,12 +67,17 @@ public final class BestiaryCatalog {
         if(n.contains("болотная баба"))return "Болотные твари";
         return "Проклятые";
     }
+    public static String displayName(String name) {
+        for(String[] r:RussianNameData.CREATURES)if(r[0].equals(name))return r[1];
+        return name;
+    }
     private static void add(String category,String origin,String row) {
         String[] p=row.split("\\|",-1);
         if(p.length!=10)throw new IllegalArgumentException("Invalid bestiary entry fields: "+p.length+" for "+row);
         for(String value:p)if(value.trim().isEmpty())throw new IllegalArgumentException("Empty bestiary field: "+p[0]);
         Entry e=new Entry(category,origin,p);
         if(BY_NAME.put(key(e.name),e)!=null)throw new IllegalArgumentException("Duplicate bestiary entry "+e.name);
+        if(!e.name.equals(e.id))ALIASES.put(key(e.id),key(e.name));
         ENTRIES.add(e);
     }
     private static void a(String category,String row){add(category,SKYRIM,row);}
@@ -264,7 +269,7 @@ public final class BestiaryCatalog {
         ArrayList<Entry> out=new ArrayList<>();
         for(Entry e:ENTRIES){
             if(category!=null&&!ALL.equals(category)&&!category.equals(e.category))continue;
-            if(q.isEmpty()||key(e.name+" "+e.category+" "+e.origin+" "+e.habitat+" "+e.appearance+
+            if(q.isEmpty()||key(e.name+" "+e.id+" "+e.category+" "+e.origin+" "+e.habitat+" "+e.appearance+
                 " "+e.behavior+" "+e.abilities+" "+e.loot+" "+e.legend+" "+e.type).contains(q))out.add(e);
         }
         return out;

@@ -89,6 +89,38 @@ final class CanonicalRussian {
         return fallback;
     }
 
+    static final class QuestMatch {
+        final int faction, stage;
+        final String title, line;
+        QuestMatch(String[] row) {
+            int slash=row[0].indexOf('/');
+            faction=slash<0 ? -1 : Integer.parseInt(row[0].substring(0,slash));
+            stage=Integer.parseInt(row[0].substring(slash+1));
+            title=row[1];
+            line=(faction<0 ? "Главный сюжет" : FactionCampaign.NAMES[faction])+" | "+title;
+        }
+        String description() {
+            if(faction<0)return CanonicalCampaign.goal(stage);
+            FactionStories.Chapter chapter=FactionStories.at(faction,stage);
+            return chapter.story+"\n\nМесто: "+CanonicalRussian.mapName(chapter.place);
+        }
+    }
+
+    static java.util.List<QuestMatch> findQuests(String text) {
+        String query=SkyrimMapCatalog.normalize(text);
+        java.util.List<QuestMatch> matches=new java.util.ArrayList<>();
+        if(query.isEmpty())return matches;
+        for(String[] row:RussianNameData.QUESTS){
+            for(int i=1;i<row.length;i++){
+                if(SkyrimMapCatalog.normalize(row[i]).contains(query)){
+                    matches.add(new QuestMatch(row));
+                    break;
+                }
+            }
+        }
+        return matches;
+    }
+
     static java.util.List<Integer> findPerks(String label) {
         java.util.List<Integer> matches = new java.util.ArrayList<>();
         for (int i = 0; i < AdvancedPerks.NAMES.length; i++) {

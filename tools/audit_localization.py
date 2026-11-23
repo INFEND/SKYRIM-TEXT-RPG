@@ -18,7 +18,7 @@ TEXT = {".java", ".kt", ".json", ".xml", ".txt", ".py", ".md", ".yml", ".yaml", 
 GROUPS = {"map": "Локации", "atlas": "Локации", "npc": "NPC", "npc-template": "NPC", "mention": "NPC",
           "weapon": "Оружие", "armor": "Броня", "item": "Предметы", "book": "Книги", "tome": "Книги",
           "scroll": "Предметы", "spell": "Заклинания", "shout": "Крики и расовые таланты",
-          "racial-power": "Крики и расовые таланты", "skill": "Навыки и перки", "perk": "Навыки и перки",
+          "racial-power": "Крики и расовые таланты", "magic-school": "Навыки и перки", "author-power": "Крики и расовые таланты", "skill": "Навыки и перки", "perk": "Навыки и перки",
           "talent-branch": "Навыки и перки", "creature": "Бестиарий", "main-quest": "Задания",
           "faction-quest": "Задания", "faction": "Фракции", "race": "Расы"}
 WORD = re.compile(r"[\w]+|[^\w\s]", re.UNICODE)
@@ -32,6 +32,10 @@ def catalog():
     item_keys = {r["id"] for r in entries if r["kind"] in {"item", "book", "weapon", "armor", "tome", "scroll"}}
     archive = "app/src/main/assets/lore_bundle.zip"
     with zipfile.ZipFile(ROOT / archive) as packed:
+        for name in packed.namelist():
+            if name.startswith("lore/Способности/") and name.endswith(".txt"):
+                entries.append(dict(kind="author-power", id=name, name=Path(name).stem, scope="author",
+                                    declaration=archive + "!" + name))
         for item in json.loads(packed.read("catalog/user_foods.json")):
             if item["name"] in item_keys:
                 continue
@@ -103,6 +107,7 @@ def collect_uses(records):
     for uid, rec in records.items():
         labels = [(rec["canonical_ru"], "canonical"), (rec["english"], "english")]
         for use in rec["project"]:
+            labels += [(use["canonical_ru"], "canonical"), (use["english"], "english")]
             labels += [(use["name"], "display"), *((a, "historical") for a in use["aliases"])]
         for label, role in labels:
             if not label:
@@ -161,9 +166,12 @@ def audit():
     errors = []
     profiles = {(e["canonical"], e["english"].casefold()): k for k, e in proof.items()
                 if k[0] == "creature" and e["english"] and not e["review"]}
-    grouped = sorted(index.items(), key=lambda pair: pair[0][0] == "npc-template")
+    skills = {e["canonical"]: e for e in proof.values() if e["kind"] == "skill" and not e["review"]}
+    grouped = sorted(index.items(), key=lambda pair: pair[0][0] in {"npc-template", "magic-school"})
     for (kind, key), row in grouped:
         ev = proof.get((kind, key), {})
+        if kind == "magic-school":
+            ev = skills.get(row["name"], {})
         alias = list(aliases[kind, key])
         if kind == "npc" and ev.get("english") and not ev.get("review"):
             alias.append(ev["english"])
@@ -201,10 +209,20 @@ def audit():
             project=[], files={}))
         if rec["status"] == "verified" and status == "corrected":
             rec["status"] = "corrected"
-        rec["project"].append(dict(kind=kind, id=key, name=row["name"], aliases=sorted(set(alias)-{row["name"]}), declaration=loc))
+        rec["project"].append(dict(kind=kind, id=key, name=row["name"], canonical_ru=ev.get("canonical", "") if not ev.get("review") else "",
+                                   english=en, source=ref, corroboration=ev.get("corroboration", ""), aliases=sorted(set(alias)-{row["name"]}), declaration=loc))
     for record in records.values():
         record["multiple_project_entries"] = len(record["project"]) > 1
         record["conflict"] = record["status"] == "conflict"
+        titles = sorted({slot["canonical_ru"] for slot in record["project"] if slot["canonical_ru"]})
+        if len(titles) > 1:
+            if record["original_id"] not in {"CWObj", "CWFortSiegeFort", "CWSiegeObj"}:
+                errors.append("Different labels for one identity without a verified variant: " + record["identity"])
+            record["canonical_variants"] = titles
+            record["canonical_ru"] = ""
+            record["english"] = ""
+        if any(slot["kind"] == "race" for slot in record["project"]):
+            record["source_type"] = "game-menu-screenshot+ru-wiki"
     scanned, uses, review_queue = collect_uses(records)
     for uid, rec in records.items():
         files = uses[uid]

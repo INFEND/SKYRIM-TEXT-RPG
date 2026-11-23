@@ -79,6 +79,7 @@ public final class CanonicalCampaign {
     static boolean hasOriginal(){return original!=null;}
     static String speakerKey(int id){return id>=1 && id<=COUNT ? stage(id).speaker : "";}
     private static Stage stage(int id){return STAGES[Math.max(0,Math.min(COUNT-1,id-1))];}
+    static String goal(int id){return stage(id).goal;}
     public static String title(int id){return stage(id).title;}
     public static String objective(GameEngine g){
         if(g.canonicalStage==0)return "Начать главную историю";

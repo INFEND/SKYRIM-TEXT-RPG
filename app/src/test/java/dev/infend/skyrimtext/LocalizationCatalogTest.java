@@ -47,7 +47,10 @@ public class LocalizationCatalogTest {
                     : "Оружие".equals(item.category) || "Боеприпасы".equals(item.category) ? "weapon"
                     : "Броня".equals(item.category) || "Одежда".equals(item.category) || "Украшения".equals(item.category) ? "armor"
                     : "Книги".equals(item.category) || "Записки".equals(item.category) ? "book" : "item";
-            String scope = item.description.toLowerCase(Locale.ROOT).contains("авторск") ? "author" : "candidate";
+            String description = item.description.toLowerCase(Locale.ROOT);
+            boolean authored = description.contains("авторск") || description.contains("из персонального архива")
+                    || description.contains("из личной библиотеки") || CompensationPowers.itemIndex(item.id) >= 0;
+            String scope = authored ? "author" : "candidate";
             row(kind, item.id, item.name, scope, "ItemCatalog");
             if (kind.equals("tome") && item.name.startsWith("Том заклинаний: ")) {
                 row("spell", item.id, item.name.substring("Том заклинаний: ".length()), scope, "LibraryItemCatalog");
@@ -55,7 +58,7 @@ public class LocalizationCatalogTest {
         }
         for (BestiaryCatalog.Entry e : BestiaryCatalog.all()) {
             boolean custom = e.origin.equals(BestiaryCatalog.AUTHOR) || e.origin.equals(BestiaryCatalog.GAME);
-            row("creature", e.name, e.name, custom ? "author" : "candidate", "BestiaryCatalog");
+            row("creature", e.id, e.name, custom ? "author" : "candidate", "BestiaryCatalog");
         }
         // These chapters split a quest into journeys, encounters or an epilogue in the adaptation.
         java.util.Set<Integer> adapted = java.util.Set.of(2, 4, 7, 12, 14, 16, 17, 20, 21, 25, 26, 27, 30, 32, 33);
@@ -72,13 +75,14 @@ public class LocalizationCatalogTest {
         }
         array("faction", FactionCampaign.NAMES, "", "FactionCampaign");
         array("skill", RpgContent.SKILLS, "", "RpgContent");
+        array("magic-school", RpgContent.MAGIC_SCHOOLS, "", "RpgContent");
         array("perk", AdvancedPerks.NAMES, "", "AdvancedPerks");
         for (int i = 0; i < TalentBranches.NAMES.length; i++) {
             for (int rank = 0; rank < TalentBranches.NAMES[i].length; rank++) {
                 row("talent-branch", i + "/" + rank, TalentBranches.NAMES[i][rank], "author", "TalentBranches");
             }
         }
-        array("race", RpgContent.RACES, "", "RpgContent");
+        array("race", RpgContent.raceNames(), "", "RpgContent");
         array("racial-power", RpgContent.POWERS, ":", "RpgContent");
         array("shout", RpgContent.SHOUTS, "\\|", "RpgContent");
         Collections.sort(rows);

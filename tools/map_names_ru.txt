@@ -38,9 +38,9 @@ Riften Docks (CC)|Рифтенские доки
 Northwind Summit|Вершина Северный Ветер
 Arkngthamz (DG)|Аркнтамз
 Bthardamz|Бтардамз
-Great Lift at Alftand|Великий подъёмник — Альфтанд
-Great Lift at Mzinchaleft|Великий подъёмник — Мзинчалефт
-Great Lift at Raldbthar|Великий подъёмник — Ральдбтхар
+Great Lift at Alftand|Главный подъёмник Альфтанда
+Great Lift at Mzinchaleft|Главный подъёмник Мзинчалефта
+Great Lift at Raldbthar|Главный подъёмник Ральдбтхара
 Goldenhills Plantation (CC)|Плантация Золотые Холмы
 Castle Volkihar (DG)|Замок Волкихар
 Darklight Tower|Башня Светотьмы
@@ -183,3 +183,4 @@ Blind Cliff Cave|Пещера Отвесный Утёс
 Clearpine Pond|Пруд Чистых Сосен
 East Empire Company Warehouse|Склад Восточной имперской компании
 Skyborn Altar|Алтарь Рождённого Небом
+Fort Dunstad|Форт Дунстад
