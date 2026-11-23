@@ -12,6 +12,13 @@ import audit_localization as audit
 
 
 class RussianRegistry(unittest.TestCase):
+    def test_reviewed_creature_aliases_are_not_used_as_runtime_template_labels(self):
+        """The game must expose the reviewed title but retain the old key for saves."""
+        source=(ROOT/"app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java").read_text(encoding="utf-8")
+        assert_code="if(t!=null)canonical=t.displayName;"
+        self.assertIn(assert_code,source)
+        self.assertNotIn("if(t!=null)canonical=t.name;",source)
+        self.assertIn("if((target==INDEX||target==TEMPLATES)&&!p.displayName.equals(n))",source)
     def test_accepted_evidence_matches_the_runtime_catalog(self):
         rows = {(r["kind"], r["id"]): r for r in audit.catalog()}
         seen = set()

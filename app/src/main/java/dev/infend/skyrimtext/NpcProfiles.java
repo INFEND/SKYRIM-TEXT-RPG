@@ -1476,7 +1476,11 @@ final class NpcProfiles {
     static String canonicalName(String name){
         if(name==null)return "";
         String canonical=LINK_NAMES.get(NpcNameMatcher.key(name));
-        if(canonical==null){Profile t=TEMPLATES.get(key(name));if(t!=null)canonical=t.name;}
+        if(canonical==null){
+            Profile t=TEMPLATES.get(key(name));
+            // The profile key is a save identifier; dialogue/display names use the reviewed label.
+            if(t!=null)canonical=t.displayName;
+        }
         return canonical==null?name.trim():canonical;
     }
 }
