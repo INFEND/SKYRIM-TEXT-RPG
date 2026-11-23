@@ -13,7 +13,7 @@ class WikiRuProgressContracts(unittest.TestCase):
         report=WIKI.counts()
         self.assertEqual(report["Карта"]["total"],515)
         self.assertEqual(report["Карта"]["wiki_verified"],15)
-        self.assertEqual(report["Именные NPC"]["wiki_verified"],45)
+        self.assertEqual(report["Именные NPC"]["wiki_verified"],125)
         self.assertEqual(report["Бестиарий"]["wiki_verified"],11)
         self.assertEqual(report["Тома и свитки"]["wiki_verified"],24)
         self.assertEqual(report["Расы и навыки"]["wiki_verified"],28)
@@ -33,7 +33,9 @@ class WikiRuProgressContracts(unittest.TestCase):
     def test_verified_npc_count_is_not_claiming_all_templates(self):
         report=WIKI.counts()
         self.assertGreater(report["Именные NPC"]["total"],1000)
-        self.assertEqual(len(WIKI.WHITERUN_VERIFIED),len(set(WIKI.WHITERUN_VERIFIED)))
+        self.assertEqual(len(WIKI.WHITERUN_VERIFIED),45)
+        self.assertEqual(len(WIKI.SOLITUDE_VERIFIED),80)
+        self.assertFalse(set(WIKI.WHITERUN_VERIFIED)&set(WIKI.SOLITUDE_VERIFIED))
         self.assertEqual(len(WIKI.MAP_VERIFIED),15)
         self.assertEqual(len(WIKI.MAIN_QUEST_VERIFIED),18)
 
