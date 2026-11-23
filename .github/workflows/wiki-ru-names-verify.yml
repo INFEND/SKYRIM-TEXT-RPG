@@ -6,6 +6,9 @@ on:
       - 'app/src/**'
       - 'tests/test_wiki_ru*'
       - 'tools/**'
+      - 'scripts/test_*ota*'
+      - 'scripts/test_signed_android_upgrade.sh'
+      - 'scripts/check_published_update_dialog.py'
       - '.github/workflows/wiki-ru-names-verify.yml'
   workflow_run:
     workflows: ["Android APK and OTA"]
@@ -16,6 +19,9 @@ on:
       - 'app/src/**'
       - 'tests/test_wiki_ru*'
       - 'tools/**'
+      - 'scripts/test_*ota*'
+      - 'scripts/test_signed_android_upgrade.sh'
+      - 'scripts/check_published_update_dialog.py'
       - '.github/workflows/wiki-ru-names-verify.yml'
 permissions:
   contents: read
@@ -51,13 +57,16 @@ jobs:
         run: gradle --no-daemon :app:testDebugUnitTest :app:assembleDebug
 
   ota-device:
-    if: github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success'
+    if: >-
+      (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success') ||
+      (github.event_name == 'push' && github.ref == 'refs/heads/main' &&
+       contains(github.event.head_commit.message, '[verify-published-ota]'))
     runs-on: ubuntu-latest
     timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.workflow_run.head_sha }}
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
           fetch-depth: 1
           persist-credentials: false
       - name: Select the signed release and its predecessor
@@ -70,7 +79,7 @@ jobs:
           version=$(sed -n "s/.*versionName '\([^']*\)'.*/\1/p" app/build.gradle | head -1)
           tag="v$version"
           if ! git fetch -q --depth=1 origin "refs/tags/$tag:refs/tags/$tag"; then exit 0; fi
-          if [[ "$(git rev-parse "$tag^{commit}")" != "$(git rev-parse HEAD)" ]]; then exit 0; fi
+          if [[ "$GITHUB_EVENT_NAME" == workflow_run && "$(git rev-parse "$tag^{commit}")" != "$(git rev-parse HEAD)" ]]; then exit 0; fi
           predecessor=$(gh api "repos/$GITHUB_REPOSITORY/releases?per_page=100" | python3 -c '
           import json, sys
           def version(s): return tuple(int(part) for part in s.split("."))
@@ -80,6 +89,16 @@ jobs:
                      and any(a["name"] == "SKYRIM-TEXT-RPG.apk" for a in r["assets"])]
           print(max(tag for tag in choices if tag[0] < current)[1])' "$version")
           gh release download "$predecessor" --pattern SKYRIM-TEXT-RPG.apk --dir "$RUNNER_TEMP"
+          gh release download "$tag" --pattern SKYRIM-TEXT-RPG.apk --pattern update.json --dir "$RUNNER_TEMP/new-release"
+          python3 - "$RUNNER_TEMP/new-release" "$version" <<'PYTHON'
+          import hashlib, json, sys
+          from pathlib import Path
+          directory = Path(sys.argv[1])
+          apk = (directory / "SKYRIM-TEXT-RPG.apk").read_bytes()
+          manifest = json.loads((directory / "update.json").read_text())
+          assert manifest["versionName"] == sys.argv[2] and manifest["sizeBytes"] == len(apk)
+          assert manifest["sha256"].lower() == hashlib.sha256(apk).hexdigest()
+          PYTHON
           echo "version=$version" >> "$GITHUB_OUTPUT"
       - name: Enable Android hardware acceleration
         if: steps.versions.outputs.version != ''
@@ -95,7 +114,9 @@ jobs:
           target: default
           arch: x86_64
           disable-animations: true
-          script: bash scripts/test_published_ota_ui.sh "${{ steps.versions.outputs.version }}"
+          script: |
+            bash scripts/test_published_ota_ui.sh "${{ steps.versions.outputs.version }}"
+            bash scripts/test_signed_android_upgrade.sh "${{ steps.versions.outputs.version }}"
       - uses: actions/upload-artifact@v4
         if: always() && steps.versions.outputs.version != ''
         with:
@@ -103,4 +124,7 @@ jobs:
           path: |
             ${{ runner.temp }}/update-screen.png
             ${{ runner.temp }}/update-window.xml
+            ${{ runner.temp }}/updated-game.png
+            ${{ runner.temp }}/updated-game.xml
+            ${{ runner.temp }}/installed-version.txt
           if-no-files-found: ignore
