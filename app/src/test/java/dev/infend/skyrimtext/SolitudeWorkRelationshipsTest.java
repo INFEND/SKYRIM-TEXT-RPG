@@ -40,9 +40,15 @@ public class SolitudeWorkRelationshipsTest {
         paid.choose("SOLITUDE:job:16");
         volunteer.choose("SOLITUDE:volunteer:16");
         assertEquals(initialGold,volunteer.gold);
-        assertEquals(relation(paid,"Яла")+2,relation(volunteer,"Яла"));
+        assertEquals("Paid shift starts with MET (50) and adds one point",51,relation(paid,"Яла"));
+        assertEquals("Volunteer help starts with HELPED (70) and adds three points",73,relation(volunteer,"Яла"));
+        assertTrue("Voluntary help must produce a stronger relationship",relation(volunteer,"Яла")>relation(paid,"Яла"));
         int after=relation(volunteer,"Яла");
         volunteer.choose("SOLITUDE:volunteer:16");
         assertEquals(after,relation(volunteer,"Яла"));
+        volunteer=GameEngine.fromJson(volunteer.toJson().toString());
+        assertEquals("Volunteer relationship must survive save/load",after,relation(volunteer,"Яла"));
+        volunteer.choose("SOLITUDE:volunteer:16");
+        assertEquals("Reload must not permit repeated relationship credit",after,relation(volunteer,"Яла"));
     }
 }
