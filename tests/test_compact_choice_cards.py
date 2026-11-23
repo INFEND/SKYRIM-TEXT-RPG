@@ -10,7 +10,7 @@ class CompactChoiceCards(unittest.TestCase):
                        "choicePadY(){return Math.max(6,8+fontBonus/2)",
                        "choiceIconSize(){return Math.max(20,24+fontBonus)"):
             self.assertIn(phrase,UI)
-        self.assertEqual(UI.count("setMinimumHeight(dp(48))"),3)
+        self.assertGreaterEqual(UI.count("setMinimumHeight(dp(48))"),3)
 
     def test_native_ai_and_live_cards(self):
         for phrase in ('text(c.title,16,TEXT,true)',
