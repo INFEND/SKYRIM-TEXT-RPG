@@ -14,6 +14,8 @@ public class SolitudeWorkScheduleTest {
         GameEngine g=new GameEngine();g.start("Тест","Норд","Воин");
         g.region=3;g.progress.location="Солитьюд";g.mode="WORLD";g.hour=10;g.stamina=100;
         g.sceneState.confirm("npc","solitude_jala","Яла","DEAD");
+        // A scheduled local resident can legitimately replace Jala. Block both contacts.
+        g.sceneState.confirm("npc","solitude_"+SolitudeResidents.IDS[8],SolitudeResidents.NAMES[8],"HOSTILE");
         g.choose("SOLITUDE:open");g.choose("SOLITUDE:visit:0");
         int gold=g.gold;g.choose("SOLITUDE:job:0");assertEquals(gold,g.gold);assertEquals(10,g.hour);
     }
