@@ -3963,6 +3963,7 @@ public final class MainActivity extends Activity {
         boolean[] occupied=new boolean[source.length()];
         int created=0;
         for(ItemCatalog.Item item:list){
+            if(ItemCatalog.sharedDisplayName(item.name))continue;
             int i=0;
             while((i=source.indexOf(item.name,i))>=0){
                 final int start=i,end=i+item.name.length();i=end;

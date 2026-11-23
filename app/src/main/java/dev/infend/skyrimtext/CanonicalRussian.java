@@ -34,6 +34,13 @@ final class CanonicalRussian {
         return item == null ? key : item.name;
     }
 
+    static String itemReference(String key) {
+        ItemCatalog.Item item = ItemCatalog.find(key);
+        if (item == null) return key;
+        if (!ItemCatalog.sharedDisplayName(item.name)) return item.name;
+        return item.name + " [" + ItemIdentityIndex.formOrKey(item.id) + "]";
+    }
+
     // An explicit identifier in a dialogue heading is nominative. Prose, inflected
     // names, free-form NPCs and user-created items have no identifier to substitute.
     static String speakerLine(String raw) {

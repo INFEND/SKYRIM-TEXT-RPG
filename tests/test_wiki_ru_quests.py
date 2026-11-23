@@ -25,7 +25,7 @@ class WikiRuQuests(unittest.TestCase):
         self.assertIn('!item.matches(query)', UI)
         self.assertIn('id.toLowerCase(Locale.ROOT).contains(needle)', ITEMS)
         self.assertIn('DISPLAY_ALIASES.putIfAbsent(visibleName,name)', ITEMS)
-        self.assertIn('return legacyId==null?null:items.get(legacyId)', ITEMS)
+        self.assertIn('if(legacyId!=null)return items.get(legacyId)', ITEMS)
 
     def test_equipment_artwork_lookup_uses_legacy_id(self):
         # Rewriting display labels must not make fallback icons or art disappear.

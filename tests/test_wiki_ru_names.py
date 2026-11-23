@@ -86,9 +86,9 @@ class WikiRuNamesTests(unittest.TestCase):
     def test_artifacts_show_wiki_name_but_keep_save_key(self):
         self.assertIn('case "Звезда Чёрной Азуры": return "Чёрная Звезда"', ITEMS)
         self.assertIn('case "Молот Волендранг": return "Волендранг"', ITEMS)
-        self.assertIn('items.put(name,new Item(name,visibleName', ITEMS)
+        self.assertIn('store(new Item(name,visibleName', ITEMS)
         self.assertIn('DISPLAY_ALIASES.putIfAbsent(visibleName,name)', ITEMS)
-        self.assertIn('return legacyId==null?null:items.get(legacyId)', ITEMS)
+        self.assertIn('if(legacyId!=null)return items.get(legacyId)', ITEMS)
 
     def test_ai_sources_are_told_to_preserve_canonical_names(self):
         self.assertIn("private static final String CANONICAL_RU_NAMES", AI)

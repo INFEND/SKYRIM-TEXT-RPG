@@ -38,6 +38,12 @@ class RussianRegistry(unittest.TestCase):
         self.assertIn("Стража Рассвета", quest["project"][0]["aliases"])
         self.assertTrue(any(e["status"] == "author" and e["category"] == "Задания" for e in by_id.values()))
 
+    def test_percentage_counts_unique_original_entries(self):
+        report = audit.markdown_table({"Книги": {"verified": 1, "corrected": 1, "conflict": 1,
+                                                "unverified": 1, "author": 4, "creation-club": 2}})
+        self.assertIn("| Книги | 4 | 2 | 1 | 2 | 1 | 50,00% |", report)
+        self.assertIn("| **Итого** | 4 | 2 | 1 | 2 | 1 | 50,00% |", report)
+
     def test_player_text_detection_excludes_identifiers_and_search_aliases(self):
         source = 'register("Farengar");\n// setTitle("Farengar");\nsetTitle("Farengar");'
         self.assertEqual([(3, "Farengar")], list(audit.player_literals("app/src/main/java/Game.java", source)))

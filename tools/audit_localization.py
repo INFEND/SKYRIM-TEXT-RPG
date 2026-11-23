@@ -238,11 +238,31 @@ def audit():
     return report, errors
 
 
+def markdown_table(counts):
+    headings = ["Категория", "Всего", "Проверено", "Исправлено", "Осталось", "Из них конфликтов", "Готовность"]
+    lines = ["| " + " | ".join(headings) + " |", "|---|" + "---:|" * (len(headings) - 1)]
+    totals = sum((Counter(values) for values in counts.values()), Counter())
+    order = dict.fromkeys(GROUPS.values())
+    for category in [*order, "**Итого**"]:
+        if category != "**Итого**" and category not in counts:
+            continue
+        values = totals if category == "**Итого**" else Counter(counts[category])
+        verified = values["verified"] + values["corrected"]
+        pending = values["unverified"] + values["conflict"]
+        total = verified + pending
+        percent = f"{100 * verified / total:.2f}%".replace(".", ",") if total else "—"
+        row = (category, total, verified, values["corrected"], pending, values["conflict"], percent)
+        lines.append("| " + " | ".join(map(str, row)) + " |")
+    lines.append("| ИИ-генерация | — | — | — | — | — | Открытая проверка текста |")
+    return "\n".join(lines)
+
+
 def main():
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("--live", action="store_true", help="check the live sources without requiring the archived occurrence list to match")
     p.add_argument("--write", action="store_true", help="refresh the checked-in compressed JSON")
     p.add_argument("--json", type=Path, help="also export the complete, human-readable JSON")
+    p.add_argument("--markdown", action="store_true", help="print the coverage table by unique original identity")
     args = p.parse_args()
     report, errors = audit()
     if (JAVA / "RussianNameData.java").read_text() != java_source():
@@ -256,8 +276,11 @@ def main():
             packed.write(compact)
     elif not args.live and (not REGISTRY.exists() or gzip.decompress(REGISTRY.read_bytes()) != compact):
         errors.append("The registry is stale; run python tools/audit_localization.py --write")
-    print(json.dumps(report["counts"], ensure_ascii=False, indent=2))
-    print(f'{len(report["entities"])} identities; {len(report["scanned"])} text resources')
+    if args.markdown:
+        print(markdown_table(report["counts"]))
+    else:
+        print(json.dumps(report["counts"], ensure_ascii=False, indent=2))
+        print(f'{len(report["entities"])} identities; {len(report["scanned"])} text resources')
     if errors:
         raise SystemExit("\n".join(errors))
 

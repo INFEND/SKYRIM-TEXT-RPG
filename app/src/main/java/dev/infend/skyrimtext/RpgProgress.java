@@ -38,8 +38,8 @@ public final class RpgProgress {
     // One improved exemplar per item ID until the inventory supports individual instances.
     private final LinkedHashMap<String,Integer> tempered=new LinkedHashMap<>();
     private final LinkedHashMap<String,String> weaponPoisons=new LinkedHashMap<>();
-    public String appliedPoison(String id){return weaponPoisons.getOrDefault(id,"");}
-    public String consumePoison(String id){String value=weaponPoisons.remove(id);return value==null?"":value;}
+    public String appliedPoison(String id){return weaponPoisons.getOrDefault(ItemCatalog.inventoryKey(id),"");}
+    public String consumePoison(String id){String value=weaponPoisons.remove(ItemCatalog.inventoryKey(id));return value==null?"":value;}
     public boolean applyPoison(String id,GameEngine g){
         String weapon=equippedName("weapon");ItemCatalog.Item item=ItemCatalog.find(weapon);
         if(!g.started||"COMBAT".equals(g.mode)||item==null||!item.weapon()||item.baseStat<=0||!GearEffects.supportedPoison(id)||!appliedPoison(weapon).isEmpty()||!removeItem(id,1))return false;
@@ -57,7 +57,7 @@ public final class RpgProgress {
     public int gearBlock(){return equipped("Амулет Стендарра")?10:0;}
     private static final String[] QUALITY={"Обычное","Хорошее","Отличное","Превосходное","Безупречное","Эпическое","Легендарное"};
     private static final int[] TEMPER_LEVELS={0,14,31,65,100,134,168};
-    public int temperQuality(String id){return quantity(id)>0?tempered.getOrDefault(id,0):0;}
+    public int temperQuality(String id){return quantity(id)>0?tempered.getOrDefault(ItemCatalog.inventoryKey(id),0):0;}
     public String temperQualityName(String id){return QUALITY[temperQuality(id)];}
     public int smithingQuality(){
         int tier=0;for(int i=1;i<TEMPER_LEVELS.length;i++)if(skillLevel(6)>=TEMPER_LEVELS[i])tier=i;

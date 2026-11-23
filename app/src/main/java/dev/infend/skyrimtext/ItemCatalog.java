@@ -30,7 +30,8 @@ public final class ItemCatalog {
             String needle = query.trim().toLowerCase(Locale.ROOT);
             return name.toLowerCase(Locale.ROOT).contains(needle)
                 || id.toLowerCase(Locale.ROOT).contains(needle)
-                || category.toLowerCase(Locale.ROOT).contains(needle);
+                || category.toLowerCase(Locale.ROOT).contains(needle)
+                || ItemIdentityIndex.matches(id, needle);
         }
         public boolean weapon(){return "Роза Сангвина".equals(name)||"Оружие".equals(category)||"Боеприпасы".equals(category)||statSkill>=0&&statSkill<=2;}
         public boolean wearable(){return "Разрушитель Заклинаний".equals(name)||"Броня".equals(category)||"Одежда".equals(category)||"Украшения".equals(category)||statSkill>=4;}
@@ -94,7 +95,18 @@ public final class ItemCatalog {
     private static final LinkedHashMap<String,Item> items=new LinkedHashMap<>();
     // Maps visible canonical names to historic item IDs, for search and model-generated actions.
     private static final HashMap<String,String> DISPLAY_ALIASES=new HashMap<>();
+    private static final Map<String,Integer> displayCounts=new HashMap<>();
     private static boolean loaded=false;
+
+    private static void store(Item item){
+        Item previous=items.put(item.id,item);
+        if(previous!=null)displayCounts.computeIfPresent(previous.name,(name,count)->count==1?null:count-1);
+        displayCounts.merge(item.name,1,Integer::sum);
+    }
+
+    static boolean sharedDisplayName(String name){
+        return displayCounts.getOrDefault(name,0)>1;
+    }
     private static void put(String name,String category,String icon,double weight,int cost,String desc,String effect){
         double stat=("Одежда".equals(category)||"Украшения".equals(category))?0:-1;
         put(name,category,icon,weight,cost,desc,effect,stat,-1);
@@ -186,7 +198,7 @@ public final class ItemCatalog {
     }
     private static void put(String name,String category,String icon,double weight,int cost,String desc,String effect,double stat,int skill){
         String visibleName=canonicalItemDisplayName(name);
-        items.put(name,new Item(name,visibleName,category,icon,weight,cost,desc,effect,stat,skill,""));
+        store(new Item(name,visibleName,category,icon,weight,cost,desc,effect,stat,skill,""));
         if(!visibleName.equals(name))DISPLAY_ALIASES.putIfAbsent(visibleName,name);
     }
     private static void weapon(String name,double[] row,int skill){
@@ -424,7 +436,7 @@ public final class ItemCatalog {
     static synchronized void registerCustom(String id,String name,int type,int stat,double weight,
             int value,String description,String effect){
         int kind=ItemWorkshopSpec.normalizeType(type);
-        items.put(id,new Item(id,name,ItemWorkshopSpec.CATEGORY[kind],
+        store(new Item(id,name,ItemWorkshopSpec.CATEGORY[kind],
                 ItemWorkshopSpec.ICON[kind],weight,value,description,effect,
                 ItemWorkshopSpec.hasStat(kind)?stat:0,ItemWorkshopSpec.SKILL[kind],
                 ItemWorkshopSpec.SLOT[kind]));
@@ -457,7 +469,8 @@ public final class ItemCatalog {
         Item existing=items.get(id);
         if(existing!=null)return existing;
         String legacyId=DISPLAY_ALIASES.get(id);
-        return legacyId==null?null:items.get(legacyId);
+        if(legacyId!=null)return items.get(legacyId);
+        return items.get(ItemIdentityIndex.resolve(id));
     }
     static String inventoryKey(String value) {
         Item item = find(value);

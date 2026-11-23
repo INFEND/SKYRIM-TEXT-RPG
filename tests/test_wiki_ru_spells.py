@@ -59,7 +59,7 @@ class RussianSpellTomeNames(unittest.TestCase):
                     continue
                 with self.subTest(item=prefix + old):
                     self.assertNotIn('add("' + prefix + canonical + '"', self.books)
-        self.assertIn("items.put(name,new Item(name,visibleName", self.items)
+        self.assertIn("store(new Item(name,visibleName", self.items)
         self.assertIn("DISPLAY_ALIASES.putIfAbsent(visibleName,name)", self.items)
         self.assertIn("String legacyId=DISPLAY_ALIASES.get(id)", self.items)
 

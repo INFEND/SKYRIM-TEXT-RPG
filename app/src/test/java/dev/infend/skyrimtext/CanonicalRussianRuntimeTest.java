@@ -36,7 +36,11 @@ public class CanonicalRussianRuntimeTest {
         for (String[] names : RussianNameData.ITEMS) {
             ItemCatalog.Item old = ItemCatalog.find(names[0]);
             assertNotNull(old);
-            assertSame(old, ItemCatalog.find(names[1]));
+            if (ItemCatalog.sharedDisplayName(names[1])) {
+                assertSame(old, ItemCatalog.find(ItemIdentityIndex.formOrKey(old.id)));
+            } else {
+                assertSame(old, ItemCatalog.find(names[1]));
+            }
             assertEquals(names[1], old.name);
             assertTrue(old.matches(names[0]));
             assertTrue(old.matches(names[1]));
@@ -148,6 +152,12 @@ public class CanonicalRussianRuntimeTest {
         JSONArray inv = new JSONArray()
             .put(new JSONObject().put("name", "Кольцо золотое").put("delta", -1))
             .put(new JSONObject().put("name", "Золотое кольцо").put("delta", 1));
+        applyInventory(g, inv);
+        assertEquals(1, g.progress.quantity("Кольцо золотое"));
+        assertFalse(g.progress.inventory.has("Золотое кольцо"));
+    }
+
+    private static void applyInventory(GameEngine g, JSONArray inv) throws Exception {
         JSONObject reply = new JSONObject();
         reply.put("scene", "Ты проверяешь записи торговли и осматриваешь кольцо в свете свечи. ".repeat(5));
         JSONArray choices = new JSONArray();
@@ -156,8 +166,64 @@ public class CanonicalRussianRuntimeTest {
         reply.put("choices", choices).put("effects", new JSONObject().put("inventory", inv))
             .put("customChance", JSONObject.NULL).put("journal", "Проверена запись торговца");
         AiGameTurn.parseModel(reply.toString(), -2).apply(g, true);
-        assertEquals(1, g.progress.quantity("Кольцо золотое"));
-        assertFalse(g.progress.inventory.has("Золотое кольцо"));
+    }
+
+    @Test public void bookAndStaffWithSameLabelRetainIndependentSaveSlots() throws Exception {
+        ItemCatalog.Item book = ItemCatalog.find("0001afba");
+        ItemCatalog.Item staff = ItemCatalog.find("0002ac6f");
+        assertNotSame(book, staff);
+        assertEquals("Ваббаджек", book.name);
+        assertEquals(book.name, staff.name);
+        assertEquals("Книги", book.category);
+        assertSame(book, ItemCatalog.find("Ваббаджек (книга)"));
+        assertSame(staff, ItemCatalog.find("Ваббаджек"));
+        assertNull(ItemCatalog.find("Wabbajack"));
+        assertEquals(2, ItemCatalog.all().stream().filter(i -> i.name.equals("Ваббаджек")).count());
+        assertTrue(book.matches("0001AFBA"));
+        assertFalse(staff.matches("0001AFBA"));
+        assertEquals("Ваббаджек [0001AFBA]", CanonicalRussian.itemReference(book.id));
+        assertEquals("Ваббаджек [0002AC6F]", CanonicalRussian.itemReference(staff.id));
+        RpgProgress old = RpgProgress.fromJson(new JSONObject().put("inventory",
+            new JSONObject().put(book.id, 2).put(staff.id, 3)));
+        assertEquals(2, old.quantity("0001afba"));
+        assertEquals(3, old.quantity("0002ac6f"));
+        assertTrue(old.removeItem("0001afba", 1));
+        RpgProgress restored = RpgProgress.fromJson(old.toJson());
+        assertEquals(1, restored.quantity(book.id));
+        assertEquals(3, restored.quantity(staff.id));
+    }
+
+    @Test public void ambiguousModelEffectsLeaveInventoryUntouchedUntilIdentified() throws Exception {
+        GameEngine game = new GameEngine();
+        game.start("Герой", "Норд", "Воин");
+        JSONArray ambiguous = new JSONArray()
+            .put(new JSONObject().put("name", "0001AFBA").put("delta", 1))
+            .put(new JSONObject().put("name", "Ваббаджек").put("delta", 1));
+        assertThrows(org.json.JSONException.class, () -> applyInventory(game, ambiguous));
+        assertEquals(0, game.progress.quantity("0001AFBA"));
+        assertEquals(0, game.progress.quantity("0002AC6F"));
+        applyInventory(game, new JSONArray().put(new JSONObject().put("name", "0001AFBA").put("delta", 1)));
+        assertEquals(1, game.progress.quantity("Ваббаджек (книга)"));
+        assertEquals(0, game.progress.quantity("Ваббаджек"));
+    }
+
+    @Test public void inventoryLooksUpQualifiedDlcIdsAndPreservesBookVolumes() {
+        ItemCatalog.Item steel = ItemCatalog.find("Skyforge Steel Sword");
+        assertSame(steel, ItemCatalog.find("Стальной меч Небесной кузницы"));
+        assertEquals("Небесный стальной меч", steel.name);
+        assertEquals("Петля", ItemCatalog.find("HEARTHFIRE_003011").name);
+        assertEquals("Улучшенный арбалет", ItemCatalog.find("DAWNGUARD_00F19E").name);
+        assertEquals("Сталгримовая булава", ItemCatalog.find("DRAGONBORN_01CDB7").name);
+        assertNull(ItemCatalog.find("XX003011"));
+        assertNull(ItemCatalog.find("DAWNGUARD_003011"));
+        assertSame(ItemCatalog.find("Гвозди"), ItemCatalog.find("Nails"));
+        assertSame(ItemCatalog.find("Аргонианский отчёт, т. 4"), ItemCatalog.find("0001ACE8"));
+        assertEquals("Аргонианский доклад, книга 4", ItemCatalog.find("0001ACE8").name);
+        assertNotSame(ItemCatalog.find("0001ACE8"), ItemCatalog.find("0001AFFC"));
+        assertTrue(ItemCatalog.find("0001AF8A").matches("Песнь Пелинала, т. 1"));
+        assertEquals("Том заклинаний: Грозовой разряд", ItemCatalog.find("0010F7F5").name);
+        assertTrue(ItemCatalog.find("0010F7F5").effect.contains("«Грозовой разряд»"));
+        assertNull(ItemCatalog.find("0010F7EE"));
     }
 
     @Test public void identifiedHeadingsChangeWhileProseAndAuthoredSpeakersRemainIntact() {

@@ -69,9 +69,9 @@ class WikiRuEquipmentTest(unittest.TestCase):
 
     def test_legacy_catalog_entries_and_generated_equipment_unchanged(self):
         # The original name is still the inventory ID, visible labels are separate.
-        self.assertIn("items.put(name,new Item(name,visibleName", CATALOG)
+        self.assertIn("store(new Item(name,visibleName", CATALOG)
         self.assertIn('DISPLAY_ALIASES.putIfAbsent(visibleName,name)', CATALOG)
-        self.assertIn('return legacyId==null?null:items.get(legacyId)', CATALOG)
+        self.assertIn('if(legacyId!=null)return items.get(legacyId)', CATALOG)
         self.assertIn('static synchronized void registerCustom(String id,String name', CATALOG)
         for name in ("Кожаная кираса", "Кираса из шкур",
                      "Драконья чешуйчатая кираса", "Костяная кираса",
@@ -94,7 +94,7 @@ class WikiRuEquipmentTest(unittest.TestCase):
         self.assertIn('"Драконья"', CATALOG)
         self.assertIn('String name=metals[i]+" "+kinds[k]', CATALOG)
         self.assertIn('put(arrows[i]+" стрела"', CATALOG)
-        self.assertIn('return legacyId==null?null:items.get(legacyId)', CATALOG)
+        self.assertIn('if(legacyId!=null)return items.get(legacyId)', CATALOG)
 
     def test_armor_generator_keeps_actual_stats_and_skill(self):
         self.assertIn('put(feminine[i]+" кираса"', CATALOG)

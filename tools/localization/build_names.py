@@ -3,6 +3,7 @@
 import argparse
 import csv
 import json
+import re
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -15,7 +16,7 @@ def evidence():
         return list(csv.DictReader(stream, delimiter="\t"))
 
 
-def npc_id(row):
+def record_id(row):
     form = row["original_id"]
     if form.startswith("XX"):
         return row["edition"].upper() + "_" + form[2:]
@@ -25,7 +26,7 @@ def npc_id(row):
 def java_source():
     accepted = [r for r in evidence() if not r["review"]]
     groups = {
-        "NPC": [(r["id"], r["canonical"], npc_id(r), r["english"]) for r in accepted
+        "NPC": [(r["id"], r["canonical"], record_id(r), r["english"]) for r in accepted
                 if r["kind"] == "npc" and (r["original_id"] or r["prior"])],
         "RACES": [(r["canonical"], r["english"], r["original_id"]) for r in
                   sorted((r for r in accepted if r["kind"] == "race"), key=lambda r: int(r["id"]))],
@@ -50,6 +51,19 @@ def java_source():
         "    static { for (String[] row : NPC) NPC_NAMES.put(row[0], row[1]); }",
         "    static String npcName(String key) { return NPC_NAMES.getOrDefault(key, key); }",
     ])
+    lines += ["}", "", "final class RussianItemIdentityData {", "    private RussianItemIdentityData() {}"]
+    item_kinds = {"item", "weapon", "armor", "book", "tome", "scroll"}
+    records = [(r["id"], record_id(r), r["english"]) for r in accepted
+               if r["kind"] in item_kinds and re.fullmatch(r"(?:00|XX)[0-9A-F]{6}", r["original_id"])]
+    # Keep each generated initializer below the JVM bytecode method-size limit.
+    chunks = [records[start:start + 160] for start in range(0, len(records), 160)]
+    methods = ", ".join(f"part{i}()" for i in range(len(chunks)))
+    lines.append("    static final String[][][] PARTS = {" + methods + "};")
+    for i, rows in enumerate(chunks):
+        lines += [f"    private static String[][] part{i}() {{", "        return new String[][] {"]
+        for row in rows:
+            lines.append("            {" + ", ".join(json.dumps(x, ensure_ascii=False) for x in row) + "},")
+        lines += ["        };", "    }"]
     return "\n".join([*lines, "}", ""])
 
 
