@@ -98,12 +98,12 @@ def quoted_array(java: str, name: str) -> list[str]:
     return re.findall(r'"([^"]*)"', match.group(1))
 
 def counts() -> dict[str, dict[str, int | float]]:
-    map_entries = {
-        fields[2]: fields[1]
+    map_entries = [
+        (fields[2], fields[1])
         for line in source("SkyrimMapPoints.java").splitlines()
         if (match := re.match(r'\s*"((?:skyrim|solstheim)-[^"]+)"', line))
         for fields in [match.group(1).split("|")]
-    }
+    ]
     npc_text = source("NpcProfiles.java")
     npc_entries = re.findall(r'^\s*add\("([^"]+)"', npc_text, re.M)
     npc_templates = re.findall(r'^\s*addTemplate\("([^"]+)"', npc_text, re.M)
@@ -133,7 +133,7 @@ def counts() -> dict[str, dict[str, int | float]]:
     quest_titles = re.findall(r'new Stage\("([^"]+)"', source("CanonicalCampaign.java"))
     # Fail loudly when previously Wiki-checked canon labels disappear.
     for english, canonical in MAP_VERIFIED.items():
-        assert map_entries.get(english) == canonical, (english, canonical)
+        assert (english, canonical) in map_entries, (english, canonical)
     assert set(WHITERUN_VERIFIED).issubset(npc_entries), "NPC Wiki registry drift"
     assert set(SOLITUDE_VERIFIED).issubset(npc_entries), "Solitude NPC Wiki registry drift"
     assert set(BESTIARY_VERIFIED).issubset(beast_entries), "Bestiary Wiki registry drift"
