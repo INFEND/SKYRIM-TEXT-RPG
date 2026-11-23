@@ -108,7 +108,7 @@ final class SolitudeEncounters {
         g.message=message;g.progress.recent=message;g.recordVisualEvent(message);g.progress.sync(g);
     }
     static void choices(GameEngine g,GameEngine.Scene s,int d){
-        if(onDuty(g,d)&&"HOSTILE".equals(g.sceneState.npcStatusByName(NAMES[d]))){
+        if(onDuty(g,d)&&g.hour+1<=CLOSE[d]&&g.stamina>=10&&"HOSTILE".equals(g.sceneState.npcStatusByName(NAMES[d]))){
             s.add("SOLITUDE:supervisor:reconcile:"+d,"Примириться: "+NAMES[d],"Авторское действие | 1 час | 10 сил | без награды");
             return;
         }
@@ -138,6 +138,11 @@ final class SolitudeEncounters {
             try{
                 g.sceneState.setContext(g.day,g.hour,"Солитьюд");
                 g.sceneState.confirm("npc",npcKey(g,d),NAMES[d],"INFORMED");
+                // Reconciliation must restore neutral standing in the shared NPC ledger.
+                // Otherwise a former hostile supervisor keeps a hostile numerical relation.
+                JSONObject reconciled=fact(g,d);
+                if(reconciled!=null&&reconciled.optInt("relation",50)<50)
+                    g.sceneState.fixNpc(npcKey(g,d),50,false);
             }catch(org.json.JSONException ignored){return true;}
             g.stamina-=10;g.hour++;g.syncLivingSystems();
             report(g,NAMES[d]+": Конфликт улажен. Доступ к городским занятиям восстановлен.");return true;
