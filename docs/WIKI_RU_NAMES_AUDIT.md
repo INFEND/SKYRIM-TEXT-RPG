@@ -61,3 +61,25 @@
 Проверка статическими тестами: `python3 -m unittest discover -s tests -p 'test_wiki_ru_names.py' -v`. Затем выполнить `gradle :app:assembleDebug` и полную регрессию, прежде чем выпускать OTA.
 
 **Не считать весь проект полностью русифицированным** только по этим изменениям.
+
+## Продолжение: девять исправлений написания топонимов (23.11.2026)
+
+При сверке с русской The Elder Scrolls Wiki обнаружены девять локаций, где транслитерация и названия были верными, но написание с «е» не совпадало с русским названием на странице Wiki.
+
+| Английский идентификатор | Было | Стало | Проверка |
+|---|---|---|---|
+| Brinewater Grotto | Грот Соленая Вода | **Грот Солёная Вода** | [Wiki](https://elderscrolls.fandom.com/ru/wiki/Хаафингар_(Skyrim)) |
+| Darkwater Pass | Черный проход | **Чёрный проход** | [Wiki](https://elderscrolls.fandom.com/ru/wiki/Чёрный_проход) |
+| Shadowgreen Cavern | Пещера Зеленая Тень | **Пещера Зелёная Тень** | [Wiki](https://elderscrolls.fandom.com/ru/wiki/Хаафингар_(Skyrim)) |
+| Snapleg Cave | Щелкающая пещера | **Щёлкающая пещера** | [Wiki](https://elderscrolls.fandom.com/ru/wiki/Истмарк_(Skyrim)) |
+| Stillborn Cave | Пещера Мертворожденного | **Пещера Мертворождённого** | [Wiki](https://elderscrolls.fandom.com/ru/wiki/Пещера_Мертворождённого) |
+| Sunderstone Gorge | Разделенное ущелье | **Разделённое ущелье** | [Wiki](https://elderscrolls.fandom.com/ru/wiki/Разделённое_ущелье) |
+| Reachcliff Cave | Утесная пещера | **Утёсная пещера** | [Wiki](https://elderscrolls.fandom.com/ru/wiki/Утёсная_пещера) |
+| Reachwater Rock | Озерный утес | **Озёрный утёс** | [Wiki](https://elderscrolls.fandom.com/ru/wiki/Озёрный_утёс) |
+| Red Eagle Redoubt | Оплот Красный Орел | **Оплот Красный Орёл** | [Wiki](https://elderscrolls.fandom.com/ru/wiki/Оплот_Красный_Орёл_(Skyrim)) |
+
+Изменены одновременно `SkyrimMapPoints.java`, исходный `tools/map_source/compiled.json` и постоянные соответствия `tools/map_names_ru.txt`. Это защищает исправления при следующей генерации карты.
+
+**Совместимость:** ID `skyrim-…`, координаты, английские идентификаторы и категории не менялись. `SkyrimMapCatalog.normalize()` уже приводит «ё» к «е», поэтому старые строки для поиска и сохранённые направления поездок продолжают разрешаться без новых дублей карты.
+
+Регрессия: `python3 -m unittest discover -s tests -p 'test_wiki_ru_names.py' -v`. Сборка APK не считается подтверждённой до прохождения Android CI.

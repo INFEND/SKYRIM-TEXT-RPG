@@ -146,3 +146,12 @@ Kynesgrove|Роща Кин
 Sarethi Farm|Ферма Сарети
 Nightgate Inn|Таверна «Ночные ворота»
 Mixwater Mill|Лесопилка «Пирожок»
+Brinewater Grotto|Грот Солёная Вода
+Darkwater Pass|Чёрный проход
+Shadowgreen Cavern|Пещера Зелёная Тень
+Snapleg Cave|Щёлкающая пещера
+Stillborn Cave|Пещера Мертворождённого
+Sunderstone Gorge|Разделённое ущелье
+Reachcliff Cave|Утёсная пещера
+Reachwater Rock|Озёрный утёс
+Red Eagle Redoubt|Оплот Красный Орёл

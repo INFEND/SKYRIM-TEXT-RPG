@@ -96,5 +96,39 @@ class WikiRuNamesTests(unittest.TestCase):
         self.assertIn('"+CANONICAL_RU_NAMES;', AI)
 
 
+
+# Wiki-verified ё/е spellings are display-only; geographic IDs and aliases remain valid.
+DIACRITIC_LOCATION_CASES = {
+    "Brinewater Grotto": ("Грот Соленая Вода", "Грот Солёная Вода"),
+    "Darkwater Pass": ("Черный проход", "Чёрный проход"),
+    "Shadowgreen Cavern": ("Пещера Зеленая Тень", "Пещера Зелёная Тень"),
+    "Snapleg Cave": ("Щелкающая пещера", "Щёлкающая пещера"),
+    "Stillborn Cave": ("Пещера Мертворожденного", "Пещера Мертворождённого"),
+    "Sunderstone Gorge": ("Разделенное ущелье", "Разделённое ущелье"),
+    "Reachcliff Cave": ("Утесная пещера", "Утёсная пещера"),
+    "Reachwater Rock": ("Озерный утес", "Озёрный утёс"),
+    "Red Eagle Redoubt": ("Оплот Красный Орел", "Оплот Красный Орёл"),
+}
+
+
+class WikiRuMapDiacriticsTests(unittest.TestCase):
+    def test_canonical_map_labels_preserve_english_ids_and_old_search(self):
+        rows = [line.strip().strip('",') for line in MAP.splitlines()
+                if line.strip().startswith('"skyrim-')]
+        translation_rows = dict(line.split("|", 1) for line in GLOSSARY.splitlines()
+                                if "|" in line and not line.lstrip().startswith("#"))
+        source = (ROOT / "tools/map_source/compiled.json").read_text(encoding="utf-8")
+        for english, (legacy, canonical) in DIACRITIC_LOCATION_CASES.items():
+            matches = [row for row in rows if len(row.split("|")) > 2
+                       and row.split("|")[2] == english]
+            with self.subTest(english=english):
+                self.assertEqual(len(matches), 1)
+                self.assertEqual(matches[0].split("|")[1], canonical)
+                self.assertEqual(translation_rows.get(english), canonical)
+                self.assertIn('"nameRu": "' + canonical + '"', source)
+                self.assertNotIn('"nameRu": "' + legacy + '"', source)
+        # normalize() maps historical е-spellings onto the new ё-spellings.
+        self.assertIn(".replace('ё','е')", CATALOG)
+
 if __name__ == "__main__":
     unittest.main()
