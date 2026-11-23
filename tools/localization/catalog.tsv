@@ -582,7 +582,7 @@ creature	Дракон-скелет	Дракон-скелет	candidate	BestiaryC
 creature	Драконий жрец	Драконий жрец	candidate	BestiaryCatalog
 creature	Драугр	Драугр	candidate	BestiaryCatalog
 creature	Драугр-палач	Драугр-палач	candidate	BestiaryCatalog
-creature	Драугр-повелитель смерти	Драугр-повелитель смерти	candidate	BestiaryCatalog
+creature	Драугр-повелитель смерти	Драугр-военачальник	candidate	BestiaryCatalog
 creature	Древний дракон	Древний дракон	candidate	BestiaryCatalog
 creature	Дремора	Дремора	candidate	BestiaryCatalog
 creature	Дымок	Дымок	candidate	BestiaryCatalog
@@ -646,7 +646,7 @@ creature	Пещерный огроид	Пещерный огроид	author	Best
 creature	Пещерный охотник	Пещерный охотник	author	BestiaryCatalog
 creature	Полуденница	Полуденница	author	BestiaryCatalog
 creature	Порождение пепла	Порождение пепла	candidate	BestiaryCatalog
-creature	Почитаемый дракон	Почитаемый дракон	candidate	BestiaryCatalog
+creature	Почитаемый дракон	Благородный дракон	candidate	BestiaryCatalog
 creature	Призванный фамильяр	Призванный фамильяр	candidate	BestiaryCatalog
 creature	Призрак	Призрак	candidate	BestiaryCatalog
 creature	Разбойник	Разбойник	candidate	BestiaryCatalog
