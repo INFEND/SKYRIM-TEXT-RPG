@@ -5524,17 +5524,23 @@ public final class MainActivity extends Activity {
         EditText input=livingField(panel,"Название способности","Название, прежнее имя или FormID",false);
         new RuneDialogBuilder(this,accent()).setTitle("Поиск способности").setView(panel)
             .setNegativeButton("Закрыть",null).setPositiveButton("Найти",(dialog,which)->{
-                java.util.List<Integer> ids=CanonicalRussian.findPerks(input.getText().toString());
-                if(ids.isEmpty()){toast("Способность не найдена");return;}
-                String[] labels=new String[ids.size()];
-                for(int i=0;i<ids.size();i++){
-                    int id=ids.get(i);
-                    labels[i]=AdvancedPerks.NAMES[id]+"  |  "+RpgContent.SKILLS[AdvancedPerks.SKILL[id]];
-                }
-                new RuneDialogBuilder(this,accent()).setTitle("Найденные способности").setItems(labels,
-                    (list,index)->showSkill(AdvancedPerks.SKILL[ids.get(index)])).setNegativeButton("Закрыть",null).show();
+                showPerkReference(input.getText().toString(), -1);
             }).show();
     }
+    private void showPerkReference(String query, int tree){
+        java.util.List<PerkLexicon.Entry> results=PerkLexicon.search(query,tree);
+        if(results.isEmpty()){toast("Способность не найдена");return;}
+        String[] labels=new String[results.size()];
+        for(int i=0;i<labels.length;i++)labels[i]=tree<0?results.get(i).label():results.get(i).name;
+        new RuneDialogBuilder(this,accent()).setTitle("Способности Skyrim").setItems(labels,(dialog,index)->{
+            PerkLexicon.Entry perk=results.get(index);
+            RuneDialogBuilder card=new RuneDialogBuilder(this,accent());
+            card.setTitle(perk.name).setMessage(perk.details()).setNegativeButton("Назад",(back,button)->showPerkReference(query,tree));
+            if(perk.tree<RpgContent.SKILLS.length)card.setPositiveButton("К навыку",(ok,button)->showSkill(perk.tree));
+            card.show();
+        }).setNegativeButton("Закрыть",null).show();
+    }
+
     private void showSkill(int index){
         int lvl=game.progress.skillLevel(index),rank=game.progress.talentRank(index);boolean combat=RpgProgress.isCombatPerk(index);
         String title=combat?game.progress.combatPerkName(index):RpgContent.SKILLS[index]+" | освоение";
@@ -5568,8 +5574,8 @@ public final class MainActivity extends Activity {
             if(combat?game.progress.buyCombatPerk(index):game.progress.buyTalent(game,index)){save();render();toast("Талант развит");}
         });
         builder.setNeutralButton("Таланты",(d,w)->{
-            new RuneDialogBuilder(this,accent()).setTitle("Развитие навыка").setItems(new String[]{"Специализации","Особые таланты"},(dd,i)->{
-                if(i==0)specializationDialog(index);else advancedPerkDialog(index);
+            new RuneDialogBuilder(this,accent()).setTitle("Развитие навыка").setItems(new String[]{"Специализации","Особые таланты","Способности Skyrim"},(dd,i)->{
+                if(i==0)specializationDialog(index);else if(i==1)advancedPerkDialog(index);else showPerkReference("",index);
             }).setNegativeButton("Закрыть",null).show();
         });
         builder.show();

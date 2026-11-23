@@ -105,6 +105,29 @@ public class CanonicalRussianRuntimeTest {
         assertEquals(0.1, ItemCatalog.find("Бриллиант").weight, 0.0001);
     }
 
+    @Test public void renamedArmorAndJewelryKeepEquipmentSlotsAndEffectsAcrossSaves() throws Exception {
+        JSONObject legacy = new JSONObject().put("inventory", new JSONObject()
+            .put("Медная диадема с ониксом", 2).put("Кольцо чистейших смесей", 1)
+            .put("Серебряный медальон Фьотли", 1).put("Броня Древних Богов", 1));
+        RpgProgress progress = RpgProgress.fromJson(legacy);
+        assertTrue(progress.equip("Медный обруч с ониксом"));
+        assertTrue(progress.equip("Кольцо чистейшей смеси"));
+        assertTrue(progress.equip("0007D678"));
+        assertTrue(progress.equip("Броня Старых богов"));
+        RpgProgress saved = RpgProgress.fromJson(progress.toJson());
+        assertEquals("Медная диадема с ониксом", saved.equippedName("head"));
+        assertEquals("Медный обруч с ониксом", saved.equippedDisplayName("head"));
+        assertEquals("Серебряный кулон Фьотли", saved.equippedDisplayName("neck"));
+        assertEquals("Броня Древних Богов", saved.equippedName("body"));
+        assertEquals(2, saved.quantity("000166FF"));
+        assertEquals(12, saved.gearAlchemy());
+        ItemCatalog.Item armor = ItemCatalog.find("000EAFD0");
+        assertEquals(3.0, armor.weight, 0.0);
+        assertEquals(611, armor.value);
+        assertEquals(28.0, armor.baseStat, 0.0);
+        assertSame(armor, ItemCatalog.find("Armor of the Old Gods"));
+    }
+
     @Test public void oldDestinationsAndNewLabelsSelectTheSameMarker() {
         for (String[] row : RussianNameData.MAP_ALIASES) {
             SkyrimMapCatalog.Site original = SkyrimMapCatalog.find(row[1]);

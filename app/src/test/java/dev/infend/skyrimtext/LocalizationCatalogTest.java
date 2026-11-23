@@ -77,6 +77,9 @@ public class LocalizationCatalogTest {
         array("skill", RpgContent.SKILLS, "", "RpgContent");
         array("magic-school", RpgContent.MAGIC_SCHOOLS, "", "RpgContent");
         array("perk", AdvancedPerks.NAMES, "", "AdvancedPerks");
+        for (PerkLexicon.Entry entry : PerkLexicon.all()) {
+            for (String id : entry.forms) row("perk-rank", id, entry.name, "candidate", "PerkLexicon");
+        }
         for (int i = 0; i < TalentBranches.NAMES.length; i++) {
             for (int rank = 0; rank < TalentBranches.NAMES[i].length; rank++) {
                 row("talent-branch", i + "/" + rank, TalentBranches.NAMES[i][rank], "author", "TalentBranches");

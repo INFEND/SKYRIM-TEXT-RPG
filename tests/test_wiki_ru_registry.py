@@ -38,6 +38,17 @@ class RussianRegistry(unittest.TestCase):
         self.assertIn("Стража Рассвета", quest["project"][0]["aliases"])
         self.assertTrue(any(e["status"] == "author" and e["category"] == "Задания" for e in by_id.values()))
 
+    def test_all_perk_ranks_are_counted_once_including_existing_save_indices(self):
+        with gzip.open(audit.REGISTRY, "rt", encoding="utf-8") as stream:
+            records = json.load(stream)["entities"]
+        perks = [entity for entity in records if "perk_rank" in entity]
+        self.assertEqual(273, len(perks))
+        self.assertEqual(273, len({entity["identity"] for entity in perks}))
+        self.assertEqual(55, sum(any(p["kind"] == "perk" for p in e["project"]) for e in perks))
+        third = next(e for e in perks if e["original_id"] == "00079342")
+        self.assertEqual({"tree": 0, "rank": 3}, third["perk_rank"])
+        self.assertEqual("Сильная рука", third["canonical_ru"])
+
     def test_percentage_counts_unique_original_entries(self):
         report = audit.markdown_table({"Книги": {"verified": 1, "corrected": 1, "conflict": 1,
                                                 "unverified": 1, "author": 4, "creation-club": 2}})

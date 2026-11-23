@@ -23,7 +23,7 @@ armor	Богатое одеяние	Богатое одеяние	candidate	Item
 armor	Богатый головной убор	Богатый головной убор	candidate	ItemCatalog
 armor	Ботинки Мифического Рассвета	Ботинки Мифического Рассвета	candidate	ItemCatalog
 armor	Ботинки Телванни	Ботинки Телванни	candidate	ItemCatalog
-armor	Броня Древних Богов	Броня Древних Богов	candidate	ItemCatalog
+armor	Броня Древних Богов	Броня Старых богов	candidate	ItemCatalog
 armor	Броня Изгоев	Броня Изгоев	candidate	ItemCatalog
 armor	Броня Клинков	Броня Клинков	candidate	ItemCatalog
 armor	Вампирская броня	Вампирская броня	candidate	ItemCatalog
@@ -68,8 +68,8 @@ armor	Зачарованное ожерелье	Зачарованное оже�
 armor	Зелёная туника мальчика	Зелёная туника мальчика	candidate	ItemCatalog
 armor	Зелёное одеяние	Зелёное одеяние	candidate	ItemCatalog
 armor	Зелёное платье девочки	Зелёное платье девочки	candidate	ItemCatalog
-armor	Золотая диадема с изумрудом	Золотая диадема с изумрудом	candidate	ItemCatalog
-armor	Золотая диадема с рубином	Золотая диадема с рубином	candidate	ItemCatalog
+armor	Золотая диадема с изумрудом	Золотой обруч с изумрудом	candidate	ItemCatalog
+armor	Золотая диадема с рубином	Золотой обруч с рубином	candidate	ItemCatalog
 armor	Золотое кольцо Виолы	Золотое кольцо Виолы	candidate	ItemCatalog
 armor	Золотое кольцо с бриллиантом	Золотое кольцо с бриллиантом	candidate	ItemCatalog
 armor	Золотое кольцо с изумрудом	Золотое кольцо с изумрудом	candidate	ItemCatalog
@@ -96,12 +96,12 @@ armor	Кожаные перчатки	Кожаные перчатки	candidate	
 armor	Кожаные сапоги	Кожаные сапоги	candidate	ItemCatalog
 armor	Кожаный капюшон	Кожаный капюшон	candidate	ItemCatalog
 armor	Кожаный шлем	Кожаный шлем	candidate	ItemCatalog
-armor	Кольцо Илас-Тей	Кольцо Илас-Тей	candidate	ItemCatalog
+armor	Кольцо Илас-Тей	Кольцо Илас-Теи	candidate	ItemCatalog
 armor	Кольцо Калсельмо	Кольцо Калсельмо	candidate	ItemCatalog
 armor	Кольцо зимнего пламени	Кольцо зимнего пламени	author	ItemCatalog
 armor	Кольцо золотое	Золотое кольцо	candidate	ItemCatalog
 armor	Кольцо серебряное	Серебряное кольцо	candidate	ItemCatalog
-armor	Кольцо чистейших смесей	Кольцо чистейших смесей	candidate	ItemCatalog
+armor	Кольцо чистейших смесей	Кольцо чистейшей смеси	candidate	ItemCatalog
 armor	Костяная кираса	Костяная броня	candidate	ItemCatalog
 armor	Костяной шлем	Костяной шлем	candidate	ItemCatalog
 armor	Костяной щит	Костяной щит	candidate	ItemCatalog
@@ -113,10 +113,10 @@ armor	Красное одеяние с капюшоном	Красное оде�
 armor	Красное платье девочки	Красное платье девочки	candidate	ItemCatalog
 armor	Ламеллярная броня	Ламеллярная броня	candidate	ItemCatalog
 armor	Лунный амулет	Лунный амулет	candidate	ItemCatalog
-armor	Медная диадема с лунным камнем	Медная диадема с лунным камнем	candidate	ItemCatalog
-armor	Медная диадема с ониксом	Медная диадема с ониксом	candidate	ItemCatalog
-armor	Медная диадема с рубином	Медная диадема с рубином	candidate	ItemCatalog
-armor	Медная диадема с сапфиром	Медная диадема с сапфиром	candidate	ItemCatalog
+armor	Медная диадема с лунным камнем	Медный обруч с лунным камнем	candidate	ItemCatalog
+armor	Медная диадема с ониксом	Медный обруч с ониксом	candidate	ItemCatalog
+armor	Медная диадема с рубином	Медный обруч с рубином	candidate	ItemCatalog
+armor	Медная диадема с сапфиром	Медный обруч с сапфиром	candidate	ItemCatalog
 armor	Меховая броня	Меховая броня	candidate	ItemCatalog
 armor	Меховые сапоги	Меховые сапоги	candidate	ItemCatalog
 armor	Мистические настроечные перчатки	Мистические настроечные перчатки	candidate	ItemCatalog
@@ -130,8 +130,8 @@ armor	Наряд из «Сияющих одежд»	Наряд из «Сияющ
 armor	Нарядная одежда	Нарядная одежда	candidate	ItemCatalog
 armor	Нарядные ботинки	Нарядные ботинки	candidate	ItemCatalog
 armor	Настроечные перчатки	Настроечные перчатки	candidate	ItemCatalog
-armor	Нефритовая диадема с изумрудом	Нефритовая диадема с изумрудом	candidate	ItemCatalog
-armor	Нефритовая диадема с сапфиром	Нефритовая диадема с сапфиром	candidate	ItemCatalog
+armor	Нефритовая диадема с изумрудом	Нефритовый обруч с изумрудом	candidate	ItemCatalog
+armor	Нефритовая диадема с сапфиром	Нефритовый обруч с сапфиром	candidate	ItemCatalog
 armor	Нордская резная кираса	Нордская резная броня	candidate	ItemCatalog
 armor	Нордские резные перчатки	Нордские резные перчатки	candidate	ItemCatalog
 armor	Нордские резные сапоги	Нордские резные сапоги	candidate	ItemCatalog
@@ -167,7 +167,7 @@ armor	Орочьи сапоги	Орочьи сапоги	candidate	ItemCatalog
 armor	Орочья кираса	Орочья броня	candidate	ItemCatalog
 armor	Очарованное ожерелье	Очарованное ожерелье	candidate	ItemCatalog
 armor	Перчатки	Перчатки	candidate	ItemCatalog
-armor	Перчатки Древних Богов	Перчатки Древних Богов	candidate	ItemCatalog
+armor	Перчатки Древних Богов	Перчатки Старых богов	candidate	ItemCatalog
 armor	Перчатки Мифического Рассвета	Перчатки Мифического Рассвета	candidate	ItemCatalog
 armor	Перчатки Псиджиков	Перчатки Псиджиков	candidate	ItemCatalog
 armor	Перчатки Цицерона	Перчатки Цицерона	candidate	ItemCatalog
@@ -186,7 +186,7 @@ armor	Роскошная одежда	Роскошная одежда	candidate	
 armor	Сапоги	Сапоги	candidate	ItemCatalog
 armor	Сапоги (вариант за 3 септима)	Сапоги (вариант за 3 септима)	candidate	ItemCatalog
 armor	Сапоги (вариант за 4 септима)	Сапоги (вариант за 4 септима)	candidate	ItemCatalog
-armor	Сапоги Древних Богов	Сапоги Древних Богов	candidate	ItemCatalog
+armor	Сапоги Древних Богов	Сапоги Старых богов	candidate	ItemCatalog
 armor	Сапоги Ульфрика	Сапоги Ульфрика	candidate	ItemCatalog
 armor	Сапоги Цицерона	Сапоги Цицерона	candidate	ItemCatalog
 armor	Сапоги из шкур	Сыромятные сапоги	candidate	ItemCatalog
@@ -196,8 +196,8 @@ armor	Свадебные сандалии	Свадебные сандалии	ca
 armor	Свадебный венец	Свадебный венец	candidate	ItemCatalog
 armor	Свадебный наряд	Свадебный наряд	candidate	ItemCatalog
 armor	Серая туника мальчика	Серая туника мальчика	candidate	ItemCatalog
-armor	Серебряная диадема с лунным камнем	Серебряная диадема с лунным камнем	candidate	ItemCatalog
-armor	Серебряная диадема с сапфиром	Серебряная диадема с сапфиром	candidate	ItemCatalog
+armor	Серебряная диадема с лунным камнем	Серебряный обруч с лунным камнем	candidate	ItemCatalog
+armor	Серебряная диадема с сапфиром	Серебряный обруч с сапфиром	candidate	ItemCatalog
 armor	Серебряное кольцо Мадези	Серебряное кольцо Мадези	candidate	ItemCatalog
 armor	Серебряное кольцо грузоподъёмности	Серебряное кольцо грузоподъёмности	author	ItemCatalog
 armor	Серебряное кольцо с аметистом	Серебряное кольцо с аметистом	candidate	ItemCatalog
@@ -207,7 +207,7 @@ armor	Серебряное ожерелье	Серебряное ожерель�
 armor	Серебряное ожерелье защиты	Серебряное ожерелье защиты	author	ItemCatalog
 armor	Серебряное ожерелье с изумрудом	Серебряное ожерелье с изумрудом	candidate	ItemCatalog
 armor	Серебряное ожерелье с самоцветами	Серебряное ожерелье с самоцветами	candidate	ItemCatalog
-armor	Серебряный медальон Фьотли	Серебряный медальон Фьотли	candidate	ItemCatalog
+armor	Серебряный медальон Фьотли	Серебряный кулон Фьотли	candidate	ItemCatalog
 armor	Серое платье девочки	Серое платье девочки	candidate	ItemCatalog
 armor	Синее одеяние	Синее одеяние	candidate	ItemCatalog
 armor	Синее одеяние с капюшоном	Синее одеяние с капюшоном	candidate	ItemCatalog
@@ -255,7 +255,7 @@ armor	Хитиновый щит	Хитиновый щит	candidate	ItemCatalog
 armor	Чёрное одеяние	Чёрное одеяние	candidate	ItemCatalog
 armor	Чёрное одеяние с капюшоном	Чёрное одеяние с капюшоном	candidate	ItemCatalog
 armor	Шахтёрская одежда	Шахтёрская одежда	candidate	ItemCatalog
-armor	Шлем Древних Богов	Шлем Древних Богов	candidate	ItemCatalog
+armor	Шлем Древних Богов	Шлем Старых богов	candidate	ItemCatalog
 armor	Шлем из шкур	Сыромятный шлем	candidate	ItemCatalog
 armor	Шляпа путника	Шляпа путника	candidate	ItemCatalog
 armor	Шутовская одежда	Шутовская одежда	candidate	ItemCatalog
@@ -3393,6 +3393,279 @@ perk	6	Стальные доспехи	candidate	AdvancedPerks
 perk	7	Торговец	candidate	AdvancedPerks
 perk	8	Новичок школы разрушения	candidate	AdvancedPerks
 perk	9	Восполнение	candidate	AdvancedPerks
+perk-rank	000153CD	Двойное изменение	candidate	PerkLexicon
+perk-rank	000153CE	Двойное колдовство	candidate	PerkLexicon
+perk-rank	000153CF	Двойное разрушение	candidate	PerkLexicon
+perk-rank	000153D0	Двойная иллюзия	candidate	PerkLexicon
+perk-rank	000153D1	Двойное восстановление	candidate	PerkLexicon
+perk-rank	000153D2	Ударная волна	candidate	PerkLexicon
+perk-rank	00018E6A	Ловкие пальчики	candidate	PerkLexicon
+perk-rank	00018E6B	Ловкие пальчики	candidate	PerkLexicon
+perk-rank	00018E6C	Ловкие пальчики	candidate	PerkLexicon
+perk-rank	00018E6D	Ловкие пальчики	candidate	PerkLexicon
+perk-rank	0003AF81	Безжалостный удар	candidate	PerkLexicon
+perk-rank	0003AF83	Глубокие раны	candidate	PerkLexicon
+perk-rank	0003AF84	Крушитель черепов	candidate	PerkLexicon
+perk-rank	0003AF9E	Веерная атака	candidate	PerkLexicon
+perk-rank	0003AFA6	Парализующий удар	candidate	PerkLexicon
+perk-rank	0003AFA7	Мастер боевых искусств	candidate	PerkLexicon
+perk-rank	0003FFFA	Рубака	candidate	PerkLexicon
+perk-rank	00051B12	Бережливый охотник	candidate	PerkLexicon
+perk-rank	00051B17	Полный комплект	candidate	PerkLexicon
+perk-rank	00051B1B	Подгонка по фигуре	candidate	PerkLexicon
+perk-rank	00051B1C	Вторая кожа	candidate	PerkLexicon
+perk-rank	0005218E	Кузнец-волшебник	candidate	PerkLexicon
+perk-rank	00052190	Драконьи доспехи	candidate	PerkLexicon
+perk-rank	00052D50	Боевая стойка	candidate	PerkLexicon
+perk-rank	00052D51	Стойка чемпиона	candidate	PerkLexicon
+perk-rank	00052D52	Сокрушительный удар	candidate	PerkLexicon
+perk-rank	00053128	Сопротивление магии	candidate	PerkLexicon
+perk-rank	00053129	Сопротивление магии	candidate	PerkLexicon
+perk-rank	0005312A	Сопротивление магии	candidate	PerkLexicon
+perk-rank	000581DD	Некромантия	candidate	PerkLexicon
+perk-rank	000581DE	Тёмные души	candidate	PerkLexicon
+perk-rank	000581E1	Обман животных	candidate	PerkLexicon
+perk-rank	000581E2	Обман людских глаз	candidate	PerkLexicon
+perk-rank	000581E4	Некромаг	candidate	PerkLexicon
+perk-rank	000581E7	Усиленное пламя	candidate	PerkLexicon
+perk-rank	000581EA	Усиленный мороз	candidate	PerkLexicon
+perk-rank	000581F4	Восполнение	candidate	PerkLexicon
+perk-rank	000581F5	Восполнение	candidate	PerkLexicon
+perk-rank	000581F7	Атронах	candidate	PerkLexicon
+perk-rank	000581F8	Регенерация	candidate	PerkLexicon
+perk-rank	000581F9	Передышка	candidate	PerkLexicon
+perk-rank	000581FC	Постоянство	candidate	PerkLexicon
+perk-rank	000581FD	Бесшумные заклинания	candidate	PerkLexicon
+perk-rank	00058200	Усиленные молнии	candidate	PerkLexicon
+perk-rank	00058201	Дезориентация	candidate	PerkLexicon
+perk-rank	00058202	Ночной вор	candidate	PerkLexicon
+perk-rank	00058204	Щипач	candidate	PerkLexicon
+perk-rank	00058205	Фокусник	candidate	PerkLexicon
+perk-rank	00058208	Замочный мастер	candidate	PerkLexicon
+perk-rank	00058209	Вечная отмычка	candidate	PerkLexicon
+perk-rank	0005820A	Золотоискатель	candidate	PerkLexicon
+perk-rank	0005820C	Лёгкий шаг	candidate	PerkLexicon
+perk-rank	00058210	Удар в спину	candidate	PerkLexicon
+perk-rank	00058211	Клинок ассасина	candidate	PerkLexicon
+perk-rank	00058213	Приглушённые шаги	candidate	PerkLexicon
+perk-rank	00058214	Воин тени	candidate	PerkLexicon
+perk-rank	00058215	Целитель	candidate	PerkLexicon
+perk-rank	00058216	Провизор	candidate	PerkLexicon
+perk-rank	00058217	Отравитель	candidate	PerkLexicon
+perk-rank	00058218	Экспериментатор	candidate	PerkLexicon
+perk-rank	0005821D	Чистота	candidate	PerkLexicon
+perk-rank	00058F61	Орлиный взор	candidate	PerkLexicon
+perk-rank	00058F62	Мощный выстрел	candidate	PerkLexicon
+perk-rank	00058F63	Егерь	candidate	PerkLexicon
+perk-rank	00058F64	Снайпер	candidate	PerkLexicon
+perk-rank	00058F66	Обезоруживание	candidate	PerkLexicon
+perk-rank	00058F67	Силовой удар плашмя	candidate	PerkLexicon
+perk-rank	00058F68	Отбивание стрел	candidate	PerkLexicon
+perk-rank	00058F69	Защита от стихий	candidate	PerkLexicon
+perk-rank	00058F6A	Живой молот	candidate	PerkLexicon
+perk-rank	00058F6C	Центр тяжести	candidate	PerkLexicon
+perk-rank	00058F6D	Упорная тренировка	candidate	PerkLexicon
+perk-rank	00058F6E	Стальные кулаки	candidate	PerkLexicon
+perk-rank	00058F6F	Хорошая экипировка	candidate	PerkLexicon
+perk-rank	00058F72	Подкуп	candidate	PerkLexicon
+perk-rank	00058F75	Очарование	candidate	PerkLexicon
+perk-rank	00058F79	Скупщик	candidate	PerkLexicon
+perk-rank	00058F7A	Купец	candidate	PerkLexicon
+perk-rank	00058F7B	Вкладчик	candidate	PerkLexicon
+perk-rank	00058F7C	Экономия душ	candidate	PerkLexicon
+perk-rank	00058F7D	Жизненные чары	candidate	PerkLexicon
+perk-rank	00058F7E	Чары умений	candidate	PerkLexicon
+perk-rank	00058F7F	Дополнительный эффект	candidate	PerkLexicon
+perk-rank	00058F80	Огненные чары	candidate	PerkLexicon
+perk-rank	00058F81	Морозные чары	candidate	PerkLexicon
+perk-rank	00058F82	Грозовые чары	candidate	PerkLexicon
+perk-rank	00059B76	Мастер разума	candidate	PerkLexicon
+perk-rank	00059B77	Гипнотический взгляд	candidate	PerkLexicon
+perk-rank	00059B78	Наука страха	candidate	PerkLexicon
+perk-rank	0005F56F	Мечник	candidate	PerkLexicon
+perk-rank	0005F592	Костолом	candidate	PerkLexicon
+perk-rank	0005F594	Смертельный удар плашмя	candidate	PerkLexicon
+perk-rank	000640B3	Мистический призыв	candidate	PerkLexicon
+perk-rank	00068BCC	Оберег-поглотитель	candidate	PerkLexicon
+perk-rank	00079342	Сильная рука	candidate	PerkLexicon
+perk-rank	00079343	Сильная рука	candidate	PerkLexicon
+perk-rank	00079344	Сильная рука	candidate	PerkLexicon
+perk-rank	00079345	Сильная рука	candidate	PerkLexicon
+perk-rank	00079346	Варвар	candidate	PerkLexicon
+perk-rank	00079347	Варвар	candidate	PerkLexicon
+perk-rank	00079348	Варвар	candidate	PerkLexicon
+perk-rank	00079349	Варвар	candidate	PerkLexicon
+perk-rank	0007934A	Избыточное натяжение	candidate	PerkLexicon
+perk-rank	0007934B	Избыточное натяжение	candidate	PerkLexicon
+perk-rank	0007934D	Избыточное натяжение	candidate	PerkLexicon
+perk-rank	00079354	Избыточное натяжение	candidate	PerkLexicon
+perk-rank	00079355	Щитоносец	candidate	PerkLexicon
+perk-rank	00079356	Щитоносец	candidate	PerkLexicon
+perk-rank	00079357	Щитоносец	candidate	PerkLexicon
+perk-rank	00079358	Щитоносец	candidate	PerkLexicon
+perk-rank	0007935E	Джаггернаут	candidate	PerkLexicon
+perk-rank	00079361	Джаггернаут	candidate	PerkLexicon
+perk-rank	00079362	Джаггернаут	candidate	PerkLexicon
+perk-rank	00079374	Джаггернаут	candidate	PerkLexicon
+perk-rank	00079376	Ловкость в обороне	candidate	PerkLexicon
+perk-rank	00079389	Ловкость в обороне	candidate	PerkLexicon
+perk-rank	00079391	Ловкость в обороне	candidate	PerkLexicon
+perk-rank	00079392	Ловкость в обороне	candidate	PerkLexicon
+perk-rank	00096590	Накладные карманы	candidate	PerkLexicon
+perk-rank	000A3F64	Бегство от смерти	candidate	PerkLexicon
+perk-rank	000BABE4	Сильная рука	candidate	PerkLexicon
+perk-rank	000BABE8	Варвар	candidate	PerkLexicon
+perk-rank	000BABED	Избыточное натяжение	candidate	PerkLexicon
+perk-rank	000BCCAE	Щитоносец	candidate	PerkLexicon
+perk-rank	000BCD2A	Джаггернаут	candidate	PerkLexicon
+perk-rank	000BCD2B	Мягкая подбивка	candidate	PerkLexicon
+perk-rank	000BE123	Ловкость в обороне	candidate	PerkLexicon
+perk-rank	000BE124	Ловкие пальчики	candidate	PerkLexicon
+perk-rank	000BE125	Взломщик-ученик	candidate	PerkLexicon
+perk-rank	000BE126	Скрытность	candidate	PerkLexicon
+perk-rank	000BE127	Алхимик	candidate	PerkLexicon
+perk-rank	000BE128	Торговец	candidate	PerkLexicon
+perk-rank	000BEE97	Зачарователь	candidate	PerkLexicon
+perk-rank	000C07C6	Скрытность	candidate	PerkLexicon
+perk-rank	000C07C7	Скрытность	candidate	PerkLexicon
+perk-rank	000C07C8	Скрытность	candidate	PerkLexicon
+perk-rank	000C07C9	Скрытность	candidate	PerkLexicon
+perk-rank	000C07CA	Алхимик	candidate	PerkLexicon
+perk-rank	000C07CB	Алхимик	candidate	PerkLexicon
+perk-rank	000C07CC	Алхимик	candidate	PerkLexicon
+perk-rank	000C07CD	Алхимик	candidate	PerkLexicon
+perk-rank	000C07CE	Торговец	candidate	PerkLexicon
+perk-rank	000C07CF	Торговец	candidate	PerkLexicon
+perk-rank	000C07D0	Торговец	candidate	PerkLexicon
+perk-rank	000C07D1	Торговец	candidate	PerkLexicon
+perk-rank	000C1E90	Мечник	candidate	PerkLexicon
+perk-rank	000C1E91	Мечник	candidate	PerkLexicon
+perk-rank	000C1E92	Костолом	candidate	PerkLexicon
+perk-rank	000C1E93	Костолом	candidate	PerkLexicon
+perk-rank	000C1E94	Глубокие раны	candidate	PerkLexicon
+perk-rank	000C1E95	Глубокие раны	candidate	PerkLexicon
+perk-rank	000C1E96	Крушитель черепов	candidate	PerkLexicon
+perk-rank	000C1E97	Крушитель черепов	candidate	PerkLexicon
+perk-rank	000C3678	Рубака	candidate	PerkLexicon
+perk-rank	000C3679	Рубака	candidate	PerkLexicon
+perk-rank	000C367C	Зачарователь	candidate	PerkLexicon
+perk-rank	000C367D	Зачарователь	candidate	PerkLexicon
+perk-rank	000C367E	Зачарователь	candidate	PerkLexicon
+perk-rank	000C367F	Зачарователь	candidate	PerkLexicon
+perk-rank	000C3680	Взломщик-адепт	candidate	PerkLexicon
+perk-rank	000C3681	Взломщик-эксперт	candidate	PerkLexicon
+perk-rank	000C3682	Взломщик-мастер	candidate	PerkLexicon
+perk-rank	000C44B5	Неистовство	candidate	PerkLexicon
+perk-rank	000C44B7	Ученик школы изменения	candidate	PerkLexicon
+perk-rank	000C44B8	Адепт школы изменения	candidate	PerkLexicon
+perk-rank	000C44B9	Эксперт школы изменения	candidate	PerkLexicon
+perk-rank	000C44BA	Мастер школы изменения	candidate	PerkLexicon
+perk-rank	000C44BB	Ученик школы колдовства	candidate	PerkLexicon
+perk-rank	000C44BC	Адепт школы колдовства	candidate	PerkLexicon
+perk-rank	000C44BD	Эксперт школы колдовства	candidate	PerkLexicon
+perk-rank	000C44BE	Мастер школы колдовства	candidate	PerkLexicon
+perk-rank	000C44BF	Ученик школы разрушения	candidate	PerkLexicon
+perk-rank	000C44C0	Адепт школы разрушения	candidate	PerkLexicon
+perk-rank	000C44C1	Эксперт школы разрушения	candidate	PerkLexicon
+perk-rank	000C44C2	Мастер школы разрушения	candidate	PerkLexicon
+perk-rank	000C44C3	Ученик школы иллюзии	candidate	PerkLexicon
+perk-rank	000C44C4	Адепт школы иллюзии	candidate	PerkLexicon
+perk-rank	000C44C5	Эксперт школы иллюзии	candidate	PerkLexicon
+perk-rank	000C44C6	Мастер школы иллюзии	candidate	PerkLexicon
+perk-rank	000C44C7	Ученик школы восстановления	candidate	PerkLexicon
+perk-rank	000C44C8	Адепт школы восстановления	candidate	PerkLexicon
+perk-rank	000C44C9	Эксперт школы восстановления	candidate	PerkLexicon
+perk-rank	000C44CA	Мастер школы восстановления	candidate	PerkLexicon
+perk-rank	000C5C05	Расчленитель	candidate	PerkLexicon
+perk-rank	000C5C06	Расчленитель	candidate	PerkLexicon
+perk-rank	000C5C07	Расчленитель	candidate	PerkLexicon
+perk-rank	000CB406	Рывок	candidate	PerkLexicon
+perk-rank	000CB407	Великий рывок	candidate	PerkLexicon
+perk-rank	000CB40D	Стальные доспехи	candidate	PerkLexicon
+perk-rank	000CB40E	Двемерские доспехи	candidate	PerkLexicon
+perk-rank	000CB40F	Эльфийские доспехи	candidate	PerkLexicon
+perk-rank	000CB410	Орочьи доспехи	candidate	PerkLexicon
+perk-rank	000CB411	Стеклянные доспехи	candidate	PerkLexicon
+perk-rank	000CB412	Эбонитовые доспехи	candidate	PerkLexicon
+perk-rank	000CB413	Даэдрические доспехи	candidate	PerkLexicon
+perk-rank	000CB414	Сложные типы брони	candidate	PerkLexicon
+perk-rank	000CB419	Атромантия	candidate	PerkLexicon
+perk-rank	000CB41A	Сила стихий	candidate	PerkLexicon
+perk-rank	000D5F1C	Парные души	candidate	PerkLexicon
+perk-rank	000D7999	Магическая броня	candidate	PerkLexicon
+perk-rank	000D799A	Магическая броня	candidate	PerkLexicon
+perk-rank	000D799B	Магическая броня	candidate	PerkLexicon
+perk-rank	000D799C	Изгнание в Обливион	candidate	PerkLexicon
+perk-rank	000D799E	Похититель душ	candidate	PerkLexicon
+perk-rank	000D79A0	Ключник	candidate	PerkLexicon
+perk-rank	000D8C33	Быстрые рефлексы	candidate	PerkLexicon
+perk-rank	000F2CA6	Новичок школы изменения	candidate	PerkLexicon
+perk-rank	000F2CA7	Новичок школы колдовства	candidate	PerkLexicon
+perk-rank	000F2CA8	Новичок школы разрушения	candidate	PerkLexicon
+perk-rank	000F2CA9	Новичок школы иллюзии	candidate	PerkLexicon
+perk-rank	000F2CAA	Новичок школы восстановления	candidate	PerkLexicon
+perk-rank	000F392A	Взломщик-новичок	candidate	PerkLexicon
+perk-rank	000F392E	Жаркое пламя	candidate	PerkLexicon
+perk-rank	000F3933	Глубокая заморозка	candidate	PerkLexicon
+perk-rank	000F3F0E	Дезинтеграция	candidate	PerkLexicon
+perk-rank	001036F0	Верный прицел	candidate	PerkLexicon
+perk-rank	00103ADA	Твёрдая рука	candidate	PerkLexicon
+perk-rank	00103ADB	Твёрдая рука	candidate	PerkLexicon
+perk-rank	00105F19	Быстрая стрельба	candidate	PerkLexicon
+perk-rank	00105F1C	Критический выстрел	candidate	PerkLexicon
+perk-rank	00105F1E	Критический выстрел	candidate	PerkLexicon
+perk-rank	00105F1F	Критический выстрел	candidate	PerkLexicon
+perk-rank	00105F22	Крылья ветра	candidate	PerkLexicon
+perk-rank	00105F23	Тихий кувырок	candidate	PerkLexicon
+perk-rank	00105F24	Тишина	candidate	PerkLexicon
+perk-rank	00105F26	Охотник за сокровищами	candidate	PerkLexicon
+perk-rank	00105F28	Носитель яда	candidate	PerkLexicon
+perk-rank	00105F29	Запугивание	candidate	PerkLexicon
+perk-rank	00105F2A	Экспериментатор	candidate	PerkLexicon
+perk-rank	00105F2B	Экспериментатор	candidate	PerkLexicon
+perk-rank	00105F2C	Змеиная кровь	candidate	PerkLexicon
+perk-rank	00105F2E	Травник	candidate	PerkLexicon
+perk-rank	00105F2F	Концентрированный яд	candidate	PerkLexicon
+perk-rank	00105F30	Призыватель	candidate	PerkLexicon
+perk-rank	00105F31	Призыватель	candidate	PerkLexicon
+perk-rank	00105F32	Мастер рун	candidate	PerkLexicon
+perk-rank	00105F33	Отражение ударов	candidate	PerkLexicon
+perk-rank	00106253	Блок на бегу	candidate	PerkLexicon
+perk-rank	00106256	Двойной вихрь	candidate	PerkLexicon
+perk-rank	00106257	Двойной вихрь	candidate	PerkLexicon
+perk-rank	00106258	Двойная мясорубка	candidate	PerkLexicon
+perk-rank	00106259	Умелые ручки	candidate	PerkLexicon
+perk-rank	00107830	Восковой слепок	candidate	PerkLexicon
+perk-rank	00107831	Ловкий боец	candidate	PerkLexicon
+perk-rank	00107832	Полный комплект	candidate	PerkLexicon
+perk-rank	00108A44	Поглотитель душ	candidate	PerkLexicon
+perk-rank	001090A2	Убеждение	candidate	PerkLexicon
+perk-rank	001090A5	Великий торговец	candidate	PerkLexicon
+perk-rank	0010FCF8	Усиленное пламя	candidate	PerkLexicon
+perk-rank	0010FCF9	Усиленный мороз	candidate	PerkLexicon
+perk-rank	0010FCFA	Усиленные молнии	candidate	PerkLexicon
+perk-rank	DAWNGUARD_005994	Лечение кровью	candidate	PerkLexicon
+perk-rank	DAWNGUARD_005995	Неземные желания	candidate	PerkLexicon
+perk-rank	DAWNGUARD_005996	Ядовитые когти	candidate	PerkLexicon
+perk-rank	DAWNGUARD_005997	Плащ ночи	candidate	PerkLexicon
+perk-rank	DAWNGUARD_005998	Сила могилы	candidate	PerkLexicon
+perk-rank	DAWNGUARD_00599A	Хватка вампира	candidate	PerkLexicon
+perk-rank	DAWNGUARD_00599B	Обнаружение всех существ	candidate	PerkLexicon
+perk-rank	DAWNGUARD_00599C	Туманная форма	candidate	PerkLexicon
+perk-rank	DAWNGUARD_00599E	Сверхъестественные рефлексы	candidate	PerkLexicon
+perk-rank	DAWNGUARD_0059A4	Звериная сила	candidate	PerkLexicon
+perk-rank	DAWNGUARD_0059A5	Животная энергия	candidate	PerkLexicon
+perk-rank	DAWNGUARD_0059A6	Неразборчивость в еде	candidate	PerkLexicon
+perk-rank	DAWNGUARD_0059A7	Жадность в еде	candidate	PerkLexicon
+perk-rank	DAWNGUARD_0059A8	Тотем ужаса	candidate	PerkLexicon
+perk-rank	DAWNGUARD_0059A9	Тотем хищника	candidate	PerkLexicon
+perk-rank	DAWNGUARD_0059AA	Тотем ледяных братьев	candidate	PerkLexicon
+perk-rank	DAWNGUARD_0059AB	Тотем луны	candidate	PerkLexicon
+perk-rank	DAWNGUARD_007A3F	Звериная сила	candidate	PerkLexicon
+perk-rank	DAWNGUARD_008A70	Трупное проклятье	candidate	PerkLexicon
+perk-rank	DAWNGUARD_011CFA	Звериная сила	candidate	PerkLexicon
+perk-rank	DAWNGUARD_011CFB	Звериная сила	candidate	PerkLexicon
+perk-rank	DAWNGUARD_016908	Вызов гаргульи	candidate	PerkLexicon
 race	0	Норд	candidate	RpgContent
 race	1	Бретонец	candidate	RpgContent
 race	2	Темный эльф	candidate	RpgContent

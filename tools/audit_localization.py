@@ -11,14 +11,14 @@ from collections import Counter, defaultdict
 from pathlib import Path
 from urllib.parse import quote
 
-from localization.build_names import DATA, JAVA, ROOT, actor_references, evidence, java_source, shout_words
+from localization.build_names import DATA, JAVA, ROOT, actor_references, evidence, java_source, perk_ranks, shout_words
 
 REGISTRY = DATA / "registry.json.gz"
 TEXT = {".java", ".kt", ".json", ".xml", ".txt", ".py", ".md", ".yml", ".yaml", ".gradle", ".properties", ".csv", ".tsv", ".sh", ".kts", ".toml", ".pro", ".html", ".js", ".jsonl"}
 GROUPS = {"map": "Локации", "atlas": "Локации", "npc": "NPC", "npc-template": "NPC", "mention": "NPC",
           "weapon": "Оружие", "armor": "Броня", "item": "Предметы", "book": "Книги", "tome": "Книги",
           "scroll": "Предметы", "spell": "Заклинания", "shout": "Крики и расовые таланты", "shout-reference": "Крики и расовые таланты", "word": "Слова силы",
-          "racial-power": "Крики и расовые таланты", "magic-school": "Навыки и перки", "author-power": "Крики и расовые таланты", "skill": "Навыки и перки", "perk": "Навыки и перки",
+          "racial-power": "Крики и расовые таланты", "magic-school": "Навыки и перки", "author-power": "Крики и расовые таланты", "skill": "Навыки и перки", "perk": "Навыки и перки", "perk-rank": "Навыки и перки",
           "talent-branch": "Навыки и перки", "creature": "Бестиарий", "main-quest": "Задания",
           "faction-quest": "Задания", "faction": "Фракции", "race": "Расы"}
 WORD = re.compile(r"[\w]+|[^\w\s]", re.UNICODE)
@@ -211,6 +211,13 @@ def audit():
             rec["status"] = "corrected"
         rec["project"].append(dict(kind=kind, id=key, name=row["name"], canonical_ru=ev.get("canonical", "") if not ev.get("review") else "",
                                    english=en, source=ref, corroboration=ev.get("corroboration", ""), aliases=sorted(set(alias)-{row["name"]}), declaration=loc))
+    rank_rows = {r["id"]: r for r in perk_ranks()}
+    for entity in records.values():
+        for project in entity["project"]:
+            if project["kind"] == "perk-rank":
+                rank = rank_rows[project["id"]]
+                entity["perk_rank"] = dict(tree=int(rank["tree"]), rank=int(rank["rank"]))
+                break
     for actor in actor_references():
         key = "record:" + actor["edition"] + ":" + actor["reference_id"]
         records[key]["actor_reference"] = {"base_id": actor["base_id"], "reference_id": actor["reference_id"]}

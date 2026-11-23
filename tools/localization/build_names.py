@@ -33,6 +33,11 @@ def actor_references():
         return list(csv.DictReader(stream, delimiter="\t"))
 
 
+def perk_ranks():
+    with (DATA / "perk_ranks.tsv").open(encoding="utf-8") as stream:
+        return list(csv.DictReader(stream, delimiter="\t"))
+
+
 def java_source():
     all_rows = evidence()
     accepted = [r for r in all_rows if not r["review"]]
@@ -82,7 +87,14 @@ def java_source():
         for row in rows:
             lines.append("            {" + ", ".join(json.dumps(x, ensure_ascii=False) for x in row) + "},")
         lines += ["        };", "    }"]
-    return "\n".join([*lines, "}", ""])
+    lines += ["}", "", "final class RussianPerkRankData {", "    private RussianPerkRankData() {}",
+              "    static final String[][] ROWS = {"]
+    perks = {r["id"]: r for r in accepted if r["kind"] == "perk-rank"}
+    for rank in perk_ranks():
+        perk = perks[rank["id"]]
+        row = (rank["tree"], rank["rank"], rank["id"], perk["canonical"], perk["english"])
+        lines.append("        {" + ", ".join(json.dumps(value, ensure_ascii=False) for value in row) + "},")
+    return "\n".join([*lines, "    };", "}", ""])
 
 
 if __name__ == "__main__":
