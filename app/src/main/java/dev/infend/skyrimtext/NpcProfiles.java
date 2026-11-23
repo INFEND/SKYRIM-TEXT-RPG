@@ -1475,12 +1475,11 @@ final class NpcProfiles {
     static java.util.LinkedHashMap<String,String> linkNames(){return new java.util.LinkedHashMap<>(LINK_NAMES);}
     static String canonicalName(String name){
         if(name==null)return "";
+        // The same text may be an unrelated named NPC alias and a template name.
+        // Resolve an exact existing profile first, with the named-NPC priority used by find().
+        Profile direct=exact(name);
+        if(direct!=null&&direct.template)return direct.displayName;
         String canonical=LINK_NAMES.get(NpcNameMatcher.key(name));
-        if(canonical==null){
-            Profile t=TEMPLATES.get(key(name));
-            // The profile key is a save identifier; dialogue/display names use the reviewed label.
-            if(t!=null)canonical=t.displayName;
-        }
         return canonical==null?name.trim():canonical;
     }
 }

@@ -47,6 +47,8 @@ public class RussianNpcTemplateLocalizationTest {
         assertFalse(NpcProfiles.findOriginal("Волк").template);
         assertTrue(NpcProfiles.findOriginal("Волк (существо)").template);
         assertEquals("Волк",NpcProfiles.canonicalName("Волк (существо)"));
+        assertEquals("Волк",NpcProfiles.canonicalName("Волк"));
+        assertSame(NpcProfiles.findOriginal("Волк"),NpcProfiles.findOriginal(NpcProfiles.canonicalName("Волк")));
     }
     @Test public void renamedCreaturesAreStillFoundInTheBestiaryByOldLabel() {
         assertSame("Фалмер-воитель",BestiaryCatalog.find("Фалмер-мастер теней"),BestiaryCatalog.find("Фалмер-воитель"));
