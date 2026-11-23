@@ -139,7 +139,7 @@ final class SolitudeShops {
         }
         if(open(g,s))for(int i=0;i<ITEMS[s].length;i++){
             String id=ITEMS[s][i];ItemCatalog.Item item=ItemCatalog.find(id);if(item==null)continue;
-            int n=stock(g,s,i),p=price(g,item);
+            int n=stock(g,s,i),p=purchasePrice(g,s,item);
             tradeChoices(scene,"SOLITUDE:buy:"+s+":"+i,"Купить: "+item.name,p,maxBuy(g,s,i,item),"В наличии: "+n);
             tradeChoices(scene,"SOLITUDE:sell:"+s+":"+i,"Продать: "+item.name,salePrice(g,s,item),maxSell(g,s,item),"У тебя: "+g.progress.quantity(id));
         }
