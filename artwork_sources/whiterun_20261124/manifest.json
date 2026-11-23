@@ -1,0 +1,47 @@
+{
+  "city": "Вайтран",
+  "gallery": "whiterun.zip",
+  "replace_only": [
+    "04.webp",
+    "05.webp",
+    "06.webp"
+  ],
+  "frames": [
+    {
+      "frame": "04.webp",
+      "caption": "Златолист · Ветреный район",
+      "source_file": "Сакура в сердце Вайтрана.png",
+      "dimensions": [
+        1672,
+        941
+      ],
+      "source_png_sha256": "77b6d12eb92a781bcd99b5cca40419de360ec67c8f454f56054d9d77e8e937d6",
+      "webp_sha256": "ac62f9116203f8cf4eb760a8394d824b6fbe46748fecd0878280d208b64ad68f",
+      "webp_bytes": 690538
+    },
+    {
+      "frame": "05.webp",
+      "caption": "Йоррваскр",
+      "source_file": "Северный зал среди осенних гор.png",
+      "dimensions": [
+        1672,
+        941
+      ],
+      "source_png_sha256": "2782bac4b0f38235ef3c603bffb156ec4b830e0fc4b732f942b4f74a99a95c2d",
+      "webp_sha256": "aab5f55e0b06150dd3e5a3961822952eaa129d56e85aa918ad8c08f8afe0c169",
+      "webp_bytes": 648586
+    },
+    {
+      "frame": "06.webp",
+      "caption": "Драконий Предел",
+      "source_file": "Северный зал среди гор.png",
+      "dimensions": [
+        1671,
+        941
+      ],
+      "source_png_sha256": "743ec020873f5beb9d48f14baf490419b4305592829bda860c406f99a67498f2",
+      "webp_sha256": "a7bd79be098be0fbb545feaf9ec26c42fd42d4765483e9efff97bab7b831e5fc",
+      "webp_bytes": 531184
+    }
+  ]
+}

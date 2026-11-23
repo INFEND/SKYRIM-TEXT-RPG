@@ -1,0 +1,47 @@
+name: SKYRIM · Apply Whiterun gallery artwork
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'artwork_sources/whiterun_20261124/replacements.zip'
+      - 'scripts/apply_whiterun_gallery_refresh.py'
+      - '.github/workflows/apply-whiterun-gallery.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+  actions: write
+concurrency:
+  group: skyrim-whiterun-gallery-main
+  cancel-in-progress: false
+jobs:
+  replace:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - name: Replace only Whiterun 04-06 and validate unchanged frames
+        run: python3 scripts/apply_whiterun_gallery_refresh.py
+      - name: Commit new downloadable gallery resource
+        shell: bash
+        run: |
+          set -euo pipefail
+          if ! git diff --quiet -- app/src/main/assets/gallery/whiterun.zip; then
+            git config user.name 'github-actions[bot]'
+            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+            git add app/src/main/assets/gallery/whiterun.zip
+            git commit -m 'artwork: replace Whiterun 04 Gildergreen, 05 Jorrvaskr, 06 Dragonsreach'
+            git pull --rebase origin main
+            git push origin HEAD:main
+          fi
+      - name: Dispatch signed downloadable-resource catalog refresh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh workflow run resource-catalog.yml --ref main
+          echo 'Signed resource catalog refresh dispatched' >> "$GITHUB_STEP_SUMMARY"
