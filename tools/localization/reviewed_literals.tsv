@@ -1,0 +1,5 @@
+file	identity	role	match	sha256	reason
+app/src/main/java/dev/infend/skyrimtext/MainActivity.java	record:0001326A	historical	элисиф	f5c9691b2cad923fca7578403b3bf14a303a06cde196e85239252717571bc037	Краткое имя Элисиф в предложении о её галерее.
+app/src/main/java/dev/infend/skyrimtext/ResourceManagerDialog.java	record:MQ304	english	sovngarde	135b6fbbb318a110cffc15e98b4916b9253511701832c4b9d47ccadcc509a574	Название файла шрифта Sovngarde, используемое в настройках.
+app/src/main/java/dev/infend/skyrimtext/SolitudeResidents.java	record:000240CC	historical	сил	e7ae449eca4630d6706b306631f88bfea24194743779b870969e60db261f78f0	Нарицательное «сил» в обозначении расхода выносливости.
+app/src/main/java/dev/infend/skyrimtext/SolitudeShops.java	record:000240CC	historical	сил	b58dd3b1fd3bc236cb389dbb0a804f76cb35b821633071400d44f9c7b9c22f8f	Нарицательное «сил» в обозначении расхода выносливости.

@@ -1,0 +1,897 @@
+Категория	Статус	Уникальный ключ	ID проекта	Текущее название	Английское название	Исходный ID	Кандидат	Причина проверки	Источник	Объявление
+NPC	Конфликт	npc:Клепп	Клепп	Клепп	Borkul the Beast	0001338A	Клепп	Один исходный идентификатор относится к нескольким записям проекта. Нужно установить вариант.	https://elderscrolls.fandom.com/ru/wiki/%D0%9A%D0%BB%D0%B5%D0%BF%D0%BF?oldid=1155282	app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Конфликт	npc:Могрул	Могрул	Могрул	Mogrul		Могрул	Источники указывают разные английские имена для одного BaseID.	https://elderscrolls.fandom.com/ru/wiki/%D0%9C%D0%BE%D0%B3%D1%80%D1%83%D0%BB_(Dragonborn)?oldid=1117485	app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Конфликт	npc:Одван	Одван	Одван	Duach	00013393	Одван	Один исходный идентификатор относится к нескольким записям проекта. Нужно установить вариант.	https://elderscrolls.fandom.com/ru/wiki/%D0%9E%D0%B4%D0%B2%D0%B0%D0%BD?oldid=1131250	app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Конфликт	npc:Скальд Старший	Скальд Старший	Скальд Старший	Skald the Elder	00013620	Скальд	Нужно уточнить регистр, прозвище или конкретную форму персонажа.	https://elderscrolls.fandom.com/ru/wiki/%D0%A1%D0%BA%D0%B0%D0%BB%D1%8C%D0%B4?oldid=1173132	app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Конфликт	npc:Урзога гра-Шугурз	Урзога гра-Шугурз	Урзога гра-Шугурз	Urzoga gra-Shugurz	000133BE	Урзога Гра-Шугурз	Нужно уточнить регистр, прозвище или конкретную форму персонажа.	https://elderscrolls.fandom.com/ru/wiki/%D0%A3%D1%80%D0%B7%D0%BE%D0%B3%D0%B0_%D0%B3%D1%80%D0%B0-%D0%A8%D1%83%D0%B3%D1%83%D1%80%D0%B7?oldid=1155304	app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Конфликт	npc:Хератар	Хератар	Хератар	Heratar	000CE089	Гератар	Нужно подтвердить личность персонажа по независимому источнику BaseID.	https://elderscrolls.fandom.com/ru/wiki/%D0%93%D0%B5%D1%80%D0%B0%D1%82%D0%B0%D1%80?oldid=1112316	app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Конфликт	npc:Хротмунд Рыжий	Хротмунд Рыжий	Хротмунд Рыжий	Hrothmund the Red		Хротмунд Красный	Нужно подтвердить личность персонажа по независимому источнику BaseID.	https://elderscrolls.fandom.com/ru/wiki/%D0%A5%D1%80%D0%BE%D1%82%D0%BC%D1%83%D0%BD%D0%B4_%D0%9A%D1%80%D0%B0%D1%81%D0%BD%D1%8B%D0%B9?oldid=1153567	app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Конфликт	npc:Эрик Грозный Убийца	Эрик Грозный Убийца	Эрик Грозный Убийца	Erik the Slayer	00065657	Эрик	Нужно уточнить регистр, прозвище или конкретную форму персонажа.	https://elderscrolls.fandom.com/ru/wiki/%D0%AD%D1%80%D0%B8%D0%BA?oldid=1151971	app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	mention:Лилия Снегоход	Лилия Снегоход	Лилия Снегоход						app/src/main/java/dev/infend/skyrimtext/LoreNpcProfiles.java
+NPC	Не проверено	mention:Фура Моррар	Фура Моррар	Фура Моррар						app/src/main/java/dev/infend/skyrimtext/LoreNpcProfiles.java
+NPC	Не проверено	npc-template:Адепт колдовства	Адепт колдовства	Адепт колдовства	Adept Conjurer					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Адепт некромантии	Адепт некромантии	Адепт некромантии	Adept Necromancer					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Алхимик	Алхимик	Алхимик	Alchemist					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Архиколдун	Архиколдун	Архиколдун	Arch Conjurer					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Архикриомант	Архикриомант	Архикриомант	Arch Cryomancer					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Архинекромант	Архинекромант	Архинекромант	Arch Necromancer					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Архипиромант	Архипиромант	Архипиромант	Arch Pyromancer					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Архиэлектромант	Архиэлектромант	Архиэлектромант	Arch Electromancer					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Бандит	Бандит	Бандит	Bandit					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Бандит-головорез	Бандит-головорез	Бандит-головорез	Bandit Thug					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Бандит-грабитель	Бандит-грабитель	Бандит-грабитель	Bandit Plunderer					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Бандит-изгой	Бандит-изгой	Бандит-изгой	Bandit Outlaw					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Бандит-лучник	Бандит-лучник	Бандит-лучник	Bandit Archer					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Бандит-маг	Бандит-маг	Бандит-маг	Bandit Wizard					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Бандит-мародёр	Бандит-мародёр	Бандит-мародёр	Bandit Marauder					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Бандит-разбойник	Бандит-разбойник	Бандит-разбойник	Bandit Highwayman					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Бард	Бард	Бард	Bard					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Беглец	Беглец	Беглец	Fugitive					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Беженец	Беженец	Беженец	Refugee					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Белый медведь	Белый медведь	Белый медведь	Snow Bear					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Благородный дракон	Благородный дракон	Благородный дракон	Revered Dragon					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Браконьер	Браконьер	Браконьер	Poacher					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Бронированный морозный тролль	Бронированный морозный тролль	Бронированный морозный тролль	Armored Frost Troll					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Вампир	Вампир	Вампир	Vampire					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Вампир Волкихара	Вампир Волкихара	Вампир Волкихара	Volkihar Vampire					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Вампир-кровопийца	Вампир-кровопийца	Вампир-кровопийца	Blooded Vampire					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Вампир-мастер	Вампир-мастер	Вампир-мастер	Master Vampire					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Вампир-новобранец	Вампир-новобранец	Вампир-новобранец	Vampire Fledgling					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Вампир-туманный	Вампир-туманный	Вампир-туманный	Mistwalker					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Ведьма	Ведьма	Ведьма	Witch					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Воин Алик'ра	Воин Алик'ра	Воин Алик'ра	Alik'r Warrior					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Волк (существо)	Волк (существо)	Волк (существо)	Wolf					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Вор	Вор	Вор	Thief					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Гаргулья-громила	Гаргулья-громила	Гаргулья-громила	Gargoyle Brute					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Гаргулья-страж	Гаргулья-страж	Гаргулья-страж	Gargoyle Sentinel					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Главарь бандитов	Главарь бандитов	Главарь бандитов	Bandit Chief					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Главарь пиратов Солстейма	Главарь пиратов Солстейма	Главарь пиратов Солстейма	Reaver Lord					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Гневный человек	Гневный человек	Гневный человек	Wrathman					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Гонец	Гонец	Гонец	Messenger					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Горящий спригган	Горящий спригган	Горящий спригган	Burnt Spriggan					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Дворянин	Дворянин	Дворянин	Noble					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Дозорный Стендарра	Дозорный Стендарра	Дозорный Стендарра	Vigilant of Stendarr					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Долинный олень	Долинный олень	Долинный олень	Vale Deer					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Долинный саблезуб	Долинный саблезуб	Долинный саблезуб	Vale Sabre Cat					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Дракон	Дракон	Дракон	Dragon					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Драугр-военачальник	Драугр-военачальник	Драугр-военачальник	Draugr Deathlord					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Драугр-воин	Драугр-воин	Драугр-воин	Draugr Wight					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Драугр-главнокомандующий	Драугр-главнокомандующий	Драугр-главнокомандующий	Draugr Death Overlord					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Древний вампир	Древний вампир	Древний вампир	Ancient Vampire					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Дремора-валкиназ	Дремора-валкиназ	Дремора-валкиназ	Dremora Valkynaz					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Дремора-кинвал	Дремора-кинвал	Дремора-кинвал	Dremora Kynval					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Дремора-кинмаршер	Дремора-кинмаршер	Дремора-кинмаршер	Dremora Kynmarcher					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Дремора-кинрив	Дремора-кинрив	Дремора-кинрив	Dremora Kynreeve					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Дремора-колдун	Дремора-колдун	Дремора-колдун	Dremora Warlock					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Дремора-лорд	Дремора-лорд	Дремора-лорд	Dremora Lord					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Дремора-маркиназ	Дремора-маркиназ	Дремора-маркиназ	Dremora Markynaz					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Жнец	Жнец	Жнец	Reaper					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Жрец	Жрец	Жрец	Priest					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Закалённый фалмер	Закалённый фалмер	Закалённый фалмер	Hardened Falmer					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Заключённый	Заключённый	Заключённый	Prisoner					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Извозчик	Извозчик	Извозчик	Carriage Driver					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Изгой	Изгой	Изгой	Forsworn					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Изгой-вересковое сердце	Изгой-вересковое сердце	Изгой-вересковое сердце	Forsworn Briarheart					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Изгой-грабитель	Изгой-грабитель	Изгой-грабитель	Forsworn Pillager					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Изгой-мародёр	Изгой-мародёр	Изгой-мародёр	Forsworn Ravager					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Изгой-разведчик	Изгой-разведчик	Изгой-разведчик	Forsworn Scout					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Изгой-разрушитель	Изгой-разрушитель	Изгой-разрушитель	Forsworn Devastator					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Имперский квартирмейстер	Имперский квартирмейстер	Имперский квартирмейстер	Imperial Quartermaster					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Имперский легат	Имперский легат	Имперский легат	Imperial Legate					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Имперский офицер	Имперский офицер	Имперский офицер	Imperial Officer					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Имперский палач	Имперский палач	Имперский палач	Imperial Headsman					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Имперский солдат	Имперский солдат	Имперский солдат	Imperial Soldier					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Квартирмейстер Братьев Бури	Квартирмейстер Братьев Бури	Квартирмейстер Братьев Бури	Stormcloak Quartermaster					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Колдун	Колдун	Колдун	Conjurer					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Колдун-мастер	Колдун-мастер	Колдун-мастер	Master Conjurer					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Командир Братьев Бури	Командир Братьев Бури	Командир Братьев Бури	Stormcloak Commander					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Кор	Кор	Кор	Chaurus					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Кор-жнец	Кор-жнец	Кор-жнец	Chaurus Reaper					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Кор-охотник	Кор-охотник	Кор-охотник	Chaurus Hunter					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Криомант	Криомант	Криомант	Cryomancer					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Кузнец	Кузнец	Кузнец	Blacksmith					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Культист Мирака	Культист Мирака	Культист Мирака	Cultist					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Курьер	Курьер	Курьер	Courier					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Ледяной волк	Ледяной волк	Ледяной волк	Ice Wolf					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Ледяной маг	Ледяной маг	Ледяной маг	Ice Mage					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Лесоруб	Лесоруб	Лесоруб	Woodcutter					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Маг молний	Маг молний	Маг молний	Storm Mage					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Мать дымков	Мать дымков	Мать дымков	Wispmother					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Морозный великан	Морозный великан	Морозный великан	Frost Giant					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Морозный дракон	Морозный дракон	Морозный дракон	Frost Dragon					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Моряк	Моряк	Моряк	Sailor					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Наёмник	Наёмник	Наёмник	Mercenary					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Наёмник Восточной имперской компании	Наёмник Восточной имперской компании	Наёмник Восточной имперской компании	East Empire Company Mercenary					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Наёмный головорез	Наёмный головорез	Наёмный головорез	Hired Thug					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Некромант	Некромант	Некромант	Necromancer					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Некромант-мастер	Некромант-мастер	Некромант-мастер	Master Necromancer					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Нищий	Нищий	Нищий	Beggar					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Оборотень	Оборотень	Оборотень	Werewolf					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Огненный маг	Огненный маг	Огненный маг	Fire Mage					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Огонёк	Огонёк	Огонёк	Wisp					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Офицер Братьев Бури	Офицер Братьев Бури	Офицер Братьев Бури	Stormcloak Officer					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Охотник	Охотник	Охотник	Hunter					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Охотник Серебряной Руки	Охотник Серебряной Руки	Охотник Серебряной Руки	Silver Hand					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Охотник Стражи Рассвета	Охотник Стражи Рассвета	Охотник Стражи Рассвета	Dawnguard					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Паломник	Паломник	Паломник	Pilgrim					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Пират	Пират	Пират	Pirate					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Пират Солстейма	Пират Солстейма	Пират Солстейма	Reaver					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Пиромант	Пиромант	Пиромант	Pyromancer					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Повар	Повар	Повар	Cook					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Призрак	Призрак	Призрак	Ghost					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Путешественник	Путешественник	Путешественник	Traveler					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Рабочий	Рабочий	Рабочий	Worker					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Риклинг	Риклинг	Риклинг	Riekling					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Риклинг-воин	Риклинг-воин	Риклинг-воин	Riekling Warrior					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Риклинг-всадник	Риклинг-всадник	Риклинг-всадник	Riekling Rider					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Рыбак	Рыбак	Рыбак	Fisherman					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Скелет-лучник	Скелет-лучник	Скелет-лучник	Skeleton Archer					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Скелет-маг	Скелет-маг	Скелет-маг	Skeleton Mage					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Скрытень	Скрытень	Скрытень	Lurker					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Слуга	Слуга	Слуга	Servant					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Солдат Братьев Бури	Солдат Братьев Бури	Солдат Братьев Бури	Stormcloak Soldier					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Солдат Талмора	Солдат Талмора	Солдат Талмора	Thalmor Soldier					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Спригган-земная мать	Спригган-земная мать	Спригган-земная мать	Spriggan Earth Mother					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Стражник	Стражник	Стражник	Guard					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Стражник Вайтрана	Стражник Вайтрана	Стражник Вайтрана	Whiterun Guard					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Стражник Виндхельма	Стражник Виндхельма	Стражник Виндхельма	Windhelm Guard					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Стражник Винтерхолда	Стражник Винтерхолда	Стражник Винтерхолда	Winterhold Guard					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Стражник Вороньей Скалы	Стражник Вороньей Скалы	Стражник Вороньей Скалы	Raven Rock Guard					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Стражник Восточной имперской компании	Стражник Восточной имперской компании	Стражник Восточной имперской компании	East Empire Company Guard					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Стражник Данстара	Стражник Данстара	Стражник Данстара	Dawnstar Guard					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Стражник Маркарта	Стражник Маркарта	Стражник Маркарта	Markarth Guard					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Стражник Морфала	Стражник Морфала	Стражник Морфала	Morthal Guard					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Стражник Рифтена	Стражник Рифтена	Стражник Рифтена	Riften Guard					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Стражник Солитьюда	Стражник Солитьюда	Стражник Солитьюда	Solitude Guard					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Стражник Соловьёв	Стражник Соловьёв	Стражник Соловьёв	Nightingale Sentinel					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Стражник Фолкрита	Стражник Фолкрита	Стражник Фолкрита	Falkreath Guard					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Странствующий торговец	Странствующий торговец	Странствующий торговец	Peddler					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Талморский маг	Талморский маг	Талморский маг	Thalmor Wizard					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Талморский стражник	Талморский стражник	Талморский стражник	Thalmor Guard					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Талморский юстициар	Талморский юстициар	Талморский юстициар	Thalmor Justiciar					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Телохранитель	Телохранитель	Телохранитель	Bodyguard					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Торговец	Торговец	Торговец	Merchant					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Трактирщик	Трактирщик	Трактирщик	Innkeeper					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Трэлл Волкихара	Трэлл Волкихара	Трэлл Волкихара	Volkihar Thrall					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Трэлл вампира	Трэлл вампира	Трэлл вампира	Vampire Thrall					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Убийца Мораг Тонг	Убийца Мораг Тонг	Убийца Мораг Тонг	Morag Tong Assassin					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Убийца Тёмного Братства	Убийца Тёмного Братства	Убийца Тёмного Братства	Dark Brotherhood Assassin					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Ученик колдуна	Ученик колдуна	Ученик колдуна	Apprentice Conjurer					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Ученик некроманта	Ученик некроманта	Ученик некроманта	Apprentice Necromancer					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Фалмер-военачальник	Фалмер-военачальник	Фалмер-военачальник	Falmer Warmonger					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Фалмер-воитель	Фалмер-воитель	Фалмер-воитель	Falmer Shadowmaster					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Фалмер-лучник	Фалмер-лучник	Фалмер-лучник	Falmer Archer					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Фалмер-мракобес	Фалмер-мракобес	Фалмер-мракобес	Falmer Gloomlurker					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Фалмер-скрытень	Фалмер-скрытень	Фалмер-скрытень	Falmer Skulker					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Фалмер-сумеречный	Фалмер-сумеречный	Фалмер-сумеречный	Falmer Nightprowler					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Фалмер-шаман	Фалмер-шаман	Фалмер-шаман	Falmer Shaman					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Фермер	Фермер	Фермер	Farmer					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Хранитель Каирна Душ	Хранитель Каирна Душ	Хранитель Каирна Душ	Keeper					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Шаман изгоев	Шаман изгоев	Шаман изгоев	Forsworn Shaman					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Шахтёр	Шахтёр	Шахтёр	Miner					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc-template:Электромант	Электромант	Электромант	Electromancer					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Агент Лоркалина	Агент Лоркалина	Агент Лоркалина						app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Азура	Азура	Азура						app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Айнетах	Айнетах	Айнетах						app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Алетий	Алетий	Алетий	Alethius					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Альва	Альва	Альва						app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Альвида	Альвида	Альвида	Alvide					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Альдинг	Альдинг	Альдинг	Alding					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Амонд Мотьер	Амонд Мотьер	Амонд Мотьер						app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Ангренор Некогда Чтимый	Ангренор Некогда Чтимый	Ангренор Некогда Чтимый						app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Асфур	Асфур	Асфур						app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Атар	Атар	Атар						app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Ахкари	Ахкари	Ахкари						app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Ахлам	Ахлам	Ахлам						app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Ахтар	Ахтар	Ахтар						app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Аэри	Аэри	Аэри						app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Ая Аррия	Ая Аррия	Ая Аррия						app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Балбаг гро-Нолоб	Балбаг гро-Нолоб	Балбаг гро-Нолоб						app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Балбус	Балбус	Балбус						app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Бассиан Аксий	Бассиан Аксий	Бассиан Аксий						app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Белхимак	Белхимак	Белхимак						app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Бенкум	Бенкум	Бенкум	Benkum					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Болар	Болар	Болар						app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Бор	Бор	Бор						app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Боргни	Боргни	Боргни						app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Боэтия	Боэтия	Боэтия						app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Вальдар	Вальдар	Вальдар	Valdar					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Вермина	Вермина	Вермина						app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Вернер Каменная Рука	Вернер Каменная Рука	Вернер Каменная Рука						app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Верховный король Торигг	Верховный король Торигг	Верховный король Торигг	High King Torygg					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Виртур	Виртур	Виртур						app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Волк	Волк	Волк	Volk					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Вослаарум	Вослаарум	Вослаарум						app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Вулжотнак	Вулжотнак	Вулжотнак						app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Вултурьйол	Вултурьйол	Вултурьйол						app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Гаморз	Гаморз	Гаморз	Ghamorz					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Ганна Уриель	Ганна Уриель	Ганна Уриель	Ganna Uriel					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Гарах	Гарах	Гарах	Garakh					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Гейрмунд	Гейрмунд	Гейрмунд						app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Гелебор	Гелебор	Гелебор						app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Гемма Уриель	Гемма Уриель	Гемма Уриель	Gemma Uriel					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Гестур Камнелом	Гестур Камнелом	Гестур Камнелом	Gestur Rockbreaker					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Гилфре	Гилфре	Гилфре						app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Гоннар Дающий Клятву	Гоннар Дающий Клятву	Гоннар Дающий Клятву	Gonnar Oath-Giver					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Горбаш Железная Рука	Горбаш Железная Рука	Горбаш Железная Рука						app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Грациан Кареллий	Грациан Кареллий	Грациан Кареллий						app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Грелка	Грелка	Грелка						app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Гул	Гул	Гул	Gul					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Гуньяр	Гуньяр	Гуньяр	Gunjar					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Гуньяр (Озёрное)	Гуньяр (Озёрное)	Гуньяр (Озёрное)						app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Гхак	Гхак	Гхак	Ghak					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Деор Лесоруб	Деор Лесоруб	Деор Лесоруб						app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Дервенин	Дервенин	Дервенин						app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Джала	Джала	Джала						app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Дирдж	Дирдж	Дирдж						app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Дравиния Каменная Ткачиха	Дравиния Каменная Ткачиха	Дравиния Каменная Ткачиха	Dravynea the Stoneweaver					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Дурак	Дурак	Дурак						app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Жуанн Манетт	Жуанн Манетт	Жуанн Манетт						app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Жюльенна Лилвив	Жюльенна Лилвив	Жюльенна Лилвив	Julienne Lylvieve					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Зайнаби	Зайнаби	Зайнаби	Zaynabi					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Илас-Теи	Илас-Теи	Илас-Теи						app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Ингол	Ингол	Ингол	Yngol					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Ирса	Ирса	Ирса	Yrsa					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Исграмор	Исграмор	Исграмор						app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Исграмор (пёс)	Исграмор (пёс)	Исграмор (пёс)						app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Исран	Исран	Исран						app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Истар Разрушитель Курганов	Истар Разрушитель Курганов	Истар Разрушитель Курганов	Istar Cairn-Breaker					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Йисра	Йисра	Йисра						app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Йод	Йод	Йод						app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Йонна	Йонна	Йонна						app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Кай Мокрая Рукоять	Кай Мокрая Рукоять	Кай Мокрая Рукоять	Kai Wet-Pommel					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Кайе	Кайе	Кайе	Kaie					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Капитан Велет	Капитан Велет	Капитан Велет	Captain Veleth					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Капитан Метиллий	Капитан Метиллий	Капитан Метиллий						app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Карита	Карита	Карита						app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Карита (паломница)	Карита (паломница)	Карита (паломница)						app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Клавикус Вайл	Клавикус Вайл	Клавикус Вайл						app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Корналус	Корналус	Корналус	Kornalus					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Ку Сит	Ку Сит	Ку Сит						app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Курвиа Лорей	Курвиа Лорей	Курвиа Лорей	Curwe					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Куст	Куст	Куст						app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Кьелд	Кьелд	Кьелд						app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Кьелд Младший	Кьелд Младший	Кьелд Младший	Kjeld the Younger					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Легат Констанций Титулей	Легат Констанций Титулей	Легат Констанций Титулей	Legate Constantius Tituleius					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Легат Таурин Дуйлий	Легат Таурин Дуйлий	Легат Таурин Дуйлий	Legate Taurinus Duilis					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Легат Фасендил	Легат Фасендил	Легат Фасендил	Legate Fasendil					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Лейфнар	Лейфнар	Лейфнар	Leifnarr					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Леонара Арий	Леонара Арий	Леонара Арий	Leonara Arius					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Леонтий Сальвий	Леонтий Сальвий	Леонтий Сальвий	Leontius Salvius					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Лигрлейд	Лигрлейд	Лигрлейд	Lygrleid					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Линли Звёздная Песня	Линли Звёздная Песня	Линли Звёздная Песня	Lynly Star-Sung					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Лисл	Лисл	Лисл	Liesl					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Лу'а аль-Скавен	Лу'а аль-Скавен	Лу'а аль-Скавен	Lu'ah Al-Skaven					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Малакат	Малакат	Малакат						app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Мать Ночи	Мать Ночи	Мать Ночи	Night Mother					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Мах	Мах	Мах	Mahk					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Медреси Дран	Медреси Дран	Медреси Дран	Medresi Dran					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Мелка	Мелка	Мелка	Melka					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Мена	Мена	Мена						app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Меридия	Меридия	Меридия						app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Мерунес Дагон	Мерунес Дагон	Мерунес Дагон						app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Мефала	Мефала	Мефала						app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Миллиус	Миллиус	Миллиус	Millius					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Милор Иент	Милор Иент	Милор Иент	Milore Ienth					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Могдурз	Могдурз	Могдурз						app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Молаг Бал	Молаг Бал	Молаг Бал						app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Молгром Дважды Убитый	Молгром Дважды Убитый	Молгром Дважды Убитый						app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Молл	Молл	Молл						app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Морик Сидрей	Морик Сидрей	Морик Сидрей	Moric Sidrey					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Муйри	Муйри	Муйри						app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Нааслаарум	Нааслаарум	Нааслаарум						app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Намира	Намира	Намира						app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Нения	Нения	Нения						app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Нийа	Нийа	Нийа	Niyya					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Никул	Никул	Никул						app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Нирья	Нирья	Нирья						app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Ноктюрнал	Ноктюрнал	Ноктюрнал						app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Олур	Олур	Олур	Olur					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Ольда	Ольда	Ольда						app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Ольфрид Сын Битвы	Ольфрид Сын Битвы	Ольфрид Сын Битвы						app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Оррини Драл	Оррини Драл	Оррини Драл	Orini Dral					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Пелагий Безумный	Пелагий Безумный	Пелагий Безумный						app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Периайт	Периайт	Периайт						app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Петра	Петра	Петра	Petra					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Плаут Карван	Плаут Карван	Плаут Карван	Plautis Carvain					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Потема Септим	Потема Септим	Потема Септим						app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Прелат Атринг	Прелат Атринг	Прелат Атринг	Prelate Athring					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Прелат Нирилор	Прелат Нирилор	Прелат Нирилор	Prelate Nirilor					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Прелат Селегриат	Прелат Селегриат	Прелат Селегриат	Prelate Celegriath					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Прелат Сиданиус	Прелат Сиданиус	Прелат Сиданиус	Prelate Sidanyis					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Прелат Эдхелбор	Прелат Эдхелбор	Прелат Эдхелбор	Prelate Edhelbor					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Ралет Элдри	Ралет Элдри	Ралет Элдри	Raleth Eldri					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Раргал Повелитель Рабов	Раргал Повелитель Рабов	Раргал Повелитель Рабов	Rargal Thrallmaster					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Раэрек	Раэрек	Раэрек						app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Ригель Сильная Рука	Ригель Сильная Рука	Ригель Сильная Рука	Rigel Strong-Arm					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Рикке	Рикке	Рикке						app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Салма	Салма	Салма						app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Салония Карван	Салония Карван	Салония Карван	Salonia Carvain					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Саэрлунд	Саэрлунд	Саэрлунд						app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Свана Дальний Щит	Свана Дальний Щит	Свана Дальний Щит						app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Сванхвир	Сванхвир	Сванхвир	Swanhvir					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Сильгья	Сильгья	Сильгья						app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Слиттер	Слиттер	Слиттер	Slitter					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Сноррейд	Сноррейд	Сноррейд	Snorreid					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Согрлаф	Согрлаф	Согрлаф	Sogrlaf					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Сонд	Сонд	Сонд	Sond					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Сонд (паломник)	Сонд (паломник)	Сонд (паломник)						app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Стиг Солёная Доска	Стиг Солёная Доска	Стиг Солёная Доска	Stig Salt-Plank					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Таддгейр	Таддгейр	Таддгейр						app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Тацит Саллюстий	Тацит Саллюстий	Тацит Саллюстий						app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Тенегрив	Тенегрив	Тенегрив	Shadowmere					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Тибер	Тибер	Тибер	Tiber					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Тильда	Тильда	Тильда	Tilde					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Тильма Измождённая	Тильма Измождённая	Тильма Измождённая						app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Тит Мид II	Тит Мид II	Тит Мид II						app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Толан	Толан	Толан						app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Торвьор Жестокое Море	Торвьор Жестокое Море	Торвьор Жестокое Море						app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Тутул	Тутул	Тутул	Tuthul					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Улен Матрен	Улен Матрен	Улен Матрен						app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Улин	Улин	Улин	Ulyn					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Умурн	Умурн	Умурн	Umurn					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Унгриен	Унгриен	Унгриен						app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Унмид Снежный Саблезуб	Унмид Снежный Саблезуб	Унмид Снежный Саблезуб						app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Уэйл	Уэйл	Уэйл	Uaile					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Фаида	Фаида	Фаида						app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Фалькс Карий	Фалькс Карий	Фалькс Карий	Falx Carius					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Фастред	Фастред	Фастред						app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Филинджар	Филинджар	Филинджар						app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Фроркмар Разорванное Знамя	Фроркмар Разорванное Знамя	Фроркмар Разорванное Знамя	Frorkmar Banner-Torn					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Фультхейм	Фультхейм	Фультхейм						app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Фультхейм Бесстрашный	Фультхейм Бесстрашный	Фультхейм Бесстрашный	Fultheim the Fearless					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Фьола	Фьола	Фьола						app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Хабд	Хабд	Хабд	Habd					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Харкон	Харкон	Харкон						app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Харлауг	Харлауг	Харлауг	Harlaug					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Харралд	Харралд	Харралд						app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Хельги	Хельги	Хельги	Helgi					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Хермеус Мора	Хермеус Мора	Хермеус Мора						app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Хирсин	Хирсин	Хирсин						app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Ходдрид	Ходдрид	Ходдрид	Hoddreid					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Хольгейр	Хольгейр	Хольгейр						app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Хоргеир	Хоргеир	Хоргеир						app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Хранительница Карсетта	Хранительница Карсетта	Хранительница Карсетта	Keeper Carcette					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Хунрур	Хунрур	Хунрур	Hunroor					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Хьорнскар Разбивающий Головы	Хьорнскар Разбивающий Головы	Хьорнскар Разбивающий Головы	Hjornskar Head-Smasher					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Хьялфар	Хьялфар	Хьялфар	Hjalfar					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Цавани	Цавани	Цавани	Tsavani					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Црасуна	Црасуна	Црасуна	Tsrasuna					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Шеогорат	Шеогорат	Шеогорат						app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Шулаг	Шулаг	Шулаг						app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Эйдис (Фалбтарз)	Эйдис (Фалбтарз)	Эйдис (Фалбтарз)						app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Элгрим	Элгрим	Элгрим						app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Элинея Мотрен	Элинея Мотрен	Элинея Мотрен	Elynea Mothren					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Юрик Голдурсон	Юрик Голдурсон	Юрик Голдурсон						app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Ямарз	Ямарз	Ямарз						app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+NPC	Не проверено	npc:Яр гро-Гатук	Яр гро-Гатук	Яр гро-Гатук	Yar gro-Gatuk					app/src/main/java/dev/infend/skyrimtext/NpcProfiles.java
+Бестиарий	Конфликт	creature:Морозный дракон	Морозный дракон	Морозный дракон	Frost Dragon	000351C3	Морозный Дракон	Написание в архивной редакции отличается от отображаемого имени	https://elderscrolls.fandom.com/ru/wiki/%D0%9C%D0%BE%D1%80%D0%BE%D0%B7%D0%BD%D1%8B%D0%B9_%D0%B4%D1%80%D0%B0%D0%BA%D0%BE%D0%BD_(%D1%81%D1%83%D1%89%D0%B5%D1%81%D1%82%D0%B2%D0%BE)?oldid=1161389	app/src/main/java/dev/infend/skyrimtext/BestiaryCatalog.java
+Бестиарий	Не проверено	creature:Вампир	Вампир	Вампир						app/src/main/java/dev/infend/skyrimtext/BestiaryCatalog.java
+Бестиарий	Не проверено	creature:Вампир-лорд	Вампир-лорд	Вампир-лорд						app/src/main/java/dev/infend/skyrimtext/BestiaryCatalog.java
+Бестиарий	Не проверено	creature:Ведьма	Ведьма	Ведьма						app/src/main/java/dev/infend/skyrimtext/BestiaryCatalog.java
+Бестиарий	Не проверено	creature:Главарь бандитов	Главарь бандитов	Главарь бандитов						app/src/main/java/dev/infend/skyrimtext/BestiaryCatalog.java
+Бестиарий	Не проверено	creature:Двемерский паук-рабочий	Двемерский паук-рабочий	Двемерский паук-рабочий						app/src/main/java/dev/infend/skyrimtext/BestiaryCatalog.java
+Бестиарий	Не проверено	creature:Дракон	Дракон	Дракон						app/src/main/java/dev/infend/skyrimtext/BestiaryCatalog.java
+Бестиарий	Не проверено	creature:Драугр-повелитель смерти	Драугр-повелитель смерти	Драугр-повелитель смерти						app/src/main/java/dev/infend/skyrimtext/BestiaryCatalog.java
+Бестиарий	Не проверено	creature:Змеевидный дракон	Змеевидный дракон	Змеевидный дракон						app/src/main/java/dev/infend/skyrimtext/BestiaryCatalog.java
+Бестиарий	Не проверено	creature:Изгой	Изгой	Изгой						app/src/main/java/dev/infend/skyrimtext/BestiaryCatalog.java
+Бестиарий	Не проверено	creature:Изгой-вересковое сердце	Изгой-вересковое сердце	Изгой-вересковое сердце						app/src/main/java/dev/infend/skyrimtext/BestiaryCatalog.java
+Бестиарий	Не проверено	creature:Колдун	Колдун	Колдун						app/src/main/java/dev/infend/skyrimtext/BestiaryCatalog.java
+Бестиарий	Не проверено	creature:Культист Мирака	Культист Мирака	Культист Мирака						app/src/main/java/dev/infend/skyrimtext/BestiaryCatalog.java
+Бестиарий	Не проверено	creature:Лось	Лось	Лось						app/src/main/java/dev/infend/skyrimtext/BestiaryCatalog.java
+Бестиарий	Не проверено	creature:Некромант	Некромант	Некромант						app/src/main/java/dev/infend/skyrimtext/BestiaryCatalog.java
+Бестиарий	Не проверено	creature:Оборотень	Оборотень	Оборотень						app/src/main/java/dev/infend/skyrimtext/BestiaryCatalog.java
+Бестиарий	Не проверено	creature:Почитаемый дракон	Почитаемый дракон	Почитаемый дракон						app/src/main/java/dev/infend/skyrimtext/BestiaryCatalog.java
+Бестиарий	Не проверено	creature:Призванный фамильяр	Призванный фамильяр	Призванный фамильяр						app/src/main/java/dev/infend/skyrimtext/BestiaryCatalog.java
+Бестиарий	Не проверено	creature:Призрак	Призрак	Призрак						app/src/main/java/dev/infend/skyrimtext/BestiaryCatalog.java
+Бестиарий	Не проверено	creature:Разбойник	Разбойник	Разбойник						app/src/main/java/dev/infend/skyrimtext/BestiaryCatalog.java
+Бестиарий	Не проверено	creature:Риклинг	Риклинг	Риклинг						app/src/main/java/dev/infend/skyrimtext/BestiaryCatalog.java
+Бестиарий	Не проверено	creature:Риклинг-вождь	Риклинг-вождь	Риклинг-вождь						app/src/main/java/dev/infend/skyrimtext/BestiaryCatalog.java
+Бестиарий	Не проверено	creature:Снежный медведь	Снежный медведь	Снежный медведь						app/src/main/java/dev/infend/skyrimtext/BestiaryCatalog.java
+Бестиарий	Не проверено	creature:Фалмер-воин	Фалмер-воин	Фалмер-воин						app/src/main/java/dev/infend/skyrimtext/BestiaryCatalog.java
+Броня	Не проверено	armor:Аликр'ский капюшон	Аликр'ский капюшон	Аликр'ский капюшон						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Броня	Не проверено	armor:Амулет Андурса	Амулет Андурса	Амулет Андурса						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Броня	Не проверено	armor:Амулет Зенитара Шави	Амулет Зенитара Шави	Амулет Зенитара Шави						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Броня	Не проверено	armor:Амулет Талоса Огмунда	Амулет Талоса Огмунда	Амулет Талоса Огмунда						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Броня	Не проверено	armor:Амулет Талоса Раэрека	Амулет Талоса Раэрека	Амулет Талоса Раэрека						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Броня	Не проверено	armor:Богатая одежда	Богатая одежда	Богатая одежда						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Броня	Не проверено	armor:Богатая одежда (вариант за 40 септимов)	Богатая одежда (вариант за 40 септимов)	Богатая одежда (вариант за 40 септимов)						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Броня	Не проверено	armor:Богатая одежда (вариант за 45 септимов)	Богатая одежда (вариант за 45 септимов)	Богатая одежда (вариант за 45 септимов)						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Броня	Не проверено	armor:Богатая одежда (вариант за 50 септимов)	Богатая одежда (вариант за 50 септимов)	Богатая одежда (вариант за 50 септимов)						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Броня	Не проверено	armor:Богатый головной убор	Богатый головной убор	Богатый головной убор						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Броня	Не проверено	armor:Ботинки Мифического Рассвета	Ботинки Мифического Рассвета	Ботинки Мифического Рассвета						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Броня	Не проверено	armor:Вампирская броня	Вампирская броня	Вампирская броня						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Броня	Не проверено	armor:Вампирские перчатки	Вампирские перчатки	Вампирские перчатки						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Броня	Не проверено	armor:Головной убор	Головной убор	Головной убор						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Броня	Не проверено	armor:Диадема из камня	Диадема из камня	Диадема из камня						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Броня	Не проверено	armor:Диадема мага	Диадема мага	Диадема мага						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Броня	Не проверено	armor:Дорожная одежда	Дорожная одежда	Дорожная одежда						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Броня	Не проверено	armor:Жёлтая туника мальчика	Жёлтая туника мальчика	Жёлтая туника мальчика						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Броня	Не проверено	armor:Жёлтое платье девочки	Жёлтое платье девочки	Жёлтое платье девочки						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Броня	Не проверено	armor:Зелёная туника мальчика	Зелёная туника мальчика	Зелёная туника мальчика						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Броня	Не проверено	armor:Зелёное одеяние	Зелёное одеяние	Зелёное одеяние						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Броня	Не проверено	armor:Зелёное платье девочки	Зелёное платье девочки	Зелёное платье девочки						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Броня	Не проверено	armor:Капюшон	Капюшон	Капюшон						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Броня	Не проверено	armor:Капюшон вампира	Капюшон вампира	Капюшон вампира						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Броня	Не проверено	armor:Капюшон палача	Капюшон палача	Капюшон палача						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Броня	Не проверено	armor:Кожаные перчатки	Кожаные перчатки	Кожаные перчатки						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Броня	Не проверено	armor:Кожаный капюшон	Кожаный капюшон	Кожаный капюшон						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Броня	Не проверено	armor:Кольцо Калсельмо	Кольцо Калсельмо	Кольцо Калсельмо						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Броня	Не проверено	armor:Красная туника мальчика	Красная туника мальчика	Красная туника мальчика						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Броня	Не проверено	armor:Красное одеяние	Красное одеяние	Красное одеяние						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Броня	Не проверено	armor:Красное платье девочки	Красное платье девочки	Красное платье девочки						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Броня	Не проверено	armor:Монашеская ряса	Монашеская ряса	Монашеская ряса						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Броня	Не проверено	armor:Монашеская ряса с капюшоном	Монашеская ряса с капюшоном	Монашеская ряса с капюшоном						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Броня	Не проверено	armor:Наряд Шеогората	Наряд Шеогората	Наряд Шеогората						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Броня	Не проверено	armor:Наряд из «Сияющих одежд»	Наряд из «Сияющих одежд»	Наряд из «Сияющих одежд»						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Броня	Не проверено	armor:Настроечные перчатки	Настроечные перчатки	Настроечные перчатки						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Броня	Не проверено	armor:Одежда	Одежда	Одежда						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Броня	Не проверено	armor:Одежда (вариант за 10 септимов)	Одежда (вариант за 10 септимов)	Одежда (вариант за 10 септимов)						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Броня	Не проверено	armor:Одежда (вариант за 5 септимов)	Одежда (вариант за 5 септимов)	Одежда (вариант за 5 септимов)						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Броня	Не проверено	armor:Одежда Ноктюрнал	Одежда Ноктюрнал	Одежда Ноктюрнал						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Броня	Не проверено	armor:Одежда с поясом	Одежда с поясом	Одежда с поясом						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Броня	Не проверено	armor:Одеяние Адепта Коллегии	Одеяние Адепта Коллегии	Одеяние Адепта Коллегии						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Броня	Не проверено	armor:Одеяние Мифического Рассвета	Одеяние Мифического Рассвета	Одеяние Мифического Рассвета						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Броня	Не проверено	armor:Одеяние Седобородых	Одеяние Седобородых	Одеяние Седобородых						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Броня	Не проверено	armor:Одеяние Телванни (Илдари)	Одеяние Телванни (Илдари)	Одеяние Телванни (Илдари)						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Броня	Не проверено	armor:Одеяние Телванни (Нелот)	Одеяние Телванни (Нелот)	Одеяние Телванни (Нелот)						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Броня	Не проверено	armor:Одеяние вампира	Одеяние вампира	Одеяние вампира						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Броня	Не проверено	armor:Одеяние культиста	Одеяние культиста	Одеяние культиста						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Броня	Не проверено	armor:Одеяние культиста (без чар)	Одеяние культиста (без чар)	Одеяние культиста (без чар)						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Броня	Не проверено	armor:Одеяние мага	Одеяние мага	Одеяние мага						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Броня	Не проверено	armor:Одеяние псиджиков	Одеяние псиджиков	Одеяние псиджиков						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Броня	Не проверено	armor:Одеяние ученика	Одеяние ученика	Одеяние ученика						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Броня	Не проверено	armor:Ожерелье Йисры	Ожерелье Йисры	Ожерелье Йисры						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Броня	Не проверено	armor:Очарованное ожерелье	Очарованное ожерелье	Очарованное ожерелье						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Броня	Не проверено	armor:Перчатки	Перчатки	Перчатки						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Броня	Не проверено	armor:Перчатки Мифического Рассвета	Перчатки Мифического Рассвета	Перчатки Мифического Рассвета						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Броня	Не проверено	armor:Плащ паломника	Плащ паломника	Плащ паломника						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Броня	Не проверено	armor:Плащ с меховой оторочкой	Плащ с меховой оторочкой	Плащ с меховой оторочкой						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Броня	Не проверено	armor:Рваная шапка	Рваная шапка	Рваная шапка						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Броня	Не проверено	armor:Редгардская одежда	Редгардская одежда	Редгардская одежда						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Броня	Не проверено	armor:Роскошная одежда	Роскошная одежда	Роскошная одежда						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Броня	Не проверено	armor:Сапоги	Сапоги	Сапоги						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Броня	Не проверено	armor:Сапоги (вариант за 3 септима)	Сапоги (вариант за 3 септима)	Сапоги (вариант за 3 септима)						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Броня	Не проверено	armor:Сапоги (вариант за 4 септима)	Сапоги (вариант за 4 септима)	Сапоги (вариант за 4 септима)						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Броня	Не проверено	armor:Сапоги странника	Сапоги странника	Сапоги странника						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Броня	Не проверено	armor:Сапоги ученика Коллегии	Сапоги ученика Коллегии	Сапоги ученика Коллегии						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Броня	Не проверено	armor:Свадебные сандалии	Свадебные сандалии	Свадебные сандалии						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Броня	Не проверено	armor:Свадебный наряд	Свадебный наряд	Свадебный наряд						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Броня	Не проверено	armor:Серая туника мальчика	Серая туника мальчика	Серая туника мальчика						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Броня	Не проверено	armor:Серое платье девочки	Серое платье девочки	Серое платье девочки						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Броня	Не проверено	armor:Синее одеяние	Синее одеяние	Синее одеяние						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Броня	Не проверено	armor:Синее одеяние с капюшоном	Синее одеяние с капюшоном	Синее одеяние с капюшоном						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Броня	Не проверено	armor:Синее платье девочки	Синее платье девочки	Синее платье девочки						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Броня	Не проверено	armor:Синяя туника мальчика	Синяя туника мальчика	Синяя туника мальчика						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Броня	Не проверено	armor:Стальные перчатки	Стальные перчатки	Стальные перчатки						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Броня	Не проверено	armor:Стальные сапоги	Стальные сапоги	Стальные сапоги						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Броня	Не проверено	armor:Талморские перчатки	Талморские перчатки	Талморские перчатки						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Броня	Не проверено	armor:Талморское одеяние	Талморское одеяние	Талморское одеяние						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Броня	Не проверено	armor:Траурная одежда	Траурная одежда	Траурная одежда						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Броня	Не проверено	armor:Траурный головной убор	Траурный головной убор	Траурный головной убор						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Броня	Не проверено	armor:Тяжёлая броня Стражи Рассвета	Тяжёлая броня Стражи Рассвета	Тяжёлая броня Стражи Рассвета						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Броня	Не проверено	armor:Украшенное одеяние	Украшенное одеяние	Украшенное одеяние						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Броня	Не проверено	armor:Фартук кузнеца	Фартук кузнеца	Фартук кузнеца						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Броня	Не проверено	armor:Чёрное одеяние	Чёрное одеяние	Чёрное одеяние						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Броня	Не проверено	armor:Шляпа путника	Шляпа путника	Шляпа путника						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Книги	Конфликт	tome:Том заклинаний: Вызов искателя	Том заклинаний: Вызов искателя	Том заклинаний: Вызов искателя	Spell Tome: Conjure Seeker	XX033C67	Том заклинаний: Вызов искателя	Заклинание установлено. Название физического тома требует отдельной сверки.	https://elderscrolls.fandom.com/ru/wiki/%D0%92%D1%8B%D0%B7%D0%BE%D0%B2_%D0%B8%D1%81%D0%BA%D0%B0%D1%82%D0%B5%D0%BB%D1%8F?oldid=1070925	app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Книги	Конфликт	tome:Том заклинаний: Вызов костяного	Том заклинаний: Вызов костяного	Том заклинаний: Вызов костяного человека	Spell Tome: Conjure Boneman	XX0045B0	Том заклинаний: Вызов костяного человека	В таблице книг и в карточке заклинания или игры указаны разные названия. Вариант таблицы — Том заклинаний: Вызов костяного	https://elderscrolls.fandom.com/ru/wiki/%D0%92%D1%8B%D0%B7%D0%BE%D0%B2_%D0%BA%D0%BE%D1%81%D1%82%D1%8F%D0%BD%D0%BE%D0%B3%D0%BE_%D1%87%D0%B5%D0%BB%D0%BE%D0%B2%D0%B5%D0%BA%D0%B0?oldid=1172830	app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Книги	Конфликт	tome:Том заклинаний: Вызов туманного	Том заклинаний: Вызов туманного	Том заклинаний: Вызов туманного человека	Spell Tome: Conjure Mistman	XX0045B1	Том заклинаний: Вызов туманного человека	В таблице книг и в карточке заклинания или игры указаны разные названия. Вариант таблицы — Том заклинаний: Вызов туманного	https://elderscrolls.fandom.com/ru/wiki/%D0%92%D1%8B%D0%B7%D0%BE%D0%B2_%D1%82%D1%83%D0%BC%D0%B0%D0%BD%D0%BD%D0%BE%D0%B3%D0%BE_%D1%87%D0%B5%D0%BB%D0%BE%D0%B2%D0%B5%D0%BA%D0%B0?oldid=1170948	app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Книги	Конфликт	tome:Том заклинаний: Вызов яростного	Том заклинаний: Вызов яростного	Том заклинаний: Вызов яростного человека	Spell Tome: Conjure Wrathman	XX0045B2	Том заклинаний: Вызов яростного человека	В таблице книг и в карточке заклинания или игры указаны разные названия. Вариант таблицы — Том заклинаний: Вызов яростного	https://elderscrolls.fandom.com/ru/wiki/%D0%92%D1%8B%D0%B7%D0%BE%D0%B2_%D1%8F%D1%80%D0%BE%D1%81%D1%82%D0%BD%D0%BE%D0%B3%D0%BE_%D1%87%D0%B5%D0%BB%D0%BE%D0%B2%D0%B5%D0%BA%D0%B0?oldid=1170956	app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Книги	Конфликт	tome:Том заклинаний: Призванный кинжал	Том заклинаний: Призванный кинжал	Том заклинаний: Призванный кинжал	Spell Tome: Bound Dagger	XX01CE07	Том заклинаний: Призванный кинжал	Заклинание установлено. Название физического тома требует отдельной сверки.	https://elderscrolls.fandom.com/ru/wiki/%D0%9F%D1%80%D0%B8%D0%B7%D0%B2%D0%B0%D0%BD%D0%BD%D1%8B%D0%B9_%D0%BA%D0%B8%D0%BD%D0%B6%D0%B0%D0%BB_(Dragonborn)?oldid=1162512	app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Книги	Конфликт	tome:Том заклинаний: Проклятие вампиров	Том заклинаний: Проклятие вампиров	Том заклинаний: Бич вампиров	Spell Tome: Vampire's Bane	XX003F4D	Том заклинаний: Бич вампиров	В таблице книг и в карточке заклинания или игры указаны разные названия. Вариант таблицы — Том заклинаний: Проклятие вампиров	https://elderscrolls.fandom.com/ru/wiki/%D0%91%D0%B8%D1%87_%D0%B2%D0%B0%D0%BC%D0%BF%D0%B8%D1%80%D0%BE%D0%B2?oldid=1126266	app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Книги	Конфликт	tome:Том заклинаний: Проклятие нежити	Том заклинаний: Проклятие нежити	Том заклинаний: Проклятие нежити	Spell Tome: Bane of the Undead	000DD647	Том заклинаний: Проклятие нежити	В таблице книг и в карточке заклинания или игры указаны разные названия. Вариант таблицы — Том заклинаний: Проклятье нежити	https://elderscrolls.fandom.com/ru/wiki/%D0%9F%D1%80%D0%BE%D0%BA%D0%BB%D1%8F%D1%82%D0%B8%D0%B5_%D0%BD%D0%B5%D0%B6%D0%B8%D1%82%D0%B8?oldid=1117760	app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Книги	Конфликт	tome:Том заклинаний: Стена мороза	Том заклинаний: Стена мороза	Том заклинаний: Стена мороза		000A270A	Том заклинаний: Стена мороза	В таблице книг и в карточке заклинания или игры указаны разные названия. Вариант таблицы — Том заклинаний: Стена холода	https://elderscrolls.fandom.com/ru/wiki/%D0%9C%D0%B0%D0%B3%D0%B8%D1%8F_(Skyrim)?oldid=1168153	app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Книги	Не проверено	book:Бич Серого квартала	Бич Серого квартала	Бич Серого квартала						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Книги	Не проверено	book:Взлёт и падение Клинков	Взлёт и падение Клинков	Взлёт и падение Клинков						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Книги	Не проверено	book:Возвращение богов	Возвращение богов	Возвращение богов						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Книги	Не проверено	book:Восстание в Фёстхолде	Восстание в Фёстхолде	Восстание в Фёстхолде						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Книги	Не проверено	book:Где вы были, когда сломался Дракон?	Где вы были, когда сломался Дракон?	Где вы были, когда сломался Дракон?						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Книги	Не проверено	book:Дети свиней	Дети свиней	Дети свиней						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Книги	Не проверено	book:Души, чёрные и белые	Души, чёрные и белые	Души, чёрные и белые						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Книги	Не проверено	book:Изменившиеся	Изменившиеся	Изменившиеся						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Книги	Не проверено	book:Истоки двемерского права	Истоки двемерского права	Истоки двемерского права						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Книги	Не проверено	book:Каймервамидиум	Каймервамидиум	Каймервамидиум						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Книги	Не проверено	book:Кодекс истинного дворянина	Кодекс истинного дворянина	Кодекс истинного дворянина						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Книги	Не проверено	book:Легендарный бич	Легендарный бич	Легендарный бич						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Книги	Не проверено	book:Мать-дымка	Мать-дымка	Мать-дымка						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Книги	Не проверено	book:Небосвод	Небосвод	Небосвод						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Книги	Не проверено	book:Ошибка Талоса	Ошибка Талоса	Ошибка Талоса						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Книги	Не проверено	book:Падение Азидала	Падение Азидала	Падение Азидала						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Книги	Не проверено	book:Песни Скайрима (исправленное издание)	Песни Скайрима (исправленное издание)	Песни Скайрима (исправленное издание)						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Книги	Не проверено	book:Песнь аскельдских мужей	Песнь аскельдских мужей	Песнь аскельдских мужей						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Книги	Не проверено	book:Путешествие по миру, т. 11	Путешествие по миру, т. 11	Путешествие по миру, т. 11						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Книги	Не проверено	book:Пять далёких звёзд	Пять далёких звёзд	Пять далёких звёзд						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Книги	Не проверено	book:Разновидности верований в Империи	Разновидности верований в Империи	Разновидности верований в Империи						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Книги	Не проверено	book:Руины Кемель-Зе	Руины Кемель-Зе	Руины Кемель-Зе						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Книги	Не проверено	book:Сказание о Дро'Зире	Сказание о Дро'Зире	Сказание о Дро'Зире						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Книги	Не проверено	book:Слова ветра	Слова ветра	Слова ветра						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Книги	Не проверено	book:Старые обычаи	Старые обычаи	Старые обычаи						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Книги	Не проверено	book:Тирск: исправленная история	Тирск: исправленная история	Тирск: исправленная история						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Книги	Не проверено	book:Утраченные легенды	Утраченные легенды	Утраченные легенды						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Книги	Не проверено	book:Хранитель и предатель	Хранитель и предатель	Хранитель и предатель						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Книги	Не проверено	book:Хранитель камней	Хранитель камней	Хранитель камней						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Книги	Не проверено	book:Хронология Третьей эры	Хронология Третьей эры	Хронология Третьей эры						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Книги	Не проверено	book:Чёрная книга: Бледный регент	Чёрная книга: Бледный регент	Чёрная книга: Бледный регент						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Книги	Не проверено	book:Чёрная книга: Ветры перемен	Чёрная книга: Ветры перемен	Чёрная книга: Ветры перемен						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Книги	Не проверено	book:Чёрная книга: Нити и филигрань	Чёрная книга: Нити и филигрань	Чёрная книга: Нити и филигрань						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Книги	Не проверено	book:Чёрная книга: Острое перо	Чёрная книга: Острое перо	Чёрная книга: Острое перо						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Книги	Не проверено	book:Этериевые войны	Этериевые войны	Этериевые войны						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Книги	Не проверено	tome:Том заклинаний: Вихревой плащ	Том заклинаний: Вихревой плащ	Том заклинаний: Вихревой плащ						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Книги	Не проверено	tome:Том заклинаний: Вызов пепельного стража	Том заклинаний: Вызов пепельного стража	Том заклинаний: Вызов пепельного стража						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Книги	Не проверено	tome:Том заклинаний: Пепельная руна	Том заклинаний: Пепельная руна	Том заклинаний: Пепельная руна						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Книги	Не проверено	tome:Том заклинаний: Пепельный кокон	Том заклинаний: Пепельный кокон	Том заклинаний: Пепельная скорлупа						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Книги	Не проверено	tome:Том заклинаний: Руна бешенства	Том заклинаний: Руна бешенства	Том заклинаний: Руна бешенства						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Книги	Не проверено	tome:Том заклинаний: Ядовитая руна	Том заклинаний: Ядовитая руна	Том заклинаний: Ядовитая руна						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Локации	Конфликт	map:skyrim-170	skyrim-170	Имперский лагерь Вайтрана	Whiterun Imperial Camp		Вайтран — Имперский лагерь	Для архивного написания требуется подтверждение из второго источника.	https://elderscrolls.fandom.com/ru/wiki/%D0%92%D0%B0%D0%B9%D1%82%D1%80%D0%B0%D0%BD_%E2%80%94_%D0%98%D0%BC%D0%BF%D0%B5%D1%80%D1%81%D0%BA%D0%B8%D0%B9_%D0%BB%D0%B0%D0%B3%D0%B5%D1%80%D1%8C?oldid=1022293	app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Конфликт	map:skyrim-172	skyrim-172	Рифт: Имперский лагерь	Rift Imperial Camp		Рифт — Имперский лагерь	Требуется сверка исторического названия проекта с более новой редакцией Wiki.	https://elderscrolls.fandom.com/ru/wiki/%D0%A0%D0%B8%D1%84%D1%82_%E2%80%94_%D0%98%D0%BC%D0%BF%D0%B5%D1%80%D1%81%D0%BA%D0%B8%D0%B9_%D0%BB%D0%B0%D0%B3%D0%B5%D1%80%D1%8C?oldid=1083525	app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Конфликт	map:skyrim-173	skyrim-173	Винтерхолд: Имперский лагерь	Winterhold Imperial Camp		Винтерхолд — Имперский лагерь	Требуется сверка исторического названия проекта с более новой редакцией Wiki.	https://elderscrolls.fandom.com/ru/wiki/%D0%92%D0%B8%D0%BD%D1%82%D0%B5%D1%80%D1%85%D0%BE%D0%BB%D0%B4_%E2%80%94_%D0%98%D0%BC%D0%BF%D0%B5%D1%80%D1%81%D0%BA%D0%B8%D0%B9_%D0%BB%D0%B0%D0%B3%D0%B5%D1%80%D1%8C?oldid=1004443	app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Конфликт	map:skyrim-176	skyrim-176	Имперский лагерь Предела	Reach Imperial Camp		Предел — Имперский лагерь	Для архивного написания требуется подтверждение из второго источника.	https://elderscrolls.fandom.com/ru/wiki/%D0%9F%D1%80%D0%B5%D0%B4%D0%B5%D0%BB_%E2%80%94_%D0%98%D0%BC%D0%BF%D0%B5%D1%80%D1%81%D0%BA%D0%B8%D0%B9_%D0%BB%D0%B0%D0%B3%D0%B5%D1%80%D1%8C?oldid=1155441	app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Конфликт	map:skyrim-177	skyrim-177	Истмарк: Имперский лагерь	Eastmarch Imperial Camp		Истмарк — Имперский лагерь	Требуется сверка исторического названия проекта с более новой редакцией Wiki.	https://elderscrolls.fandom.com/ru/wiki/%D0%98%D1%81%D1%82%D0%BC%D0%B0%D1%80%D0%BA_%E2%80%94_%D0%98%D0%BC%D0%BF%D0%B5%D1%80%D1%81%D0%BA%D0%B8%D0%B9_%D0%BB%D0%B0%D0%B3%D0%B5%D1%80%D1%8C?oldid=1116771	app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Конфликт	map:skyrim-185	skyrim-185	Фолкрит: Сторожевая башня	Falkreath Watchtower		Фолкрит — Сторожевая башня	Требуется сверка исторического названия проекта с более новой редакцией Wiki.	https://elderscrolls.fandom.com/ru/wiki/%D0%A4%D0%BE%D0%BB%D0%BA%D1%80%D0%B8%D1%82_%E2%80%94_%D0%A1%D1%82%D0%BE%D1%80%D0%BE%D0%B6%D0%B5%D0%B2%D0%B0%D1%8F_%D0%B1%D0%B0%D1%88%D0%BD%D1%8F?oldid=1064057	app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Конфликт	map:skyrim-198	skyrim-198	Храм Небесной Гавани	Sky Haven Temple		Храм Небесной гавани	Нужно сопоставить историческое название пункта назначения с этапом сюжета.	https://elderscrolls.fandom.com/ru/wiki/%D0%A5%D1%80%D0%B0%D0%BC_%D0%9D%D0%B5%D0%B1%D0%B5%D1%81%D0%BD%D0%BE%D0%B9_%D0%B3%D0%B0%D0%B2%D0%B0%D0%BD%D0%B8?oldid=1180309	app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Конфликт	map:skyrim-199	skyrim-199	Маяк Солитьюда	Solitude Lighthouse		Солитьюд — Маяк	Для архивного написания требуется подтверждение из второго источника.	https://elderscrolls.fandom.com/ru/wiki/%D0%A1%D0%BE%D0%BB%D0%B8%D1%82%D1%8C%D1%8E%D0%B4_%E2%80%94_%D0%9C%D0%B0%D1%8F%D0%BA?oldid=1115882	app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Конфликт	map:skyrim-211	skyrim-211	Каменные Холмы	Stonehills		Каменные холмы	Нужно определить место, о котором идёт речь в сюжете или задании.	https://elderscrolls.fandom.com/ru/wiki/%D0%9A%D0%B0%D0%BC%D0%B5%D0%BD%D0%BD%D1%8B%D0%B5_%D1%85%D0%BE%D0%BB%D0%BC%D1%8B_(Skyrim)?oldid=1171593	app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Конфликт	map:skyrim-2279	skyrim-2279	Поместье Озёрное	Lakeview Manor		Поместье «Озёрное»	Нужно определить место, о котором идёт речь в сюжете или задании.	https://elderscrolls.fandom.com/ru/wiki/%D0%9F%D0%BE%D0%BC%D0%B5%D1%81%D1%82%D1%8C%D0%B5_%C2%AB%D0%9E%D0%B7%D1%91%D1%80%D0%BD%D0%BE%D0%B5%C2%BB?oldid=1168528	app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Конфликт	map:skyrim-2280	skyrim-2280	Поместье Уиндстад	Windstad Manor		Поместье «Уиндстад»	Нужно определить место, о котором идёт речь в сюжете или задании.	https://elderscrolls.fandom.com/ru/wiki/%D0%9F%D0%BE%D0%BC%D0%B5%D1%81%D1%82%D1%8C%D0%B5_%C2%AB%D0%A3%D0%B8%D0%BD%D0%B4%D1%81%D1%82%D0%B0%D0%B4%C2%BB?oldid=1177121	app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Конфликт	map:skyrim-27	skyrim-27	Волчий Череп	Wolfskull Cave		Пещера Волчий Череп	Нужно определить место, о котором идёт речь в сюжете или задании.	https://elderscrolls.fandom.com/ru/wiki/%D0%9F%D0%B5%D1%89%D0%B5%D1%80%D0%B0_%D0%92%D0%BE%D0%BB%D1%87%D0%B8%D0%B9_%D0%A7%D0%B5%D1%80%D0%B5%D0%BF?oldid=1145621	app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Конфликт	map:skyrim-281	skyrim-281	Святилище Тёмного Братства	Dark Brotherhood Sanctuary		Убежище Тёмного Братства	Нужно определить место, о котором идёт речь в сюжете или задании.	https://elderscrolls.fandom.com/ru/wiki/%D0%A3%D0%B1%D0%B5%D0%B6%D0%B8%D1%89%D0%B5_%D0%A2%D1%91%D0%BC%D0%BD%D0%BE%D0%B3%D0%BE_%D0%91%D1%80%D0%B0%D1%82%D1%81%D1%82%D0%B2%D0%B0_(Skyrim)?oldid=1170973	app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Конфликт	map:skyrim-287	skyrim-287	Каприз Яфета	Japhet's Folly		Каприз Иафета	Нужно определить место, о котором идёт речь в сюжете или задании.	https://elderscrolls.fandom.com/ru/wiki/%D0%9A%D0%B0%D0%BF%D1%80%D0%B8%D0%B7_%D0%98%D0%B0%D1%84%D0%B5%D1%82%D0%B0?oldid=1144824	app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Конфликт	map:skyrim-308	skyrim-308	Место крушения Гордости Тель Воса	Wreck of The Pride of Tel Vos		Место крушения «Гордости Тель Воса»	Для архивного написания требуется подтверждение из второго источника.	https://elderscrolls.fandom.com/ru/wiki/%D0%9C%D0%B5%D1%81%D1%82%D0%BE_%D0%BA%D1%80%D1%83%D1%88%D0%B5%D0%BD%D0%B8%D1%8F_%C2%AB%D0%93%D0%BE%D1%80%D0%B4%D0%BE%D1%81%D1%82%D0%B8_%D0%A2%D0%B5%D0%BB%D1%8C_%D0%92%D0%BE%D1%81%D0%B0%C2%BB?oldid=1074772	app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Конфликт	map:skyrim-316	skyrim-316	Святилище Боэтии	Sacellum of Boethiah		Часовня Боэтии	Для архивного написания требуется подтверждение из второго источника.	https://elderscrolls.fandom.com/ru/wiki/%D0%A7%D0%B0%D1%81%D0%BE%D0%B2%D0%BD%D1%8F_%D0%91%D0%BE%D1%8D%D1%82%D0%B8%D0%B8?oldid=1145856	app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Конфликт	map:skyrim-320	skyrim-320	Маркарт: Конюшни	Markarth Stables		Конюшни Маркарта	Требуется сверка исторического названия проекта с более новой редакцией Wiki.	https://elderscrolls.fandom.com/ru/wiki/%D0%9A%D0%BE%D0%BD%D1%8E%D1%88%D0%BD%D0%B8_%D0%9C%D0%B0%D1%80%D0%BA%D0%B0%D1%80%D1%82%D0%B0?oldid=1155264	app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Конфликт	map:skyrim-321	skyrim-321	Виндхельм: Конюшни	Windhelm Stables		Виндхельм — Конюшни	Требуется сверка исторического названия проекта с более новой редакцией Wiki.	https://elderscrolls.fandom.com/ru/wiki/%D0%92%D0%B8%D0%BD%D0%B4%D1%85%D0%B5%D0%BB%D1%8C%D0%BC_%E2%80%94_%D0%9A%D0%BE%D0%BD%D1%8E%D1%88%D0%BD%D0%B8?oldid=1023826	app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Конфликт	map:skyrim-324	skyrim-324	Рифтен: Конюшни	Riften Stables		Рифтен — Конюшни	Требуется сверка исторического названия проекта с более новой редакцией Wiki.	https://elderscrolls.fandom.com/ru/wiki/%D0%A0%D0%B8%D1%84%D1%82%D0%B5%D0%BD_%E2%80%94_%D0%9A%D0%BE%D0%BD%D1%8E%D1%88%D0%BD%D0%B8?oldid=1136024	app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Конфликт	map:skyrim-329	skyrim-329	Фолкрит: Лагерь Братьев Бури	Falkreath Stormcloak Camp		Фолкрит — Лагерь Братьев Бури	Требуется сверка исторического названия проекта с более новой редакцией Wiki.	https://elderscrolls.fandom.com/ru/wiki/%D0%A4%D0%BE%D0%BB%D0%BA%D1%80%D0%B8%D1%82_%E2%80%94_%D0%9B%D0%B0%D0%B3%D0%B5%D1%80%D1%8C_%D0%91%D1%80%D0%B0%D1%82%D1%8C%D0%B5%D0%B2_%D0%91%D1%83%D1%80%D0%B8?oldid=1112293	app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Конфликт	map:skyrim-330	skyrim-330	Рифт: Лагерь Братьев Бури	Rift Stormcloak Camp		Рифт — Лагерь Братьев Бури	Требуется сверка исторического названия проекта с более новой редакцией Wiki.	https://elderscrolls.fandom.com/ru/wiki/%D0%A0%D0%B8%D1%84%D1%82_%E2%80%94_%D0%9B%D0%B0%D0%B3%D0%B5%D1%80%D1%8C_%D0%91%D1%80%D0%B0%D1%82%D1%8C%D0%B5%D0%B2_%D0%91%D1%83%D1%80%D0%B8?oldid=1132677	app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Конфликт	map:skyrim-331	skyrim-331	Винтерхолд: Лагерь Братьев Бури	Winterhold Stormcloak Camp		Винтерхолд — Лагерь Братьев Бури	Требуется сверка исторического названия проекта с более новой редакцией Wiki.	https://elderscrolls.fandom.com/ru/wiki/%D0%92%D0%B8%D0%BD%D1%82%D0%B5%D1%80%D1%85%D0%BE%D0%BB%D0%B4_%E2%80%94_%D0%9B%D0%B0%D0%B3%D0%B5%D1%80%D1%8C_%D0%91%D1%80%D0%B0%D1%82%D1%8C%D0%B5%D0%B2_%D0%91%D1%83%D1%80%D0%B8?oldid=1163185	app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Конфликт	map:skyrim-332	skyrim-332	Белый Берег: Лагерь Братьев Бури	Pale Stormcloak Camp		Белый Берег — Лагерь Братьев Бури	Требуется сверка исторического названия проекта с более новой редакцией Wiki.	https://elderscrolls.fandom.com/ru/wiki/%D0%91%D0%B5%D0%BB%D1%8B%D0%B9_%D0%91%D0%B5%D1%80%D0%B5%D0%B3_%E2%80%94_%D0%9B%D0%B0%D0%B3%D0%B5%D1%80%D1%8C_%D0%91%D1%80%D0%B0%D1%82%D1%8C%D0%B5%D0%B2_%D0%91%D1%83%D1%80%D0%B8?oldid=915269	app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Конфликт	map:skyrim-333	skyrim-333	Хьялмарк: Лагерь Братьев Бури	Hjaalmarch Stormcloak Camp		Хьялмарк — Лагерь Братьев Бури	Требуется сверка исторического названия проекта с более новой редакцией Wiki.	https://elderscrolls.fandom.com/ru/wiki/%D0%A5%D1%8C%D1%8F%D0%BB%D0%BC%D0%B0%D1%80%D0%BA_%E2%80%94_%D0%9B%D0%B0%D0%B3%D0%B5%D1%80%D1%8C_%D0%91%D1%80%D0%B0%D1%82%D1%8C%D0%B5%D0%B2_%D0%91%D1%83%D1%80%D0%B8?oldid=1098851	app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Конфликт	map:skyrim-334	skyrim-334	Предел: Лагерь Братьев Бури	Reach Stormcloak Camp		Предел — Лагерь Братьев Бури	Требуется сверка исторического названия проекта с более новой редакцией Wiki.	https://elderscrolls.fandom.com/ru/wiki/%D0%9F%D1%80%D0%B5%D0%B4%D0%B5%D0%BB_%E2%80%94_%D0%9B%D0%B0%D0%B3%D0%B5%D1%80%D1%8C_%D0%91%D1%80%D0%B0%D1%82%D1%8C%D0%B5%D0%B2_%D0%91%D1%83%D1%80%D0%B8?oldid=1163793	app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Конфликт	map:skyrim-335	skyrim-335	Хаафингар: Лагерь Братьев Бури	Haafingar Stormcloak Camp		Хаафингар — Лагерь Братьев Бури	Требуется сверка исторического названия проекта с более новой редакцией Wiki.	https://elderscrolls.fandom.com/ru/wiki/%D0%A5%D0%B0%D0%B0%D1%84%D0%B8%D0%BD%D0%B3%D0%B0%D1%80_%E2%80%94_%D0%9B%D0%B0%D0%B3%D0%B5%D1%80%D1%8C_%D0%91%D1%80%D0%B0%D1%82%D1%8C%D0%B5%D0%B2_%D0%91%D1%83%D1%80%D0%B8?oldid=1145789	app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Конфликт	map:skyrim-336	skyrim-336	Вайтран: Лагерь Братьев Бури	Whiterun Stormcloak Camp		Вайтран — Лагерь Братьев Бури	Требуется сверка исторического названия проекта с более новой редакцией Wiki.	https://elderscrolls.fandom.com/ru/wiki/%D0%92%D0%B0%D0%B9%D1%82%D1%80%D0%B0%D0%BD_%E2%80%94_%D0%9B%D0%B0%D0%B3%D0%B5%D1%80%D1%8C_%D0%91%D1%80%D0%B0%D1%82%D1%8C%D0%B5%D0%B2_%D0%91%D1%83%D1%80%D0%B8?oldid=1116775	app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Конфликт	map:skyrim-357	skyrim-357	Солитьюд: Лесопилка	Solitude Sawmill		Солитьюд — Лесопилка	Требуется сверка исторического названия проекта с более новой редакцией Wiki.	https://elderscrolls.fandom.com/ru/wiki/%D0%A1%D0%BE%D0%BB%D0%B8%D1%82%D1%8C%D1%8E%D0%B4_%E2%80%94_%D0%9B%D0%B5%D1%81%D0%BE%D0%BF%D0%B8%D0%BB%D0%BA%D0%B0?oldid=1116989	app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Конфликт	map:skyrim-7	skyrim-7	Хребет Остриё Ножа	Knifepoint Ridge		Хребет Острие Ножа	Требуется сверка исторического названия проекта с более новой редакцией Wiki.	https://elderscrolls.fandom.com/ru/wiki/%D0%A5%D1%80%D0%B5%D0%B1%D0%B5%D1%82_%D0%9E%D1%81%D1%82%D1%80%D0%B8%D0%B5_%D0%9D%D0%BE%D0%B6%D0%B0?oldid=1145863	app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Конфликт	map:solstheim-2504	solstheim-2504	Пик Фрикте	Frykte Peak		Пик Фрукт	Для архивного написания требуется подтверждение из второго источника.	https://elderscrolls.fandom.com/ru/wiki/%D0%9F%D0%B8%D0%BA_%D0%A4%D1%80%D1%83%D0%BA%D1%82?oldid=1136487	app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Конфликт	map:solstheim-2516	solstheim-2516	Заброшенный дом	Abandoned Lodge		Заброшенный постоялый двор	Нужно определить место, о котором идёт речь в сюжете или задании.	https://elderscrolls.fandom.com/ru/wiki/%D0%97%D0%B0%D0%B1%D1%80%D0%BE%D1%88%D0%B5%D0%BD%D0%BD%D1%8B%D0%B9_%D0%BF%D0%BE%D1%81%D1%82%D0%BE%D1%8F%D0%BB%D1%8B%D0%B9_%D0%B4%D0%B2%D0%BE%D1%80?oldid=1019884	app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Конфликт	map:solstheim-2525	solstheim-2525	Деревня скаалов	Skaal Village		Деревня Скаалов	Нужно определить место, о котором идёт речь в сюжете или задании.	https://elderscrolls.fandom.com/ru/wiki/%D0%94%D0%B5%D1%80%D0%B5%D0%B2%D0%BD%D1%8F_%D0%A1%D0%BA%D0%B0%D0%B0%D0%BB%D0%BE%D0%B2_(Dragonborn)?oldid=1163913	app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Конфликт	map:solstheim-2533	solstheim-2533	Обломки «Стремительного шквала»	Wreck of the Strident Squall		Место крушения «Порыва ветра»	Для архивного написания требуется подтверждение из второго источника.	https://elderscrolls.fandom.com/ru/wiki/%D0%9C%D0%B5%D1%81%D1%82%D0%BE_%D0%BA%D1%80%D1%83%D1%88%D0%B5%D0%BD%D0%B8%D1%8F_%C2%AB%D0%9F%D0%BE%D1%80%D1%8B%D0%B2%D0%B0_%D0%B2%D0%B5%D1%82%D1%80%D0%B0%C2%BB?oldid=1144677	app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Конфликт	map:solstheim-2536	solstheim-2536	Колбьорн	Kolbjorn Barrow		Курган Колбьорн	Нужно определить место, о котором идёт речь в сюжете или задании.	https://elderscrolls.fandom.com/ru/wiki/%D0%9A%D1%83%D1%80%D0%B3%D0%B0%D0%BD_%D0%9A%D0%BE%D0%BB%D0%B1%D1%8C%D0%BE%D1%80%D0%BD_(Dragonborn)?oldid=1123137	app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Не проверено	atlas:Алтарь Призывателя	Алтарь Призывателя	Алтарь Призывателя						app/src/main/java/dev/infend/skyrimtext/WorldAtlas.java
+Локации	Не проверено	atlas:Болото Хьялмарка	Болото Хьялмарка	Болото Хьялмарка						app/src/main/java/dev/infend/skyrimtext/WorldAtlas.java
+Локации	Не проверено	atlas:Глотка Мрака	Глотка Мрака	Глотка Мрака						app/src/main/java/dev/infend/skyrimtext/WorldAtlas.java
+Локации	Не проверено	atlas:Дозор Стендарра	Дозор Стендарра	Дозор Стендарра						app/src/main/java/dev/infend/skyrimtext/WorldAtlas.java
+Локации	Не проверено	atlas:Пещера Утёсного Скитальца	Пещера Утёсного Скитальца	Пещера Утёсного Скитальца						app/src/main/java/dev/infend/skyrimtext/WorldAtlas.java
+Локации	Не проверено	atlas:Святилище Талоса к северо-востоку от Вайтрана	Святилище Талоса к северо-востоку от Вайтрана	Святилище Талоса к северо-востоку от Вайтрана						app/src/main/java/dev/infend/skyrimtext/WorldAtlas.java
+Локации	Не проверено	atlas:Северный проход	Северный проход	Северный проход						app/src/main/java/dev/infend/skyrimtext/WorldAtlas.java
+Локации	Не проверено	atlas:Совнгард	Совнгард	Совнгард						app/src/main/java/dev/infend/skyrimtext/WorldAtlas.java
+Локации	Не проверено	atlas:Убежище Драконьего Моста	Убежище Драконьего Моста	Убежище Драконьего Моста						app/src/main/java/dev/infend/skyrimtext/WorldAtlas.java
+Локации	Не проверено	atlas:Чёрная Гавань	Чёрная Гавань	Чёрная Гавань						app/src/main/java/dev/infend/skyrimtext/WorldAtlas.java
+Локации	Не проверено	map:skyrim-1037	skyrim-1037	Драконий курган Одинокая гора	Dragon Mound: Lone Mountain					app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Не проверено	map:skyrim-1038	skyrim-1038	Святилище Аркея 4	Shrine of Arkay 4					app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Не проверено	map:skyrim-1040	skyrim-1040	Драконий курган Вечнозелёные леса	Dragon Mound: Evergreen Woods					app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Не проверено	map:skyrim-1041	skyrim-1041	Драконий курган Желчный хребет	Dragon Mound: Bilegulch Ridge					app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Не проверено	map:skyrim-1042	skyrim-1042	Драконий курган Утёсы Теснины грабителя	Dragon Mound: Robber's Gorge Bluffs					app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Не проверено	map:skyrim-1043	skyrim-1043	Драконий курган Лес у реки Карт	Dragon Mound: Karth River Forest					app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Не проверено	map:skyrim-1044	skyrim-1044	Драконий курган 6	Dragon Mound 6					app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Не проверено	map:skyrim-1045	skyrim-1045	Драконий курган 7	Dragon Mound 7					app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Не проверено	map:skyrim-1046	skyrim-1046	Драконий курган 8	Dragon Mound 8					app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Не проверено	map:skyrim-1047	skyrim-1047	Драконий курган 9	Dragon Mound 9					app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Не проверено	map:skyrim-1048	skyrim-1048	Драконий курган 10	Dragon Mound 10					app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Не проверено	map:skyrim-13	skyrim-13	Нижняя Отвесная нора	Lower Steepfall Burrow					app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Не проверено	map:skyrim-14	skyrim-14	Южный Ноголомный проход	South Brittleshin Pass					app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Не проверено	map:skyrim-145	skyrim-145	Дрифтшейд — Приют	Driftshade Refuge					app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Не проверено	map:skyrim-155	skyrim-155	Скала Гулдун	Guldun Rock					app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Не проверено	map:skyrim-165	skyrim-165	Военный лагерь Маркарта — Империя	Markarth Military Camp					app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Не проверено	map:skyrim-166	skyrim-166	Военный лагерь Солитьюда — Империя	Solitude Military Camp					app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Не проверено	map:skyrim-167	skyrim-167	Военный лагерь Вайтрана — Империя	Whiterun Military Camp					app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Не проверено	map:skyrim-168	skyrim-168	Военный лагерь Виндхельма — Империя	Windhelm Military Camp					app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Не проверено	map:skyrim-169	skyrim-169	Военный лагерь Рифтена — Империя	Riften Military Camp					app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Не проверено	map:skyrim-171	skyrim-171	Фолкрит: Имперский лагерь	Falkreath Imperial Camp					app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Не проверено	map:skyrim-174	skyrim-174	Белый Берег: Имперский лагерь	Pale Imperial Camp					app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Не проверено	map:skyrim-175	skyrim-175	Хьялмарк: Имперский лагерь	Hjaalmarch Imperial Camp					app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Не проверено	map:skyrim-197	skyrim-197	Гильдия воров	Thieves Guild					app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Не проверено	map:skyrim-2130	skyrim-2130	Озеро Гейр	Lake Geir					app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Не проверено	map:skyrim-2131	skyrim-2131	Озеро Хонрик	Lake Honrich					app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Не проверено	map:skyrim-2132	skyrim-2132	Озеро Илиналта	Lake Ilinalta					app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Не проверено	map:skyrim-2133	skyrim-2133	Озеро Йоргрим	Lake Yorgrim					app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Не проверено	map:skyrim-217	skyrim-217	Северная горная застава	North Skybound Watch					app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Не проверено	map:skyrim-226	skyrim-226	Южный бастион Кричащий Ветер	South Shriekwind Bastion					app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Не проверено	map:skyrim-2281	skyrim-2281	Хельяркен-холл	Heljarchen Hall (HF)					app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Не проверено	map:skyrim-2289	skyrim-2289	Рунвальд — Раскопки	Ruunvald Excavation (DG)					app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Не проверено	map:skyrim-2291	skyrim-2291	Балкон замка Волкихар	Castle Volkihar Balcony (DG)					app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Не проверено	map:skyrim-2293	skyrim-2293	Переправа на Солстейм	To Solstheim (DB)					app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Не проверено	map:skyrim-23	skyrim-23	Пост Септимия Сегония	Septimus Signus's Outpost					app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Не проверено	map:skyrim-2493	skyrim-2493	Перевал Данмет	Dunmeth Pass					app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Не проверено	map:skyrim-2494	skyrim-2494	Бледный перевал	Pale Pass					app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Не проверено	map:skyrim-257	skyrim-257	Северный бастион Кричащий Ветер	North Shriekwind Bastion					app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Не проверено	map:skyrim-259	skyrim-259	Южная горная застава	South Skybound Watch					app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Не проверено	map:skyrim-272	skyrim-272	Северный проход Холодных Скал	North Cold Rock Pass					app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Не проверено	map:skyrim-2727	skyrim-2727	Врата в Хаммерфелл	Hammerfell Gate					app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Не проверено	map:skyrim-273	skyrim-273	Южный проход Холодных Скал	South Cold Rock Pass					app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Не проверено	map:skyrim-284	skyrim-284	Старый Хролдан	Old Hroldan					app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Не проверено	map:skyrim-3	skyrim-3	Теснина грабителя	Robber's Gorge					app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Не проверено	map:skyrim-305	skyrim-305	Привередливый слоад	Dainty Sload					app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Не проверено	map:skyrim-312	skyrim-312	Место крушения «Бегущего по льду»	Wreck of the Icerunner					app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Не проверено	map:skyrim-322	skyrim-322	Вайтран: Конюшни	Whiterun Stables					app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Не проверено	map:skyrim-325	skyrim-325	Военный лагерь Рифтена — Братья Бури	Riften Military Camp					app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Не проверено	map:skyrim-326	skyrim-326	Военный лагерь Солитьюда — Братья Бури	Solitude Military Camp					app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Не проверено	map:skyrim-327	skyrim-327	Военный лагерь Маркарта — Братья Бури	Markarth Military Camp					app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Не проверено	map:skyrim-328	skyrim-328	Военный лагерь Вайтрана — Братья Бури	Whiterun Military Camp					app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Не проверено	map:skyrim-355	skyrim-355	Винтерхолд	Winterhold					app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Не проверено	map:skyrim-366	skyrim-366	Драконий курган Кровавые пики	Dragon Mound: Bloodlet Peaks					app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Не проверено	map:skyrim-399	skyrim-399	Драконий курган Рорикстед	Dragon Mound: Rorikstead Resurrection					app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Не проверено	map:skyrim-406	skyrim-406	Драконий курган Озёрный перевал	Dragon Mound: Reachwater Pass					app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Не проверено	map:skyrim-428	skyrim-428	Святилище Акатоша 1	Shrine of Akatosh 1					app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Не проверено	map:skyrim-429	skyrim-429	Святилище Дибеллы 1	Shrine of Dibella 1					app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Не проверено	map:skyrim-436	skyrim-436	Драконий курган 1	Dragon Mound 1					app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Не проверено	map:skyrim-453	skyrim-453	Святилище Дибеллы 2	Shrine of Dibella 2					app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Не проверено	map:skyrim-456	skyrim-456	Святилище Кинарет	Shrine of Kynareth					app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Не проверено	map:skyrim-458	skyrim-458	Драконий курган 2	Dragon Mound 2					app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Не проверено	map:skyrim-459	skyrim-459	Святилище Талоса 1	Shrine of Talos 1					app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Не проверено	map:skyrim-460	skyrim-460	Драконий курган 3	Dragon Mound 3					app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Не проверено	map:skyrim-461	skyrim-461	Святилище Зенитара 1	Shrine of Zenithar 1					app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Не проверено	map:skyrim-462	skyrim-462	Святилище Акатоша 2	Shrine of Akatosh 2					app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Не проверено	map:skyrim-478	skyrim-478	Святилище Талоса 2	Shrine of Talos 2					app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Не проверено	map:skyrim-487	skyrim-487	Святилище Зенитара 2	Shrine of Zenithar 2					app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Не проверено	map:skyrim-488	skyrim-488	Святилище Мары 1	Shrine of Mara 1					app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Не проверено	map:skyrim-492	skyrim-492	Святилище Талоса 3	Shrine of Talos 3					app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Не проверено	map:skyrim-51	skyrim-51	Северный Ноголомный проход	North Brittleshin Pass					app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Не проверено	map:skyrim-511	skyrim-511	Святилище Акатоша 3	Shrine of Akatosh 3					app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Не проверено	map:skyrim-513	skyrim-513	Святилище Талоса 4	Shrine of Talos 4					app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Не проверено	map:skyrim-515	skyrim-515	Святилище Талоса 5	Shrine of Talos 5					app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Не проверено	map:skyrim-519	skyrim-519	Святилище Талоса 6	Shrine of Talos 6					app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Не проверено	map:skyrim-520	skyrim-520	Святилище Талоса 7	Shrine of Talos 7					app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Не проверено	map:skyrim-533	skyrim-533	Святилище Зенитара 3	Shrine of Zenithar 3					app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Не проверено	map:skyrim-542	skyrim-542	Святилище Аркея 1	Shrine of Arkay 1					app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Не проверено	map:skyrim-626	skyrim-626	Святилище Аркея 2	Shrine of Arkay 2					app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Не проверено	map:skyrim-627	skyrim-627	Драконий курган Утёсы Картспайра	Dragon Mound: Karthspire Bluffs					app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Не проверено	map:skyrim-635	skyrim-635	Драконий курган 4	Dragon Mound 4					app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Не проверено	map:skyrim-636	skyrim-636	Драконий курган 5	Dragon Mound 5					app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Не проверено	map:skyrim-669	skyrim-669	Святилище Акатоша 4	Shrine of Akatosh 4					app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Не проверено	map:skyrim-677	skyrim-677	Святилище Талоса 8	Shrine of Talos 8					app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Не проверено	map:skyrim-685	skyrim-685	Святилище Мары 2	Shrine of Mara 2					app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Не проверено	map:skyrim-691	skyrim-691	Святилище Джулианоса 1	Shrine of Julianos 1					app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Не проверено	map:skyrim-695	skyrim-695	Святилище Талоса 9	Shrine of Talos 9					app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Не проверено	map:skyrim-722	skyrim-722	Драконий курган Большой кромлех	Dragon Mound: Great Henge Resurrection					app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Не проверено	map:skyrim-735	skyrim-735	Святилище Талоса 10	Shrine of Talos 10					app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Не проверено	map:skyrim-763	skyrim-763	Святилище Зенитара 4	Shrine of Zenithar 4					app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Не проверено	map:skyrim-770	skyrim-770	Святилище Дибеллы 3	Shrine of Dibella 3					app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Не проверено	map:skyrim-771	skyrim-771	Святилище Джулианоса 2	Shrine of Julianos 2					app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Не проверено	map:skyrim-786	skyrim-786	Святилище Стендарра 1	Shrine of Stendarr 1					app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Не проверено	map:skyrim-838	skyrim-838	Святилище Аркея 3	Shrine of Arkay 3					app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Не проверено	map:skyrim-85	skyrim-85	Камни-хранители	The Guardian Stones					app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Не проверено	map:skyrim-890	skyrim-890	Драконий курган Йоргрим	Dragon Mound: Yorgrim Resurrection					app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Не проверено	map:skyrim-891	skyrim-891	Драконий курган Долина Рагнвальда	Dragon Mound: Ragnvald Vale					app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Не проверено	map:skyrim-9	skyrim-9	Тайный вход в Утёсную пещеру	Reachcliff Secret Entrance					app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Не проверено	map:skyrim-910	skyrim-910	Святилище Малаката	Shrine to Malacath					app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Не проверено	map:skyrim-922	skyrim-922	Святилище Стендарра 2	Shrine of Stendarr 2					app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Не проверено	map:skyrim-925	skyrim-925	Святилище Талоса 11	Shrine of Talos 11					app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Не проверено	map:solstheim-2517	solstheim-2517	Переправа в Скайрим	To Skyrim					app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Не проверено	map:solstheim-2529	solstheim-2529	Пепельная крепость	Ashfallow Citadel					app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Не проверено	map:solstheim-2532	solstheim-2532	Утёс Морозной Луны	Frostmoon Crag					app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Не проверено	map:solstheim-2623	solstheim-2623	Святилище Кинарет (Солстейм)	Shrine of Kynareth					app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Не проверено	map:solstheim-2624	solstheim-2624	Святилище Зенитара (Солстейм)	Shrine of Zenithar					app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Не проверено	map:solstheim-2725	solstheim-2725	Драконий курган Подножие храма	Dragon Mound: Temple Foothills					app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Локации	Не проверено	map:solstheim-2726	solstheim-2726	Драконий курган Замёрзшие отмели	Dragon Mound: Frozen Shoals					app/src/main/java/dev/infend/skyrimtext/SkyrimMapPoints.java
+Оружие	Конфликт	weapon:Боевой топор Стражи Рассвета	Боевой топор Стражи Рассвета	Боевой топор Стражи Рассвета	Dawnguard War Axe	XX00D098	Боевой топор Стражи рассвета	Регистр в заголовке статьи и в карточке различается. Требуется поле FULL игры.	https://elderscrolls.fandom.com/ru/wiki/%D0%91%D0%BE%D0%B5%D0%B2%D0%BE%D0%B9_%D1%82%D0%BE%D0%BF%D0%BE%D1%80_%D0%A1%D1%82%D1%80%D0%B0%D0%B6%D0%B8_%D0%A0%D0%B0%D1%81%D1%81%D0%B2%D0%B5%D1%82%D0%B0?oldid=1091997	app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Оружие	Не проверено	weapon:Двуручный меч Балгруфа	Двуручный меч Балгруфа	Двуручный меч Балгруфа						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Оружие	Не проверено	weapon:Железный лук	Железный лук	Железный лук						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Оружие	Не проверено	weapon:Клинок Хаафингара	Клинок Хаафингара	Клинок Хаафингара						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Оружие	Не проверено	weapon:Меч семьи Амрена	Меч семьи Амрена	Меч семьи Амрена						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Оружие	Не проверено	weapon:Походный клинок	Походный клинок	Походный клинок						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Оружие	Не проверено	weapon:Родовой топор Горбаша	Родовой топор Горбаша	Родовой топор Горбаша						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Оружие	Не проверено	weapon:Сломанный посох	Сломанный посох	Сломанный посох						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Оружие	Не проверено	weapon:Стальной лук	Стальной лук	Стальной лук						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Конфликт	item:Идеальное зелье запаса сил	Идеальное зелье запаса сил	Идеальное зелье запаса сил		00039CF3	Идеальное зелье запаса сил	Один исходный идентификатор относится к нескольким записям проекта. Нужно установить вариант.	https://elderscrolls.fandom.com/ru/wiki/%D0%97%D0%B5%D0%BB%D1%8C%D1%8F_(Skyrim)?oldid=1176657	app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Конфликт	item:Ключ от дома Фалиона	Ключ от дома Фалиона	Ключ от дома Фалиона	Key to Falion's House		Ключ от дома Фалиона	Одному названию соответствуют несколько FormID — 00108BA4, 0009E298	https://elderscrolls.fandom.com/ru/wiki/ID_%D0%BA%D0%BB%D1%8E%D1%87%D0%B5%D0%B9_(Skyrim)?oldid=1177111	app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Конфликт	item:Ключ от тюрьмы Рифтена	Ключ от тюрьмы Рифтена	Ключ от тюрьмы Рифтена	Riften Jail Key		Ключ от тюрьмы Рифтена	Одному названию соответствуют несколько FormID — 000FF787, 000612B8	https://elderscrolls.fandom.com/ru/wiki/ID_%D0%BA%D0%BB%D1%8E%D1%87%D0%B5%D0%B9_(Skyrim)?oldid=1177111	app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Конфликт	item:Ключ от усадьбы «Чёрный Вереск»	Ключ от усадьбы «Чёрный Вереск»	Ключ от усадьбы «Чёрный Вереск»				У ключа в проекте не указан замок. Возможны Black-Briar Manor Key (000FDEB7) и Black-Briar Lodge Key (0002C474). До установления принадлежности сохраняются оба ключа инвентаря.	https://elderscrolls.fandom.com/ru/wiki/ID_%D0%BA%D0%BB%D1%8E%D1%87%D0%B5%D0%B9_(Skyrim)?oldid=1177111	app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Конфликт	item:Крепкое зелье запаса сил	Крепкое зелье запаса сил	Крепкое зелье запаса сил		00039CF3	Крепкое зелье запаса сил	Один исходный идентификатор относится к нескольким записям проекта. Нужно установить вариант.	https://elderscrolls.fandom.com/ru/wiki/%D0%97%D0%B5%D0%BB%D1%8C%D1%8F_(Skyrim)?oldid=1176657	app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Конфликт	item:Микстура иллюзии	Микстура иллюзии	Микстура иллюзии		0003994E	Микстура иллюзии	Один исходный идентификатор относится к нескольким записям проекта. Нужно установить вариант.	https://elderscrolls.fandom.com/ru/wiki/%D0%97%D0%B5%D0%BB%D1%8C%D1%8F_(Skyrim)?oldid=1176657	app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Конфликт	item:Эликсир меткости	Эликсир меткости	Эликсир меткости		0003994E	Эликсир меткости	Один исходный идентификатор относится к нескольким записям проекта. Нужно установить вариант.	https://elderscrolls.fandom.com/ru/wiki/%D0%97%D0%B5%D0%BB%D1%8C%D1%8F_(Skyrim)?oldid=1176657	app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Амулет Аркея Андурса	Амулет Аркея Андурса	Амулет Аркея Андурса						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Амулет Талоса Роггвира	Амулет Талоса Роггвира	Амулет Талоса Роггвира						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Аргонианское кровавое вино	Аргонианское кровавое вино	Аргонианское кровавое вино						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Бивень моржа	Бивень моржа	Бивень моржа						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Блюдо	Блюдо	Блюдо						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Большой камень душ (заполненный)	Большой камень душ (заполненный)	Большой камень душ (заполненный)						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Бритва Мерунеса	Бритва Мерунеса	Бритва Мерунеса						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Булава Молаг Бала	Булава Молаг Бала	Булава Молаг Бала						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Ведро	Ведро	Ведро						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Великий камень душ (заполненный)	Великий камень душ (заполненный)	Великий камень душ (заполненный)						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Вилы	Вилы	Вилы						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Вирулентный яд антимагии	Вирулентный яд антимагии	Вирулентный яд антимагии						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Вирулентный яд невосполнения	Вирулентный яд невосполнения	Вирулентный яд невосполнения						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Главный ключ от Катарии	Главный ключ от Катарии	Главный ключ от Катарии						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Горшок	Горшок	Горшок						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Двемерская посуда	Двемерская посуда	Двемерская посуда						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Двемерская сковорода	Двемерская сковорода	Двемерская сковорода						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Двемерская сковорода (большая)	Двемерская сковорода (большая)	Двемерская сковорода (большая)						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Двемерская тарелка	Двемерская тарелка	Двемерская тарелка						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Двемерская чашка	Двемерская чашка	Двемерская чашка						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Деревянный половник	Деревянный половник	Деревянный половник						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Документы Братьев Бури	Документы Братьев Бури	Документы Братьев Бури						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Древесный уголь	Древесный уголь	Древесный уголь						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Древний свиток	Древний свиток	Древний свиток						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Железный драконий коготь	Железный драконий коготь	Железный драконий коготь						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Зазубренная кирка	Зазубренная кирка	Зазубренная кирка						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Запечатанное письмо Амонда Мотьера	Запечатанное письмо Амонда Мотьера	Запечатанное письмо Амонда Мотьера						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Записка искателя сокровищ	Записка искателя сокровищ	Записка искателя сокровищ						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Записки Алезия	Записки Алезия	Записки Алезия						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Звезда Азуры	Звезда Азуры	Звезда Азуры						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Зелье крови	Зелье крови	Зелье крови						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Имперские документы	Имперские документы	Имперские документы						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Ингредиенты Балбуса	Ингредиенты Балбуса	Ингредиенты Балбуса						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Инструмент для бальзамирования	Инструмент для бальзамирования	Инструмент для бальзамирования						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Испорченная книга	Испорченная книга	Испорченная книга						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Клинок Горя	Клинок Горя	Клинок Горя						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Ключ Гловера от гильдии	Ключ Гловера от гильдии	Ключ Гловера от гильдии						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Ключ Рунвальда	Ключ Рунвальда	Ключ Рунвальда						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Ключ от «Пьяного нетча»	Ключ от «Пьяного нетча»	Ключ от «Пьяного нетча»						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Ключ от Бенконгерика	Ключ от Бенконгерика	Ключ от Бенконгерика						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Ключ от аптеки Тел-Митрина	Ключ от аптеки Тел-Митрина	Ключ от аптеки Тел-Митрина						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Ключ от большого зала скаалов	Ключ от большого зала скаалов	Ключ от большого зала скаалов						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Ключ от гробницы Вороньей Скалы	Ключ от гробницы Вороньей Скалы	Ключ от гробницы Вороньей Скалы						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Ключ от длинного дома Картвастена	Ключ от длинного дома Картвастена	Ключ от длинного дома Картвастена						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Ключ от дома Алоров	Ключ от дома Алоров	Ключ от дома Алоров						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Ключ от дома Балдора	Ключ от дома Балдора	Ключ от дома Балдора						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Ключ от дома Гловера Мэллори	Ключ от дома Гловера Мэллори	Ключ от дома Гловера Мэллори						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Ключ от дома Денгейра	Ключ от дома Денгейра	Ключ от дома Денгейра						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Ключ от дома Деора	Ключ от дома Деора	Ключ от дома Деора						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Ключ от дома Каэреллиев	Ключ от дома Каэреллиев	Ключ от дома Каэреллиев						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Ключ от дома Морвен	Ключ от дома Морвен	Ключ от дома Морвен						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Ключ от дома Ослафа	Ключ от дома Ослафа	Ключ от дома Ослафа						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Ключ от дома Эдлы	Ключ от дома Эдлы	Ключ от дома Эдлы						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Ключ от заброшенного жилища	Ключ от заброшенного жилища	Ключ от заброшенного жилища						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Ключ от замка Карстаага	Ключ от замка Карстаага	Ключ от замка Карстаага						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Ключ от зачарователя посохов	Ключ от зачарователя посохов	Ключ от зачарователя посохов						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Ключ от источника Красноводного логова	Ключ от источника Красноводного логова	Ключ от источника Красноводного логова						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Ключ от кабинета Восточной имперской компании	Ключ от кабинета Восточной имперской компании	Ключ от кабинета Восточной имперской компании						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Ключ от клетки Мерилар	Ключ от клетки Мерилар	Ключ от клетки Мерилар						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Ключ от кургана Гильденхул	Ключ от кургана Гильденхул	Ключ от кургана Гильденхул						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Ключ от кургана Пыльного	Ключ от кургана Пыльного	Ключ от кургана Пыльного						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Ключ от кухни Тел-Митрина	Ключ от кухни Тел-Митрина	Ключ от кухни Тел-Митрина						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Ключ от лесопилки «Полумесяц»	Ключ от лесопилки «Полумесяц»	Ключ от лесопилки «Полумесяц»						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Ключ от маяка Хабда	Ключ от маяка Хабда	Ключ от маяка Хабда						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Ключ от подсобных помещений Красноводного логова	Ключ от подсобных помещений Красноводного логова	Ключ от подсобных помещений Красноводного логова						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Ключ от поместья Морвейнов	Ключ от поместья Морвейнов	Ключ от поместья Морвейнов						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Ключ от поместья Северинов	Ключ от поместья Северинов	Ключ от поместья Северинов						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Ключ от сейфа Северинов	Ключ от сейфа Северинов	Ключ от сейфа Северинов						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Ключ от сокровищницы	Ключ от сокровищницы	Ключ от сокровищницы						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Ключ от сундука Вендила Уллена	Ключ от сундука Вендила Уллена	Ключ от сундука Вендила Уллена						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Ключ от тайников Стражи Рассвета	Ключ от тайников Стражи Рассвета	Ключ от тайников Стражи Рассвета						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Ключ от тюрьмы Вороньей Скалы	Ключ от тюрьмы Вороньей Скалы	Ключ от тюрьмы Вороньей Скалы						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Ключ от фермы «Мёртвый свет»	Ключ от фермы «Мёртвый свет»	Ключ от фермы «Мёртвый свет»						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Ключ от фермы Иент	Ключ от фермы Иент	Ключ от фермы Иент						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Ключ от фермы Феллстар	Ключ от фермы Феллстар	Ключ от фермы Феллстар						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Ключ от форта Морозного Мотылька	Ключ от форта Морозного Мотылька	Ключ от форта Морозного Мотылька						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Ключ от храма Вороньей Скалы	Ключ от храма Вороньей Скалы	Ключ от храма Вороньей Скалы						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Ключ от храма Мирака	Ключ от храма Мирака	Ключ от храма Мирака						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Ключ от шахты Вороньей Скалы	Ключ от шахты Вороньей Скалы	Ключ от шахты Вороньей Скалы						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Ключ от шахты Сидна	Ключ от шахты Сидна	Ключ от шахты Сидна						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Ключ управляющего Тел-Митрина	Ключ управляющего Тел-Митрина	Ключ управляющего Тел-Митрина						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Коготь костяного ястреба	Коготь костяного ястреба	Коготь костяного ястреба						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Кожаные полоски	Кожаные полоски	Кожаные полоски						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Кокон паука-альбиноса	Кокон паука-альбиноса	Кокон паука-альбиноса						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Кольцо Хирсина	Кольцо Хирсина	Кольцо Хирсина						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Корень жаррина	Корень жаррина	Корень жаррина						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Корзина	Корзина	Корзина						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Корзина с цветами	Корзина с цветами	Корзина с цветами						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Крохотный камень душ (заполненный)	Крохотный камень душ (заполненный)	Крохотный камень душ (заполненный)						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Кружка	Кружка	Кружка						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Кубок	Кубок	Кубок						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Кувшин	Кувшин	Кувшин						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Кузнечные меха	Кузнечные меха	Кузнечные меха						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Кулон погибшей путницы	Кулон погибшей путницы	Кулон погибшей путницы						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Лечебное зелье	Лечебное зелье	Лечебное зелье						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Лопата	Лопата	Лопата						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Лососевая икра	Лососевая икра	Лососевая икра						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Лук Ауриэля	Лук Ауриэля	Лук Ауриэля						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Маленький камень душ (заполненный)	Маленький камень душ (заполненный)	Маленький камень душ (заполненный)						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Малый камень душ (заполненный)	Малый камень душ (заполненный)	Малый камень душ (заполненный)						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Маска Мирака	Маска Мирака	Маска Мирака						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Медовуха Хоннинга	Медовуха Хоннинга	Медовуха Хоннинга						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Медовуха Чёрного Вереска	Медовуха Чёрного Вереска	Медовуха Чёрного Вереска						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Меч Мерунеса	Меч Мерунеса	Меч Мерунеса						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Микстура бодрости	Микстура бодрости	Микстура бодрости						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Миска	Миска	Миска						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Молот Волендранг	Молот Волендранг	Волендранг						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Молоток	Молоток	Молоток						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Морозная мирриам	Морозная мирриам	Морозная мирриам						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Мох императорского зонтика	Мох императорского зонтика	Мох императорского зонтика						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Необычный камень	Необычный камень	Необычный камень						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Обычный камень душ (заполненный)	Обычный камень душ (заполненный)	Обычный камень душ (заполненный)						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Окровавленная кружка	Окровавленная кружка	Окровавленная кружка						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Оленья шкура	Оленья шкура	Оленья шкура						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Осколки Вутрада	Осколки Вутрада	Осколки Вутрада						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Осколки лезвия Бритвы Мерунеса	Осколки лезвия Бритвы Мерунеса	Осколки лезвия Бритвы Мерунеса						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Осколок камня душ	Осколок камня душ	Осколок камня душ						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Охладитель	Охладитель	Охладитель						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Пепельная медовуха	Пепельная медовуха	Пепельная медовуха						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Перья костяного ястреба	Перья костяного ястреба	Перья костяного ястреба						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Письмо Септимия	Письмо Септимия	Письмо Септимия						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Письмо Торкильда	Письмо Торкильда	Письмо Торкильда						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Письмо о пленных	Письмо о пленных	Письмо о пленных						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Планы Серебряной Руки	Планы Серебряной Руки	Планы Серебряной Руки						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Плетёный хлеб	Плетёный хлеб	Плетёный хлеб						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Повреждённая Звезда Азуры	Повреждённая Звезда Азуры	Повреждённая Звезда Азуры						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Подсвечник	Подсвечник	Подсвечник						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Похищенное кольцо	Похищенное кольцо	Похищенное кольцо						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Похищенный амулет	Похищенный амулет	Похищенный амулет						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Похлёбка из моллюсков	Похлёбка из моллюсков	Похлёбка из моллюсков						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Приглашение в музей Данстара	Приглашение в музей Данстара	Приглашение в музей Данстара						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Приготовленное мясо кабана	Приготовленное мясо кабана	Приготовленное мясо кабана						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Приказ Талмора	Приказ Талмора	Приказ Талмора						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Приказ Тёмного Братства	Приказ Тёмного Братства	Приказ Тёмного Братства						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Припасы Стражи Рассвета	Припасы Стражи Рассвета	Припасы Стражи Рассвета						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Пряное вино	Пряное вино	Пряное вино						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Пустая бутылка вина	Пустая бутылка вина	Пустая бутылка вина						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Разрушитель Заклинаний	Разрушитель Заклинаний	Разрушитель Заклинаний						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Распоряжения Линоита	Распоряжения Линоита	Распоряжения Линоита						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Распоряжения Салии	Распоряжения Салии	Распоряжения Салии						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Распоряжения Хакара	Распоряжения Хакара	Распоряжения Хакара						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Резерв Чёрного Вереска	Резерв Чёрного Вереска	Резерв Чёрного Вереска						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Роза Сангвина	Роза Сангвина	Роза Сангвина						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Ртутный слиток	Ртутный слиток	Ртутный слиток						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Сведения о Чёрной книге	Сведения о Чёрной книге	Сведения о Чёрной книге						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Скелетный ключ	Скелетный ключ	Скелетный ключ						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Сломанная рукоять железного боевого топора	Сломанная рукоять железного боевого топора	Сломанная рукоять железного боевого топора						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Сломанная рукоять железного меча	Сломанная рукоять железного меча	Сломанная рукоять железного меча						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Сломанная рукоять железной булавы	Сломанная рукоять железной булавы	Сломанная рукоять железной булавы						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Сломанная рукоять стального боевого молота	Сломанная рукоять стального боевого молота	Сломанная рукоять стального боевого молота						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Сломанная рукоять стального двуручного меча	Сломанная рукоять стального двуручного меча	Сломанная рукоять стального двуручного меча						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Сломанная рукоять стального меча	Сломанная рукоять стального меча	Сломанная рукоять стального меча						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Сломанная рукоять стальной секиры	Сломанная рукоять стальной секиры	Сломанная рукоять стальной секиры						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Сломанное лезвие железного боевого топора	Сломанное лезвие железного боевого топора	Сломанное лезвие железного боевого топора						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Сломанное лезвие стальной секиры	Сломанное лезвие стальной секиры	Сломанное лезвие стальной секиры						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Сломанное навершие железной булавы	Сломанное навершие железной булавы	Сломанное навершие железной булавы						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Сломанное навершие стального боевого молота	Сломанное навершие стального боевого молота	Сломанное навершие стального боевого молота						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Сломанный клинок железного меча	Сломанный клинок железного меча	Сломанный клинок железного меча						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Сломанный клинок стального двуручного меча	Сломанный клинок стального двуручного меча	Сломанный клинок стального двуручного меча						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Сломанный клинок стального меча	Сломанный клинок стального меча	Сломанный клинок стального меча						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Стеклянный драконий коготь	Стеклянный драконий коготь	Стеклянный драконий коготь						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Таинственная записка Братства	Таинственная записка Братства	Таинственная записка Братства						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Тарелка	Тарелка	Тарелка						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Топор дровосека	Топор дровосека	Топор дровосека						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Тотем оборотня	Тотем оборотня	Тотем оборотня						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Фляга	Фляга	Фляга						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Фонарь	Фонарь	Фонарь						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Хитин грязевого краба	Хитин грязевого краба	Хитин грязевого краба						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Чайник	Чайник	Чайник						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Чашка	Чашка	Чашка						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Человеческое мясо	Человеческое мясо	Человеческое мясо						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Череп	Череп	Череп						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Череп Порчи	Череп Порчи	Череп Порчи						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Череп костяного ястреба	Череп костяного ястреба	Череп костяного ястреба						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Чернильница	Чернильница	Чернильница						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Чугунный котёл	Чугунный котёл	Чугунный котёл						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Чужой контракт Тёмного Братства	Чужой контракт Тёмного Братства	Чужой контракт Тёмного Братства						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Чёрный камень душ (заполненный)	Чёрный камень душ (заполненный)	Чёрный камень душ (заполненный)						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Шкура Спасителя	Шкура Спасителя	Шкура Спасителя						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Шкура долинного оленя	Шкура долинного оленя	Шкура долинного оленя						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Шкура долинного саблезуба	Шкура долинного саблезуба	Шкура долинного саблезуба						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Шкура медведя	Шкура медведя	Шкура медведя						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Щипцы	Щипцы	Щипцы						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Щит Ауриэля	Щит Ауриэля	Щит Ауриэля						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Эбонитовая кольчуга	Эбонитовая кольчуга	Эбонитовая кольчуга						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Эбонитовый драконий коготь	Эбонитовый драконий коготь	Эбонитовый драконий коготь						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Эбонитовый клинок	Эбонитовый клинок	Эбонитовый клинок						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Экстрактор эссенции	Экстрактор эссенции	Экстрактор эссенции						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	item:Этериевый осколок	Этериевый осколок	Этериевый осколок						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	scroll:Свиток огненного плаща Дж'зарго	Свиток огненного плаща Дж'зарго	Свиток огненного плаща Дж'зарго						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	scroll:Свиток: Гроза	Свиток: Гроза	Свиток: Гроза						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	scroll:Свиток: Грозовой плащ	Свиток: Грозовой плащ	Свиток: Грозовой плащ						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	scroll:Свиток: Ледяная руна	Свиток: Ледяная руна	Свиток: Ледяная руна						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	scroll:Труды Шалидора: Восстановление	Труды Шалидора: Восстановление	Труды Шалидора: Восстановление						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	scroll:Труды Шалидора: Изменение	Труды Шалидора: Изменение	Труды Шалидора: Изменение						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	scroll:Труды Шалидора: Иллюзия	Труды Шалидора: Иллюзия	Труды Шалидора: Иллюзия						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	scroll:Труды Шалидора: Колдовство	Труды Шалидора: Колдовство	Труды Шалидора: Колдовство						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	scroll:Труды Шалидора: Магия	Труды Шалидора: Магия	Труды Шалидора: Магия						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Предметы	Не проверено	scroll:Труды Шалидора: Разрушение	Труды Шалидора: Разрушение	Труды Шалидора: Разрушение						app/src/main/java/dev/infend/skyrimtext/ItemCatalog.java
+Слова силы	Конфликт	word:00020E18	00020E18	Тор	TOOR	00020E18	Тор	Источники расходятся в значении слова — Пекло / Пламя	https://elderscrolls.fandom.com/ru/wiki/%D0%9E%D0%B3%D0%BD%D0%B5%D0%BD%D0%BD%D0%BE%D0%B5_%D0%B4%D1%8B%D1%85%D0%B0%D0%BD%D0%B8%D0%B5_(%D0%BA%D1%80%D0%B8%D0%BA)?oldid=993850	app/src/main/java/dev/infend/skyrimtext/ShoutLexicon.java
+Слова силы	Конфликт	word:0002F7BB	0002F7BB	WULD	WULD	0002F7BB	Вулд	Источники расходятся в написании слова — Вулд / Вульд	https://elderscrolls.fandom.com/ru/wiki/%D0%A1%D1%82%D1%80%D0%B5%D0%BC%D0%B8%D1%82%D0%B5%D0%BB%D1%8C%D0%BD%D1%8B%D0%B9_%D1%80%D1%8B%D0%B2%D0%BE%D0%BA?oldid=961744	app/src/main/java/dev/infend/skyrimtext/ShoutLexicon.java
+Слова силы	Конфликт	word:DAWNGUARD_0030D4	DAWNGUARD_0030D4	DUR	DUR	XX0030D4	Дюр	Источники расходятся в написании слова — Дюр / Дур. Источники расходятся в значении слова — Проклятье / Проклятие	https://elderscrolls.fandom.com/ru/wiki/%D0%92%D1%8B%D0%B7%D0%BE%D0%B2_%D0%94%D1%8E%D1%80%D0%BD%D0%B5%D0%B2%D0%B8%D1%80%D0%B0?oldid=1170315	app/src/main/java/dev/infend/skyrimtext/ShoutLexicon.java
+Слова силы	Конфликт	word:DAWNGUARD_007CB8	DAWNGUARD_007CB8	Ваз	VAAZ	XX007CB8	Ваз	Источники расходятся в значении слова — Вырывание / Разрыв	https://elderscrolls.fandom.com/ru/wiki/%D0%A0%D0%B0%D0%B7%D1%80%D1%8B%D0%B2_%D0%B4%D1%83%D1%88%D0%B8?oldid=1161404	app/src/main/java/dev/infend/skyrimtext/ShoutLexicon.java
+Слова силы	Конфликт	word:DRAGONBORN_0179DA	DRAGONBORN_0179DA	Ха	HAH	XX0179DA	Ха	Источники расходятся в значении слова — Разум / Ум	https://elderscrolls.fandom.com/ru/wiki/%D0%9F%D0%BE%D0%B4%D1%87%D0%B8%D0%BD%D0%B5%D0%BD%D0%B8%D0%B5_%D0%B2%D0%BE%D0%BB%D0%B8?oldid=1127061	app/src/main/java/dev/infend/skyrimtext/ShoutLexicon.java
+Слова силы	Конфликт	word:DRAGONBORN_01DF93	DRAGONBORN_01DF93	MUL	MUL	XX01DF93	Муль	Источники расходятся в написании слова — Муль / Мул	https://elderscrolls.fandom.com/ru/wiki/%D0%92%D0%BE%D0%BF%D0%BB%D0%BE%D1%89%D0%B5%D0%BD%D0%B8%D0%B5_%D0%B4%D1%80%D0%B0%D0%BA%D0%BE%D0%BD%D0%B0_(%D0%BA%D1%80%D0%B8%D0%BA)?oldid=1110861	app/src/main/java/dev/infend/skyrimtext/ShoutLexicon.java

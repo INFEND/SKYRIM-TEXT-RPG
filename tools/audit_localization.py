@@ -3,6 +3,8 @@
 import argparse
 import csv
 import gzip
+import hashlib
+import io
 import json
 import re
 import subprocess
@@ -14,6 +16,7 @@ from urllib.parse import quote
 from localization.build_names import DATA, JAVA, ROOT, actor_references, evidence, java_source, perk_ranks, shout_words
 
 REGISTRY = DATA / "registry.json.gz"
+PENDING = ROOT / "docs/WIKI_RU_PENDING.tsv"
 TEXT = {".java", ".kt", ".json", ".xml", ".txt", ".py", ".md", ".yml", ".yaml", ".gradle", ".properties", ".csv", ".tsv", ".sh", ".kts", ".toml", ".pro", ".html", ".js", ".jsonl"}
 GROUPS = {"map": "Локации", "atlas": "Локации", "npc": "NPC", "npc-template": "NPC", "mention": "NPC",
           "weapon": "Оружие", "armor": "Броня", "item": "Предметы", "book": "Книги", "tome": "Книги",
@@ -49,7 +52,7 @@ def sources():
     command = ["git", "ls-files", "--cached", "--others", "--exclude-standard", "-z"]
     files = subprocess.check_output(command, cwd=ROOT).decode().split("\0")
     for path in sorted(set(filter(None, files))):
-        if path.startswith("tools/localization/") or path in {"tools/audit_localization.py", "docs/WIKI_RU_REGISTRY.md"}:
+        if path.startswith("tools/localization/") or path in {"tools/audit_localization.py", "docs/WIKI_RU_REGISTRY.md", "docs/WIKI_RU_PENDING.tsv"}:
             continue
         file = ROOT / path
         if not file.is_file() or "/build/" in path or path.startswith("build/"):
@@ -102,6 +105,17 @@ def find_mentions(words, trie):
             j += 1
 
 
+def reviewed_literals():
+    with (DATA / "reviewed_literals.tsv").open(encoding="utf-8") as stream:
+        return {(r["file"], r["identity"], r["role"], r["match"], r["sha256"]): r["reason"]
+                for r in csv.DictReader(stream, delimiter="\t")}
+
+
+def literal_decision(decisions, path, uid, role, term, literal):
+    checksum = hashlib.sha256(literal.encode("utf-8")).hexdigest()
+    return decisions.get((path, uid, role, term, checksum))
+
+
 def collect_uses(records):
     trie = {}
     for uid, rec in records.items():
@@ -119,6 +133,8 @@ def collect_uses(records):
     found = defaultdict(lambda: defaultdict(set))
     scanned = []
     review = set()
+    reviewed = []
+    decisions = reviewed_literals()
     for path, body in sources():
         scanned.append(path)
         for _, _, uid, role in find_mentions(tokens(body), trie):
@@ -132,8 +148,13 @@ def collect_uses(records):
                     continue
                 if any(other == uid and start <= i and j <= end for start, end, other in covered):
                     continue
-                review.add((path, line, uid, role, " ".join(words[i:j])))
-    return scanned, found, [dict(file=p, line=n, identity=u, role=r, match=m) for p, n, u, r, m in sorted(review)]
+                term = " ".join(words[i:j])
+                decision = literal_decision(decisions, path, uid, role, term, literal)
+                if decision:
+                    reviewed.append(dict(file=path, line=line, identity=uid, role=role, match=term, reason=decision))
+                else:
+                    review.add((path, line, uid, role, term))
+    return scanned, found, [dict(file=p, line=n, identity=u, role=r, match=m) for p, n, u, r, m in sorted(review)], reviewed
 
 
 
@@ -238,7 +259,7 @@ def audit():
             record["english"] = ""
         if any(slot["kind"] == "race" for slot in record["project"]):
             record["source_type"] = "game-menu-screenshot+ru-wiki"
-    scanned, uses, review_queue = collect_uses(records)
+    scanned, uses, review_queue, reviewed_text = collect_uses(records)
     for uid, rec in records.items():
         files = uses[uid]
         for slot in rec["project"]:
@@ -247,7 +268,7 @@ def audit():
     counts = defaultdict(Counter)
     for rec in records.values():
         counts[rec["category"]][rec["status"]] += 1
-    report = dict(version=2, display_literals_for_review=review_queue, basis="Project catalog identities, not an exhaustive export of the original game.",
+    report = dict(version=3, display_literals_for_review=review_queue, reviewed_display_literals=reviewed_text, basis="Project catalog identities, not an exhaustive export of the original game.",
                   counts=dict(sorted(counts.items())), scanned=scanned,
                   entities=[records[key] for key in sorted(records)])
     return report, errors
@@ -272,10 +293,28 @@ def markdown_table(counts):
     return "\n".join(lines)
 
 
+def pending_table(entities):
+    output = io.StringIO()
+    writer = csv.writer(output, delimiter="\t", lineterminator="\n")
+    writer.writerow(("Категория", "Статус", "Уникальный ключ", "ID проекта", "Текущее название",
+                     "Английское название", "Исходный ID", "Кандидат", "Причина проверки", "Источник", "Объявление"))
+    states = {"conflict": "Конфликт", "unverified": "Не проверено"}
+    for entity in sorted(entities, key=lambda e: (e["category"], e["status"], e["identity"])):
+        if entity["status"] not in states:
+            continue
+        slots = entity["project"]
+        def values(field):
+            return " | ".join(dict.fromkeys(s[field] for s in slots if s[field]))
+        writer.writerow((entity["category"], states[entity["status"]], entity["identity"], values("id"),
+                         values("name"), entity["english"], entity["original_id"], entity["candidate_name"],
+                         entity["review"], entity["source"], values("declaration")))
+    return output.getvalue()
+
+
 def main():
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("--live", action="store_true", help="check the live sources without requiring the archived occurrence list to match")
-    p.add_argument("--write", action="store_true", help="refresh the checked-in compressed JSON")
+    p.add_argument("--write", action="store_true", help="refresh the checked-in registry and pending TSV")
     p.add_argument("--json", type=Path, help="also export the complete, human-readable JSON")
     p.add_argument("--markdown", action="store_true", help="print the coverage table by unique original identity")
     args = p.parse_args()
@@ -283,14 +322,20 @@ def main():
     if (JAVA / "RussianNameData.java").read_text() != java_source():
         errors.append("Regenerate RussianNameData.java")
     compact = json.dumps(report, ensure_ascii=False, separators=(",", ":")).encode()
+    if args.write and errors:
+        raise SystemExit("\n".join(errors))
+    pending = pending_table(report["entities"])
     if args.json:
         args.json.write_text(json.dumps(report, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     if args.write:
+        PENDING.write_text(pending, encoding="utf-8")
         # Empty filename and fixed timestamp make the committed artifact reproducible.
         with REGISTRY.open("wb") as dest, gzip.GzipFile(filename="", mode="wb", fileobj=dest, mtime=0) as packed:
             packed.write(compact)
     elif not args.live and (not REGISTRY.exists() or gzip.decompress(REGISTRY.read_bytes()) != compact):
         errors.append("The registry is stale; run python tools/audit_localization.py --write")
+    if not args.live and not args.write and (not PENDING.exists() or PENDING.read_text(encoding="utf-8") != pending):
+        errors.append("The pending TSV is stale; run python tools/audit_localization.py --write")
     if args.markdown:
         print(markdown_table(report["counts"]))
     else:

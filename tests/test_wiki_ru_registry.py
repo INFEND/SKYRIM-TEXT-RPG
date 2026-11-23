@@ -1,4 +1,6 @@
+import csv
 import gzip
+import io
 import json
 from pathlib import Path
 import sys
@@ -48,6 +50,26 @@ class RussianRegistry(unittest.TestCase):
         third = next(e for e in perks if e["original_id"] == "00079342")
         self.assertEqual({"tree": 0, "rank": 3}, third["perk_rank"])
         self.assertEqual("Сильная рука", third["canonical_ru"])
+
+    def test_pending_table_lists_each_unreviewed_identity_once(self):
+        with gzip.open(audit.REGISTRY, "rt", encoding="utf-8") as stream:
+            entities = json.load(stream)["entities"]
+        pending = list(csv.DictReader(io.StringIO(audit.pending_table(entities)), delimiter="\t"))
+        expected = {e["identity"] for e in entities if e["status"] in {"conflict", "unverified"}}
+        self.assertEqual(expected, {row["Уникальный ключ"] for row in pending})
+        self.assertEqual(len(expected), len(pending))
+        self.assertTrue(all(row["Причина проверки"] for row in pending if row["Статус"] == "Конфликт"))
+
+    def test_reviewed_font_label_does_not_hide_a_new_geographic_occurrence(self):
+        with gzip.open(audit.REGISTRY, "rt", encoding="utf-8") as stream:
+            reviewed = json.load(stream)["reviewed_display_literals"]
+        font = next(e for e in reviewed if e["match"] == "sovngarde")
+        fields = font["file"], font["identity"], font["role"], font["match"]
+        decisions = audit.reviewed_literals()
+        original = (audit.ROOT / font["file"]).read_text()
+        display = next(v for n, v in audit.player_literals(font["file"], original) if n == font["line"] and "Sovngarde" in v)
+        self.assertEqual(font["reason"], audit.literal_decision(decisions, *fields, display))
+        self.assertIsNone(audit.literal_decision(decisions, *fields, "Путешествие в Sovngarde"))
 
     def test_percentage_counts_unique_original_entries(self):
         report = audit.markdown_table({"Книги": {"verified": 1, "corrected": 1, "conflict": 1,
