@@ -484,7 +484,8 @@ public final class LocationGalleryView extends LinearLayout {
     private void openResourceManager(){
         if(getContext() instanceof android.app.Activity){
             android.app.Activity a=(android.app.Activity)getContext();
-            new ResourceManagerDialog(a,accent,()->{show(current);prefetch();},"gallery:"+slug).show();
+            String initialGroup=archive(slug,archiveFrame(current)+1).startsWith("media/")?"media:whiterun":"gallery:"+slug;
+            new ResourceManagerDialog(a,accent,()->{show(current);prefetch();},initialGroup).show();
         }
     }
     private void move(int delta){

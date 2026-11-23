@@ -33,6 +33,7 @@ class WhiterunArtwork(unittest.TestCase):
         self.assertIn('return archive.startsWith("media/")?archive:"gallery/"+archive;', source)
         self.assertEqual(source.count("archivePath(slug,"), 4)
         self.assertIn('{"Главные ворота","Главная улица","Рынок"', source)
+        self.assertIn('?"media:whiterun":"gallery:"+slug', source)
 
 if __name__ == "__main__":
     unittest.main()

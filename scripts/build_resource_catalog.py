@@ -103,6 +103,7 @@ def build(commit, thin=False):
             if path not in expected or hashlib.sha256(f.read_bytes()).hexdigest()!=expected[path]:
                 raise ValueError("Elisif artwork differs from the supplied originals")
             add(path,"media:elisif","Элисиф Прекрасная")
+        elif group=="whiterun":add(path,"media:whiterun","Вайтран · Главные ворота и Главная улица")
         else:add(path,"media:"+group,"Дополнительные ресурсы: "+group)
     listed={e["path"] for e in records}
     for f in ASSETS.rglob("*"):
