@@ -141,6 +141,31 @@ public final class ItemCatalog {
             case "Крыло голубой бабочки": return "Крыло синей бабочки";
             case "Пурпурный горноцвет": return "Лиловый горноцвет";
             case "Усики коруса-охотника": return "Усик коруса-охотника";
+            // Wiki-verified spell tome and scroll display names, retaining historical save IDs.
+            case "Том заклинаний: Пепельный кокон": return "Том заклинаний: Пепельная скорлупа";
+            case "Том заклинаний: Хаос": return "Том заклинаний: Катавасия";
+            case "Свиток: Хаос": return "Свиток: Катавасия";
+            case "Том заклинаний: Вызов костяного": return "Том заклинаний: Вызов костяного человека";
+            case "Том заклинаний: Вызов туманного": return "Том заклинаний: Вызов туманного человека";
+            case "Том заклинаний: Вызов яростного": return "Том заклинаний: Вызов яростного человека";
+            case "Том заклинаний: Реанимация": return "Том заклинаний: Призрак";
+            case "Том заклинаний: Изгнание высших даэдра": return "Том заклинаний: Высылка даэдра";
+            case "Том заклинаний: Подчинение даэдра": return "Том заклинаний: Приказ даэдра";
+            case "Том заклинаний: Грозовой плащ": return "Том заклинаний: Плащ молний";
+            case "Том заклинаний: Стена огня": return "Том заклинаний: Стена пламени";
+            case "Том заклинаний: Стена молний": return "Том заклинаний: Грозовая стена";
+            case "Том заклинаний: Гроза": return "Том заклинаний: Гроза с молниями";
+            case "Том заклинаний: Лечащие руки": return "Том заклинаний: Исцеляющие руки";
+            case "Том заклинаний: Залечивание ран": return "Том заклинаний: Излечение от ран";
+            case "Том заклинаний: Лечение других": return "Том заклинаний: Лечение ближних";
+            case "Том заклинаний: Великое лечение": return "Том заклинаний: Высшее лечение";
+            case "Том заклинаний: Отпугивание высшей нежити": return "Том заклинаний: Отпугивание старшей нежити";
+            case "Том заклинаний: Изгнание младшей нежити": return "Том заклинаний: Отталкивание младшей нежити";
+            case "Том заклинаний: Изгнание нежити": return "Том заклинаний: Отталкивание нежити";
+            case "Том заклинаний: Круг стража": return "Том заклинаний: Защитный круг";
+            case "Свиток: Круг стража": return "Свиток: Защитный круг";
+            case "Том заклинаний: Солнечный огонь": return "Том заклинаний: Огонь солнца";
+            case "Том заклинаний: Проклятие вампиров": return "Том заклинаний: Бич вампиров";
             default: return id;
         }
     }
@@ -319,6 +344,14 @@ public final class ItemCatalog {
     }
     // Supplement uses existing name as save key, so replacements preserve quantities.
     static void registerSupplement(String name,String category,String icon,double weight,int cost,String desc,String effect,double stat,int skill){
+        // Lore spell tomes preserve their original save keys but teach the visible canonical spell name.
+        String visibleName=canonicalItemDisplayName(name);
+        String prefix="Том заклинаний: ";
+        if(name.startsWith(prefix)&&visibleName.startsWith(prefix)&&!visibleName.equals(name)){
+            String oldSpell=name.substring(prefix.length());
+            String canonicalSpell=visibleName.substring(prefix.length());
+            effect=effect.replace("«"+oldSpell+"»","«"+canonicalSpell+"»");
+        }
         put(name,category,icon,weight,cost,desc,effect,stat,skill);
     }
     static void registerMissing(String name,String category,String icon,double weight,int cost,String desc,String effect,double stat,int skill){
