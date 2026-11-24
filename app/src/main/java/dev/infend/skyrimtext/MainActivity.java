@@ -1357,11 +1357,11 @@ public final class MainActivity extends Activity {
                 int probability=check.optInt("chance",-1),die=check.optInt("roll",-1);
                 if(probability<0||die<1)continue;
                 boolean success=AiGameTurn.success(probability,die);
-                rewardNotice((success?"Успех":"Неудача")+" | Бросок: "+die+"/100 | Шанс: "+probability+"%",success?ITEM_UP:ITEM_DOWN);
+                rewardNotice((success?"Успех":"Неудача")+" | Шанс: "+probability+"%",success?ITEM_UP:ITEM_DOWN);
             }
         }else if(roll>=1&&chance>=0){
             boolean success=roll<=chance;
-            rewardNotice((success?"Успех":"Неудача")+" | Бросок: "+roll+"/100 | Шанс: "+chance+"%",success?ITEM_UP:ITEM_DOWN);
+            rewardNotice((success?"Успех":"Неудача")+" | Шанс: "+chance+"%",success?ITEM_UP:ITEM_DOWN);
         }
         if(deltas!=null){java.util.Iterator<String> keys=deltas.keys();while(keys.hasNext()){
             String key=keys.next();long n=deltas.optLong(key);if(n==0)continue;
@@ -2542,27 +2542,15 @@ public final class MainActivity extends Activity {
         if(index>=0)addChoiceStat(panel,RpgContent.SKILLS[index],
             game.progress.skillLevel(index)+" (уровень)",accent(),2);
     }
-    /** Never fabricate a numerical formula for a probability authored by an LLM. */
+    private int aiChoiceChance(AiGameTurn.Option option){
+        return PlayerChance.calculate(game,option.chance,choiceSkillIndex(option.skill),option.title,option.detail).chance;
+    }
     private String aiChoiceCalculation(AiGameTurn.Option option,int chance,boolean nativeCombat){
         if(nativeCombat){
             String explanation=game.progress.chanceExplanation();
-            if(!explanation.isEmpty())return explanation;
+            return explanation.isEmpty()?"Шанс по правилам боевого движка: "+Math.max(0,chance)+"%":explanation;
         }
-        if(chance<0)return "Гарантированный исход: 100%. Бросок кубика не выполняется.";
-        StringBuilder details=new StringBuilder();
-        details.append("Источник шанса: оценка ИИ, а не формула движка.\n");
-        int index=choiceSkillIndex(option.skill);
-        if(index>=0)details.append("Навык: ").append(RpgContent.SKILLS[index])
-            .append(" — ").append(game.progress.skillLevel(index)).append(" (уровень).\n");
-        details.append("Вероятность: ").append(chance).append("%.\n")
-            .append("Бросок: равномерное целое от 1 до 100.\n");
-        if(chance>0)details.append("Успех: 1–").append(chance).append(" (")
-            .append(chance).append(" исходов).\n");
-        if(chance<100)details.append("Неудача: ").append(chance+1).append("–100 (")
-            .append(100-chance).append(" исходов).\n");
-        details.append("ИИ не прислал числовую разбивку по сложности и условиям. ")
-            .append("Игровой движок не выдумывает недостающие коэффициенты.");
-        return details.toString();
+        return PlayerChance.calculate(game,option.chance,choiceSkillIndex(option.skill),option.title,option.detail).explanation;
     }
 
     private void choiceChanceBar(LinearLayout host,int chance,int color){
@@ -2616,7 +2604,7 @@ public final class MainActivity extends Activity {
         }else{
             addChoiceStat(prose,"ШАНС УСПЕХА","100%",SceneChoiceMeta.chanceColor(100),0);
             choiceChanceBar(prose,100,SceneChoiceMeta.chanceColor(100));
-            livingChanceLink(prose,c.title,"Гарантированное действие: 100%.\nБросок кубика не требуется.\nПоследствия применяются по правилам игры.");
+            livingChanceLink(prose,c.title,"Гарантированное действие: 100%.\nПоследствия применяются по правилам игры.");
         }
         LinearLayout.LayoutParams layout=lp(-1,-2);layout.bottomMargin=dp(4);
         content.addView(box,layout);
@@ -2687,15 +2675,14 @@ public final class MainActivity extends Activity {
     private void retryLockedAction(){
         String action=pendingAiAction();if(action.isEmpty()||aiTurnBusy)return;
         String instruction=prefs.getString(AI_PENDING_INSTRUCTION,"");
-        if(!instruction.isEmpty()){if(LockedChecks.restore(prefs.getString(AI_PENDING_CHECKS,""))==null){toast("Запись бросков повреждена");return;}requestAiTurn(instruction,true);return;}
+        if(!instruction.isEmpty()){if(LockedChecks.restore(prefs.getString(AI_PENDING_CHECKS,""))==null){toast("Запись результатов повреждена");return;}requestAiTurn(instruction,true);return;}
         int chance=prefs.getInt(AI_PENDING_CHANCE,-2),die=prefs.getInt(AI_PENDING_DIE,-1);
-        if(chance< -1||chance>100||(chance>=0&&(die<1||die>100))){toast("Запись броска повреждена");return;}
+        if(chance< -1||chance>100||(chance>=0&&(die<1||die>100))){toast("Запись результата повреждена");return;}
         requestAiTurn(lockedFreeInstruction(action,chance,die),true,false,chance,null);
     }
     private String lockedFreeInstruction(String action,int chance,int die){
-        String verdict=chance<0?"Для обычного мирного действия бросок не нужен. Это не гарантирует согласия собеседника, выдачи секретов или получения награды.":
-            "ИИ ранее зафиксировал шанс "+chance+"%, Android уже бросил "+die+
-            " из 100. Результат "+(AiGameTurn.success(chance,die)?"УСПЕХ":"НЕУДАЧА")+".";
+        String verdict=chance<0?"Обычное мирное действие выполнимо. Это не гарантирует согласия собеседника, выдачи секретов или получения награды.":
+            "Движок зафиксировал шанс "+chance+"%. Результат "+(AiGameTurn.success(chance,die)?"УСПЕХ":"НЕУДАЧА")+".";
         return "СВОБОДНОЕ ДЕЙСТВИЕ ИГРОКА: "+action+"\n"+(prefs.getInt(AI_PENDING_FATE,-1)==game.day?"Благосклонность судьбы уже дала повтор; итог окончательный.\n":"")+verdict+
             " НЕ пересчитывай вероятность и НЕ меняй исход. Верни customChance ровно "+
             (chance<0?"null":String.valueOf(chance))+
@@ -2853,7 +2840,7 @@ public final class MainActivity extends Activity {
             actionButton("ПОВТОРИТЬ ДЕЙСТВИЕ","Продолжить с прежним броском",true,()->retryLockedAction());
             actionButton("ОТМЕНИТЬ НЕЗАВЕРШЁННОЕ ДЕЙСТВИЕ","Вернуться к выбору без применения эффектов",false,()->{
                 new android.app.AlertDialog.Builder(this).setTitle("Отменить действие?")
-                    .setMessage("Незавершённая ИИ-сцена и её бросок будут отброшены. Состояние героя не изменится.")
+                    .setMessage("Незавершённая ИИ-сцена и её результат будут отброшены. Состояние героя не изменится.")
                     .setNegativeButton("Назад",null).setPositiveButton("Отменить",(d,w)->{
                         clearAiPending();selectedAiChoices.clear();aiOwnDraft="";clearAiDraft();
                         aiTurnStatus="";aiTurnPreview="";aiChoicePreview.clear();render();
@@ -2978,7 +2965,7 @@ public final class MainActivity extends Activity {
                     return;
                 }
                 requestAiTurn("ОЦЕНКА СВОБОДНОГО ДЕЙСТВИЯ: "+compound+
-                    "\nОцени единый шанс составного действия. Для простых мирных действий без риска укажи customChance=null. Не исполняй до броска Android.",false,true,-2,compound);
+                    "\nОцени единый шанс составного действия. Для простых мирных действий без риска укажи customChance=null. Не исполняй до проверки движком.",false,true,-2,compound);
                 return;
             }
             if(compound.equals(pendingAiAction())){String lockedInstruction=prefs.getString(AI_PENDING_INSTRUCTION,"");if(!lockedInstruction.isEmpty()&&LockedChecks.restore(prefs.getString(AI_PENDING_CHECKS,""))!=null){requestAiTurn(lockedInstruction,true);return;}toast("Сохранённая проверка недоступна");return;}
@@ -2990,16 +2977,15 @@ public final class MainActivity extends Activity {
             for(Integer index:indexes){
                 if(index<1||index>game.aiTurn.choices.size())continue;
                 AiGameTurn.Option option=game.aiTurn.choices.get(index-1);
-                int die=option.chance<0?-1:AiGameTurn.roll();if(FixShopAiContext.mayRetry(game,option.chance,die,fateDay==game.day)){die=AiGameTurn.roll();fateDay=game.day;instruction.append("Благосклонность судьбы использована; повторный бросок окончательный.\n");}checks.add(index,option.title,option.chance,die);
+                int chance=aiChoiceChance(option);int die=chance<0?-1:AiGameTurn.roll();if(FixShopAiContext.mayRetry(game,chance,die,fateDay==game.day)){die=AiGameTurn.roll();fateDay=game.day;instruction.append("Благосклонность судьбы использована; повторная проверка окончательная.\n");}checks.add(index,option.title,chance,die);
                 instruction.append("Вариант ").append(index).append(": ");
-                if(option.chance<0)instruction.append("шанс 100%, бросок не требуется.");
-                else instruction.append("шанс ").append(option.chance).append("%, бросок ")
-                    .append(die).append("/100, ")
-                    .append(AiGameTurn.success(option.chance,die)?"УСПЕХ.":"НЕУДАЧА.");
+                if(chance<0)instruction.append("шанс 100%, действие без риска.");
+                else instruction.append("шанс ").append(chance).append("%, итог: ")
+                    .append(AiGameTurn.success(chance,die)?"УСПЕХ.":"НЕУДАЧА.");
                 instruction.append("\n");
             }
             instruction.append("Продолжи историю, применив effects только за совершённые действия.");
-            if(!storeSelectedChecks(compound,instruction.toString(),checks,fateDay)){toast("Не удалось сохранить броски");return;}
+            if(!storeSelectedChecks(compound,instruction.toString(),checks,fateDay)){toast("Не удалось сохранить результаты");return;}
             requestAiTurn(instruction.toString(),true);
             }catch(RuntimeException manualInputError){
                 android.util.Log.e("SkyrimAI","Manual action submission failed",manualInputError);
@@ -3155,7 +3141,7 @@ public final class MainActivity extends Activity {
                 iconHost.setTag(iconKey);
             }
             String title=(showChoiceNumbers()?(i+1)+". ":"")+option.title;
-            String meta=option.chance>=0?(option.skill.isEmpty()?"":option.skill+" | ")+option.chance+"%":option.skill;
+            int previewChance=aiChoiceChance(option);String meta=option.ready?(option.skill.isEmpty()?"":option.skill+" | ")+(previewChance<0?100:previewChance)+"%":option.skill;
             if(!title.contentEquals(views[0].getText()))views[0].setText(title);
             if(!option.detail.contentEquals(views[1].getText()))views[1].setText(option.detail);
             if(!meta.contentEquals(views[2].getText()))views[2].setText(meta);
@@ -3199,7 +3185,7 @@ public final class MainActivity extends Activity {
         choiceExtras(detail,option.combatAction);
         boolean combat="COMBAT".equals(game.mode)&&game.enemyHp>0;
         int displayedChance=combat?("HEAVY".equals(option.combatAction)||"FLEE".equals(option.combatAction)
-            ?game.progress.chance(game,option.combatAction):-1):option.chance;
+            ?game.progress.chance(game,option.combatAction):-1):aiChoiceChance(option);
         if(displayedChance>=0){
             showChoiceSkillLevel(detail,option.skill,option.combatAction);
             addChoiceStat(detail,"ШАНС УСПЕХА",displayedChance+"%",
@@ -3209,7 +3195,7 @@ public final class MainActivity extends Activity {
         }else{
             addChoiceStat(detail,"ШАНС УСПЕХА","100%",SceneChoiceMeta.chanceColor(100),0);
             choiceChanceBar(detail,100,SceneChoiceMeta.chanceColor(100));
-            livingChanceLink(detail,option.title,"Гарантированный исход проверки: 100%.\nБросок кубика не выполняется.\nСостояние игры всё равно изменяется только после подтверждённого действия.");
+            livingChanceLink(detail,option.title,combat?"Действие выполняется по правилам боя.":aiChoiceCalculation(option,displayedChance,false));
         }
         boolean available=combat?nativeAiCombatAvailable(option.combatAction):option.companionAction.isEmpty()||AiCompanionActions.allowed(game,option.companionAction);
         if(!available){
@@ -3322,10 +3308,10 @@ public final class MainActivity extends Activity {
                         throw new IllegalStateException("Состояние героя изменилось во время генерации");
                     if(proposalOnly){
                         // The short chance-only response is never written to RPG memory.
-                        int fixedChance=AiGameTurn.parseChance(answer);
+                        int fixedChance=PlayerChance.calculate(game,AiGameTurn.parseChance(answer),-1,customAction,"").chance;
                         int die=fixedChance<0?-1:AiGameTurn.roll();int fateDay=-1;
                         if(FixShopAiContext.mayRetry(game,fixedChance,die,false)){die=AiGameTurn.roll();fateDay=game.day;}
-                        if(!storeAiPending(customAction,fixedChance,die,fateDay))throw new IllegalStateException("Не удалось сохранить бросок");
+                        if(!storeAiPending(customAction,fixedChance,die,fateDay))throw new IllegalStateException("Не удалось сохранить результат");
                         aiTurnBusy=false;aiTurnPreview="";
                         requestAiTurn(lockedFreeInstruction(customAction,fixedChance,die),
                             true,false,fixedChance,null);
@@ -3333,7 +3319,7 @@ public final class MainActivity extends Activity {
                     }
                     AiGameTurn completed=local?AiGameTurn.parseLocalModel(answer,expectedChance):AiGameTurn.parseModel(answer,expectedChance);
                     if(expectedChance!=-2&&completed.customChance!=expectedChance)
-                        throw new IllegalStateException("ИИ изменил шанс после броска");
+                        throw new IllegalStateException("ИИ изменил шанс после проверки");
                     GameEngine next=GameEngine.fromJson(saved,true);
                     java.util.Map<String,Integer> before=itemSnapshot(next);
                     VisualSnapshot visualBefore=new VisualSnapshot(next);
