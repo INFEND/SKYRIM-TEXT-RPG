@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Release gate: both legacy download names are byte-identical lightweight APKs."""
 import hashlib,json,pathlib,zipfile
+from title_art_gate import verify_title_art
 ROOT=pathlib.Path(__file__).resolve().parents[1]
 apk=ROOT/"dist/SKYRIM-TEXT-RPG.apk"
 alias=ROOT/"dist/SKYRIM-TEXT-RPG-thin.apk"
@@ -20,6 +21,9 @@ with zipfile.ZipFile(apk) as z:
         assert "assets/"+entry["asset"] not in names
         assert external[entry["asset"]]["size"]==entry["size"]
         assert len(external[entry["asset"]]["sha256"])==64
+    # Menu covers are explicitly bundled by build_resource_catalog.py for offline startup.
+    # Verify their exact content before exempting these six paths from the media ban.
+    core |= verify_title_art(z, ROOT/"app/src/main/assets")
     assert core<=names
     # The approved action atlas is a required, small offline UI resource, not optional media.
     action_path="assets/icons/action_choices_283.webp"
