@@ -94,14 +94,23 @@ final class ResourceStore {
                 for(int i=0;i<galleries.length();i++){
                     JSONArray archives=galleries.getJSONObject(i).getJSONArray("archives");
                     for(int k=0;k<archives.length();k++){
-                        String path="gallery/"+archives.getString(k);
+                        String archive=archives.getString(k);
+                        // Replacement frames may live in a separate media archive.
+                        String path=archive.startsWith("media/")?archive:"gallery/"+archive;
                         frames.put(path,frames.getOrDefault(path,0)+1);
                     }
                 }
+                for(Map.Entry<String,Integer> frame:frames.entrySet()){
+                    Entry archive=entries.get(frame.getKey());
+                    if(archive==null||frame.getValue()<=0||frame.getValue()>archive.units)
+                        throw new IOException("Количество фотографий не соответствует каталогу: "+frame.getKey());
+                }
                 for(Entry e:entries.values())if(e.path.startsWith("gallery/")){
                     Integer count=frames.get(e.path);
-                    if(count==null||count<=0||(e.explicitUnits&&e.units!=count))
-                        throw new IOException("Количество фотографий не соответствует каталогу");
+                    // A legacy ZIP may retain original frames superseded by overlays.
+                    // Count only frames that the current gallery actually displays.
+                    if(count==null||count<=0||count>e.units)
+                        throw new IOException("Количество фотографий не соответствует каталогу: "+e.path);
                     e.units=count;
                 }
             }

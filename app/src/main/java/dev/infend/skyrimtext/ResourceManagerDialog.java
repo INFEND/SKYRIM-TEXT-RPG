@@ -187,7 +187,7 @@ final class ResourceManagerDialog {
                 if(!dialog.isShowing())return;
                 catalogReport=outcome;rebuildGroups();setBusy(false);
                 if(!stop.get()&&!groups.isEmpty())run("check",new LinkedHashSet<>(groups.keySet()));
-                else showStatus("Проверка остановлена");
+                else showStatus(stop.get()?"Проверка остановлена":outcome);
             });
         });
     }

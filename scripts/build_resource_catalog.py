@@ -184,6 +184,23 @@ def gallery_registry():
     if actual!=observed:raise ValueError("Unregistered gallery archives "+str(actual^observed))
     return result
 
+def validate_archive_references(data):
+    """Fail release generation if a gallery references absent or undersized archives."""
+    from collections import Counter
+    entries={entry["path"]:entry for entry in data["files"]}
+    frames=Counter(
+        archive if archive.startswith("media/") else "gallery/"+archive
+        for gallery in data["galleries"] for archive in gallery["archives"]
+    )
+    for path,number in frames.items():
+        entry=entries.get(path)
+        if entry is None or number>entry["units"]:
+            raise ValueError("Gallery archive mismatch: "+path)
+    for path in entries:
+        if path.startswith("gallery/") and frames[path]<1:
+            raise ValueError("Unreferenced gallery archive: "+path)
+
+
 def main():
     parser=argparse.ArgumentParser()
     parser.add_argument("--commit",default=None)
@@ -193,6 +210,7 @@ def main():
     data=build(commit,args.thin)
     data["revision"]=int(subprocess.check_output(["git","show","-s","--format=%ct",commit],cwd=ROOT,text=True).strip())
     data["galleries"]=gallery_registry()
+    validate_archive_references(data)
     labels={e["slug"]:e["name"] for e in data["galleries"]}
     for e in data["files"]:
         if e["group"].startswith("gallery:"):e["label"]=labels[e["group"].split(":",1)[1]]
