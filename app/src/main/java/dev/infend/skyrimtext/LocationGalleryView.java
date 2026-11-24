@@ -180,7 +180,21 @@ public final class LocationGalleryView extends LinearLayout {
 
     private static GalleryDefinition cityInterior(String city,String place){
         GalleryDefinition gallery=definition(place);
-        return gallery!=null&&city.equals(gallery.parent)?gallery:null;
+        return gallery!=null&&!gallery.parent.isEmpty()&&definition(city)!=null&&definition(city)==definition(gallery.parent)?gallery:null;
+    }
+
+    /** All downloaded child galleries belong to the shared location directory. */
+    static java.util.List<String> childPlaces(String city){
+        GalleryRegistry r=registry;GalleryDefinition owner=definition(city);
+        java.util.ArrayList<String> children=new java.util.ArrayList<>();
+        if(r!=null&&owner!=null)for(GalleryDefinition d:r.slugs.values())
+            if(!d.parent.isEmpty()&&r.names.get(locationKey(d.parent))==owner)children.add(d.name);
+        children.sort(String.CASE_INSENSITIVE_ORDER);
+        return children;
+    }
+    static boolean sameCityPlace(String city,String first,String second){
+        GalleryDefinition a=cityInterior(city,first);
+        return a!=null&&a==cityInterior(city,second);
     }
 
     static String cityPlaceTitle(String city,String place){
@@ -408,36 +422,7 @@ public final class LocationGalleryView extends LinearLayout {
         }
         show(0);
         prefetch();
-        if(!fullscreen&&cityFrame<0)addInteriorLinks();
-    }
-    /** Interiors have their own captions and packs, never mixed with exterior views. */
-    private void addInteriorLinks(){
-        GalleryRegistry r=registry;
-        GalleryDefinition owner=definition(location);
-        if(r==null||owner==null)return;
-        java.util.ArrayList<GalleryDefinition> children=new java.util.ArrayList<>();
-        for(GalleryDefinition d:r.slugs.values())
-            if(!d.parent.isEmpty()&&definition(d.parent)==owner)children.add(d);
-        children.sort((a,b)->a.name.compareToIgnoreCase(b.name));
-        for(GalleryDefinition d:children){
-            TextView link=text(d.name+"  ›",14,accent);
-            link.setGravity(Gravity.CENTER_VERTICAL);
-            link.setPadding(dp(12),dp(9),dp(12),dp(9));
-            link.setBackground(panel(0xff151515,12,Color.TRANSPARENT));
-            LayoutParams params=new LayoutParams(-1,-2);params.topMargin=dp(6);
-            galleryBody.addView(link,params);
-            link.setOnClickListener(v->openInterior(d.name));
-        }
-    }
-    private void openInterior(String name){
-        if(!hasGallery(name))return;
-        android.widget.ScrollView scroll=new android.widget.ScrollView(getContext());
-        LinearLayout body=new LinearLayout(getContext());body.setOrientation(VERTICAL);
-        body.setPadding(dp(12),dp(8),dp(12),dp(12));body.setBackgroundColor(Color.BLACK);
-        scroll.addView(body);
-        body.addView(new LocationGalleryView(getContext(),name,accent,false),new LayoutParams(-1,-2));
-        android.app.AlertDialog dialog=new RuneDialogBuilder(getContext(),accent).setTitle(name).setView(scroll).setNegativeButton("Закрыть",null).create();
-        dialog.show();
+        // Child locations are rendered by MainActivity's categorized city directory.
     }
     /** Small borderless vector glyphs, independent of global icon tint and button style. */
     private View galleryGlyph(int kind,int color){

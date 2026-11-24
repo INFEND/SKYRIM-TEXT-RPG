@@ -61,6 +61,34 @@ final class CityArchitecture {
         for(String group:groups)list.add(Collections.unmodifiableList(Arrays.asList(group.split("\\|"))));
         CITIES.put(city,Collections.unmodifiableList(list));
     }
-    static List<List<String>> groups(String city){List<List<String>> list=CITIES.get(city);return list==null?Collections.emptyList():list;}
+    /** Merge the canonical directory with downloaded interiors without duplicating aliases. */
+    static List<List<String>> groups(String city){
+        List<List<String>> base=CITIES.get(city);
+        if(base==null)base=CITIES.get(LocationGalleryView.displayName(city));
+        List<String> children=LocationGalleryView.childPlaces(city);
+        if(children.isEmpty())return base==null?Collections.emptyList():base;
+        List<List<String>> out=new ArrayList<>();
+        for(int i=0;i<CATEGORIES.length;i++)
+            out.add(base==null?new ArrayList<>():new ArrayList<>(base.get(i)));
+        for(String child:children){
+            boolean found=false;
+            for(List<String> group:out)for(String place:group)
+                if(place.equalsIgnoreCase(child)||LocationGalleryView.sameCityPlace(city,place,child))found=true;
+            if(!found)out.get(categoryFor(child)).add(child);
+        }
+        return out;
+    }
+    static int categoryFor(String name){
+        String n=name.toLowerCase(Locale.ROOT).replace('ё','е');
+        if(n.contains("кузниц")||n.contains("лавк")||n.contains("таверн")||n.contains("трактир")||
+           n.contains("торгов")||n.contains("аптек")||n.contains("конюш")||n.contains("медовар")||
+           n.contains("ферм")||n.contains("лесопил")||n.contains("ночлеж")||n.contains("постоял"))return 3;
+        if(n.contains("храм")||n.contains("святилищ")||n.contains("коллеги")||n.contains("катакомб")||
+           n.contains("курган")||n.contains("раскоп")||n.contains("музей")||n.contains("камень земли"))return 4;
+        if(n.contains("дворец")||n.contains("крепост")||n.contains("казарм")||n.contains("тюрьм"))return 1;
+        if(n.contains("площад")||n.contains("ворот")||n.contains("улиц")||n.contains("арка")||n.contains("мост"))return 0;
+        if(n.startsWith("дом ")||n.contains("поместье")||n.contains("жилище"))return 2;
+        return 3; // Named shops and inns without a generic prefix.
+    }
     static boolean here(GameEngine g){return g.started&&!groups(g.progress.location).isEmpty();}
 }

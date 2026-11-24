@@ -1477,6 +1477,7 @@ public final class MainActivity extends Activity {
         String location=entry.optString("location");
         LinearLayout panel=column();panel.setPadding(dp(12),dp(10),dp(12),dp(14));
         if(LocationGalleryView.hasGallery(location))panel.addView(new LocationGalleryView(this,location,accent(),false),lp(-1,-2));
+        renderCityArchitecture(panel,location,false);
         addText(panel,"День "+entry.optInt("day")+(entry.has("hour")?String.format(java.util.Locale.ROOT," | %02d:00",entry.optInt("hour")):"")+" | "+location,13,ITEM_GOLD,true,9);
         addText(panel,entry.optString("event"),16,TEXT,false,12);
         JSONObject d=entry.optJSONObject("details");
@@ -2229,7 +2230,6 @@ public final class MainActivity extends Activity {
     private void renderStory(){
         boolean nativeScene=game.nativeSceneRequired();
         if(game.aiNarrativeMode&&!nativeScene){
-            if("WORLD".equals(game.mode))renderCityArchitecture();
             renderAiGame();return;
         }
         GameEngine.Scene s=game.scene();section(s.kicker,s.title,"");
@@ -2240,10 +2240,10 @@ public final class MainActivity extends Activity {
         if(LiviaStory.MODE.equals(game.mode)&&game.livia.stage==4&&game.livia.survivor())actionButton("Ливия | Спутница и отношения",game.livia.life.gearLabel(),false,()->npcDetails(LiviaStory.NAME));
         if(LocationGalleryView.hasGallery(game.progress.location)||WorkImageEditor.hasPrimary(this,"location",game.progress.location)){
             content.addView(sceneGallery(game.progress.location),lp(-1,-2));
-            renderLocationWeather(content);
         }else{
             content.addView(new NordicArtView(this,NordicArtView.STORY),lp(-1,188));
         }
+        renderStoryLocationDirectory();
         workshopAction(content,"location",()->
             WorkImageEditor.open(this,"location",game.progress.location,game.progress.location,
                 "Локация текущего прохождения.",accent(),this::render));
@@ -2264,7 +2264,6 @@ public final class MainActivity extends Activity {
         renderStoryJournal();
         // Mandatory native resolution and explicit city menus are not a second AI chat.
         space(content,12);
-        if("WORLD".equals(game.mode)&&!game.road.pending())renderCityArchitecture();
         addText(content,"Что ты предпримешь?",22,TEXT,true,7);
         addText(content,s.choices.size()+" доступных вариантов. Вероятность показана только для настоящих проверок.",12,MUTED,false,15);
         int number=0;
@@ -2303,14 +2302,20 @@ public final class MainActivity extends Activity {
     private boolean cityIconsOnly(){return prefs.getBoolean(CITY_ICONS_ONLY_PREF,false);}
 
     /** Compact accordion or a single five-icon row; retain state separately for each city. */
-    private void renderCityArchitecture(){
-        if(!CityArchitecture.here(game))return;
+    private void renderStoryLocationDirectory(){
         String city=game.progress.location;
+        boolean world="WORLD".equals(game.mode)&&!game.road.pending();
+        if(LocationGalleryView.hasGallery(city)||WorkImageEditor.hasPrimary(this,"location",city)||
+            (world&&!CityArchitecture.groups(city).isEmpty()))renderLocationWeather(content);
+        if(world)renderCityArchitecture(content,city,true);
+    }
+    private void renderCityArchitecture(LinearLayout host,String city,boolean interactive){
         java.util.List<java.util.List<String>> groups=CityArchitecture.groups(city);
-        addText(content,"Городские локации",20,TEXT,true,6);
+        if(groups.isEmpty())return;
+        addText(host,"Городские локации",20,TEXT,true,6);
         if(cityIconsOnly()){
-            renderCityIconRow(city,groups);
-            space(content,6);
+            renderCityIconRow(host,city,groups,interactive);
+            space(host,6);
             return;
         }
         for(int category=0;category<groups.size();category++){
@@ -2323,7 +2328,7 @@ public final class MainActivity extends Activity {
             LinearLayout.LayoutParams titleSize=new LinearLayout.LayoutParams(0,-2,1);titleSize.leftMargin=dp(9);heading.addView(title,titleSize);
             View arrow=addonIcon("down",accent());heading.addView(arrow,lp(20,20));
             panel.addView(heading,lp(-1,-2));
-            AccordionLayout entries=cityCategoryEntries(city,index,places);
+            AccordionLayout entries=cityCategoryEntries(city,index,places,interactive);
             String key="city_architecture_"+city+"_"+index;
             boolean opened=prefs.getBoolean(key,false);entries.setVisibility(opened?View.VISIBLE:View.GONE);arrow.setRotation(opened?180f:0f);
             panel.addView(entries,lp(-1,-2));heading.setFocusable(true);heading.setClickable(true);
@@ -2335,24 +2340,24 @@ public final class MainActivity extends Activity {
                 heading.setContentDescription(CityArchitecture.CATEGORIES[index]+(open?", раскрыто":", свёрнуто"));
                 prefs.edit().putBoolean(key,open).apply();
             });
-            LinearLayout.LayoutParams size=lp(-1,-2);size.bottomMargin=dp(4);content.addView(panel,size);
+            LinearLayout.LayoutParams size=lp(-1,-2);size.bottomMargin=dp(4);host.addView(panel,size);
         }
-        space(content,6);
+        space(host,6);
     }
 
-    private AccordionLayout cityCategoryEntries(String city,int index,java.util.List<String> places){
+    private AccordionLayout cityCategoryEntries(String city,int index,java.util.List<String> places,boolean interactive){
         AccordionLayout entries=new AccordionLayout(this);entries.setPadding(dp(8),0,dp(8),dp(6));
         for(String place:places){
             TextView entry=text(LocationGalleryView.cityPlaceTitle(city,place),15,TEXT,false);entry.setPadding(dp(10),dp(8),dp(10),dp(8));
             entry.setMinHeight(dp(48));entry.setGravity(Gravity.CENTER_VERTICAL);
             entry.setBackground(bg(0xff1b1b1b,Color.TRANSPARENT,10));
             LinearLayout.LayoutParams itemSize=lp(-1,-2);itemSize.bottomMargin=dp(4);entries.addView(entry,itemSize);
-            entry.setOnClickListener(v->cityPlaceDialog(city,index,place));entry.setFocusable(true);
+            entry.setOnClickListener(v->cityPlaceDialog(city,index,place,interactive));entry.setFocusable(true);
         }
         return entries;
     }
 
-    private void renderCityIconRow(String city,java.util.List<java.util.List<String>> groups){
+    private void renderCityIconRow(LinearLayout host,String city,java.util.List<java.util.List<String>> groups,boolean interactive){
         LinearLayout panel=column();
         LinearLayout icons=row();panel.addView(icons,lp(-1,48));
         AccordionLayout details=new AccordionLayout(this);panel.addView(details,lp(-1,-2));
@@ -2373,7 +2378,7 @@ public final class MainActivity extends Activity {
             if(valid){
                 details.removeAllViews();
                 space(details,4);
-                details.addView(cityCategoryEntries(city,index,groups.get(index)),lp(-1,-2));
+                details.addView(cityCategoryEntries(city,index,groups.get(index),interactive),lp(-1,-2));
             }
             // Switching between two open categories replaces content immediately,
             // without a blank intermediate frame; opening/closing animates height.
@@ -2398,7 +2403,7 @@ public final class MainActivity extends Activity {
             if(!button.isEnabled())button.setAlpha(0.4f);
         }
         select.accept(prefs.getInt(key,-1));
-        content.addView(panel,lp(-1,-2));
+        host.addView(panel,lp(-1,-2));
     }
     private View citySectionIcon(int kind){
         final int tint=accent();
@@ -2420,8 +2425,8 @@ public final class MainActivity extends Activity {
             }
         };
     }
-    private void cityPlaceDialog(String city,int category,String place){
-        if(game.aiNarrativeMode&&livingBusy()){toast("Сначала заверши или отмени текущий ход");return;}
+    private void cityPlaceDialog(String city,int category,String place,boolean interactive){
+        if(interactive&&game.aiNarrativeMode&&livingBusy()){toast("Сначала заверши или отмени текущий ход");return;}
         String title=LocationGalleryView.cityPlaceTitle(city,place);
         LinearLayout panel=column();addText(panel,city+" | "+CityArchitecture.CATEGORIES[category],14,MUTED,false,8);
         LocationGalleryView gallery=LocationGalleryView.cityPlaceGallery(this,city,place,accent());
@@ -2432,6 +2437,9 @@ public final class MainActivity extends Activity {
         workshopAction(panel,"city",()->
                 WorkImageEditor.open(this,"location",assetId,title,
                     "Город: "+city+". Район: "+CityArchitecture.CATEGORIES[category]+".",accent(),this::render));
+        if(!interactive){
+            new RuneDialogBuilder(this,accent()).setTitle(title).setView(panel).setNegativeButton("Закрыть",null).show();return;
+        }
         int d=-1;
         if("Солитьюд".equals(city)){
             String[] names={"Главные ворота","Мрачный замок","Синий дворец","Коллегия бардов","Храм Богов","Кузница Солитьюда","Смеющаяся крыса","Гавань Солитьюда"};
@@ -2731,9 +2739,9 @@ public final class MainActivity extends Activity {
             "api".equals(source)&&AiKeyVault.configured(this));
         if(LocationGalleryView.hasGallery(game.progress.location)||WorkImageEditor.hasPrimary(this,"location",game.progress.location)){
             content.addView(sceneGallery(game.progress.location),lp(-1,-2));
-            renderLocationWeather(content);
-            space(content,13);
         }
+        renderStoryLocationDirectory();
+        space(content,13);
         if(!ready&&!aiTurnBusy){
             LinearLayout card=card();
             addText(card,"ИИ-ИГРА НЕ ПОДКЛЮЧЕНА",14,accent(),true,11);
@@ -4004,8 +4012,10 @@ public final class MainActivity extends Activity {
         addText(overview,"Два полных листа рельефа работают без интернета. Масштаб и положение каждого листа сохраняются отдельно.",11,MUTED,false,7);
         if(LocationGalleryView.hasGallery(game.progress.location)||WorkImageEditor.hasPrimary(this,"location",game.progress.location)){
             overview.addView(sceneGallery(game.progress.location),lp(-1,-2));
-            renderLocationWeather(overview);
         }
+        if(LocationGalleryView.hasGallery(game.progress.location)||WorkImageEditor.hasPrimary(this,"location",game.progress.location)||
+            !CityArchitecture.groups(game.progress.location).isEmpty())renderLocationWeather(overview);
+        renderCityArchitecture(overview,game.progress.location,false);
         workshopAction(content,"location",()->
             WorkImageEditor.open(this,"location",game.progress.location,game.progress.location,
                 "Текущая локация на карте Скайрима.",accent(),this::render));
@@ -4313,7 +4323,10 @@ public final class MainActivity extends Activity {
             wrapper.addView(local!=null?local:new LocationGalleryView(this,place.name,accent(),false),lp(-1,-2));
             if(place.name.equalsIgnoreCase(game.progress.location))renderLocationWeather(wrapper);
             space(wrapper,10);
+        }else if(place.name.equalsIgnoreCase(game.progress.location)&&!CityArchitecture.groups(place.name).isEmpty()){
+            renderLocationWeather(wrapper);
         }
+        renderCityArchitecture(wrapper,place.name,false);
 
         LinearLayout details=column();
         details.setBackground(AmoledAppearance.shape(this,PANEL_2,android.graphics.Color.TRANSPARENT,16));
