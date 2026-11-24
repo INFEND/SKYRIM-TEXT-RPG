@@ -93,6 +93,7 @@ public final class ItemCatalog {
         }
     }
     private static final LinkedHashMap<String,Item> items=new LinkedHashMap<>();
+    private static final LinkedHashMap<String,Item> aiItems=new LinkedHashMap<>();
     // Maps visible canonical names to historic item IDs, for search and model-generated actions.
     private static final HashMap<String,String> DISPLAY_ALIASES=new HashMap<>();
     private static final Map<String,Integer> displayCounts=new HashMap<>();
@@ -441,6 +442,41 @@ public final class ItemCatalog {
                 ItemWorkshopSpec.hasStat(kind)?stat:0,ItemWorkshopSpec.SKILL[kind],
                 ItemWorkshopSpec.SLOT[kind]));
     }
+    static String aiKey(String name){return name.trim().toLowerCase(Locale.ROOT).replace('ё','е');}
+    static Item aiDefinition(String name,JSONObject row){
+        String n=aiKey(name);
+        String category=row.optString("category","");
+        if(!java.util.Arrays.asList("Одежда","Оружие","Броня","Украшения","Еда","Напитки","Ингредиенты","Книги","Материалы","Разное","Квестовые предметы","Зелья","Инструменты").contains(category)){
+            category=n.matches(".*(платье|одежд|рубаш|манти|сапог|перчат|капюшон|штан|плащ|туник).*")?"Одежда":
+                n.matches(".*(меч|кинжал|топор|лук|булав|молот|копье).*")?"Оружие":
+                n.matches(".*(брон|доспех|кирас|щит|шлем).*")?"Броня":
+                n.matches(".*(кольц|амулет|ожерел|кулон).*")?"Украшения":"Разное";
+        }
+        double defaultWeight="Одежда".equals(category)?.5:"Оружие".equals(category)?3:"Броня".equals(category)?4:"Украшения".equals(category)?.1:.5;
+        double weight=row.optDouble("weight",defaultWeight);
+        if(!Double.isFinite(weight)||weight<.01||weight>50)weight=defaultWeight;
+        int value=Math.max(0,Math.min(1000,row.optInt("value",row.optInt("cost",20))));
+        String description=row.optString("description","").trim();
+        if(description.isEmpty())description="Предмет, созданный в ходе истории.";
+        if(description.length()>400)description=description.substring(0,400);
+        int stat="Оружие".equals(category)?Math.max(1,Math.min(35,row.optInt("stat",5))):
+            "Броня".equals(category)?Math.max(0,Math.min(35,row.optInt("stat",3))):0;
+        int skill="Оружие".equals(category)?(n.contains("лук")?2:0):"Броня".equals(category)?4:-1;
+        return new Item(name,category,"",weight,value,description,"",stat,skill);
+    }
+    static JSONObject saveAiDefinition(Item item)throws org.json.JSONException{
+        return new JSONObject().put("name",item.name).put("category",item.category).put("weight",item.weight)
+            .put("value",item.value).put("description",item.description).put("stat",item.baseStat);
+    }
+    static synchronized void restoreAiItems(JSONObject definitions){
+        aiItems.clear();if(definitions==null)return;
+        java.util.Iterator<String> keys=definitions.keys();
+        while(keys.hasNext()){String key=keys.next();JSONObject row=definitions.optJSONObject(key);
+            if(row==null)continue;String name=row.optString("name","").trim();
+            if(name.length()<2||name.length()>80||find(name)!=null||sharedDisplayName(name))continue;
+            aiItems.put(aiKey(name),aiDefinition(name,row));
+        }
+    }
     private ItemCatalog(){}
     public static synchronized void initialize(Context c){
         if(loaded)return;
@@ -463,20 +499,21 @@ public final class ItemCatalog {
     public static ArrayList<Item> all(){
         ArrayList<Item> list=new ArrayList<>();
         for(Item item:items.values())if(!item.category.isEmpty())list.add(item);
-        return list;
+        list.addAll(aiItems.values());return list;
     }
     public static Item find(String id){
         Item existing=items.get(id);
         if(existing!=null)return existing;
         String legacyId=DISPLAY_ALIASES.get(id);
         if(legacyId!=null)return items.get(legacyId);
-        return items.get(ItemIdentityIndex.resolve(id));
+        Item canonical=items.get(ItemIdentityIndex.resolve(id));
+        return canonical!=null?canonical:id==null?null:aiItems.get(aiKey(id));
     }
     static String inventoryKey(String value) {
         Item item = find(value);
         return item == null ? value : item.id;
     }
-    public static int count(){return items.size();}
+    public static int count(){return items.size()+aiItems.size();}
     public static int countCategory(String category){return sorted(category,"Название").size();}
     public static ArrayList<Item> sorted(String category,String by){
         ArrayList<Item> list=new ArrayList<>();

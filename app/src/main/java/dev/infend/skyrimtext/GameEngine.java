@@ -217,7 +217,7 @@ public final class GameEngine {
         if(name.length()>28)name=name.substring(0,28);
         race=RACES[RpgContent.raceIndex(desiredRace)];
         heroClass=contains(CLASSES,desiredClass)?desiredClass:"Без класса";
-        started=true;solitude=new SolitudeCity();compensation=new CompensationPowers();compensation.installCatalog();lastLivingResult=new JSONObject();lastCheckChance=lastCheckRoll=-1;needs=new LivingNeeds();economy=new LivingEconomy();java.util.Arrays.fill(regenBonus,0);regenIgnorePenalty=false;fixSpent=0;fixShop=new FixShopState();aiTurn=null;sceneState=new SceneState();road=new RoadEvents();katherine=new KatherineStory();alma=new AlmaStory();livia=new LiviaStory();itachi=new ItachiStory();aiJournal="";day=1;hour=8;level=1;xp=0;gold=85;potions=3;manaPotions=1;
+        started=true;ItemCatalog.restoreAiItems(null);solitude=new SolitudeCity();compensation=new CompensationPowers();compensation.installCatalog();lastLivingResult=new JSONObject();lastCheckChance=lastCheckRoll=-1;needs=new LivingNeeds();economy=new LivingEconomy();java.util.Arrays.fill(regenBonus,0);regenIgnorePenalty=false;fixSpent=0;fixShop=new FixShopState();aiTurn=null;sceneState=new SceneState();road=new RoadEvents();katherine=new KatherineStory();alma=new AlmaStory();livia=new LiviaStory();itachi=new ItachiStory();aiJournal="";day=1;hour=8;level=1;xp=0;gold=85;potions=3;manaPotions=1;
         questStage=0;sideQuest=0;sideKills=0;boardCompleted=0;explored=0;victories=0;reputation=0;
         swordUpgraded=false;armorUpgraded=false;
         gearHpApplied=gearMpApplied=gearSpApplied=0;maxHp=100;maxStamina=100;maxMagicka=100;attack=12;armor=2;

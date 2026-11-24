@@ -3346,6 +3346,7 @@ public final class MainActivity extends Activity {
                     if(!completed.journal.isEmpty())aiMemory.add(aiSession,"event",completed.journal);
                     aiTurnStatus="";
                  }catch(Exception ex){
+                    if(game==originalGame)ItemCatalog.restoreAiItems(originalGame.progress.aiItems);
                     if(!local&&repairAttempt==0&&game==originalGame&&ex instanceof org.json.JSONException){
                         aiTurnBusy=false;aiTurnPreview="";
                         String fix=proposalOnly?

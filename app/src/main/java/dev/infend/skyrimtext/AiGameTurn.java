@@ -448,6 +448,8 @@ public final class AiGameTurn {
         if(g.enemyHp>0 && place!=null && !place.name.equals(g.progress.location))
             throw new JSONException("Нельзя покинуть локацию во время боя");
         java.util.LinkedHashMap<String,Integer> inventoryChanges=new java.util.LinkedHashMap<>();
+        java.util.LinkedHashMap<String,ItemCatalog.Item> newItems=new java.util.LinkedHashMap<>();
+        double proposedWeight=g.progress.carryWeight();
         if(e.has("inventory") && !e.isNull("inventory") && !(e.opt("inventory") instanceof JSONArray))
             throw new JSONException("Инвентарь должен быть массивом");
         JSONArray inv=e.optJSONArray("inventory");
@@ -461,21 +463,35 @@ public final class AiGameTurn {
                 if(ItemCatalog.sharedDisplayName(name))
                     throw new JSONException("У нескольких предметов такое название. Нужен идентификатор: "+name);
                 ItemCatalog.Item resolved=ItemCatalog.find(name);
-                if(resolved==null)throw new JSONException("Предмет неизвестен: "+name);
+                int delta=change(item,"delta",50);
+                if(delta==0)continue;
+                if(resolved==null){
+                    String key=ItemCatalog.aiKey(name);
+                    resolved=newItems.get(key);
+                    if(resolved==null){
+                        if(delta<0)throw new JSONException("Нельзя изъять отсутствующий предмет: "+name);
+                        if(name.length()<2||name.codePoints().anyMatch(Character::isISOControl)||CompensationPowers.itemIndex(name)>=0)
+                            throw new JSONException("Недопустимое имя предмета");
+                        resolved=ItemCatalog.aiDefinition(name,item);
+                        newItems.put(key,resolved);
+                    }
+                }
                 name=resolved.id;
                 if("Септимы".equals(name)||"Лечебное зелье".equals(name)||"Зелье магии".equals(name))
                     throw new JSONException("Валюту и зелья меняют отдельные поля");
                 if(CompensationPowers.itemIndex(name)>=0)throw new JSONException("Системный предмет не изменяется ИИ");
-                changes.put(name,changes.getOrDefault(name,0)+change(item,"delta",50));
+                changes.put(name,changes.getOrDefault(name,0)+delta);
             }
             double weight=g.progress.carryWeight();
             for(String name:changes.keySet()){
                 int amount=g.progress.quantity(name)+changes.get(name);
                 if(amount<0||amount>9999)throw new JSONException("Неверное количество "+name);
-                weight+=changes.get(name)*ItemCatalog.find(name).weight;
+                ItemCatalog.Item definition=ItemCatalog.find(name);
+                if(definition==null)definition=newItems.get(ItemCatalog.aiKey(name));
+                weight+=changes.get(name)*definition.weight;
             }
             if(weight>Math.max(g.progress.carryLimit(),g.progress.carryWeight())+0.0001 || weight < -0.0001)throw new JSONException("Недопустимый вес рюкзака");
-            inventoryChanges.putAll(changes);
+            inventoryChanges.putAll(changes);proposedWeight=weight;
         }
         int q=change(e,"questStageDelta",1),d=change(e,"dragonStageDelta",1);
         if(q<0||d<0)throw new JSONException("Сюжетный этап нельзя откатывать");
@@ -646,8 +662,11 @@ public final class AiGameTurn {
             }
         }
         ArrayList<AiEquipmentActions.Change> equipmentChanges=
-            AiEquipmentActions.prepare(g,e,inventoryChanges);
+            AiEquipmentActions.prepare(g,e,inventoryChanges,proposedWeight,newItems.keySet());
         // Commit only after all model-controlled fields have passed validation.
+        for(ItemCatalog.Item item:newItems.values())if(inventoryChanges.getOrDefault(item.id,0)>0)
+            g.progress.aiItems.put(ItemCatalog.aiKey(item.id),ItemCatalog.saveAiDefinition(item));
+        if(!newItems.isEmpty())ItemCatalog.restoreAiItems(g.progress.aiItems);
         for(String name:inventoryChanges.keySet())
             g.progress.quantity(name,g.progress.quantity(name)+inventoryChanges.get(name));
         if(enemy!=null){

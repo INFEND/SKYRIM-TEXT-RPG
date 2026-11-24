@@ -49,6 +49,13 @@ final class AiEquipmentActions {
     }
     static ArrayList<Change> prepare(GameEngine g,JSONObject effects,
                                       Map<String,Integer> inventoryDelta)throws JSONException{
+        double resultingWeight=g.progress.carryWeight();
+        for(Map.Entry<String,Integer> delta:inventoryDelta.entrySet()){
+            ItemCatalog.Item item=ItemCatalog.find(delta.getKey());if(item!=null)resultingWeight+=item.weight*delta.getValue();
+        }
+        return prepare(g,effects,inventoryDelta,resultingWeight,java.util.Collections.emptySet());
+    }
+    static ArrayList<Change> prepare(GameEngine g,JSONObject effects,Map<String,Integer> inventoryDelta,double resultingWeight,java.util.Set<String> newNames)throws JSONException{
         ArrayList<Change> out=new ArrayList<>();
         if(!effects.has("equipmentChanges")||effects.isNull("equipmentChanges"))return out;
         if(!(effects.opt("equipmentChanges") instanceof JSONArray))
@@ -61,11 +68,6 @@ final class AiEquipmentActions {
         for(int i=0;i<CompensationPowers.SLOTS;i++){
             String name=g.compensation.itemNames[i];
             if(name!=null&&!name.isEmpty())taken.add(name.toLowerCase(Locale.ROOT));
-        }
-        double resultingWeight=g.progress.carryWeight();
-        for(Map.Entry<String,Integer> delta:inventoryDelta.entrySet()){
-            ItemCatalog.Item item=ItemCatalog.find(delta.getKey());
-            if(item!=null)resultingWeight+=item.weight*delta.getValue();
         }
         for(int i=0;i<source.length();i++){
             JSONObject row=source.optJSONObject(i);
@@ -93,7 +95,7 @@ final class AiEquipmentActions {
             double newWeight=weight(row);
             if(!create&&g.compensation.itemType[slot]!=type)
                 throw new JSONException("Тип существующего предмета менять нельзя");
-            if(ItemCatalog.find(name)!=null||!taken.add(name.toLowerCase(Locale.ROOT)))
+            if(ItemCatalog.find(name)!=null||newNames.contains(ItemCatalog.aiKey(name))||!taken.add(name.toLowerCase(Locale.ROOT)))
                 throw new JSONException("Название предмета уже используется");
             if(!touched.add(slot)&&create)throw new JSONException("Повтор предмета");
             resultingWeight+=newWeight-(create?0:g.compensation.itemWeight[slot]);

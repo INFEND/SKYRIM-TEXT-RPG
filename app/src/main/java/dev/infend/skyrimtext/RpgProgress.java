@@ -5,6 +5,7 @@ import java.util.*;
 
 public final class RpgProgress {
     public final JSONObject inventory = new JSONObject();
+    public final JSONObject aiItems = new JSONObject();
     RoadArtifacts artifacts=new RoadArtifacts();
     public final ArrayList<String> completed = new ArrayList<>();
     public final ArrayList<String> failed = new ArrayList<>();
@@ -460,7 +461,7 @@ public final class RpgProgress {
             o.put("startId",startId).put("location",location).put("recent",recent)
              .put("points",new JSONArray(spent)).put("skillLevels",new JSONArray(skillLevels))
              .put("skillXp",new JSONArray(skillXp)).put("trainingLevel",trainingLevel)
-             .put("trainingsThisLevel",trainingsThisLevel).put("inventory",inventory)
+             .put("trainingsThisLevel",trainingsThisLevel).put("inventory",inventory).put("aiItems",aiItems)
              .put("completed",new JSONArray(completed)).put("failed",new JSONArray(failed))
              .put("questOutcomes",new JSONObject(questOutcomes)).put("aiQuestRecords",aiQuestRecords).put("roadArtifacts",artifacts.save())
              .put("fixCarryBonus",fixCarryBonus).put("perks",perkPoints).put("combatPerks",new JSONArray(combatPerks)).put("studyPerks",new JSONArray(studyPerks)).put("talentBranches",branches.toJson()).put("advancedPerks",advanced.toJson())
@@ -477,7 +478,8 @@ public final class RpgProgress {
         return o;
     }
     public static RpgProgress fromJson(JSONObject obj){
-        RpgProgress p=new RpgProgress();if(obj==null)return p;
+        RpgProgress p=new RpgProgress();ItemCatalog.restoreAiItems(null);if(obj==null)return p;
+        JSONObject definitions=obj.optJSONObject("aiItems");if(definitions!=null){java.util.Iterator<String> names=definitions.keys();while(names.hasNext()){String key=names.next();try{p.aiItems.put(key,definitions.getJSONObject(key));}catch(Exception ignored){}}}ItemCatalog.restoreAiItems(p.aiItems);
         p.artifacts=RoadArtifacts.restore(obj.optJSONObject("roadArtifacts"));p.branches=TalentBranches.fromJson(obj.optJSONArray("talentBranches"));p.advanced=AdvancedPerks.fromJson(obj.optJSONArray("advancedPerks"));
         p.startId=obj.optString("startId","Хелген");p.location=obj.optString("location","Хелген");
         p.recent=obj.optString("recent","");p.perkPoints=Math.max(0,obj.optInt("perks",0));p.fixCarryBonus=Math.max(0,Math.min(1000000,obj.optInt("fixCarryBonus",0)));
