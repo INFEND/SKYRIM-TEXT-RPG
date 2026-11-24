@@ -9212,8 +9212,8 @@
         },
         {
           "frame": 3,
-          "source_sha256": "569001855573810d1d6d73d8782359fa83baf69ae0af8f2bc90b7c256ddcc6cc",
-          "source_bytes": 3474394,
+          "source_sha256": "567831e7dc729a0d2a8899b54c9210a80e10c1bf60d115fefe5970a1a466ad3c",
+          "source_bytes": 3483148,
           "source_dimensions": [
             1672,
             941
@@ -9222,14 +9222,14 @@
             1672,
             941
           ],
-          "bytes": 526558,
-          "quality": 88,
-          "sha256": "2bd641877127059c0ce49a73d50e3bcc217936ff5e099947c1ba61bc6df9a996",
-          "full_resolution_luma_ssim": 0.986222,
-          "worst_128px_luma_ssim": 0.978288,
-          "chroma_mean_absolute_error": 1.806978,
-          "chroma_95th_percentile_error": 5,
-          "scene": "Northern hill town of pine beams, pale turf, wheat-colored grassy plains, soft distant snow peaks; original terrain and medieval architecture. An open-air common filled with locally woven golden shades, vegetables, pottery and a wedge of sun over the ochre marketplace, pedestrian view."
+          "bytes": 515924,
+          "sha256": "40c901e0d1b955dca740b3a6edc8dfda724e0022e74eb5ea4d624dc9a892b07f",
+          "full_resolution_luma_ssim": 0.988413,
+          "worst_128px_luma_ssim": 0.979203,
+          "chroma_mean_absolute_error": 1.514843,
+          "chroma_95th_percentile_error": 4,
+          "scene": "Рынок Вайтрана: торговые лавки, колодец, стражник и деревянные дома.",
+          "source": "user_supplied"
         },
         {
           "frame": 4,
