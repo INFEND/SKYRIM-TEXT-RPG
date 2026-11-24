@@ -183,7 +183,7 @@ public final class AiGameTurn {
             // The engine owns the chance. Missing echo or known null is not a new roll.
             if(json.has("customChance")&&!json.isNull("customChance")&&
                     probability(json,"customChance")!=lockedChance)
-                throw new JSONException("ИИ изменил шанс после броска");
+                throw new JSONException("ИИ изменил шанс после проверки");
             json.put("customChance",lockedChance<0?JSONObject.NULL:lockedChance);
         }
         JSONArray options=json.optJSONArray("choices");

@@ -24,7 +24,7 @@ class AiLockedFreeActionContract(unittest.TestCase):
                          'prefs.getInt(AI_PENDING_DIE,-1)',"aiClient.generateChance(token",
                          "aiClient.generateChance(key"):
             self.assertIn(fragment,view)
-        self.assertIn("int fixedChance=AiGameTurn.parseChance(answer)",view)
+        self.assertIn("int fixedChance=PlayerChance.calculate(game,AiGameTurn.parseChance(answer),-1,customAction",view)
         self.assertIn(".putInt(AI_PENDING_FATE,fateDay).commit()",view)
         self.assertIn("FixShopAiContext.commitRetry(next,prefs.getInt(AI_PENDING_FATE,-1))",view)
         self.assertIn(".remove(AI_PENDING_FATE)",view)

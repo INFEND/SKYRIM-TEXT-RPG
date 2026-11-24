@@ -36,9 +36,9 @@ class PocketOrcaStoryPolish(unittest.TestCase):
         self.assertNotIn('"БЕЗ ПРОВЕРКИ"',UI)
         self.assertIn('addChoiceStat(prose,"ШАНС УСПЕХА","100%"',UI)
         self.assertIn('addChoiceStat(detail,"ШАНС УСПЕХА","100%"',UI)
-        self.assertIn('instruction.append("шанс 100%, бросок не требуется.")',UI)
-        self.assertIn('int die=option.chance<0?-1:AiGameTurn.roll()',UI)
-        self.assertIn('AiGameTurn.success(option.chance,die)',UI)
+        self.assertIn('instruction.append("шанс 100%, действие без риска.")',UI)
+        self.assertIn('int die=chance<0?-1:AiGameTurn.roll()',UI)
+        self.assertIn('AiGameTurn.success(chance,die)',UI)
 
     def test_skills_show_actual_name_and_level_not_model_raw_value(self):
         self.assertIn("private int choiceSkillIndex(String skill)",UI)
@@ -49,7 +49,15 @@ class PocketOrcaStoryPolish(unittest.TestCase):
 
     def test_chance_calculations_are_truthful(self):
         self.assertIn('private String aiChoiceCalculation(',UI)
-        self.assertIn('ИИ не прислал числовую разбивку',UI)
+        formula=(SRC/"PlayerChance.java").read_text(encoding="utf-8")
+        self.assertIn('PlayerChance.calculate(game,option.chance',UI)
+        self.assertIn('aiChoiceChance(option)',UI)
+        self.assertIn('int raw=65+bonus+situation+reputation+perks;',formula)
+        self.assertIn('int chance=Math.max(5,Math.min(100,raw));',formula)
+        self.assertIn('ИТОГ: ',formula)
+        self.assertNotIn('ИИ не прислал числовую разбивку',UI)
+        self.assertNotIn('Бросок:',UI)
+        self.assertNotIn('Бросок d100',PROGRESS)
         self.assertIn('chanceExplanation="ИГРОВОЙ РАСЧЁТ ШАНСА',PROGRESS)
         self.assertIn('ИТОГ: ',PROGRESS)
         self.assertIn('Ограничение до диапазона 0–100%',PROGRESS)

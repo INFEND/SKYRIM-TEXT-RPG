@@ -15,5 +15,9 @@ class RecoveredInn(unittest.TestCase):
         self.assertEqual(hashlib.sha256(data).hexdigest(),"63e9f5879607fd7f9529f5262b2cad086cfdc902ec0fb008889e50422ef1f7d8")
     def test_children_are_separate(self):
         s=(ROOT/"app/src/main/java/dev/infend/skyrimtext/LocationGalleryView.java").read_text()
-        self.assertIn("addInteriorLinks()",s)
-        self.assertIn("openInterior(d.name)",s)
+        ui=(ROOT/"app/src/main/java/dev/infend/skyrimtext/MainActivity.java").read_text()
+        directory=(ROOT/"app/src/main/java/dev/infend/skyrimtext/CityArchitecture.java").read_text()
+        self.assertNotIn("addInteriorLinks()",s)
+        self.assertIn("LocationGalleryView.childPlaces(city)",directory)
+        self.assertIn("cityPlaceDialog(city,index,place,interactive)",ui)
+        self.assertIn("LocationGalleryView.cityPlaceGallery(this,city,place,accent())",ui)

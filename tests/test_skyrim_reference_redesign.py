@@ -66,7 +66,7 @@ class SkyrimReferenceRedesign(unittest.TestCase):
         ui=code("MainActivity.java")
         self.assertIn("private void renderAiChoice(",ui)
         self.assertIn("private void storyChoice(",ui)
-        self.assertIn("AiGameTurn.success(option.chance,die)",ui)
+        self.assertIn("AiGameTurn.success(chance,die)",ui)
         self.assertIn("game.progress.chance(game,c.action)",ui)
         self.assertIn('СВОЙ ВАРИАНТ ОТВЕТА',ui)
         self.assertIn('AmoledAppearance.storyTint(c.action,c.title',ui)

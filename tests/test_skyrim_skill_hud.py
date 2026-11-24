@@ -22,7 +22,7 @@ class SkillLevelHudContracts(unittest.TestCase):
     def test_game_data_and_probability_mechanics_are_unchanged(self):
         ui=(SRC/"MainActivity.java").read_text(encoding="utf-8")
         self.assertIn("game.progress.chance(game,c.action)",ui)
-        self.assertIn("AiGameTurn.success(option.chance,die)",ui)
+        self.assertIn("AiGameTurn.success(chance,die)",ui)
         self.assertIn('prefs.edit().putString("save",game.toJson().toString())',ui)
 
 if __name__=="__main__":unittest.main()

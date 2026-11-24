@@ -20,7 +20,7 @@ class CatalogUiOverhaul(unittest.TestCase):
         self.assertIn('addChoiceStat(detail,"ШАНС УСПЕХА",displayedChance+"%"',choice)
         self.assertIn('SceneChoiceMeta.chanceColor(displayedChance)',choice)
         self.assertIn('if(displayedChance>=0)',choice)
-        self.assertIn('game.progress.chance(game,option.combatAction):-1):option.chance',choice)
+        self.assertIn('game.progress.chance(game,option.combatAction):-1):aiChoiceChance(option)',choice)
         self.assertNotIn('addChoiceStat(detail,"ШАНС УСПЕХА",option.chance',choice)
         self.assertIn('public static String skillName(String action)',META)
 
