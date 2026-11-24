@@ -502,13 +502,34 @@ public final class UpdateManager {
                         if(!a.isFinishing()&&!a.isDestroyed())migration.stage("Сохранение ресурсов",done+" / "+total+" | "+label);
                     }));
                     a.runOnUiThread(()->{if(a.isFinishing()||a.isDestroyed()||!migration.isShowing())return;migration.dismiss();launchVerifiedInstaller(a);});
-                }catch(Exception e){a.runOnUiThread(()->{if(!a.isFinishing()&&!a.isDestroyed())migration.fail("Не удалось сохранить ресурсы: "+friendly(e),()->{migration.dismiss();install(a);});});}
+                }catch(Exception e){a.runOnUiThread(()->{
+                    if(a.isFinishing()||a.isDestroyed())return;
+                    migration.dismiss();
+                    offerInstallWithoutMigration(a,friendly(e));
+                });}
             });
         }catch(Exception e){
             OtaProgressDialog screen=new OtaProgressDialog(a);
             screen.show();screen.fail(friendly(e),null);
         }
     }
+    /**
+     * A damaged legacy bundled resource catalog must never permanently trap the
+     * user on an obsolete version. Keep verification strict and make the choice
+     * explicit: only optional media may require downloading after installation.
+     */
+    private static void offerInstallWithoutMigration(Activity a,String reason){
+        int accent=a instanceof MainActivity?((MainActivity)a).currentAccent():0xffc8a86b;
+        new RuneDialogBuilder(a,accent)
+            .setTitle("Не удалось перенести ресурсы")
+            .setMessage("Ошибка: "+reason+"\\n\\n"
+                +"APK уже проверен. Можно установить обновление без переноса старых фотографий и дополнительных ресурсов. "
+                +"Сохранения игры и настройки не удаляются. Отсутствующие ресурсы затем можно скачать в управлении ресурсами.")
+            .setNegativeButton("Отмена",null)
+            .setPositiveButton("Установить без переноса",(dialog,which)->launchVerifiedInstaller(a))
+            .show();
+    }
+
     private static void launchVerifiedInstaller(Activity a){
         try{
             File apk=apkFile(a);
