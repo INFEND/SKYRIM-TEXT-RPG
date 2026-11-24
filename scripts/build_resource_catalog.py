@@ -110,7 +110,7 @@ def build(commit, thin=False):
         if not f.is_file():continue
         path=f.relative_to(ASSETS).as_posix()
         if path in listed or path=="resource_manifest.json":continue
-        if path not in CORE or f.stat().st_size>2*1024*1024:
+        if (path not in CORE and not re.fullmatch(r"title_art/[0-5]\.webp",path)) or f.stat().st_size>2*1024*1024:
             raise ValueError("Asset must be externalized or explicitly approved as core: "+path)
     if not records:raise ValueError("No optional assets")
     return dict(schema=1,commit=commit,bundled=not thin,files=records)
@@ -201,6 +201,26 @@ def validate_archive_references(data):
             raise ValueError("Unreferenced gallery archive: "+path)
 
 
+# Core title cover derivatives are extracted before the optional gallery archives
+# are removed. Do not make the user download locations to open the main menu.
+TITLE_ART_FRAMES=[
+    ("bleakfallsbarrow","01.webp"),
+    ("labyrinthian","01.webp"),
+    ("labyrinthian","02.webp"),
+    ("throatoftheworld","01.webp"),
+    ("highhrothgar","01.webp"),
+    ("throatoftheworld","02.webp"),
+]
+def bundle_title_art():
+    target=ASSETS/"title_art"
+    target.mkdir(parents=True,exist_ok=True)
+    for index,(slug,frame) in enumerate(TITLE_ART_FRAMES):
+        with zipfile.ZipFile(ASSETS/"gallery"/(slug+".zip")) as archive:
+            raw=archive.read(frame)
+        if not 16000<len(raw)<2_000_000 or raw[:4]!=b"RIFF" or raw[8:12]!=b"WEBP":
+            raise ValueError("Invalid title art: "+slug+"/"+frame)
+        (target/(str(index)+".webp")).write_bytes(raw)
+
 def main():
     parser=argparse.ArgumentParser()
     parser.add_argument("--commit",default=None)
@@ -218,6 +238,7 @@ def main():
         data["files"].extend(font_records())
     (ASSETS/"resource_manifest.json").write_text(json.dumps(data,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
     if args.thin:
+        bundle_title_art()
         for e in data["files"]:
             if "url" not in e:(ASSETS/e["path"]).unlink()
     print("Resource catalog:",len(data["files"]),"files;",sum(e["size"] for e in data["files"]),"bytes; bundled=",data["bundled"])

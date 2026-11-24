@@ -86,6 +86,13 @@ public final class MainActivity extends Activity {
     private static final String SKILL_HUD_OWNER="skill_hud_owner";
     private static final String SKILL_HUD_SNAPSHOT="skill_hud_snapshot";
     private boolean animations=true, titleOpen=true;
+    private int launchTitleArt=-1;
+    private int titleArtIndex(){
+        int fixed=TitleArtView.normalize(prefs.getInt(TitleArtView.PREF_ART,0));
+        if(!prefs.getBoolean(TitleArtView.PREF_RANDOM,false))return fixed;
+        if(launchTitleArt<0)launchTitleArt=new java.util.Random().nextInt(TitleArtView.NAMES.length);
+        return launchTitleArt;
+    }
     private int codexCategory=0;
     private String bestiaryFilter=BestiaryCatalog.ALL, bestiaryQuery="";
     private SkyrimOtaController updater;
@@ -2023,17 +2030,22 @@ public final class MainActivity extends Activity {
     }
     private void renderTitle(){
         content.setPadding(0,dp(8),0,dp(25));
-        FrameLayout cover=new FrameLayout(this);content.addView(cover,lp(-1,340));
-        cover.addView(new NordicArtView(this,NordicArtView.TITLE),
+        int heightDp=(int)(getResources().getDisplayMetrics().heightPixels/getResources().getDisplayMetrics().density);
+        FrameLayout cover=new FrameLayout(this);content.addView(cover,lp(-1,Math.max(270,Math.min(540,(int)(heightDp*.56f)))));
+        cover.addView(new TitleArtView(this,titleArtIndex(),
+            animations&&prefs.getBoolean(TitleArtView.PREF_SNOW,true),
+            animations&&prefs.getBoolean(TitleArtView.PREF_MOTION,true)),
             new FrameLayout.LayoutParams(-1,-1));
         LinearLayout letter=column();letter.setGravity(Gravity.CENTER);
         FrameLayout.LayoutParams overlay=new FrameLayout.LayoutParams(-1,-1);overlay.setMargins(dp(8),0,dp(8),dp(25));cover.addView(letter,overlay);
-        SkyrimIconView rune=new SkyrimIconView(this,"dragon",accent());
-        LinearLayout.LayoutParams logo=lp(82,82);logo.gravity=Gravity.CENTER;
+        letter.setGravity(Gravity.BOTTOM|Gravity.CENTER_HORIZONTAL);
+        SkyrimIconView rune=new SkyrimIconView(this,"dragon",0xffcbd5de);
+        LinearLayout.LayoutParams logo=lp(72,72);logo.gravity=Gravity.CENTER_HORIZONTAL;
         letter.addView(rune,logo);
-        TextView name=text("СКАЙРИМ",38,TEXT,false);name.setGravity(Gravity.CENTER);name.setLetterSpacing(.14f);
+        TextView name=text("СКАЙРИМ",38,0xffe0e6eb,false);name.setGravity(Gravity.CENTER);name.setLetterSpacing(.14f);
+        name.setShadowLayer(dp(5),0,dp(2),Color.BLACK);
         letter.addView(name,lp(-1,60));
-        TextView subtitle=text("Т Е К С Т О В А Я   R P G",11,accent(),false);
+        TextView subtitle=text("Т Е К С Т О В А Я   R P G",11,0xffaebdca,false);
         subtitle.setGravity(Gravity.CENTER);letter.addView(subtitle,lp(-1,32));
         titleRule();
         titleButton("Новая игра",true,()->{
@@ -7034,6 +7046,50 @@ public final class MainActivity extends Activity {
         addText(host,"Отключённые потребности не расходуются и не накладывают штрафы. Значения сохраняются до повторного включения. При отключении всех раздел героя скрывается.",12,MUTED,false,8);
         refresh.run();
     }
+    private void renderTitleArtSettings(){
+        LinearLayout panel=card();
+        addText(panel,"ГЛАВНОЕ МЕНЮ",11,accent(),true,10);
+        int selected=TitleArtView.normalize(prefs.getInt(TitleArtView.PREF_ART,0));
+        panel.addView(new TitleArtView(this,selected,false,false),lp(-1,150));
+        TextView choose=text("Фон | "+TitleArtView.NAMES[selected],15,TEXT,true);
+        choose.setPadding(dp(8),dp(12),dp(8),dp(12));
+        panel.addView(choose,lp(-1,-2));choose.setOnClickListener(v->chooseTitleArt());
+        titleArtSwitch(panel,"Случайный фон при запуске",TitleArtView.PREF_RANDOM,false);
+        titleArtSwitch(panel,"Снежинки",TitleArtView.PREF_SNOW,true);
+        titleArtSwitch(panel,"Плавное движение фона",TitleArtView.PREF_MOTION,true);
+        addText(panel,"Эффекты отключаются вместе с общей анимацией. Фоны доступны без загрузки ресурсов.",12,MUTED,false,0);
+    }
+    private void titleArtSwitch(LinearLayout panel,String label,String key,boolean defaultValue){
+        Switch toggle=new Switch(this);toggle.setText(label);toggle.setTextColor(TEXT);
+        toggle.setTextSize(sp(14));toggle.setThumbTintList(ColorStateList.valueOf(accent()));
+        toggle.setChecked(prefs.getBoolean(key,defaultValue));panel.addView(toggle,lp(-1,47));
+        toggle.setOnCheckedChangeListener((v,on)->{prefs.edit().putBoolean(key,on).apply();if(TitleArtView.PREF_RANDOM.equals(key))launchTitleArt=-1;});
+    }
+    private void chooseTitleArt(){
+        int current=TitleArtView.normalize(prefs.getInt(TitleArtView.PREF_ART,0));
+        LinearLayout panel=column();panel.setPadding(dp(12),dp(6),dp(12),dp(10));
+        FrameLayout preview=new FrameLayout(this);panel.addView(preview,lp(-1,200));
+        preview.addView(new TitleArtView(this,current,false,false),new FrameLayout.LayoutParams(-1,-1));
+        final int[] selected={current};
+        android.widget.RadioGroup list=new android.widget.RadioGroup(this);
+        for(int i=0;i<TitleArtView.NAMES.length;i++){
+            android.widget.RadioButton option=new android.widget.RadioButton(this);
+            option.setId(100+i);option.setText(TitleArtView.NAMES[i]);option.setTextColor(TEXT);
+            option.setButtonTintList(ColorStateList.valueOf(accent()));
+            list.addView(option,new android.widget.RadioGroup.LayoutParams(-1,dp(44)));
+        }
+        list.check(100+current);panel.addView(list,lp(-1,-2));
+        list.setOnCheckedChangeListener((group,id)->{
+            selected[0]=TitleArtView.normalize(id-100);preview.removeAllViews();
+            preview.addView(new TitleArtView(this,selected[0],false,false),new FrameLayout.LayoutParams(-1,-1));
+        });
+        ScrollView pickerScroll=new ScrollView(this);pickerScroll.addView(panel);
+        new RuneDialogBuilder(this,accent()).setTitle("Фон главного меню").setView(pickerScroll)
+            .setNegativeButton("Отмена",null).setPositiveButton("Применить",(d,w)->{
+                prefs.edit().putInt(TitleArtView.PREF_ART,selected[0]).putBoolean(TitleArtView.PREF_RANDOM,false).apply();
+                launchTitleArt=-1;render();
+            }).show();
+    }
     private void renderSettings(){
         section("ПАРАМЕТРЫ","Настройки","Твоя история, твои правила.");
         int additionsStart=content.getChildCount();
@@ -7088,6 +7144,7 @@ public final class MainActivity extends Activity {
         foldAddonSection("additions","Дополнения",additionsStart,true);
         content.addView(new NordicArtView(this,NordicArtView.STORY),lp(-1,105));space(content,12);
         int appearanceStart=content.getChildCount();
+        renderTitleArtSettings();
         LinearLayout palette=card();addText(palette,"ЦВЕТ АКЦЕНТА",11,accent(),true,12);
         for(int i=0;i<ACCENTS.length;i++){
             final int value=i;LinearLayout item=row();LinearLayout.LayoutParams p=lp(-1,42);palette.addView(item,p);
