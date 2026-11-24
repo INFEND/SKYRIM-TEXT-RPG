@@ -41,5 +41,7 @@ class AmoledAppearanceTest(unittest.TestCase):
         ui=code("MainActivity.java")
         self.assertNotIn("AmoledAppearance.buttons()==5?actionTint:accent()",ui)
         self.assertIn('chance>=0?skillGlyph(choiceSkillName(c.action)):"skills",accent());',ui)
-        self.assertIn("new SkyrimIconView(this,skillGlyph(option.skill),accent());",ui)
+        self.assertIn("ActionChoiceIcons.view(this,ActionChoiceIcons.resolve(option.combatAction,option.title,option.skill),skillGlyph(option.skill),accent());",ui)
+        self.assertIn("ActionChoiceIcons.view(this,actionIcon,glyph,accent())",ui)
+        self.assertIn("if(image==null)return new SkyrimIconView(context,fallback,tint);",code("ActionChoiceIcons.java"))
         self.assertIn("box.setBackground(new RuneFrameDrawable(PANEL,actionTint",ui)
