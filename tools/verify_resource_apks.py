@@ -5,7 +5,7 @@ ROOT=pathlib.Path(__file__).resolve().parents[1]
 apk=ROOT/"dist/SKYRIM-TEXT-RPG.apk"
 alias=ROOT/"dist/SKYRIM-TEXT-RPG-thin.apk"
 assert hashlib.sha256(apk.read_bytes()).digest()==hashlib.sha256(alias.read_bytes()).digest()
-core={"assets/icons/skyrim_icons_48.webp","assets/lore_bundle.zip","assets/fonts/Sovngarde Light.ttf","assets/fonts/Sovngarde Bold.ttf","assets/fonts/OFL.txt","assets/resource_manifest.json"}
+core={"assets/icons/action_choices_283.webp","assets/icons/skyrim_icons_48.webp","assets/lore_bundle.zip","assets/fonts/Sovngarde Light.ttf","assets/fonts/Sovngarde Bold.ttf","assets/fonts/OFL.txt","assets/resource_manifest.json"}
 font_spec=json.loads((ROOT/"app/font-choices.json").read_text(encoding="utf-8"))
 font_entries=[entry for family in font_spec["families"] for entry in family["files"]]
 with zipfile.ZipFile(apk) as z:
@@ -21,6 +21,16 @@ with zipfile.ZipFile(apk) as z:
         assert external[entry["asset"]]["size"]==entry["size"]
         assert len(external[entry["asset"]]["sha256"])==64
     assert core<=names
+    # The approved action atlas is a required, small offline UI resource, not optional media.
+    action_path="assets/icons/action_choices_283.webp"
+    action_source=ROOT/"app/src/main/assets/icons/action_choices_283.webp"
+    action_data=z.read(action_path)
+    assert 0<len(action_data)<=384*1024,action_path
+    assert action_data[:4]==b"RIFF" and action_data[8:12]==b"WEBP",action_path
+    assert hashlib.sha256(action_data).digest()==hashlib.sha256(action_source.read_bytes()).digest(),action_path
+    action_index="assets/icons/action_choices_283.tsv"
+    assert len(z.read(action_index).decode("utf-8").splitlines())==284,action_index
+    assert "assets/icons/action_choices_LICENSE.txt" in names
     engine=ROOT/"dist/SKYRIM-LOCAL-AI.apk"
     module=json.loads(z.read("assets/engine_module.json"))
     assert module["size"]==engine.stat().st_size and module["sha256"]==hashlib.sha256(engine.read_bytes()).hexdigest()
