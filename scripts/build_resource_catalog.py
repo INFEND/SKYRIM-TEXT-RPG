@@ -8,7 +8,7 @@ CITIES=dict(zip("whiterun windhelm winterhold dawnstar markarth morthal riverwoo
 MAPS={"skyrim_geographic.webp":"Карта Скайрима","skyrim_user_mosaic.webp":"Дополнительная карта Скайрима","solstheim_terrain.webp":"Карта Солстейма"}
 RACES=dict(zip("nord breton dunmer khajiit imperial orc redguard altmer bosmer argonian".split(),
     "Норды|Бретонцы|Данмеры|Каджиты|Имперцы|Орки|Редгарды|Альтмеры|Босмеры|Аргониане".split("|")))
-CORE={"lore_bundle.zip","icons/skyrim_icons_48.webp","fonts/Sovngarde Light.ttf","fonts/Sovngarde Bold.ttf","fonts/OFL.txt"}
+CORE={"icons/action_choices_283.webp","icons/action_choices_283.tsv","icons/action_choices_LICENSE.txt","lore_bundle.zip","icons/skyrim_icons_48.webp","fonts/Sovngarde Light.ttf","fonts/Sovngarde Bold.ttf","fonts/OFL.txt"}
 MEDIA_RE=re.compile(r"media/[a-z0-9_-]+/[a-z0-9_-]+\.(?:webp|png|jpg|jpeg|zip|ogg|mp3|mp4|json)")
 def font_records():
     spec=json.loads((ROOT/"app/font-choices.json").read_text(encoding="utf-8"))

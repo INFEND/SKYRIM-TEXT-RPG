@@ -2588,7 +2588,7 @@ public final class MainActivity extends Activity {
             ordinalSize.rightMargin=dp(5);
             box.addView(ordinal,ordinalSize);
         }
-        SkyrimIconView glyph=new SkyrimIconView(this,
+        View glyph=ActionChoiceIcons.view(this,ActionChoiceIcons.resolve(c.action,c.title,chance>=0?choiceSkillName(c.action):""),
             chance>=0?skillGlyph(choiceSkillName(c.action)):"skills",accent());
         if(visual("choices"))box.addView(glyph,lp(choiceIconSize(),choiceIconSize()));
         LinearLayout prose=column();
@@ -3146,10 +3146,13 @@ public final class MainActivity extends Activity {
             android.widget.FrameLayout iconHost=aiChoiceLiveIconHosts.get(i);
             String glyph=option.skill.isEmpty()?
                 SkyrimIconView.iconForLabel(option.title):skillGlyph(option.skill);
-            if(!glyph.equals(iconHost.getTag())){
+            int actionIcon=ActionChoiceIcons.resolve(option.combatAction,option.title,option.skill);
+            String iconKey=actionIcon+":"+glyph;
+            iconHost.setVisibility(visual("choices")?View.VISIBLE:View.GONE);
+            if(!iconKey.equals(iconHost.getTag())){
                 iconHost.removeAllViews();
-                iconHost.addView(new SkyrimIconView(this,glyph,accent()),new android.widget.FrameLayout.LayoutParams(-1,-1));
-                iconHost.setTag(glyph);
+                iconHost.addView(ActionChoiceIcons.view(this,actionIcon,glyph,accent()),new android.widget.FrameLayout.LayoutParams(-1,-1));
+                iconHost.setTag(iconKey);
             }
             String title=(showChoiceNumbers()?(i+1)+". ":"")+option.title;
             String meta=option.chance>=0?(option.skill.isEmpty()?"":option.skill+" | ")+option.chance+"%":option.skill;
@@ -3183,7 +3186,7 @@ public final class MainActivity extends Activity {
             ordinalSize.rightMargin=dp(5);
             row.addView(ordinal,ordinalSize);
         }
-        SkyrimIconView glyph=new SkyrimIconView(this,skillGlyph(option.skill),accent());
+        View glyph=ActionChoiceIcons.view(this,ActionChoiceIcons.resolve(option.combatAction,option.title,option.skill),skillGlyph(option.skill),accent());
         if(visual("choices"))row.addView(glyph,lp(choiceIconSize(),choiceIconSize()));
         LinearLayout detail=column();
         LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(0,-2,1);
