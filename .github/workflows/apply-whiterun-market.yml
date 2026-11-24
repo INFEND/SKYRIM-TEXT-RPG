@@ -1,0 +1,88 @@
+name: SKYRIM · Apply Whiterun market artwork
+on:
+  push:
+    branches: [main]
+    paths: ['artwork_sources/whiterun_20261124/03.webp']
+  workflow_dispatch:
+permissions:
+  contents: write
+  actions: write
+concurrency:
+  group: skyrim-whiterun-gallery-main
+  cancel-in-progress: false
+jobs:
+  replace:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - name: Replace frame 03 and verify all other members
+        run: |
+          python3 - <<'PY'
+          import hashlib, json, os, pathlib, tempfile, zipfile
+          source = pathlib.Path('artwork_sources/whiterun_20261124/03.webp')
+          archive = pathlib.Path('app/src/main/assets/gallery/whiterun.zip')
+          registry = pathlib.Path('docs/gallery_registry.json')
+          raw = source.read_bytes()
+          expected = '40c901e0d1b955dca740b3a6edc8dfda724e0022e74eb5ea4d624dc9a892b07f'
+          assert hashlib.sha256(raw).hexdigest() == expected, 'Wrong source image'
+          assert len(raw) == 515924 and raw[:4] == b'RIFF' and raw[8:12] == b'WEBP'
+          data = json.loads(registry.read_text(encoding='utf-8'))
+          city = next(x for x in data if x['slug'] == 'whiterun')
+          assert len(city['captions']) == 6
+          city['captions'][2] = 'Рынок'
+          frame = next(x for x in city['artwork']['frames'] if x['frame'] == 3)
+          frame.clear()
+          frame.update(frame=3, source_sha256='567831e7dc729a0d2a8899b54c9210a80e10c1bf60d115fefe5970a1a466ad3c',
+              source_bytes=3483148, source_dimensions=[1672,941], dimensions=[1672,941],
+              bytes=len(raw), sha256=expected, full_resolution_luma_ssim=0.988413,
+              worst_128px_luma_ssim=0.979203, chroma_mean_absolute_error=1.514843,
+              chroma_95th_percentile_error=4, scene='Рынок Вайтрана: торговые лавки, колодец, стражник и деревянные дома.',
+              source='user_supplied')
+          with zipfile.ZipFile(archive) as z:
+              assert z.testzip() is None
+              infos = z.infolist()
+              names = [i.filename for i in infos]
+              assert len(names) == len(set(names)) and {f'{n:02d}.webp' for n in range(1,7)}.issubset(names)
+              previous = {name:z.read(name) for name in names}
+              comment = z.comment
+          if previous['03.webp'] != raw:
+              fd, name = tempfile.mkstemp(suffix='.zip',dir=archive.parent)
+              os.close(fd)
+              tmp = pathlib.Path(name)
+              try:
+                  with zipfile.ZipFile(tmp,'w') as z:
+                      z.comment = comment
+                      for info in infos:
+                          z.writestr(info,raw if info.filename=='03.webp' else previous[info.filename])
+                  with zipfile.ZipFile(tmp) as z:
+                      assert z.testzip() is None and z.namelist() == names
+                      assert all(z.read(n) == (raw if n=='03.webp' else previous[n]) for n in names)
+                  os.replace(tmp,archive)
+              finally:
+                  tmp.unlink(missing_ok=True)
+          registry.write_text(json.dumps(data,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          print('Verified Whiterun 03.webp and preserved every other archive member')
+          PY
+      - name: Validate gallery and resource contracts
+        run: |
+          python3 -m unittest discover -s tests -p 'test_location_galleries.py' -v
+          python3 -m unittest discover -s tests -p 'test_resource*.py' -v
+      - name: Commit and refresh signed OTA resources
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          if ! git diff --quiet -- app/src/main/assets/gallery/whiterun.zip docs/gallery_registry.json; then
+            git config user.name 'github-actions[bot]'
+            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+            git add app/src/main/assets/gallery/whiterun.zip docs/gallery_registry.json
+            git commit -m 'artwork: replace Whiterun market frame 03'
+            git pull --rebase origin main
+            git push origin HEAD:main
+          fi
+          gh workflow run resource-catalog.yml --ref main
