@@ -61,11 +61,17 @@ final class CityArchitecture {
         for(String group:groups)list.add(Collections.unmodifiableList(Arrays.asList(group.split("\\|"))));
         CITIES.put(city,Collections.unmodifiableList(list));
     }
-    /** Merge the canonical directory with downloaded interiors without duplicating aliases. */
     static List<List<String>> groups(String city){
         List<List<String>> base=CITIES.get(city);
-        if(base==null)base=CITIES.get(LocationGalleryView.displayName(city));
-        List<String> children=LocationGalleryView.childPlaces(city);
+        return base==null?Collections.emptyList():base;
+    }
+    /** Runtime gallery registry is separate from the offline canonical directory. */
+    static List<List<String>> groupsWithGalleries(String city){
+        return merge(LocationGalleryView.displayName(city),LocationGalleryView.childPlaces(city),
+            (first,second)->LocationGalleryView.sameCityPlace(city,first,second));
+    }
+    static List<List<String>> merge(String city,List<String> children,java.util.function.BiPredicate<String,String> aliases){
+        List<List<String>> base=CITIES.get(city);
         if(children.isEmpty())return base==null?Collections.emptyList():base;
         List<List<String>> out=new ArrayList<>();
         for(int i=0;i<CATEGORIES.length;i++)
@@ -73,7 +79,7 @@ final class CityArchitecture {
         for(String child:children){
             boolean found=false;
             for(List<String> group:out)for(String place:group)
-                if(place.equalsIgnoreCase(child)||LocationGalleryView.sameCityPlace(city,place,child))found=true;
+                if(place.equalsIgnoreCase(child)||aliases.test(place,child))found=true;
             if(!found)out.get(categoryFor(child)).add(child);
         }
         return out;

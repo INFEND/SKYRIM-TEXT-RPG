@@ -2306,11 +2306,12 @@ public final class MainActivity extends Activity {
         String city=game.progress.location;
         boolean world="WORLD".equals(game.mode)&&!game.road.pending();
         if(LocationGalleryView.hasGallery(city)||WorkImageEditor.hasPrimary(this,"location",city)||
-            (world&&!CityArchitecture.groups(city).isEmpty()))renderLocationWeather(content);
-        if(world)renderCityArchitecture(content,city,true);
+            !CityArchitecture.groupsWithGalleries(city).isEmpty())renderLocationWeather(content);
+        if(world||(!"COMBAT".equals(game.mode)&&!game.road.pending()))
+            renderCityArchitecture(content,city,world);
     }
     private void renderCityArchitecture(LinearLayout host,String city,boolean interactive){
-        java.util.List<java.util.List<String>> groups=CityArchitecture.groups(city);
+        java.util.List<java.util.List<String>> groups=CityArchitecture.groupsWithGalleries(city);
         if(groups.isEmpty())return;
         addText(host,"Городские локации",20,TEXT,true,6);
         if(cityIconsOnly()){
@@ -4014,7 +4015,7 @@ public final class MainActivity extends Activity {
             overview.addView(sceneGallery(game.progress.location),lp(-1,-2));
         }
         if(LocationGalleryView.hasGallery(game.progress.location)||WorkImageEditor.hasPrimary(this,"location",game.progress.location)||
-            !CityArchitecture.groups(game.progress.location).isEmpty())renderLocationWeather(overview);
+            !CityArchitecture.groupsWithGalleries(game.progress.location).isEmpty())renderLocationWeather(overview);
         renderCityArchitecture(overview,game.progress.location,false);
         workshopAction(content,"location",()->
             WorkImageEditor.open(this,"location",game.progress.location,game.progress.location,
@@ -4323,7 +4324,7 @@ public final class MainActivity extends Activity {
             wrapper.addView(local!=null?local:new LocationGalleryView(this,place.name,accent(),false),lp(-1,-2));
             if(place.name.equalsIgnoreCase(game.progress.location))renderLocationWeather(wrapper);
             space(wrapper,10);
-        }else if(place.name.equalsIgnoreCase(game.progress.location)&&!CityArchitecture.groups(place.name).isEmpty()){
+        }else if(place.name.equalsIgnoreCase(game.progress.location)&&!CityArchitecture.groupsWithGalleries(place.name).isEmpty()){
             renderLocationWeather(wrapper);
         }
         renderCityArchitecture(wrapper,place.name,false);
